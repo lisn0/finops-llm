@@ -1,6 +1,18 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>LLM cost anomaly detection · FinOps LLM</title><meta name="description" content="How to detect LLM cost anomalies before they become invoice surprises." /><meta name="robots" content="index, follow" /><link rel="canonical" href="https://finopsllm.com/research/anomaly-detection" />
-<style>body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.65}.wrap{max-width:820px;margin:0 auto;padding:56px 24px}a{color:#7AAFFF}p,li{color:#B6C0D2}</style></head>
-<body><main class="wrap"><h1>LLM cost anomaly detection</h1><p>LLM cost anomalies are often invisible until the monthly invoice because traffic volume, token length, retries, and model routing can all shift independently.</p><h2>Signals to monitor</h2><ul><li>Spend per endpoint per hour</li><li>Tokens per request by percentile</li><li>Retry and fallback rate</li><li>Cache hit rate and cache-read token share</li><li>Model mix changes after deploys</li></ul><h2>Response pattern</h2><p>Alert the owner, attach the deployment window, show the driver, and provide a rollback or routing-policy change. A useful alert explains what changed, not just that spend increased.</p><p><a href="/research">Back to research</a></p></main></body></html>
+<title>LLM cost anomaly detection · FinOps LLM</title><meta name="description" content="How to detect LLM cost anomalies from token growth, retry loops, context expansion, route drift, and cache hit-rate drops." /><meta name="robots" content="index, follow" /><link rel="canonical" href="https://finopsllm.com/research/anomaly-detection" />
+<style>body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}.wrap{max-width:840px;margin:0 auto;padding:56px 24px}a{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}</style></head>
+<body><main class="wrap"><h1>LLM cost anomaly detection</h1>
+<p>LLM cost anomalies are often invisible until the invoice because spend can rise without request volume rising. A deployment may add retrieved context, change a router threshold, reduce cache hits, trigger retries, or move traffic to a more expensive model. Traditional traffic alerts miss those changes.</p>
+<p>A useful anomaly detector watches cost drivers, not just total cost. Total daily spend is a lagging indicator. The earlier signals are tokens per request, model mix, fallback rate, cache hit rate, batch share, and spend per product surface.</p>
+<h2>Signals to monitor</h2>
+<ul><li>Spend per endpoint, team, and customer per hour.</li><li>Input and output tokens per request at p50, p90, and p99.</li><li>Retry rate, fallback rate, and provider error rate.</li><li>Cache hit rate and cache-read token share.</li><li>Model mix changes after deploys or prompt releases.</li><li>Batchable work accidentally running synchronously.</li></ul>
+<h2>Baselines</h2>
+<p>Use multiple baselines. A support bot has daily and weekly cycles. A nightly enrichment job has a batch window. An eval suite spikes around releases. A single global threshold will either miss real anomalies or wake people up constantly.</p>
+<p>The best baseline is per owner and workload class. Alert when a feature deviates from its own normal pattern, not when the entire company crosses a generic spend limit.</p>
+<h2>Actionable alerts</h2>
+<p>An alert should explain the driver: “p90 input tokens doubled on endpoint X after deploy Y,” “cache hit rate dropped from 74% to 18%,” or “fallback to frontier model increased by 31%.” If the alert cannot name a likely owner and driver, it will be ignored.</p>
+<h2>Response loop</h2>
+<p>Attach deploy context, route-policy diffs, and the top affected customers or workloads. Then offer the next move: roll back a prompt, lower retrieval count, restore a router threshold, disable a fallback, or move a job to batch. Anomaly detection is only valuable when it shortens the time from invoice surprise to engineering action.</p>
+<p><a href="/research">Back to research</a></p></main></body></html>
 
