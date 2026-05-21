@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Anthropic cost attribution · FinOps LLM</title><meta name="description" content="How to attribute Anthropic spend by product, owner, workload, and token class while preserving clean financial reconciliation." /><meta name="robots" content="index, follow" /><link rel="canonical" href="https://finopsllm.com/research/anthropic-cost-attribution" />
+<style>body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}.wrap{max-width:840px;margin:0 auto;padding:56px 24px}a{color:#7AAFFF}p,li{color:#B6C0D2}h2{margin-top:34px}</style></head>
+<body><main class="wrap"><h1>Anthropic cost attribution</h1>
+<p>Anthropic cost attribution works best when you treat billing as a join across application metadata, request usage, and finance records. The provider can tell you model usage. Your application must tell you why the call happened, who owns it, and whether it served customer value.</p>
+<p>Without that join, every invoice line starts to look like a provider bill instead of a product bill. That makes route-policy reviews, budget ownership, and customer margin analysis much harder than they need to be.</p>
+<h2>Metadata to attach at request time</h2>
+<ul><li>Feature or endpoint name.</li><li>Team owner and environment.</li><li>Tenant, account, or internal cost center where allowed.</li><li>Workload type such as agent step, support answer, eval, or enrichment.</li><li>Fallback status, route reason, and prompt or template version.</li></ul>
+<h2>Common attribution blind spots</h2>
+<p>Retries and orchestration steps are easy to miss. An agent workflow may look like a single user action while actually generating several model calls. Another blind spot is tool-driven work: when the model selects a tool and calls back into the workflow, finance still needs the full chain connected to the original owner.</p>
+<p>It also helps to separate experimental and production Anthropic traffic. This makes budgets and optimization reviews much clearer, especially when product teams are testing prompts, route policies, or larger context windows.</p>
+<h2>What good attribution enables</h2>
+<p>Once attribution is stable, you can report spend by team, feature, customer cohort, or successful outcome. That enables showback, chargeback, route tuning, and margin analysis. It also makes cross-provider comparisons fairer because you are comparing the same workload, not just list price.</p>
+<p>Related reading: <a href="/research/openai-cost-attribution">OpenAI cost attribution</a>, <a href="/research/llm-chargeback-showback">LLM chargeback and showback</a>, and <a href="/research/provider-arbitrage">provider arbitrage</a>.</p>
+<p><a href="/research">Back to research</a></p></main></body></html>
