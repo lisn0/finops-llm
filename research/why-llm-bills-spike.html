@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Why does my LLM bill spike? The most common causes · FinOps LLM</title><meta name="description" content="The most common reasons an OpenAI or Anthropic bill jumps without warning — model-mix drift, broken cache hits, reasoning tokens, retrieval depth, retries, and runaway agents — and how to catch each one early." /><meta name="robots" content="index, follow" /><link rel="canonical" href="https://finopsllm.com/research/why-llm-bills-spike" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://finopsllm.com/research/why-llm-bills-spike" />
+<meta property="og:title" content="Why does my LLM bill spike? The most common causes" />
+<meta property="og:description" content="The most common reasons an LLM bill jumps without warning — model drift, broken caches, reasoning tokens, retrieval depth, retries, runaway agents — and how to catch each early." />
+<meta property="og:image" content="https://finopsllm.com/og.svg" />
+<meta property="og:site_name" content="FinOps LLM" />
+<meta property="og:locale" content="en_US" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:site" content="@finopsllm" />
+<meta name="twitter:title" content="Why does my LLM bill spike? The most common causes" />
+<meta name="twitter:description" content="Model drift, broken caches, reasoning tokens, retrieval depth, retries, and runaway agents — and how to catch each early." />
+<meta name="twitter:image" content="https://finopsllm.com/og.svg" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","headline":"Why does my LLM bill spike? The most common causes","description":"The most common reasons an OpenAI or Anthropic bill jumps without warning — model-mix drift, broken cache hits, reasoning tokens, retrieval depth, retries, and runaway agents — and how to catch each one early.","url":"https://finopsllm.com/research/why-llm-bills-spike","datePublished":"2026-05-31","dateModified":"2026-05-31","image":"https://finopsllm.com/og.png","author":{"@type":"Organization","name":"FinOps LLM team"},"publisher":{"@type":"Organization","name":"FinOps LLM","url":"https://finopsllm.com/"}}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://finopsllm.com/"},{"@type":"ListItem","position":2,"name":"Research","item":"https://finopsllm.com/research"},{"@type":"ListItem","position":3,"name":"Why does my LLM bill spike?","item":"https://finopsllm.com/research/why-llm-bills-spike"}]}
+</script>
+<style>body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}.wrap{max-width:840px;margin:0 auto;padding:56px 24px}a{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}h3{margin-top:22px;color:#E6EAF2}</style></head>
+<body><main class="wrap"><h1>Why does my LLM bill spike?</h1>
+<p>A spike in an LLM bill almost never comes from a price change. It comes from a change in <em>how</em> your code uses the models — a change that often ships in an ordinary pull request, with no line item that says "this will double our token cost." Because providers bill per <a href="/research/how-llm-providers-charge">token and per model</a>, a single deploy can move the bill sharply while request volume stays flat.</p>
+<p>Here are the causes that show up again and again, roughly in order of how often they catch teams out, and how to catch each one before the invoice does.</p>
+<h2>1. Model-mix drift</h2>
+<p>Someone changes a default, raises a router threshold, or "temporarily" points a feature at the flagship model to fix a quality complaint — and forgets to point it back. Because the gap between model tiers can be more than 10× per token, shifting even a fraction of traffic up the ladder moves the bill hard. This is the single most common spike.</p>
+<p><strong>Catch it:</strong> track the share of requests per model over time, not just total spend. A change in the mix is the earliest signal, and it shows up before the monthly invoice.</p>
+<h2>2. A broken cache</h2>
+<p>If you rely on prompt caching, your discount depends on a stable prompt prefix. Change a system prompt, reorder context, or inject a timestamp into the cached region, and the cache-hit rate collapses. Those tokens that used to be billed at a steep discount are now billed at full price — same traffic, much higher cost.</p>
+<p><strong>Catch it:</strong> monitor <a href="/research/prompt-cache-attribution">cache-read token share</a> as a first-class metric. A sudden drop in cache hits is a spike in disguise.</p>
+<h2>3. Reasoning tokens you can't see</h2>
+<p>Adopting a reasoning model, or raising its reasoning budget, can multiply the cost of a request without changing the visible output at all. The <a href="/research/reasoning-token-attribution">reasoning tokens</a> are billed but never shown, so the spike has no obvious cause in the UI.</p>
+<p><strong>Catch it:</strong> separate reasoning tokens from visible output in your cost data, and treat a reasoning-model rollout as a budgeted change, not a drop-in swap.</p>
+<h2>4. Retrieval depth crept up</h2>
+<p>In a <a href="/research/rag-cost-optimization">RAG</a> system, the number and size of retrieved documents go straight into the prompt as input tokens. A relevance fix that bumps top-k from 5 to 20, or a chunk-size change, raises input cost on every single request. It looks like a quality improvement in code review; it looks like a spike on the invoice.</p>
+<p><strong>Catch it:</strong> track average input tokens per request per feature. Retrieval changes show up there immediately.</p>
+<h2>5. Retries, timeouts, and fallback chains</h2>
+<p>Aggressive retry logic and <a href="/research/model-routing">fallback chains</a> are good for reliability and dangerous for cost. If a primary model starts timing out and every failed call retries on a more expensive fallback, you can pay two or three times for each user request during an incident — and the cost outlives the incident if no one notices.</p>
+<p><strong>Catch it:</strong> count retries and fallback firings, and alert when they rise. A reliability problem and a cost problem are often the same event.</p>
+<h2>6. A runaway agent loop</h2>
+<p>Agentic workloads call models in loops. A planning bug, a tool that returns noise, or a missing stop condition can send an agent into dozens of model calls for a task that should have taken three. Multiply that across production traffic and the bill moves fast. This is the spike most likely to be a genuine bug rather than a tuning choice.</p>
+<p><strong>Catch it:</strong> cap and monitor calls-per-task, and set <a href="/research/agent-spend-attribution">spend guardrails</a> on agent workloads specifically.</p>
+<h2>7. Output length and format changes</h2>
+<p>Raising a <em>max tokens</em> limit, switching to a more verbose response format, or prompting for "detailed" answers increases output tokens — the most expensive token type. A prompt tweak that improves answer quality can quietly raise per-request cost across the board.</p>
+<p><strong>Catch it:</strong> track average output tokens per request and treat prompt changes as cost changes.</p>
+<h2>8. Real growth (the good kind)</h2>
+<p>Sometimes the bill is up because usage is up — more customers, more requests, a successful launch. That is not a problem to fix; it is a number to attribute. The goal is to be able to say "spend rose 30% because feature X served 40% more requests at a stable cost per request," rather than guessing. A spike you can explain is a spike you can defend.</p>
+<h2>The common thread: you cannot diagnose what you cannot attribute</h2>
+<p>Every cause above is invisible on a dashboard that only shows total spend. They become obvious the moment spend is broken out by feature, model, token type, and cache-hit rate. That breakdown is <a href="/research/what-is-llm-cost-attribution">cost attribution</a>, and it is the difference between "the bill went up and we don't know why" and "the checkout summarizer shifted to the flagship model on Tuesday — here's the fix." Pair attribution with <a href="/research/anomaly-detection">anomaly detection</a> and most spikes are caught within hours, not at month-end.</p>
+<h2>Related</h2>
+<ul>
+<li><a href="/research/how-llm-providers-charge">How do LLM providers charge?</a> — the pricing mechanics behind every spike.</li>
+<li><a href="/research/what-is-llm-cost-attribution">What is LLM cost attribution?</a> — how to trace a spike to its cause.</li>
+<li><a href="/research/anomaly-detection">LLM cost anomaly detection</a> — catching spikes before the invoice.</li>
+<li><a href="/research/how-to-budget-for-ai-spend">How to budget for AI spend</a> — setting envelopes so spikes are bounded.</li>
+</ul>
+<hr style="margin:48px 0 24px;border:none;border-top:1px solid #1E2A3F" /><p>Want this applied to your own LLM spend? FinOps LLM runs a free audit of your AI costs and shows where the savings are. <a href="/book">Book free audit &rarr;</a></p><p><a href="/research">Back to research</a></p></main></body></html>
