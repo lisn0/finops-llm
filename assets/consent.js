@@ -3,7 +3,7 @@
 	'use strict';
 
 	var GA4_ID = 'G-5BB5KVZCL3';
-	var CLARITY_ID = 'x04l9c8hmh';
+	var CLARITY_ID = 'x04shhb3of';
 	var COOKIE_NAME = 'finops_consent';
 	var COOKIE_MAX_AGE = 60 * 60 * 24 * 365; // 365 days
 
