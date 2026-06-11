@@ -7,9 +7,9 @@
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://finopsllm.com/"},{"@type":"ListItem","position":2,"name":"Research","item":"https://finopsllm.com/research"},{"@type":"ListItem","position":3,"name":"LLM cost monitoring","item":"https://finopsllm.com/research/llm-cost-monitoring"}]}
 </script>
-<style>body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}.wrap{max-width:860px;margin:0 auto;padding:56px 24px}a{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}.callout{border-left:4px solid #7AAFFF;padding-left:16px;margin:24px 0;font-style:italic;color:#B6C0D2}</style><script src="/assets/consent.js" defer></script>
+<style>body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}.wrap{max-width:860px;margin:0 auto;padding:56px 24px}a{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}.callout{border-left:4px solid #7AAFFF;padding-left:16px;margin:24px 0;font-style:italic;color:#B6C0D2}table{border-collapse:collapse;width:100%;margin:24px 0;font-size:.95em}th,td{border:1px solid #1E2A3F;padding:10px 12px;text-align:left;color:#B6C0D2}th{color:#E6EAF2;background:#101726}</style><script src="/assets/consent.js" defer></script>
 </head>
-<body><main class=”wrap”><h1>LLM cost monitoring</h1>
+<body><main class="wrap"><h1>LLM cost monitoring</h1>
 <p>LLM cost monitoring is the practice of tracking spend at request level, not just invoice level. If you cannot explain which feature, user, model, or retry pattern created the cost spike, you are not monitoring spend. You are only seeing the bill after the damage is done. Cost attribution starts here.</p>
 
 <h2>What to track on every request</h2>
@@ -24,6 +24,18 @@
 <li><strong>Estimated cost.</strong> So you can alert before invoice close, not after damage accumulates.</li>
 </ul>
 
+<h2>Token classes are billed differently — track them separately</h2>
+<table>
+<thead><tr><th>Token class</th><th>Billing behavior</th><th>Monitoring pitfall if conflated</th></tr></thead>
+<tbody>
+<tr><td>Input (uncached)</td><td>Full list price per model</td><td>Prompt growth hides inside aggregate token counts</td></tr>
+<tr><td>Output</td><td>Priced higher than input on most models</td><td>Verbose-output drift looks like traffic growth</td></tr>
+<tr><td>Cache read</td><td>Discounted (~50% OpenAI, ~90% Anthropic)</td><td>Counting cache reads as normal input corrupts the baseline and overstates "savings"</td></tr>
+<tr><td>Reasoning / thinking</td><td>Billed as output even though invisible to users</td><td>Standard token counts miss it entirely</td></tr>
+<tr><td>Retry and tool-call</td><td>Every upstream attempt is billed, user sees one answer</td><td>Failed and repeated work reads as legitimate usage</td></tr>
+<tr><td>Batch</td><td>Discounted asynchronous lane</td><td>Mixing batch with realtime hides which workloads could move lanes</td></tr>
+</tbody>
+</table>
 <h2>Use a consistent telemetry schema</h2>
 <p>OpenTelemetry's GenAI semantic conventions are a strong baseline because they standardize fields like model, input tokens, output tokens, cache-read tokens, conversation IDs, and provider names. That makes it easier to swap vendors or observability backends without rebuilding your data model every quarter. Define your schema first; the tooling (Langfuse, Helicone) will follow.</p>
 
@@ -47,7 +59,7 @@
 </ul>
 
 <h2>Monitoring rule</h2>
-<div class=”callout”><strong>If your dashboard cannot tell you whether the spike came from prompt growth, model drift, retries, cached-token share changes, or one noisy customer, your instrumentation is still too thin.</strong></div>
+<div class="callout"><strong>If your dashboard cannot tell you whether the spike came from prompt growth, model drift, retries, cached-token share changes, or one noisy customer, your instrumentation is still too thin.</strong></div>
 
 <h2>A practical stack</h2>
 <p>For most teams, provider-native billing plus a gateway layer, request metadata in application logs, and an observability tool like Langfuse or Helicone covers the essentials. For larger operations, add a warehouse layer and monthly reconciliation against provider or cloud billing exports so you can tie cost back to customer cohorts, feature releases, and margin.</p>
@@ -56,7 +68,7 @@
 <p>Monitoring alone does not lower your bill. It gives you the ranked list of what to fix first. Once that list is visible, the usual wins are smaller default models, output caps, prompt cleanup, prompt caching (especially for cache-read discounts), batching, and quota controls based on unit economics.</p>
 
 <h2>Related</h2>
-<ul><li><a href=”/research/anomaly-detection”>LLM cost anomaly detection</a> — detecting spend surges.</li><li><a href=”/research/ai-observability”>AI observability</a> — cost signals and operational metrics.</li><li><a href=”/research/what-is-llm-finops”>What is LLM FinOps?</a> — the complete operating discipline.</li></ul>
+<ul><li><a href="/research/anomaly-detection">LLM cost anomaly detection</a> — detecting spend surges.</li><li><a href="/research/ai-observability">AI observability</a> — cost signals and operational metrics.</li><li><a href="/research/what-is-llm-finops">What is LLM FinOps?</a> — the complete operating discipline.</li></ul>
 
-<hr style=”margin:48px 0 24px;border:none;border-top:1px solid #1E2A3F” /><p>Want this applied to your own LLM spend? FinOps LLM runs a free audit of your AI costs and shows where the savings are. <a href=”/book”>Book free audit &rarr;</a></p><p><a href=”/”>Back to FinOps LLM</a></p></main></body></html>
+<hr style="margin:48px 0 24px;border:none;border-top:1px solid #1E2A3F" /><p>Want this applied to your own LLM spend? FinOps LLM runs a free audit of your AI costs and shows where the savings are. <a href="/book">Book free audit &rarr;</a></p><p><a href="/">Back to FinOps LLM</a></p></main></body></html>
 
