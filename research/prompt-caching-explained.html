@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Prompt caching explained · FinOps LLM</title><meta name="description" content="Provider-native prompt caching stores processed prefixes and discounts re-reads. How it works across OpenAI, Anthropic, and AWS Bedrock, how to structure prompts for cache hits, and the FinOps impact on attribution." /><meta name="robots" content="index, follow" /><link rel="canonical" href="https://finopsllm.com/research/prompt-caching-explained" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","headline":"Prompt caching explained · FinOps LLM","description":"Provider-native prompt caching stores processed prefixes and discounts re-reads. How it works across OpenAI, Anthropic, and AWS Bedrock, how to structure prompts for cache hits, and the FinOps impact on attribution.","url":"https://finopsllm.com/research/prompt-caching-explained","datePublished":"2026-06-11","dateModified":"2026-06-11","image":"https://finopsllm.com/og.png","author":{"@type":"Organization","name":"FinOps LLM team"},"publisher":{"@type":"Organization","name":"FinOps LLM","url":"https://finopsllm.com/"}}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://finopsllm.com/"},{"@type":"ListItem","position":2,"name":"Research","item":"https://finopsllm.com/research"},{"@type":"ListItem","position":3,"name":"Prompt caching explained","item":"https://finopsllm.com/research/prompt-caching-explained"}]}
+</script>
+<style>body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}.wrap{max-width:860px;margin:0 auto;padding:56px 24px}a{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}</style><script src="/assets/consent.js" defer></script>
+</head>
+<body><main class="wrap"><h1>Prompt caching explained</h1>
+<p>Prompt caching is a provider-native optimization where LLM APIs store the processed prefix of a prompt and apply a discount when that prefix is re-read. The model provider parses the prefix once, computes embeddings and key-value caches, and reuses them across subsequent requests. Cache hits reduce token costs significantly—OpenAI discounts cache-read input tokens at roughly 50% of normal input cost, while Anthropic discounts them at roughly 90% of normal input cost. The financial benefit depends on how stable your prompt prefix is and how often the same prefix repeats across requests.</p>
+<h2>How prompt caching works across providers</h2>
+<ul>
+<li><strong>OpenAI.</strong> Automatic for sufficiently long prompts (typically ≥1024 tokens). The model tracks the longest common prefix across requests and caches it. No code change required, though you can optimize by putting stable content first. Cache reads cost approximately 50% of standard input tokens; cache writes cost slightly more than normal input to pay for caching overhead.</li>
+<li><strong>Anthropic.</strong> Explicit cache control via breakpoints in the message list. Add <code>cache_control: {"type": "ephemeral"}</code> to the last message block you want cached (usually the system prompt and tools). Cache reads are discounted to approximately 10% of normal input token cost. Cache writes cost 25% more than normal input. Requires structural awareness: you place the cache breakpoint, not the model.</li>
+<li><strong>Amazon Bedrock.</strong> Supported on select models (Anthropic Claude via Bedrock). Uses the same explicit cache_control breakpoint mechanism as Anthropic's native API. Availability depends on the model and region; check Bedrock's current documentation for supported configurations.</li>
+</ul>
+<h2>Structuring prompts for cache hits</h2>
+<p>Cache hits require byte-identical prefixes. Small differences break the cache silently. Use these patterns to maximize stability:</p>
+<ul>
+<li><strong>System prompt and tools first, user content last.</strong> Put your stable instructions, tool definitions, and few-shot examples before the variable user request. The longer the stable prefix, the greater the savings.</li>
+<li><strong>Byte-identical across requests.</strong> Any whitespace, formatting, or punctuation change invalidates the cache. Avoid dynamic timestamps, random IDs, or computed values in the prefix.</li>
+<li><strong>Avoid per-user system prompts.</strong> If you customize the system prompt per user (e.g., "You are an assistant for Alice"), the cache will never hit. Instead, keep the system prompt universal and pass user context in the variable part of the message.</li>
+<li><strong>Use deterministic JSON or markdown for tools.</strong> If your tool definitions are code-generated, ensure the generation is deterministic. Reordering fields, adding newlines, or changing indentation breaks the cache.</li>
+<li><strong>Separate cache breakpoint from request boundary.</strong> Some systems split messages at request time. Ensure the split happens after your stable prefix, not in the middle of it.</li>
+</ul>
+<h2>Mistakes that silently disable caching</h2>
+<ul>
+<li><strong>Reordering tools or examples.</strong> If your orchestration layer re-sorts function definitions or few-shot examples on each request, the cache never hits even though the content is identical.</li>
+<li><strong>Injecting dynamic data early in the prefix.</strong> Conversation IDs, request timestamps, or user agent strings in the system prompt or early messages break cache consistency across requests.</li>
+<li><strong>Per-user system prompts.</strong> "You are helping {username}" or "Your tone should match {brand_voice}" in the system prompt means the prefix changes every request.</li>
+<li><strong>Nondeterministic serialization.</strong> If your message serialization uses unordered dicts, set iteration, or floating-point rendering, identical logical content produces different bytes and misses the cache.</li>
+<li><strong>Intermixing cached and uncached messages.</strong> Some frameworks make it easy to add preamble text conditionally. If your cache breakpoint floats or messages before it vary, cache hits become unreliable.</li>
+</ul>
+<h2>FinOps: tracking cache tokens for attribution</h2>
+<p>Cache-read tokens cost far less than normal input tokens. If you don't track them separately in your cost model and attribution, your savings estimates become fiction. When a request uses 8k cache-read tokens and 500 new input tokens, conflating them corrupts your baseline. You need three token counts: input (normal), cache-read (cached prefix), and output. Your cost calculation then uses the provider's discount to compute actual spend per request, and your attribution model reports both gross tokens and net cost.</p>
+<p>Without separate tracking, teams celebrate cost savings that don't exist (because they're measuring gross tokens, not net cost) or fail to see real savings because their baseline is built on incorrect token pricing.</p>
+<h2>The golden rule</h2>
+<blockquote style="margin:24px 0;padding:16px 0 16px 16px;border-left:3px solid #7AAFFF;color:#B6C0D2;font-style:italic">Stable prefix, variable suffix, byte-identical every time. Then measure cache-read tokens separately or your numbers lie.</blockquote>
+<h2>Related</h2>
+<ul><li><a href="/research/prompt-cache-attribution">Prompt cache attribution</a> — how to split savings across teams.</li><li><a href="/research/semantic-cache-economics">Semantic cache economics</a> — caching beyond byte-matching.</li><li><a href="/research/how-llm-providers-charge">How LLM providers charge</a> — cost mechanics across platforms.</li></ul>
+<hr style="margin:48px 0 24px;border:none;border-top:1px solid #1E2A3F" /><p>Want this applied to your own LLM spend? FinOps LLM runs a free audit of your AI costs and shows where the savings are. <a href="/book">Book free audit &rarr;</a></p><p><a href="/research">Back to research</a></p></main></body></html>
