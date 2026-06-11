@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>OpenTelemetry GenAI conventions for cost attribution · FinOps LLM</title><meta name="description" content="Standard attribute vocabulary for LLM observability. Track costs, models, tokens, and cache metrics across vendors with vendor-neutral semantic conventions." /><meta name="robots" content="index, follow" /><link rel="canonical" href="https://finopsllm.com/research/opentelemetry-genai-conventions" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","headline":"OpenTelemetry GenAI conventions for cost attribution · FinOps LLM","description":"Standard attribute vocabulary for LLM observability. Track costs, models, tokens, and cache metrics across vendors with vendor-neutral semantic conventions.","url":"https://finopsllm.com/research/opentelemetry-genai-conventions","datePublished":"2026-06-11","dateModified":"2026-06-11","image":"https://finopsllm.com/og.png","author":{"@type":"Organization","name":"FinOps LLM team"},"publisher":{"@type":"Organization","name":"FinOps LLM","url":"https://finopsllm.com/"}}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://finopsllm.com/"},{"@type":"ListItem","position":2,"name":"Research","item":"https://finopsllm.com/research"},{"@type":"ListItem","position":3,"name":"OpenTelemetry GenAI conventions","item":"https://finopsllm.com/research/opentelemetry-genai-conventions"}]}
+</script>
+<style>body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}.wrap{max-width:860px;margin:0 auto;padding:56px 24px}a{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}</style><script src="/assets/consent.js" defer></script>
+</head>
+<body><main class="wrap"><h1>OpenTelemetry GenAI conventions for cost attribution</h1>
+<p>OpenTelemetry GenAI semantic conventions define a standard vocabulary of attributes for tracing and metering LLM calls. They enable observability backends, cost attribution engines, and billing systems to speak the same language about which model was invoked, how many tokens were consumed, and whether the tokens came from cache or live inference. Without a standard schema, each vendor's tracing layer invents its own attribute names, forcing teams to maintain translation maps for every new tool they adopt.</p>
+<p>The GenAI conventions are published and versioned by the OpenTelemetry specification maintainers. Adopting them means your traces will interoperate across Langfuse, Helicone, LiteLLM, custom collectors, and future platforms without remodeling or migration.</p>
+<h2>Core attributes for cost tracking</h2>
+<ul>
+<li><strong>gen_ai.system.</strong> The LLM provider (e.g., "openai", "anthropic", "azure", "bedrock", "vertex"). Joins spans to price tables keyed by vendor.</li>
+<li><strong>gen_ai.request.model and gen_ai.response.model.</strong> Request model (what you asked for) and response model (what you got). For routed or fallback scenarios, these may differ. Essential for pricing because models within the same vendor carry different rates.</li>
+<li><strong>gen_ai.usage.input_tokens and gen_ai.usage.output_tokens.</strong> Counts of input and output tokens in the request. Decimal precision required; floats corrupt cost math at scale.</li>
+<li><strong>gen_ai.usage.cache_read_tokens and gen_ai.usage.cache_creation_tokens.</strong> Tokens read from cache (OpenAI ~50% discount, Anthropic ~90%) and tokens written to cache. Conflating these with normal input tokens underestimates the value of caching.</li>
+<li><strong>gen_ai.operation.name.</strong> Human-readable operation identifier (e.g., "chat.completion", "embedding.create"). Helps group spans by function in cost reports.</li>
+<li><strong>gen_ai.request.id and gen_ai.session.id.</strong> Request correlation ID and conversation/session identifier. Required for chargeback and for tracking multi-turn cost per conversation.</li>
+</ul>
+<h2>Why a standard schema powers attribution</h2>
+<p>Cost attribution collapses without schema consistency. A standard set of attributes means:</p>
+<ul>
+<li><strong>Vendor-neutral joins.</strong> Price the same span in OpenAI, Anthropic, or Bedrock by changing the gen_ai.system attribute and the underlying price table. No reparse.</li>
+<li><strong>Observability backend swaps.</strong> Move from Langfuse to Helicone without losing cost granularity because both emit the same attribute names.</li>
+<li><strong>Chargeback without bespoke math.</strong> Customer and feature tags propagate consistently across all downstream systems. A billing system that understands gen_ai.usage.input_tokens and gen_ai.system doesn't need special code per team.</li>
+<li><strong>Cache and fallback handling.</strong> Separate token types and model mismatch detection prevent the most common cost-math errors.</li>
+</ul>
+<h2>Enriching spans with business metadata</h2>
+<p>Cost attribution requires more than LLM attributes. Instrument spans with:</p>
+<ul>
+<li><strong>Feature name.</strong> Which product capability or workflow incurred this cost. Enables cost-per-feature and identifies expensive user paths.</li>
+<li><strong>Account or tenant ID.</strong> Required for SaaS chargeback and per-customer profitability. Apply privacy-aware scrubbing; never log the full customer name.</li>
+<li><strong>Plan or tier.</strong> Segment cost by customer segment (free, pro, enterprise) to detect tier-specific issues.</li>
+<li><strong>Environment.</strong> Production vs. staging vs. eval. Eval and testing spend should never bill customers.</li>
+<li><strong>User or request ID.</strong> Required for detailed per-user cost analysis and for debugging cost outliers.</li>
+</ul>
+<p>Attach these in a middleware or instrumentation layer so they flow into every span without repeating in application code.</p>
+<h2>Common pitfalls</h2>
+<p><strong>Sampling out the wrong spans.</strong> Sampling for observability performance is standard. But if your sampler drops spans from high-cost customers or excludes fallback attempts, your cost attribution will be off. Use a separate cost-aware sampler that preserves all LLM calls even if it samples other telemetry.</p>
+<p><strong>Losing exact model versions.</strong> If you record only "gpt-4" without the version (e.g., "gpt-4-turbo-2024-04-09"), pricing is ambiguous. OpenAI retired gpt-4-32k and replaced it with a cheaper variant under the same name. Always capture full model identifiers.</p>
+<p><strong>Conflating cache reads with normal input.</strong> A span with 10k cache-read tokens and 500 new input tokens has very different cost implications than 10.5k normal input. If your aggregation adds them together, you overestimate input cost and underestimate cache value.</p>
+<p><strong>Skipping fallback annotations.</strong> If a request tried GPT-4 and fell back to GPT-3.5, both should appear in the trace. A single span with only the fallback model hides the extra cost of the first attempt and skews per-model percentages.</p>
+<h2>Applying the rule</h2>
+<blockquote style="border-left:4px solid #7AAFFF;padding-left:16px;margin:24px 0;font-style:italic">
+Cost data is only as trustworthy as the schema it flows through. Standardize on GenAI semantic conventions early; migration after the fact is expensive.
+</blockquote>
+<h2>Related</h2>
+<ul><li><a href="/research/llm-cost-monitoring">LLM cost monitoring</a> — operational metrics and alerting.</li><li><a href="/research/llm-cost-attribution">LLM cost attribution</a> — chargeback models and segmentation.</li><li><a href="/research/llm-token-tracking">LLM token tracking</a> — usage analytics and forecasting.</li><li><a href="/research/ai-observability">AI observability</a> — tracing, metrics, and cost signals.</li></ul>
+<hr style="margin:48px 0 24px;border:none;border-top:1px solid #1E2A3F" /><p>Want this applied to your own LLM spend? FinOps LLM runs a free audit of your AI costs and shows where the savings are. <a href="/book">Book free audit &rarr;</a></p><p><a href="/research">Back to research</a></p></main></body></html>
