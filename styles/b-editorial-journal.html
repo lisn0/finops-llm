@@ -1,0 +1,1457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>FinOps LLM — AI cost attribution and optimization</title>
+	<meta name="description" content="FinOps LLM: AI cost management and LLM observability platform. Real-time attribution, anomaly detection, and automated optimization across OpenAI, Anthropic, Bedrock, and more." />
+
+	<link rel="preconnect" href="https://fonts.googleapis.com" />
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+	<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=Crimson+Text:ital@0;1&display=swap" rel="stylesheet" />
+
+	<style>
+		:root {
+			--bg: #FAF7F2;
+			--text: #1A1814;
+			--accent: #7C2D12;
+			--accent-light: #A16535;
+			--border: #E8E3DB;
+			--quiet: #9A8F87;
+		}
+
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+		}
+
+		html {
+			scroll-behavior: smooth;
+		}
+
+		body {
+			background: var(--bg);
+			color: var(--text);
+			font-family: 'Inter', -apple-system, system-ui, sans-serif;
+			font-size: 16px;
+			line-height: 1.6;
+			-webkit-font-smoothing: antialiased;
+			text-rendering: optimizeLegibility;
+		}
+
+		a {
+			color: var(--accent);
+			text-decoration: none;
+			transition: color 0.2s ease;
+		}
+
+		a:hover {
+			color: var(--accent-light);
+		}
+
+		.wrap {
+			max-width: 1000px;
+			margin: 0 auto;
+			padding: 0 48px;
+		}
+
+		/* ============== HEADER ============== */
+		header {
+			background: var(--bg);
+			border-bottom: 1px solid var(--border);
+			position: sticky;
+			top: 0;
+			z-index: 40;
+			padding: 28px 0;
+		}
+
+		.header-wrap {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			max-width: 1000px;
+			margin: 0 auto;
+			padding: 0 48px;
+		}
+
+		.brand {
+			font-family: 'Fraunces', serif;
+			font-size: 22px;
+			font-weight: 700;
+			color: var(--text);
+			text-decoration: none;
+			letter-spacing: -0.02em;
+		}
+
+		.brand:hover {
+			color: var(--accent);
+		}
+
+		nav.primary {
+			display: flex;
+			gap: 40px;
+			align-items: center;
+		}
+
+		nav.primary a {
+			font-size: 14px;
+			font-weight: 500;
+			color: var(--text);
+			border-bottom: 1px solid transparent;
+			padding-bottom: 2px;
+			transition: border-color 0.2s ease;
+		}
+
+		nav.primary a:hover {
+			border-bottom-color: var(--accent);
+		}
+
+		.nav-right {
+			display: flex;
+			gap: 20px;
+			align-items: center;
+		}
+
+		.nav-cta {
+			background: var(--accent);
+			color: var(--bg);
+			padding: 10px 20px;
+			font-weight: 600;
+			font-size: 14px;
+			border-radius: 3px;
+			border: none;
+			cursor: pointer;
+			transition: background 0.2s ease;
+		}
+
+		.nav-cta:hover {
+			background: var(--accent-light);
+		}
+
+		.nav-email {
+			font-size: 14px;
+			color: var(--text);
+		}
+
+		/* ============== HERO / LEDE ============== */
+		.hero {
+			padding: 80px 0 60px;
+		}
+
+		.lede {
+			font-family: 'Fraunces', serif;
+			font-size: clamp(48px, 6vw, 72px);
+			font-weight: 700;
+			line-height: 1.1;
+			letter-spacing: -0.03em;
+			margin-bottom: 36px;
+			max-width: 22ch;
+			color: var(--text);
+		}
+
+		.lede em {
+			font-style: italic;
+			font-weight: 400;
+			color: var(--accent);
+		}
+
+		.drop-cap {
+			font-family: 'Fraunces', serif;
+			float: left;
+			font-size: 96px;
+			line-height: 80px;
+			padding-right: 12px;
+			font-weight: 700;
+			color: var(--accent);
+		}
+
+		.standfirst {
+			font-size: 20px;
+			line-height: 1.7;
+			color: var(--text);
+			max-width: 70ch;
+			margin-bottom: 32px;
+		}
+
+		.standfirst strong {
+			font-weight: 600;
+			color: var(--text);
+		}
+
+		.cta-group {
+			display: flex;
+			gap: 16px;
+			margin-bottom: 40px;
+			flex-wrap: wrap;
+		}
+
+		.btn {
+			padding: 12px 28px;
+			font-weight: 600;
+			font-size: 14px;
+			border-radius: 3px;
+			border: 1px solid var(--accent);
+			cursor: pointer;
+			transition: all 0.2s ease;
+			text-decoration: none;
+			display: inline-block;
+		}
+
+		.btn-primary {
+			background: var(--accent);
+			color: var(--bg);
+		}
+
+		.btn-primary:hover {
+			background: var(--accent-light);
+			border-color: var(--accent-light);
+		}
+
+		.btn-secondary {
+			background: transparent;
+			color: var(--accent);
+		}
+
+		.btn-secondary:hover {
+			background: var(--bg);
+			border-color: var(--accent-light);
+			color: var(--accent-light);
+		}
+
+		.meta-line {
+			font-size: 12px;
+			letter-spacing: 0.08em;
+			text-transform: uppercase;
+			color: var(--quiet);
+			margin-top: 24px;
+		}
+
+		/* ============== SECTION DIVIDERS ============== */
+		.section-divider {
+			height: 1px;
+			background: var(--border);
+			margin: 80px 0;
+		}
+
+		.eyebrow {
+			font-size: 11px;
+			letter-spacing: 0.12em;
+			text-transform: uppercase;
+			color: var(--accent);
+			font-weight: 600;
+			margin-bottom: 12px;
+		}
+
+		h2 {
+			font-family: 'Fraunces', serif;
+			font-size: clamp(36px, 4vw, 56px);
+			font-weight: 700;
+			line-height: 1.15;
+			letter-spacing: -0.03em;
+			margin-bottom: 24px;
+			color: var(--text);
+		}
+
+		h2 em {
+			font-style: italic;
+			font-weight: 400;
+			color: var(--accent);
+		}
+
+		h3 {
+			font-family: 'Crimson Text', serif;
+			font-size: 28px;
+			font-weight: 600;
+			line-height: 1.3;
+			margin-bottom: 16px;
+			color: var(--text);
+		}
+
+		p {
+			margin-bottom: 16px;
+		}
+
+		/* ============== PILLARS ============== */
+		.pillars {
+			padding: 80px 0;
+		}
+
+		.section-intro {
+			margin-bottom: 60px;
+		}
+
+		.section-intro-text {
+			font-size: 17px;
+			line-height: 1.75;
+			color: var(--quiet);
+			max-width: 65ch;
+			margin-top: 12px;
+		}
+
+		.pillars-grid {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 48px;
+			margin-bottom: 48px;
+		}
+
+		.pillar {
+			border-top: 2px solid var(--accent);
+			padding-top: 24px;
+		}
+
+		.pillar h3 {
+			margin-bottom: 12px;
+		}
+
+		.pillar-num {
+			font-family: 'Fraunces', serif;
+			font-size: 12px;
+			font-weight: 600;
+			letter-spacing: 0.1em;
+			color: var(--quiet);
+			margin-bottom: 8px;
+			text-transform: uppercase;
+		}
+
+		.pillar p {
+			font-size: 15px;
+			color: var(--text);
+			line-height: 1.7;
+			margin-bottom: 16px;
+		}
+
+		.pillar ul {
+			list-style: none;
+			font-size: 13px;
+			color: var(--quiet);
+			line-height: 1.8;
+		}
+
+		.pillar li {
+			margin-bottom: 8px;
+		}
+
+		.pillar li:before {
+			content: "→ ";
+			color: var(--accent);
+			font-weight: 600;
+			margin-right: 6px;
+		}
+
+		/* ============== LEVERS TABLE ============== */
+		.levers {
+			padding: 80px 0;
+		}
+
+		.levers-intro {
+			margin-bottom: 48px;
+		}
+
+		.levers-table {
+			width: 100%;
+			border-collapse: collapse;
+			margin-top: 32px;
+		}
+
+		.levers-table th {
+			text-align: left;
+			font-family: 'Fraunces', serif;
+			font-weight: 600;
+			font-size: 14px;
+			padding: 16px 0;
+			border-bottom: 1px solid var(--border);
+			color: var(--text);
+			letter-spacing: 0.02em;
+		}
+
+		.levers-table td {
+			padding: 20px 0;
+			border-bottom: 1px solid var(--border);
+			font-size: 14px;
+			color: var(--text);
+		}
+
+		.levers-table tr:last-child td {
+			border-bottom: none;
+		}
+
+		.lever-num {
+			font-weight: 600;
+			color: var(--accent);
+			width: 60px;
+		}
+
+		.lever-name {
+			font-weight: 600;
+		}
+
+		.lever-desc {
+			color: var(--quiet);
+			max-width: 400px;
+		}
+
+		.lever-range {
+			text-align: right;
+			color: var(--accent);
+			font-weight: 600;
+		}
+
+		/* ============== HOW IT WORKS ============== */
+		.how-it-works {
+			padding: 80px 0;
+		}
+
+		.timeline {
+			margin-top: 48px;
+		}
+
+		.timeline-item {
+			display: grid;
+			grid-template-columns: 120px 1fr;
+			gap: 40px;
+			margin-bottom: 56px;
+			padding-bottom: 40px;
+			border-bottom: 1px solid var(--border);
+		}
+
+		.timeline-item:last-child {
+			border-bottom: none;
+			margin-bottom: 0;
+			padding-bottom: 0;
+		}
+
+		.timeline-when {
+			font-family: 'Fraunces', serif;
+			font-weight: 700;
+			font-size: 14px;
+			color: var(--accent);
+			letter-spacing: 0.08em;
+			text-transform: uppercase;
+		}
+
+		.timeline-body h3 {
+			margin-bottom: 12px;
+		}
+
+		.timeline-body p {
+			font-size: 15px;
+			color: var(--text);
+			line-height: 1.7;
+			margin-bottom: 12px;
+		}
+
+		.deliverable {
+			background: rgba(124, 45, 18, 0.05);
+			border-left: 2px solid var(--accent);
+			padding: 16px 20px;
+			margin-top: 16px;
+			font-size: 13px;
+			color: var(--text);
+			line-height: 1.6;
+		}
+
+		.deliverable strong {
+			font-weight: 600;
+			color: var(--accent);
+			display: block;
+			font-size: 11px;
+			letter-spacing: 0.08em;
+			text-transform: uppercase;
+			margin-bottom: 4px;
+		}
+
+		/* ============== RESULTS NUMBERS ============== */
+		.results {
+			padding: 80px 0;
+		}
+
+		.results-grid {
+			display: grid;
+			grid-template-columns: repeat(4, 1fr);
+			gap: 40px;
+			margin-top: 48px;
+		}
+
+		.result-card {
+			text-align: center;
+		}
+
+		.result-label {
+			font-size: 12px;
+			letter-spacing: 0.1em;
+			text-transform: uppercase;
+			color: var(--quiet);
+			margin-bottom: 8px;
+			font-weight: 500;
+		}
+
+		.result-value {
+			font-family: 'Fraunces', serif;
+			font-size: 56px;
+			font-weight: 700;
+			letter-spacing: -0.04em;
+			color: var(--accent);
+			line-height: 1;
+			margin-bottom: 12px;
+		}
+
+		.result-desc {
+			font-size: 13px;
+			color: var(--text);
+			line-height: 1.6;
+		}
+
+		/* ============== PRICING ============== */
+		.pricing {
+			padding: 80px 0;
+		}
+
+		.pricing-grid {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 40px;
+			margin-top: 48px;
+		}
+
+		.plan {
+			border: 1px solid var(--border);
+			padding: 40px;
+			border-radius: 3px;
+		}
+
+		.plan.featured {
+			border: 2px solid var(--accent);
+		}
+
+		.plan-tag {
+			font-size: 11px;
+			letter-spacing: 0.1em;
+			text-transform: uppercase;
+			color: var(--accent);
+			font-weight: 600;
+			margin-bottom: 12px;
+		}
+
+		.plan h3 {
+			font-size: 32px;
+			margin-bottom: 8px;
+		}
+
+		.plan-lead {
+			font-size: 15px;
+			color: var(--text);
+			line-height: 1.7;
+			margin-bottom: 24px;
+		}
+
+		.plan-price {
+			font-family: 'Fraunces', serif;
+			font-size: 42px;
+			font-weight: 700;
+			color: var(--accent);
+			margin-bottom: 8px;
+			letter-spacing: -0.02em;
+		}
+
+		.plan-note {
+			font-size: 13px;
+			color: var(--quiet);
+			margin-bottom: 24px;
+			font-style: italic;
+		}
+
+		.plan ul {
+			list-style: none;
+			margin-bottom: 28px;
+		}
+
+		.plan li {
+			font-size: 14px;
+			padding: 10px 0;
+			border-top: 1px solid var(--border);
+			color: var(--text);
+			line-height: 1.6;
+		}
+
+		.plan li:before {
+			content: "✓ ";
+			color: var(--accent);
+			font-weight: 600;
+			margin-right: 8px;
+		}
+
+		.plan .btn {
+			width: 100%;
+			text-align: center;
+		}
+
+		/* ============== FAQ ============== */
+		.faq {
+			padding: 80px 0;
+		}
+
+		.faq-intro {
+			margin-bottom: 48px;
+		}
+
+		details {
+			border-bottom: 1px solid var(--border);
+			padding: 24px 0;
+		}
+
+		details:first-of-type {
+			border-top: 1px solid var(--border);
+		}
+
+		details summary {
+			list-style: none;
+			cursor: pointer;
+			font-family: 'Fraunces', serif;
+			font-size: 18px;
+			font-weight: 600;
+			color: var(--text);
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			user-select: none;
+		}
+
+		details summary::-webkit-details-marker {
+			display: none;
+		}
+
+		details summary::after {
+			content: "+";
+			display: inline-block;
+			transition: transform 0.2s ease;
+			color: var(--accent);
+			font-weight: 700;
+		}
+
+		details[open] summary::after {
+			transform: rotate(45deg);
+		}
+
+		details .answer {
+			padding-top: 16px;
+			font-size: 15px;
+			color: var(--text);
+			line-height: 1.7;
+			max-width: 75ch;
+		}
+
+		details .answer strong {
+			font-weight: 600;
+		}
+
+		/* ============== RESEARCH HUB ============== */
+		.research {
+			padding: 80px 0;
+		}
+
+		.research-articles {
+			margin-top: 48px;
+		}
+
+		.article-group {
+			margin-bottom: 48px;
+		}
+
+		.article-group-title {
+			font-family: 'Fraunces', serif;
+			font-size: 14px;
+			font-weight: 700;
+			letter-spacing: 0.08em;
+			text-transform: uppercase;
+			color: var(--accent);
+			margin-bottom: 20px;
+		}
+
+		.article-list {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 28px;
+		}
+
+		.article-card {
+			display: block;
+			padding: 20px 0;
+			border-bottom: 1px solid var(--border);
+			text-decoration: none;
+		}
+
+		.article-card:hover h4 {
+			color: var(--accent-light);
+		}
+
+		.article-type {
+			font-size: 11px;
+			letter-spacing: 0.1em;
+			text-transform: uppercase;
+			color: var(--quiet);
+			font-weight: 600;
+			margin-bottom: 6px;
+		}
+
+		.article-card h4 {
+			font-family: 'Crimson Text', serif;
+			font-size: 20px;
+			font-weight: 600;
+			color: var(--text);
+			margin-bottom: 8px;
+			line-height: 1.3;
+			transition: color 0.2s ease;
+		}
+
+		.article-desc {
+			font-size: 13px;
+			color: var(--quiet);
+			line-height: 1.6;
+		}
+
+		.article-meta {
+			font-size: 11px;
+			color: var(--quiet);
+			margin-top: 12px;
+			letter-spacing: 0.05em;
+		}
+
+		/* ============== FINAL CTA ============== */
+		.final-cta {
+			padding: 80px 0;
+		}
+
+		.cta-block {
+			text-align: center;
+		}
+
+		.cta-block h2 {
+			max-width: 20ch;
+			margin-left: auto;
+			margin-right: auto;
+		}
+
+		.cta-block p {
+			font-size: 16px;
+			color: var(--text);
+			max-width: 75ch;
+			margin-left: auto;
+			margin-right: auto;
+			margin-bottom: 28px;
+			line-height: 1.7;
+		}
+
+		.cta-buttons {
+			display: flex;
+			gap: 16px;
+			justify-content: center;
+			flex-wrap: wrap;
+			margin-bottom: 24px;
+		}
+
+		.cta-fine {
+			font-size: 11px;
+			letter-spacing: 0.08em;
+			text-transform: uppercase;
+			color: var(--quiet);
+		}
+
+		/* ============== FOOTER ============== */
+		footer {
+			background: rgba(124, 45, 18, 0.08);
+			border-top: 1px solid var(--border);
+			padding: 60px 0 36px;
+			margin-top: 80px;
+		}
+
+		.footer-top {
+			display: grid;
+			grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+			gap: 48px;
+			margin-bottom: 40px;
+			padding-bottom: 40px;
+			border-bottom: 1px solid var(--border);
+		}
+
+		.footer-col h5 {
+			font-family: 'Fraunces', serif;
+			font-size: 12px;
+			font-weight: 700;
+			letter-spacing: 0.1em;
+			text-transform: uppercase;
+			color: var(--accent);
+			margin-bottom: 16px;
+		}
+
+		.footer-col ul {
+			list-style: none;
+		}
+
+		.footer-col li {
+			margin-bottom: 8px;
+		}
+
+		.footer-col a {
+			font-size: 14px;
+			color: var(--text);
+		}
+
+		.footer-col p {
+			font-size: 14px;
+			color: var(--text);
+			line-height: 1.7;
+		}
+
+		.footer-compliance {
+			display: flex;
+			gap: 8px;
+			margin-top: 12px;
+			flex-wrap: wrap;
+		}
+
+		.compliance-tag {
+			font-size: 10px;
+			letter-spacing: 0.08em;
+			text-transform: uppercase;
+			color: var(--quiet);
+			border: 1px solid var(--border);
+			padding: 4px 8px;
+		}
+
+		.footer-bottom {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			flex-wrap: wrap;
+			gap: 20px;
+			font-size: 12px;
+			color: var(--quiet);
+			letter-spacing: 0.05em;
+		}
+
+		/* ============== RESPONSIVE ============== */
+		@media (max-width: 768px) {
+			.wrap {
+				padding: 0 28px;
+			}
+
+			.header-wrap {
+				padding: 0 28px;
+			}
+
+			nav.primary {
+				display: none;
+			}
+
+			.lede {
+				font-size: 42px;
+			}
+
+			.standfirst {
+				font-size: 17px;
+			}
+
+			.pillars-grid,
+			.pricing-grid {
+				grid-template-columns: 1fr;
+			}
+
+			.results-grid {
+				grid-template-columns: 1fr 1fr;
+			}
+
+			.timeline-item {
+				grid-template-columns: 1fr;
+				gap: 16px;
+			}
+
+			.footer-top {
+				grid-template-columns: 1fr;
+			}
+
+			.article-list {
+				grid-template-columns: 1fr;
+			}
+
+			.cta-buttons {
+				flex-direction: column;
+			}
+
+			.btn {
+				display: block;
+				text-align: center;
+			}
+		}
+	</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+	<div class="header-wrap">
+		<a href="/" class="brand">FinOps LLM</a>
+		<nav class="primary">
+			<a href="#platform">Platform</a>
+			<a href="#optimization">Optimization</a>
+			<a href="#engagement">Engagement</a>
+			<a href="#pricing">Pricing</a>
+			<a href="#research">Research</a>
+		</nav>
+		<div class="nav-right">
+			<a href="mailto:hello@finopsllm.com" class="nav-email">hello@finopsllm.com</a>
+			<a href="/book" class="nav-cta">Book audit</a>
+		</div>
+	</div>
+</header>
+
+<main>
+
+<!-- HERO / LEDE -->
+<section class="hero">
+	<div class="wrap">
+		<h1 class="lede"><span class="drop-cap">C</span>ontrolling AI spend with <em>precision</em> and discipline.</h1>
+		<p class="standfirst">
+			<strong>FinOps LLM</strong> brings the FinOps Foundation framework — visibility, attribution, optimization, and accountability — to LLM and GenAI spend. <strong>Real-time cost attribution</strong> across OpenAI, Anthropic, Bedrock, and Gemini. <strong>Anomaly detection and automated optimization</strong> (routing, caching, compression). <strong>Monthly reconciliation</strong> against raw provider invoices.
+		</p>
+		<div class="cta-group">
+			<a href="/book" class="btn btn-primary">Book free audit</a>
+			<a href="#platform" class="btn btn-secondary">Tour the platform</a>
+		</div>
+		<div class="meta-line">Invoice-first audits · Read-only by default · Multi-cloud reconciliation</div>
+	</div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- PILLARS / PLATFORM -->
+<section class="pillars" id="platform">
+	<div class="wrap">
+		<div class="section-intro">
+			<span class="eyebrow">01. The platform</span>
+			<h2>Four pillars of AI FinOps.</h2>
+			<p class="section-intro-text">
+				The FinOps Foundation framework—visibility, attribution, optimization, and accountability—adapts directly to token economics. Every dollar of LLM spend becomes auditable, attributable, and optimizable. Same discipline. Different unit of cost.
+			</p>
+		</div>
+
+		<div class="pillars-grid">
+			<article class="pillar">
+				<div class="pillar-num">Pillar 01</div>
+				<h3>Visibility</h3>
+				<p>Token-level cost data ingested from every provider. Reconciled hourly. Filterable by provider, model, feature, team, customer, and environment.</p>
+				<ul>
+					<li>OpenAI, Anthropic, Bedrock, Gemini, Azure, Groq, Together</li>
+					<li>Hourly ingestion, sub-5-minute reconciliation lag</li>
+					<li>Read-only by default; NDA and DPA on request</li>
+				</ul>
+			</article>
+
+			<article class="pillar">
+				<div class="pillar-num">Pillar 02</div>
+				<h3>Attribution &amp; chargeback</h3>
+				<p>Every token mapped to a feature, team, and customer cohort. Monthly chargeback and showback, exported to your finance system or as CSV.</p>
+				<ul>
+					<li>Custom dimensions: feature, team, tier, region</li>
+					<li>Cohort spend analysis and customer-tier P&amp;L</li>
+					<li>NetSuite, QuickBooks, CSV, or API</li>
+				</ul>
+			</article>
+
+			<article class="pillar">
+				<div class="pillar-num">Pillar 03</div>
+				<h3>Anomaly detection</h3>
+				<p>Real-time alerts when spend, latency, or quality deviates from a feature's rolling baseline. Slack, PagerDuty, email—with optional auto-throttle.</p>
+				<ul>
+					<li>Per-feature rolling baselines, seasonality-aware</li>
+					<li>Slack, PagerDuty, email, or webhook alerts</li>
+					<li>Optional auto-throttle and budget enforcement</li>
+				</ul>
+			</article>
+
+			<article class="pillar">
+				<div class="pillar-num">Pillar 04</div>
+				<h3>Automated optimization</h3>
+				<p>Model routing, semantic caching, and prompt compression deployed behind feature flags, A/B tested for seven days minimum, graduated only on quality wins.</p>
+				<ul>
+					<li>Routing tree with per-request quality classification</li>
+					<li>Semantic cache with sub-10ms hit latency</li>
+					<li>Quality SLO enforcement and auto-rollback</li>
+				</ul>
+			</article>
+		</div>
+	</div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- LEVERS / OPTIMIZATION -->
+<section class="levers" id="optimization">
+	<div class="wrap">
+		<div class="levers-intro">
+			<span class="eyebrow">02. Optimization</span>
+			<h2>Six levers we pull in every engagement.</h2>
+			<p class="section-intro-text">
+				Most teams combine three or four. The audit ranks which dominate your spend surface and projects savings before any commitment.
+			</p>
+		</div>
+
+		<table class="levers-table">
+			<thead>
+				<tr>
+					<th class="lever-num">No.</th>
+					<th>Lever</th>
+					<th>Description</th>
+					<th class="lever-range">Savings range</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td class="lever-num">01</td>
+					<td class="lever-name">Model routing</td>
+					<td class="lever-desc">Request-level classification routes to the cheapest model meeting your quality bar. Reasoning to flagships; classification to small fast models.</td>
+					<td class="lever-range">30–50%</td>
+				</tr>
+				<tr>
+					<td class="lever-num">02</td>
+					<td class="lever-name">Semantic caching</td>
+					<td class="lever-desc">Near-duplicate prompts fingerprinted with embeddings; identical answers served from sub-10ms cache.</td>
+					<td class="lever-range">20–40%</td>
+				</tr>
+				<tr>
+					<td class="lever-num">03</td>
+					<td class="lever-name">Prompt compression</td>
+					<td class="lever-desc">System prompts audited for redundancy. Examples deduplicated. Retrieved context compressed with LLMLingua-style techniques.</td>
+					<td class="lever-range">15–30%</td>
+				</tr>
+				<tr>
+					<td class="lever-num">04</td>
+					<td class="lever-name">Batch &amp; async pricing</td>
+					<td class="lever-desc">Non-interactive workloads routed to batch endpoints (up to 50% discount) with SLO-aware queueing.</td>
+					<td class="lever-range">10–50%</td>
+				</tr>
+				<tr>
+					<td class="lever-num">05</td>
+					<td class="lever-name">Provider arbitrage</td>
+					<td class="lever-desc">Identical capability often costs 2–3× more at one provider. We route by capability-per-dollar.</td>
+					<td class="lever-range">20–35%</td>
+				</tr>
+				<tr>
+					<td class="lever-num">06</td>
+					<td class="lever-name">Fallback chains</td>
+					<td class="lever-desc">Smart retries and tiered fallbacks avoid over-provisioning while maintaining SLO.</td>
+					<td class="lever-range">5–15%</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- HOW IT WORKS -->
+<section class="how-it-works" id="engagement">
+	<div class="wrap">
+		<div class="section-intro">
+			<span class="eyebrow">03. Engagement</span>
+			<h2>Four phases: audit, plan, ship, <em>reconcile.</em></h2>
+			<p class="section-intro-text">
+				Every engagement follows the same structure. Most customers see their first reconciled provider invoice by the end of week five.
+			</p>
+		</div>
+
+		<div class="timeline">
+			<div class="timeline-item">
+				<div class="timeline-when">WEEK 01<br>AUDIT</div>
+				<div class="timeline-body">
+					<h3>Map every dollar.</h3>
+					<p>We ingest provider invoices, gateway logs, and usage telemetry. By Friday, you have a full map of your LLM spend—by provider, model, feature, team—ranked by waste.</p>
+					<div class="deliverable">
+						<strong>Deliverable</strong>
+						Spend map, prioritized opportunities, locked baseline (countersigned)
+					</div>
+				</div>
+			</div>
+
+			<div class="timeline-item">
+				<div class="timeline-when">WEEK 02<br>PLAN</div>
+				<div class="timeline-body">
+					<h3>Rank by waste.</h3>
+					<p>The audit becomes a prioritized engineering plan respecting your compliance posture, latency SLOs, and release process. Quality guardrails agreed per endpoint. You sign off on every change.</p>
+					<div class="deliverable">
+						<strong>Deliverable</strong>
+						Engineering plan, routing tree, cache spec, quality SLOs, rollout schedule
+					</div>
+				</div>
+			</div>
+
+			<div class="timeline-item">
+				<div class="timeline-when">WEEKS 03–05<br>SHIP</div>
+				<div class="timeline-body">
+					<h3>Ship &amp; A/B test.</h3>
+					<p>FinOps LLM engineers pair with yours to ship each optimization behind feature flags, A/B test for seven days vs. baseline, and graduate to 100% traffic. The cockpit goes live alongside.</p>
+					<div class="deliverable">
+						<strong>Deliverable</strong>
+						Live cockpit, Slack alerts, weekly review, first reconciliation
+					</div>
+				</div>
+			</div>
+
+			<div class="timeline-item">
+				<div class="timeline-when">ONGOING<br>RECONCILE</div>
+				<div class="timeline-body">
+					<h3>Compound the savings.</h3>
+					<p>Prices move. Traffic shifts. Models ship. The platform watches for drift; we recommend and implement follow-ups so savings compound. Every month closes with a signed Statement of Savings.</p>
+					<div class="deliverable">
+						<strong>Deliverable</strong>
+						Monthly signed statement, drift and quality alerts, ongoing tuning
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- RESULTS -->
+<section class="results">
+	<div class="wrap">
+		<div class="section-intro">
+			<span class="eyebrow">04. Results</span>
+			<h2>Numbers from real engagements.</h2>
+			<p class="section-intro-text">
+				Illustrative reduction ranges from common LLM optimization levers. Targets are set after a provider-invoice audit and workload review.
+			</p>
+		</div>
+
+		<div class="results-grid">
+			<div class="result-card">
+				<div class="result-label">Typical reduction</div>
+				<div class="result-value">38–68%</div>
+				<div class="result-desc">Range across engagements, depending on architecture and traffic mix.</div>
+			</div>
+			<div class="result-card">
+				<div class="result-label">Time to savings</div>
+				<div class="result-value">3–5 wks</div>
+				<div class="result-desc">Kickoff to first reconciled provider invoice.</div>
+			</div>
+			<div class="result-card">
+				<div class="result-label">Quality delta</div>
+				<div class="result-value">+0.2%</div>
+				<div class="result-desc">Every change A/B tested for 7 days minimum.</div>
+			</div>
+			<div class="result-card">
+				<div class="result-label">Audit fee</div>
+				<div class="result-value">$0</div>
+				<div class="result-desc">Free—credited against implementation.</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- PRICING -->
+<section class="pricing" id="pricing">
+	<div class="wrap">
+		<div class="section-intro">
+			<span class="eyebrow">05. Pricing</span>
+			<h2>Two ways to pay.</h2>
+			<p class="section-intro-text">
+				Most teams start on Performance—the audit is free, you only pay on results. Platform tier is for finance teams wanting self-serve attribution without a managed engagement.
+			</p>
+		</div>
+
+		<div class="pricing-grid">
+			<article class="plan featured">
+				<div class="plan-tag">★ Most popular</div>
+				<h3>Performance</h3>
+				<p class="plan-lead">Free audit. Then you only pay when we save you money—measured against a locked baseline, reconciled to provider invoices.</p>
+				<div class="plan-price">15–25%<br><span style="font-size: 20px; color: var(--quiet);">of verified savings</span></div>
+				<p class="plan-note">No savings, no fee. Audit credited against implementation. Cancel anytime.</p>
+				<ul>
+					<li>Free audit, 1-week turnaround, countersigned baseline</li>
+					<li>Full optimization stack: routing, cache, compression, arbitrage</li>
+					<li>Live cockpit + chargeback + monthly signed statements</li>
+					<li>Engineering pair with FinOps LLM team, weekly reviews</li>
+					<li>Quality SLO enforcement and auto-rollback</li>
+					<li>Minimum: $20K/month LLM spend</li>
+				</ul>
+				<a href="/book" class="btn btn-primary">Book free audit</a>
+			</article>
+
+			<article class="plan">
+				<div class="plan-tag">Self-serve</div>
+				<h3>Platform</h3>
+				<p class="plan-lead">Cockpit, attribution, and chargeback for teams wanting visibility without managed implementation. Bring your own optimization.</p>
+				<div class="plan-price">From $1,500<br><span style="font-size: 20px; color: var(--quiet);">/month</span></div>
+				<p class="plan-note">Annual or monthly. Upgrade to Performance anytime.</p>
+				<ul>
+					<li>Real-time spend attribution across all major providers</li>
+					<li>Anomaly detection, Slack and PagerDuty alerts</li>
+					<li>Chargeback and showback exports: NetSuite, CSV, API</li>
+					<li>Budget enforcement and per-team auto-throttle</li>
+					<li>Forecast and what-if scenario modelling</li>
+					<li>Email and chat support, 24-hour SLA</li>
+				</ul>
+				<a href="mailto:hello@finopsllm.com" class="btn btn-secondary">Talk to sales</a>
+			</article>
+		</div>
+	</div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- FAQ -->
+<section class="faq">
+	<div class="wrap">
+		<div class="faq-intro">
+			<span class="eyebrow">06. Questions</span>
+			<h2>Common <em>questions.</em></h2>
+			<p class="section-intro-text">Missing something? Email <a href="mailto:hello@finopsllm.com">hello@finopsllm.com</a>—we respond within one business day.</p>
+		</div>
+
+		<details open>
+			<summary>What is FinOps for LLM?</summary>
+			<div class="answer">
+				<strong>FinOps for LLM</strong> brings the FinOps Foundation framework—visibility, attribution, optimization, and accountability—to LLM and GenAI spend. It includes per-feature and per-team chargeback, anomaly detection, budget governance, and continuous optimization of model routing, caching, and prompts.
+			</div>
+		</details>
+
+		<details>
+			<summary>What does FinOps LLM do?</summary>
+			<div class="answer">
+				FinOps LLM is the platform purpose-built for LLM cost intelligence. We provide <strong>real-time spend attribution</strong> across OpenAI, Anthropic, Bedrock, and Gemini, plus automated optimization (routing, caching, compression) and <strong>monthly reconciliation</strong> against provider invoices.
+			</div>
+		</details>
+
+		<details>
+			<summary>How is pricing structured?</summary>
+			<div class="answer">
+				Two models. <strong>Performance</strong>—free audit, then 15–25% of verified monthly savings. <strong>Platform</strong>—flat tiers from $1,500/month for self-serve attribution and analytics. Most customers start on Performance.
+			</div>
+		</details>
+
+		<details>
+			<summary>How much can we save?</summary>
+			<div class="answer">
+				Typical reduction in the first full billing cycle after implementation is <strong>38–68%</strong>, depending on architecture and traffic mix. The audit quantifies what's material for your workload before any commitment.
+			</div>
+		</details>
+
+		<details>
+			<summary>Which providers are supported?</summary>
+			<div class="answer">
+				<strong>OpenAI, Anthropic, Gemini &amp; Vertex AI, AWS Bedrock, Azure OpenAI, Groq, Together, Mistral, Cohere, Fireworks, Replicate</strong>, and most open-source endpoints. Multi-provider deployments typically have the largest savings surface.
+			</div>
+		</details>
+
+		<details>
+			<summary>Does FinOps LLM support chargeback and showback?</summary>
+			<div class="answer">
+				Yes. Token-level attribution to providers, models, features, teams, and customer cohorts. Monthly chargeback and showback exported to <strong>NetSuite, QuickBooks, CSV, or API</strong>. Custom dimensions supported.
+			</div>
+		</details>
+
+		<details>
+			<summary>How do you handle customer data?</summary>
+			<div class="answer">
+				<strong>Read-only by default.</strong> Billing and usage data is enough for most attribution work. Prompt and output data is only accessed with explicit customer approval for specific optimizations that require it. NDA and DPA available on request.
+			</div>
+		</details>
+
+		<details>
+			<summary>How long does implementation take?</summary>
+			<div class="answer">
+				Attribution and dashboards go live in <strong>under a week</strong>. Optimization implementation takes 3–5 weeks; savings appear on the first full provider invoice after go-live.
+			</div>
+		</details>
+	</div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- RESEARCH HUB -->
+<section class="research" id="research">
+	<div class="wrap">
+		<div class="section-intro">
+			<span class="eyebrow">07. Research</span>
+			<h2>Briefs, benchmarks &amp; <em>tools.</em></h2>
+			<p class="section-intro-text">
+				Long-form research for engineering and finance leaders evaluating FinOps for AI. Free, no signup, updated monthly.
+			</p>
+		</div>
+
+		<div class="research-articles">
+			<div class="article-group">
+				<div class="article-group-title">Guides &amp; frameworks</div>
+				<div class="article-list">
+					<a href="/research/finops-for-llm" class="article-card">
+						<div class="article-type">Guide</div>
+						<h4>FinOps for LLM: a complete framework</h4>
+						<div class="article-desc">Visibility, attribution, optimization, accountability—applied to tokens, with a 30-page reference architecture.</div>
+						<div class="article-meta">16 min • June 2026</div>
+					</a>
+					<a href="/research/ai-cost-optimization" class="article-card">
+						<div class="article-type">Playbook</div>
+						<h4>AI cost optimization</h4>
+						<div class="article-desc">Practical steps for reducing AI spend through routing, caching, batching, and prompt discipline.</div>
+						<div class="article-meta">8 min • May 2026</div>
+					</a>
+				</div>
+			</div>
+
+			<div class="article-group">
+				<div class="article-group-title">Tutorials &amp; operations</div>
+				<div class="article-list">
+					<a href="/research/llm-cost-attribution" class="article-card">
+						<div class="article-type">Tutorial</div>
+						<h4>Token-level cost attribution in production</h4>
+						<div class="article-desc">Tagging strategies, chargeback math, and gateway integration patterns with reference code.</div>
+						<div class="article-meta">11 min • Code • 4.2K read</div>
+					</a>
+					<a href="/research/llm-cost-monitoring" class="article-card">
+						<div class="article-type">Operations</div>
+						<h4>LLM cost monitoring</h4>
+						<div class="article-desc">Metrics, alerting, and owner boundaries that keep spend changes from hiding in monthly invoices.</div>
+						<div class="article-meta">10 min • Operations</div>
+					</a>
+				</div>
+			</div>
+
+			<div class="article-group">
+				<div class="article-group-title">Optimization techniques</div>
+				<div class="article-list">
+					<a href="/research/model-routing" class="article-card">
+						<div class="article-type">Algorithm</div>
+						<h4>Model routing</h4>
+						<div class="article-desc">How to send easy requests to cheaper models and maintain quality, latency, and fallback behavior.</div>
+						<div class="article-meta">12 min • Practical</div>
+					</a>
+					<a href="/research/rag-cost-optimization" class="article-card">
+						<div class="article-type">Practical</div>
+						<h4>RAG cost optimization</h4>
+						<div class="article-desc">Reduce retrieval-driven token waste with better chunking, tighter context caps, and selective reranking.</div>
+						<div class="article-meta">7 min • Practical</div>
+					</a>
+					<a href="/research/provider-arbitrage" class="article-card">
+						<div class="article-type">Benchmarks</div>
+						<h4>Provider arbitrage</h4>
+						<div class="article-desc">Compare equivalent model capability across providers without undercounting migration and overhead costs.</div>
+						<div class="article-meta">11 min • Benchmarks</div>
+					</a>
+					<a href="/benchmarks" class="article-card">
+						<div class="article-type">Data</div>
+						<h4>LLM price-per-capability benchmark · Q2 '26</h4>
+						<div class="article-desc">Monthly cost-per-successful-task across GPT, Claude, Gemini, Mistral, Llama on standardized workloads.</div>
+						<div class="article-meta">Updated monthly • Q2 '26 live</div>
+					</a>
+				</div>
+			</div>
+
+			<div class="article-group">
+				<div class="article-group-title">Reference</div>
+				<div class="article-list">
+					<a href="/glossary" class="article-card">
+						<div class="article-type">Reference</div>
+						<h4>AI FinOps glossary</h4>
+						<div class="article-desc">Definitions for attribution, showback, chargeback, cache-read tokens, routing, and cost-per-successful-task.</div>
+						<div class="article-meta">Free • Always available</div>
+					</a>
+					<a href="/research/llm-chargeback-showback" class="article-card">
+						<div class="article-type">Finance</div>
+						<h4>LLM chargeback and showback</h4>
+						<div class="article-desc">How to report AI spend by team and product before turning it into budget allocation.</div>
+						<div class="article-meta">8 min • Governance</div>
+					</a>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- FINAL CTA -->
+<section class="final-cta">
+	<div class="wrap">
+		<div class="cta-block">
+			<h2>Get your AI bill under <em>adult supervision.</em></h2>
+			<p>Two weeks. Read-only access. We return with a full map of your spend, ranked by waste, plus a baseline our cockpit can track against. Free. No implementation commitment.</p>
+			<div class="cta-buttons">
+				<a href="/book" class="btn btn-primary">Book free audit</a>
+				<a href="/benchmarks" class="btn btn-secondary">View benchmarks</a>
+			</div>
+			<div class="cta-fine">30-MIN DISCOVERY · READ-ONLY BY DEFAULT · NDA + DPA ON REQUEST · NO COMMITMENT</div>
+		</div>
+	</div>
+</section>
+
+</main>
+
+<!-- FOOTER -->
+<footer>
+	<div class="wrap">
+		<div class="footer-top">
+			<div class="footer-col">
+				<a href="/" class="brand" style="display: inline-block; margin-bottom: 16px;">FinOps LLM</a>
+				<p>AI cost management and LLM observability platform. Real-time attribution, anomaly detection, and automated optimization for production GenAI.</p>
+				<div class="footer-compliance">
+					<span class="compliance-tag">Read-only by default</span>
+					<span class="compliance-tag">NDA + DPA on request</span>
+					<span class="compliance-tag">Invoice-reconciled</span>
+				</div>
+			</div>
+
+			<div class="footer-col">
+				<h5>Platform</h5>
+				<ul>
+					<li><a href="#platform">The four pillars</a></li>
+					<li><a href="#optimization">Optimization</a></li>
+					<li><a href="#engagement">Engagement</a></li>
+					<li><a href="#pricing">Pricing</a></li>
+					<li><a href="/benchmarks">Benchmarks</a></li>
+				</ul>
+			</div>
+
+			<div class="footer-col">
+				<h5>Research</h5>
+				<ul>
+					<li><a href="/research/finops-for-llm">FinOps for LLM</a></li>
+					<li><a href="/research/ai-cost-optimization">Cost optimization</a></li>
+					<li><a href="/research/llm-cost-attribution">Attribution</a></li>
+					<li><a href="/research/anomaly-detection">Anomaly detection</a></li>
+					<li><a href="/glossary">Glossary</a></li>
+				</ul>
+			</div>
+
+			<div class="footer-col">
+				<h5>Company</h5>
+				<ul>
+					<li><a href="/about">About</a></li>
+					<li><a href="/case-studies">Case studies</a></li>
+					<li><a href="mailto:hello@finopsllm.com">Contact</a></li>
+				</ul>
+			</div>
+
+			<div class="footer-col">
+				<h5>Legal</h5>
+				<ul>
+					<li><a href="/privacy">Privacy</a></li>
+					<li><a href="/terms">Terms</a></li>
+					<li><a href="/security">Security</a></li>
+				</ul>
+			</div>
+		</div>
+
+		<div class="footer-bottom">
+			<span>© 2026 FinOps LLM, Inc.</span>
+			<span>FinOps for the era of tokens</span>
+		</div>
+	</div>
+</footer>
+
+</body>
+</html>
