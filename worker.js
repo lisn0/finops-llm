@@ -1,5 +1,5 @@
 /**
- * FinOps LLM — static-assets Worker with Markdown for Agents.
+ * FinOps LLM — static-assets Worker with Markdown for Agents + language routing.
  *
  * Runs in front of the static assets (assets.run_worker_first = true). For
  * normal browser/crawler traffic it transparently proxies to env.ASSETS. When
@@ -10,13 +10,61 @@
  * preserves the AI-training opt-out (Content-Signal: ai-train=no) rather than
  * Cloudflare's native ai-train=yes default.
  *
- * Also performs the www -> apex redirect here, because Workers static-assets
- * _redirects matches on path only and cannot see the request hostname.
+ * Also performs:
+ *   - the www -> apex redirect (Workers static-assets _redirects matches on
+ *     path only and cannot see the request hostname);
+ *   - Accept-Language routing: humans whose top preference is a translated
+ *     language (es/fr/de/ja) are sent to that language mirror, but ONLY for
+ *     pages that have a published translation, NEVER for crawlers (hreflang +
+ *     indexing depend on stable URLs), and always overridable via the on-page
+ *     language switcher (the `lang` cookie).
  */
 
 const APEX = 'finopsllm.com';
 const DEFAULT_TITLE = 'FinOps LLM';
 const CONTENT_SIGNAL = 'search=yes, ai-input=yes, ai-train=no';
+
+// Languages with a full published translation mirror. Order is not significant.
+const LANGS = ['es', 'fr', 'de', 'ja'];
+
+// English paths that have a published translation in EVERY language above, so a
+// language redirect can never land a visitor on a 404. Extend this set (and add
+// the matching <lang>/ pages) as more pages are translated.
+const TRANSLATED = new Set([
+	'/',
+	'/research',
+	'/research/finops-for-llm',
+	'/research/ai-finops',
+	'/research/llm-cost-attribution',
+	'/research/openai-cost-attribution',
+	'/research/llm-chargeback-showback',
+	'/research/anomaly-detection',
+]);
+
+// Map an English path to its translated equivalent: '/' -> '/es/', '/research'
+// -> '/fr/research', etc. Mirrors the structure built by the i18n clone script.
+function targetFor(lang, path) {
+	return path === '/' ? `/${lang}/` : `/${lang}${path}`;
+}
+
+// For the requested URL, return the language being served and — when the page
+// belongs to a translated cluster — the hreflang alternates for every locale.
+// Lets the markdown-for-agents response declare its Content-Language and
+// advertise the other-language URLs, so an agent can fetch and cite the version
+// matching its user's language. Non-translated pages just report their language.
+function langInfo(url) {
+	const m = url.pathname.match(/^\/(es|fr|de|ja)(\/|$)/);
+	const lang = m ? m[1] : 'en';
+	const base = normalizePath(m ? url.pathname.slice(lang.length + 1) || '/' : url.pathname);
+	if (!TRANSLATED.has(base)) return { lang, alternates: [] };
+	const alternates = [{ lang: 'en', href: url.origin + base }];
+	for (const l of LANGS) alternates.push({ lang: l, href: url.origin + targetFor(l, base) });
+	return { lang, alternates };
+}
+
+// Crawlers, AI agents, and link unfurlers must always see the URL they asked
+// for — never auto-redirect them, or hreflang clusters break.
+const BOT_RE = /bot|crawl|spider|slurp|mediapartners|facebookexternalhit|embedly|quora|pinterest|whatsapp|telegram|googlebot|bingbot|duckduckbot|yandex|baidu|applebot|amazonbot|gptbot|claudebot|claude-|oai-searchbot|chatgpt-user|perplexity|mistralai|meta-externalagent|google-extended/i;
 
 export default {
 	async fetch(request, env) {
@@ -28,42 +76,127 @@ export default {
 			return Response.redirect(url.toString(), 301);
 		}
 
-		// 2. Fetch whatever the static host would serve (also applies _redirects/_headers).
+		// 2. Language negotiation (humans only, translated pages only).
+		const langHop = languageRedirect(request, url);
+		if (langHop) return langHop;
+
+		// 3. Fetch whatever the static host would serve (also applies _redirects/_headers).
 		const assetResponse = await env.ASSETS.fetch(request);
 
-		// 3. Only transform GET requests that explicitly negotiate markdown.
+		// 4. Only transform GET requests that explicitly negotiate markdown.
 		const accept = request.headers.get('Accept') || '';
 		if (request.method !== 'GET' || !/text\/markdown/i.test(accept)) {
 			return assetResponse;
 		}
 
-		// 4. Only transform real HTML pages.
+		// 5. Only transform real HTML pages.
 		const contentType = assetResponse.headers.get('Content-Type') || '';
 		if (assetResponse.status !== 200 || !contentType.includes('text/html')) {
 			return assetResponse;
 		}
 
 		const html = await assetResponse.text();
-		const markdown = htmlToMarkdown(html, url, DEFAULT_TITLE);
+		const info = langInfo(url);
+		const markdown = htmlToMarkdown(html, url, DEFAULT_TITLE, info);
 
-		return new Response(markdown, {
-			status: 200,
-			headers: {
-				'Content-Type': 'text/markdown; charset=utf-8',
-				'Content-Signal': CONTENT_SIGNAL,
-				'X-Content-Type-Options': 'nosniff',
-				'Cache-Control': 'public, max-age=0, must-revalidate',
-				'Vary': 'Accept',
-			},
-		});
+		const headers = {
+			'Content-Type': 'text/markdown; charset=utf-8',
+			'Content-Signal': CONTENT_SIGNAL,
+			'Content-Language': info.lang,
+			'X-Content-Type-Options': 'nosniff',
+			'Cache-Control': 'public, max-age=0, must-revalidate',
+			'Vary': 'Accept',
+		};
+		if (info.alternates.length) {
+			headers.Link = info.alternates
+				.map((a) => `<${a.href}>; rel="alternate"; hreflang="${a.lang}"`)
+				.join(', ');
+		}
+		return new Response(markdown, { status: 200, headers });
 	},
 };
+
+/* ------------------------------------------------------------------ */
+/* Language routing                                                    */
+/* ------------------------------------------------------------------ */
+
+function languageRedirect(request, url) {
+	if (request.method !== 'GET') return null;
+
+	// Only navigational HTML requests; skip assets and markdown-for-agents.
+	const accept = request.headers.get('Accept') || '';
+	if (!accept.includes('text/html')) return null;
+
+	// Never bounce crawlers/agents.
+	if (BOT_RE.test(request.headers.get('User-Agent') || '')) return null;
+
+	// Already inside a translated tree (/es, /fr, /de, /ja).
+	if (/^\/(es|fr|de|ja)(\/|$)/.test(url.pathname)) return null;
+
+	const path = normalizePath(url.pathname);
+	if (!TRANSLATED.has(path)) return null; // no translation -> serve English
+
+	const choice = langCookie(request);
+	if (choice === 'en') return null; // user explicitly chose English
+	const lang = choice && choice !== 'en' ? choice : preferredLang(request);
+	if (!lang || !LANGS.includes(lang)) return null;
+
+	const dest = new URL(url.toString());
+	dest.pathname = targetFor(lang, path);
+	return new Response(null, {
+		status: 302,
+		headers: {
+			Location: dest.toString(),
+			'Cache-Control': 'no-store',
+			Vary: 'Accept-Language, Cookie',
+		},
+	});
+}
+
+function normalizePath(p) {
+	if (p.length > 1 && p.endsWith('/')) p = p.slice(0, -1);
+	if (p.endsWith('/index.html')) p = p.slice(0, -'/index.html'.length) || '/';
+	else if (p.endsWith('.html')) p = p.slice(0, -'.html'.length);
+	return p || '/';
+}
+
+function langCookie(request) {
+	const c = request.headers.get('Cookie') || '';
+	const m = c.match(/(?:^|;\s*)lang=(en|es|fr|de|ja)\b/);
+	return m ? m[1] : null;
+}
+
+// Pick the visitor's preferred translated language from Accept-Language, or null
+// to stay on English. A translated language must beat (or tie) English to win;
+// among translated languages the highest q wins, ties broken by header order.
+function preferredLang(request) {
+	const al = request.headers.get('Accept-Language') || '';
+	if (!al) return null;
+	let bestEn = 0;
+	let bestLang = null;
+	let bestLangQ = -1;
+	for (const part of al.split(',')) {
+		const segs = part.trim().split(';');
+		const base = segs[0].toLowerCase().split('-')[0];
+		let q = 1;
+		for (let i = 1; i < segs.length; i++) {
+			const mm = segs[i].trim().match(/^q=([0-9.]+)$/);
+			if (mm) q = parseFloat(mm[1]);
+		}
+		if (base === 'en') bestEn = Math.max(bestEn, q);
+		else if (LANGS.includes(base) && q > bestLangQ) {
+			bestLangQ = q;
+			bestLang = base;
+		}
+	}
+	return bestLang && bestLangQ > 0 && bestLangQ >= bestEn ? bestLang : null;
+}
 
 /* ------------------------------------------------------------------ */
 /* HTML -> Markdown (heuristic, no dependencies)                       */
 /* ------------------------------------------------------------------ */
 
-function htmlToMarkdown(html, url, defaultTitle) {
+function htmlToMarkdown(html, url, defaultTitle, info) {
 	const title = extractTitle(html, defaultTitle);
 	let body = extractMain(html);
 
@@ -110,7 +243,12 @@ function htmlToMarkdown(html, url, defaultTitle) {
 		.trim();
 
 	const header = `# ${title}\n\n> Source: ${url.origin}${url.pathname}\n\n`;
-	return `${header}${body}\n`;
+	let footer = '';
+	if (info && info.alternates && info.alternates.length) {
+		const links = info.alternates.map((a) => `[${a.lang}](${a.href})`).join(' · ');
+		footer = `\n\n---\n\nAvailable languages: ${links}\n`;
+	}
+	return `${header}${body}\n${footer}`;
 }
 
 function extractTitle(html, defaultTitle) {

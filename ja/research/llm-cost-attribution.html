@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>LLM費用配分 · FinOps LLM</title><meta name="description" content="請求書の精度を失わずにLLM支出を製品、チーム、ユーザー、テナント、機能、およびワークロードに配分する方法。" /><meta name="robots" content="index, follow" /><link rel="canonical" href="https://finopsllm.com/ja/research/llm-cost-attribution" /><link rel="alternate" hreflang="en" href="https://finopsllm.com/research/llm-cost-attribution" />
+<link rel="alternate" hreflang="es" href="https://finopsllm.com/es/research/llm-cost-attribution" />
+<link rel="alternate" hreflang="fr" href="https://finopsllm.com/fr/research/llm-cost-attribution" />
+<link rel="alternate" hreflang="de" href="https://finopsllm.com/de/research/llm-cost-attribution" />
+<link rel="alternate" hreflang="ja" href="https://finopsllm.com/ja/research/llm-cost-attribution" />
+<link rel="alternate" hreflang="x-default" href="https://finopsllm.com/research/llm-cost-attribution" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","headline":"LLM費用配分 · FinOps LLM","description":"請求書の精度を失わずにLLM支出を製品、チーム、ユーザー、テナント、機能、およびワークロードに配分する方法。","url":"https://finopsllm.com/ja/research/llm-cost-attribution","datePublished":"2026-05-05","dateModified":"2026-05-05","image":"https://finopsllm.com/og.png","author":{"@type":"Organization","name":"FinOps LLM team"},"publisher":{"@type":"Organization","name":"FinOps LLM","url":"https://finopsllm.com/"}}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"ホーム","item":"https://finopsllm.com/ja/"},{"@type":"ListItem","position":2,"name":"リサーチ","item":"https://finopsllm.com/ja/research"},{"@type":"ListItem","position":3,"name":"LLM費用配分","item":"https://finopsllm.com/ja/research/llm-cost-attribution"}]}
+</script>
+<style>body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}.wrap{max-width:840px;margin:0 auto;padding:56px 24px}a{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}.langsw{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;color:#647289;margin:0 0 26px}.langsw a{text-decoration:none}.langsw a[aria-current]{color:#E6EAF2;font-weight:600}</style><script src="/assets/consent.js" defer></script><script src="/assets/lang.js" defer></script>
+</head>
+<body><main class="wrap"><nav class="langsw" aria-label="Language / Idioma"><a href="/research/llm-cost-attribution" hreflang="en">EN</a> · <a href="/es/research/llm-cost-attribution" hreflang="es">ES</a> · <a href="/fr/research/llm-cost-attribution" hreflang="fr">FR</a> · <a href="/de/research/llm-cost-attribution" hreflang="de">DE</a> · <a href="/ja/research/llm-cost-attribution" hreflang="ja" aria-current="page">JA</a></nav><h1>LLM費用配分</h1>
+<p>LLM費用配分は、プロバイダー請求書と運用上の決定の間の橋です。プロバイダーはアカウント、モデル、トークンクラス、および時々地域または機能で請求します。企業は、チーム、製品、顧客、ワークフロー、および値のユニット別の支出を理解する必要があります。配分レイヤーは、生の請求書との照合を失わずに、これら2つのビューを接続します。</p>
+<p>重要なのは、リクエストがプロバイダーまたはゲートウェイに到達する前にラベルを付けることです。事後的に作成されたレコードは、通常は不完全です。最低限として、本番環境のすべてのLLM呼び出しは、安定したエンドポイント名、環境、チーム所有者、製品表面、ワークロードクラス、および相関IDを運ぶ必要があります。契約が許可する場所では、テナントまたは顧客IDを追加します。エージェントワークフローの場合、各ツール呼び出しまたはモデルステップを個別にラベル付けします。</p>
+<h2>リクエスト数は配分ではない</h2>
+<p>リクエスト数による支出の割り当てはほぼ常に間違っています。長いコンテキスト推論リクエストは、数百の短い分類呼び出しよりも費用がかかる可能性があります。配分はトークンクラスとモデル価格が必要です。また、リトライとフォールバックのデータが必要です。「成功した」応答は、以前の3つの失敗した呼び出しを隠す可能性があるからです。</p>
+<h2>推奨される寸法</h2>
+<ul><li>プロバイダー、モデル、およびモデルバージョン（利用可能な場合）。</li><li>入力、出力、キャッシュ書き込み、キャッシュ読み取り、および推論のトークンクラス。</li><li>チーム、製品、機能、エンドポイント、および環境。</li><li>ワークロードクラス：リアルタイムユーザーパス、バックグラウンド作業、評価、エンリッチメント、エージェントステップ、サポートワークフロー、または分析タスク。</li><li>プライバシーと契約境界が許可する場合の顧客またはテナント配分。</li></ul>
+<h2>請求書の照合</h2>
+<p>配分はプロバイダー請求書と照合されて戻る必要があります。丸め、遅延請求行、およびプロバイダー固有の割引による小さな違いを期待しますが、大きなギャップは、レコードパイプラインがトラフィックを失っているか、古い価格表を使用していることを意味します。ファイナンスビューは、配分された支出と未割り当ての支出の両方を表示して、データ品質の問題が見えるようにする必要があります。</p>
+<h2>ショーバックからアクションへ</h2>
+<p>最初の結果はショーバックである必要があります：どのチームと製品表面が支出を駆動しているか、および先月からどのワークロードが変更されたか。チームがそのデータを信頼したら、それを使用して最適化作業をランク付けします。配分は、ルーティング、キャッシュ、またはプロンプト変更を承認できる所有者に直接指摘するため、価値があります。</p><h2>関連</h2>
+<ul><li><a href="/ja/research/openai-cost-attribution">OpenAI費用配分</a> — OpenAI固有の配分パターン。</li><li><a href="/ja/research/llm-chargeback-showback">LLMチャージバックとショーバック</a> — 支出を所有者に移動。</li><li><a href="/research/what-is-llm-finops">LLM FinOpsとは？</a> — 完全な運用規律。</li></ul>
+<hr style="margin:48px 0 24px;border:none;border-top:1px solid #1E2A3F" /><p>自分のLLM支出に適用したいですか？FinOps LLMはAI費用の無料監査を実施し、節約場所を示します。<a href="/book">無料監査を予約 →</a></p><p><a href="/ja/research">リサーチに戻る</a></p></main></body></html>
