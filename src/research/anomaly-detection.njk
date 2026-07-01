@@ -1,0 +1,36 @@
+---
+permalink: "research/anomaly-detection.html"
+---
+{% extends "shell.njk" %}{% block prefix %}<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>LLM cost anomaly detection · FinOps LLM</title><meta name="description" content="How to detect LLM cost anomalies from token growth, retry loops, context expansion, route drift, and cache hit-rate drops." /><meta name="robots" content="index, follow" /><link rel="canonical" href="https://finopsllm.com/research/anomaly-detection" />
+<link rel="alternate" hreflang="en" href="https://finopsllm.com/research/anomaly-detection" />
+<link rel="alternate" hreflang="es" href="https://finopsllm.com/es/research/anomaly-detection" />
+<link rel="alternate" hreflang="fr" href="https://finopsllm.com/fr/research/anomaly-detection" />
+<link rel="alternate" hreflang="de" href="https://finopsllm.com/de/research/anomaly-detection" />
+<link rel="alternate" hreflang="ja" href="https://finopsllm.com/ja/research/anomaly-detection" />
+<link rel="alternate" hreflang="x-default" href="https://finopsllm.com/research/anomaly-detection" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","headline":"LLM cost anomaly detection · FinOps LLM","description":"How to detect LLM cost anomalies from token growth, retry loops, context expansion, route drift, and cache hit-rate drops.","url":"https://finopsllm.com/research/anomaly-detection","datePublished":"2026-05-05","dateModified":"2026-05-05","image":"https://finopsllm.com/og.png","author":{"@type":"Organization","name":"FinOps LLM team"},"publisher":{"@type":"Organization","name":"FinOps LLM","url":"https://finopsllm.com/"}}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://finopsllm.com/"},{"@type":"ListItem","position":2,"name":"Research","item":"https://finopsllm.com/research"},{"@type":"ListItem","position":3,"name":"LLM cost anomaly detection","item":"https://finopsllm.com/research/anomaly-detection"}]}
+</script>
+<style>body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}.wrap{max-width:840px;margin:0 auto;padding:56px 24px}a{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}.langsw{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;color:#647289;margin:0 0 26px}.langsw a{text-decoration:none}.langsw a[aria-current]{color:#E6EAF2;font-weight:600}</style><script src="/assets/consent.js" defer></script><script src="/assets/attribution.js" defer></script><script src="/assets/lang.js" defer></script>
+</head>
+<body><main class="wrap">{% endblock %}{% block body %}<nav class="langsw" aria-label="Language / Idioma"><a href="/research/anomaly-detection" hreflang="en" aria-current="page">EN</a> · <a href="/es/research/anomaly-detection" hreflang="es">ES</a> · <a href="/fr/research/anomaly-detection" hreflang="fr">FR</a> · <a href="/de/research/anomaly-detection" hreflang="de">DE</a> · <a href="/ja/research/anomaly-detection" hreflang="ja">JA</a></nav><h1>LLM cost anomaly detection</h1>
+<p>LLM cost anomalies are often invisible until the invoice because spend can rise without request volume rising. A deployment may add retrieved context, change a router threshold, reduce cache hits, trigger retries, or move traffic to a more expensive model. Traditional traffic alerts miss those changes.</p>
+<p>A useful anomaly detector watches cost drivers, not just total cost. Total daily spend is a lagging indicator. The earlier signals are tokens per request, model mix, fallback rate, cache hit rate, batch share, and spend per product surface.</p>
+<h2>Signals to monitor</h2>
+<ul><li>Spend per endpoint, team, and customer per hour.</li><li>Input and output tokens per request at p50, p90, and p99.</li><li>Retry rate, fallback rate, and provider error rate.</li><li>Cache hit rate and cache-read token share.</li><li>Model mix changes after deploys or prompt releases.</li><li>Batchable work accidentally running synchronously.</li></ul>
+<h2>Baselines</h2>
+<p>Use multiple baselines. A support bot has daily and weekly cycles. A nightly enrichment job has a batch window. An eval suite spikes around releases. A single global threshold will either miss real anomalies or wake people up constantly.</p>
+<p>The best baseline is per owner and workload class. Alert when a feature deviates from its own normal pattern, not when the entire company crosses a generic spend limit.</p>
+<h2>Actionable alerts</h2>
+<p>An alert should explain the driver: “p90 input tokens doubled on endpoint X after deploy Y,” “cache hit rate dropped from 74% to 18%,” or “fallback to frontier model increased by 31%.” If the alert cannot name a likely owner and driver, it will be ignored.</p>
+<h2>Response loop</h2>
+<p>Attach deploy context, route-policy diffs, and the top affected customers or workloads. Then offer the next move: roll back a prompt, lower retrieval count, restore a router threshold, disable a fallback, or move a job to batch. Anomaly detection is only valuable when it shortens the time from invoice surprise to engineering action.</p><h2>Related</h2>
+<ul><li><a href="/research/llm-cost-monitoring">LLM cost monitoring</a> — dashboards and observability for spend.</li><li><a href="/research/ai-observability">AI observability</a> — cost signals and operational metrics.</li><li><a href="/research/why-llm-bills-spike">Why LLM bills spike</a> — root causes of cost surges.</li></ul>
+<hr style="margin:48px 0 24px;border:none;border-top:1px solid #1E2A3F" /><p>Want this applied to your own LLM spend? FinOps LLM runs a free audit of your AI costs and shows where the savings are. <a href="/book">Book free audit &rarr;</a></p><p><a href="/research">Back to research</a></p>{% endblock %}{% block suffix %}</main></body></html>
+
+{% endblock %}

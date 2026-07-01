@@ -1,0 +1,48 @@
+---
+permalink: "research/finops-for-llm.html"
+---
+{% extends "shell.njk" %}{% block prefix %}<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>FinOps for LLM · FinOps LLM</title><meta name="description" content="A practical framework for applying FinOps principles to LLM and GenAI spend: visibility, attribution, optimization, and accountability." /><meta name="robots" content="index, follow" /><link rel="canonical" href="https://finopsllm.com/research/finops-for-llm" />
+<link rel="alternate" hreflang="en" href="https://finopsllm.com/research/finops-for-llm" />
+<link rel="alternate" hreflang="es" href="https://finopsllm.com/es/research/finops-for-llm" />
+<link rel="alternate" hreflang="fr" href="https://finopsllm.com/fr/research/finops-for-llm" />
+<link rel="alternate" hreflang="de" href="https://finopsllm.com/de/research/finops-for-llm" />
+<link rel="alternate" hreflang="ja" href="https://finopsllm.com/ja/research/finops-for-llm" />
+<link rel="alternate" hreflang="x-default" href="https://finopsllm.com/research/finops-for-llm" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","headline":"FinOps for LLM · FinOps LLM","description":"A practical framework for applying FinOps principles to LLM and GenAI spend: visibility, attribution, optimization, and accountability.","url":"https://finopsllm.com/research/finops-for-llm","datePublished":"2026-05-05","dateModified":"2026-06-11","image":"https://finopsllm.com/og.png","author":{"@type":"Organization","name":"FinOps LLM team"},"publisher":{"@type":"Organization","name":"FinOps LLM","url":"https://finopsllm.com/"}}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://finopsllm.com/"},{"@type":"ListItem","position":2,"name":"Research","item":"https://finopsllm.com/research"},{"@type":"ListItem","position":3,"name":"FinOps for LLM","item":"https://finopsllm.com/research/finops-for-llm"}]}
+</script>
+<style>body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}.wrap{max-width:840px;margin:0 auto;padding:56px 24px}a{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}table{border-collapse:collapse;width:100%;margin:24px 0;font-size:.95em}th,td{border:1px solid #1E2A3F;padding:10px 12px;text-align:left;color:#B6C0D2}th{color:#E6EAF2;background:#101726}.langsw{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;color:#647289;margin:0 0 26px}.langsw a{text-decoration:none}.langsw a[aria-current]{color:#E6EAF2;font-weight:600}</style><script src="/assets/consent.js" defer></script><script src="/assets/attribution.js" defer></script>
+<script src="/assets/lang.js" defer></script>
+</head>
+<body><main class="wrap">{% endblock %}{% block body %}<nav class="langsw" aria-label="Language / Idioma"><a href="/research/finops-for-llm" hreflang="en" aria-current="page">EN</a> · <a href="/es/research/finops-for-llm" hreflang="es">ES</a> · <a href="/fr/research/finops-for-llm" hreflang="fr">FR</a> · <a href="/de/research/finops-for-llm" hreflang="de">DE</a> · <a href="/ja/research/finops-for-llm" hreflang="ja">JA</a></nav><h1>FinOps for LLM: a practical framework</h1>
+<p>FinOps for LLMs is the practice of making AI spend visible, attributable, optimizable, and accountable. It borrows from cloud FinOps, but the cost drivers are different. A cloud bill is shaped by instances, storage, transfer, and commitments. An LLM bill is shaped by input tokens, output tokens, cache writes, cache reads, retries, model mix, context length, batch eligibility, and quality requirements.</p>
+<p>The first mistake teams make is treating LLM spend as one provider-level number. That hides the real levers. A support summarization endpoint, an agent workflow, a nightly enrichment job, and an eval suite may all use the same model, but they have different latency needs, quality thresholds, cacheability, and ownership. FinOps starts when those workloads are separated.</p>
+<table>
+<thead><tr><th>Pillar</th><th>Core question</th><th>What it produces</th></tr></thead>
+<tbody>
+<tr><td>1. Visibility</td><td>What are we actually paying for, request by request?</td><td>Normalized usage records split by input, output, cache-write, cache-read, batch, and retry spend</td></tr>
+<tr><td>2. Attribution</td><td>Which team, feature, customer, or workload caused it?</td><td>Spend mapped to owners: environment, endpoint, team, tenant, model, workload class</td></tr>
+<tr><td>3. Optimization</td><td>Which lever lowers cost per successful task without breaking quality?</td><td>Routing, caching, batching, compaction, and arbitrage changes shipped behind flags</td></tr>
+<tr><td>4. Accountability</td><td>Who reviews the numbers and acts on them each month?</td><td>Showback (then chargeback) reports and an operating rhythm reconciled against invoices</td></tr>
+</tbody>
+</table>
+<h2>1. Visibility</h2>
+<p>Visibility means normalizing provider invoices and gateway logs into a common record. Each request should carry enough metadata to answer: who owns it, which feature generated it, which model handled it, how many token classes were billed, whether the call retried, and whether the output produced user value.</p>
+<p>Good visibility separates input, output, cache-write, cache-read, batch, and retry spend. Without this split, teams accidentally count cache-read discounts as savings, miss retry loops, and compare providers on list price rather than cost per successful task.</p>
+<h2>2. Attribution</h2>
+<p>Attribution maps spend to teams, products, customers, and workloads. The point is not blame; the point is decision quality. A finance team cannot govern spend if every line item says “OpenAI.” An engineering leader cannot optimize a product surface if spend is grouped only by provider account.</p>
+<p>Minimum useful attribution usually includes environment, endpoint, team owner, customer or tenant where allowed, model, provider, and workload class. Mature programs add business metrics such as resolved ticket, completed analysis, generated report, or successful agent task.</p>
+<h2>3. Optimization</h2>
+<p>Optimization should follow attribution. The common levers are model routing, semantic caching, prompt caching, context compaction, batch routing, provider arbitrage, and fallback policy tuning. Each lever changes the bill differently. Routing changes model mix. Caching changes input-token and latency economics. Batch moves work into discounted asynchronous lanes. Compaction reduces repeated context.</p>
+<p>The test is not “did token count go down?” The test is “did cost per successful task go down without breaking quality, latency, or reliability?”</p>
+<h2>4. Accountability</h2>
+<p>Showback should come before chargeback. First give teams a credible monthly view of their spend and drivers. Once the numbers are trusted, chargeback can make sense for mature organizations. The goal is a repeatable operating rhythm: review the largest drivers, agree on optimization candidates, ship changes behind flags, and reconcile against the next invoice.</p><h2>Related</h2>
+<ul><li><a href="/research/what-is-llm-finops">What is LLM FinOps?</a> — the operating discipline.</li><li><a href="/research/ai-finops">AI FinOps</a> — the broader practice LLM FinOps fits inside.</li><li><a href="/research/llm-cost-attribution">LLM cost attribution</a> — how the attribution layer works.</li><li><a href="/research/llm-chargeback-showback">LLM chargeback and showback</a> — moving cost to owners.</li></ul>
+<hr style="margin:48px 0 24px;border:none;border-top:1px solid #1E2A3F" /><p>Want this applied to your own LLM spend? FinOps LLM runs a free audit of your AI costs and shows where the savings are. <a href="/book">Book free audit &rarr;</a></p><p><a href="/research">Back to research</a></p>{% endblock %}{% block suffix %}</main></body></html>
+
+{% endblock %}

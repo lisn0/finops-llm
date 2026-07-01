@@ -1,0 +1,63 @@
+---
+permalink: "research/llm-token-types-explained.html"
+---
+{% extends "shell.njk" %}{% block prefix %}<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Input, output, cache, and reasoning tokens: what each costs and why · FinOps LLM</title><meta name="description" content="A plain-English breakdown of the four token types that drive an LLM bill — input, output, cache-read, and reasoning tokens — what each one costs, and which levers reduce each." /><meta name="robots" content="index, follow" /><link rel="canonical" href="https://finopsllm.com/research/llm-token-types-explained" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://finopsllm.com/research/llm-token-types-explained" />
+<meta property="og:title" content="Input, output, cache, and reasoning tokens: what each costs and why" />
+<meta property="og:description" content="A plain-English breakdown of the four token types that drive an LLM bill — input, output, cache-read, and reasoning — what each costs and which levers reduce each." />
+<meta property="og:image" content="https://finopsllm.com/og.svg" />
+<meta property="og:site_name" content="FinOps LLM" />
+<meta property="og:locale" content="en_US" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:site" content="@finopsllm" />
+<meta name="twitter:title" content="Input, output, cache, and reasoning tokens: what each costs and why" />
+<meta name="twitter:description" content="The four token types that drive an LLM bill — what each costs and which levers reduce each." />
+<meta name="twitter:image" content="https://finopsllm.com/og.svg" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","headline":"Input, output, cache, and reasoning tokens: what each costs and why","description":"A plain-English breakdown of the four token types that drive an LLM bill — input, output, cache-read, and reasoning tokens — what each one costs, and which levers reduce each.","url":"https://finopsllm.com/research/llm-token-types-explained","datePublished":"2026-05-31","dateModified":"2026-06-11","image":"https://finopsllm.com/og.png","author":{"@type":"Organization","name":"FinOps LLM team"},"publisher":{"@type":"Organization","name":"FinOps LLM","url":"https://finopsllm.com/"}}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://finopsllm.com/"},{"@type":"ListItem","position":2,"name":"Research","item":"https://finopsllm.com/research"},{"@type":"ListItem","position":3,"name":"Input, output, cache, and reasoning tokens","item":"https://finopsllm.com/research/llm-token-types-explained"}]}
+</script>
+<style>body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}.wrap{max-width:840px;margin:0 auto;padding:56px 24px}a{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}h3{margin-top:22px;color:#E6EAF2}</style><script src="/assets/consent.js" defer></script><script src="/assets/attribution.js" defer></script>
+</head>
+<body><main class="wrap">{% endblock %}{% block body %}<h1>Input, output, cache, and reasoning tokens</h1>
+<p>When you read an LLM invoice, every dollar resolves to one of a few token types — and they do not cost the same. Treating them as one undifferentiated pile of "tokens" is the most common reason a cost baseline is wrong and a savings estimate is off. This is a plain-English guide to the four token types that matter, what each costs relative to the others, and which lever reduces each.</p>
+<h2>1. Input tokens</h2>
+<p><strong>What they are:</strong> everything you send the model — the user's message, your system prompt, retrieved documents, tool definitions, and the prior conversation history.</p>
+<p><strong>Relative cost:</strong> the cheaper of the two billed-at-full-price types, but rarely small. Input is often the <em>largest</em> token count in retrieval-heavy and long-conversation workloads, so low unit price does not mean low total cost.</p>
+<p><strong>What drives it up:</strong> long system prompts, deep <a href="/research/rag-cost-optimization">retrieval</a>, full chat history replayed on every turn, oversized tool schemas.</p>
+<p><strong>Levers:</strong> <a href="/research/semantic-cache-economics">prompt compression</a>, trimming history, tightening retrieval depth, and moving stable prefixes into a prompt cache (see below).</p>
+<h2>2. Output tokens</h2>
+<p><strong>What they are:</strong> everything the model generates back to you — the visible answer.</p>
+<p><strong>Relative cost:</strong> typically the most expensive token type per unit, often several times the price of input tokens on the same model.</p>
+<p><strong>What drives it up:</strong> high <em>max tokens</em> limits, verbose or "detailed" response styles, formats that pad output (large JSON, repeated boilerplate), and chatty multi-turn designs.</p>
+<p><strong>Levers:</strong> cap output length to what the task needs, prompt for concision, use structured outputs that don't repeat context, and pick a smaller model where the quality bar allows.</p>
+<h2>3. Cache-read tokens</h2>
+<p><strong>What they are:</strong> input tokens served from a provider's prompt cache instead of processed fresh, because the same prefix was seen recently.</p>
+<p><strong>Relative cost:</strong> heavily discounted. As of 2026, roughly 50% off on OpenAI and up to about 90% off on Anthropic — always check current provider pricing. This is the one token type that is <em>cheaper</em>, and the discount is large enough to change a baseline materially.</p>
+<p><strong>Why they're dangerous to ignore:</strong> cache-read tokens look like ordinary input tokens unless you separate them. Count them at full price and you overstate spend; lose them (because a deploy changed a once-stable prompt) and your bill <a href="/research/why-llm-bills-spike">spikes</a> with no traffic change. Tracking <a href="/research/prompt-cache-attribution">cache reads as their own line</a> is fundamental to an accurate number.</p>
+<p><strong>Levers:</strong> stabilise system prompts and shared context so they cache; keep volatile content (timestamps, per-request data) out of the cached prefix.</p>
+<h2>4. Reasoning tokens</h2>
+<p><strong>What they are:</strong> tokens a reasoning model generates internally while "thinking," before it produces the visible answer. They are billed like output but never shown to the user.</p>
+<p><strong>Relative cost:</strong> priced as output, and on hard prompts they can <em>exceed</em> the visible answer by several times. They are the token type most likely to surprise a team that budgeted only for the output it can see.</p>
+<p><strong>What drives it up:</strong> adopting a reasoning model, raising the reasoning budget, or pointing reasoning models at tasks that don't need them.</p>
+<p><strong>Levers:</strong> reserve reasoning models for tasks that genuinely benefit, tune the reasoning budget, and <a href="/research/reasoning-token-attribution">track reasoning tokens separately</a> so their cost is visible.</p>
+<h2>Putting it together</h2>
+<p>A single request's cost is the sum of these four, each at its own price, multiplied by the model that handled it:</p>
+<p><em>input (full price) + cache reads (discounted) + output + reasoning — × the model's per-token rate.</em></p>
+<p>Two requests with the same total token count can cost very differently depending on the mix. A request that is mostly cache-read input is cheap; a request of the same size that is mostly output and reasoning is expensive. This is exactly why a cost baseline built on a single blended token price is unreliable — and why <a href="/research/what-is-llm-cost-attribution">attribution</a> has to break spend out by token type, not just by feature.</p>
+<h2>The one-line takeaway</h2>
+<p>Output and reasoning tokens are where the money usually goes; input is where the volume usually is; cache reads are the discount you must not lose. Track all four separately, per feature and per model, and the bill stops being a mystery.</p>
+<h2>Related</h2>
+<ul>
+<li><a href="/research/cost-per-request-kpi">Cost per request as a product KPI</a> — using token types in product metrics.</li>
+<li><a href="/research/how-llm-providers-charge">How do LLM providers charge?</a> — the full pricing picture.</li>
+<li><a href="/research/llm-token-tracking">LLM token tracking</a> — instrumenting token data in practice.</li>
+<li><a href="/research/prompt-cache-attribution">Prompt cache attribution</a> — getting cache reads right.</li>
+</ul>
+<hr style="margin:48px 0 24px;border:none;border-top:1px solid #1E2A3F" /><p>Want this applied to your own LLM spend? FinOps LLM runs a free audit of your AI costs and shows where the savings are. <a href="/book">Book free audit &rarr;</a></p><p><a href="/research">Back to research</a></p>{% endblock %}{% block suffix %}</main></body></html>
+{% endblock %}

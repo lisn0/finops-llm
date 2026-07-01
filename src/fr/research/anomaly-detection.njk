@@ -1,0 +1,35 @@
+---
+permalink: "fr/research/anomaly-detection.html"
+---
+{% extends "shell.njk" %}{% block prefix %}<!DOCTYPE html>
+<html lang="fr"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Détection d'anomalies de coûts des LLM · FinOps LLM</title><meta name="description" content="Comment détecter les anomalies de coûts des LLM à partir de la croissance des tokens, des boucles de nouvelle tentative, de l'expansion du contexte, de la dérive du routage et des baisses du taux de hit du cache." /><meta name="robots" content="index, follow" /><link rel="canonical" href="https://finopsllm.com/fr/research/anomaly-detection" />
+<link rel="alternate" hreflang="en" href="https://finopsllm.com/research/anomaly-detection" />
+<link rel="alternate" hreflang="es" href="https://finopsllm.com/es/research/anomaly-detection" />
+<link rel="alternate" hreflang="fr" href="https://finopsllm.com/fr/research/anomaly-detection" />
+<link rel="alternate" hreflang="de" href="https://finopsllm.com/de/research/anomaly-detection" />
+<link rel="alternate" hreflang="ja" href="https://finopsllm.com/ja/research/anomaly-detection" />
+<link rel="alternate" hreflang="x-default" href="https://finopsllm.com/research/anomaly-detection" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","headline":"Détection d'anomalies de coûts des LLM · FinOps LLM","description":"Comment détecter les anomalies de coûts des LLM à partir de la croissance des tokens, des boucles de nouvelle tentative, de l'expansion du contexte, de la dérive du routage et des baisses du taux de hit du cache.","url":"https://finopsllm.com/fr/research/anomaly-detection","datePublished":"2026-05-05","dateModified":"2026-05-05","image":"https://finopsllm.com/og.png","author":{"@type":"Organization","name":"FinOps LLM team"},"publisher":{"@type":"Organization","name":"FinOps LLM","url":"https://finopsllm.com/"}}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Accueil","item":"https://finopsllm.com/fr/"},{"@type":"ListItem","position":2,"name":"Recherche","item":"https://finopsllm.com/fr/research"},{"@type":"ListItem","position":3,"name":"Détection d'anomalies de coûts des LLM","item":"https://finopsllm.com/fr/research/anomaly-detection"}]}
+</script>
+<style>body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}.wrap{max-width:840px;margin:0 auto;padding:56px 24px}a{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}.langsw{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;color:#647289;margin:0 0 26px}.langsw a{text-decoration:none}.langsw a[aria-current]{color:#E6EAF2;font-weight:600}</style><script src="/assets/consent.js" defer></script><script src="/assets/attribution.js" defer></script><script src="/assets/lang.js" defer></script>
+</head>
+<body><main class="wrap">{% endblock %}{% block body %}<nav class="langsw" aria-label="Language / Idioma"><a href="/research/anomaly-detection" hreflang="en">EN</a> · <a href="/es/research/anomaly-detection" hreflang="es">ES</a> · <a href="/fr/research/anomaly-detection" hreflang="fr" aria-current="page">FR</a> · <a href="/de/research/anomaly-detection" hreflang="de">DE</a> · <a href="/ja/research/anomaly-detection" hreflang="ja">JA</a></nav><h1>Détection d'anomalies de coûts des LLM</h1>
+<p>Les anomalies de coûts des LLM sont souvent invisibles jusqu'à l'arrivée de la facture car les dépenses peuvent augmenter sans que le volume de requêtes augmente. Un déploiement peut ajouter du contexte récupéré, modifier un seuil de routage, réduire les hits du cache, déclencher des nouvelles tentatives ou déplacer le trafic vers un modèle plus coûteux. Les alertes de trafic traditionnelles manquent ces changements.</p>
+<p>Un détecteur d'anomalies utile surveille les facteurs de coûts, pas seulement le coût total. La dépense quotidienne totale est un indicateur retardé. Les premiers signaux sont les tokens par requête, le mélange de modèles, le taux de secours, le taux de hit du cache, la part des lots et la dépense par surface de produit.</p>
+<h2>Signaux à surveiller</h2>
+<ul><li>Dépenses par endpoint, équipe et client par heure.</li><li>Tokens d'entrée et de sortie par requête à p50, p90 et p99.</li><li>Taux de nouvelle tentative, taux de secours et taux d'erreur du fournisseur.</li><li>Taux de hit du cache et part des tokens lus en cache.</li><li>Changements du mélange de modèles après des déploiements ou des lancements de prompts.</li><li>Travail traitable s'exécutant accidentellement de manière synchrone.</li></ul>
+<h2>Lignes de base</h2>
+<p>Utilisez plusieurs lignes de base. Un chatbot de support a des cycles quotidiens et hebdomadaires. Un travail d'enrichissement nocturne a une fenêtre batch. Une suite d'évaluation a des pics autour des lancements. Un seuil global unique sera soit trop insensible, soit réveillera les gens constamment.</p>
+<p>La meilleure ligne de base est par propriétaire et classe de charge de travail. Alertez quand une fonctionnalité s'écarte de son propre modèle normal, pas quand toute l'entreprise franchit une limite de dépense générique.</p>
+<h2>Alertes exploitables</h2>
+<p>Une alerte doit expliquer le facteur : « les tokens d'entrée p90 ont doublé sur l'endpoint X après le déploiement Y », « le taux de hit du cache a chuté de 74% à 18% », ou « le basculement vers le modèle frontier a augmenté de 31% ». Si l'alerte ne peut pas nommer un propriétaire probable et un facteur, elle sera ignorée.</p>
+<h2>Boucle de réponse</h2>
+<p>Attachez le contexte de déploiement, les diffs de politique de routage et les clients ou charges de travail les plus affectés. Ensuite, proposez l'étape suivante : annuler un prompt, réduire le nombre de récupérations, restaurer un seuil de routage, désactiver un secours ou déplacer un travail vers batch. La détection d'anomalies n'est précieuse que lorsqu'elle raccourcit le délai entre la surprise de la facture et l'action technique.</p><h2>Connexes</h2>
+<ul><li><a href="/research/llm-cost-monitoring">Surveillance des coûts des LLM</a> — dashboards et observabilité des dépenses.</li><li><a href="/research/ai-observability">Observabilité d'IA</a> — signaux de coûts et métriques opérationnelles.</li><li><a href="/research/why-llm-bills-spike">Pourquoi les factures LLM explosent</a> — causes racines des augmentations de coûts.</li></ul>
+<hr style="margin:48px 0 24px;border:none;border-top:1px solid #1E2A3F" /><p>Vous voulez que cela s'applique à vos propres dépenses d'IA? FinOps LLM réalise un audit gratuit de vos coûts d'IA et vous montre où se trouvent les économies. <a href="/book">Réservez votre audit gratuit &rarr;</a></p><p><a href="/fr/research">Retour à la recherche</a></p>{% endblock %}{% block suffix %}</main></body></html>
+{% endblock %}

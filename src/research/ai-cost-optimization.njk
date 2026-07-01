@@ -1,0 +1,27 @@
+---
+permalink: "research/ai-cost-optimization.html"
+---
+{% extends "shell.njk" %}{% block prefix %}<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AI cost optimization · FinOps LLM</title><meta name="description" content="A practical guide to AI cost optimization across LLM routing, prompt design, caching, batch jobs, and governance." /><meta name="robots" content="index, follow" /><link rel="canonical" href="https://finopsllm.com/research/ai-cost-optimization" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","headline":"AI cost optimization · FinOps LLM","description":"A practical guide to AI cost optimization across LLM routing, prompt design, caching, batch jobs, and governance.","url":"https://finopsllm.com/research/ai-cost-optimization","datePublished":"2026-05-12","dateModified":"2026-05-12","image":"https://finopsllm.com/og.png","author":{"@type":"Organization","name":"FinOps LLM team"},"publisher":{"@type":"Organization","name":"FinOps LLM","url":"https://finopsllm.com/"}}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://finopsllm.com/"},{"@type":"ListItem","position":2,"name":"Research","item":"https://finopsllm.com/research"},{"@type":"ListItem","position":3,"name":"AI cost optimization","item":"https://finopsllm.com/research/ai-cost-optimization"}]}
+</script>
+<style>body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}.wrap{max-width:840px;margin:0 auto;padding:56px 24px}a{color:#7AAFFF}p,li{color:#B6C0D2}h2{margin-top:34px}</style><script src="/assets/consent.js" defer></script><script src="/assets/attribution.js" defer></script>
+</head>
+<body><main class="wrap">{% endblock %}{% block body %}<h1>AI cost optimization</h1>
+<p>AI cost optimization is the discipline of lowering the cost of useful model work without damaging quality, latency, or reliability. The useful unit is not cost per token in isolation. The useful unit is cost per successful task: resolved support ticket, accepted code suggestion, completed workflow, or approved analysis.</p>
+<p>The most common mistake is negotiating provider price before fixing workload design. In many teams, the largest avoidable cost comes from sending too much context, routing simple work to expensive models, retrying noisy prompts, or running synchronous jobs that could be batched. Optimization starts by finding the waste pattern, not by assuming the invoice is mainly a procurement problem.</p>
+<h2>Where savings usually come from</h2>
+<ul><li>Model routing that sends easy requests to lower-cost models and escalates only when confidence is low.</li><li>Prompt and context compaction so each request carries only the evidence needed for the task.</li><li>Prompt caching, semantic caching, and response reuse for repeated tasks.</li><li>Batch routing for evals, enrichment, reprocessing, and other non-urgent workloads.</li><li>Retry and fallback controls that stop low-quality loops from multiplying cost.</li></ul>
+<h2>How to prioritize optimization work</h2>
+<p>Start with attribution. Break spend by feature, owner, model, provider, token class, and workload type. Then rank by total spend and variance. A support assistant using a premium model on every request often produces a larger savings opportunity than a carefully tuned agent pipeline that runs less often.</p>
+<p>Optimization should be measured against a stable quality baseline. Routing to a cheaper model is only a win if the task still succeeds. That is why the best programs combine finance metrics with product metrics such as containment rate, approval rate, latency, or task completion.</p>
+<h2>Cost optimization operating rhythm</h2>
+<p>Strong teams review AI cost weekly, not only at month end. They compare the largest drivers, pick one or two optimization candidates, test behind flags, and reconcile the results against provider and gateway data. This turns cost reduction from an occasional project into a repeatable product habit.</p>
+<p>If you need the supporting mechanics, see <a href="/research/llm-cost-attribution">LLM cost attribution</a>, <a href="/research/model-routing">model routing</a>, and <a href="/research/llm-budget-governance">LLM budget governance</a>.</p>
+<hr style="margin:48px 0 24px;border:none;border-top:1px solid #1E2A3F" /><p>Want this applied to your own LLM spend? FinOps LLM runs a free audit of your AI costs and shows where the savings are. <a href="/book">Book free audit &rarr;</a></p><p><a href="/research">Back to research</a></p>{% endblock %}{% block suffix %}</main></body></html>
+{% endblock %}

@@ -1,0 +1,35 @@
+---
+permalink: "de/research/anomaly-detection.html"
+---
+{% extends "shell.njk" %}{% block prefix %}<!DOCTYPE html>
+<html lang="de"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AI-Kostenanomalien-Erkennung · FinOps LLM</title><meta name="description" content="Wie man AI-Kostenanomalien durch Token-Wachstum, Wiederholungsschleifen, Kontext-Expansion, Routing-Abweichung und Cache-Hit-Rate-Rückgang erkennt." /><meta name="robots" content="index, follow" /><link rel="canonical" href="https://finopsllm.com/de/research/anomaly-detection" />
+<link rel="alternate" hreflang="en" href="https://finopsllm.com/research/anomaly-detection" />
+<link rel="alternate" hreflang="es" href="https://finopsllm.com/es/research/anomaly-detection" />
+<link rel="alternate" hreflang="fr" href="https://finopsllm.com/fr/research/anomaly-detection" />
+<link rel="alternate" hreflang="de" href="https://finopsllm.com/de/research/anomaly-detection" />
+<link rel="alternate" hreflang="ja" href="https://finopsllm.com/ja/research/anomaly-detection" />
+<link rel="alternate" hreflang="x-default" href="https://finopsllm.com/research/anomaly-detection" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","headline":"AI-Kostenanomalien-Erkennung · FinOps LLM","description":"Wie man AI-Kostenanomalien durch Token-Wachstum, Wiederholungsschleifen, Kontext-Expansion, Routing-Abweichung und Cache-Hit-Rate-Rückgang erkennt.","url":"https://finopsllm.com/de/research/anomaly-detection","datePublished":"2026-05-05","dateModified":"2026-05-05","image":"https://finopsllm.com/og.png","author":{"@type":"Organization","name":"FinOps LLM team"},"publisher":{"@type":"Organization","name":"FinOps LLM","url":"https://finopsllm.com/"}}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Startseite","item":"https://finopsllm.com/de/"},{"@type":"ListItem","position":2,"name":"Forschung","item":"https://finopsllm.com/de/research"},{"@type":"ListItem","position":3,"name":"AI-Kostenanomalien-Erkennung","item":"https://finopsllm.com/de/research/anomaly-detection"}]}
+</script>
+<style>body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}.wrap{max-width:840px;margin:0 auto;padding:56px 24px}a{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}.langsw{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;color:#647289;margin:0 0 26px}.langsw a{text-decoration:none}.langsw a[aria-current]{color:#E6EAF2;font-weight:600}</style><script src="/assets/consent.js" defer></script><script src="/assets/attribution.js" defer></script><script src="/assets/lang.js" defer></script>
+</head>
+<body><main class="wrap">{% endblock %}{% block body %}<nav class="langsw" aria-label="Language / Idioma"><a href="/research/anomaly-detection" hreflang="en">EN</a> · <a href="/es/research/anomaly-detection" hreflang="es">ES</a> · <a href="/fr/research/anomaly-detection" hreflang="fr">FR</a> · <a href="/de/research/anomaly-detection" hreflang="de" aria-current="page">DE</a> · <a href="/ja/research/anomaly-detection" hreflang="ja">JA</a></nav><h1>AI-Kostenanomalien-Erkennung</h1>
+<p>AI-Kostenanomalien sind oft unsichtbar bis die Rechnung kommt weil Ausgaben steigen können ohne dass das Request-Volumen steigt. Ein Deployment kann abgerufenen Kontext hinzufügen, einen Routing-Schwellwert ändern, Cache-Hits reduzieren, Wiederholungen aktivieren oder Traffic zu einem teureren Modell verschieben. Traditionelle Traffic-Alerts erkennen diese Änderungen nicht.</p>
+<p>Ein sinnvoller Anomalie-Detektor überwacht Kostenfaktoren, nicht nur Gesamtkosten. Die täglichen Gesamtausgaben sind ein verzögerter Indikator. Die ersten Signale sind Tokens pro Request, Modellmix, Abruf-Rate, Cache-Hit-Rate, Batch-Quote und Ausgaben nach Produktoberfläche.</p>
+<h2>Zu überwachende Signale</h2>
+<ul><li>Ausgaben pro Endpoint, Team und Kunde pro Stunde.</li><li>Eingabe- und Ausgabe-Tokens pro Request bei p50, p90 und p99.</li><li>Wiederholungs-Rate, Abruf-Rate und Anbieter-Fehlerrate.</li><li>Cache-Hit-Rate und Quote von Cache-gelesenen Tokens.</li><li>Modellmix-Änderungen nach Deployments oder Prompt-Launches.</li><li>Verarbeitbare Arbeit die versehentlich synchron läuft.</li></ul>
+<h2>Baselines</h2>
+<p>Verwenden Sie mehrere Baselines. Ein Support-Bot hat täglich und wöchentliche Zyklen. Ein nächtlicher Anreicherungsjob hat ein Batch-Fenster. Eine Evaluation-Suite hat Spitzen um Launches. Ein einzelner globaler Schwellwert wird zu unempfindlich oder weckt die Leute ständig auf.</p>
+<p>Die beste Baseline ist nach Eigentümer und Workload-Klasse. Warnung wenn eine Feature von ihrem normalen Muster abweicht, nicht wenn die gesamte Firma einen generischen Ausgabenlimit kreuzt.</p>
+<h2>Handlungsfähige Alerts</h2>
+<p>Ein Alert sollte den Faktor erklären: "Eingabe-Tokens p90 verdoppelten sich am Endpoint X nach Deployment Y", "Cache-Hit-Rate fiel von 74% auf 18%", oder "Abruf zum Grenzmodell stieg um 31%". Wenn der Alert keinen wahrscheinlichen Eigentümer und Faktor nennen kann, wird er ignoriert.</p>
+<h2>Antwort-Schleife</h2>
+<p>Hängen Sie Deployment-Kontext, Routing-Richtlinien Diffs und die am meisten betroffenen Kunden oder Workloads an. Bieten Sie dann den nächsten Schritt an: Prompt zurückfahren, Abruf-Zählung reduzieren, Routing-Schwellwert wiederherstellen, Abruf deaktivieren oder Arbeit zu Batch verschieben. Anomalieerkennung ist nur wertvoll wenn sie die Zeit von der Rechnungs-Überraschung zu technischer Aktion verkürzt.</p><h2>Verwandt</h2>
+<ul><li><a href="/research/llm-cost-monitoring">LLM-Kostenüberwachung</a> — Dashboards und Observability für Ausgaben.</li><li><a href="/research/ai-observability">AI-Observability</a> — Kosten-Signale und operative Metriken.</li><li><a href="/research/why-llm-bills-spike">Warum LLM-Rechnungen steigen</a> — Grundursachen für Kosten-Anstieg.</li></ul>
+<hr style="margin:48px 0 24px;border:none;border-top:1px solid #1E2A3F" /><p>Möchten Sie dies auf Ihre eigenen AI-Ausgaben anwenden? FinOps LLM führt ein kostenloses Audit Ihrer AI-Kosten durch und zeigt Ihnen, wo Einsparungen möglich sind. <a href="/book">Kostenloses Audit anfordern &rarr;</a></p><p><a href="/de/research">Zurück zur Forschung</a></p>{% endblock %}{% block suffix %}</main></body></html>
+{% endblock %}
