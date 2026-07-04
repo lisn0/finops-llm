@@ -1,0 +1,56 @@
+---
+permalink: "es/research/mcp-server-cost-impact.html"
+---
+{% extends "shell.njk" %}{% block prefix %}<!DOCTYPE html>
+<html lang="es"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Impacto en costes de servidores MCP · FinOps LLM</title><meta name="description" content="Cómo las llamadas a herramientas MCP multiplican el uso de tokens y lo que te cuesta. Estrategias para medir y reducir la sobrecarga relacionada con MCP." /><meta name="robots" content="index, follow" /><link rel="canonical" href="https://finopsllm.com/es/research/mcp-server-cost-impact" />
+<link rel="alternate" hreflang="en" href="https://finopsllm.com/research/mcp-server-cost-impact" />
+<link rel="alternate" hreflang="es" href="https://finopsllm.com/es/research/mcp-server-cost-impact" />
+<link rel="alternate" hreflang="ja" href="https://finopsllm.com/ja/research/mcp-server-cost-impact" />
+<link rel="alternate" hreflang="x-default" href="https://finopsllm.com/research/mcp-server-cost-impact" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","headline":"Impacto en costes de servidores MCP · FinOps LLM","description":"Cómo las llamadas a herramientas MCP multiplican el uso de tokens y lo que te cuesta. Estrategias para medir y reducir la sobrecarga relacionada con MCP.","url":"https://finopsllm.com/es/research/mcp-server-cost-impact","datePublished":"2026-07-04","dateModified":"2026-07-04","image":"https://finopsllm.com/og.png","author":{"@type":"Organization","name":"FinOps LLM team"},"publisher":{"@type":"Organization","name":"FinOps LLM","url":"https://finopsllm.com/"}}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Inicio","item":"https://finopsllm.com/es/"},{"@type":"ListItem","position":2,"name":"Investigación","item":"https://finopsllm.com/es/research"},{"@type":"ListItem","position":3,"name":"Impacto en costes de servidores MCP","item":"https://finopsllm.com/es/research/mcp-server-cost-impact"}]}
+</script>
+<style>body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}.wrap{max-width:840px;margin:0 auto;padding:56px 24px}a{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}table{border-collapse:collapse;width:100%;margin:24px 0;font-size:.95em}th,td{border:1px solid #1E2A3F;padding:10px 12px;text-align:left;color:#B6C0D2}th{color:#E6EAF2;background:#101726}.langsw{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;color:#647289;margin:0 0 26px}.langsw a{text-decoration:none}.langsw a[aria-current]{color:#E6EAF2;font-weight:600}</style><script src="/assets/consent.js" defer></script><script src="/assets/attribution.js" defer></script>
+<script src="/assets/lang.js" defer></script>
+</head>
+<body><main class="wrap">{% endblock %}{% block body %}<nav class="langsw" aria-label="Language / Idioma"><a href="/research/mcp-server-cost-impact" hreflang="en">EN</a> · <a href="/es/research/mcp-server-cost-impact" hreflang="es" aria-current="page">ES</a> · <a href="/ja/research/mcp-server-cost-impact" hreflang="ja">JA</a></nav><h1>Impacto en costes de servidores MCP</h1>
+<p>El Protocolo de Contexto de Modelo (MCP) permite a los LLM llamar a herramientas externas: bases de datos, APIs, sistemas de archivos, motores de búsqueda. Es potente. También es caro. Cada definición de herramienta MCP consume espacio en la ventana de contexto, cada llamada a herramienta es un viaje de ida y vuelta a la API por separado, y cada resultado de herramienta se devuelve al modelo como tokens de entrada adicionales. Para equipos que ejecutan flujos de trabajo de agentes intensivos en MCP, la sobrecarga relacionada con herramientas puede representar el 30–60% del gasto total en tokens.</p>
+<p>Este artículo explica cómo MCP incrementa los costes, cómo medir la sobrecarga y qué hacer al respecto.</p>
+<h2>Cómo MCP consume tokens</h2>
+<p>Hay tres capas de coste en tokens en cada interacción MCP:</p>
+<p><strong>Capa 1: Definiciones de herramientas.</strong> Cada servidor MCP registra herramientas con el modelo. Una definición de herramienta incluye el nombre de la función, el esquema de parámetros y una descripción de lo que hace la herramienta. Una definición de herramienta típicamente consume 500–2.000 tokens. Un servidor con 15 herramientas añade 7,5K–30K tokens a cada solicitud, incluso si no se llama a ninguna de esas herramientas.</p>
+<p><strong>Capa 2: Solicitudes de llamada a herramientas.</strong> Cuando el modelo decide llamar a una herramienta, genera una salida de llamada a herramienta (nombre de función + argumentos). Esto se factura como tokens de salida. Luego el resultado de la herramienta vuelve como tokens de entrada. Un solo viaje de ida y vuelta de llamada a herramienta típicamente cuesta 1K–5K tokens dependiendo del tamaño del resultado.</p>
+<p><strong>Capa 3: Resultados de herramientas en contexto.</strong> Los resultados de herramientas permanecen en el contexto de la conversación para todos los turnos posteriores. Si llamas a 10 herramientas en una sesión, esos resultados se acumulan. Una consulta a base de datos que devuelve 50 filas de JSON puede añadir 8K–15K tokens que persisten durante el resto de la conversación.</p>
+<h2>El efecto compuesto</h2>
+<p>Los costes de MCP se componen porque las definiciones de herramientas se envían con cada solicitud. Si tienes 20 herramientas definidas (10K–40K tokens de definiciones) y haces 5 solicitudes en una conversación, solo las definiciones de herramientas cuestan 50K–200K tokens de entrada. Añade los resultados de las llamadas a herramientas y fácilmente puedes duplicar tu consumo base de tokens.</p>
+<table>
+<thead><tr><th>Patrón MCP</th><th>Sobrecarga en tokens</th><th>Frecuencia</th><th>Impacto mensual en costes (estimación)</th></tr></thead>
+<tbody>
+<tr><td>Definiciones de herramientas (10 herramientas)</td><td>5K–20K tokens por solicitud</td><td>Cada solicitud</td><td>$15–$60 por usuario</td></tr>
+<tr><td>Viaje de ida y vuelta de una llamada a herramienta</td><td>1K–5K tokens</td><td>3–10 por sesión</td><td>$5–$25 por usuario</td></tr>
+<tr><td>Resultado grande de herramienta (consulta DB, búsqueda de código)</td><td>5K–20K tokens</td><td>1–5 por sesión</td><td>$10–$50 por usuario</td></tr>
+<tr><td>Resultados acumulados en sesión larga</td><td>20K–100K tokens</td><td>1–3 sesiones/día</td><td>$30–$120 por usuario</td></tr>
+<tr><td>Definiciones de herramientas no usadas cargadas</td><td>5K–30K tokens por solicitud</td><td>Cada solicitud</td><td>$15–$90 por usuario</td></tr>
+</tbody>
+</table>
+<h2>Cómo medir la sobrecarga de MCP</h2>
+<p>La forma más simple de medir el coste de MCP es ejecutar el mismo prompt dos veces: una con herramientas MCP cargadas y otra sin ellas. La diferencia en tokens de entrada es tu sobrecarga de definiciones de herramientas. Luego cuenta los tokens de llamadas a herramientas por separado: la mayoría de proveedores los etiquetan distintamente en sus paneles de facturación.</p>
+<p>Para una medición más precisa, instrumenta tu cliente MCP para registrar: número de herramientas registradas, tokens consumidos por definiciones de herramientas por solicitud, número de llamadas a herramientas por sesión, tokens por resultado de herramienta y tokens totales de sesión atribuidos a actividad de herramientas.</p>
+<h2>Estrategias para reducir los costes de MCP</h2>
+<p><strong>1. Carga herramientas selectivamente.</strong> No registres todas las herramientas para cada solicitud. Si el usuario está haciendo una pregunta de código, no necesita herramientas de base de datos o despliegue cargadas. Muchos clientes MCP soportan carga dinámica de herramientas basada en contexto o activación explícita del usuario.</p>
+<p><strong>2. Minimiza las descripciones de herramientas.</strong> Las descripciones de herramientas son el mayor consumidor de tokens en las definiciones. Una descripción verbosa puede ser 500 tokens; una concisa puede ser 100 tokens. En 20 herramientas, eso es una diferencia de 8K tokens por solicitud.</p>
+<p><strong>3. Trunca los resultados de herramientas.</strong> Devuelve solo los campos que el modelo realmente necesita. Si una consulta a base de datos devuelve 20 columnas pero el modelo solo necesita 3, proyecta el resultado. Limita el tamaño del resultado a un límite razonable: 2K–4K tokens es generalmente suficiente para que el modelo tome una decision.</p>
+<p><strong>4. Cachea llamadas repetidas.</strong> Si la misma herramienta se llama con los mismos argumentos en una sesión, devuelve el resultado cacheado en lugar de ejecutar de nuevo. Esto es especialmente valioso para búsquedas de referencia, consultas de esquema y obtención de documentación.</p>
+<p><strong>5. Resume antes de inyectar.</strong> Para resultados grandes de herramientas (contenido completo de archivos, respuestas largas de API), resume antes de añadir al contexto. Devuelve un resumen más la opción de obtener el resultado completo si el modelo lo necesita.</p>
+<p><strong>6. Usa límites de presupuesto para resultados de herramientas.</strong> Establece un presupuesto por sesión para tokens de resultados de herramientas. Cuando se alcanza el presupuesto, rechaza más llamadas a herramientas o cambia a un modelo más barato para el resto de la sesión.</p>
+<h2>El coste oculto de los servidores MCP</h2>
+<p>Más allá de los costes en tokens, los servidores MCP introducen sobrecarga de latencia y fiabilidad. Una llamada a herramienta que tarda 3 segundos en responder añade latencia a cada turno. Una herramienta que falla intermitentemente causa reintentos. Ambos aumentan el coste efectivo por tarea.</p>
+<p>Para equipos que escalan el uso de MCP en una organización, rastrear estos costes a nivel de servidor es esencial. Enruta las cargas de trabajo intensivas en MCP a modelos con costes por token más bajos, y mantén los flujos de trabajo ligeros en MCP en modelos premium donde la latencia importa.</p>
+<h2>Relacionado</h2>
+<ul><li><a href="/es/research/agent-economics">Economía de agentes</a> — cómo se calculan los precios de los agentes de codificación en la práctica.</li><li><a href="/research/agent-spend-attribution">Atribución del gasto de agentes</a> — rastreo de costes de agentes por proyecto.</li><li><a href="/research/llm-token-tracking">Seguimiento de tokens de LLM</a> — medición de lo que gastas.</li><li><a href="/es/research/finops-for-llm">FinOps para LLM</a> — el marco más amplio.</li></ul>
+<hr style="margin:48px 0 24px;border:none;border-top:1px solid #1E2A3F" /><p>¿Quieres que esto se aplique a tu propio gasto en LLM? FinOps LLM ejecuta una auditoría gratuita de tus costes en IA y muestra dónde están los ahorros. <a href="/book">Solicita tu auditoría gratuita &rarr;</a></p><p><a href="/es/research">Volver a la investigación</a></p>{% endblock %}{% block suffix %}</main></body></html>
+{% endblock %}

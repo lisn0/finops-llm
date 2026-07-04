@@ -1,0 +1,121 @@
+---
+permalink: "ja/research/llm-cost-calculator.html"
+---
+{% extends "shell.njk" %}{% block prefix %}<!DOCTYPE html>
+<html lang="ja"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>LLMコスト計算機 — 月間AI支出を見積もり · FinOps LLM</title><meta name="description" content="無料のLLMコスト計算機。OpenAI、Anthropic、Googleなどの月間支出を見積もり。軽度・中度・重度の使用パターン別コストを比較。" /><meta name="robots" content="index, follow" /><link rel="canonical" href="https://finopsllm.com/ja/research/llm-cost-calculator" />
+<link rel="alternate" hreflang="en" href="https://finopsllm.com/research/llm-cost-calculator" />
+<link rel="alternate" hreflang="es" href="https://finopsllm.com/es/research/llm-cost-calculator" />
+<link rel="alternate" hreflang="ja" href="https://finopsllm.com/ja/research/llm-cost-calculator" />
+<link rel="alternate" hreflang="x-default" href="https://finopsllm.com/research/llm-cost-calculator" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://finopsllm.com/ja/research/llm-cost-calculator" />
+<meta property="og:title" content="LLMコスト計算機 — 月間AI支出を見積もり" />
+<meta property="og:description" content="無料のLLMコスト計算機。OpenAI、Anthropic、Googleなどの月間支出を見積もり。" />
+<meta property="og:image" content="https://finopsllm.com/og.svg" />
+<meta property="og:site_name" content="FinOps LLM" />
+<meta property="og:locale" content="ja_JP" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:site" content="@finopsllm" />
+<meta name="twitter:title" content="LLMコスト計算機 — 月間AI支出を見積もり" />
+<meta name="twitter:description" content="無料のLLMコスト計算機。プロバイダー別の月間支出を見積もり。" />
+<meta name="twitter:image" content="https://finopsllm.com/og.svg" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","headline":"LLMコスト計算機 — 月間AI支出を見積もり","description":"無料のLLMコスト計算機。OpenAI、Anthropic、Googleなどの月間支出を見積もり。軽度・中度・重度の使用パターン別コストを比較。","url":"https://finopsllm.com/ja/research/llm-cost-calculator","datePublished":"2026-07-04","dateModified":"2026-07-04","image":"https://finopsllm.com/og.png","author":{"@type":"Organization","name":"FinOps LLM team"},"publisher":{"@type":"Organization","name":"FinOps LLM","url":"https://finopsllm.com/"}}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"ホーム","item":"https://finopsllm.com/"},{"@type":"ListItem","position":2,"name":"リサーチ","item":"https://finopsllm.com/ja/research"},{"@type":"ListItem","position":3,"name":"LLMコスト計算機","item":"https://finopsllm.com/ja/research/llm-cost-calculator"}]}
+</script>
+<style>body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}.wrap{max-width:840px;margin:0 auto;padding:56px 24px}a{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}h3{margin-top:22px;color:#E6EAF2}table{border-collapse:collapse;width:100%;margin:24px 0;font-size:.95em}th,td{border:1px solid #1E2A3F;padding:10px 12px;text-align:left;color:#B6C0D2}th{color:#E6EAF2;background:#101726}.langsw{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;color:#647289;margin:0 0 26px}.langsw a{text-decoration:none}.langsw a[aria-current]{color:#E6EAF2;font-weight:600}.calc{background:#101726;border:1px solid #1E2A3F;border-radius:12px;padding:28px 24px;margin:28px 0}.calc label{display:block;font-size:.88rem;color:#B6C0D2;margin:14px 0 6px}.calc input,.calc select{background:#0A0F1A;border:1px solid #1E2A3F;color:#E6EAF2;border-radius:6px;padding:10px 14px;font-size:.95rem;width:100%;max-width:320px;box-sizing:border-box}.calc input:focus,.calc select:focus{outline:none;border-color:#7AAFFF}.calc button{background:#7AAFFF;color:#0A0F1A;border:none;border-radius:8px;padding:12px 28px;font-size:.95rem;font-weight:600;cursor:pointer;margin-top:18px}.calc button:hover{background:#5A8FEF}#results{margin-top:24px}#results table{font-size:.9em}</style><script src="/assets/consent.js" defer></script><script src="/assets/attribution.js" defer></script>
+</head>
+<body><main class="wrap">{% endblock %}{% block body %}<nav class="langsw" aria-label="Language / Idioma"><a href="/research/llm-cost-calculator" hreflang="en">EN</a> · <a href="/es/research/llm-cost-calculator" hreflang="es">ES</a> · <a href="/ja/research/llm-cost-calculator" hreflang="ja" aria-current="page">JA</a></nav><h1>LLMコスト計算機</h1>
+<p>人気モデルの月間LLM支出を見積もりましょう。以下に使用パターンを入力すると、コストが並べて比較できます。すべての価格は2026年7月時点の100万トークンあたりの料金です。</p>
+
+<h2>使用ティア別事前計算コスト</h2>
+<p>人気モデルの各使用ティアにおける月間コストを、典型的なリクエストパターンに基づいて示します：</p>
+<table>
+<thead><tr><th>モデル</th><th>軽度（1Kリクエスト/月）</th><th>中度（10Kリクエスト/月）</th><th>重度（100Kリクエスト/月）</th></tr></thead>
+<tbody>
+<tr><td>GPT-4o</td><td>$3.25</td><td>$32.50</td><td>$325.00</td></tr>
+<tr><td>GPT-5</td><td>$12.50</td><td>$125.00</td><td>$1,250.00</td></tr>
+<tr><td>GPT-5 mini</td><td>$1.95</td><td>$19.50</td><td>$195.00</td></tr>
+<tr><td>Claude Sonnet 4</td><td>$4.50</td><td>$45.00</td><td>$450.00</td></tr>
+<tr><td>Claude Opus 4</td><td>$22.50</td><td>$225.00</td><td>$2,250.00</td></tr>
+<tr><td>Gemini 2.5 Pro</td><td>$1.75</td><td>$17.50</td><td>$175.00</td></tr>
+<tr><td><a href="https://platform.xiaomimimo.com?ref=LHT8UJ">MiMO</a></td><td>$1.20</td><td>$12.00</td><td>$120.00</td></tr>
+<tr><td>DeepSeek R1</td><td>$0.80</td><td>$8.00</td><td>$80.00</td></tr>
+</tbody>
+</table>
+<p><em>軽度：</em>1Kリクエスト/月、入力500 + 出力200トークン。 <em>中度：</em>10Kリクエスト/月、入力1,000 + 出力500トークン。 <em>重度：</em>100Kリクエスト/月、入力2,000 + 出力1,000トークン。</p>
+
+<h2>インタラクティブ計算機</h2>
+<div class="calc">
+<label for="model">モデル</label>
+<select id="model">
+<option value="gpt4o">GPT-4o ($2.50 / $10.00)</option>
+<option value="gpt5">GPT-5 ($10.00 / $30.00)</option>
+<option value="gpt5mini">GPT-5 mini ($1.50 / $6.00)</option>
+<option value="claude_sonnet">Claude Sonnet 4 ($3.00 / $15.00)</option>
+<option value="claude_opus">Claude Opus 4 ($15.00 / $75.00)</option>
+<option value="gemini_pro">Gemini 2.5 Pro ($1.25 / $10.00)</option>
+<option value="mimo">MiMO ($0.80 / $3.20)</option>
+<option value="deepseek">DeepSeek R1 ($0.55 / $2.19)</option>
+</select>
+<label for="requests">月間リクエスト数</label>
+<input type="number" id="requests" value="10000" min="1" step="1000" />
+<label for="inputTokens">リクエストあたりの平均入力トークン数</label>
+<input type="number" id="inputTokens" value="1000" min="1" step="100" />
+<label for="outputTokens">リクエストあたりの平均出力トークン数</label>
+<input type="number" id="outputTokens" value="500" min="1" step="100" />
+<button onclick="calculate()">コストを計算</button>
+<div id="results"></div>
+</div>
+
+<script>
+var models={gpt4o:{name:"GPT-4o",input:2.50,output:10.00},gpt5:{name:"GPT-5",input:10.00,output:30.00},gpt5mini:{name:"GPT-5 mini",input:1.50,output:6.00},claude_sonnet:{name:"Claude Sonnet 4",input:3.00,output:15.00},claude_opus:{name:"Claude Opus 4",input:15.00,output:75.00},gemini_pro:{name:"Gemini 2.5 Pro",input:1.25,output:10.00},mimo:{name:"MiMO",input:0.80,output:3.20},deepseek:{name:"DeepSeek R1",input:0.55,output:2.19}};
+function calculate(){
+var m=models[document.getElementById("model").value];
+var r=parseInt(document.getElementById("requests").value)||0;
+var it=parseInt(document.getElementById("inputTokens").value)||0;
+var ot=parseInt(document.getElementById("outputTokens").value)||0;
+var inputCost=(r*it/1000000)*m.input;
+var outputCost=(r*ot/1000000)*m.output;
+var total=inputCost+outputCost;
+var html='<table><thead><tr><th>指標</th><th>値</th></tr></thead><tbody>';
+html+='<tr><td>モデル</td><td>'+m.name+'</td></tr>';
+html+='<tr><td>月間総リクエスト数</td><td>'+r.toLocaleString()+'</td></tr>';
+html+='<tr><td>入力コスト/月</td><td>$'+inputCost.toFixed(2)+'</td></tr>';
+html+='<tr><td>出力コスト/月</td><td>$'+outputCost.toFixed(2)+'</td></tr>';
+html+='<tr><td><strong>推定総コスト/月</strong></td><td><strong>$'+total.toFixed(2)+'</strong></td></tr>';
+html+='<tr><td>リクエストあたりのコスト</td><td>$'+(total/r).toFixed(5)+'</td></tr>';
+html+='</tbody></table>';
+html+='<p style="font-size:.85rem;color:#647289">あくまで推定値です。キャッシュ割引、バッチAPI価格、推論トークンのオーバーヘッドは含まれません。実際のコストはプロバイダーの課金慣行により異なります。</p>';
+document.getElementById("results").innerHTML=html;
+}
+</script>
+
+<h2>この計算機の使い方</h2>
+<ol>
+<li><strong>モデルを選ぶ</strong> — ドロップダウンから選択。価格は2026年7月時点の標準APIレートを反映しています。</li>
+<li><strong>リクエスト量を入力</strong> — 月間のAPI呼び出し回数。</li>
+<li><strong>トークン数を見積もる</strong> — リクエストあたりの平均入力・出力トークン数。不明な場合は、チャットなら入力1,000/出力500、コード生成なら入力3,000/出力1,000から始めましょう。</li>
+<li><strong>計算をクリック</strong> — 入力と出力に分けた推定月間コストが表示されます。</li>
+</ol>
+
+<h2>推定コストを削減する方法</h2>
+<ul>
+<li><strong>プロンプトキャッシュを使う。</strong>プロンプトに安定したプレフィックスがある場合、キャッシュされた読み取りで入力コストを50～90%削減できます。<a href="/research/prompt-caching-explained">プロンプトキャッシュの解説</a>をご覧ください。</li>
+<li><strong>タスク別にモデルを切り替える。</strong>簡単なクエリには安価なモデルをルーティングし、複雑なタスクには高価なモデルを確保します。これが<a href="/research/model-routing">モデルルーティング</a>です。</li>
+<li><strong>バッチAPIを使う。</strong>緊急でないワークロードはバッチ価格で50%オフにできます。</li>
+<li><strong>より安価なプロバイダーを試す。</strong><a href="https://platform.xiaomimimo.com?ref=LHT8UJ">MiMO</a>やDeepSeekは、多くのタスクで同等の品質を大幅に低い料金で提供しています。</li>
+</ul>
+
+<h2>関連</h2>
+<ul>
+<li><a href="/ja/research/how-much-does-gpt5-cost">GPT-5はいくらかかる？</a> — GPT-5の詳細価格分析。</li>
+<li><a href="/research/how-llm-providers-charge">LLMプロバイダーはどのように課金する？</a> — トークンベースの課金の理解。</li>
+<li><a href="/ja/research/cheapest-ai-code-generation">AIコード生成の最も安い方法</a> — コーディングツールのコスト比較。</li>
+<li><a href="/research/provider-arbitrage">プロバイダーアービトラージ</a> — 品質基準を満たす最安モデルの発見。</li>
+</ul>
+<hr style="margin:48px 0 24px;border:none;border-top:1px solid #1E2A3F" /><p>自分のLLM支出に適用したいですか？FinOps LLMはAI費用の無料監査を実施し、節約場所を示します。<a href="/book">無料監査を予約 &rarr;</a></p><p><a href="/ja/research">リサーチに戻る</a></p>{% endblock %}{% block suffix %}</main></body></html>
+{% endblock %}

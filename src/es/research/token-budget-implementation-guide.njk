@@ -1,0 +1,129 @@
+---
+permalink: "es/research/token-budget-implementation-guide.html"
+---
+{% extends "shell.njk" %}{% block prefix %}<!DOCTYPE html>
+<html lang="es"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Guía de implementación de presupuestos de tokens · FinOps LLM</title><meta name="description" content="Cómo implementar presupuestos de tokens en producción: límites por solicitud, cuotas por equipo, presupuestos por período, límites duros vs blandos y degradación gradual." /><meta name="robots" content="index, follow" /><link rel="canonical" href="https://finopsllm.com/es/research/token-budget-implementation-guide" />
+<link rel="alternate" hreflang="en" href="https://finopsllm.com/research/token-budget-implementation-guide" />
+<link rel="alternate" hreflang="es" href="https://finopsllm.com/es/research/token-budget-implementation-guide" />
+<link rel="alternate" hreflang="ja" href="https://finopsllm.com/ja/research/token-budget-implementation-guide" />
+<link rel="alternate" hreflang="x-default" href="https://finopsllm.com/research/token-budget-implementation-guide" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","headline":"Guía de implementación de presupuestos de tokens","description":"Cómo implementar presupuestos de tokens en producción: límites por solicitud, cuotas por equipo, presupuestos por período, límites duros vs blandos y degradación gradual.","url":"https://finopsllm.com/es/research/token-budget-implementation-guide","datePublished":"2026-07-04","dateModified":"2026-07-04","image":"https://finopsllm.com/og.png","author":{"@type":"Organization","name":"FinOps LLM team"},"publisher":{"@type":"Organization","name":"FinOps LLM","url":"https://finopsllm.com/"}}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Inicio","item":"https://finopsllm.com/"},{"@type":"ListItem","position":2,"name":"Investigación","item":"https://finopsllm.com/es/research"},{"@type":"ListItem","position":3,"name":"Guía de implementación de presupuestos de tokens","item":"https://finopsllm.com/es/research/token-budget-implementation-guide"}]}
+</script>
+<style>body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}.wrap{max-width:860px;margin:0 auto;padding:56px 24px}a{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}table{width:100%;border-collapse:collapse;margin:20px 0}th,td{padding:10px 12px;border:1px solid #1E2A3F;text-align:left;font-size:14px}th{background:#111829;color:#E6EAF2;font-weight:600}td{color:#B6C0D2}pre{background:#111829;border:1px solid #1E2A3F;border-radius:6px;padding:16px;overflow-x:auto;font-size:13px;color:#B6C0D2}.langsw{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;color:#647289;margin:0 0 26px}.langsw a{text-decoration:none}.langsw a[aria-current]{color:#E6EAF2;font-weight:600}</style><script src="/assets/consent.js" defer></script><script src="/assets/attribution.js" defer></script>
+</head>
+<body><main class="wrap">{% endblock %}{% block body %}<nav class="langsw" aria-label="Idioma"><a href="/research/token-budget-implementation-guide" hreflang="en">EN</a> · <a href="/es/research/token-budget-implementation-guide" hreflang="es" aria-current="page">ES</a> · <a href="/ja/research/token-budget-implementation-guide" hreflang="ja">JA</a></nav><h1>Guía de implementación de presupuestos de tokens</h1>
+<p>Los presupuestos de tokens son la capa operativa del control de costes de LLM. La atribución te dice adónde va el dinero; los presupuestos eviten que vaya a lugares que no deseas. Sin presupuestos, un bucle de agente mal configurado o un aumento en el tráfico de usuarios puede agotar una asignación mensual en horas. Esta guía cubre cómo implementar cuatro tipos de presupuestos de tokens en producción, con pseudocódigo para cada patrón.</p>
+<h2>Tipos de presupuesto</h2>
+<table><thead><tr><th>Tipo de presupuesto</th><th>Granularidad</th><th>Aplicación</th><th>Caso de uso</th></tr></thead>
+<tbody><tr><td>Por solicitud</td><td>Una sola llamada API</td><td>Límite duro vía parámetro max_tokens</td><td>Prevenir finalizaciones descontroladas, acotar latencia</td></tr>
+<tr><td>Cuota por equipo</td><td>Equipo o proyecto durante un período</td><td>Límite blando con alertas, límite duro en umbral</td><td>Asignación de costes departamental, evitar que un equipo consuma presupuesto compartido</td></tr>
+<tr><td>Por período de tiempo</td><td>Diario, semanal o mensual</td><td>Límite duro con período de gracia</td><td>Límites de presupuesto mensual, gasto a nivel de sprint</td></tr>
+<tr><td>Por flujo de trabajo</td><td>Un solo pipeline o ejecución de agente</td><td>Límite duro por paso y total</td><td>Agentes multi-paso, pipelines de RAG, ejecuciones de evaluación</td></tr></tbody>
+</table>
+<h2>Límites por solicitud</h2>
+<p>El presupuesto más simple: limita cada solicitud con <code>max_tokens</code>. Esto no es opcional — cada solicitud de producción debe tener un límite explícito de tokens de salida. Sin él, una respuesta verbosa del modelo puede consumir tokens inesperados e inflar la latencia.</p>
+<pre>// Aplicación de presupuesto por solicitud
+function llamarLLM(prompt, config):
+    respuesta = proveedor.completar(
+        prompt: prompt,
+        modelo: config.modelo,
+        max_tokens: config.max_tokens_salida,    // límite duro
+        temperatura: config.temperatura
+    )
+    if respuesta.uso.tokens_totales > config.umbral_alerta:
+        log.advertencia("Solicitud superó límite blando",
+            tokens: respuesta.uso.tokens_totales,
+            umbral: config.umbral_alerta
+        )
+    return respuesta</pre>
+<h2>Cuotas por equipo</h2>
+<p>Las cuotas por equipo requieren un contador compartido que persista entre solicitudes. El patrón: verifica el presupuesto restante antes de cada llamada, rechaza o degrada si el presupuesto se agotó.</p>
+<pre>// Cuota de equipo con contador en Redis
+function verificarPresupuestoEquipo(equipoId, tokensEstimados):
+    clave = "presupuesto:" + equipoId + ":" + periodoActual()
+    restante = redis.obtener(clave) or obtenerCuotaEquipo(equipoId)
+
+    if restante &lt; tokensEstimados:
+        if restante &lt; tokensEstimados * 0.1:
+            return DENEGAR    // límite duro: rechazar solicitud
+        else:
+            return DEGRADAR   // límite blando: usar modelo más barato
+
+    return PERMITIR
+
+function registrarUso(equipoId, tokensReales):
+    clave = "presupuesto:" + equipoId + ":" + periodoActual()
+    redis.decrementar(clave, tokensReales)
+    restante = redis.obtener(clave)
+    if restante &lt; obtenerCuotaEquipo(equipoId) * 0.2:
+        alerta.cuotaBaja(equipoId, restante)</pre>
+<h2>Presupuestos por período de tiempo</h2>
+<p>Los presupuestos por período de tiempo envuelven las cuotas de equipo con una ventana temporal. La diferencia clave: necesitas un mecanismo de período de gracia. Cuando un equipo alcanza el 80% de su presupuesto mensual, envía una alerta. Al 100%, permite un período de gracia configurable (por ejemplo, 24 horas) antes de que la aplicación dura entre en vigor. Esto evita que un equipo se bloquee a mitad de tarea el último día del mes.</p>
+<pre>// Presupuesto por período con período de gracia
+function aplicarPresupuesto(equipoId):
+    uso = obtenerUsoPeriodo(equipoId, mesActual())
+    limite = obtenerLimiteMensualEquipo(equipoId)
+
+    if uso &lt; limite * 0.8:
+        return PERMITIR
+
+    if uso &lt; limite * 1.0:
+        alerta.avisoPresupuesto(equipoId, uso, limite)
+        return PERMITIR   // zona de advertencia blanda
+
+    if uso &lt; limite * 1.1 and dentroPeriodoGracia(equipoId):
+        alerta.presupuestoExcedido(equipoId, uso, limite)
+        return PERMITIR   // período de gracia: permitir exceso
+
+    return DENEGAR  // parada dura</pre>
+<h2>Presupuestos por flujo de trabajo</h2>
+<p>Los agentes y pipelines multi-paso necesitan presupuestos en dos niveles: por paso (evita que un solo paso consuma demasiado) y por ejecución (evita que todo el pipeline exceda su asignación). Sigue ambos en el contexto del flujo de trabajo.</p>
+<pre>// Rastreador de presupuesto de flujo de trabajo
+class PresupuestoFlujo:
+    constructor(maxPorPaso, maxTotal):
+        this.maxPorPaso = maxPorPaso
+        this.maxTotal = maxTotal
+        this.gastado = 0
+
+    function ejecutarPaso(fnPaso, prompt):
+        if this.gastado &gt;= this.maxTotal:
+            return respuestaReserva("Presupuesto excedido")
+
+        respuesta = llamarLLM(prompt, {
+            max_tokens: min(this.maxPorPaso,
+                           this.maxTotal - this.gastado)
+        })
+
+        this.gastado += respuesta.uso.tokens_totales
+        return respuesta</pre>
+<h2>Degradación gradual cuando se excede el presupuesto</h2>
+<p>No devuelvas simplemente un error cuando se alcanza un presupuesto. Degrada con gracia. Cambia a un modelo más barato (GPT-4o-mini en lugar de GPT-4o), reduce el tamaño de la ventana de contexto, omite pasos de procesamiento opcionales o devuelve un resultado parcial con una nota de que el procesamiento completo requiere aprobación de presupuesto. La experiencia del usuario debe degradarse, no romperse.</p>
+<pre>// Cadena de degradación
+function llamarConDegradacion(prompt, config):
+    if verificarPresupuesto(config.equipoId, MODELO_COMPLETO):
+        return llamarLLM(prompt, { modelo: config.modeloPrimario })
+
+    if verificarPresupuesto(config.equipoId, MODELO_BARATO):
+        log.info("Degradando modelo por presupuesto")
+        return llamarLLM(prompt, { modelo: config.modeloReserva })
+
+    if verificarPresupuesto(config.equipoId, TOKENS_MINIMOS):
+        truncado = truncarContexto(prompt, 50%)
+        return llamarLLM(truncado, {
+            modelo: config.modeloReserva,
+            max_tokens: 256
+        })
+
+    return cacheadoOFallback(prompt)</pre>
+<h2>Monitorización de la salud del presupuesto</h2>
+<p>Sigue tres métricas: tasa de consumo (tokens consumidos por hora vs. presupuesto), previsión (al ritmo actual, cuándo se agotará el presupuesto) y recuento de anulaciones (cuántas veces se usó el período de gracia). Si el uso del período de gracia supera el 10% de las solicitudes totales, el presupuesto está demasiado bajo para la carga de trabajo.</p>
+<h2>Relacionado</h2>
+<ul><li><a href="/research/llm-budget-governance">Gobernanza del presupuesto de LLM</a> — políticas organizativas detrás de los presupuestos.</li><li><a href="/research/agent-spend-guardrails">Vallas de gasto de agentes</a> — patrones de presupuesto para agentes autónomos.</li><li><a href="/research/cap-inference-costs">Cómo limitar costes de inferencia</a> — controles de costes del lado del proveedor.</li></ul>
+<hr style="margin:48px 0 24px;border:none;border-top:1px solid #1E2A3F" /><p>¿Quieres esto aplicado a tu propio gasto en LLM? FinOps LLM ejecuta una auditoría gratuita de tus costes de IA y muestra dónde están los ahorros. <a href="/book">Reserva auditoría gratuita &rarr;</a></p><p><a href="/es/research">Volver a investigación</a></p>{% endblock %}{% block suffix %}</main></body></html>
+
+{% endblock %}

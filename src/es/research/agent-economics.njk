@@ -1,0 +1,67 @@
+---
+permalink: "es/research/agent-economics.html"
+---
+{% extends "shell.njk" %}{% block prefix %}<!DOCTYPE html>
+<html lang="es"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Economía de agentes: ¿cuánto cuesta realmente un agente de codificación? · FinOps LLM</title><meta name="description" content="Análisis de costes reales de agentes de codificación — Cursor, GitHub Copilot, Claude Code, Cline, Windsurf. Desglose de coste por tarea, tokens por sesión y costes ocultos." /><meta name="robots" content="index, follow" /><link rel="canonical" href="https://finopsllm.com/es/research/agent-economics" />
+<link rel="alternate" hreflang="en" href="https://finopsllm.com/research/agent-economics" />
+<link rel="alternate" hreflang="es" href="https://finopsllm.com/es/research/agent-economics" />
+<link rel="alternate" hreflang="ja" href="https://finopsllm.com/ja/research/agent-economics" />
+<link rel="alternate" hreflang="x-default" href="https://finopsllm.com/research/agent-economics" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","headline":"Economía de agentes: ¿cuánto cuesta realmente un agente de codificación? · FinOps LLM","description":"Análisis de costes reales de agentes de codificación — Cursor, GitHub Copilot, Claude Code, Cline, Windsurf. Desglose de coste por tarea, tokens por sesión y costes ocultos.","url":"https://finopsllm.com/es/research/agent-economics","datePublished":"2026-07-04","dateModified":"2026-07-04","image":"https://finopsllm.com/og.png","author":{"@type":"Organization","name":"FinOps LLM team"},"publisher":{"@type":"Organization","name":"FinOps LLM","url":"https://finopsllm.com/"}}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Inicio","item":"https://finopsllm.com/es/"},{"@type":"ListItem","position":2,"name":"Investigación","item":"https://finopsllm.com/es/research"},{"@type":"ListItem","position":3,"name":"Economía de agentes","item":"https://finopsllm.com/es/research/agent-economics"}]}
+</script>
+<style>body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}.wrap{max-width:840px;margin:0 auto;padding:56px 24px}a{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}table{border-collapse:collapse;width:100%;margin:24px 0;font-size:.95em}th,td{border:1px solid #1E2A3F;padding:10px 12px;text-align:left;color:#B6C0D2}th{color:#E6EAF2;background:#101726}.langsw{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;color:#647289;margin:0 0 26px}.langsw a{text-decoration:none}.langsw a[aria-current]{color:#E6EAF2;font-weight:600}</style><script src="/assets/consent.js" defer></script><script src="/assets/attribution.js" defer></script>
+<script src="/assets/lang.js" defer></script>
+</head>
+<body><main class="wrap">{% endblock %}{% block body %}<nav class="langsw" aria-label="Language / Idioma"><a href="/research/agent-economics" hreflang="en">EN</a> · <a href="/es/research/agent-economics" hreflang="es" aria-current="page">ES</a> · <a href="/ja/research/agent-economics" hreflang="ja">JA</a></nav><h1>Economía de agentes: ¿cuánto cuesta realmente un agente de codificación?</h1>
+<p>Los agentes de codificación son la categoría de gasto en LLM de más rápido crecimiento en 2026. Cada equipo de ingeniería está usando uno o evaluando uno. Pero los modelos de precios son confusos: los planes de suscripción ocultan límites de tokens detrás del lenguaje "ilimitado", los agentes basados en API exponen costes en bruto que se disparan de forma impredecible, y ninguno de los dos modelos te dice lo que realmente pagas por tarea completada.</p>
+<p>Este artículo desglosa la economía real de los cinco agentes de codificación más populares, introduce una métrica de "coste por tarea útil" y explica por qué los agentes basados en API pueden ser tanto más baratos como más caros que los planes de suscripción según los patrones de uso.</p>
+<h2>El panorama de precios</h2>
+<p>Los agentes de codificación se dividen en dos categorías de precios. Los agentes de suscripción cobran una tarifa mensual fija con uso incluido. Los agentes basados en API cobran por token consumido, típicamente a través de tu propia cuenta de proveedor. La elección correcta depende de cuántas tareas ejecutas, qué tan grande es tu base de código y qué tan complejos se vuelven tus prompts.</p>
+<table>
+<thead><tr><th>Agente</th><th>Plan</th><th>Coste mensual</th><th>Tokens/solicitudes incluidos</th><th>Tareas estimadas/mes</th><th>Coste por tarea</th><th>Modelo principal</th></tr></thead>
+<tbody>
+<tr><td>Cursor</td><td>Pro</td><td>$20/mes</td><td>500 solicitudes rápidas (modelos premium)</td><td>~80–150</td><td>$0,13–$0,25</td><td>Claude Sonnet 4, GPT-4.1</td></tr>
+<tr><td>GitHub Copilot</td><td>Pro+</td><td>$39/mes</td><td>1.500 solicitudes premium</td><td>~150–300</td><td>$0,13–$0,26</td><td>Claude Sonnet 4, GPT-4.1</td></tr>
+<tr><td>GitHub Copilot</td><td>Pro</td><td>$10/mes</td><td>300 solicitudes premium</td><td>~30–60</td><td>$0,17–$0,33</td><td>GPT-4.1, Claude Sonnet 4</td></tr>
+<tr><td>Claude Code</td><td>API (Max opcional)</td><td>$5–$100+</td><td>Pago por token vía API de Anthropic</td><td>~20–200+</td><td>$0,25–$2,00</td><td>Claude Sonnet 4</td></tr>
+<tr><td>Cline</td><td>API (BYOK)</td><td>$5–$80+</td><td>Pago por token vía cualquier proveedor</td><td>~20–200+</td><td>$0,20–$3,00</td><td>Configurado por el usuario</td></tr>
+<tr><td>Windsurf</td><td>Pro</td><td>$15/mes</td><td>500 créditos (modelos premium)</td><td>~60–120</td><td>$0,13–$0,25</td><td>Claude Sonnet 4, GPT-4.1</td></tr>
+</tbody>
+</table>
+<h2>Qué significa realmente "coste por tarea"</h2>
+<p>La tabla anterior muestra el rango anunciado, pero el coste real por tarea depende de tres factores ocultos: carga de ventana de contexto, cadenas de llamadas a herramientas y bucles de reintento. Una tarea "simple" como añadir un nuevo endpoint de API puede consumir 15K–40K tokens durante la sesión. Un refactor complejo que toca múltiples archivos puede superar fácilmente los 200K tokens.</p>
+<p>La carga de ventana de contexto es el mayor coste oculto. Cada agente de codificación carga tus archivos abiertos, la estructura del proyecto y el historial de conversación reciente en cada llamada a la API. Un proyecto con archivos grandes significa más tokens por solicitud, incluso si estás haciendo una pregunta simple. Las llamadas a herramientas multiplican esto: cada operación de lectura, búsqueda o edición es un viaje de ida y vuelta a la API con el contexto completo.</p>
+<h2>Costes ocultos que la mayoría de equipos pasan por alto</h2>
+<p><strong>Bucles de reintento.</strong> Cuando el primer intento de un agente falla en pruebas o linting, reintenta automáticamente. Cada reintento es una llamada a la API a precio completo. En la práctica, el 20–40% de las sesiones de agente implican al menos un reintento, añadiendo un 30–80% al coste en tokens de esa tarea.</p>
+<p><strong>Desbordamiento de contexto.</strong> Las sesiones largas alcanzan los límites de contexto. Cuando esto sucede, el agente resume el contexto previo (perdiendo detalle) o elimina los primeros mensajes (perdiendo contexto). Ambos conducen a una salida de menor calidad y más reintentos.</p>
+<p><strong>Sobrecarga de llamadas a herramientas.</strong> Una sola tarea puede implicar 5–15 llamadas a herramientas (leer archivo, buscar código, editar archivo, ejecutar pruebas). Cada llamada a herramienta incluye el contexto completo de la conversación más la definición de la herramienta. Solo las definiciones de herramientas pueden consumir 2K–5K tokens del prompt del sistema por llamada.</p>
+<p><strong>Solicitudes premium inactivas.</strong> Los planes de suscripción cuentan "solicitudes rápidas" incluso cuando el agente devuelve una salida no útil. Una sugerencia rechazada aún cuesta una solicitud premium.</p>
+<h2>API vs. suscripción: cuándo gana cada uno</h2>
+<p>Los agentes basados en API (Claude Code, Cline) ganan cuando tu uso es irregular o ligero. Si ejecutas 20–40 tareas enfocadas al mes, pagar $0,30–$0,80 por tarea es más barato que una suscripción de $20–$39. También ganan cuando necesitas un modelo específico para una tarea específica: pagas solo por lo que usas.</p>
+<p>Los agentes de suscripción (Cursor, Copilot, Windsurf) ganan cuando el uso es constante e intensivo. Si ejecutas más de 100 tareas al mes, el coste efectivo por tarea baja a menos de $0,20, que es difícil de superar con precios de API. También ganan en previsibilidad: los equipos de finanzas pueden presupuestar una cantidad fija.</p>
+<p>El punto de cruce es típicamente 40–80 tareas al mes por desarrollador. Por debajo de eso, el precio de API es más barato. Por encima, los planes de suscripción ofrecen mejor economía.</p>
+<h2>La métrica de "coste por tarea útil"</h2>
+<p>El coste bruto por tarea es engañoso porque no todas las tareas producen valor. Una sesión de agente que falla, devuelve una respuesta incorrecta o requiere retrabajo manual tiene un coste real de cero salida útil. La métrica que importa es:</p>
+<p><strong>Coste por tarea útil = Gasto mensual total / Tareas que se enviaron sin retrabajo manual</strong></p>
+<p>En la práctica, los equipos reportan que el 60–80% de las tareas de agente producen salida utilizable en el primer intento. El 20–40% restante requiere intervención manual. Esto significa que el coste efectivo por tarea útil es 1,25x–1,7x el coste bruto por tarea.</p>
+<p>Para equipos que construyen con modelos de código abierto o exploran alternativas rentables, plataformas como <a href="https://platform.xiaomimimo.com?ref=LHT8UJ">MiMO</a> ofrecen precios competitivos que pueden cambiar el cálculo API vs. suscripción.</p>
+<h2>Cómo reducir los costes de agentes</h2>
+<ul>
+<li><strong>Recorta el contexto.</strong> Cierra archivos irrelevantes antes de invocar al agente. Menos contexto = menos tokens por llamada.</li>
+<li><strong>Escribe prompts específicos.</strong> Los prompts vagos conducen a más llamadas a herramientas y reintentos. "Añade un endpoint POST /users que valide email" cuesta menos que "arregla lo de usuarios."</li>
+<li><strong>Usa modelos específicos por tarea.</strong> Las ediciones simples no necesitan un modelo de razonamiento. Enruta el código repetitivo a modelos más baratos y los refactores complejos a los premium.</li>
+<li><strong>Monitorea el uso de tokens.</strong> Rastrea el conteo de tokens por sesión. Si el coste promedio por sesión está subiendo, tus prompts o base de código pueden estar creciendo más rápido de lo esperado.</li>
+<li><strong>Establece límites de reintento.</strong> Limita los reintentos automáticos a 2–3 por tarea. Más allá de eso, escala a un humano.</li>
+</ul>
+<h2>Qué esperar a continuación</h2>
+<p>Los precios de agentes se mueven rápido. Los planes de suscripción están aumentando los límites incluidos a medida que la competencia se intensifica. Los precios de API continúan bajando: Claude Sonnet 4 cuesta un 60% menos que Claude 3.5 Sonnet en su lanzamiento. Los modelos de codificación de código abierto están cerrando la brecha de calidad, lo que empujará los precios de API aún más abajo.</p>
+<p>La tendencia más importante es el pricing específico para agentes. Los proveedores están experimentando con precios por tarea, límites por sesión y facturación ponderada por calidad. Para finales de 2026, espera que la mayoría de agentes ofrezcan una garantía de "coste por tarea exitosa" en lugar de facturación bruta por tokens.</p>
+<h2>Relacionado</h2>
+<ul><li><a href="/es/research/coding-plan-comparison">Comparación de planes de codificación IA</a> — benchmark basado en evidencia.</li><li><a href="/research/agent-spend-attribution">Atribución del gasto de agentes</a> — cómo rastrear costes de agentes por proyecto y equipo.</li><li><a href="/research/agent-spend-guardrails">Límites de gasto de agentes</a> — establecer límites antes de que los costes se descontrolen.</li><li><a href="/es/research/finops-for-llm">FinOps para LLM</a> — el marco más amplio.</li></ul>
+<hr style="margin:48px 0 24px;border:none;border-top:1px solid #1E2A3F" /><p>¿Quieres que esto se aplique a tu propio gasto en LLM? FinOps LLM ejecuta una auditoría gratuita de tus costes en IA y muestra dónde están los ahorros. <a href="/book">Solicita tu auditoría gratuita &rarr;</a></p><p><a href="/es/research">Volver a la investigación</a></p>{% endblock %}{% block suffix %}</main></body></html>
+{% endblock %}

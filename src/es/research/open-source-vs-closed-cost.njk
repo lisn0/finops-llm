@@ -1,0 +1,262 @@
+---
+permalink: "es/research/open-source-vs-closed-cost.html"
+---
+{% extends "shell.njk" %}{% block prefix %}<!DOCTYPE html>
+<html lang="es"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Modelos Abiertos vs. Cerrados: Comparativa de Costes LLM · FinOps LLM</title><meta name="description" content="Comparativa detallada de costes entre modelos LLM de código abierto y propietarios. Analiza tarifas API, costes de autoalojamiento, calidad y cuándo elegir cada opción." /><meta name="robots" content="index, follow" /><link rel="canonical" href="https://finopsllm.com/es/research/open-source-vs-closed-cost" />
+<link rel="alternate" hreflang="en" href="https://finopsllm.com/research/open-source-vs-closed-cost" />
+<link rel="alternate" hreflang="es" href="https://finopsllm.com/es/research/open-source-vs-closed-cost" />
+<link rel="alternate" hreflang="ja" href="https://finopsllm.com/ja/research/open-source-vs-closed-cost" />
+<link rel="alternate" hreflang="x-default" href="https://finopsllm.com/research/open-source-vs-closed-cost" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","headline":"Modelos Abiertos vs. Cerrados: Comparativa de Costes LLM · FinOps LLM","description":"Comparativa detallada de costes entre modelos LLM de código abierto y propietarios. Analiza tarifas API, costes de autoalojamiento, calidad y cuándo elegir cada opción.","url":"https://finopsllm.com/es/research/open-source-vs-closed-cost","datePublished":"2026-07-04","dateModified":"2026-07-04","image":"https://finopsllm.com/og.png","author":{"@type":"Organization","name":"FinOps LLM team"},"publisher":{"@type":"Organization","name":"FinOps LLM","url":"https://finopsllm.com/"}}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Inicio","item":"https://finopsllm.com/"},{"@type":"ListItem","position":2,"name":"Investigación","item":"https://finopsllm.com/es/research"},{"@type":"ListItem","position":3,"name":"Modelos Abiertos vs. Cerrados","item":"https://finopsllm.com/es/research/open-source-vs-closed-cost"}]}
+</script>
+<style>
+body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}
+.wrap{max-width:1100px;margin:0 auto;padding:56px 24px}
+a{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}
+.langsw{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;color:#647289;margin:0 0 26px}
+.langsw a{text-decoration:none}.langsw a[aria-current]{color:#E6EAF2;font-weight:600}
+.hero-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:16px;margin:28px 0 36px}
+.hero-stat{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:18px 16px;text-align:center}
+.hero-stat .num{font-size:2rem;font-weight:700;color:#7AAFFF;display:block}
+.hero-stat .lbl{font-size:.82rem;color:#647289;margin-top:4px}
+.badge-row{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 32px;list-style:none;padding:0}
+.badge-row li{background:#101726;border:1px solid #1E2A3F;border-radius:8px;padding:8px 14px;font-size:.85rem;color:#B6C0D2}
+.method-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin:20px 0 32px}
+.method-card{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:18px}
+.method-card h3{font-size:.95rem;color:#E6EAF2;margin:0 0 8px}
+.method-card p{font-size:.85rem;margin:0}
+.table-wrap{overflow-x:auto;margin:0 0 32px;-webkit-overflow-scrolling:touch}
+table{border-collapse:collapse;width:100%;font-size:.82rem;white-space:nowrap}
+th,td{border:1px solid #1E2A3F;padding:8px 10px;text-align:left;color:#B6C0D2}
+th{color:#E6EAF2;background:#101726;cursor:pointer;position:sticky;top:0;user-select:none}
+th:hover{background:#162035}
+th .sort-arrow{font-size:.7rem;margin-left:4px;opacity:.4}
+th.sorted .sort-arrow{opacity:1;color:#7AAFFF}
+td.provider-cell{white-space:normal;min-width:140px}
+td.price-cell{text-align:right;font-variant-numeric:tabular-nums}
+td.limit-cell{text-align:right;font-variant-numeric:tabular-nums;min-width:55px}
+tr:hover{background:rgba(122,175,255,.04)}
+.est{color:#647289}
+.official{color:#B6C0D2}
+.ref-link{font-size:.75rem;color:#7AAFFF;text-decoration:none;border-bottom:1px dotted rgba(122,175,255,.3)}
+.ref-link:hover{border-bottom-color:#7AAFFF}
+.footnotes{font-size:.8rem;color:#64748b;margin:16px 0 0}
+.footnotes p{margin:6px 0}
+.guide-section{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:24px;margin:12px 0}
+.guide-section h3{color:#E6EAF2;margin:0 0 10px;font-size:1rem}
+.highlight-box{background:rgba(122,175,255,.08);border:1px solid rgba(122,175,255,.2);border-radius:10px;padding:20px;margin:16px 0}
+.highlight-box p{margin:6px 0}
+@media(max-width:700px){.hero-stats{grid-template-columns:repeat(2,1fr)}table{font-size:.75rem}th,td{padding:6px 7px}}
+</style><script src="/assets/consent.js" defer></script><script src="/assets/attribution.js" defer></script>
+<script src="/assets/lang.js" defer></script>
+</head>
+<body><main class="wrap">{% endblock %}{% block body %}
+<nav class="langsw" aria-label="Language / Idioma"><a href="/research/open-source-vs-closed-cost" hreflang="en">EN</a> · <a href="/es/research/open-source-vs-closed-cost" hreflang="es" aria-current="page">ES</a> · <a href="/ja/research/open-source-vs-closed-cost" hreflang="ja">JA</a></nav>
+
+<h1>Modelos Abiertos vs. Cerrados: Comparativa de Costes LLM</h1>
+<p>Los modelos de código abierto (Llama, DeepSeek, Qwen, MiMo) han cerrado la brecha de calidad con los modelos propietarios (GPT, Claude, Gemini) en la mayoría de tareas de producción. Pero la comparativa de costes va más allá del precio por token. Esta guía analiza costes API, costes de autoalojamiento, calidad real y cuándo elegir cada opción para maximizar el ahorro sin sacrificar resultados.</p>
+
+<div class="hero-stats">
+  <div class="hero-stat"><span class="num">80-90%</span><span class="lbl">Ahorro potencial</span></div>
+  <div class="hero-stat"><span class="num">5+</span><span class="lbl">Modelos abiertos principales</span></div>
+  <div class="hero-stat"><span class="num">&lt;5%</span><span class="lbl">Brecha de calidad</span></div>
+  <div class="hero-stat"><span class="num">Jul 2026</span><span class="lbl">Última actualización</span></div>
+</div>
+
+<ul class="badge-row">
+  <li>Los modelos abiertos ahora rivalizan con GPT-4 en la mayoría de benchmarks</li>
+  <li>Los proveedores hospedados compiten agresivamente en precio con modelos abiertos</li>
+  <li>La brecha de calidad persiste solo en razonamiento frontera</li>
+</ul>
+
+<h2>Comparativa de Precios API</h2>
+
+<div class="table-wrap">
+<table id="pricingTable">
+<thead>
+<tr>
+  <th data-col="model">Modelo <span class="sort-arrow">↕</span></th>
+  <th data-col="provider">Proveedor <span class="sort-arrow">↕</span></th>
+  <th data-col="input" class="price-cell">Entrada $/1M <span class="sort-arrow">↕</span></th>
+  <th data-col="output" class="price-cell">Salida $/1M <span class="sort-arrow">↕</span></th>
+  <th data-col="context">Ventana de Contexto <span class="sort-arrow">↕</span></th>
+  <th data-col="type">Tipo <span class="sort-arrow">↕</span></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>GPT-5</td>
+  <td class="provider-cell"><strong>OpenAI</strong></td>
+  <td class="price-cell official" data-val="10.00">$10.00</td>
+  <td class="price-cell official" data-val="30.00">$30.00</td>
+  <td class="limit-cell" data-val="256">256K tokens</td>
+  <td>Cerrado</td>
+</tr>
+<tr>
+  <td>Claude Sonnet 4</td>
+  <td class="provider-cell"><strong>Anthropic</strong></td>
+  <td class="price-cell official" data-val="3.00">$3.00</td>
+  <td class="price-cell official" data-val="15.00">$15.00</td>
+  <td class="limit-cell" data-val="200">200K tokens</td>
+  <td>Cerrado</td>
+</tr>
+<tr>
+  <td>Gemini 2.5 Pro</td>
+  <td class="provider-cell"><strong>Google</strong></td>
+  <td class="price-cell official" data-val="1.25">$1.25</td>
+  <td class="price-cell official" data-val="10.00">$10.00</td>
+  <td class="limit-cell" data-val="1000">1M tokens</td>
+  <td>Cerrado</td>
+</tr>
+<tr>
+  <td>Llama 4 Maverick</td>
+  <td class="provider-cell"><strong>Meta / hospedado</strong></td>
+  <td class="price-cell est" data-val="0.35">$0.20–$0.50</td>
+  <td class="price-cell est" data-val="1.05">$0.60–$1.50</td>
+  <td class="limit-cell" data-val="128">128K tokens</td>
+  <td>Abierto</td>
+</tr>
+<tr>
+  <td>DeepSeek-V3</td>
+  <td class="provider-cell"><strong>DeepSeek</strong></td>
+  <td class="price-cell official" data-val="0.27">$0.27</td>
+  <td class="price-cell official" data-val="1.10">$1.10</td>
+  <td class="limit-cell" data-val="128">128K tokens</td>
+  <td>Abierto</td>
+</tr>
+<tr>
+  <td>Qwen 3</td>
+  <td class="provider-cell"><strong>Alibaba / hospedado</strong></td>
+  <td class="price-cell est" data-val="0.45">$0.30–$0.60</td>
+  <td class="price-cell est" data-val="1.35">$0.90–$1.80</td>
+  <td class="limit-cell" data-val="128">128K tokens</td>
+  <td>Abierto</td>
+</tr>
+<tr>
+  <td>MiMo</td>
+  <td class="provider-cell"><strong>Xiaomi MiMO</strong><br /><a class="ref-link" href="https://platform.xiaomimimo.com?ref=LHT8UJ">Regístrate — ambos obtienen $2 ↗</a></td>
+  <td class="price-cell est" data-val="0.80">$0.80</td>
+  <td class="price-cell est" data-val="3.20">$3.20</td>
+  <td class="limit-cell" data-val="128">128K tokens</td>
+  <td>Abierto</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<h2>Costes de Autoalojamiento</h2>
+<div class="guide-section">
+  <h3>Hardware e infraestructura</h3>
+  <p>Ejecutar modelos de código abierto localmente requiere GPUs potentes. Una NVIDIA A100 (80GB) cuesta ~$2/hora en la nube y puede servir modelos de hasta 70B parámetros. Para modelos más grandes (Llama 4 Maverick 400B), necesitas múltiples GPUs o GPUs más potentes (H100 a ~$4/hora).</p>
+</div>
+<div class="guide-section">
+  <h3>Punto de equilibrio</h3>
+  <p>El autoalojamiento es rentable cuando procesas más de ~1 millón de tokens por día de forma consistente. Por debajo de ese volumen, los costes de infraestructura superan el ahorro frente a las APIs hospedadas. Calcula: coste mensual de GPU / tokens mensuales procesados = coste por token. Compara con las tarifas API de la tabla anterior.</p>
+</div>
+<div class="guide-section">
+  <h3>Costes ocultos del autoalojamiento</h3>
+  <ul>
+    <li>Infraestructura de inferencia (vLLM, TGI): configuración y mantenimiento continuo</li>
+    <li>Red y almacenamiento: transferencia de datos y almacenamiento de modelos (70B+ = 140GB+)</li>
+    <li>Fiabilidad: redundancia, balanceo de carga, recuperación ante fallos</li>
+    <li>Personal: necesitas ingenieros de ML para operar y optimizar</li>
+  </ul>
+</div>
+
+<h2>¿Cuándo Elegir Modelo Abierto?</h2>
+<div class="guide-section">
+  <h3>Usa modelos abiertos cuando:</h3>
+  <ul>
+    <li>Alto volumen de clasificación, extracción o resumen (donde la calidad "suficiente" basta)</li>
+    <li>Sensibilidad al coste: presupuestos ajustados que requieren el menor coste por token</li>
+    <li>Privacidad de datos: necesitas que los datos nunca salgan de tu infraestructura</li>
+    <li>Fine-tuning personalizado: requieres adaptar el modelo a tu dominio específico</li>
+    <li>Despliegue offline/edge: operación sin conexión a internet</li>
+    <li>Escalabilidad predecible: volumen constante que justifica infraestructura dedicada</li>
+  </ul>
+</div>
+
+<h2>¿Cuándo Elegir Modelo Cerrado?</h2>
+<div class="guide-section">
+  <h3>Usa modelos cerrados cuando:</h3>
+  <ul>
+    <li>Tareas de razonamiento frontera donde la máxima calidad es crítica</li>
+    <li>Calidad lista para usar: necesitas el mejor rendimiento sin fine-tuning</li>
+    <li>Bajo volumen: la simplicidad de la API supera el ahorro de modelos abiertos</li>
+    <li>Tareas multimodales: visión, audio, y texto combinados</li>
+    <li>Latencia crítica: los modelos optimizados de proveedores son más rápidos</li>
+    <li>Soporte y SLA: necesitas garantías contractuales de disponibilidad</li>
+  </ul>
+</div>
+
+<h2>La Brecha de Calidad en 2026</h2>
+<div class="highlight-box">
+  <p><strong>Para la mayoría de las tareas de producción, la brecha es menor al 5%.</strong> Resumen, extracción, clasificación, generación de código y uso de herramientas: los modelos abiertos están al nivel de los modelos cerrados. La brecha persiste en razonamiento frontera (pruebas matemáticas complejas, planificación multianivel) donde Claude Opus 4 y o3 siguen siendo superiores.</p>
+  <p>Para el 80% de los casos de uso en producción, un modelo abierto hospedado a $0.30/1M tokens produce resultados indistinguibles de un modelo cerrado a $10/1M tokens.</p>
+</div>
+
+<h2>Estrategia Híbrida Óptima</h2>
+<div class="method-grid">
+  <div class="method-card"><h3>Enruta por complejidad</h3><p>Tareas simples (clasificación, extracción) → modelo abierto barato. Tareas complejas (razonamiento, código avanzado) → modelo cerrado premium.</p></div>
+  <div class="method-card"><h3>Modelos abiertos para lotes</h3><p>Procesamiento por lotes, evaluaciones y generación de contenido no urgente → modelos abiertos con API de lotes al menor coste.</p></div>
+  <div class="method-card"><h3>Reserva cerrados para UX</h3><p>Interfaces de usuario en tiempo real donde la calidad de respuesta importa directamente → modelos cerrados con menor latencia.</p></div>
+  <div class="method-card"><h3>Autoaloja para datos sensibles</h3><p>Datos regulados, secretos comerciales o información personal → modelos abiertos en tu propia infraestructura.</p></div>
+</div>
+
+<h2>Relacionado</h2>
+<ul>
+<li><a href="/es/research/provider-arbitrage">Arbitraje de proveedores</a> — encontrar el modelo más barato que cumpla tu umbral de calidad.</li>
+<li><a href="/es/research/model-routing">Enrutamiento de modelos</a> — enviar tareas al nivel de coste adecuado.</li>
+<li><a href="/es/research/cheapest-ai-code-generation">La forma más barata de ejecutar generación de código IA</a> — comparativa de herramientas de codificación.</li>
+<li><a href="/es/research/finops-for-llm">FinOps para LLM</a> — el marco más amplio.</li>
+</ul>
+
+<div class="footnotes">
+  <p>Los precios de los modelos hospedados varían según el proveedor y pueden cambiar frecuentemente.</p>
+  <p>Los precios de autoalojamiento son estimaciones basadas en tarifas de nube pública estándar.</p>
+  <p>Algunos enlaces pueden incluir códigos de referido.</p>
+</div>
+
+<hr style="margin:48px 0 24px;border:none;border-top:1px solid #1E2A3F" />
+<p>¿Quieres esto aplicado a tu propio gasto en LLM? FinOps LLM realiza una auditoría gratuita de tus costes de IA y muestra dónde están los ahorros. <a href="/book">Reserva auditoría gratuita &rarr;</a></p>
+<p><a href="/es/research">Volver a investigación</a></p>
+
+<script>
+(function(){
+  var table=document.getElementById('pricingTable');
+  if(!table)return;
+  var tbody=table.querySelector('tbody');
+  var headers=table.querySelectorAll('th[data-col]');
+  var currentSort={col:null,asc:true};
+  headers.forEach(function(th){
+    th.addEventListener('click',function(){
+      var col=this.dataset.col;
+      if(currentSort.col===col){currentSort.asc=!currentSort.asc}
+      else{currentSort.col=col;currentSort.asc=true}
+      headers.forEach(function(h){h.classList.remove('sorted')});
+      this.classList.add('sorted');
+      this.querySelector('.sort-arrow').textContent=currentSort.asc?'↑':'↓';
+      sortTable(col,currentSort.asc);
+    });
+  });
+  function sortTable(col,asc){
+    var rows=Array.from(tbody.querySelectorAll('tr'));
+    var colMap={model:0,provider:1,input:2,output:3,context:4,type:5};
+    var idx=colMap[col];if(idx===undefined)return;
+    rows.sort(function(a,b){
+      var va,vb;
+      if(col==='model'||col==='provider'||col==='type'){va=a.cells[idx].textContent.trim();vb=b.cells[idx].textContent.trim();return asc?va.localeCompare(vb):vb.localeCompare(va)}
+      va=parseFloat(a.cells[idx].dataset.val||0);vb=parseFloat(b.cells[idx].dataset.val||0);
+      return asc?va-vb:vb-va;
+    });
+    rows.forEach(function(r){tbody.appendChild(r)});
+  }
+})();
+</script>
+{% endblock %}{% block suffix %}</main></body></html>
+{% endblock %}

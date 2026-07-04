@@ -1,0 +1,129 @@
+---
+permalink: "ja/research/token-budget-implementation-guide.html"
+---
+{% extends "shell.njk" %}{% block prefix %}<!DOCTYPE html>
+<html lang="ja"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>トークン予算実装ガイド · FinOps LLM</title><meta name="description" content="本番環境でのトークン予算の実装方法：リクエストごとの制限、チームごとの割り当て、期間ごとの予算、ハード制限 vs ソフト制限、予算超過時のグレースフルデグラデーション。" /><meta name="robots" content="index, follow" /><link rel="canonical" href="https://finopsllm.com/ja/research/token-budget-implementation-guide" />
+<link rel="alternate" hreflang="en" href="https://finopsllm.com/research/token-budget-implementation-guide" />
+<link rel="alternate" hreflang="es" href="https://finopsllm.com/es/research/token-budget-implementation-guide" />
+<link rel="alternate" hreflang="ja" href="https://finopsllm.com/ja/research/token-budget-implementation-guide" />
+<link rel="alternate" hreflang="x-default" href="https://finopsllm.com/research/token-budget-implementation-guide" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","headline":"トークン予算実装ガイド","description":"本番環境でのトークン予算の実装方法：リクエストごとの制限、チームごとの割り当て、期間ごとの予算、ハード制限 vs ソフト制限、予算超過時のグレースフルデグラデーション。","url":"https://finopsllm.com/ja/research/token-budget-implementation-guide","datePublished":"2026-07-04","dateModified":"2026-07-04","image":"https://finopsllm.com/og.png","author":{"@type":"Organization","name":"FinOps LLM team"},"publisher":{"@type":"Organization","name":"FinOps LLM","url":"https://finopsllm.com/"}}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"ホーム","item":"https://finopsllm.com/"},{"@type":"ListItem","position":2,"name":"リサーチ","item":"https://finopsllm.com/ja/research"},{"@type":"ListItem","position":3,"name":"トークン予算実装ガイド","item":"https://finopsllm.com/ja/research/token-budget-implementation-guide"}]}
+</script>
+<style>body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}.wrap{max-width:860px;margin:0 auto;padding:56px 24px}a{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}table{width:100%;border-collapse:collapse;margin:20px 0}th,td{padding:10px 12px;border:1px solid #1E2A3F;text-align:left;font-size:14px}th{background:#111829;color:#E6EAF2;font-weight:600}td{color:#B6C0D2}pre{background:#111829;border:1px solid #1E2A3F;border-radius:6px;padding:16px;overflow-x:auto;font-size:13px;color:#B6C0D2}.langsw{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;color:#647289;margin:0 0 26px}.langsw a{text-decoration:none}.langsw a[aria-current]{color:#E6EAF2;font-weight:600}</style><script src="/assets/consent.js" defer></script><script src="/assets/attribution.js" defer></script>
+</head>
+<body><main class="wrap">{% endblock %}{% block body %}<nav class="langsw" aria-label="言語"><a href="/research/token-budget-implementation-guide" hreflang="en">EN</a> · <a href="/es/research/token-budget-implementation-guide" hreflang="es">ES</a> · <a href="/ja/research/token-budget-implementation-guide" hreflang="ja" aria-current="page">JA</a></nav><h1>トークン予算実装ガイド</h1>
+<p>トークン予算はLLMコスト制御の運用レイヤーです。属性付けはお金の行き先を示しますが、予算は望まない場所に流れるのを防ぎます。予算がなければ、設定ミスのあるエージェントループやユーザートラフィックの急増が数時間で月間配分を使い切ってしまう可能性があります。このガイドでは、4種類のトークン予算を本番環境で実装する方法を、各パターンの疑似コード付きで説明します。</p>
+<h2>予算タイプ</h2>
+<table><thead><tr><th>予算タイプ</th><th>粒度</th><th>適用方法</th><th>ユースケース</th></tr></thead>
+<tbody><tr><td>リクエストごと</td><td>単一のAPI呼び出し</td><td>max_tokensパラメーターによるハードリミット</td><td>暴走する補完の防止、レイテンシの制限</td></tr>
+<tr><td>チームごとの割り当て</td><td>期間内のチームまたはプロジェクト</td><td>アラート付きソフトリミット、しきい値でのハードリミット</td><td>部門別コスト配分、1チームが共有予算を消費するのを防ぐ</td></tr>
+<tr><td>期間ごと</td><td>日次、週次、月次</td><td>グレースピリオド付きハードリミット</td><td>月間予算上限、スプリントレベルの支出</td></tr>
+<tr><td>ワークフローごと</td><td>単一のパイプラインまたはエージェント実行</td><td>ステップごとおよび合計のハードリミット</td><td>マルチステップエージェント、RAGパイプライン、評価実行</td></tr></tbody>
+</table>
+<h2>リクエストごとの制限</h2>
+<p>最もシンプルな予算：すべてのリクエストを<code>max_tokens</code>で制限します。これはオプションではありません — 本番のすべてのリクエストには明示的な出力トークン制限が必要です。これがないと、冗長なモデル応答が予期しないトークンを消費し、レイテンシを膨らませる可能性があります。</p>
+<pre>// リクエストごとの予算適用
+function callLLM(prompt, config):
+    response = provider.complete(
+        prompt: prompt,
+        model: config.model,
+        max_tokens: config.max_output_tokens,    // ハードキャップ
+        temperature: config.temperature
+    )
+    if response.usage.total_tokens > config.warn_threshold:
+        log.warn("リクエストがソフトリミットを超過",
+            tokens: response.usage.total_tokens,
+            threshold: config.warn_threshold
+        )
+    return response</pre>
+<h2>チームごとの割り当て</h2>
+<p>チーム割り当てには、リクエスト間で持続する共有カウンターが必要です。パターン：各呼び出し前に残り予算をチェックし、予算が尽きた場合は拒否またはダウングレードします。</p>
+<pre>// Redis バックエンドのカウンターによるチーム割り当て
+function checkTeamBudget(teamId, estimatedTokens):
+    key = "budget:" + teamId + ":" + currentPeriod()
+    remaining = redis.get(key) or getTeamQuota(teamId)
+
+    if remaining &lt; estimatedTokens:
+        if remaining &lt; estimatedTokens * 0.1:
+            return DENY    // ハードリミット：リクエストを拒否
+        else:
+            return DOWNGRADE  // ソフトリミット：安価なモデルを使用
+
+    return ALLOW
+
+function recordUsage(teamId, actualTokens):
+    key = "budget:" + teamId + ":" + currentPeriod()
+    redis.decrby(key, actualTokens)
+    remaining = redis.get(key)
+    if remaining &lt; getTeamQuota(teamId) * 0.2:
+        alert.quotaLow(teamId, remaining)</pre>
+<h2>期間ごとの予算</h2>
+<p>期間ごとの予算はチーム割り当てを時間ウィンドウでラップします。重要な違い：グレースピリオドメカニズムが必要です。チームが月間予算の80%に達した場合、アラートを送信します。100%では、構成可能なグレースピリオド（例：24時間）を許可してからハード適用が開始されます。これにより、月末にチームがタスク途中でブロックされるのを防ぎます。</p>
+<pre>// グレースピリオド付き期間予算
+function enforceBudget(teamId):
+    usage = getUsageForPeriod(teamId, currentMonth())
+    limit = getTeamMonthlyLimit(teamId)
+
+    if usage &lt; limit * 0.8:
+        return ALLOW
+
+    if usage &lt; limit * 1.0:
+        alert.budgetWarning(teamId, usage, limit)
+        return ALLOW   // ソフト警告ゾーン
+
+    if usage &lt; limit * 1.1 and withinGracePeriod(teamId):
+        alert.budgetExceeded(teamId, usage, limit)
+        return ALLOW   // グレースピリオド：超過を許可
+
+    return DENY  // ハードストップ</pre>
+<h2>ワークフローごとの予算</h2>
+<p>マルチステップエージェントとパイプラインには2つのレベルの予算が必要です：ステップごと（単一ステップが消費しすぎるのを防止）と実行ごと（パイプライン全体が割り当てを超過するのを防止）。ワークフローコンテキストの両方を追跡します。</p>
+<pre>// ワークフロー予算トラッカー
+class WorkflowBudget:
+    constructor(maxPerStep, maxTotal):
+        this.maxPerStep = maxPerStep
+        this.maxTotal = maxTotal
+        this.spent = 0
+
+    function callStep(stepFn, prompt):
+        if this.spent &gt;= this.maxTotal:
+            return fallbackResponse("予算超過")
+
+        response = callLLM(prompt, {
+            max_tokens: min(this.maxPerStep,
+                           this.maxTotal - this.spent)
+        })
+
+        this.spent += response.usage.total_tokens
+        return response</pre>
+<h2>予算超過時のグレースフルデグラデーション</h2>
+<p>予算に達したときにエラーを返すだけにしてはいけません。グレースフルにデグレードします。安価なモデルに切り替える（GPT-4oの代わりにGPT-4o-mini）、コンテキストウィンドウサイズを縮小する、オプションの処理ステップをスキップする、または完全な処理には予算承認が必要であるというメモ付きで部分的な結果を返します。ユーザーエクスペリエンスは壊れるのではなく、低下すべきです。</p>
+<pre>// デグラデーションチェーン
+function callWithDegradation(prompt, config):
+    if checkBudget(config.teamId, FULL_MODEL):
+        return callLLM(prompt, { model: config.primaryModel })
+
+    if checkBudget(config.teamId, CHEAP_MODEL):
+        log.info("予算のためモデルをダウングレード")
+        return callLLM(prompt, { model: config.fallbackModel })
+
+    if checkBudget(config.teamId, MINIMAL_TOKENS):
+        truncated = truncateContext(prompt, 50%)
+        return callLLM(truncated, {
+            model: config.fallbackModel,
+            max_tokens: 256
+        })
+
+    return cachedOrFallback(prompt)</pre>
+<h2>予算の健全性監視</h2>
+<p>3つの指標を追跡します：バーンレート（1時間あたりの消費トークン 対 予算）、予測（現在のレートで予算がいつ枯渇するか）、オーバーライド回数（グレースピリオドが何回使用されたか）。グレースピリオドの使用が総リクエストの10%を超える場合、予算がワークロードに対して低すぎます。</p>
+<h2>関連項目</h2>
+<ul><li><a href="/research/llm-budget-governance">LLM予算ガバナンス</a> — 予算背后的組織ポリシー。</li><li><a href="/research/agent-spend-guardrails">エージェント支出ガードレール</a> — 自律エージェントの予算パターン。</li><li><a href="/research/cap-inference-costs">推論コストの上限設定方法</a> — プロバイダー側のコスト制御。</li></ul>
+<hr style="margin:48px 0 24px;border:none;border-top:1px solid #1E2A3F" /><p>これをご自身のLLM支出に適用しませんか？FinOps LLMはAIコストの無料監査を実行し、削減のポイントを示します。<a href="/book">無料監査を予約 &rarr;</a></p><p><a href="/ja/research">リサーチに戻る</a></p>{% endblock %}{% block suffix %}</main></body></html>
+
+{% endblock %}

@@ -1,0 +1,121 @@
+---
+permalink: "es/research/llm-cost-calculator.html"
+---
+{% extends "shell.njk" %}{% block prefix %}<!DOCTYPE html>
+<html lang="es"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Calculadora de Costes LLM — Estima Tu Gasto Mensual en IA · FinOps LLM</title><meta name="description" content="Calculadora gratuita de costes LLM. Estima el gasto mensual en OpenAI, Anthropic, Google y más. Compara costes para patrones de uso ligero, medio e intensivo." /><meta name="robots" content="index, follow" /><link rel="canonical" href="https://finopsllm.com/es/research/llm-cost-calculator" />
+<link rel="alternate" hreflang="en" href="https://finopsllm.com/research/llm-cost-calculator" />
+<link rel="alternate" hreflang="es" href="https://finopsllm.com/es/research/llm-cost-calculator" />
+<link rel="alternate" hreflang="ja" href="https://finopsllm.com/ja/research/llm-cost-calculator" />
+<link rel="alternate" hreflang="x-default" href="https://finopsllm.com/research/llm-cost-calculator" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://finopsllm.com/es/research/llm-cost-calculator" />
+<meta property="og:title" content="Calculadora de Costes LLM — Estima Tu Gasto Mensual en IA" />
+<meta property="og:description" content="Calculadora gratuita de costes LLM. Estima el gasto mensual en múltiples proveedores." />
+<meta property="og:image" content="https://finopsllm.com/og.svg" />
+<meta property="og:site_name" content="FinOps LLM" />
+<meta property="og:locale" content="es_ES" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:site" content="@finopsllm" />
+<meta name="twitter:title" content="Calculadora de Costes LLM — Estima Tu Gasto Mensual en IA" />
+<meta name="twitter:description" content="Calculadora gratuita de costes LLM. Estima el gasto mensual en múltiples proveedores." />
+<meta name="twitter:image" content="https://finopsllm.com/og.svg" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","headline":"Calculadora de Costes LLM — Estima Tu Gasto Mensual en IA","description":"Calculadora gratuita de costes LLM. Estima el gasto mensual en OpenAI, Anthropic, Google y más. Compara costes para patrones de uso ligero, medio e intensivo.","url":"https://finopsllm.com/es/research/llm-cost-calculator","datePublished":"2026-07-04","dateModified":"2026-07-04","image":"https://finopsllm.com/og.png","author":{"@type":"Organization","name":"FinOps LLM team"},"publisher":{"@type":"Organization","name":"FinOps LLM","url":"https://finopsllm.com/"}}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Inicio","item":"https://finopsllm.com/es/"},{"@type":"ListItem","position":2,"name":"Investigación","item":"https://finopsllm.com/es/research"},{"@type":"ListItem","position":3,"name":"Calculadora de Costes LLM","item":"https://finopsllm.com/es/research/llm-cost-calculator"}]}
+</script>
+<style>body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}.wrap{max-width:840px;margin:0 auto;padding:56px 24px}a{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}h3{margin-top:22px;color:#E6EAF2}table{border-collapse:collapse;width:100%;margin:24px 0;font-size:.95em}th,td{border:1px solid #1E2A3F;padding:10px 12px;text-align:left;color:#B6C0D2}th{color:#E6EAF2;background:#101726}.langsw{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;color:#647289;margin:0 0 26px}.langsw a{text-decoration:none}.langsw a[aria-current]{color:#E6EAF2;font-weight:600}.calc{background:#101726;border:1px solid #1E2A3F;border-radius:12px;padding:28px 24px;margin:28px 0}.calc label{display:block;font-size:.88rem;color:#B6C0D2;margin:14px 0 6px}.calc input,.calc select{background:#0A0F1A;border:1px solid #1E2A3F;color:#E6EAF2;border-radius:6px;padding:10px 14px;font-size:.95rem;width:100%;max-width:320px;box-sizing:border-box}.calc input:focus,.calc select:focus{outline:none;border-color:#7AAFFF}.calc button{background:#7AAFFF;color:#0A0F1A;border:none;border-radius:8px;padding:12px 28px;font-size:.95rem;font-weight:600;cursor:pointer;margin-top:18px}.calc button:hover{background:#5A8FEF}#results{margin-top:24px}#results table{font-size:.9em}</style><script src="/assets/consent.js" defer></script><script src="/assets/attribution.js" defer></script>
+</head>
+<body><main class="wrap">{% endblock %}{% block body %}<nav class="langsw" aria-label="Language / Idioma"><a href="/research/llm-cost-calculator" hreflang="en">EN</a> · <a href="/es/research/llm-cost-calculator" hreflang="es" aria-current="page">ES</a> · <a href="/ja/research/llm-cost-calculator" hreflang="ja">JA</a></nav><h1>Calculadora de Costes LLM</h1>
+<p>Estima tu gasto mensual en LLMs entre modelos populares. Introduce tu patrón de uso a continuación y compara los costes lado a lado. Todos los precios son por millón de tokens a julio de 2026.</p>
+
+<h2>Costes precalculados por nivel de uso</h2>
+<p>Así es lo que cuesta cada nivel de uso por mes en modelos populares, basado en patrones de solicitud típicos:</p>
+<table>
+<thead><tr><th>Modelo</th><th>Ligero (1K req/mes)</th><th>Medio (10K req/mes)</th><th>Intensivo (100K req/mes)</th></tr></thead>
+<tbody>
+<tr><td>GPT-4o</td><td>$3.25</td><td>$32.50</td><td>$325.00</td></tr>
+<tr><td>GPT-5</td><td>$12.50</td><td>$125.00</td><td>$1,250.00</td></tr>
+<tr><td>GPT-5 mini</td><td>$1.95</td><td>$19.50</td><td>$195.00</td></tr>
+<tr><td>Claude Sonnet 4</td><td>$4.50</td><td>$45.00</td><td>$450.00</td></tr>
+<tr><td>Claude Opus 4</td><td>$22.50</td><td>$225.00</td><td>$2,250.00</td></tr>
+<tr><td>Gemini 2.5 Pro</td><td>$1.75</td><td>$17.50</td><td>$175.00</td></tr>
+<tr><td><a href="https://platform.xiaomimimo.com?ref=LHT8UJ">MiMO</a></td><td>$1.20</td><td>$12.00</td><td>$120.00</td></tr>
+<tr><td>DeepSeek R1</td><td>$0.80</td><td>$8.00</td><td>$80.00</td></tr>
+</tbody>
+</table>
+<p><em>Ligero:</em> 1K solicitudes/mes, 500 entrada + 200 tokens de salida. <em>Medio:</em> 10K solicitudes/mes, 1,000 entrada + 500 tokens de salida. <em>Intensivo:</em> 100K solicitudes/mes, 2,000 entrada + 1,000 tokens de salida.</p>
+
+<h2>Calculadora interactiva</h2>
+<div class="calc">
+<label for="model">Modelo</label>
+<select id="model">
+<option value="gpt4o">GPT-4o ($2.50 / $10.00)</option>
+<option value="gpt5">GPT-5 ($10.00 / $30.00)</option>
+<option value="gpt5mini">GPT-5 mini ($1.50 / $6.00)</option>
+<option value="claude_sonnet">Claude Sonnet 4 ($3.00 / $15.00)</option>
+<option value="claude_opus">Claude Opus 4 ($15.00 / $75.00)</option>
+<option value="gemini_pro">Gemini 2.5 Pro ($1.25 / $10.00)</option>
+<option value="mimo">MiMO ($0.80 / $3.20)</option>
+<option value="deepseek">DeepSeek R1 ($0.55 / $2.19)</option>
+</select>
+<label for="requests">Solicitudes por mes</label>
+<input type="number" id="requests" value="10000" min="1" step="1000" />
+<label for="inputTokens">Tokens de entrada promedio por solicitud</label>
+<input type="number" id="inputTokens" value="1000" min="1" step="100" />
+<label for="outputTokens">Tokens de salida promedio por solicitud</label>
+<input type="number" id="outputTokens" value="500" min="1" step="100" />
+<button onclick="calculate()">Calcular coste</button>
+<div id="results"></div>
+</div>
+
+<script>
+var models={gpt4o:{name:"GPT-4o",input:2.50,output:10.00},gpt5:{name:"GPT-5",input:10.00,output:30.00},gpt5mini:{name:"GPT-5 mini",input:1.50,output:6.00},claude_sonnet:{name:"Claude Sonnet 4",input:3.00,output:15.00},claude_opus:{name:"Claude Opus 4",input:15.00,output:75.00},gemini_pro:{name:"Gemini 2.5 Pro",input:1.25,output:10.00},mimo:{name:"MiMO",input:0.80,output:3.20},deepseek:{name:"DeepSeek R1",input:0.55,output:2.19}};
+function calculate(){
+var m=models[document.getElementById("model").value];
+var r=parseInt(document.getElementById("requests").value)||0;
+var it=parseInt(document.getElementById("inputTokens").value)||0;
+var ot=parseInt(document.getElementById("outputTokens").value)||0;
+var inputCost=(r*it/1000000)*m.input;
+var outputCost=(r*ot/1000000)*m.output;
+var total=inputCost+outputCost;
+var html='<table><thead><tr><th>Métrica</th><th>Valor</th></tr></thead><tbody>';
+html+='<tr><td>Modelo</td><td>'+m.name+'</td></tr>';
+html+='<tr><td>Total solicitudes/mes</td><td>'+r.toLocaleString()+'</td></tr>';
+html+='<tr><td>Coste de entrada/mes</td><td>$'+inputCost.toFixed(2)+'</td></tr>';
+html+='<tr><td>Coste de salida/mes</td><td>$'+outputCost.toFixed(2)+'</td></tr>';
+html+='<tr><td><strong>Coste total estimado/mes</strong></td><td><strong>$'+total.toFixed(2)+'</strong></td></tr>';
+html+='<tr><td>Coste por solicitud</td><td>$'+(total/r).toFixed(5)+'</td></tr>';
+html+='</tbody></table>';
+html+='<p style="font-size:.85rem;color:#647289">Estimación únicamente. No incluye descuentos de caché, precios de API por lotes ni sobrecarga de tokens de razonamiento. Los costes reales varían según las prácticas de facturación del proveedor.</p>';
+document.getElementById("results").innerHTML=html;
+}
+</script>
+
+<h2>Cómo usar esta calculadora</h2>
+<ol>
+<li><strong>Elige tu modelo</strong> del desplegable. Los precios reflejan tarifas API estándar a julio de 2026.</li>
+<li><strong>Introduce tu volumen de solicitudes</strong> — cuántas llamadas API haces al mes.</li>
+<li><strong>Estima el recuento de tokens</strong> — el número promedio de tokens de entrada y salida por solicitud. Si no estás seguro, empieza con 1,000 entrada / 500 salida para chat, o 3,000 entrada / 1,000 salida para generación de código.</li>
+<li><strong>Pulsa Calcular</strong> para ver tu coste mensual estimado dividido por entrada y salida.</li>
+</ol>
+
+<h2>Cómo reducir tu estimación</h2>
+<ul>
+<li><strong>Usa caché de prompts.</strong> Si tus prompts tienen un prefijo estable, las lecturas de caché pueden reducir los costes de entrada en un 50–90%. Ver <a href="/research/prompt-caching-explained">caché de prompts explicada</a>.</li>
+<li><strong>Cambia de modelo por tarea.</strong> Encamina consultas simples a modelos más baratos y reserva los caros para tareas complejas. Esto es el <a href="/research/model-routing">enrutamiento de modelos</a>.</li>
+<li><strong>Usa APIs por lotes.</strong> Las cargas de trabajo no urgentes pueden usar precios por lotes con 50% de descuento.</li>
+<li><strong>Prueba proveedores más baratos.</strong> <a href="https://platform.xiaomimimo.com?ref=LHT8UJ">MiMO</a> y DeepSeek ofrecen tarifas significativamente más bajas para calidad comparable en muchas tareas.</li>
+</ul>
+
+<h2>Relacionado</h2>
+<ul>
+<li><a href="/es/research/how-much-does-gpt5-cost">¿Cuánto cuesta GPT-5?</a> — desglose detallado de precios de GPT-5.</li>
+<li><a href="/research/how-llm-providers-charge">¿Cómo cobran los proveedores de LLM?</a> — entender la facturación basada en tokens.</li>
+<li><a href="/es/research/cheapest-ai-code-generation">La forma más barata de ejecutar generación de código con IA</a> — comparación de costes para herramientas de codificación.</li>
+<li><a href="/research/provider-arbitrage">Arbitraje de proveedores</a> — encontrar el modelo más barato que cumple tu umbral de calidad.</li>
+</ul>
+<hr style="margin:48px 0 24px;border:none;border-top:1px solid #1E2A3F" /><p>¿Quieres esto aplicado a tu propio gasto en LLM? FinOps LLM ejecuta una auditoría gratuita de tus costes de IA y muestra dónde están los ahorros. <a href="/book">Reserva auditoría gratuita &rarr;</a></p><p><a href="/es/research">Volver a investigación</a></p>{% endblock %}{% block suffix %}</main></body></html>
+{% endblock %}
