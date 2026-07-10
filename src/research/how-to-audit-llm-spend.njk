@@ -8,29 +8,25 @@ permalink: "research/how-to-audit-llm-spend.html"
 <link rel="alternate" hreflang="es" href="https://finopsllm.com/es/research/how-to-audit-llm-spend" />
 <link rel="alternate" hreflang="ja" href="https://finopsllm.com/ja/research/how-to-audit-llm-spend" />
 <link rel="alternate" hreflang="x-default" href="https://finopsllm.com/research/how-to-audit-llm-spend" />
-<script type="application/ld+json">
 {"@context":"https://schema.org","@type":"TechArticle","headline":"How to audit your LLM spend in 30 minutes","description":"A step-by-step walkthrough to audit your LLM costs in 30 minutes: gather billing data, normalize tokens, attribute spend, and set up alerts.","url":"https://finopsllm.com/research/how-to-audit-llm-spend","datePublished":"2026-07-04","dateModified":"2026-07-04","image":"https://finopsllm.com/og.png","author":{"@type":"Organization","name":"FinOps LLM team"},"publisher":{"@type":"Organization","name":"FinOps LLM","url":"https://finopsllm.com/"}}
-</script>
-<script type="application/ld+json">
 {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://finopsllm.com/"},{"@type":"ListItem","position":2,"name":"Research","item":"https://finopsllm.com/research"},{"@type":"ListItem","position":3,"name":"How to audit your LLM spend","item":"https://finopsllm.com/research/how-to-audit-llm-spend"}]}
-</script>
 <style>body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}.wrap{max-width:860px;margin:0 auto;padding:56px 24px}a{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}table{width:100%;border-collapse:collapse;margin:20px 0}th,td{padding:10px 12px;border:1px solid #1E2A3F;text-align:left;font-size:14px}th{background:#111829;color:#E6EAF2;font-weight:600}td{color:#B6C0D2}.langsw{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;color:#647289;margin:0 0 26px}.langsw a{text-decoration:none}.langsw a[aria-current]{color:#E6EAF2;font-weight:600}</style><script src="/assets/consent.js" defer></script><script src="/assets/attribution.js" defer></script>
 </head>
 <body><main class="wrap">{% endblock %}{% block body %}<nav class="langsw" aria-label="Language"><a href="/research/how-to-audit-llm-spend" hreflang="en" aria-current="page">EN</a> · <a href="/es/research/how-to-audit-llm-spend" hreflang="es">ES</a> · <a href="/ja/research/how-to-audit-llm-spend" hreflang="ja">JA</a></nav><h1>How to audit your LLM spend in 30 minutes</h1>
 <p>Most teams do not know how their LLM budget breaks down. Costs hide behind provider dashboards that show totals but not attribution, token types that are billed at different rates, and usage patterns that shift week to week. This guide gives you a structured audit you can run in half an hour using tools you already have.</p>
-<h2>Step 1 — Gather billing data from providers</h2>
+<h2>Step 1 - Gather billing data from providers</h2>
 <p>Export the last 30 days of usage from every LLM provider you use. For OpenAI, use the Usage API or download CSV from the dashboard. For Anthropic, pull from the Billing API. For Google, export from the Cloud Billing console. For self-hosted models, pull request logs from your inference server. Store everything in one folder. You need raw data, not summaries.</p>
-<h2>Step 2 — Normalize token counts across providers</h2>
+<h2>Step 2 - Normalize token counts across providers</h2>
 <p>Each provider counts tokens differently. OpenAI and Anthropic use their own tokenizers; Google uses SentencePiece. To compare, convert all counts to a common unit. The simplest approach: use each provider's published per-token price to calculate cost per request, then compare costs directly rather than raw token counts. This avoids tokenizer mismatch entirely.</p>
-<h2>Step 3 — Split by input, output, cache, and reasoning tokens</h2>
+<h2>Step 3 - Split by input, output, cache, and reasoning tokens</h2>
 <p>Providers charge different rates for different token types. Cached input tokens are typically 50% cheaper on OpenAI and Anthropic. Reasoning tokens (on o-series and similar models) can cost 2–4x standard output tokens. Break your spend into these four buckets: input, output, cached input, and reasoning. If your provider does not expose this split, estimate it from the model type and request pattern.</p>
-<h2>Step 4 — Attribute to teams and features</h2>
-<p>Map each API key or project to the team or feature that owns it. If you do not have key-level separation, use request metadata — headers, tags, or the <code>user</code> parameter that most providers support. The goal is a table: which team spends how much on which feature. Without this, you cannot hold anyone accountable for cost.</p>
-<h2>Step 5 — Identify the top 3 cost drivers</h2>
+<h2>Step 4 - Attribute to teams and features</h2>
+<p>Map each API key or project to the team or feature that owns it. If you do not have key-level separation, use request metadata - headers, tags, or the <code>user</code> parameter that most providers support. The goal is a table: which team spends how much on which feature. Without this, you cannot hold anyone accountable for cost.</p>
+<h2>Step 5 - Identify the top 3 cost drivers</h2>
 <p>Sort by total spend descending. In most organizations, 80% of LLM cost comes from 3–5 usage patterns. Common drivers: a chatbot with long context windows, a code generation feature that uses expensive models for all requests, or a background enrichment job that runs on every document without filtering. Name them. This is where you focus optimization effort.</p>
-<h2>Step 6 — Calculate cost-per-task for key workflows</h2>
+<h2>Step 6 - Calculate cost-per-task for key workflows</h2>
 <p>Pick your top 3 workflows. For each, divide total spend by the number of completed tasks. This gives you a unit economics number you can track over time. A customer support workflow that costs $0.12 per ticket is manageable. One that costs $1.40 per ticket needs attention. The absolute number matters less than the trend and the comparison between workflows.</p>
-<h2>Step 7 — Set up alerts for anomalies</h2>
+<h2>Step 7 - Set up alerts for anomalies</h2>
 <p>Configure alerts at two levels: total daily spend (catches runaway jobs) and per-workflow spend (catches drift). Most providers support billing alerts natively. For cross-provider alerting, pipe your usage data into a dashboard or use a tool like <a href="https://platform.xiaomimimo.com?ref=LHT8UJ" target="_blank" rel="noopener">MiMO</a> that aggregates across providers. A simple rule: alert if any day exceeds 150% of the trailing 7-day average.</p>
 <h2>Quick Audit Checklist</h2>
 <table><thead><tr><th>Step</th><th>Tool needed</th><th>Time estimate</th><th>Output</th></tr></thead>
@@ -43,9 +39,9 @@ permalink: "research/how-to-audit-llm-spend.html"
 <tr><td>7. Set up alerts</td><td>Provider billing alerts + dashboard</td><td>2 min</td><td>Anomaly detection active</td></tr></tbody>
 </table>
 <h2>What to do next</h2>
-<p>This audit gives you a snapshot. The real value comes from running it regularly — weekly for high-spend teams, monthly for everyone else. Automate the data collection and make the cost-per-task metric a first-class product metric. If you want help building this into a continuous process, <a href="https://platform.xiaomimimo.com?ref=LHT8UJ" target="_blank" rel="noopener">MiMO</a> provides cross-provider dashboards and automated attribution out of the box.</p>
+<p>This audit gives you a snapshot. The real value comes from running it regularly - weekly for high-spend teams, monthly for everyone else. Automate the data collection and make the cost-per-task metric a first-class product metric. If you want help building this into a continuous process, <a href="https://platform.xiaomimimo.com?ref=LHT8UJ" target="_blank" rel="noopener">MiMO</a> provides cross-provider dashboards and automated attribution out of the box.</p>
 <h2>Related</h2>
-<ul><li><a href="/research/llm-cost-attribution">LLM cost attribution</a> — deeper dive into attribution patterns.</li><li><a href="/research/anomaly-detection">LLM cost anomaly detection</a> — automated alerting strategies.</li><li><a href="/research/how-to-budget-for-ai-spend">How to budget for AI spend</a> — moving from audit to budget.</li></ul>
+<ul><li><a href="/research/llm-cost-attribution">LLM cost attribution</a> - deeper dive into attribution patterns.</li><li><a href="/research/anomaly-detection">LLM cost anomaly detection</a> - automated alerting strategies.</li><li><a href="/research/how-to-budget-for-ai-spend">How to budget for AI spend</a> - moving from audit to budget.</li></ul>
 <hr style="margin:48px 0 24px;border:none;border-top:1px solid #1E2A3F" /><p>Want this applied to your own LLM spend? FinOps LLM runs a free audit of your AI costs and shows where the savings are. <a href="/book">Book free audit &rarr;</a></p><p><a href="/research">Back to research</a></p>{% endblock %}{% block suffix %}</main></body></html>
 
 {% endblock %}

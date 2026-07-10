@@ -8,29 +8,25 @@ permalink: "ja/research/how-to-audit-llm-spend.html"
 <link rel="alternate" hreflang="es" href="https://finopsllm.com/es/research/how-to-audit-llm-spend" />
 <link rel="alternate" hreflang="ja" href="https://finopsllm.com/ja/research/how-to-audit-llm-spend" />
 <link rel="alternate" hreflang="x-default" href="https://finopsllm.com/research/how-to-audit-llm-spend" />
-<script type="application/ld+json">
-{"@context":"https://schema.org","@type":"TechArticle","headline":"30分でLLM支出を監査する方法","description":"30分でLLMコストを監査するステップバイステップガイド：請求データの収集、トークンの正規化、支出の属性付け、アラートの設定。","url":"https://finopsllm.com/ja/research/how-to-audit-llm-spend","datePublished":"2026-07-04","dateModified":"2026-07-04","image":"https://finopsllm.com/og.png","author":{"@type":"Organization","name":"FinOps LLM team"},"publisher":{"@type":"Organization","name":"FinOps LLM","url":"https://finopsllm.com/"}}
-</script>
-<script type="application/ld+json">
-{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"ホーム","item":"https://finopsllm.com/"},{"@type":"ListItem","position":2,"name":"リサーチ","item":"https://finopsllm.com/ja/research"},{"@type":"ListItem","position":3,"name":"LLM支出の監査方法","item":"https://finopsllm.com/ja/research/how-to-audit-llm-spend"}]}
-</script>
+{"@context":"https://schema.org","@type":"TechArticle","headline":"30\u5206\u3067LLM\u652f\u51fa\u3092\u76e3\u67fb\u3059\u308b\u65b9\u6cd5","description":"30\u5206\u3067LLM\u30b3\u30b9\u30c8\u3092\u76e3\u67fb\u3059\u308b\u30b9\u30c6\u30c3\u30d7\u30d0\u30a4\u30b9\u30c6\u30c3\u30d7\u30ac\u30a4\u30c9\uff1a\u8acb\u6c42\u30c7\u30fc\u30bf\u306e\u53ce\u96c6\u3001\u30c8\u30fc\u30af\u30f3\u306e\u6b63\u898f\u5316\u3001\u652f\u51fa\u306e\u5c5e\u6027\u4ed8\u3051\u3001\u30a2\u30e9\u30fc\u30c8\u306e\u8a2d\u5b9a\u3002","url":"https://finopsllm.com/ja/research/how-to-audit-llm-spend","datePublished":"2026-07-04","dateModified":"2026-07-04","image":"https://finopsllm.com/og.png","author":{"@type":"Organization","name":"FinOps LLM team"},"publisher":{"@type":"Organization","name":"FinOps LLM","url":"https://finopsllm.com/"}}
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"\u30db\u30fc\u30e0","item":"https://finopsllm.com/"},{"@type":"ListItem","position":2,"name":"\u30ea\u30b5\u30fc\u30c1","item":"https://finopsllm.com/ja/research"},{"@type":"ListItem","position":3,"name":"LLM\u652f\u51fa\u306e\u76e3\u67fb\u65b9\u6cd5","item":"https://finopsllm.com/ja/research/how-to-audit-llm-spend"}]}
 <style>body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}.wrap{max-width:860px;margin:0 auto;padding:56px 24px}a{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}table{width:100%;border-collapse:collapse;margin:20px 0}th,td{padding:10px 12px;border:1px solid #1E2A3F;text-align:left;font-size:14px}th{background:#111829;color:#E6EAF2;font-weight:600}td{color:#B6C0D2}.langsw{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;color:#647289;margin:0 0 26px}.langsw a{text-decoration:none}.langsw a[aria-current]{color:#E6EAF2;font-weight:600}</style><script src="/assets/consent.js" defer></script><script src="/assets/attribution.js" defer></script>
 </head>
 <body><main class="wrap">{% endblock %}{% block body %}<nav class="langsw" aria-label="言語"><a href="/research/how-to-audit-llm-spend" hreflang="en">EN</a> · <a href="/es/research/how-to-audit-llm-spend" hreflang="es">ES</a> · <a href="/ja/research/how-to-audit-llm-spend" hreflang="ja" aria-current="page">JA</a></nav><h1>30分でLLM支出を監査する方法</h1>
 <p>ほとんどのチームはLLM予算の内訳を把握していません。コストは、属性付けではなく合計を表示するプロバイダーのダッシュボード、異なる料金で請求されるトークンタイプ、週ごとに変化する使用パターンの裏に隠れています。このガイドでは、既にお手元のツールを使って30分で実行できる構造化された監査を提供します。</p>
-<h2>ステップ1 — プロバイダーから請求データを収集する</h2>
+<h2>ステップ1 - プロバイダーから請求データを収集する</h2>
 <p>使用しているすべてのLLMプロバイダーから過去30日間の使用データをエクスポートします。OpenAIの場合は、Usage APIを使用するかダッシュボードからCSVをダウンロードします。Anthropicの場合は、Billing APIからデータを取得します。Googleの場合は、Cloud Billingコンソールからエクスポートします。セルフホストモデルの場合は、推論サーバーからリクエストログを取得します。すべてを1つのフォルダに保存します。要約ではなく生データが必要です。</p>
-<h2>ステップ2 — プロバイダー間でトークン数を正規化する</h2>
+<h2>ステップ2 - プロバイダー間でトークン数を正規化する</h2>
 <p>各プロバイダーはトークンを異なる方法でカウントします。OpenAIとAnthropicは独自のトークナイザーを使用し、GoogleはSentencePieceを使用します。比較するには、すべてのカウントを共通の単位に変換します。最も簡単なアプローチは、各プロバイダーが公開しているトークン単価を使用してリクエストあたりのコストを計算し、生のトークン数ではなくコストを直接比較することです。これによりトークナイザーの不一致を完全に回避できます。</p>
-<h2>ステップ3 — 入力、出力、キャッシュ、推論トークンに分割する</h2>
+<h2>ステップ3 - 入力、出力、キャッシュ、推論トークンに分割する</h2>
 <p>プロバイダーはトークンタイプによって異なる料金を請求します。キャッシュされた入力トークンは、OpenAIとAnthropicで通常50%安くなります。推論トークン（oシリーズや同様のモデルでは）は標準出力トークンの2〜4倍のコストになることがあります。支出を入力、出力、キャッシュ入力、推論の4つのバケットに分割します。プロバイダーがこの分割を公開していない場合は、モデルタイプとリクエストパターンから推定します。</p>
-<h2>ステップ4 — チームと機能に属性付ける</h2>
+<h2>ステップ4 - チームと機能に属性付ける</h2>
 <p>各APIキーまたはプロジェクトを、それを所有するチームまたは機能にマッピングします。キーレベルの分離がない場合は、リクエストメタデータ（ヘッダー、タグ、またはほとんどのプロバイダーがサポートする<code>user</code>パラメーター）を使用します。目標は、どのチームがどの機能にいくら支出しているかというテーブルを作成することです。これなしでは、コストの責任を誰にも負わせることができません。</p>
-<h2>ステップ5 — トップ3のコストドライバーを特定する</h2>
+<h2>ステップ5 - トップ3のコストドライバーを特定する</h2>
 <p>総支出の降順でソートします。ほとんどの組織では、LLMコストの80%は3〜5の使用パターンから来ます。一般的なドライバー：長いコンテキストウィンドウを持つチャットボット、すべてのリクエストに高価なモデルを使用するコード生成機能、フィルタリングなしですべてのドキュメントで実行されるバックグラウンドエンリッチメントジョブ。名前をつけます。ここが最適化の集中ポイントです。</p>
-<h2>ステップ6 — 主要なワークフローのタスクあたりコストを計算する</h2>
+<h2>ステップ6 - 主要なワークフローのタスクあたりコストを計算する</h2>
 <p>上位3つのワークフローを選択します。各について、総支出を完了したタスク数で割ります。これにより、経時的に追跡できるユニットエコノミクスの数値が得られます。チケットあたり$0.12のカスタマーサポートワークフローは管理可能です。チケットあたり$1.40のワークフローは注意が必要です。絶対値よりもトレンドとワークフロー間の比較の方が重要です。</p>
-<h2>ステップ7 — 異常のアラートを設定する</h2>
+<h2>ステップ7 - 異常のアラートを設定する</h2>
 <p>2つのレベルでアラートを設定します：1日の総支出（暴走ジョブを検出）とワークフローごとの支出（ドリフトを検出）。ほとんどのプロバイダーは請求アラートをネイティブにサポートしています。プロバイダー横断のアラートについては、使用データをダッシュボードにパイプするか、<a href="https://platform.xiaomimimo.com?ref=LHT8UJ" target="_blank" rel="noopener">MiMO</a>のようなプロバイダーを集約するツールを使用します。シンプルなルール：いずれかの日の支出が過去7日間の平均の150%を超えた場合にアラートを出します。</p>
 <h2>クイック監査チェックリスト</h2>
 <table><thead><tr><th>ステップ</th><th>必要なツール</th><th>推定時間</th><th>成果物</th></tr></thead>
@@ -43,9 +39,9 @@ permalink: "ja/research/how-to-audit-llm-spend.html"
 <tr><td>7. アラートの設定</td><td>プロバイダー請求アラート + ダッシュボード</td><td>2分</td><td>異常検知が有効</td></tr></tbody>
 </table>
 <h2>次のステップ</h2>
-<p>この監査はスナップショットを提供します。本当の価値は定期的な実行から来ます — 高支出チームは週次、その他は月次。データ収集を自動化し、タスクあたりコスト指標をファーストクラスの製品指標にします。これを継続的なプロセスとして構築する助けが必要な場合は、<a href="https://platform.xiaomimimo.com?ref=LHT8UJ" target="_blank" rel="noopener">MiMO</a>がプロバイダー横断ダッシュボードと自動属性付けをすぐに提供します。</p>
+<p>この監査はスナップショットを提供します。本当の価値は定期的な実行から来ます - 高支出チームは週次、その他は月次。データ収集を自動化し、タスクあたりコスト指標をファーストクラスの製品指標にします。これを継続的なプロセスとして構築する助けが必要な場合は、<a href="https://platform.xiaomimimo.com?ref=LHT8UJ" target="_blank" rel="noopener">MiMO</a>がプロバイダー横断ダッシュボードと自動属性付けをすぐに提供します。</p>
 <h2>関連項目</h2>
-<ul><li><a href="/ja/research/llm-cost-attribution">LLM費用配分</a> — 属性付けパターンの詳細。</li><li><a href="/ja/research/anomaly-detection">LLM費用異常検知</a> — 自動アラート戦略。</li><li><a href="/research/how-to-budget-for-ai-spend">AI支出の予算化方法</a> — 監査から予算へ。</li></ul>
+<ul><li><a href="/ja/research/llm-cost-attribution">LLM費用配分</a> - 属性付けパターンの詳細。</li><li><a href="/ja/research/anomaly-detection">LLM費用異常検知</a> - 自動アラート戦略。</li><li><a href="/research/how-to-budget-for-ai-spend">AI支出の予算化方法</a> - 監査から予算へ。</li></ul>
 <hr style="margin:48px 0 24px;border:none;border-top:1px solid #1E2A3F" /><p>これをご自身のLLM支出に適用しませんか？FinOps LLMはAIコストの無料監査を実行し、削減のポイントを示します。<a href="/book">無料監査を予約 &rarr;</a></p><p><a href="/ja/research">リサーチに戻る</a></p>{% endblock %}{% block suffix %}</main></body></html>
 
 {% endblock %}

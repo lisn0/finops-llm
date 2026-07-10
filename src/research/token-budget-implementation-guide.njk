@@ -8,12 +8,8 @@ permalink: "research/token-budget-implementation-guide.html"
 <link rel="alternate" hreflang="es" href="https://finopsllm.com/es/research/token-budget-implementation-guide" />
 <link rel="alternate" hreflang="ja" href="https://finopsllm.com/ja/research/token-budget-implementation-guide" />
 <link rel="alternate" hreflang="x-default" href="https://finopsllm.com/research/token-budget-implementation-guide" />
-<script type="application/ld+json">
 {"@context":"https://schema.org","@type":"TechArticle","headline":"Token budget implementation guide","description":"How to implement token budgets in production: per-request limits, per-team quotas, per-time-period budgets, hard vs soft limits, and graceful degradation.","url":"https://finopsllm.com/research/token-budget-implementation-guide","datePublished":"2026-07-04","dateModified":"2026-07-04","image":"https://finopsllm.com/og.png","author":{"@type":"Organization","name":"FinOps LLM team"},"publisher":{"@type":"Organization","name":"FinOps LLM","url":"https://finopsllm.com/"}}
-</script>
-<script type="application/ld+json">
 {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://finopsllm.com/"},{"@type":"ListItem","position":2,"name":"Research","item":"https://finopsllm.com/research"},{"@type":"ListItem","position":3,"name":"Token budget implementation guide","item":"https://finopsllm.com/research/token-budget-implementation-guide"}]}
-</script>
 <style>body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}.wrap{max-width:860px;margin:0 auto;padding:56px 24px}a{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}table{width:100%;border-collapse:collapse;margin:20px 0}th,td{padding:10px 12px;border:1px solid #1E2A3F;text-align:left;font-size:14px}th{background:#111829;color:#E6EAF2;font-weight:600}td{color:#B6C0D2}pre{background:#111829;border:1px solid #1E2A3F;border-radius:6px;padding:16px;overflow-x:auto;font-size:13px;color:#B6C0D2}.langsw{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;color:#647289;margin:0 0 26px}.langsw a{text-decoration:none}.langsw a[aria-current]{color:#E6EAF2;font-weight:600}</style><script src="/assets/consent.js" defer></script><script src="/assets/attribution.js" defer></script>
 </head>
 <body><main class="wrap">{% endblock %}{% block body %}<nav class="langsw" aria-label="Language"><a href="/research/token-budget-implementation-guide" hreflang="en" aria-current="page">EN</a> · <a href="/es/research/token-budget-implementation-guide" hreflang="es">ES</a> · <a href="/ja/research/token-budget-implementation-guide" hreflang="ja">JA</a></nav><h1>Token budget implementation guide</h1>
@@ -26,7 +22,7 @@ permalink: "research/token-budget-implementation-guide.html"
 <tr><td>Per-workflow</td><td>Single pipeline or agent run</td><td>Hard limit per step and total</td><td>Multi-step agents, RAG pipelines, eval runs</td></tr></tbody>
 </table>
 <h2>Per-request limits</h2>
-<p>The simplest budget: cap every request with <code>max_tokens</code>. This is not optional — every production request should have an explicit output token limit. Without it, a verbose model response can consume unexpected tokens and inflate latency.</p>
+<p>The simplest budget: cap every request with <code>max_tokens</code>. This is not optional - every production request should have an explicit output token limit. Without it, a verbose model response can consume unexpected tokens and inflate latency.</p>
 <pre>// Per-request budget enforcement
 function callLLM(prompt, config):
     response = provider.complete(
@@ -123,7 +119,7 @@ function callWithDegradation(prompt, config):
 <h2>Monitoring budget health</h2>
 <p>Track three metrics: burn rate (tokens consumed per hour vs. budget), forecast (at current rate, when will the budget be exhausted), and override count (how many times the grace period was used). If grace period usage exceeds 10% of total requests, the budget is set too low for the workload.</p>
 <h2>Related</h2>
-<ul><li><a href="/research/llm-budget-governance">LLM budget governance</a> — organizational policies behind budgets.</li><li><a href="/research/agent-spend-guardrails">Agent spend guardrails</a> — budget patterns for autonomous agents.</li><li><a href="/research/cap-inference-costs">How to cap inference costs</a> — provider-side cost controls.</li></ul>
+<ul><li><a href="/research/llm-budget-governance">LLM budget governance</a> - organizational policies behind budgets.</li><li><a href="/research/agent-spend-guardrails">Agent spend guardrails</a> - budget patterns for autonomous agents.</li><li><a href="/research/cap-inference-costs">How to cap inference costs</a> - provider-side cost controls.</li></ul>
 <hr style="margin:48px 0 24px;border:none;border-top:1px solid #1E2A3F" /><p>Want this applied to your own LLM spend? FinOps LLM runs a free audit of your AI costs and shows where the savings are. <a href="/book">Book free audit &rarr;</a></p><p><a href="/research">Back to research</a></p>{% endblock %}{% block suffix %}</main></body></html>
 
 {% endblock %}

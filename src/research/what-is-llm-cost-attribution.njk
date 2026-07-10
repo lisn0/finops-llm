@@ -14,29 +14,25 @@ permalink: "research/what-is-llm-cost-attribution.html"
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:site" content="@finopsllm" />
 <meta name="twitter:title" content="What is LLM cost attribution? A plain-English explainer" />
-<meta name="twitter:description" content="Tracing AI spend back to a feature, team, or customer — and why total-spend dashboards aren't enough." />
+<meta name="twitter:description" content="Tracing AI spend back to a feature, team, or customer - and why total-spend dashboards aren't enough." />
 <meta name="twitter:image" content="https://finopsllm.com/og.svg" />
-<script type="application/ld+json">
 {"@context":"https://schema.org","@type":"TechArticle","headline":"What is LLM cost attribution? A plain-English explainer","description":"A plain-English explainer of LLM cost attribution: what it means to trace AI spend back to a feature, team, or customer, why total-spend dashboards aren't enough, and how attribution actually works.","url":"https://finopsllm.com/research/what-is-llm-cost-attribution","datePublished":"2026-05-31","dateModified":"2026-06-11","image":"https://finopsllm.com/og.png","author":{"@type":"Organization","name":"FinOps LLM team"},"publisher":{"@type":"Organization","name":"FinOps LLM","url":"https://finopsllm.com/"}}
-</script>
-<script type="application/ld+json">
 {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://finopsllm.com/"},{"@type":"ListItem","position":2,"name":"Research","item":"https://finopsllm.com/research"},{"@type":"ListItem","position":3,"name":"What is LLM cost attribution?","item":"https://finopsllm.com/research/what-is-llm-cost-attribution"}]}
-</script>
 <style>body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}.wrap{max-width:840px;margin:0 auto;padding:56px 24px}a{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}h3{margin-top:22px;color:#E6EAF2}</style><script src="/assets/consent.js" defer></script><script src="/assets/attribution.js" defer></script>
 </head>
 <body><main class="wrap">{% endblock %}{% block body %}<h1>What is LLM cost attribution?</h1>
-<p>LLM cost attribution is the practice of tracing every dollar of language-model spend back to the thing that caused it — a feature, a team, an environment, or a specific customer. It answers the question a provider invoice never will: not "what did we spend on OpenAI," but "<em>which</em> part of our product spent it, and on whose behalf." Attribution is the foundation everything else in AI cost management is built on; without it, budgets are guesses and savings claims are unverifiable.</p>
+<p>LLM cost attribution is the practice of tracing every dollar of language-model spend back to the thing that caused it - a feature, a team, an environment, or a specific customer. It answers the question a provider invoice never will: not "what did we spend on OpenAI," but "<em>which</em> part of our product spent it, and on whose behalf." Attribution is the foundation everything else in AI cost management is built on; without it, budgets are guesses and savings claims are unverifiable.</p>
 <h2>The problem attribution solves</h2>
-<p>A provider invoice arrives aggregated and lagging. You get a line item per model per day — not "the checkout summarizer cost $14,000 last month." If spend jumps 30%, the invoice tells you <em>that</em> it happened, never <em>why</em>. A dashboard that shows total spend has the same blind spot: it is a number going up, with no owner attached.</p>
+<p>A provider invoice arrives aggregated and lagging. You get a line item per model per day - not "the checkout summarizer cost $14,000 last month." If spend jumps 30%, the invoice tells you <em>that</em> it happened, never <em>why</em>. A dashboard that shows total spend has the same blind spot: it is a number going up, with no owner attached.</p>
 <p>Attribution closes that gap. It reconstructs, from your own request logs, the answer to four questions for every unit of spend: which feature triggered the call, which environment it ran in (production, staging, eval, internal), which team owns that surface, and which customer or workspace it served. Once spend carries those tags, the invoice stops being a mystery.</p>
 <h2>What "attribution" actually means in practice</h2>
 <p>Concretely, attribution means every LLM request leaves a structured trace carrying at minimum:</p>
 <ul>
-<li><strong>Feature / surface</strong> — the product capability that made the call.</li>
-<li><strong>Environment</strong> — production vs staging vs eval vs internal tooling, so test spend never masquerades as revenue-feature spend.</li>
-<li><strong>Team</strong> — the group accountable for that surface.</li>
-<li><strong>Customer or workspace</strong> — for per-customer gross-margin analysis.</li>
-<li><strong>Cost breakdown</strong> — input, output, <a href="/research/llm-token-types-explained">cache-read, and reasoning tokens</a> separately, since they are priced differently.</li>
+<li><strong>Feature / surface</strong> - the product capability that made the call.</li>
+<li><strong>Environment</strong> - production vs staging vs eval vs internal tooling, so test spend never masquerades as revenue-feature spend.</li>
+<li><strong>Team</strong> - the group accountable for that surface.</li>
+<li><strong>Customer or workspace</strong> - for per-customer gross-margin analysis.</li>
+<li><strong>Cost breakdown</strong> - input, output, <a href="/research/llm-token-types-explained">cache-read, and reasoning tokens</a> separately, since they are priced differently.</li>
 </ul>
 <p>Traffic that arrives untagged does not vanish into "unallocated." It goes into a default bucket <em>with a named owner</em>, so the bucket itself can be driven toward zero over time. The discipline is as much organizational as technical: someone has to own the tagging contract and enforce it at the gateway.</p>
 <h2>Why total spend isn't enough</h2>
@@ -49,21 +45,21 @@ permalink: "research/what-is-llm-cost-attribution.html"
 <h2>Attribution vs observability vs reconciliation</h2>
 <p>These get conflated. They are different layers:</p>
 <ul>
-<li><strong>Observability</strong> tells you what happened to a request — latency, errors, traces. It is necessary plumbing, but a trace without cost tags is telemetry, not attribution.</li>
+<li><strong>Observability</strong> tells you what happened to a request - latency, errors, traces. It is necessary plumbing, but a trace without cost tags is telemetry, not attribution.</li>
 <li><strong>Attribution</strong> maps cost to an owner. It is the layer that turns usage data into a business answer.</li>
 <li><strong>Reconciliation</strong> ties your attributed internal estimate back to the actual provider <a href="/research/invoice-reconciliation">invoice</a>, so the numbers everyone argues over are trusted.</li>
 </ul>
 <p>You need all three, but in order: observability produces the data, attribution gives it meaning, reconciliation makes it defensible.</p>
 <h2>How accurate does it need to be?</h2>
-<p>Attribution does not have to be perfect to be useful — it has to be trusted and improving. A practice that attributes 85% of spend cleanly, names the owner of the remaining 15%, and reconciles to the invoice monthly is far more valuable than a "100% accurate" model that no one has checked against a real bill. Start coarse (feature and environment), get it reconciling, then refine toward per-customer granularity where the margin questions actually need it.</p>
+<p>Attribution does not have to be perfect to be useful - it has to be trusted and improving. A practice that attributes 85% of spend cleanly, names the owner of the remaining 15%, and reconciles to the invoice monthly is far more valuable than a "100% accurate" model that no one has checked against a real bill. Start coarse (feature and environment), get it reconciling, then refine toward per-customer granularity where the margin questions actually need it.</p>
 <h2>Where to start</h2>
-<p>Attribution is the first step in any AI cost program, before budgets and before optimization. The minimum viable version is a tagging contract — what every request must carry — enforced at the gateway, plus a breakdown of spend by feature, environment, and token type. Once that exists, <a href="/research/how-to-budget-for-ai-spend">budgeting</a>, anomaly detection, and chargeback all become possible. Until it exists, they are guesswork.</p>
+<p>Attribution is the first step in any AI cost program, before budgets and before optimization. The minimum viable version is a tagging contract - what every request must carry - enforced at the gateway, plus a breakdown of spend by feature, environment, and token type. Once that exists, <a href="/research/how-to-budget-for-ai-spend">budgeting</a>, anomaly detection, and chargeback all become possible. Until it exists, they are guesswork.</p>
 <h2>Related</h2>
 <ul>
-<li><a href="/research/cost-per-request-kpi">Cost per request as a product KPI</a> — operationalizing attribution in product.</li>
-<li><a href="/research/llm-cost-attribution">LLM cost attribution (in depth)</a> — how the allocation layer is built.</li>
-<li><a href="/research/what-is-llm-finops">What is LLM FinOps?</a> — the broader discipline attribution sits inside.</li>
-<li><a href="/research/how-to-budget-for-ai-spend">How to budget for AI spend</a> — the step attribution unlocks.</li>
+<li><a href="/research/cost-per-request-kpi">Cost per request as a product KPI</a> - operationalizing attribution in product.</li>
+<li><a href="/research/llm-cost-attribution">LLM cost attribution (in depth)</a> - how the allocation layer is built.</li>
+<li><a href="/research/what-is-llm-finops">What is LLM FinOps?</a> - the broader discipline attribution sits inside.</li>
+<li><a href="/research/how-to-budget-for-ai-spend">How to budget for AI spend</a> - the step attribution unlocks.</li>
 </ul>
 <hr style="margin:48px 0 24px;border:none;border-top:1px solid #1E2A3F" /><p>Want this applied to your own LLM spend? FinOps LLM runs a free audit of your AI costs and shows where the savings are. <a href="/book">Book free audit &rarr;</a></p><p><a href="/research">Back to research</a></p>{% endblock %}{% block suffix %}</main></body></html>
 {% endblock %}
