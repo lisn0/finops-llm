@@ -11,7 +11,7 @@ permalink: "research/azure-openai-vs-direct-cost.html"
 {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://finopsllm.com/"},{"@type":"ListItem","position":2,"name":"Research","item":"https://finopsllm.com/research"},{"@type":"ListItem","position":3,"name":"Azure OpenAI vs Direct OpenAI Cost","item":"https://finopsllm.com/research/azure-openai-vs-direct-cost"}]}
 </script>
 <script type="application/ld+json">
-{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Is Azure OpenAI cheaper than direct OpenAI?", "acceptedAnswer": {"@type": "Answer", "text": "No. Direct OpenAI API pricing ($5M for GPT-5.5 input) is typically 10–15% cheaper than Azure OpenAI at standard rates. Azure's advantage is quota management, compliance, and integration with Azure services, not price."}}, {"@type": "Question", "name": "What is provisioned throughput?", "acceptedAnswer": {"@type": "Answer", "text": "Azure's provisioned throughput reserves GPU capacity and offers discounts for unused capacity. Pricing starts at $0.40–$2.00 per 1K tokens for provisioned tier, vs $5 per 1M tokens pay-per-token."}}, {"@type": "Question", "name": "When should I use Azure OpenAI?", "acceptedAnswer": {"@type": "Answer", "text": "Use Azure if: (1) you're already on Azure and want consolidated billing, (2) you need compliance/FedRAMP/sovereign-cloud guarantees, (3) you can reserve capacity and achieve 30–40% discount with provisioned throughput."}}, {"@type": "Question", "name": "Can I optimize cost by switching between Azure and direct?", "acceptedAnswer": {"@type": "Answer", "text": "Yes, if your usage is variable. Use pay-per-token for low/unpredictable volume (<$1K/month). Use provisioned throughput for consistent volume >$5K/month. Monitor quarterly and switch if cost difference exceeds 10%."}}]}
+{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Is Azure OpenAI cheaper than direct OpenAI?", "acceptedAnswer": {"@type": "Answer", "text": "At standard rates, neither: Azure Global deployments price GPT-5.4 at the same $2.50/M input and $15/M output as OpenAI direct. Regional and data-zone Azure deployments add roughly 10–20%. Azure's advantage is compliance, RBAC, quota management, and consolidated billing — not per-token price."}}, {"@type": "Question", "name": "What is provisioned throughput?", "acceptedAnswer": {"@type": "Answer", "text": "Azure's reserved model capacity, billed per PTU (provisioned throughput unit): $2 per PTU per hour on demand, or about $260 per PTU per month with a monthly reservation — up to 82% less than the hourly rate (yearly reservations reach up to 85%). Throughput per PTU is model-specific; size it with Azure's capacity calculator."}}, {"@type": "Question", "name": "When should I use Azure OpenAI?", "acceptedAnswer": {"@type": "Answer", "text": "Use Azure if: (1) you're already on Azure and want consolidated billing, (2) you need compliance/FedRAMP/sovereign-cloud guarantees, (3) your throughput is high and steady enough that a PTU reservation beats pay-per-token for your workload."}}, {"@type": "Question", "name": "Can I optimize cost by switching between Azure and direct?", "acceptedAnswer": {"@type": "Answer", "text": "Yes, if your usage is variable. Use pay-per-token for low or unpredictable volume; consider PTU reservations only for sustained, forecastable throughput. Monitor quarterly and switch if the cost difference exceeds 10%."}}]}
 </script>
 <style>
 body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}
@@ -48,134 +48,136 @@ td.highlight{background:rgba(122,175,255,.08)}
 <p>Compare Azure OpenAI Services (via Azure's managed API) against direct OpenAI API access. Analyze per-token pricing, provisioned throughput discounts, compliance costs, and total cost of ownership to choose the best path for your workload.</p>
 
 <ul class="badge-row">
-  <li>Direct OpenAI API is 10–15% cheaper at pay-per-token rates</li>
-  <li>Azure provisioned throughput can save 30–40% for predictable, high-volume workloads</li>
+  <li>Azure Global deployments match direct OpenAI list prices (GPT-5.4: $2.50/$15 on both)</li>
+  <li>Regional and data-zone Azure deployments add roughly 10–20%</li>
+  <li>PTU monthly reservations cost up to 82% less per unit than hourly PTUs</li>
   <li>Azure adds value for enterprise compliance, regional isolation, and billing consolidation</li>
   <li>Switching between providers has minimal cost penalty</li>
 </ul>
 
 <h2>Per-Token Pricing Comparison</h2>
 
-<p>Azure and OpenAI use the same underlying models (GPT-5.5, GPT-5.4, etc.) but billing differs. Direct OpenAI charges one rate; Azure adds a regional markup (typically +10%).</p>
+<p>Azure and OpenAI serve the same underlying models, and — contrary to a common assumption — Azure's <strong>Global</strong> deployment type prices GPT-5.4 identically to OpenAI direct. The premium only appears when you pin traffic to a specific region or data zone, or use extended-context and Pro tiers.</p>
 
 <table>
 <thead>
 <tr>
-  <th>Model</th>
+  <th>Model / tier</th>
   <th>OpenAI Direct Input</th>
   <th>OpenAI Direct Output</th>
-  <th>Azure Input (East US)</th>
-  <th>Azure Output (East US)</th>
-  <th>Azure Markup %</th>
+  <th>Azure Input (Global)</th>
+  <th>Azure Output (Global)</th>
+  <th>Difference</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-  <td><strong>GPT-5.5</strong></td>
-  <td class="number">$5.00</td>
-  <td class="number">$30.00</td>
-  <td class="number">$5.50</td>
-  <td class="number">$33.00</td>
-  <td class="number">+10%</td>
-</tr>
-<tr>
-  <td><strong>GPT-5.4</strong></td>
+  <td><strong>GPT-5.4 (standard context)</strong></td>
   <td class="number">$2.50</td>
   <td class="number">$15.00</td>
-  <td class="number">$2.75</td>
-  <td class="number">$16.50</td>
-  <td class="number">+10%</td>
+  <td class="number">$2.50</td>
+  <td class="number">$15.00</td>
+  <td class="number">parity</td>
 </tr>
 <tr>
-  <td><strong>GPT-5.4-nano</strong></td>
-  <td class="number">$0.20</td>
-  <td class="number">$1.25</td>
-  <td class="number">$0.22</td>
-  <td class="number">$1.38</td>
-  <td class="number">+10%</td>
+  <td><strong>GPT-5.4 (&gt;272K context)</strong></td>
+  <td class="number">—</td>
+  <td class="number">—</td>
+  <td class="number">$5.00</td>
+  <td class="number">$22.50</td>
+  <td class="number">Azure long-context tier</td>
+</tr>
+<tr>
+  <td><strong>GPT-5.4 Pro</strong></td>
+  <td class="number">—</td>
+  <td class="number">—</td>
+  <td class="number">$30.00</td>
+  <td class="number">$180.00</td>
+  <td class="number">premium tier</td>
+</tr>
+<tr>
+  <td><strong>GPT-5.5 / GPT-5.6 family</strong></td>
+  <td class="number">$5.00</td>
+  <td class="number">$30.00</td>
+  <td class="number" colspan="2">not publicly listed (quote via Azure)</td>
+  <td class="number">—</td>
 </tr>
 </tbody>
 </table>
 
-<p><strong>Regional variation:</strong> Azure pricing varies by region. East US is baseline (+0%). West US 2 is +15%, UK South is +20%, Japan East is +25%. If your workload requires a distant region, Azure cost difference can exceed 25%.</p>
+<p><strong>Regional variation:</strong> Azure pricing varies by deployment type, and this is where the real markup lives. Against the Global baseline, Microsoft's published examples include roughly +12% for Regional Australia East and +20% for Regional Sweden Central, with Data Zone deployments around +10%. Exact rates differ per model and region — check the Azure AI Foundry pricing page for yours. If your workload requires a pinned distant region, expect a 10–20% premium over direct OpenAI.</p>
 
 <h2>Provisioned Throughput: Where Azure Wins</h2>
 
-<p>Azure offers provisioned throughput (reserved capacity), which offers significant discounts for predictable, high-volume usage.</p>
+<p>Azure sells reserved model capacity in <strong>PTUs (provisioned throughput units)</strong>. You pay for capacity, not tokens — so the economics hinge entirely on how fully you use what you reserve. The published rates:</p>
 
 <table>
 <thead>
 <tr>
-  <th>Pricing Model</th>
-  <th>Monthly Cost (Commitment)</th>
-  <th>Tokens Included</th>
-  <th>Cost per 1M Tokens</th>
+  <th>Billing Model</th>
+  <th>Published Rate</th>
+  <th>Vs. hourly PTU</th>
   <th>Best For</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-  <td><strong>OpenAI API (pay-per-token)</strong></td>
-  <td class="number">$0 (no commitment)</td>
-  <td class="number">Unlimited</td>
-  <td class="number">$5.00 (GPT-5.5 input avg)</td>
+  <td><strong>Pay-per-token (either provider)</strong></td>
+  <td class="number">$0 commitment; per-token list prices above</td>
+  <td class="number">—</td>
   <td class="number">Variable or low volume</td>
 </tr>
 <tr>
-  <td><strong>Azure pay-per-token (East US)</strong></td>
-  <td class="number">$0 (no commitment)</td>
-  <td class="number">Unlimited</td>
-  <td class="number">$5.50 (GPT-5.5 input avg)</td>
-  <td class="number">Azure ecosystem, compliance</td>
+  <td><strong>PTU, hourly</strong></td>
+  <td class="number">$2 per PTU per hour (≈$1,460/PTU/month if run 24/7)</td>
+  <td class="number">baseline</td>
+  <td class="number">Short bursts, testing PTU sizing</td>
 </tr>
 <tr class="highlight">
-  <td><strong>Azure provisioned 100K TPM (1 month)</strong></td>
-  <td class="number">$9,360–$14,400</td>
-  <td class="number">~288M tokens/month</td>
-  <td class="number">$3.25–$5.00 effective</td>
+  <td><strong>PTU, monthly reservation</strong></td>
+  <td class="number">~$260 per PTU per month (published GPT-4o Global example)</td>
+  <td class="number">up to −82%</td>
   <td class="number">Stable, high volume</td>
 </tr>
 <tr class="highlight">
-  <td><strong>Azure provisioned 1M TPM (1 month)</strong></td>
-  <td class="number">$93,600–$144,000</td>
-  <td class="number">~2.88B tokens/month</td>
-  <td class="number">$3.25–$5.00 effective</td>
-  <td class="number">Very large, predictable workloads</td>
+  <td><strong>PTU, yearly reservation</strong></td>
+  <td class="number">quote-based</td>
+  <td class="number">up to −85%</td>
+  <td class="number">Very large, forecastable workloads</td>
 </tr>
 </tbody>
 </table>
 
-<p><strong>TPM = tokens per minute.</strong> A 100K TPM provisioned deployment reserves enough capacity for ~100,000 tokens/minute = 5.76B tokens/day = 172.8B tokens/month. Pricing starts at $9,360/month, which equals $0.054 per 1M tokens for input.</p>
+<p><strong>How many PTUs do you need?</strong> Throughput per PTU is model-specific — Microsoft publishes a capacity calculator in Azure AI Foundry rather than a universal tokens-per-PTU number, and deployments start as small as 1 PTU. That means there is no honest one-line "PTU = X tokens/month" conversion; size it with the calculator against your real traffic.</p>
 
-<p><strong>Real example:</strong> Your app processes 500M tokens/month consistently. Direct OpenAI: 500M × $0.005/M = $2,500/month. Azure provisioned (100K TPM): $11,880/month (fixed) but includes way more capacity. Only makes sense if your volume is stable AND exceeds 3B tokens/month, where the break-even works out.</p>
+<p><strong>Modeled example</strong> (illustrative arithmetic, not a quote): suppose the calculator says your steady workload needs 50 PTUs. A monthly reservation costs 50 × $260 = <strong>$13,000/month fixed</strong>, versus 50 × $1,460 ≈ $73,000/month if you ran the same capacity on hourly PTUs. Whether $13,000 beats pay-per-token depends on the token volume those 50 PTUs actually carry — reservations only win at sustained, high utilization.</p>
 
 <h2>Cost Comparison: Three Scenarios</h2>
 
 <div class="scenario-card">
-  <h3>Scenario 1: Small Team (100M tokens/month)</h3>
-  <p><strong>Volume:</strong> 60M input (Opus 4.8) + 40M output = 100M/month total</p>
-  <p><strong>Direct OpenAI:</strong> (60M × $5/M) + (40M × $25/M) = $300 + $1,000 = $1,300/month</p>
-  <p><strong>Azure pay-per-token (East US):</strong> (60M × $5.50/M) + (40M × $27.50/M) = $330 + $1,100 = $1,430/month (+10%)</p>
-  <p><strong>Azure provisioned (100K TPM):</strong> $11,880/month (huge overkill; only justified at 2–3B tokens/month)</p>
-  <p><strong>Winner:</strong> Direct OpenAI by $130/month. Provisioned doesn't make sense here.</p>
+  <h3>Scenario 1: Small Team (100M tokens/month, GPT-5.4)</h3>
+  <p><strong>Volume:</strong> 60M input + 40M output = 100M/month total</p>
+  <p><strong>Direct OpenAI:</strong> (60M × $2.50/M) + (40M × $15/M) = $150 + $600 = $750/month</p>
+  <p><strong>Azure pay-per-token (Global):</strong> same list rates → $750/month. A pinned regional deployment at +12–20% would run ~$840–$900.</p>
+  <p><strong>Azure provisioned:</strong> not worth sizing at this volume; even a small reservation is idle most of the time.</p>
+  <p><strong>Winner:</strong> price tie at Global rates — decide on ecosystem, compliance, and quota needs, not price.</p>
 </div>
 
 <div class="scenario-card">
-  <h3>Scenario 2: Mid-Size (1B tokens/month)</h3>
-  <p><strong>Volume:</strong> 600M input (GPT-5.5) + 400M output = 1B/month total</p>
-  <p><strong>Direct OpenAI:</strong> (600M × $5/M) + (400M × $30/M) = $3,000 + $12,000 = $15,000/month</p>
-  <p><strong>Azure pay-per-token (East US):</strong> (600M × $5.50/M) + (400M × $33/M) = $3,300 + $13,200 = $16,500/month (+10%)</p>
-  <p><strong>Azure provisioned (500K TPM):</strong> $47,000–$59,000/month (cost per token ≈ $4.70–$5.90/M; slightly better than pay-per-token, but commitment risk)</p>
-  <p><strong>Winner:</strong> Direct OpenAI unless you have strict compliance needs or Azure cost allocation demands.</p>
+  <h3>Scenario 2: Mid-Size (1B tokens/month, GPT-5.4)</h3>
+  <p><strong>Volume:</strong> 600M input + 400M output = 1B/month total</p>
+  <p><strong>Direct OpenAI:</strong> (600M × $2.50/M) + (400M × $15/M) = $1,500 + $6,000 = $7,500/month</p>
+  <p><strong>Azure pay-per-token (Global):</strong> $7,500/month at parity; ~$8,400–$9,000 if you must pin a premium region. (GPT-5.5's Azure rate isn't publicly listed — direct GPT-5.5 for the same volume would be (600M × $5) + (400M × $30) = $15,000.)</p>
+  <p><strong>Azure provisioned:</strong> worth a sizing exercise — if the capacity calculator puts your steady load at ≤25 PTUs, a monthly reservation is 25 × $260 = $6,500, undercutting pay-per-token.</p>
+  <p><strong>Winner:</strong> pay-per-token on either, unless a PTU sizing quote comes in under $7,500 for your throughput.</p>
 </div>
 
 <div class="scenario-card">
-  <h3>Scenario 3: Large, Predictable (5B tokens/month)</h3>
-  <p><strong>Volume:</strong> 3B input (mix of models) + 2B output = 5B/month total</p>
-  <p><strong>Direct OpenAI:</strong> Estimated $22,000/month (avg $4.40/M accounting for model mix)</p>
-  <p><strong>Azure pay-per-token:</strong> ~$24,200/month (+10%)</p>
-  <p><strong>Azure provisioned (1M TPM):</strong> $93,600/month (cost per token ≈ $1.87/M — saves $20,400/month vs pay-per-token! But requires 1-month commitment).</p>
-  <p><strong>Winner:</strong> Azure provisioned if usage is stable. Saves $20K+/month. Risk: if volume drops 50%, you're still paying $93.6K for unused capacity.</p>
+  <h3>Scenario 3: Large, Predictable (5B tokens/month, GPT-5.4)</h3>
+  <p><strong>Volume:</strong> 3B input + 2B output = 5B/month total</p>
+  <p><strong>Pay-per-token (either provider, Global parity):</strong> (3B × $2.50/M) + (2B × $15/M) = $7,500 + $30,000 = $37,500/month</p>
+  <p><strong>Azure provisioned (modeled):</strong> if this workload sizes to ~50 PTUs, a monthly reservation is 50 × $260 = $13,000/month — a ~$24,500/month saving. If it sizes to ~150 PTUs, the reservation is $39,000 and pay-per-token wins. The PTU count from Azure's capacity calculator IS the decision.</p>
+  <p><strong>Winner:</strong> Azure provisioned when usage is stable and the sized PTU cost lands well below $37,500. Risk: if volume halves, the reservation cost doesn't.</p>
 </div>
 
 <h2>Non-Price Factors: When Azure Wins</h2>
@@ -233,7 +235,7 @@ td.highlight{background:rgba(122,175,255,.08)}
     <li>Your volume is <1B tokens/month</li>
     <li>Your workload is variable (unpredictable spikes)</li>
     <li>You don't have compliance requirements beyond standard SOC 2</li>
-    <li>You want lowest possible base price</li>
+    <li>You need models whose Azure rates aren't publicly listed (GPT-5.5/5.6 family)</li>
     <li>You're not on Azure or don't need consolidated billing</li>
   </ul>
 </div>
@@ -244,19 +246,18 @@ td.highlight{background:rgba(122,175,255,.08)}
     <li>You're already paying for Azure services and want one bill</li>
     <li>You need FedRAMP/HIPAA/compliance features</li>
     <li>You want RBAC and quota management over API keys</li>
-    <li>You operate in EU and need data residency</li>
-    <li>The 10% premium is acceptable for operational simplicity</li>
+    <li>You operate in EU and need data residency (regional deployments cost ~10–20% more)</li>
+    <li>Global deployment works for you — it matches direct OpenAI list prices</li>
   </ul>
 </div>
 
 <div class="guide-section">
   <h3>Use Azure OpenAI (provisioned) if:</h3>
   <ul>
-    <li>Your volume is stable and >2B tokens/month</li>
-    <li>You can forecast usage 3–6 months ahead</li>
+    <li>Your volume is high, stable, and forecastable 3–6 months ahead</li>
     <li>You need guaranteed quota (no rate-limit rejections)</li>
-    <li>You want 30–40% cost savings over pay-per-token</li>
-    <li>You can justify the multi-month commitment cost</li>
+    <li>Azure's capacity calculator sizes your workload to a PTU count whose reservation cost (~$260/PTU/month) lands clearly below your pay-per-token bill</li>
+    <li>You can justify the reservation commitment if volume dips</li>
   </ul>
 </div>
 
@@ -270,7 +271,7 @@ td.highlight{background:rgba(122,175,255,.08)}
 
 <p><strong>Batch off-peak requests:</strong> If using provisioned throughput, batch non-urgent requests during off-peak hours to smooth volume spikes and keep TPM steady.</p>
 
-<p><strong>Layer by model cost:</strong> Use GPT-5.4-nano ($0.20 input) for classification tasks, GPT-5.5 for reasoning. Reduces effective cost-per-token.</p>
+<p><strong>Layer by model cost:</strong> Route classification and extraction tasks to a budget tier (e.g., GPT-5.6 Luna at $1/M input, $6/M output direct) and reserve GPT-5.5 for reasoning. Reduces effective cost-per-token.</p>
 
 <p><strong>Split between providers:</strong> High-volume stable workloads on Azure provisioned; variable/bursty on Direct OpenAI. Costs might be lower than picking one provider for everything.</p>
 

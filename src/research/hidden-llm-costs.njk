@@ -74,9 +74,9 @@ td.highlight{background:rgba(248,113,113,.08)}
 <tbody>
 <tr>
   <td><strong>Embedding API (per 1M tokens)</strong></td>
-  <td class="number">$0.02–$0.10</td>
+  <td class="number">$0.02–$0.13</td>
   <td class="number">10M tokens/month (queries + reindexing)</td>
-  <td class="number">$200–$1,000</td>
+  <td class="number">$0.20–$1.30</td>
 </tr>
 <tr>
   <td><strong>Vector DB (managed SaaS)</strong></td>
@@ -94,12 +94,12 @@ td.highlight{background:rgba(248,113,113,.08)}
   <td><strong>Total RAG infrastructure</strong></td>
   <td class="number">—</td>
   <td class="number">—</td>
-  <td class="number">$260–$1,800</td>
+  <td class="number">$10–$800 (dominated by the vector DB)</td>
 </tr>
 </tbody>
 </table>
 
-<p><strong>Real scenario:</strong> A customer support chatbot with 100K monthly queries (avg 3K tokens per query). Embedding every query and document chunk requires ~5M embedding tokens/month. OpenAI Embedding API at $0.02 per 1M = $100/month. Add vector DB ($50–$100/month) + retrieval latency (small but nonzero). Total: ~$200/month in infrastructure on top of your LLM API cost.</p>
+<p><strong>Real scenario:</strong> A customer support chatbot with 100K monthly queries (avg 3K tokens per query). Embedding every query plus document-chunk reindexing runs ~5M embedding tokens/month — at OpenAI's text-embedding-3-small rate of $0.02 per 1M tokens, that's $0.10/month; even text-embedding-3-large ($0.13 per 1M) stays under $1. The embedding API is <em>not</em> the hidden cost here — the always-on vector database is: a managed tier for this workload typically runs $50–$100/month whether or not queries flow. Total: ~$50–$100/month of infrastructure on top of your LLM API bill, almost all of it vector DB hosting.</p>
 
 <p><strong>How to measure:</strong> Audit your cloud bill (AWS, GCP, Azure) for vector DB infrastructure. Add explicit embedding API costs from your provider dashboard. Sum these separately from LLM token costs.</p>
 
@@ -196,7 +196,7 @@ td.highlight{background:rgba(248,113,113,.08)}
 </tbody>
 </table>
 
-<p><strong>Real scenario:</strong> An LLM app logging every prompt + completion to Datadog. Each LLM call generates ~2–5 KB of structured logs. At 100K API calls/month, that's 200–500 GB of log data. Datadog at $1/GB ingestion = $200–$500/month just for logs.</p>
+<p><strong>Real scenario:</strong> An LLM app logging every prompt + completion to Datadog. Each LLM call generates ~2–5 KB of structured logs, so 10M API calls/month produces 20–50 GB — at an assumed $1/GB ingestion, $20–$50/month. Log the full prompt and completion text (often 10–20 KB per call) and the same traffic is 100–200 GB, or $100–$200/month, before indexing and retention fees.</p>
 
 <p><strong>How to measure:</strong> Check your observability platform bill separately. If it's in your shared cloud account, segment it by cost center or tag.</p>
 
@@ -288,7 +288,7 @@ td.highlight{background:rgba(248,113,113,.08)}
 </tbody>
 </table>
 
-<p><strong>Storage cost:</strong> Cached prompts typically stored for 1 hour (default) to 5 days. OpenAI charges $1–$4.50 per hour for Gemini context caching; Anthropic pricing is per-write, not per-duration. For a single cached 100K token PDF, Anthropic = $2 write + repeated hits; Gemini = $100–$450 per day depending on retention.</p>
+<p><strong>Storage cost:</strong> The billing models differ, and that's the trap. Anthropic charges per <em>write</em> (1.25× the base input price for the default 5-minute TTL) with no ongoing storage fee — caching a 100K-token PDF on Opus 4.8 costs 100K × $6.25/M ≈ $0.63 to write, then ≈$0.05 per full cached re-read (100K × $0.50/M). Google's Gemini context caching instead bills storage per token-hour on top of discounted reads, so a long retention window accrues cost even with zero hits — check current per-model storage rates before caching large contexts for days. OpenAI's automatic prompt caching applies its cached-input discount with no separate write or storage fee.</p>
 
 <p><strong>How to measure:</strong> If using prompt caching, track: total_write_tokens_cached, cache_hit_rate, cache_hit_tokens. Calculate: (write_cost + (hit_tokens × hit_rate × cache_read_price)) vs. (total_tokens × non_cache_price). Most teams see 40–60% savings once hit rate exceeds 20%.</p>
 
@@ -308,9 +308,9 @@ td.highlight{background:rgba(248,113,113,.08)}
 <tbody>
 <tr>
   <td><strong>Classifier model (to decide routing)</strong></td>
-  <td class="number">$0.0005–$0.002</td>
+  <td class="number">$0.00007–$0.0003 (200–1K-token prompt on Gemini 2.5 Flash)</td>
   <td class="number">1M</td>
-  <td class="number">$5–$20</td>
+  <td class="number">$70–$300</td>
 </tr>
 <tr>
   <td><strong>Misroute rate (calls to expensive model unnecessarily)</strong></td>
@@ -327,7 +327,7 @@ td.highlight{background:rgba(248,113,113,.08)}
 </tbody>
 </table>
 
-<p><strong>Real scenario:</strong> You route 30% of calls to GPT-5.5 and 70% to Gemini Flash. The classifier model (Gemini Flash itself) costs $0.001 per call. You also misroute 5% of requests (sending a simple task to GPT-5.5 by mistake). Total overhead: ~$100/month + 5% cost overage on 30% of calls = $100 + $37 = $137/month in orchestration tax.</p>
+<p><strong>Real scenario:</strong> 1M calls/month, routing 30% to GPT-5.5 and 70% to Gemini 2.5 Flash; a typical call is ~1.5K input / 500 output tokens. Per call that's ~$0.0225 on GPT-5.5 ((1,500 × $5/M) + (500 × $30/M)) vs ~$0.0017 on 2.5 Flash — so misrouting 5% of traffic (50,000 simple calls sent to GPT-5.5) wastes 50,000 × ~$0.021 ≈ <strong>$1,040/month</strong>. Add the classifier itself (~$70 at $0.00007/call) and the orchestration tax is ~<strong>$1,100/month</strong> — roughly 14% on top of the ~$7,900 baseline spend, dominated by misroutes rather than the router.</p>
 
 <h2>Cost Measurement Framework</h2>
 
