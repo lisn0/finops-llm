@@ -27,19 +27,41 @@ const CONTENT_SIGNAL = 'search=yes, ai-input=yes, ai-train=no';
 // Languages with a full published translation mirror. Order is not significant.
 const LANGS = ['es', 'fr', 'de', 'ja'];
 
-// English paths that have a published translation in EVERY language above, so a
-// language redirect can never land a visitor on a 404. Extend this set (and add
-// the matching <lang>/ pages) as more pages are translated.
-const TRANSLATED = new Set([
-	'/',
-	'/research',
+// English paths that have a published translation, PER LANGUAGE, so a language
+// redirect can never land a visitor on a 404. es/ja carry more translations
+// than de/fr, so the sets differ. Keep each set in sync with the files that
+// actually exist under src/<lang>/ — list them with:
+//   ls src/<lang>/research/*.njk
+const CORE = ['/', '/research'];
+const DEEP = [
 	'/research/finops-for-llm',
 	'/research/ai-finops',
 	'/research/llm-cost-attribution',
 	'/research/openai-cost-attribution',
 	'/research/llm-chargeback-showback',
 	'/research/anomaly-detection',
-]);
+];
+const EXTENDED = [
+	'/research/agent-economics',
+	'/research/caching-strategies-compared',
+	'/research/cheapest-ai-code-generation',
+	'/research/coding-plan-comparison',
+	'/research/how-much-does-gpt5-cost',
+	'/research/how-to-audit-llm-spend',
+	'/research/llm-api-pricing-tracker',
+	'/research/llm-cost-calculator',
+	'/research/llm-cost-trends-2025-2026',
+	'/research/mcp-server-cost-impact',
+	'/research/open-source-vs-closed-cost',
+	'/research/reasoning-model-cost-guide',
+	'/research/token-budget-implementation-guide',
+];
+const TRANSLATED = {
+	es: new Set([...CORE, ...DEEP, ...EXTENDED]),
+	ja: new Set([...CORE, ...DEEP, ...EXTENDED]),
+	fr: new Set([...CORE, ...DEEP]),
+	de: new Set([...CORE, ...DEEP]),
+};
 
 // Map an English path to its translated equivalent: '/' -> '/es/', '/research'
 // -> '/fr/research', etc. Mirrors the structure built by the i18n clone script.
@@ -56,9 +78,10 @@ function langInfo(url) {
 	const m = url.pathname.match(/^\/(es|fr|de|ja)(\/|$)/);
 	const lang = m ? m[1] : 'en';
 	const base = normalizePath(m ? url.pathname.slice(lang.length + 1) || '/' : url.pathname);
-	if (!TRANSLATED.has(base)) return { lang, alternates: [] };
+	const langsWithPage = LANGS.filter((l) => TRANSLATED[l].has(base));
+	if (!langsWithPage.length) return { lang, alternates: [] };
 	const alternates = [{ lang: 'en', href: url.origin + base }];
-	for (const l of LANGS) alternates.push({ lang: l, href: url.origin + targetFor(l, base) });
+	for (const l of langsWithPage) alternates.push({ lang: l, href: url.origin + targetFor(l, base) });
 	return { lang, alternates };
 }
 
@@ -134,12 +157,12 @@ function languageRedirect(request, url) {
 	if (/^\/(es|fr|de|ja)(\/|$)/.test(url.pathname)) return null;
 
 	const path = normalizePath(url.pathname);
-	if (!TRANSLATED.has(path)) return null; // no translation -> serve English
 
 	const choice = langCookie(request);
 	if (choice === 'en') return null; // user explicitly chose English
 	const lang = choice && choice !== 'en' ? choice : preferredLang(request);
 	if (!lang || !LANGS.includes(lang)) return null;
+	if (!TRANSLATED[lang].has(path)) return null; // no translation in this language -> serve English
 
 	const dest = new URL(url.toString());
 	dest.pathname = targetFor(lang, path);
