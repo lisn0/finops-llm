@@ -14,6 +14,9 @@ permalink: "research/reasoning-model-cost-guide.html"
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://finopsllm.com/"},{"@type":"ListItem","position":2,"name":"Research","item":"https://finopsllm.com/research"},{"@type":"ListItem","position":3,"name":"Reasoning Model Cost Guide","item":"https://finopsllm.com/research/reasoning-model-cost-guide"}]}
 </script>
+<script type="application/ld+json">
+{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "What is methodology?", "acceptedAnswer": {"@type": "Answer", "text": "Output token price for normal (non-reasoning) completion, from official provider pages. Reasoning pricingEffective cost including thinking tokens. Measured as standard output price × average thinking multiplier for each model."}}, {"@type": "Question", "name": "What is reasoning model pricing table?", "acceptedAnswer": {"@type": "Answer", "text": "Reasoning Output $/1M includes thinking tokens billed at output rates. Multiplier is average across typical tasks; actual multiplier varies by prompt complexity. DeepSeek R1 and QwQ output thinking tokens by default. OpenAI o3/o4-mini charge thinking tokens separately from visible output."}}, {"@type": "Question", "name": "When to Use Reasoning Models?", "acceptedAnswer": {"@type": "Answer", "text": "Reasoning models excel at tasks requiring planning: refactoring across multiple files, debugging complex state, or writing algorithms with edge cases. The thinking tokens let the model \"work through\" the problem rather than pattern-match."}}, {"@type": "Question", "name": "When to Skip Reasoning Models?", "acceptedAnswer": {"@type": "Answer", "text": "Pulling data from documents, reformatting JSON, summarising text, or translating content. These tasks need pattern matching, not reasoning. Using o3 for extraction is like hiring a mathematician to sort mail - expensive and unnecessary."}}, {"@type": "Question", "name": "What is cost optimisation strategies?", "acceptedAnswer": {"@type": "Answer", "text": "Use a cheap standard model (GPT-4o-mini, Gemini Flash) as a router. If the task is simple, answer directly. If complex, escalate to a reasoning model. This \"cascade\" pattern can cut reasoning-model usage by 60-80% while preserving quality where it matters."}}]}
+</script>
 <style>
 body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}
 .wrap{max-width:1100px;margin:0 auto;padding:56px 24px}
@@ -84,7 +87,7 @@ tr:hover{background:rgba(122,175,255,.04)}
 <body><main class="wrap">{% endblock %}{% block body %}
 <nav class="langsw" aria-label="Language"><a href="/research/reasoning-model-cost-guide" hreflang="en" aria-current="page">EN</a> · <a href="/es/research/reasoning-model-cost-guide" hreflang="es">ES</a> · <a href="/ja/research/reasoning-model-cost-guide" hreflang="ja">JA</a></nav>
 
-<h1>Reasoning Model Cost Guide</h1>
+<h1>Reasoning Model Cost Guide</h1><p class="updated" style="color:#6B7689;font-size:14px;margin-top:-6px">Updated 4 July 2026 · first published 4 July 2026</p>
 <p>Reasoning models like o3, o4-mini, DeepSeek-R1, QwQ, and MiMo generate internal "thinking" tokens before producing output. This hidden cost can inflate your bill 5-30x. This guide breaks down when reasoning models are worth the premium and when a standard model is the smarter spend.</p>
 
 <div class="hero-stats">
