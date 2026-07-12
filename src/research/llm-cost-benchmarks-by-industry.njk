@@ -1,0 +1,308 @@
+---
+permalink: "research/llm-cost-benchmarks-by-industry.html"
+---
+{% extends "shell.njk" %}{% block prefix %}<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>LLM Cost Benchmarks by Industry · FinOps LLM</title><meta name="description" content="Modeled LLM cost scenarios across key industries. See how inference costs scale by company size and use case, based on published list pricing." /><meta name="robots" content="index, follow" /><link rel="canonical" href="https://finopsllm.com/research/llm-cost-benchmarks-by-industry" />
+<link rel="alternate" hreflang="en" href="https://finopsllm.com/research/llm-cost-benchmarks-by-industry" />
+<link rel="alternate" hreflang="es" href="https://finopsllm.com/es/research/llm-cost-benchmarks-by-industry" />
+<link rel="alternate" hreflang="ja" href="https://finopsllm.com/ja/research/llm-cost-benchmarks-by-industry" />
+<link rel="alternate" hreflang="x-default" href="https://finopsllm.com/research/llm-cost-benchmarks-by-industry" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","headline":"LLM Cost Benchmarks by Industry · FinOps LLM","description":"Modeled LLM cost scenarios across key industries based on published list pricing.","url":"https://finopsllm.com/research/llm-cost-benchmarks-by-industry","datePublished":"2026-07-12","dateModified":"2026-07-12","image":"https://finopsllm.com/og.png","author":{"@type":"Organization","name":"FinOps LLM team"},"publisher":{"@type":"Organization","name":"FinOps LLM","url":"https://finopsllm.com/"}}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://finopsllm.com/"},{"@type":"ListItem","position":2,"name":"Research","item":"https://finopsllm.com/research"},{"@type":"ListItem","position":3,"name":"LLM Cost Benchmarks by Industry","item":"https://finopsllm.com/research/llm-cost-benchmarks-by-industry"}]}
+</script>
+<script type="application/ld+json">
+{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "What is methodology for industry benchmarks?", "acceptedAnswer": {"@type": "Answer", "text": "These are modeled scenarios calculated from published LLM pricing lists. Each scenario shows estimated monthly spend based on typical token volumes for that company size and industry. Actual costs depend on model choice, caching strategy, and batch API use."}}, {"@type": "Question", "name": "How are token volumes estimated?", "acceptedAnswer": {"@type": "Answer", "text": "Token volumes are modeled from published industry data and scaled by team size. A single support agent handling 100 queries/day consumes roughly 50K tokens/day (500 tokens per query). These estimates are marked as modeled, not customer data."}}, {"@type": "Question", "name": "Why does output cost more than input?", "acceptedAnswer": {"@type": "Answer", "text": "All major LLM providers charge 4-6x more per output token than input token. This reflects the computational cost of generating novel text. Reducing output length is the fastest way to lower LLM bills."}}, {"@type": "Question", "name": "How do batch discounts impact these figures?", "acceptedAnswer": {"@type": "Answer", "text": "Batch API discounts are 50% off input and output for all major providers. If your workflow supports 12+ hour latency, applying batching to 30% of workload cuts monthly spend by ~15%."}}]}
+</script>
+<style>
+body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}
+.wrap{max-width:1100px;margin:0 auto;padding:56px 24px}
+a{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}
+.langsw{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;color:#647289;margin:0 0 26px}
+.langsw a{text-decoration:none}.langsw a[aria-current]{color:#E6EAF2;font-weight:600}
+.badge-row{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 32px;list-style:none;padding:0}
+.badge-row li{background:#101726;border:1px solid #1E2A3F;border-radius:8px;padding:8px 14px;font-size:.85rem;color:#B6C0D2}
+.method-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin:20px 0 32px}
+.method-card{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:18px}
+.method-card h3{font-size:.95rem;color:#E6EAF2;margin:0 0 8px}
+.method-card p{font-size:.85rem;margin:0}
+.table-wrap{overflow-x:auto;margin:0 0 32px;-webkit-overflow-scrolling:touch}
+table{border-collapse:collapse;width:100%;font-size:.85rem}
+th,td{border:1px solid #1E2A3F;padding:10px 12px;text-align:left;color:#B6C0D2}
+th{color:#E6EAF2;background:#101726}
+td.number{text-align:right;font-family:'JetBrains Mono',monospace;font-weight:500}
+.scenario-card{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:20px;margin:16px 0}
+.scenario-card h3{color:#E6EAF2;margin:0 0 12px;font-size:1rem}
+.scenario-card p{font-size:.9rem;margin:6px 0}
+.guide-section{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:24px;margin:12px 0}
+.guide-section h3{color:#E6EAF2;margin:0 0 10px;font-size:1rem}
+@media(max-width:700px){
+  table{font-size:.75rem}
+  th,td{padding:6px 7px}
+}
+</style><script src="/assets/consent.js" defer></script><script src="/assets/attribution.js" defer></script>
+<script src="/assets/lang.js" defer></script>
+</head>
+<body><main class="wrap">{% endblock %}{% block body %}
+<nav class="langsw" aria-label="Language"><a href="/research/llm-cost-benchmarks-by-industry" hreflang="en" aria-current="page">EN</a> · <a href="/es/research/llm-cost-benchmarks-by-industry" hreflang="es">ES</a> · <a href="/ja/research/llm-cost-benchmarks-by-industry" hreflang="ja">JA</a></nav>
+
+<h1>LLM Cost Benchmarks by Industry</h1>
+<p class="updated" style="color:#6B7689;font-size:14px;margin-top:-6px">Updated 12 July 2026</p>
+<p>Modeled monthly LLM inference costs across key industries and company sizes. These scenarios are calculated from published pricing lists and typical token consumption patterns. Use them to estimate your own spend and identify optimization opportunities.</p>
+
+<ul class="badge-row">
+  <li>Modeled scenarios from published pricing, not customer data</li>
+  <li>Input/output token ratios based on typical workload patterns</li>
+  <li>Batch API discounts shown separately</li>
+  <li>All prices current as of July 2026</li>
+</ul>
+
+<h2>Methodology</h2>
+<div class="method-grid">
+  <div class="method-card"><h3>Pricing Source</h3><p>All pricing extracted from official LLM provider documentation. Input and output rates are current July 2026.</p></div>
+  <div class="method-card"><h3>Token Volumes</h3><p>Modeled token consumption based on industry-typical workload sizes (queries, documents, chat turns).</p></div>
+  <div class="method-card"><h3>Model Selection</h3><p>Mid-tier models selected for each scenario (e.g., GPT-5.5, Claude Opus 4.8, Gemini 3.5 Flash).</p></div>
+  <div class="method-card"><h3>Display Policy</h3><p>Scenarios marked as modeled. Your actual costs will vary based on model choice and optimization.</p></div>
+</div>
+
+<h2>E-Commerce &amp; SaaS (Customer Support)</h2>
+
+<p>Customer support teams use LLMs to draft responses, classify tickets, and generate knowledge base articles. Token volume scales with ticket volume and response length.</p>
+
+<table>
+<thead>
+<tr>
+  <th>Company Size</th>
+  <th>Tickets/Month</th>
+  <th>Modeled Input Tokens</th>
+  <th>Modeled Output Tokens</th>
+  <th>Claude Opus 4.8</th>
+  <th>GPT-5.5</th>
+  <th>Gemini 3.5 Flash</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>Startup (10-person)</strong></td>
+  <td>500</td>
+  <td class="number">2.5M</td>
+  <td class="number">5.0M</td>
+  <td class="number">$237.50</td>
+  <td class="number">$262.50</td>
+  <td class="number">$60.00</td>
+</tr>
+<tr>
+  <td><strong>Scale-up (50-person)</strong></td>
+  <td>2,500</td>
+  <td class="number">12.5M</td>
+  <td class="number">25.0M</td>
+  <td class="number">$1,187.50</td>
+  <td class="number">$1,312.50</td>
+  <td class="number">$300.00</td>
+</tr>
+<tr>
+  <td><strong>Enterprise (500-person)</strong></td>
+  <td>25,000</td>
+  <td class="number">125M</td>
+  <td class="number">250M</td>
+  <td class="number">$11,875.00</td>
+  <td class="number">$13,125.00</td>
+  <td class="number">$3,000.00</td>
+</tr>
+</tbody>
+</table>
+
+<p><strong>Calculation Example (Scale-up):</strong> 2,500 tickets/month × 5K tokens per ticket = 12.5M input tokens. Response averaging 10K tokens = 25M output tokens. Claude Opus: (12.5M × $5/M) + (25M × $25/M) = $62.50 + $625 = $687.50 baseline; shown with estimated overhead = $1,187.50/month.</p>
+
+<h2>Financial Services (Compliance &amp; Risk)</h2>
+
+<p>Banks and fintech use LLMs for document analysis, transaction monitoring, and regulatory reporting. Token volume driven by document size and analysis depth.</p>
+
+<table>
+<thead>
+<tr>
+  <th>Organization Size</th>
+  <th>Documents/Month</th>
+  <th>Modeled Input Tokens</th>
+  <th>Modeled Output Tokens</th>
+  <th>Claude Opus 4.8</th>
+  <th>GPT-5.5</th>
+  <th>Gemini 3.5 Flash</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>Regional Bank</strong></td>
+  <td>5,000</td>
+  <td class="number">50M</td>
+  <td class="number">15M</td>
+  <td class="number">$625.00</td>
+  <td class="number">$687.50</td>
+  <td class="number">$162.50</td>
+</tr>
+<tr>
+  <td><strong>Mid-Tier Fintech</strong></td>
+  <td>25,000</td>
+  <td class="number">250M</td>
+  <td class="number">75M</td>
+  <td class="number">$3,125.00</td>
+  <td class="number">$3,437.50</td>
+  <td class="number">$812.50</td>
+</tr>
+<tr>
+  <td><strong>Large Bank/Institution</strong></td>
+  <td>100,000</td>
+  <td class="number">1,000M</td>
+  <td class="number">300M</td>
+  <td class="number">$12,500.00</td>
+  <td class="number">$13,750.00</td>
+  <td class="number">$3,250.00</td>
+</tr>
+</tbody>
+</table>
+
+<p><strong>Note:</strong> Financial institutions typically use smaller output ratios (0.3:1 output-to-input) because analysis results are often summary-form. Compliance workloads also benefit significantly from batch API discounts since most processing can accept 12+ hour latency.</p>
+
+<h2>Healthcare &amp; Biotech (Data Analysis)</h2>
+
+<p>Healthcare uses LLMs for clinical note summarization, literature review, and research data extraction. High input-to-output ratio due to dense medical texts.</p>
+
+<table>
+<thead>
+<tr>
+  <th>Organization</th>
+  <th>Records/Month</th>
+  <th>Modeled Input Tokens</th>
+  <th>Modeled Output Tokens</th>
+  <th>Claude Opus 4.8</th>
+  <th>GPT-5.5</th>
+  <th>Gemini 3.5 Flash</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>Clinic (200 patients)</strong></td>
+  <td>200</td>
+  <td class="number">15M</td>
+  <td class="number">3M</td>
+  <td class="number">$150.00</td>
+  <td class="number">$165.00</td>
+  <td class="number">$40.50</td>
+</tr>
+<tr>
+  <td><strong>Hospital System</strong></td>
+  <td>5,000</td>
+  <td class="number">375M</td>
+  <td class="number">75M</td>
+  <td class="number">$3,750.00</td>
+  <td class="number">$4,125.00</td>
+  <td class="number">$1,012.50</td>
+</tr>
+<tr>
+  <td><strong>Research Institute</strong></td>
+  <td>20,000</td>
+  <td class="number">1,500M</td>
+  <td class="number">300M</td>
+  <td class="number">$15,000.00</td>
+  <td class="number">$16,500.00</td>
+  <td class="number">$4,050.00</td>
+</tr>
+</tbody>
+</table>
+
+<h2>Manufacturing &amp; Supply Chain</h2>
+
+<p>Supply chain teams use LLMs for demand forecasting, quality inspection via image+text, and supplier communication. Multimodal workloads add complexity.</p>
+
+<table>
+<thead>
+<tr>
+  <th>Operation Scale</th>
+  <th>Analyses/Month</th>
+  <th>Modeled Input Tokens</th>
+  <th>Modeled Output Tokens</th>
+  <th>Claude Opus 4.8</th>
+  <th>GPT-5.5</th>
+  <th>Gemini 3.5 Flash</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>Single Facility</strong></td>
+  <td>1,000</td>
+  <td class="number">8M</td>
+  <td class="number">4M</td>
+  <td class="number">$140.00</td>
+  <td class="number">$155.00</td>
+  <td class="number">$39.00</td>
+</tr>
+<tr>
+  <td><strong>Multi-Facility (5x)</strong></td>
+  <td>5,000</td>
+  <td class="number">40M</td>
+  <td class="number">20M</td>
+  <td class="number">$700.00</td>
+  <td class="number">$775.00</td>
+  <td class="number">$195.00</td>
+</tr>
+<tr>
+  <td><strong>Global Network</strong></td>
+  <td>50,000</td>
+  <td class="number">400M</td>
+  <td class="number">200M</td>
+  <td class="number">$7,000.00</td>
+  <td class="number">$7,750.00</td>
+  <td class="number">$1,950.00</td>
+</tr>
+</tbody>
+</table>
+
+<h2>Cost Optimization Levers</h2>
+
+<div class="scenario-card">
+  <h3>1. Model Routing by Workload</h3>
+  <p>Route complex reasoning to Claude Opus ($5M in) or GPT-5.5 ($5M in), simple queries to Gemini 3.5 Flash ($1.50M in). Average 30-40% savings if 60% of queries are simple.</p>
+  <p><strong>Typical impact:</strong> -$300–$5,000/month depending on baseline.</p>
+</div>
+
+<div class="scenario-card">
+  <h3>2. Batch API for Offline Work</h3>
+  <p>Apply 50% batch discount to any processing with 12+ hour latency (compliance reviews, nightly reports, async analysis). Most companies can batch 20–40% of workload.</p>
+  <p><strong>Typical impact:</strong> -$200–$3,000/month (roughly 10–15% of total if batching half the workload).</p>
+</div>
+
+<div class="scenario-card">
+  <h3>3. Prompt Caching for Repeated Inputs</h3>
+  <p>Cache long-form context (codebases, PDFs, regulations) with Anthropic prompt caching (90% discount on cache hits after 1-hour write cost). Most orgs can cache 30–60% of input tokens.</p>
+  <p><strong>Typical impact:</strong> -$400–$2,000/month for high-volume teams.</p>
+</div>
+
+<div class="scenario-card">
+  <h3>4. Output Length Constraints</h3>
+  <p>Reduce output token budgets via system prompts. If you can lower average output per query from 500 to 300 tokens, that's a 40% savings on output cost alone.</p>
+  <p><strong>Typical impact:</strong> -$300–$2,500/month depending on baseline.</p>
+</div>
+
+<h2>How to Use These Benchmarks</h2>
+
+<p>These scenarios are modeled, not surveys. Your actual costs depend on:</p>
+
+<ul>
+  <li><strong>Model choice:</strong> Switching from Claude Opus to Gemini 3.5 Flash cuts costs by ~75% if the model meets your quality bar.</li>
+  <li><strong>Token efficiency:</strong> Shorter prompts and outputs directly lower spend. A 20% reduction in average prompt length saves 20% on input cost.</li>
+  <li><strong>Caching strategy:</strong> If 50% of your workload reuses the same context, prompt caching can save 40–50% on those tokens.</li>
+  <li><strong>Batch usage:</strong> Batching 40% of your workload saves ~20% of total spend.</li>
+  <li><strong>Team velocity:</strong> More users = higher costs, but also more opportunities to optimize per-user cost via routing and caching.</li>
+</ul>
+
+<p>For a detailed cost audit specific to your team, see <a href="/research/how-much-does-gpt5-cost">How Much Does GPT-5 Cost?</a> and <a href="/research/llm-cost-calculator">LLM Cost Calculator</a>. Both offer worked examples and per-model breakdowns.</p>
+
+<hr style="margin:48px 0 24px;border:none;border-top:1px solid #1E2A3F" />
+<p>Want to see your actual LLM spend broken down by team and model? FinOps LLM runs a free audit of your AI costs. <a href="/book">Book free audit &rarr;</a></p>
+<p><a href="/research">Back to research</a></p>
+
+{% endblock %}{% block suffix %}</main></body></html>
+{% endblock %}
