@@ -3,16 +3,19 @@ permalink: "ja/research/open-source-vs-closed-cost.html"
 ---
 {% extends "shell.njk" %}{% block prefix %}<!DOCTYPE html>
 <html lang="ja"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>オープンソース vs. クローズド：LLMコスト比較 · FinOps LLM</title><meta name="description" content="オープンソースLLMとプロプライエタリLLMのコスト比較。API料金、セルフホスティングコスト、品質、各オプションを選ぶタイミングを分析。" /><meta name="robots" content="index, follow" /><link rel="canonical" href="https://finopsllm.com/ja/research/open-source-vs-closed-cost" />
+<title>オープンソース vs. クローズド：LLMコスト比較 · FinOps LLM</title><meta name="description" content="Llama、Qwen、DeepSeekをセルフホスティングするのは、いつAPIアクセスよりも有利か？GPUコスト、推論最適化、運用オーバーヘッド、およびワークロード固有の意思決定フレームワーク。" /><meta name="robots" content="index, follow" /><link rel="canonical" href="https://finopsllm.com/ja/research/open-source-vs-closed-cost" />
 <link rel="alternate" hreflang="en" href="https://finopsllm.com/research/open-source-vs-closed-cost" />
 <link rel="alternate" hreflang="es" href="https://finopsllm.com/es/research/open-source-vs-closed-cost" />
 <link rel="alternate" hreflang="ja" href="https://finopsllm.com/ja/research/open-source-vs-closed-cost" />
 <link rel="alternate" hreflang="x-default" href="https://finopsllm.com/research/open-source-vs-closed-cost" />
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"TechArticle","headline":"\u30aa\u30fc\u30d7\u30f3\u30bd\u30fc\u30b9 vs. \u30af\u30ed\u30fc\u30ba\u30c9\uff1aLLM\u30b3\u30b9\u30c8\u6bd4\u8f03 \u00b7 FinOps LLM","description":"\u30aa\u30fc\u30d7\u30f3\u30bd\u30fc\u30b9LLM\u3068\u30d7\u30ed\u30d7\u30e9\u30a4\u30a8\u30bf\u30eaLLM\u306e\u30b3\u30b9\u30c8\u6bd4\u8f03\u3002API\u6599\u91d1\u3001\u30bb\u30eb\u30d5\u30db\u30b9\u30c6\u30a3\u30f3\u30b0\u30b3\u30b9\u30c8\u3001\u54c1\u8cea\u3001\u5404\u30aa\u30d7\u30b7\u30e7\u30f3\u3092\u9078\u3076\u30bf\u30a4\u30df\u30f3\u30b0\u3092\u5206\u6790\u3002","url":"https://finopsllm.com/ja/research/open-source-vs-closed-cost","datePublished":"2026-07-04","dateModified":"2026-07-04","image":"https://finopsllm.com/og.png","author":{"@type":"Organization","name":"FinOps LLM team"},"publisher":{"@type":"Organization","name":"FinOps LLM","url":"https://finopsllm.com/"}}
+{"@context":"https://schema.org","@type":"TechArticle","headline":"オープンソース vs. クローズド：LLMコスト比較 · FinOps LLM","description":"Llama、Qwen、DeepSeekをセルフホスティングするのは、いつAPIアクセスよりも有利か？GPUコスト、推論最適化、運用オーバーヘッド、および決定フレームワーク。","url":"https://finopsllm.com/ja/research/open-source-vs-closed-cost","datePublished":"2026-07-04","dateModified":"2026-07-15","image":"https://finopsllm.com/og.png","author":{"@type":"Organization","name":"FinOps LLM team"},"publisher":{"@type":"Organization","name":"FinOps LLM","url":"https://finopsllm.com/"}}
 </script>
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"\u30db\u30fc\u30e0","item":"https://finopsllm.com/"},{"@type":"ListItem","position":2,"name":"\u30ea\u30b5\u30fc\u30c1","item":"https://finopsllm.com/ja/research"},{"@type":"ListItem","position":3,"name":"\u30aa\u30fc\u30d7\u30f3\u30bd\u30fc\u30b9 vs. \u30af\u30ed\u30fc\u30ba\u30c9\uff1aLLM\u30b3\u30b9\u30c8\u6bd4\u8f03","item":"https://finopsllm.com/ja/research/open-source-vs-closed-cost"}]}
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"ホーム","item":"https://finopsllm.com/"},{"@type":"ListItem","position":2,"name":"リサーチ","item":"https://finopsllm.com/ja/research"},{"@type":"ListItem","position":3,"name":"オープンソース vs. クローズド：コスト","item":"https://finopsllm.com/ja/research/open-source-vs-closed-cost"}]}
+</script>
+<script type="application/ld+json">
+{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "方法論は何か？", "acceptedAnswer": {"@type": "Answer", "text": "各プロバイダーの価格ページから発表された標準料金。ボリュームバッチまたは割引は適用されません。セルフホスト推論最適化セットアップ用クラウドGPUオンデマンド価格（Lambda、RunPod、AWS）vLLMまたはTensorRT-LLM搭載。"}}, {"@type": "Question", "name": "コスト比較表とは？", "acceptedAnswer": {"@type": "Answer", "text": "API Cost/月は、標準料金で月間100M出力トークン+300M入力トークンを想定します。セルフホストコストにはGPUレンタル、15%運用オーバーヘッド、推論スタック（vLLM）が含まれます。初期セットアップエンジニアリング時間は含まれません。"}}, {"@type": "Question", "name": "主要なコスト要因は？", "acceptedAnswer": {"@type": "Answer", "text": "Llama 4 Maverick用8x H100ノードはLambda、RunPod、またはAWSのオンデマンドで月2,000～3,500ドルです。スポット/先制可能インスタンスはこれを40-60%削減できますが、再起動レイテンシーと可用性リスクが加わります。本番ワークロードについて、予約インスタンス（1年契約）は通常オンデマンドより30-40%節約できます。"}}, {"@type": "Question", "name": "意思決定フレームワークは？", "acceptedAnswer": {"@type": "Answer", "text": "ほとんどのチームはハイブリッドになります：フロンティア推論タスクと低ボリュームワークロードにはAPIを使用し、高ボリューム、レイテンシー許容度の高いタスク（コンテンツ生成、データ抽出、内部ツール）にはオープンソースモデルをセルフホストします。"}}, {"@type": "Question", "name": "オープンソースモデルをどこで実行するか？", "acceptedAnswer": {"@type": "Answer", "text": "GPUの価格は2026年7月時点のオンデマンド時間単価です。予約/スポット価格は大きく異なります。MiMOはMiMo-V2-ProおよびMiMo-V2-OmniへのAPI ベースアクセスを競争力のある料金で提供します-完全なセルフホスティングとプレミアムAPI価格の中間。"}}]}
 </script>
 <style>
 body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}
@@ -20,16 +23,24 @@ body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E
 a{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}
 .langsw{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;color:#647289;margin:0 0 26px}
 .langsw a{text-decoration:none}.langsw a[aria-current]{color:#E6EAF2;font-weight:600}
+
+/* Hero stats */
 .hero-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:16px;margin:28px 0 36px}
 .hero-stat{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:18px 16px;text-align:center}
 .hero-stat .num{font-size:2rem;font-weight:700;color:#7AAFFF;display:block}
 .hero-stat .lbl{font-size:.82rem;color:#647289;margin-top:4px}
+
+/* Badges */
 .badge-row{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 32px;list-style:none;padding:0}
 .badge-row li{background:#101726;border:1px solid #1E2A3F;border-radius:8px;padding:8px 14px;font-size:.85rem;color:#B6C0D2}
+
+/* Methodology */
 .method-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin:20px 0 32px}
 .method-card{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:18px}
 .method-card h3{font-size:.95rem;color:#E6EAF2;margin:0 0 8px}
 .method-card p{font-size:.85rem;margin:0}
+
+/* Table */
 .table-wrap{overflow-x:auto;margin:0 0 32px;-webkit-overflow-scrolling:touch}
 table{border-collapse:collapse;width:100%;font-size:.82rem;white-space:nowrap}
 th,td{border:1px solid #1E2A3F;padding:8px 10px;text-align:left;color:#B6C0D2}
@@ -40,202 +51,276 @@ th.sorted .sort-arrow{opacity:1;color:#7AAFFF}
 td.provider-cell{white-space:normal;min-width:140px}
 td.price-cell{text-align:right;font-variant-numeric:tabular-nums}
 td.limit-cell{text-align:right;font-variant-numeric:tabular-nums;min-width:55px}
+td.model-cell{font-size:.78rem}
 tr:hover{background:rgba(122,175,255,.04)}
+
+/* Gray for estimated values */
 .est{color:#647289}
 .official{color:#B6C0D2}
+
+/* Referral links */
 .ref-link{font-size:.75rem;color:#7AAFFF;text-decoration:none;border-bottom:1px dotted rgba(122,175,255,.3)}
 .ref-link:hover{border-bottom-color:#7AAFFF}
+
+/* Footnotes */
 .footnotes{font-size:.8rem;color:#64748b;margin:16px 0 0}
 .footnotes p{margin:6px 0}
+
+/* Guide */
 .guide-section{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:24px;margin:12px 0}
 .guide-section h3{color:#E6EAF2;margin:0 0 10px;font-size:1rem}
-.highlight-box{background:rgba(122,175,255,.08);border:1px solid rgba(122,175,255,.2);border-radius:10px;padding:20px;margin:16px 0}
-.highlight-box p{margin:6px 0}
-@media(max-width:700px){.hero-stats{grid-template-columns:repeat(2,1fr)}table{font-size:.75rem}th,td{padding:6px 7px}}
+
+/* Decision framework */
+.decision-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;margin:20px 0 32px}
+.decision-card{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:24px}
+.decision-card.api{border-left:4px solid #7AAFFF}
+.decision-card.self{border-left:4px solid #4ADE80}
+.decision-card h3{font-size:1rem;margin:0 0 12px;color:#E6EAF2}
+.decision-card ul{margin:0;padding-left:18px}
+.decision-card li{margin:6px 0;font-size:.88rem}
+
+/* Responsive */
+@media(max-width:700px){
+  .hero-stats{grid-template-columns:repeat(2,1fr)}
+  table{font-size:.75rem}
+  th,td{padding:6px 7px}
+  .decision-grid{grid-template-columns:1fr}
+}
 </style><script src="/assets/consent.js" defer></script><script src="/assets/attribution.js" defer></script>
 <script src="/assets/lang.js" defer></script>
 </head>
 <body><main class="wrap">{% endblock %}{% block body %}
-<nav class="langsw" aria-label="Language / Idioma"><a href="/research/open-source-vs-closed-cost" hreflang="en">EN</a> · <a href="/es/research/open-source-vs-closed-cost" hreflang="es">ES</a> · <a href="/ja/research/open-source-vs-closed-cost" hreflang="ja" aria-current="page">JA</a></nav>
+<nav class="langsw" aria-label="Language"><a href="/research/open-source-vs-closed-cost" hreflang="en">EN</a> · <a href="/es/research/open-source-vs-closed-cost" hreflang="es">ES</a> · <a href="/ja/research/open-source-vs-closed-cost" hreflang="ja" aria-current="page">JA</a></nav>
 
-<h1>オープンソース vs. クローズド：LLMコスト比較</h1>
-<p>オープンソースモデル（Llama、DeepSeek、Qwen、MiMo）はほとんどの生産タスクでプロプライエタリモデル（GPT、Claude、Gemini）との品質ギャップを縮めてきました。しかし、コスト比較はトークン単価だけでは語れません。このガイドでは、APIコスト、セルフホスティングコスト、実際の品質、各オプションを選ぶタイミングを分析し、結果を犠牲にせずに節約を最大化する方法を解説します。</p>
+<h1>オープンソース vs. クローズド：LLMコスト比較</h1><p class="updated" style="color:#6B7689;font-size:14px;margin-top:-6px">更新 2026年7月15日 · 初出 2026年7月4日</p>
+<p>Llama、Qwen、DeepSeekをセルフホスティングするのは、APIアクセスに対して、いつ損益分岐点に達するのでしょうか。この分析はGPUコスト、推論最適化、運用オーバーヘッド、および特定のワークロードに対する意思決定フレームワークを提供します。</p>
 
 <div class="hero-stats">
-  <div class="hero-stat"><span class="num">80-90%</span><span class="lbl">節約の可能性</span></div>
-  <div class="hero-stat"><span class="num">5+</span><span class="lbl">主要オープンモデル</span></div>
-  <div class="hero-stat"><span class="num">&lt;5%</span><span class="lbl">品質ギャップ</span></div>
-  <div class="hero-stat"><span class="num">2026年7月</span><span class="lbl">最終更新</span></div>
+  <div class="hero-stat"><span class="num">8</span><span class="lbl">比較モデル</span></div>
+  <div class="hero-stat"><span class="num">5</span><span class="lbl">分析GPU層</span></div>
+  <div class="hero-stat"><span class="num">3</span><span class="lbl">損益分岐点シナリオ</span></div>
+  <div class="hero-stat"><span class="num">Jul 2026</span><span class="lbl">最終更新</span></div>
 </div>
 
 <ul class="badge-row">
-  <li>オープンモデルはほとんどのベンチマークでGPT-4と互角に</li>
-  <li>ホストプロバイダーがオープンモデルで激しい価格競争</li>
-  <li>品質ギャップはフロンティア推論でのみ残存</li>
+  <li>セルフホストコストはクラウドGPU価格を想定（オンデマンド）</li>
+  <li>APIコストはプロバイダーごとの標準出力価格を使用</li>
+  <li>損益分岐点は70%利用率、24/7可用性に基づく</li>
 </ul>
 
-<h2>API価格比較</h2>
+<h2>方法論</h2>
+<div class="method-grid">
+  <div class="method-card"><h3>API価格</h3><p>各プロバイダーの価格ページからの標準発表料金。ボリューム割引またはバッチ割引は適用されません。</p></div>
+  <div class="method-card"><h3>クラウドGPUセルフホスト</h3><p>推論最適化セットアップ用クラウドオンデマンド価格（Lambda、RunPod、AWS）vLLMまたはTensorRT-LLM搭載。</p></div>
+  <div class="method-card"><h3>運用オーバーヘッド</h3><p>モニタリング、スケーリング、モデル更新、および管理インフラストラクチャ用の生GPUコストに対する15%運用サーチャージが含まれます。</p></div>
+  <div class="method-card"><h3>品質ギャップ</h3><p>GPT-4o / Claude Sonnet 4相対の100%ベースラインで。公開ベンチマークと実際のタスクパフォーマンスに基づく。</p></div>
+</div>
+
+<h2 id="comparison">コスト比較表</h2>
 
 <div class="table-wrap">
-<table id="pricingTable">
+<table id="comparisonTable">
 <thead>
 <tr>
   <th data-col="model">モデル <span class="sort-arrow">↕</span></th>
-  <th data-col="provider">プロバイダー <span class="sort-arrow">↕</span></th>
-  <th data-col="input" class="price-cell">入力$/1M <span class="sort-arrow">↕</span></th>
-  <th data-col="output" class="price-cell">出力$/1M <span class="sort-arrow">↕</span></th>
-  <th data-col="context">コンテキストウィンドウ <span class="sort-arrow">↕</span></th>
-  <th data-col="type">タイプ <span class="sort-arrow">↕</span></th>
+  <th data-col="apiCost" class="price-cell">APIコスト/月 <span class="sort-arrow">↕</span></th>
+  <th data-col="selfCost" class="price-cell">セルフホストコスト（クラウドGPU） <span class="sort-arrow">↕</span></th>
+  <th data-col="breakeven" class="price-cell">損益分岐点ボリューム <span class="sort-arrow">↕</span></th>
+  <th data-col="quality">品質ギャップ</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-  <td>GPT-5</td>
-  <td class="provider-cell"><strong>OpenAI</strong></td>
-  <td class="price-cell official" data-val="10.00">$10.00</td>
-  <td class="price-cell official" data-val="30.00">$30.00</td>
-  <td class="limit-cell" data-val="256">256Kトークン</td>
-  <td>クローズド</td>
+  <td>Llama 4 Maverick (DeepInfra)</td>
+  <td class="price-cell official" data-val="260">$260/月</td>
+  <td class="price-cell official" data-val="2800">$2,800/月</td>
+  <td class="price-cell official" data-val="350">~350Mトークン/月</td>
+  <td>~95% of GPT-4o</td>
 </tr>
 <tr>
-  <td>Claude Sonnet 4</td>
-  <td class="provider-cell"><strong>Anthropic</strong></td>
-  <td class="price-cell official" data-val="3.00">$3.00</td>
-  <td class="price-cell official" data-val="15.00">$15.00</td>
-  <td class="limit-cell" data-val="200">200Kトークン</td>
-  <td>クローズド</td>
+  <td>Llama 3.3 70B (Groq)</td>
+  <td class="price-cell official" data-val="277">$277/月</td>
+  <td class="price-cell official" data-val="1200">$1,200/月</td>
+  <td class="price-cell official" data-val="210">~210Mトークン/月</td>
+  <td>~87% of GPT-4o</td>
 </tr>
 <tr>
-  <td>Gemini 2.5 Pro</td>
-  <td class="provider-cell"><strong>Google</strong></td>
-  <td class="price-cell official" data-val="1.25">$1.25</td>
-  <td class="price-cell official" data-val="10.00">$10.00</td>
-  <td class="limit-cell" data-val="1000">1Mトークン</td>
-  <td>クローズド</td>
+  <td>Llama 4 Scout (Groq)</td>
+  <td class="price-cell official" data-val="136">$136/月</td>
+  <td class="price-cell official" data-val="1400">$1,400/月</td>
+  <td class="price-cell official" data-val="350">~350Mトークン/月</td>
+  <td>~88% of GPT-4o</td>
 </tr>
 <tr>
-  <td>Llama 4 Maverick</td>
-  <td class="provider-cell"><strong>Meta / ホスト</strong></td>
-  <td class="price-cell est" data-val="0.35">$0.20–$0.50</td>
-  <td class="price-cell est" data-val="1.05">$0.60–$1.50</td>
-  <td class="limit-cell" data-val="128">128Kトークン</td>
-  <td>オープン</td>
+  <td>Qwen 3.7-Max</td>
+  <td class="price-cell official" data-val="525">$525/月</td>
+  <td class="price-cell official" data-val="1600">$1,600/月</td>
+  <td class="price-cell official" data-val="100">~100Mトークン/月</td>
+  <td>~92% of GPT-4o</td>
 </tr>
 <tr>
-  <td>DeepSeek-V3</td>
-  <td class="provider-cell"><strong>DeepSeek</strong></td>
-  <td class="price-cell official" data-val="0.27">$0.27</td>
-  <td class="price-cell official" data-val="1.10">$1.10</td>
-  <td class="limit-cell" data-val="128">128Kトークン</td>
-  <td>オープン</td>
+  <td>DeepSeek V4 Pro</td>
+  <td class="price-cell official" data-val="435">$435/月</td>
+  <td class="price-cell official" data-val="1800">$1,800/月</td>
+  <td class="price-cell official" data-val="130">~130Mトークン/月</td>
+  <td>~96% of GPT-4o</td>
 </tr>
 <tr>
-  <td>Qwen 3</td>
-  <td class="provider-cell"><strong>Alibaba / ホスト</strong></td>
-  <td class="price-cell est" data-val="0.45">$0.30–$0.60</td>
-  <td class="price-cell est" data-val="1.35">$0.90–$1.80</td>
-  <td class="limit-cell" data-val="128">128Kトークン</td>
-  <td>オープン</td>
+  <td>DeepSeek V4 Flash</td>
+  <td class="price-cell official" data-val="140">$140/月</td>
+  <td class="price-cell official" data-val="1400">$1,400/月</td>
+  <td class="price-cell official" data-val="450">~450Mトークン/月</td>
+  <td>~82% of GPT-4o</td>
 </tr>
 <tr>
-  <td>MiMo</td>
-  <td class="provider-cell"><strong>Xiaomi MiMO</strong><br /><a class="ref-link" href="https://platform.xiaomimimo.com?ref=LHT8UJ">登録 - お互いに$2ゲット ↗</a></td>
-  <td class="price-cell est" data-val="0.80">$0.80</td>
-  <td class="price-cell est" data-val="3.20">$3.20</td>
-  <td class="limit-cell" data-val="128">128Kトークン</td>
-  <td>オープン</td>
+  <td>Mistral Medium 3.5</td>
+  <td class="price-cell official" data-val="525">$525/月</td>
+  <td class="price-cell official" data-val="2000">$2,000/月</td>
+  <td class="price-cell official" data-val="120">~120Mトークン/月</td>
+  <td>~91% of GPT-4o</td>
+</tr>
+<tr>
+  <td>GPT-4o (APIのみ)</td>
+  <td class="price-cell official" data-val="750">$750/月</td>
+  <td class="price-cell est" data-val="0">N/A</td>
+  <td class="price-cell est" data-val="0">N/A</td>
+  <td>ベースライン（100%）</td>
 </tr>
 </tbody>
 </table>
 </div>
 
-<h2>セルフホスティングコスト</h2>
-<div class="guide-section">
-  <h3>ハードウェアとインフラ</h3>
-  <p>オープンソースモデルをローカルで実行するには強力なGPUが必要です。NVIDIA A100（80GB）はクラウドで約$2/時間で、最大70Bパラメータのモデルを配信できます。より大きなモデル（Llama 4 Maverick 400B）には、複数のGPUまたはより強力なGPU（H100で約$4/時間）が必要です。</p>
-</div>
-<div class="guide-section">
-  <h3>損益分岐点</h3>
-  <p>セルフホスティングは、毎日約100万トークン以上を一貫して処理する場合にコスト効率が良くなります。そのボリューム未満では、インフラコストがホストAPIの節約を上回ります。計算式：月間GPUコスト / 月間処理トークン = トークンあたりのコスト。上記のAPI料金と比較してください。</p>
-</div>
-<div class="guide-section">
-  <h3>セルフホスティングの隠れたコスト</h3>
-  <ul>
-    <li>推論インフラ（vLLM、TGI）：設定と継続的なメンテナンス</li>
-    <li>ネットワークとストレージ：データ転送とモデルストレージ（70B以上 = 140GB以上）</li>
-    <li>信頼性：冗長性、負荷分散、障害復旧</li>
-    <li>人材：運用と最適化のためのMLエンジニアが必要</li>
-  </ul>
-</div>
-
-<h2>いつオープンモデルを選ぶべきか？</h2>
-<div class="guide-section">
-  <h3>オープンモデルを使う場面：</h3>
-  <ul>
-    <li>高ボリュームの分類、抽出、要約（「十分な」品質で足りる場面）</li>
-    <li>コスト感度：トークンあたり最低コストが必要な tight な予算</li>
-    <li>データプライバシー：データをインフラの外に出すことができない</li>
-    <li>カスタムファインチューニング：特定のドメインにモデルを適応させる必要がある</li>
-    <li>オフライン/エッジデプロイ：インターネット接続なしの運用</li>
-    <li>予測可能なスケーラビリティ：専用インフラを正当化する一定のボリューム</li>
-  </ul>
-</div>
-
-<h2>いつクローズドモデルを選ぶべきか？</h2>
-<div class="guide-section">
-  <h3>クローズドモデルを使う場面：</h3>
-  <ul>
-    <li>最高品質が重要なフロンティア推論タスク</li>
-    <li>すぐに使える品質：ファインチューニングなしで最高のパフォーマンスが必要</li>
-    <li>低ボリューム：APIのシンプルさがオープンモデルの節約を上回る</li>
-    <li>マルチモーダルタスク：ビジョン、音声、テキストの組み合わせ</li>
-    <li>レイテンシーが重要：プロバイダーの最適化モデルの方が高速</li>
-    <li>サポートとSLA：可用性の契約保証が必要</li>
-  </ul>
-</div>
-
-<h2>2026年の品質ギャップ</h2>
-<div class="highlight-box">
-  <p><strong>ほとんどの生産タスクにおいて、ギャップは5%未満です。</strong>要約、抽出、分類、コード生成、ツール使用：オープンモデルはクローズドモデルと同等レベルです。ギャップが残るのはフロンティア推論（複雑な数学的証明、多段階プランニング）で、Claude Opus 4とo3が依然として優位です。</p>
-  <p>生産ユースケースの80%について、$0.30/1Mトークンのホストオープンモデルは$10/1Mトークンのクローズドモデルと見分けがつかない結果を生成します。</p>
-</div>
-
-<h2>最適なハイブリッド戦略</h2>
-<div class="method-grid">
-  <div class="method-card"><h3>複雑さでルーティング</h3><p>シンプルなタスク（分類、抽出）→ 安価なオープンモデル。複雑なタスク（推論、高度なコード）→ プレミアムクローズドモデル。</p></div>
-  <div class="method-card"><h3>バッチにオープンモデル</h3><p>バッチ処理、評価、緊急でないコンテンツ生成 → 最低コストのバッチAPI付きオープンモデル。</p></div>
-  <div class="method-card"><h3>UXにはクローズドを確保</h3><p>レスポンス品質が直接影響するリアルタイムユーザーインターフェース → 低レイテンシーのクローズドモデル。</p></div>
-  <div class="method-card"><h3>機密データはセルフホスト</h3><p>規制データ、営業秘密、個人情報 → 自社インフラ上のオープンモデル。</p></div>
-</div>
-
-<h2>関連</h2>
-<ul>
-<li><a href="/ja/research/provider-arbitrage">プロバイダーアービトラージ</a> - 品質基準を満たす最安モデルの発見。</li>
-<li><a href="/ja/research/model-routing">モデルルーティング</a> - タスクを適切なコストティアに送信。</li>
-<li><a href="/ja/research/cheapest-ai-code-generation">AIコード生成の最も安い方法</a> - コーディングツールのコスト比較。</li>
-<li><a href="/ja/research/finops-for-llm">LLM向けFinOps</a> - より広いフレームワーク。</li>
-</ul>
-
 <div class="footnotes">
-  <p>ホストモデルの価格はプロバイダーにより異なり、頻繁に変動します。</p>
-  <p>セルフホスティングの価格は標準的なパブリッククラウド料金に基づく推定です。</p>
+  <p>APIコスト/月は標準料金で月間100M出力トークン+300M入力トークンを想定します。</p>
+  <p>セルフホストコストにはGPUレンタル、15%運用オーバーヘッド、推論スタック（vLLM）が含まれます。初期セットアップエンジニアリング時間は含まれません。</p>
+  <p>損益分岐点ボリュームは、セルフホスティングがAPIより安くなる月間出力トークン数です。</p>
+  <p>品質ギャップは概算であり、タスク依存です。MMLU、HumanEval、GPQA等のベンチマークがこれらの推定値を通知します。</p>
   <p>一部のリンクには紹介コードが含まれている場合があります。</p>
 </div>
 
+<h2 id="cost-factors">主要なコスト要因</h2>
+
+<div class="guide-section">
+  <h3>1) GPUレンタルが支配的なコスト</h3>
+  <p>Llama 4 Maverick用8x H100ノードはLambda、RunPod、またはAWSからのオンデマンドで月2,000～3,500ドルです。スポット/先制可能インスタンスはこれを40-60%削減できますが、再起動レイテンシーと可用性リスクが追加されます。本番ワークロードについて、予約インスタンス（1年契約）は通常オンデマンドより30-40%節約できます。</p>
+</div>
+<div class="guide-section">
+  <h3>2) 推論最適化が方程式を変える</h3>
+  <p>連続バッチング、KVキャッシュページング、および量子化（GPTQ/AWQ 4ビット）によるvLLMは、同じハードウェアで2-4倍のスループットを増加させることができます。TensorRT-LLMはサポートされているアーキテクチャに対してさらに20-40%を追加します。単一A100上の4ビット量子化Llama 4 Scoutは、2x A100上のナイーブfp16セットアップと同等になることができます。</p>
+</div>
+<div class="guide-section">
+  <h3>3) 運用オーバーヘッドは実質的ですが減少しています</h3>
+  <p>推論インフラストラクチャの実行にはGPUモニタリング、モデル更新、負荷分散、およびフェイルオーバーが必要です。生GPUコストの15-25%をオペレーション費用で予算してください。管理プラットフォーム（Anyscale、Modal、Replicate）はこれを吸収しますが、生GPUに対して30-50%プレミアムを請求しています-GPU支出が~$5K/月未満の場合に価値があります。</p>
+</div>
+<div class="guide-section">
+  <h3>4) プロンプトキャッシングはAPIのギャップを狭めます</h3>
+  <p>APIプロバイダーはプロンプトキャッシング（繰り返されるプレフィックスで50-90%割引）をますます提供しています。ワークロードがキャッシュフレンドリー（RAG、マルチターン）の場合、APIコストは大幅に低下し、セルフホスティングの損益分岐点ボリュームが上がります。</p>
+</div>
+
+<h2 id="framework">意思決定フレームワーク</h2>
+
+<div class="decision-grid">
+  <div class="decision-card api">
+    <h3>APIを使用する場合...</h3>
+    <ul>
+      <li>月間出力ボリュームが100Mトークン未満</li>
+      <li>フロンティアモデルの品質が必要（GPT-4o、Claude Opus 4）</li>
+      <li>チームがGPU/MLOpsの専門知識を持たない</li>
+      <li>レイテンシー要件が厳しい（TTFT<200ms）</li>
+      <li>運用オーバーヘッドをゼロにしたい</li>
+      <li>ワークロードがバースト状またはシーズン的</li>
+    </ul>
+  </div>
+  <div class="decision-card self">
+    <h3>セルフホストする場合...</h3>
+    <ul>
+      <li>月間出力ボリュームが一貫して200Mトークンを超える</li>
+      <li>データプライバシーがサードパーティAPIアクセスを要求しない</li>
+      <li>カスタムファインチューニングモデルが必要</li>
+      <li>チームがMLOps能力を持っている</li>
+      <li>ワークロードが定常状態（予測可能なGPU利用）</li>
+      <li>1年予約GPUインスタンスを約束できる</li>
+    </ul>
+  </div>
+</div>
+
+<div class="guide-section">
+  <h3>ハイブリッドアプローチ：実用的な中間地点</h3>
+  <p>ほとんどのチームはハイブリッドになります：フロンティア推論タスクと低ボリュームワークロードにはAPIを使用し、高ボリューム、レイテンシー許容度の高いタスク（コンテンツ生成、データ抽出、内部ツール）にはオープンソースモデルをセルフホストします。これにより、APIコスト支出を制御下に保ちながら、セルフホスト機能を段階的に構築できます。</p>
+</div>
+
+<h2 id="providers">オープンソースモデルをどこで実行するか</h2>
+
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+  <th>プラットフォーム</th>
+  <th>GPUオプション</th>
+  <th>A100 80GB価格</th>
+  <th>H100価格</th>
+  <th>管理推論</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>Lambda Cloud</td>
+  <td>A100, H100, H200</td>
+  <td class="price-cell">$1.10/時間</td>
+  <td class="price-cell">$2.49/時間</td>
+  <td>いいえ（自分のものを持参）</td>
+</tr>
+<tr>
+  <td>RunPod</td>
+  <td>A100, H100, L40S</td>
+  <td class="price-cell">$1.19/時間</td>
+  <td class="price-cell">$2.69/時間</td>
+  <td>サーバーレスオプション</td>
+</tr>
+<tr>
+  <td>AWS (p4d/p5)</td>
+  <td>A100, H100</td>
+  <td class="price-cell">$3.67/時間</td>
+  <td class="price-cell">$6.37/時間</td>
+  <td>SageMaker</td>
+</tr>
+<tr>
+  <td>Google Cloud</td>
+  <td>A100, H100</td>
+  <td class="price-cell">$3.22/時間</td>
+  <td class="price-cell">$5.07/時間</td>
+  <td>Vertex AI</td>
+</tr>
+<tr>
+  <td><a class="ref-link" href="https://platform.xiaomimimo.com?ref=LHT8UJ">Xiaomi MiMO ↗</a></td>
+  <td>APIベース</td>
+  <td class="price-cell">N/A</td>
+  <td class="price-cell">N/A</td>
+  <td>API ($0.50/$2.00 per 1M)</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<div class="footnotes">
+  <p>GPU価格は2026年7月時点のオンデマンド時間単価です。予約/スポット価格は大きく異なります。</p>
+  <p>MiMOはMiMo-V2-ProおよびMiMo-V2-OmniへのAPIベースアクセスを競争力のある料金で提供します-完全なセルフホスティングとプレミアムAPI価格の中間。</p>
+</div>
+
 <hr style="margin:48px 0 24px;border:none;border-top:1px solid #1E2A3F" />
-<p>自分のLLM支出に適用したいですか？FinOps LLMはAI費用の無料監査を実施し、節約場所を示します。<a href="/book">無料監査を予約 &rarr;</a></p>
+<p>独自のLLM支出にこれを適用したいですか？FinOps LLMはAIコストの無料監査を実施し、節約場所を示します。<a href="/book">無料監査を予約 &rarr;</a></p>
 <p><a href="/ja/research">リサーチに戻る</a></p>
 
 <script>
 (function(){
-  var table=document.getElementById('pricingTable');
-  if(!table)return;
-  var tbody=table.querySelector('tbody');
-  var headers=table.querySelectorAll('th[data-col]');
-  var currentSort={col:null,asc:true};
+  const table=document.getElementById('comparisonTable');
+  const tbody=table.querySelector('tbody');
+  const headers=table.querySelectorAll('th[data-col]');
+  let currentSort={col:null,asc:true};
+
   headers.forEach(function(th){
     th.addEventListener('click',function(){
-      var col=this.dataset.col;
+      const col=this.dataset.col;
       if(currentSort.col===col){currentSort.asc=!currentSort.asc}
       else{currentSort.col=col;currentSort.asc=true}
       headers.forEach(function(h){h.classList.remove('sorted')});
@@ -244,13 +329,17 @@ tr:hover{background:rgba(122,175,255,.04)}
       sortTable(col,currentSort.asc);
     });
   });
+
   function sortTable(col,asc){
-    var rows=Array.from(tbody.querySelectorAll('tr'));
-    var colMap={model:0,provider:1,input:2,output:3,context:4,type:5};
-    var idx=colMap[col];if(idx===undefined)return;
+    const rows=Array.from(tbody.querySelectorAll('tr'));
+    const colMap={model:0,apiCost:1,selfCost:2,breakeven:3,quality:4};
+    const idx=colMap[col];if(idx===undefined)return;
     rows.sort(function(a,b){
-      var va,vb;
-      if(col==='model'||col==='provider'||col==='type'){va=a.cells[idx].textContent.trim();vb=b.cells[idx].textContent.trim();return asc?va.localeCompare(vb):vb.localeCompare(va)}
+      let va,vb;
+      if(col==='model'||col==='quality'){
+        va=a.cells[idx].textContent.trim();vb=b.cells[idx].textContent.trim();
+        return asc?va.localeCompare(vb):vb.localeCompare(va);
+      }
       va=parseFloat(a.cells[idx].dataset.val||0);vb=parseFloat(b.cells[idx].dataset.val||0);
       return asc?va-vb:vb-va;
     });
