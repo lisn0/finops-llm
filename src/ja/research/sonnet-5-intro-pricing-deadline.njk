@@ -1,0 +1,356 @@
+---
+permalink: "ja/research/sonnet-5-intro-pricing-deadline.html"
+---
+{% extends "shell.njk" %}{% block prefix %}<!DOCTYPE html>
+<html lang="ja"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Claude Sonnet 5 導入価格締切（8月31日）：請求額50％上昇 · FinOps LLM</title><meta name="description" content="Claude Sonnet 5の導入価格（$2/$10/1M tokens）は2026年8月31日に期限切れです。標準料金$3/$15は9月1日に開始され、請求額が50％上昇します。締切前にコストを固定し、ワークロードを再ベンチマークし、キャッシュに移行してください。" /><meta name="robots" content="index, follow" /><link rel="canonical" href="https://finopsllm.com/ja/research/sonnet-5-intro-pricing-deadline" />
+<link rel="alternate" hreflang="en" href="https://finopsllm.com/research/sonnet-5-intro-pricing-deadline" />
+<link rel="alternate" hreflang="es" href="https://finopsllm.com/es/research/sonnet-5-intro-pricing-deadline" />
+<link rel="alternate" hreflang="ja" href="https://finopsllm.com/ja/research/sonnet-5-intro-pricing-deadline" />
+<link rel="alternate" hreflang="x-default" href="https://finopsllm.com/research/sonnet-5-intro-pricing-deadline" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","headline":"Claude Sonnet 5 導入価格締切（8月31日）：請求額50％上昇 · FinOps LLM","description":"Claude Sonnet 5の導入価格は2026年8月31日に期限切れになります。標準料金$3/$15は9月1日に開始され、請求額が50％上昇します。締切前にコストを固定し、ワークロードを再ベンチマークし、キャッシュに移行してください。","url":"https://finopsllm.com/ja/research/sonnet-5-intro-pricing-deadline","datePublished":"2026-07-19","dateModified":"2026-07-19","image":"https://finopsllm.com/og.png","author":{"@type":"Organization","name":"FinOps LLM team"},"publisher":{"@type":"Organization","name":"FinOps LLM","url":"https://finopsllm.com/"}}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"ホーム","item":"https://finopsllm.com/ja/"},{"@type":"ListItem","position":2,"name":"リサーチ","item":"https://finopsllm.com/ja/research"},{"@type":"ListItem","position":3,"name":"Claude Sonnet 5 導入価格締切","item":"https://finopsllm.com/ja/research/sonnet-5-intro-pricing-deadline"}]}
+</script>
+<script type="application/ld+json">
+{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Claude Sonnet 5の導入価格はいつ終了しますか？", "acceptedAnswer": {"@type": "Answer", "text": "2026年8月31日午後11時59分UTC。2026年9月1日から、Claude Sonnet 5は導入価格から標準価格に移行します。延長または自動更新はありません。締切は絶対です。"}}, {"@type": "Question", "name": "請求額はどのくらい増加しますか？", "acceptedAnswer": {"@type": "Answer", "text": "Claude Sonnet 5ワークロードの場合、正確に50％です。入力価格は1M tokenあたり$2から$3に上昇（+50％）。出力は1M tokenあたり$10から$15に上昇（+50％）。8月に$10,000/月のコストがかかるワークロードは、変更がない場合9月に$15,000/月になります。"}}, {"@type": "Question", "name": "BedrockとVertexにも導入価格は適用されますか？", "acceptedAnswer": {"@type": "Answer", "text": "導入価格はAnthropicダイレクトAPIに適用されます。AWS BedrockとGoogle Vertex AIはAnthropicの価格をパススルーするため、9月1日に同じ値上げが適用されます。クラウドプロバイダーの契約条件を確認してください。"}}, {"@type": "Question", "name": "8月31日までに何をすべきですか？", "acceptedAnswer": {"@type": "Answer", "text": "1) 使用コミットメントが利用可能な場合は確保します。2) Sonnet 5を安価なモデル（Haiku、Gemini 2.5 Flash）と比較し直します。3) 繰り返されるプロンプトをプロンプトキャッシングに移行します（キャッシュ割引は基本価格と共にスケールするため、今キャッシュセービングスを固定することは価値があります）。4) 8月25日のカレンダーアラートを設定して、移行後のコストをテストします。5) Q3予算の値上げをモデル化します。"}}]}
+</script>
+<style>
+body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}
+.wrap{max-width:1100px;margin:0 auto;padding:56px 24px}
+a{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}
+.langsw{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;color:#647289;margin:0 0 26px}
+.langsw a{text-decoration:none}.langsw a[aria-current]{color:#E6EAF2;font-weight:600}
+.badge-row{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 32px;list-style:none;padding:0}
+.badge-row li{background:#101726;border:1px solid #1E2A3F;border-radius:8px;padding:8px 14px;font-size:.85rem;color:#B6C0D2}
+.table-wrap{overflow-x:auto;margin:0 0 32px;-webkit-overflow-scrolling:touch}
+table{border-collapse:collapse;width:100%;font-size:.85rem}
+th,td{border:1px solid #1E2A3F;padding:10px 12px;text-align:left;color:#B6C0D2}
+th{color:#E6EAF2;background:#101726}
+td.number{text-align:right;font-family:'JetBrains Mono',monospace;font-weight:500}
+td.highlight{background:rgba(248,113,113,.08)}
+.cost-component{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:20px;margin:16px 0}
+.cost-component h3{color:#E6EAF2;margin:0 0 12px;font-size:1rem}
+.cost-component p{font-size:.9rem;margin:6px 0}
+.guide-section{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:24px;margin:12px 0}
+.guide-section h3{color:#E6EAF2;margin:0 0 10px;font-size:1rem}
+.warning{border-left:4px solid #f87171;padding:16px;background:rgba(248,113,113,.08);margin:20px 0}
+@media(max-width:700px){
+  table{font-size:.75rem}
+  th,td{padding:6px 7px}
+}
+</style><script src="/assets/consent.js" defer></script><script src="/assets/attribution.js" defer></script>
+<script src="/assets/lang.js" defer></script>
+</head>
+<body><main class="wrap">{% endblock %}{% block body %}
+
+<nav class="langsw" aria-label="言語"><a href="/research/sonnet-5-intro-pricing-deadline" hreflang="en">EN</a> · <a href="/es/research/sonnet-5-intro-pricing-deadline" hreflang="es">ES</a> · <a href="/ja/research/sonnet-5-intro-pricing-deadline" hreflang="ja" aria-current="page">JA</a></nav>
+
+<h1>Claude Sonnet 5導入価格は8月31日に終了：請求額が50％上昇</h1>
+<p class="updated" style="color:#6B7689;font-size:14px;margin-top:-6px">公開日：2026年7月19日</p>
+<p>Anthropicは<a href="https://www.anthropic.com/news/claude-sonnet-5">2026年6月30日にClaude Sonnet 5をリリース</a>しました。導入価格は$2/1M入力トークン、$10/1M出力トークンです。この価格には<strong>絶対的な締切があります：2026年8月31日</strong>。9月1日から、Sonnet 5は$3/$15/1M標準価格に移行し、<strong>一律50％のコスト増加</strong>となります。Sonnet 5ワークロードを実行している場合、次の6週間はコストを固定し、増加に備える期間です。</p>
+
+<ul class="badge-row">
+  <li>導入価格は2026年8月31日までのみ有効</li>
+  <li>標準価格（$3/$15）は2026年9月1日に開始</li>
+  <li>Sonnet 5ワークロードのコスト増加は正確に50％</li>
+  <li>Anthropic API、Bedrock、Vertex AIに適用</li>
+  <li>再ベンチマーク、コミットメント確保、予測更新まで43日</li>
+</ul>
+
+<div class="warning">
+  <strong>重要な締切：</strong>Claude Sonnet 5の導入価格は43日後（2026年8月31日）に期限切れになります。10M token/月のワークロードは$20から$30/月に移行します。1B token/月のワークロードは$2,000から$3,000に移行します。Sonnet 5がクリティカルパスにある場合、今すぐ値上げを予算化するか、切り替え前にワークロードをシフトしてください。</div>
+
+<h2>数学：50％がスケールで何を意味するか</h2>
+
+<p>導入価格から標準価格へのジャンプはシンプルで大きなものです。現実的なワークロードをモデル化してみましょう：</p>
+
+<table>
+<thead>
+<tr>
+  <th>ワークロードプロファイル</th>
+  <th>月間入力トークン</th>
+  <th>月間出力トークン</th>
+  <th>8月コスト（導入）</th>
+  <th>9月コスト（標準）</th>
+  <th>月間差分</th>
+  <th>年間影響</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>ライト（バッチ/内部）</strong></td>
+  <td class="number">50M</td>
+  <td class="number">20M</td>
+  <td class="number">$200</td>
+  <td class="number">$300</td>
+  <td class="number">+$100</td>
+  <td class="number">+$1,200</td>
+</tr>
+<tr>
+  <td><strong>ミッドティア（顧客向け）</strong></td>
+  <td class="number">500M</td>
+  <td class="number">150M</td>
+  <td class="number">$2,500</td>
+  <td class="number">$3,750</td>
+  <td class="number">+$1,250</td>
+  <td class="number">+$15,000</td>
+</tr>
+<tr class="highlight">
+  <td><strong>エンタープライズ（高ボリューム推論）</strong></td>
+  <td class="number">2B</td>
+  <td class="number">800M</td>
+  <td class="number">$12,000</td>
+  <td class="number">$18,000</td>
+  <td class="number">+$6,000</td>
+  <td class="number">+$72,000</td>
+</tr>
+<tr>
+  <td><strong>ヘビー（マルチリクエストフロー）</strong></td>
+  <td class="number">5B</td>
+  <td class="number">2.5B</td>
+  <td class="number">$35,000</td>
+  <td class="number">$52,500</td>
+  <td class="number">+$17,500</td>
+  <td class="number">+$210,000</td>
+</tr>
+</tbody>
+</table>
+
+<p><strong>重要な洞察：</strong>ミッドティアSonnet 5ワークロード（500M入力+150M出力token/月）を持つ企業は、変更がない場合月$1,250の増加が見られ、年間$15,000に積み重なります。エンタープライズワークロードの場合、年間影響は$70K超になる可能性があります。</p>
+
+<h2>誰が影響を受けるか</h2>
+
+<p>締切はすべてのチャネルに適用されます：</p>
+
+<div class="cost-component">
+  <h3>Anthropic API（ダイレクト）</h3>
+  <p>導入価格は2026年8月31日午後11時59分UTCに終了します。<a href="https://platform.claude.com/docs/en/about-claude/pricing">Anthropicの価格ドキュメント</a>で検証されています。延長や遅延は発表されていません。</p>
+</div>
+
+<div class="cost-component">
+  <h3>AWS Bedrock</h3>
+  <p>BedrockはAnthropicの価格をパススルーします。導入価格は8月31日までBedrockのSonnet 5に適用されます。値上げはあなたのBedrock請求書に9月1日に表示されます。AWS契約の任意のコミットメント割引が増加をオフセットできるか確認してください。</p>
+</div>
+
+<div class="cost-component">
+  <h3>Google Vertex AI</h3>
+  <p>Vertex AIはClaudeモデルをAnthropicの価格パススルーで統合しています。トランジションは9月1日に発生します。Vertex請求書はローカル通貨で見積もられます。異なるタイムゾーンを使用している場合は、正確な日付についてGoogleアカウントチームに確認してください。</p>
+</div>
+
+<div class="cost-component">
+  <h3>GitHub Copilot Enterprise</h3>
+  <p>CopilotがバックエンドとしてSonnet 5を使用する場合、Microsoftは価格増加を計画に転送する場合と転送しない場合があります。Copilot Enterpriseは固定シートライセンスであるため、影響はMicrosoftがバックエンドコストを吸収するか反映するかに依存します。Copilot請求書を確認するか、Microsoftアカウントチームに連絡してください。</p>
+</div>
+
+<h2>3つの戦略：8月31日までにすべきこと</h2>
+
+<h3>戦略1：使用コミットメントを確保（利用可能な場合）</h3>
+
+<p>AnthropicがSonnet 5に対して使用コミットメントまたはボリューム割引を提供しているか確認してください。ボリューム割引または年間前払い契約は実効価格増加を削減する可能性があります。<a href="https://www.anthropic.com/contact-sales">Anthropicセールス</a>に今すぐ連絡してください。8月31日前に署名されたコミットメントで導入価格を保持する可能性があります。</p>
+
+<p><strong>アクション：</strong>Sonnet 5に月$5K以上を費やしている場合、8月15日までにAnthropicセールスにメールしてください。年間コミットメントが導入価格を固定するか、段階化割引を提供するか尋ねてください。コミットメント契約の必要なリードタイムは通常2～3週間です。</p>
+
+<h3>戦略2：ルーティングとモデルミックスを再ベンチマーク</h3>
+
+<p>すべてのワークロードがSonnet 5を必要とするわけではありません。50％の価格ジャンプは、実際にSonnet 5が必要なタスクと安価な代替案にシフトできるタスクを監査する強制関数です。</p>
+
+<table>
+<thead>
+<tr>
+  <th>タスクカテゴリ</th>
+  <th>Sonnet 5入力/$1M</th>
+  <th>代替モデル</th>
+  <th>代替入力/$1M</th>
+  <th>100M Tokenあたりの節約</th>
+  <th>シフトいつ</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>分類（厳密なルール）</strong></td>
+  <td class="number">$3（9月1日後）</td>
+  <td>Claude Haiku 4.5</td>
+  <td class="number">$1.00</td>
+  <td class="number">$200</td>
+  <td>精度≥95％</td>
+</tr>
+<tr>
+  <td><strong>要約</strong></td>
+  <td class="number">$3</td>
+  <td>Gemini 2.5 Flash</td>
+  <td class="number">$0.15</td>
+  <td class="number">$285</td>
+  <td>推論不要</td>
+</tr>
+<tr>
+  <td><strong>マルチターン会話</strong></td>
+  <td class="number">$3</td>
+  <td>GPT-5.6 Luna</td>
+  <td class="number">$1.00</td>
+  <td class="number">$200</td>
+  <td>品質同等</td>
+</tr>
+<tr class="highlight">
+  <td><strong>複雑な推論（Sonnet 5を維持）</strong></td>
+  <td class="number">$3</td>
+  <td>—</td>
+  <td class="number">—</td>
+  <td class="number">—</td>
+  <td>代替案なし</td>
+</tr>
+<tr>
+  <td><strong>エージェンティックループ（マルチステップ）</strong></td>
+  <td class="number">$3</td>
+  <td>Haiku + Sonnet 5ハイブリッド</td>
+  <td class="number">$1.00（Haiku）+ $3（Sonnet 5）</td>
+  <td>シンプルなステップにHaikusを使用して保存</td>
+  <td>ベンチマークサポート</td>
+</tr>
+</tbody>
+</table>
+
+<p><strong>アクション：</strong>今後2週間で、Sonnet 5呼び出しログを取得し、ワークロード別に分類します。Haikuで分類タスクの10％をベンチマーク、Gemini 2.5 FlashでSummarization、GPT-5.6 Lunaでシンプルマルチターンをベンチマークします。品質が同等（またはクローズ）であれば、9月1日前にそのワークロードをシフトして節約を固定してください。</p>
+
+<h3>戦略3：プロンプトキャッシングを実装（または展開）</h3>
+
+<p>プロンプトキャッシングはトークン消費を減らし、導入価格が期限切れになる前の価値を保存する最も直接的な方法です。Sonnet 5へのキャッシュ書き込みは1M tokenあたり$2.50で、入力価格の1.25倍（導入時）。標準では$3.75。キャッシュ読み取りは1M当たり$0.20（導入時の入力価格の0.1倍）。標準では$0.30。</p>
+
+<p><strong>機会：</strong>40％のキャッシュヒット率を持つワークロードは、入力コストで36％節約します。今導入価格でキャッシュインフラストラクチャを固定することは、進行中のヒット率セービングスが相続されることを意味します。9月1日後、同じキャッシュヒットは依然として90％オフですが、割引する基本価格は50％高くなります。</p>
+
+<p><strong>例：</strong>Sonnet 5で100M tokens/月をキャッシュされたシステムプロンプト+コンテキスト：</p>
+<ul>
+  <li><strong>8月（導入）：</strong>書き込みコスト：100M × $2.50/M = $250。月額読取コスト（キャッシュヒットから1Bトークン読み取りと仮定）：1B × $0.20/M = $200。合計：キャッシュで$450/月。</li>
+  <li><strong>9月（標準）：</strong>書き込みコスト：100M × $3.75/M = $375。月額読取コスト：1B × $0.30/M = $300。合計：$675/月（50％高い）。</li>
+  <li><strong>今キャッシュを実装して保存：</strong>今から8月31日までに500Mキャッシュ入力tokenを追加し、9月から毎月30キャッシュヒットを累積する場合、累積読取割引を固定します。キャッシュ書き込みコストは数ヶ月間支払う投資です。</li>
+</ul>
+
+<p><strong>アクション：</strong>繰り返されるプロンプトまたはドキュメントコンテキスト（RAGドキュメント、システム指示、ボイラープレート）の上位3つを特定します。Anthropic APIでキャッシングをテストします。ヒット率が≥20％の場合、8月31日前に実装してください。キャッシュ書き込みは、レート値上げが発生する時期を気にしない唯一のコストです。今書き込みコストに投資すると、永遠に固定読取コストリターンを得られます。</p>
+
+<h2>タイムライン：6週間のカウントダウン</h2>
+
+<div class="guide-section">
+  <h3>週1（7月25日までに）</h3>
+  <p>現在のSonnet 5支出を監査します。請求ダッシュボードまたはLLM可観測性プラットフォームから呼び出しログ（モデル、token、ワークロードタイプ）を抽出します。月間実行レートを計算します。変更がない場合のQ4支出をモデル化します。</p>
+</div>
+
+<div class="guide-section">
+  <h3>週2（8月1日までに）</h3>
+  <p>使用コミットメントについてAnthropicセールスに連絡してください。本番トラフィックの10％で代替モデル（Haiku、Luna、Gemini 2.5 Flash）のベンチマーク開始。ルーティングシフト候補の上位3つを特定します。</p>
+</div>
+
+<div class="guide-section">
+  <h3>週3（8月8日までに）</h3>
+  <p>ベンチマークを完成させ、ルーティング計画にコミット。シフトが必要な場合、A/Bテストのデプロイを開始します。高ボリュームの繰り返されるコンテキストのプロンプトキャッシュを実装。移行前に≥100Mトークンキャッシュされたターゲット。</p>
+</div>
+
+<div class="guide-section">
+  <h3>週4（8月15日までに）</h3>
+  <p>Anthropicとの使用コミットメントをロック（適用可能な場合）。本番へのルーティング変更をデプロイ（低推論タスクを安価なモデルにシフト）。キャッシュインフラが活性化され、15%+のヒット率を確認してください。</p>
+</div>
+
+<div class="guide-section">
+  <h3>週5（8月22日までに）</h3>
+  <p>本番コストと品質メトリクスを監視。必要に応じてルーティングを調整。8月の実行レートに基づいて最終9月コストを予測します。</p>
+</div>
+
+<div class="guide-section">
+  <h3>週6（8月31日までに）</h3>
+  <p>すべてのルーティング変更が活性化されていることを確認。9月5日のカレンダーアラートを設定して、請求が予測と一致することを確認します。達成されたコスト影響と節約に関する事後分析を公開します。</p>
+</div>
+
+<h2>比較：9月1日後のSonnet 5対代替案</h2>
+
+<p>導入価格の期限切れ後、Sonnet 5は標準価格での他のモデルと比べてどうですか？</p>
+
+<table>
+<thead>
+<tr>
+  <th>モデル</th>
+  <th>プロバイダー</th>
+  <th>入力$/1M</th>
+  <th>出力$/1M</th>
+  <th>典型的なユースケース</th>
+  <th>9月1日後のSonnet 5対</th>
+</tr>
+</thead>
+<tbody>
+<tr class="highlight">
+  <td><strong>Claude Sonnet 5（標準）</strong></td>
+  <td>Anthropic</td>
+  <td class="number">$3.00</td>
+  <td class="number">$15.00</td>
+  <td>速度と推論のバランス</td>
+  <td>ベースライン</td>
+</tr>
+<tr>
+  <td>GPT-5.6 Terra</td>
+  <td>OpenAI</td>
+  <td class="number">$2.50</td>
+  <td class="number">$15.00</td>
+  <td>ミッドティア推論</td>
+  <td>入力で17％安い</td>
+</tr>
+<tr>
+  <td>GPT-5.6 Luna</td>
+  <td>OpenAI</td>
+  <td class="number">$1.00</td>
+  <td class="number">$6.00</td>
+  <td>高速分類、シンプルなタスク</td>
+  <td>全体的に67％安い</td>
+</tr>
+<tr>
+  <td>Gemini 3.1 Pro</td>
+  <td>Google</td>
+  <td class="number">$2.00</td>
+  <td class="number">$12.00</td>
+  <td>エージェンティックループ、ツール使用</td>
+  <td>入力で33％安い</td>
+</tr>
+<tr>
+  <td>Gemini 2.5 Flash</td>
+  <td>Google</td>
+  <td class="number">$0.15</td>
+  <td class="number">$0.60</td>
+  <td>ウルトラファスト、ハイボリューム</td>
+  <td>95％安い</td>
+</tr>
+<tr>
+  <td>Claude Haiku 4.5</td>
+  <td>Anthropic</td>
+  <td class="number">$1.00</td>
+  <td class="number">$5.00</td>
+  <td>低レイテンシ分類</td>
+  <td>入力で67％安い</td>
+</tr>
+<tr>
+  <td>DeepSeek V4 Flash</td>
+  <td>DeepSeek</td>
+  <td class="number">$0.14</td>
+  <td class="number">$0.28</td>
+  <td>コスト最適化、オープンモデル</td>
+  <td>95％安い（ただしあまり洗練されていない）</td>
+</tr>
+</tbody>
+</table>
+
+<p><strong>現実：</strong>$3/$15のSonnet 5は、ほとんどのタスクにとって最も安いまたは最もコスト効率的なモデルではなくなりました。GPT-5.6 Terraは入力で17％安い。Haikuは分類で67％安い。値上げ後のSonnet 5の価値は、複雑な推論の品質と均衡タスクの速度にあります。コストリーダーシップではありません。その品質を必要としないワークロードは今代替案に移行すべきです。</p>
+
+<h2>よくある質問</h2>
+
+<p><strong>Q：締切が延長される可能性はありますか？</strong><br>A：Anthropicは延長を発表していません。<a href="https://www.anthropic.com/news/claude-sonnet-5">6月30日のローンチ発表</a>は「2026年8月31日を通じて」と明記しています。絶対日付に備えてください。延長が発表された場合、それはボーナス。締切を最終として扱います。</p>
+
+<p><strong>Q：新しいトークナイザーはトークン数に影響しますか？</strong><br>A：はい。Sonnet 5は新しいトークナイザーを使用し、同等のテキストに対して古いClaudeモデルの約30％多くのトークンを生成します。これはあなたの実際のtokenコストが期待より高いことを意味します。コスト予測にこれを因子化してください。</p>
+
+<p><strong>Q：年間前払いで導入価格を固定できますか？</strong><br>A：おそらく、Anthropicが前払いオプションを提供している場合。8月15日前にセールスに連絡して尋ねてください。前払いはしばしば料金値上げを通じて価格を相続する唯一の方法ですが、あなたは事前にコミットする必要があります。</p>
+
+<p><strong>Q：Anthropicとのカスタム契約がある場合は？</strong><br>A：カスタム契約は異なる条件がある可能性があります。正確な切り替え日とレートをアカウントチームで確認してください。契約が価格設定条項を指定する場合、公開価格ページよりも優先されます：9月1日があなたを驚かせる前に今確認してください。</p>
+
+<hr style="margin:48px 0 24px;border:none;border-top:1px solid #1E2A3F" />
+<p>8月31日の締切は現実、50％の値上げは確実、あなたは行動する6週間があります。切り替え前に再ベンチマーク、コミットメント確保、ワークロード移行をするチームはQ4 LLM支出を大幅に削減します。9月1日まで待つチームは完全なコスト増加を吸収します。</p>
+<p><a href="/ja/research">リサーチに戻る</a></p>
+
+{% endblock %}{% block suffix %}</main></body></html>
+{% endblock %}

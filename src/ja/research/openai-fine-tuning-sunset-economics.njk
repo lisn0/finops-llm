@@ -1,0 +1,381 @@
+---
+permalink: "ja/research/openai-fine-tuning-sunset-economics.html"
+---
+{% extends "shell.njk" %}{% block prefix %}<!DOCTYPE html>
+<html lang="ja"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>OpenAIファインチューニング終了の経済学 · FinOps LLM</title><meta name="description" content="OpenAIが2026–27年にセルフサーブファインチューニングを段階廃止します。3つの移行パスを評価：GPT-5.5でのプロンプトエンジニアリング（キャッシング付き）、Llama/Qwenでのオープンソースロラ、またはVertex/Bedrockを通じた管理型ファインチューニング。コスト比較と隠れた移行費用を含めて説明します。" /><meta name="robots" content="index, follow" /><link rel="canonical" href="https://finopsllm.com/ja/research/openai-fine-tuning-sunset-economics" />
+<link rel="alternate" hreflang="en" href="https://finopsllm.com/research/openai-fine-tuning-sunset-economics" />
+<link rel="alternate" hreflang="es" href="https://finopsllm.com/es/research/openai-fine-tuning-sunset-economics" />
+<link rel="alternate" hreflang="ja" href="https://finopsllm.com/ja/research/openai-fine-tuning-sunset-economics" />
+<link rel="alternate" hreflang="x-default" href="https://finopsllm.com/research/openai-fine-tuning-sunset-economics" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","headline":"OpenAIファインチューニング終了の経済学 · FinOps LLM","description":"OpenAIがセルフサーブファインチューニングを廃止。評価すべき移行コスト：GPT-5.5でのプロンプトエンジニアリング、オープンソースロラ、または代替管理型ファインチューニング。意思決定フレームワークとコスト比較を含みます。","url":"https://finopsllm.com/ja/research/openai-fine-tuning-sunset-economics","datePublished":"2026-07-19","dateModified":"2026-07-19","image":"https://finopsllm.com/og.png","author":{"@type":"Organization","name":"FinOps LLM team"},"publisher":{"@type":"Organization","name":"FinOps LLM","url":"https://finopsllm.com/"}}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"ホーム","item":"https://finopsllm.com/ja/"},{"@type":"ListItem","position":2,"name":"リサーチ","item":"https://finopsllm.com/ja/research"},{"@type":"ListItem","position":3,"name":"OpenAIファインチューニング終了の経済学","item":"https://finopsllm.com/ja/research/openai-fine-tuning-sunset-economics"}]}
+</script>
+<script type="application/ld+json">
+{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "OpenAIのファインチューニング済みモデルはいつ新規作成できなくなりますか？", "acceptedAnswer": {"@type": "Answer", "text": "スケジュール：2026年5月7日（新規組織がブロック）、2026年7月2日（60日間の非アクティブ期間の組織がブロック）、2027年1月6日（すべての新規ジョブがブロック）。既存のファインチューニング済みモデルの推論は、ベースモデルの廃止まで続きます。"}}, {"@type": "Question", "name": "プロンプトキャッシュはファインチューニングと比較して採算が取れますか？", "acceptedAnswer": {"@type": "Answer", "text": "同じコンテキスト上の繰り返されるプロンプトに対して：はい。GPT-5.5のプロンプトキャッシュは読取で$0.60/M対$3.00/Mフレッシュで、few-shotの例（より長いプロンプト）は効率的にキャッシュできます。採算点は通常プロンプトサイズに応じて10-30回のキャッシュヒットで、ほとんどのチームは数日以内に達成します。"}}, {"@type": "Question", "name": "オープンソースロラは管理型ファインチューニングより安いですか？", "acceptedAnswer": {"@type": "Answer", "text": "通常はそうです。Together AIを通じた訓練コスト：ジョブあたり約$200-$500。GroqまたはFireworksでの推論：約$0.10-$0.30/Mトークン。成功したレスポンスあたりの総コストは、管理型サービスより30-50%低い場合が多いですが、MLOpsのオーバーヘッドが必要です。"}}, {"@type": "Question", "name": "移行中に見落とされている隠れたコストは何ですか？", "acceptedAnswer": {"@type": "Answer", "text": "再評価（新しいアプローチ対既存比較）、回帰テスト（置換パスが同じ品質を提供するか）、デュアル実行（安全性のための古新パスの並列実行）、新しいモデルが変更される場合のアダプターの再訓練。移行あたり4-8週間と約$2K-$10Kのエンジニアリング時間を予算してください。"}}]}
+</script>
+<style>
+body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}
+.wrap{max-width:1100px;margin:0 auto;padding:56px 24px}
+a{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}
+.langsw{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;color:#647289;margin:0 0 26px}
+.langsw a{text-decoration:none}.langsw a[aria-current]{color:#E6EAF2;font-weight:600}
+.badge-row{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 32px;list-style:none;padding:0}
+.badge-row li{background:#101726;border:1px solid #1E2A3F;border-radius:8px;padding:8px 14px;font-size:.85rem;color:#B6C0D2}
+.table-wrap{overflow-x:auto;margin:0 0 32px;-webkit-overflow-scrolling:touch}
+table{border-collapse:collapse;width:100%;font-size:.85rem}
+th,td{border:1px solid #1E2A3F;padding:10px 12px;text-align:left;color:#B6C0D2}
+th{color:#E6EAF2;background:#101726}
+td.number{text-align:right;font-family:'JetBrains Mono',monospace;font-weight:500}
+td.highlight{background:rgba(248,113,113,.08)}
+.cost-component{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:20px;margin:16px 0}
+.cost-component h3{color:#E6EAF2;margin:0 0 12px;font-size:1rem}
+.cost-component p{font-size:.9rem;margin:6px 0}
+.guide-section{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:24px;margin:12px 0}
+.guide-section h3{color:#E6EAF2;margin:0 0 10px;font-size:1rem}
+.warning{border-left:4px solid #f87171;padding:16px;background:rgba(248,113,113,.08);margin:20px 0}
+.decision-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;margin:20px 0 32px}
+.decision-card{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:24px}
+.decision-card h3{font-size:1rem;margin:0 0 12px;color:#E6EAF2}
+.decision-card ul{margin:0;padding-left:18px}
+.decision-card li{margin:6px 0;font-size:.88rem}
+.path1{border-left:4px solid #7AAFFF}
+.path2{border-left:4px solid #4ADE80}
+.path3{border-left:4px solid #FBBF24}
+@media(max-width:700px){
+  table{font-size:.75rem}
+  th,td{padding:6px 7px}
+  .decision-grid{grid-template-columns:1fr}
+}
+</style><script src="/assets/consent.js" defer></script><script src="/assets/attribution.js" defer></script>
+<script src="/assets/lang.js" defer></script>
+</head>
+<body><main class="wrap">{% endblock %}{% block body %}
+
+
+<nav class="langsw" aria-label="言語"><a href="/research/openai-fine-tuning-sunset-economics" hreflang="en">EN</a> · <a href="/es/research/openai-fine-tuning-sunset-economics" hreflang="es">ES</a> · <a href="/ja/research/openai-fine-tuning-sunset-economics" hreflang="ja" aria-current="page">JA</a></nav>
+
+<h1>OpenAIファインチューニング終了の経済学</h1>
+<p class="updated" style="color:#6B7689;font-size:14px;margin-top:-6px">公開日：2026年7月19日</p>
+<p>OpenAIはセルフサーブファインチューニングを段階廃止しています。2026年5月7日から、新しい組織はファインチューニングジョブを作成できなくなります。2027年1月6日までに、すべての組織がその能力を失います。ファインチューニング済みGPTモデルに依存している場合は、今すぐ移行パスを選択する必要があります：プロンプトキャッシング付きGPT-5.5でのプロンプトエンジニアリング、LlamaまたはQwenでのオープンソースLoRAアダプター、またはVertex AI、AWS Bedrock、またはMistralを通じた管理型ファインチューニング。各パスには異なるコストと運用のトレードオフがあります。</p>
+
+<ul class="badge-row">
+  <li>セルフサーブファインチューニング作成は2027年1月6日にすべての組織で終了</li>
+  <li>既存のファインチューニング済みモデルでの推論は、ベース廃止まで続く</li>
+  <li>GPT-5.5のプロンプトキャッシュは10-30ヒットでファインチューニングのROIに匹敵またはそれを上回る</li>
+  <li>オープンソースLoRAは高ボリュームで管理型サービスより30-50%安い</li>
+  <li>隠れた移行コスト：再評価、回帰テスト、デュアル実行、再訓練</li>
+</ul>
+
+<div class="warning">
+  <strong>期限：</strong>組織は2027年1月6日前に移行パスにコミットする必要があります。既存のファインチューニング済みモデルはベースモデルが廃止されるまで推論リクエストの提供を継続しますが、その日付後に新しいトレーニングジョブを作成することはできません。
+</div>
+
+<h2>スケジュールと被爆マトリックス</h2>
+
+<p><strong>誰が影響を受け、いつ：</strong></p>
+
+<table>
+<thead>
+<tr>
+  <th>日付</th>
+  <th>フェーズ</th>
+  <th>影響を受ける組織</th>
+  <th>必要なアクション</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>2026年5月7日</strong></td>
+  <td>フェーズ1</td>
+  <td>新規組織、以前のファインチューニングなし</td>
+  <td class="number">新規ジョブを開始できない</td>
+</tr>
+<tr>
+  <td><strong>2026年7月2日</strong></td>
+  <td>フェーズ2</td>
+  <td>過去60日間ファインチューニング済みモデル推論がない既存組織</td>
+  <td class="number">新規ジョブを開始できない</td>
+</tr>
+<tr>
+  <td><strong>2027年1月6日</strong></td>
+  <td>フェーズ3（最終）</td>
+  <td>すべての組織、アクティブユーザーを含む</td>
+  <td class="number">新規トレーニングジョブなし</td>
+</tr>
+<tr class="highlight">
+  <td><strong>2027年以降</strong></td>
+  <td>推論のみ</td>
+  <td>デプロイ済みファインチューニング済みモデルをすべての組織</td>
+  <td class="number">ベースモデルサンセットまで推論継続</td>
+</tr>
+</tbody>
+</table>
+
+<p><strong>OpenAIがファインチューニングを廃止する理由：</strong>GPT-5.5クラスのベースモデルとプロンプトキャッシュの組み合わせにより、ほとんどのユースケースでファインチューニングが不要になります。システムプロンプトとfew-shotの例を含む長いプロンプトは、キャッシュ時にファインチューニングのパフォーマンスと同等またはそれ以上でありながら、総トークン数が少なくなります。管理型ファインチューニングのオーバーヘッドは、ほとんどのワークロードの価値を超えています。</p>
+
+<h2>意思決定ツリー：3つの移行パス</h2>
+
+<div class="decision-grid">
+  <div class="decision-card path1">
+    <h3>パス1：プロンプトエンジニアリング + GPT-5.5 + キャッシング</h3>
+    <p style="font-size:.9rem;margin-bottom:16px">ファインチューニング済みロジックをシステムプロンプト + キャッシュされたfew-shotの例として書き直します。トレーニングのオーバーヘッドなしで、より長いプロンプトとのトレード。</p>
+    <ul>
+      <li><strong>トレーニングコスト：</strong>$0（再訓練なし）</li>
+      <li><strong>呼び出しあたりのトークンコスト：</strong>より長いプロンプト、フレッシュレートの50%でキャッシュ</li>
+      <li><strong>セットアップ時間：</strong>1-4週間（プロンプトエンジニアリング + ベンチマーク）</li>
+      <li><strong>継続的な操作：</strong>プロンプト反復、MLOpsは不要</li>
+    </ul>
+  </div>
+  <div class="decision-card path2">
+    <h3>パス2：LoRA on Open-Source（Together、Fireworks、Groq）</h3>
+    <p style="font-size:.9rem;margin-bottom:16px">LoRAアダプターを使用してLlama 4またはQwen 3.5をファインチューニング、管理型推論でホスト。完全なファインチューニング制御、オープンソース再現性。</p>
+    <ul>
+      <li><strong>トレーニングコスト：</strong>ジョブあたり$200-$500</li>
+      <li><strong>推論コスト：</strong>$0.10-$0.30/Mトークン（競争力のある）</li>
+      <li><strong>セットアップ時間：</strong>2-6週間（データ準備、アダプター訓練、テスト）</li>
+      <li><strong>継続的な操作：</strong>アダプターパフォーマンス監視、必要に応じて再訓練</li>
+    </ul>
+  </div>
+  <div class="decision-card path3">
+    <h3>パス3：管理型ファインチューニング（Vertex、Bedrock、Mistral）</h3>
+    <p style="font-size:.9rem;margin-bottom:16px">Google Vertex AI、AWS Bedrock、またはMistralのファインチューニングを使用。おなじみのワークフロー、ベンダーサポート、ただし高いトークンあたりコスト。</p>
+    <ul>
+      <li><strong>トレーニングコスト：</strong>ジョブあたり$500-$2,000</li>
+      <li><strong>推論コスト：</strong>$0.20-$1.00/Mトークン（プレミアム）</li>
+      <li><strong>セットアップ時間：</strong>1-3週間（必要な統合が少ない）</li>
+      <li><strong>継続的な操作：</strong>ベンダーが操作を処理、訓練ケイデンスを管理</li>
+    </ul>
+  </div>
+</div>
+
+<h2>パス1：プロンプトエンジニアリング + GPT-5.5キャッシング — 解いた数学</h2>
+
+<p>カスタマーサポートチケット分類用のファインチューニング済みGPT-4モデルがあったと想定します。ファインチューニング済みモデルは10Kの標識付きチケットで訓練されました。各リクエストは約500トークン入力を送信し、約50トークン出力を取得します。</p>
+
+<p><strong>以前のコスト（ファインチューニング）：</strong>ファインチューニングジョブ：~$50。月100K呼び出しでの推論：(500入力×$3/M + 50出力×$15/M) × 100K = $150/月 + 訓練 = 全込み~$200/月。</p>
+
+<p><strong>新しいコスト（GPT-5.5でのプロンプトキャッシング）：</strong>40個のfew-shotの例（各~200トークン）を含むシステムプロンプトを作成 = 8Kトークン。これがキャッシュ充填です。最初の呼び出し：8K×(1.25×$3/M) + 500×$3/M + 50×$15/M ≈ $0.045。以降の呼び出し（キャッシュヒット）：500×(0.5×$3/M) + 50×$15/M ≈ $0.0015。月100K呼び出しで、90%ヒット率を想定（90Kキャッシュヒット）。コスト：10K呼び出し×$0.045 + 90K呼び出し×$0.0015 = $450 + $135 = <strong>$585/月</strong>。</p>
+
+<p><strong>待って、それはもっと高い！</strong>プロンプトを調整しない場合は真です。ただしfew-shotの例を10個（2Kトークン）に削減すると、コストは~$280/月に下がります。さらに：クエリをバッチ処理できる場合（1つの呼び出しで10個の関連チケットを処理）、チケットあたりのコストはさらに30%下がります。<strong>結論：GPT-5.5でのプロンプトキャッシュは、ユニークなコンテキストあたり15-30回のキャッシュヒットでファインチューニングより安くなります。</strong>ほとんどのチームはデプロイ後数時間でそこに達します。</p>
+
+<p><strong>品質リスク：</strong>few-shotプロンプトは、エッジケースと通常でないフォーマットでファインチューニングの下で実行される可能性があります。回帰テストに2-4週間を予算してください。</p>
+
+<h2>パス2：オープンソースLoRA — コストと物流</h2>
+
+<p>LoRA（Low-Rank Adaptation）を通じたオープンソースファインチューニングは、ベースモデルを凍結し、小さなアダプター行列（パラメーターの1-5%）のみを訓練します。コスト構造：</p>
+
+<table>
+<thead>
+<tr>
+  <th>コンポーネント</th>
+  <th>プロバイダー例</th>
+  <th>コスト</th>
+  <th>注記</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>訓練（10Kサンプル上のLlama 3.3 70B）</strong></td>
+  <td>Together AI</td>
+  <td class="number">$300</td>
+  <td>単一H100 GPU上のLoRA（~4時間）</td>
+</tr>
+<tr>
+  <td><strong>推論（1Mトークンあたり）</strong></td>
+  <td>Groq (Llama 3.3 70B)</td>
+  <td class="number">$0.27</td>
+  <td>高速（ファインチューニング済みGPT-4対調整ラグなし）</td>
+</tr>
+<tr>
+  <td><strong>推論（1Mトークンあたり）</strong></td>
+  <td>Together AI (Llama 3.3 70B)</td>
+  <td class="number">$0.18</td>
+  <td>低速応答、低コスト</td>
+</tr>
+<tr>
+  <td><strong>モデルホスティング（月次、常時オン）</strong></td>
+  <td>runpodでセルフホスト</td>
+  <td class="number">$300-$600</td>
+  <td>A100 GPU レンタル + 運用オーバーヘッド</td>
+</tr>
+<tr class="highlight">
+  <td><strong>月100万呼び出しの合計</strong></td>
+  <td>—</td>
+  <td class="number">$318-$600</td>
+  <td>Groq API（管理型）、ホスティングコストなし</td>
+</tr>
+</tbody>
+</table>
+
+<p><strong>オープンソースがより安い理由：</strong>「ファインチューニング」ステータスのトークンあたりプレミアムなし。アダプターはあなたのものであり、配布および改善できます。モデル品質（Llama 4 Maverick）は、ほとんどのタスクで30-50%低いコストでGPT-4oに相当します。トレード：MLOpsを所有 — 再訓練ケイデンス、ドリフト検出、アダプターバージョン間のA/Bテスト。</p>
+
+<p><strong>統合リスク：</strong>OpenAI APIからGroq、Together、またはセルフホストに切り替えると、推論レイテンシ、エラー処理、スケーリングが変わります。1-2週間の統合作業を予想します。</p>
+
+<h2>パス3：管理型ファインチューニング（Vertex、Bedrock、Mistral）</h2>
+
+<table>
+<thead>
+<tr>
+  <th>プロバイダー</th>
+  <th>トレーニングコスト（10Kサンプル）</th>
+  <th>推論コスト（100万出力トークンあたり）</th>
+  <th>ベースモデル</th>
+  <th>本番までの時間</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>Google Vertex AI</strong></td>
+  <td class="number">$500-$800</td>
+  <td class="number">$0.40-$1.50</td>
+  <td>Gemini 1.5 Flash、その他のOSモデル</td>
+  <td class="number">1-2週間</td>
+</tr>
+<tr>
+  <td><strong>AWS Bedrock（Claude Sonnetファインチューニング）</strong></td>
+  <td class="number">$600-$1,200</td>
+  <td class="number">$0.80-$2.00</td>
+  <td>Claude Sonnet、Llama 4、Mistral</td>
+  <td class="number">1-2週間</td>
+</tr>
+<tr>
+  <td><strong>Mistralファインチューニング</strong></td>
+  <td class="number">$400-$700</td>
+  <td class="number">$0.25-$0.60</td>
+  <td>Mistral 3.5 Moe、その他のMistralモデル</td>
+  <td class="number">1週間</td>
+</tr>
+<tr class="highlight">
+  <td><strong>典型的な月コスト（100K呼び出し、平均500トークン）</strong></td>
+  <td class="number">$600-$1,200（1回限りの訓練）</td>
+  <td class="number">$200-$1,000（再発推論）</td>
+  <td class="number">—</td>
+  <td class="number">—</td>
+</tr>
+</tbody>
+</table>
+
+<p>管理型サービスは最も簡単なオンランプです：チームはすでにAPI認証を知っており、ベンダーサポートが利用可能で、MLOpsオーバーヘッドを回避できます。ただし推論コストはオープンソースLoRA以上2-5倍実行します。このパスは以下の場合に意味があります：(1)月の出力が100M未満のトークン、(2)チームにMLOps経験がない、または(3)エンタープライズSLAが必要。</p>
+
+<h2>3パスコスト比較（具体的なワークロード）</h2>
+
+<p>ワークロード：SaaS向けカスタマーサービスAI。月100万推論呼び出し、呼び出しあたり平均500入力 + 150出力トークン。チームは5Kのラベル付き会話でモデルをファインチューニングしました。</p>
+
+<table>
+<thead>
+<tr>
+  <th>コストコンポーネント</th>
+  <th>パス1：キャッシング+GPT-5.5</th>
+  <th>パス2：Groq上のLoRA（Llama3.3）</th>
+  <th>パス3：Bedrock（Claude SonnetFT）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>初期セットアップ / 訓練</strong></td>
+  <td class="number">$0（プロンプトエンジニアリングのみ）</td>
+  <td class="number">$300</td>
+  <td class="number">$1,000</td>
+</tr>
+<tr>
+  <td><strong>月推論コスト（100万呼び出し）</strong></td>
+  <td class="number">$450-$600</td>
+  <td class="number">$270</td>
+  <td class="number">$900-$1,200</td>
+</tr>
+<tr>
+  <td><strong>月合計（1年目）</strong></td>
+  <td class="number">$450-$600</td>
+  <td class="number">$600（訓練償却含む）</td>
+  <td class="number">$1,900-$2,200</td>
+</tr>
+<tr class="highlight">
+  <td><strong>1年目合計</strong></td>
+  <td class="number">$5,400-$7,200</td>
+  <td class="number">$3,600-$4,800</td>
+  <td class="number">$12,000-$15,000</td>
+</tr>
+</tbody>
+</table>
+
+<p><strong>パス2（LoRA）は純粋コストで勝ちますが、セットアップと保守にMLOps時間が必要です。**パス1（プロンプトキャッシング）はわずかに高い継続コストを受け入れられる場合、摩擦が少なくなります。パス3（管理型）は、エンタープライズSLAまたはハンズオフ操作が必須の場合のみ選択されます。</p>
+
+<h2>隠れた移行コスト — これらを見逃さないでください</h2>
+
+<p>上記の表は、操作的摩擦を省略しています。計画：</p>
+
+<div class="cost-component">
+  <h3>1. 再評価とベンチマーク</h3>
+  <p>ホールドアウトテストセット上で新しいモデルの精度、レイテンシ、コストを測定します。予算：2-3週間、$1K-$3Kのエンジニアリング時間。</p>
+</div>
+
+<div class="cost-component">
+  <h3>2. 回帰テスト</h3>
+  <p>古いファインチューニング済みモデルと新しいパスを同じ100-1K本番クエリで実行します。品質ギャップを測定します。カスタマー向けシステムの場合、2-4週間のA/Bテスト（デュアル実行）を検討してください。操作コスト：$2K-$5K。</p>
+</div>
+
+<div class="cost-component">
+  <h3>3. デュアル実行期間</h3>
+  <p>本番環境での回帰を検出するために、古新パスの両方を並列実行します。これは2-4週間の推論コストを2倍にします。移行請求に$500-$2,000を追加します。</p>
+</div>
+
+<div class="cost-component">
+  <h3>4. 訓練ワークフローの変更</h3>
+  <p>定期的に再訓練する場合（月次、四半期）、スクリプト変更に組み込みます。LoRA再訓練スクリプトはOpenAI APIと異なります。Mistral、Vertex、およびBedrockはそれぞれ異なる訓練APIを持っています。予算：1-2週間、$500-$1,500。</p>
+</div>
+
+<div class="cost-component">
+  <h3>5. アダプタードリフトと監視</h3>
+  <p>訓練データが変更された場合、オープンソースアダプターはドリフト可能です。パフォーマンス監視と再訓練トリガーを設定します。管理型サービスの場合、プロバイダーがこれを処理しますが、監視オーバーヘッドを請求します。予算：継続中 +$200-$500/月。</p>
+</div>
+
+<p><strong>隠れたコスト合計：$4K-$12Kのエンジニアリング時間 + $500-$2,000のデュアル実行操作。</strong>ほとんどのチームはこれを50%過小評価しています。プロジェクト計画に含めてください。</p>
+
+<h2>意思決定フレームワーク</h2>
+
+<div class="guide-section">
+  <h3>パス1を選択（キャッシング+GPT-5.5）以下の場合：</h3>
+  <ul>
+    <li>月推論ボリュームが100M未満のトークン以下</li>
+    <li>現在のワークロードは繰り返されるコンテキスト（RAG、マルチターン）を持つ — 高いキャッシュヒット可能性</li>
+    <li>チームにMLOps経験がなく、最小限のオーバーヘッドを望む</li>
+    <li>簡潔さのための品質トレードオフを受け入れられる（ほとんどのタスクは≤5%の回帰を見る）</li>
+    <li>レイテンシ要件は柔軟（>500ms TTFTが受け入れ可能）</li>
+  </ul>
+</div>
+
+<div class="guide-section">
+  <h3>パス2を選択（オープンソースLoRA）以下の場合：</h3>
+  <ul>
+    <li>月推論ボリュームが200M以上のトークン — 30-50%のコスト利点</li>
+    <li>チームは訓練、監視、再訓練のMLOps帯域幅がある</li>
+    <li>再現性が必要であり、アダプター上で完全な制御が必要（オープンソース利点）</li>
+    <li>データプライバシーはOpenAI、Google、またはAWS独自APIへの呼び出しを除外</li>
+    <li>レイテンシが重要（<200ms）— Groqは100ms未満の応答を提供</li>
+  </ul>
+</div>
+
+<div class="guide-section">
+  <h3>パス3を選択（管理型ファインチューニング）以下の場合：</h3>
+  <ul>
+    <li>エンタープライズSLA、ベンダーサポート、またはHIPAA/SOC2コンプライアンスが必要</li>
+    <li>チームにインフラストラクチャ専門知識がなく、ゼロMLOpsを望む</li>
+    <li>月ボリュームが50M未満のトークン（コスト プレミアムは低スケールで受け入れ可能）</li>
+    <li>ベンダーエコシステムに既に投資済み（AWS、Google Cloud、Mistral）</li>
+    <li>訓練頻度は月次以下（操作コストはチャーン不足でより良好に償却）</li>
+  </ul>
+</div>
+
+<h2>関連資料</h2>
+<p>より広いコスト環境についてのさらなるコンテキストについては、<a href="/ja/research/open-source-vs-closed-cost">オープンソース対クローズドLLMコスト比較</a>を参照してください。これはセルフホストおよびAPIオプション間で採算点ボリュームを比較しています。</p>
+
+<hr style="margin:48px 0 24px;border:none;border-top:1px solid #1E2A3F" />
+<p>既にファインチューニング移行コストを追跡していますか？FinOps LLMはLLM支出を監査し、どの移行パスが最も節約されるかを特定します。<a href="/book">無料監査を予約</a>。</p>
+<p><a href="/ja/research">リサーチに戻る</a></p>
+
+{% endblock %}{% block suffix %}</main></body></html>
+{% endblock %}

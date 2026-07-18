@@ -1,0 +1,357 @@
+---
+permalink: "es/research/sonnet-5-intro-pricing-deadline.html"
+---
+{% extends "shell.njk" %}{% block prefix %}<!DOCTYPE html>
+<html lang="es"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Claude Sonnet 5 límite de precios introductorios (31 ago): aumento de factura del 50% · FinOps LLM</title><meta name="description" content="Los precios introductorios de Claude Sonnet 5 ($2/$10 por 1M tokens) vencen el 31 de agosto de 2026. Las tarifas estándar de $3/$15 comienzan el 1 de septiembre, elevando las facturas un 50%. Fija costes, vuelve a comparar cargas de trabajo y cambia a caché antes de la fecha límite." /><meta name="robots" content="index, follow" /><link rel="canonical" href="https://finopsllm.com/es/research/sonnet-5-intro-pricing-deadline" />
+<link rel="alternate" hreflang="en" href="https://finopsllm.com/research/sonnet-5-intro-pricing-deadline" />
+<link rel="alternate" hreflang="es" href="https://finopsllm.com/es/research/sonnet-5-intro-pricing-deadline" />
+<link rel="alternate" hreflang="ja" href="https://finopsllm.com/ja/research/sonnet-5-intro-pricing-deadline" />
+<link rel="alternate" hreflang="x-default" href="https://finopsllm.com/research/sonnet-5-intro-pricing-deadline" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","headline":"Claude Sonnet 5 límite de precios introductorios (31 ago): aumento de factura del 50% · FinOps LLM","description":"Los precios introductorios de Claude Sonnet 5 vencen el 31 de agosto de 2026. Las tarifas estándar de $3/$15 comienzan el 1 de septiembre, elevando las facturas un 50%. Fija costes, vuelve a comparar cargas de trabajo y cambia a caché antes de la fecha límite.","url":"https://finopsllm.com/es/research/sonnet-5-intro-pricing-deadline","datePublished":"2026-07-19","dateModified":"2026-07-19","image":"https://finopsllm.com/og.png","author":{"@type":"Organization","name":"FinOps LLM team"},"publisher":{"@type":"Organization","name":"FinOps LLM","url":"https://finopsllm.com/"}}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Inicio","item":"https://finopsllm.com/es/"},{"@type":"ListItem","position":2,"name":"Investigación","item":"https://finopsllm.com/es/research"},{"@type":"ListItem","position":3,"name":"Claude Sonnet 5 límite de precios introductorios","item":"https://finopsllm.com/es/research/sonnet-5-intro-pricing-deadline"}]}
+</script>
+<script type="application/ld+json">
+{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "¿Cuándo terminan los precios introductorios de Claude Sonnet 5?", "acceptedAnswer": {"@type": "Answer", "text": "31 de agosto de 2026 a las 23:59 UTC. A partir del 1 de septiembre de 2026, Claude Sonnet 5 pasa de precios introductorios a estándar. No hay prórroga ni renovación automática: la fecha límite es definitiva."}}, {"@type": "Question", "name": "¿Cuánto aumentará mi factura?", "acceptedAnswer": {"@type": "Answer", "text": "Exactamente un 50% para cargas de trabajo de Claude Sonnet 5. Los precios de entrada suben de $2 a $3 por 1M tokens (+50%); la salida sube de $10 a $15 por 1M tokens (+50%). Una carga de trabajo que cuesta $10,000/mes en agosto costará $15,000/mes en septiembre si no cambia."}}, {"@type": "Question", "name": "¿Se aplican los precios introductorios a Bedrock y Vertex?", "acceptedAnswer": {"@type": "Answer", "text": "Los precios introductorios se aplican a la API directa de Anthropic. AWS Bedrock y Google Vertex AI transfieren los precios de Anthropic, por lo que el aumento se aplica también allí a partir del 1 de septiembre. Verifica los términos de tu contrato con tu proveedor de nube."}}, {"@type": "Question", "name": "¿Qué debo hacer antes del 31 de agosto?", "acceptedAnswer": {"@type": "Answer", "text": "1) Fija compromisos de uso si están disponibles. 2) Vuelve a comparar el enrutamiento a Sonnet 5 frente a modelos más baratos (Haiku, Gemini 2.5 Flash). 3) Cambia prompts repetidas a caché de prompts (los descuentos de caché se escalan con el precio base, así que fijar ahorros de caché ahora es valioso). 4) Establece una alerta en el calendario para el 25 de ago para probar costes posteriores a la migración. 5) Modela el aumento en tu presupuesto de Q3 ahora."}}]}
+</script>
+<style>
+body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}
+.wrap{max-width:1100px;margin:0 auto;padding:56px 24px}
+a{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}
+.langsw{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;color:#647289;margin:0 0 26px}
+.langsw a{text-decoration:none}.langsw a[aria-current]{color:#E6EAF2;font-weight:600}
+.badge-row{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 32px;list-style:none;padding:0}
+.badge-row li{background:#101726;border:1px solid #1E2A3F;border-radius:8px;padding:8px 14px;font-size:.85rem;color:#B6C0D2}
+.table-wrap{overflow-x:auto;margin:0 0 32px;-webkit-overflow-scrolling:touch}
+table{border-collapse:collapse;width:100%;font-size:.85rem}
+th,td{border:1px solid #1E2A3F;padding:10px 12px;text-align:left;color:#B6C0D2}
+th{color:#E6EAF2;background:#101726}
+td.number{text-align:right;font-family:'JetBrains Mono',monospace;font-weight:500}
+td.highlight{background:rgba(248,113,113,.08)}
+.cost-component{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:20px;margin:16px 0}
+.cost-component h3{color:#E6EAF2;margin:0 0 12px;font-size:1rem}
+.cost-component p{font-size:.9rem;margin:6px 0}
+.guide-section{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:24px;margin:12px 0}
+.guide-section h3{color:#E6EAF2;margin:0 0 10px;font-size:1rem}
+.warning{border-left:4px solid #f87171;padding:16px;background:rgba(248,113,113,.08);margin:20px 0}
+@media(max-width:700px){
+  table{font-size:.75rem}
+  th,td{padding:6px 7px}
+}
+</style><script src="/assets/consent.js" defer></script><script src="/assets/attribution.js" defer></script>
+<script src="/assets/lang.js" defer></script>
+</head>
+<body><main class="wrap">{% endblock %}{% block body %}
+
+<nav class="langsw" aria-label="Idioma"><a href="/research/sonnet-5-intro-pricing-deadline" hreflang="en">EN</a> · <a href="/es/research/sonnet-5-intro-pricing-deadline" hreflang="es" aria-current="page">ES</a> · <a href="/ja/research/sonnet-5-intro-pricing-deadline" hreflang="ja">JA</a></nav>
+
+<h1>Los precios introductorios de Claude Sonnet 5 terminan el 31 de agosto: tu factura sube un 50%</h1>
+<p class="updated" style="color:#6B7689;font-size:14px;margin-top:-6px">Publicado 19 de julio de 2026</p>
+<p>Anthropic lanzó <a href="https://www.anthropic.com/news/claude-sonnet-5">Claude Sonnet 5 el 30 de junio de 2026</a> a precios introductorios de $2/1M tokens de entrada y $10/1M tokens de salida. Ese precio tiene <strong>una fecha límite definitiva: 31 de agosto de 2026</strong>. A partir del 1 de septiembre, Sonnet 5 se traslada a precios estándar de $3/$15 por 1M, un <strong>aumento de costes del 50% plano</strong>. Si ejecutas cargas de trabajo de Sonnet 5, las próximas 6 semanas son tu ventana para fijar costes y planificar el aumento.</p>
+
+<ul class="badge-row">
+  <li>Precios introductorios válidos hasta el 31 de agosto de 2026 solamente</li>
+  <li>Precios estándar ($3/$15) comienzan el 1 de septiembre de 2026</li>
+  <li>El aumento de costes es exactamente del 50% para cargas de trabajo de Sonnet 5</li>
+  <li>Se aplica a la API de Anthropic, Bedrock y Vertex AI</li>
+  <li>43 días para volver a comparar, fijar compromisos y replantear presupuestos</li>
+</ul>
+
+<div class="warning">
+  <strong>Fecha límite crítica:</strong> Los precios introductorios de Claude Sonnet 5 vencen en 43 días (31 de agosto de 2026). Una carga de trabajo de 10M tokens/mes pasará de $20 a $30/mes. Una carga de trabajo de 1B tokens/mes pasará de $2,000 a $3,000. Si Sonnet 5 está en tu ruta crítica, presupuesta el aumento ahora o desplaza cargas de trabajo antes del cambio.
+</div>
+
+<h2>Las Matemáticas: Qué Significa el 50% a Escala</h2>
+
+<p>El salto de precios introductorios a estándar es limpio y significativo. Modelemos una carga de trabajo realista:</p>
+
+<table>
+<thead>
+<tr>
+  <th>Perfil de Carga de Trabajo</th>
+  <th>Tokens de Entrada Mensuales</th>
+  <th>Tokens de Salida Mensuales</th>
+  <th>Coste Agosto (Intro)</th>
+  <th>Coste Septiembre (Estándar)</th>
+  <th>Delta Mensual</th>
+  <th>Impacto Anual</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>Ligera (lote/interno)</strong></td>
+  <td class="number">50M</td>
+  <td class="number">20M</td>
+  <td class="number">$200</td>
+  <td class="number">$300</td>
+  <td class="number">+$100</td>
+  <td class="number">+$1,200</td>
+</tr>
+<tr>
+  <td><strong>Nivel medio (orientada al cliente)</strong></td>
+  <td class="number">500M</td>
+  <td class="number">150M</td>
+  <td class="number">$2,500</td>
+  <td class="number">$3,750</td>
+  <td class="number">+$1,250</td>
+  <td class="number">+$15,000</td>
+</tr>
+<tr class="highlight">
+  <td><strong>Empresa (razonamiento de alto volumen)</strong></td>
+  <td class="number">2B</td>
+  <td class="number">800M</td>
+  <td class="number">$12,000</td>
+  <td class="number">$18,000</td>
+  <td class="number">+$6,000</td>
+  <td class="number">+$72,000</td>
+</tr>
+<tr>
+  <td><strong>Pesada (flujos multi-solicitud)</strong></td>
+  <td class="number">5B</td>
+  <td class="number">2.5B</td>
+  <td class="number">$35,000</td>
+  <td class="number">$52,500</td>
+  <td class="number">+$17,500</td>
+  <td class="number">+$210,000</td>
+</tr>
+</tbody>
+</table>
+
+<p><strong>Insight clave:</strong> Una empresa con una carga de trabajo de Sonnet 5 de nivel medio (500M entrada + 150M tokens de salida/mes) verá un aumento mensual de $1,250 que se compone a $15,000 anuales si nada cambia. Para cargas de trabajo empresariales, el impacto anual puede exceder los $70K.</p>
+
+<h2>A Quién Afecta</h2>
+
+<p>La fecha límite se aplica en todos los canales:</p>
+
+<div class="cost-component">
+  <h3>API de Anthropic (directa)</h3>
+  <p>Los precios introductorios terminan el 31 de agosto de 2026 a las 23:59 UTC. Verificado en la <a href="https://platform.claude.com/docs/en/about-claude/pricing">documentación de precios de Anthropic</a>. No se ha anunciado ninguna prórroga o demora.</p>
+</div>
+
+<div class="cost-component">
+  <h3>AWS Bedrock</h3>
+  <p>Bedrock transfiere los precios de Anthropic. Los precios introductorios se aplican a Sonnet 5 en Bedrock hasta el 31 de agosto. El aumento aparecerá en tu factura de Bedrock el 1 de septiembre. Verifica tu contrato de AWS para cualquier descuento por compromiso que pueda compensar el aumento.</p>
+</div>
+
+<div class="cost-component">
+  <h3>Google Vertex AI</h3>
+  <p>Vertex AI integra modelos de Claude con transferencia de precios de Anthropic. La transición ocurre el 1 de septiembre. Las facturas de Vertex se cotizan en tu moneda local; confirma la fecha exacta con tu equipo de cuenta de Google si utilizas una zona horaria diferente.</p>
+</div>
+
+<div class="cost-component">
+  <h3>GitHub Copilot Enterprise</h3>
+  <p>Si Copilot usa Sonnet 5 como backend, Microsoft puede o no transferir el aumento de precio a tu plan. Copilot Enterprise es una licencia de asiento fijo, así que el impacto depende de si Microsoft absorbe o refleja el coste del backend. Verifica tu factura de Copilot o contacta a tu equipo de cuenta de Microsoft.</p>
+</div>
+
+<h2>Tres Estrategias: Qué Hacer Antes del 31 de Agosto</h2>
+
+<h3>Estrategia 1: Fija Compromisos de Uso (Si Están Disponibles)</h3>
+
+<p>Verifica si Anthropic ofrece compromisos de uso o descuentos por volumen para Sonnet 5. Los descuentos basados en volumen o los acuerdos de prepago anual podrían reducir el aumento de precio efectivo. Contacta con <a href="https://www.anthropic.com/contact-sales">ventas de Anthropic</a> ahora: podrían mantener los precios introductorios en compromisos firmados antes del 31 de agosto.</p>
+
+<p><strong>Acción:</strong> Envía correo a ventas de Anthropic antes del 15 de agosto si gastas >$5K/mes en Sonnet 5. Pregunta si un compromiso anual fija precios introductorios u ofrece descuentos escalonados. El tiempo de espera para contratos de compromiso es típicamente de 2–3 semanas.</p>
+
+<h3>Estrategia 2: Vuelve a Comparar Enrutamiento y Mezcla de Modelos</h3>
+
+<p>No todas las cargas de trabajo necesitan Sonnet 5. El salto de precio del 50% es una función de fuerza para auditar qué tareas realmente requieren Sonnet 5 y cuáles pueden cambiar a alternativas más baratas.</p>
+
+<table>
+<thead>
+<tr>
+  <th>Categoría de Tarea</th>
+  <th>Entrada Sonnet 5/$1M</th>
+  <th>Modelo Alternativo</th>
+  <th>Entrada Alt/$1M</th>
+  <th>Ahorros por 100M Tokens</th>
+  <th>Cuándo Cambiar</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>Clasificación (reglas estrictas)</strong></td>
+  <td class="number">$3 (después de sep 1)</td>
+  <td>Claude Haiku 4.5</td>
+  <td class="number">$1.00</td>
+  <td class="number">$200</td>
+  <td>Exactitud ≥95%</td>
+</tr>
+<tr>
+  <td><strong>Resumen</strong></td>
+  <td class="number">$3</td>
+  <td>Gemini 2.5 Flash</td>
+  <td class="number">$0.15</td>
+  <td class="number">$285</td>
+  <td>Sin razonamiento necesario</td>
+</tr>
+<tr>
+  <td><strong>Conversación multi-turno</strong></td>
+  <td class="number">$3</td>
+  <td>GPT-5.6 Luna</td>
+  <td class="number">$1.00</td>
+  <td class="number">$200</td>
+  <td>Calidad equivalente</td>
+</tr>
+<tr class="highlight">
+  <td><strong>Razonamiento complejo (mantén Sonnet 5)</strong></td>
+  <td class="number">$3</td>
+  <td>—</td>
+  <td class="number">—</td>
+  <td class="number">—</td>
+  <td>Sin alternativa</td>
+</tr>
+<tr>
+  <td><strong>Bucles agénticos (multi-paso)</strong></td>
+  <td class="number">$3</td>
+  <td>Híbrido Haiku + Sonnet 5</td>
+  <td class="number">$1.00 (Haiku) + $3 (Sonnet 5)</td>
+  <td>Ahorra usando Haiku para pasos simples</td>
+  <td>Benchmarks soportan</td>
+</tr>
+</tbody>
+</table>
+
+<p><strong>Acción:</strong> Durante las próximas 2 semanas, extrae tus registros de llamadas de Sonnet 5 y categoriza por carga de trabajo. Compara el 10% de tareas de clasificación en Haiku, resumen en Gemini 2.5 Flash, y multi-turno simple en GPT-5.6 Luna. Si la calidad es equivalente (o cercana), desplaza esa carga de trabajo antes del 1 de septiembre y fija los ahorros.</p>
+
+<h3>Estrategia 3: Implementa (o Expande) Caché de Prompts</h3>
+
+<p>El caché de prompts es la forma más directa de reducir el consumo de tokens y preservar el valor de los precios introductorios antes de que expiren. Las escrituras de caché a Sonnet 5 cuestan $2.50 por 1M tokens (1.25× precio de entrada en intro; será $3.75 en estándar). Las lecturas de caché cuestan $0.20 por 1M (0.1× precio de entrada en intro; será $0.30 en estándar).</p>
+
+<p><strong>La oportunidad:</strong> Una carga de trabajo con una tasa de aciertos de caché del 40% ahorra un 36% en coste de entrada. Fijar infraestructura de caché ahora a precios introductorios significa que tus ahorros de tasa de aciertos en curso están heredados. Después del 1 de septiembre, los mismos aciertos de caché siguen siendo 90% de descuento, pero el precio base que descuentan es 50% más alto.</p>
+
+<p><strong>Ejemplo:</strong> Prompt de sistema + contexto almacenado en caché 100M tokens/mes en Sonnet 5:</p>
+<ul>
+  <li><strong>Agosto (intro):</strong> Coste de escritura: 100M × $2.50/M = $250. Coste de lectura mensual (supón 1B tokens de lectura de aciertos de caché): 1B × $0.20/M = $200. Total: $450/mes para caché.</li>
+  <li><strong>Septiembre (estándar):</strong> Coste de escritura: 100M × $3.75/M = $375. Coste de lectura mensual: 1B × $0.30/M = $300. Total: $675/mes (50% más alto).</li>
+  <li><strong>Ahorros por implementar caché ahora:</strong> Si añades 500M tokens de entrada almacenados en caché entre ahora y el 31 de agosto, y acumulan 30 aciertos de caché cada mes a partir de septiembre, fijas descuentos de lectura acumulados. El coste de escritura de caché es una inversión que se amortiza durante meses.</li>
+</ul>
+
+<p><strong>Acción:</strong> Identifica tus 3 prompts más repetidos o contextos de documento (documentos RAG, instrucciones del sistema, boilerplate). Prueba caché en API de Anthropic. Si la tasa de acierto es ≥20%, implementa antes del 31 de agosto. Las escrituras de caché son el único coste que no importa cuándo ocurra el aumento de tasa: invertir en coste de escritura ahora produce retornos de coste de lectura fijos para siempre.</p>
+
+<h2>Cronograma: La Cuenta Regresiva de 6 Semanas</h2>
+
+<div class="guide-section">
+  <h3>Semana 1 (antes del 25 de julio)</h3>
+  <p>Audita el gasto actual de Sonnet 5. Extrae registros de llamadas (modelo, tokens, tipo de carga de trabajo) de tu panel de facturación o plataforma de observabilidad de LLM. Calcula la tasa de ejecución mensual. Modela gasto de Q4 si nada cambia.</p>
+</div>
+
+<div class="guide-section">
+  <h3>Semana 2 (antes del 1 de agosto)</h3>
+  <p>Contacta a ventas de Anthropic para investigar compromisos de uso. Comienza a comparar modelos alternativos (Haiku, Luna, Gemini 2.5 Flash) en el 10% del tráfico de producción. Identifica 3 candidatos principales para cambio de enrutamiento.</p>
+</div>
+
+<div class="guide-section">
+  <h3>Semana 3 (antes del 8 de agosto)</h3>
+  <p>Finaliza benchmarks y compromete un plan de enrutamiento. Si se necesitan cambios, comienza a desplegar pruebas A/B. Implementa caché de prompts para contextos repetidos de alto volumen. Destino ≥100M tokens almacenados en caché antes del cambio.</p>
+</div>
+
+<div class="guide-section">
+  <h3>Semana 4 (antes del 15 de agosto)</h3>
+  <p>Fija compromisos de uso con Anthropic (si aplicable). Despliega cambios de enrutamiento a producción (desplaza tareas de bajo razonamiento a modelos más baratos). Verifica que la infraestructura de caché está activa e hits en 15%+.</p>
+</div>
+
+<div class="guide-section">
+  <h3>Semana 5 (antes del 22 de agosto)</h3>
+  <p>Monitorea costes de producción y métricas de calidad. Ajusta enrutamiento si es necesario. Pronostica costes finales de septiembre basados en tasa de ejecución de agosto.</p>
+</div>
+
+<div class="guide-section">
+  <h3>Semana 6 (antes del 31 de agosto)</h3>
+  <p>Confirma que todos los cambios de enrutamiento están activos. Establece alerta en el calendario para el 5 de septiembre para verificar que la facturación coincide con el pronóstico. Publica análisis post-mortem sobre impacto de costes y ahorros logrados.</p>
+</div>
+
+<h2>Comparación: Sonnet 5 vs. Alternativas Después del 1 de Septiembre</h2>
+
+<p>Una vez que expiren los precios introductorios, ¿cómo se compara Sonnet 5 con otros modelos a sus precios estándar?</p>
+
+<table>
+<thead>
+<tr>
+  <th>Modelo</th>
+  <th>Proveedor</th>
+  <th>Entrada $/1M</th>
+  <th>Salida $/1M</th>
+  <th>Caso de Uso Típico</th>
+  <th>vs. Sonnet 5 Después de Sep 1</th>
+</tr>
+</thead>
+<tbody>
+<tr class="highlight">
+  <td><strong>Claude Sonnet 5 (estándar)</strong></td>
+  <td>Anthropic</td>
+  <td class="number">$3.00</td>
+  <td class="number">$15.00</td>
+  <td>Balance de velocidad y razonamiento</td>
+  <td>Línea base</td>
+</tr>
+<tr>
+  <td>GPT-5.6 Terra</td>
+  <td>OpenAI</td>
+  <td class="number">$2.50</td>
+  <td class="number">$15.00</td>
+  <td>Razonamiento nivel medio</td>
+  <td>17% más barato en entrada</td>
+</tr>
+<tr>
+  <td>GPT-5.6 Luna</td>
+  <td>OpenAI</td>
+  <td class="number">$1.00</td>
+  <td class="number">$6.00</td>
+  <td>Clasificación rápida, tareas simples</td>
+  <td>67% más barato en general</td>
+</tr>
+<tr>
+  <td>Gemini 3.1 Pro</td>
+  <td>Google</td>
+  <td class="number">$2.00</td>
+  <td class="number">$12.00</td>
+  <td>Bucles agénticos, uso de herramientas</td>
+  <td>33% más barato en entrada</td>
+</tr>
+<tr>
+  <td>Gemini 2.5 Flash</td>
+  <td>Google</td>
+  <td class="number">$0.15</td>
+  <td class="number">$0.60</td>
+  <td>Ultra rápido, alto volumen</td>
+  <td>95% más barato</td>
+</tr>
+<tr>
+  <td>Claude Haiku 4.5</td>
+  <td>Anthropic</td>
+  <td class="number">$1.00</td>
+  <td class="number">$5.00</td>
+  <td>Clasificación baja latencia</td>
+  <td>67% más barato en entrada</td>
+</tr>
+<tr>
+  <td>DeepSeek V4 Flash</td>
+  <td>DeepSeek</td>
+  <td class="number">$0.14</td>
+  <td class="number">$0.28</td>
+  <td>Optimizado para coste, modelo abierto</td>
+  <td>95% más barato (pero menos pulido)</td>
+</tr>
+</tbody>
+</table>
+
+<p><strong>La realidad:</strong> Sonnet 5 a $3/$15 ya no es el modelo más barato o más rentable para la mayoría de tareas. GPT-5.6 Terra es 17% más barato en entrada. Haiku es 67% más barato para clasificación. El valor de Sonnet 5 después del aumento es en calidad para razonamiento complejo y velocidad para tareas equilibradas, no en liderazgo de costes. Las cargas de trabajo que no requieren esa calidad deberían moverse a alternativas ahora.</p>
+
+<h2>Preguntas Frecuentes</h2>
+
+<p><strong>P: ¿Hay alguna posibilidad de que se extienda la fecha límite?</strong><br>R: Anthropic no ha anunciado una prórroga. El <a href="https://www.anthropic.com/news/claude-sonnet-5">anuncio de lanzamiento del 30 de junio</a> deja claro "hasta el 31 de agosto de 2026". Prepárate para la fecha definitiva. Si se anuncia una prórroga, es una bonificación; trata la fecha límite como final.</p>
+
+<p><strong>P: ¿Afecta el nuevo tokenizador a los recuentos de tokens?</strong><br>R: Sí. Sonnet 5 usa un tokenizador nuevo que produce aproximadamente 30% más tokens que modelos Claude más antiguos para texto equivalente. Esto significa que tu gasto actual de tokens es más alto de lo que podrías esperar. Factoriza esto en pronósticos de costes.</p>
+
+<p><strong>P: ¿Puedo fijar precios introductorios con prepago anual?</strong><br>R: Posiblemente, si Anthropic ofrece opciones de prepago. Contacta a ventas antes del 15 de agosto para preguntar. El prepago es a menudo la única forma de heredar precios a través de un aumento de tasa, pero necesitas comprometerte bien por adelantado.</p>
+
+<p><strong>P: ¿Y si tengo un contrato personalizado con Anthropic?</strong><br>R: Los contratos personalizados pueden tener términos diferentes. Verifica la fecha exacta de cambio y tasa con tu equipo de cuenta. Si tu contrato especifica términos de precios, tienen prioridad sobre la página de precios público: confirma ahora antes de que el 1 de septiembre te sorprenda.</p>
+
+<hr style="margin:48px 0 24px;border:none;border-top:1px solid #1E2A3F" />
+<p>La fecha límite del 31 de agosto es real, el aumento del 50% es cierto, y tienes 6 semanas para actuar. Los equipos que vuelven a comparar, fijan compromisos y desplazan cargas de trabajo antes del cambio cortarán significativamente su gasto en LLM de Q4. Los equipos que esperen hasta el 1 de septiembre absorberán el aumento de costes completo.</p>
+<p><a href="/es/research">Volver a investigación</a></p>
+
+{% endblock %}{% block suffix %}</main></body></html>
+{% endblock %}

@@ -1,0 +1,447 @@
+---
+permalink: "ja/research/gpt-5-6-pricing-tier-guide.html"
+---
+{% extends "shell.njk" %}{% block prefix %}<!DOCTYPE html>
+<html lang="ja"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>GPT-5.6 料金ティアガイド：Luna、Terra、Sol · FinOps LLM</title><meta name="description" content="GPT-5.6 Luna、Terra、Solの価格設定ガイド：分類、エージェント、推論に適したティアはどれか。ワークロードタイプ別のコスト経路付き実例とフォールバックパターン。" /><meta name="robots" content="index, follow" /><link rel="canonical" href="https://finopsllm.com/ja/research/gpt-5-6-pricing-tier-guide" />
+<link rel="alternate" hreflang="en" href="https://finopsllm.com/research/gpt-5-6-pricing-tier-guide" />
+<link rel="alternate" hreflang="es" href="https://finopsllm.com/es/research/gpt-5-6-pricing-tier-guide" />
+<link rel="alternate" hreflang="ja" href="https://finopsllm.com/ja/research/gpt-5-6-pricing-tier-guide" />
+<link rel="alternate" hreflang="x-default" href="https://finopsllm.com/research/gpt-5-6-pricing-tier-guide" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","headline":"GPT-5.6 料金ティアガイド：Luna、Terra、Sol · FinOps LLM","description":"GPT-5.6の3つのティアの実践的なルーティングガイド：分類、抽出、エージェント型推論、困難な推論タスクに使用するモデル。タスクあたりの実例と段階的フォールバックパターン。","url":"https://finopsllm.com/ja/research/gpt-5-6-pricing-tier-guide","datePublished":"2026-07-19","dateModified":"2026-07-19","image":"https://finopsllm.com/og.png","author":{"@type":"Organization","name":"FinOps LLM team"},"publisher":{"@type":"Organization","name":"FinOps LLM","url":"https://finopsllm.com/"}}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"ホーム","item":"https://finopsllm.com/ja/"},{"@type":"ListItem","position":2,"name":"リサーチ","item":"https://finopsllm.com/ja/research"},{"@type":"ListItem","position":3,"name":"GPT-5.6 料金ティアガイド","item":"https://finopsllm.com/ja/research/gpt-5-6-pricing-tier-guide"}]}
+</script>
+<script type="application/ld+json">
+{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "GPT-5.6の分類タスクにはどのティアを使うべきですか？", "acceptedAnswer": {"@type": "Answer", "text": "Luna（$1/$6 per 1M）は分類と単純な抽出に適しています。入力600トークン+出力100トークンで、Lunaは$0.00066/リクエスト対Terraの$0.00175/リクエストです。精度がボトルネックでなければ、Lunaは62%の節約で同等の結果を提供します。"}}, {"@type": "Question", "name": "Terra（$2.50/$15）がSol（$5/$30）を上回るのはいつですか？", "acceptedAnswer": {"@type": "Answer", "text": "常にです。Terraはパフォーマンス/コストの最適ポイントとして位置付けられています：Solと同じ機能要件ですが、正確に半額です。エージェントループ、マルチターン会話、中程度の推論タスクにTerraを使用してください。Terraの推論深度が明らかに不十分な場合にのみSolを使用します。"}}, {"@type": "Question", "name": "GPT-5.6のプロンプトキャッシュのコスト影響は何ですか？", "acceptedAnswer": {"@type": "Answer", "text": "キャッシュ書き込みは入力の1.25倍（例：Lunaで$1.25 per 1M）です。キャッシュ読み取りは入力の10%（Lunaで$0.10 per 1M）です。100Kトークンのプレフィックスが30分以内に5回以上再利用される場合、キャッシュはキャッシュなしの繰り返し呼び出しと比べて60%以上の節約となります。"}}, {"@type": "Question", "name": "GPT-5.6はClaude Sonnet 5とDeepSeek V4とどう比較しますか？", "acceptedAnswer": {"@type": "Answer", "text": "Luna（$1/$6）はClaude Sonnet（$2/$10 intro、$3/$15 Sept 1）より50-60%安く、DeepSeek V4 Flash（$0.14/$0.28）はLunaより7-20倍安いです。推論ワークロードについては、Sol（$5/$30）とClaude Sonnetは異なるパフォーマンス対ドルをトレードしています；ユースケースをベンチマークしてください。"}}]}
+</script>
+<style>
+body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}
+.wrap{max-width:1100px;margin:0 auto;padding:56px 24px}
+a{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}
+.langsw{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;color:#647289;margin:0 0 26px}
+.langsw a{text-decoration:none}.langsw a[aria-current]{color:#E6EAF2;font-weight:600}
+.badge-row{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 32px;list-style:none;padding:0}
+.badge-row li{background:#101726;border:1px solid #1E2A3F;border-radius:8px;padding:8px 14px;font-size:.85rem;color:#B6C0D2}
+.table-wrap{overflow-x:auto;margin:0 0 32px;-webkit-overflow-scrolling:touch}
+table{border-collapse:collapse;width:100%;font-size:.85rem}
+th,td{border:1px solid #1E2A3F;padding:10px 12px;text-align:left;color:#B6C0D2}
+th{color:#E6EAF2;background:#101726}
+td.number{text-align:right;font-family:'JetBrains Mono',monospace;font-weight:500}
+td.highlight{background:rgba(248,113,113,.08)}
+.cost-example{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:20px;margin:16px 0}
+.cost-example h3{color:#E6EAF2;margin:0 0 12px;font-size:1rem}
+.cost-example p{font-size:.9rem;margin:6px 0}
+.routing-guide{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:24px;margin:12px 0}
+.routing-guide h3{color:#E6EAF2;margin:0 0 10px;font-size:1rem}
+.warning{border-left:4px solid #f87171;padding:16px;background:rgba(248,113,113,.08);margin:20px 0}
+@media(max-width:700px){
+  table{font-size:.75rem}
+  th,td{padding:6px 7px}
+}
+</style><script src="/assets/consent.js" defer></script><script src="/assets/attribution.js" defer></script>
+<script src="/assets/lang.js" defer></script>
+</head>
+<body><main class="wrap">{% endblock %}{% block body %}
+
+<nav class="langsw" aria-label="言語"><a href="/research/gpt-5-6-pricing-tier-guide" hreflang="en">EN</a> · <a href="/es/research/gpt-5-6-pricing-tier-guide" hreflang="es">ES</a> · <a href="/ja/research/gpt-5-6-pricing-tier-guide" hreflang="ja" aria-current="page">JA</a></nav>
+
+<h1>GPT-5.6 料金ティアガイド：Luna、Terra、Sol</h1>
+<p class="updated" style="color:#6B7689;font-size:14px;margin-top:-6px">公開日：2026年7月19日</p>
+<p>OpenAIは7月10日にGPT-5.6を3つの異なる料金ティアで発表しました：Lunaが$1/$6 per 1M tokens、Terraが$2.50/$15、Solが$5/$30。これは単なるスピード/品質のトレードオフではありません。各ティアは異なるクラスのワークロード向けに位置付けられています。質問は「どれが最高か」ではなく「このタスクには何が正しいか」です。このガイドはタスクをティアにマップし、タスクあたりのコスト例を説明し、安いティアが十分に確信できない場合に知的にカスケードする方法を示します。</p>
+
+<ul class="badge-row">
+  <li>Luna（$1/$6）：分類、単純な抽出、大量ルーティング</li>
+  <li>Terra（$2.50/$15）：バランスの取れた推論、エージェントループ、マルチターン会話</li>
+  <li>Sol（$5/$30）：フロンティア推論、コード生成、困難な研究</li>
+  <li>キャッシュ読み取りは90%節約；キャッシュ書き込みは入力の1.25倍 — 30分間に5回以上のヒットで損益分岐点</li>
+  <li>バッチAPIは非対話型作業の場合、ティア料金に加えて50%割引を追加</li>
+</ul>
+
+<div class="warning">
+  <strong>重要な注意：</strong> OpenAIはTerraとSolを同等の推論能力を持つと位置付けており、主にスピードとスループットで異なります。実際のワークロードに対して両方をベンチマークしてください — 同等性の主張はあなたのデータ分布では常に成立するわけではありません。<a href="/ja/research/how-much-does-gpt5-cost">GPT-5 vs 代替品</a>でClaudeとDeepSeekとの比較を参照してください。
+</div>
+
+<h2>1. 3つのティア：スピード、コスト、能力</h2>
+
+<table>
+<thead>
+<tr>
+  <th>ティア</th>
+  <th>入力 $/1M</th>
+  <th>出力 $/1M</th>
+  <th>キャッシュ読取 $/1M</th>
+  <th>コンテキスト</th>
+  <th>典型的なレイテンシ</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>Luna</strong></td>
+  <td class="number">$1.00</td>
+  <td class="number">$6.00</td>
+  <td class="number">$0.10</td>
+  <td>128K</td>
+  <td>80–200 ms</td>
+</tr>
+<tr>
+  <td><strong>Terra</strong></td>
+  <td class="number">$2.50</td>
+  <td class="number">$15.00</td>
+  <td class="number">$0.25</td>
+  <td>128K</td>
+  <td>150–400 ms</td>
+</tr>
+<tr>
+  <td><strong>Sol</strong></td>
+  <td class="number">$5.00</td>
+  <td class="number">$30.00</td>
+  <td class="number">$0.50</td>
+  <td>128K</td>
+  <td>300–800 ms</td>
+</tr>
+</tbody>
+</table>
+
+<p><strong>レイテンシが重要：</strong> Lunaは最速です。ストリーミング、リアルタイム分類、スループット用に最適化されているからです。Solは最遅です。より多くの内部推論を実行しているからです。対話的なユーザーフェーシング型ワークロードについて、Lunaも安いです<em>そして</em>速いです — ただし、タスクに対して十分に能力がある場合のみです。これが重要なルーティング決定です。</p>
+
+<h2>2. タスク型ルーティング表</h2>
+
+<p>この表は一般的なLLMタスクを、成功したレスポンスあたりのコストを最小化するティアにマップします：</p>
+
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+  <th>タスク型</th>
+  <th>例</th>
+  <th>推奨ティア</th>
+  <th>ティアでの成功率</th>
+  <th>推定コスト/1K タスク</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>分類</strong></td>
+  <td>スパム/非スパム；感情（肯定/否定/中立）</td>
+  <td>Luna</td>
+  <td class="number">95–98%</td>
+  <td class="number">$1.20–$1.50</td>
+</tr>
+<tr>
+  <td><strong>構造化抽出</strong></td>
+  <td>テキストから名前、メール、電話を抽出</td>
+  <td>Luna</td>
+  <td class="number">92–96%</td>
+  <td class="number">$1.80–$2.40</td>
+</tr>
+<tr>
+  <td><strong>カテゴリ化（多クラス）</strong></td>
+  <td>50以上の製品カテゴリのいずれかを割り当て</td>
+  <td>Luna</td>
+  <td class="number">88–94%</td>
+  <td class="number">$2.40–$3.20</td>
+</tr>
+<tr>
+  <td><strong>要約</strong></td>
+  <td>記事またはチャットログを凝縮</td>
+  <td>Luna</td>
+  <td class="number">92–97%</td>
+  <td class="number">$1.50–$2.00</td>
+</tr>
+<tr>
+  <td><strong>エージェント ループ（ツール利用）</strong></td>
+  <td>マルチターン：検索、推論、精緻化</td>
+  <td>Terra</td>
+  <td class="number">85–92%</td>
+  <td class="number">$8.00–$12.00</td>
+</tr>
+<tr>
+  <td><strong>マルチターン会話</strong></td>
+  <td>顧客サポート、アドバイザリーボット</td>
+  <td>Terra</td>
+  <td class="number">88–94%</td>
+  <td class="number">$6.00–$10.00</td>
+</tr>
+<tr>
+  <td><strong>コード生成（単純）</strong></td>
+  <td>SQLクエリ、Bashスニペット、正規表現</td>
+  <td>Terra</td>
+  <td class="number">80–90%</td>
+  <td class="number">$10.00–$15.00</td>
+</tr>
+<tr>
+  <td><strong>コード生成（複雑）</strong></td>
+  <td>完全なエンドポイント、ステートマシン、DSLコンパイラ</td>
+  <td>Sol</td>
+  <td class="number">75–88%</td>
+  <td class="number">$25.00–$40.00</td>
+</tr>
+<tr>
+  <td><strong>研究+統合</strong></td>
+  <td>10以上の論文を分析、コンセンサスを統合</td>
+  <td>Sol</td>
+  <td class="number">80–90%</td>
+  <td class="number">$30.00–$50.00</td>
+</tr>
+<tr class="highlight">
+  <td><strong>困難な推論（新規問題）</strong></td>
+  <td>証明検証、新規アルゴリズム設計</td>
+  <td>Sol</td>
+  <td class="number">70–85%</td>
+  <td class="number">$40.00–$70.00</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<p><strong>主要な洞察：</strong> タスクあたりのコストはAPIコストだけではなく、(APIコスト)/(成功率)です。95%の成功率のLuna分類は成功したレスポンスあたり~$1.26です。同じタスクをSolに98%の成功率でルーティングした場合、レスポンスあたり~$5.10支払いますが、ワークロードの3%多く解決しました。それが4倍のコストに見合う価値があるかどうかはわかりません。</p>
+
+<h2>3. タスクあたりのコスト実例</h2>
+
+<div class="cost-example">
+  <h3>例1：スパム分類（Luna）</h3>
+  <p><strong>タスク：</strong> メールをスパム（はい/いいえバイナリ）として分類。</p>
+  <p><strong>典型的なトークンプロファイル：</strong> 400入力（メール）+50出力（分類+確信度）=450トークン。</p>
+  <p><strong>Lunaコスト：</strong> (400 × $1/1M) + (50 × $6/1M) = $0.00043/リクエスト。</p>
+  <p><strong>96%が初回で成功した場合：</strong> $0.00043 / 0.96 = $0.00045 per successful classification。</p>
+  <p><strong>月間100万メールで：</strong> $450/月（システムプロンプトを再利用する場合、キャッシュ割引プラス）。</p>
+  <p><strong>誤ってSolにルーティングされた場合：</strong> (400 × $5 + 50 × $30) / 1M = $0.0025 per リクエスト。98%の成功：$0.00255/成功 = $2,550/月（5.7倍以上）。</p>
+</div>
+
+<div class="cost-example">
+  <h3>例2：顧客サポートエージェント（Terra）</h3>
+  <p><strong>タスク：</strong> ツール利用を含むマルチターンサポート会話（チケット検索、ポリシー検索、エスカレーション決定）。</p>
+  <p><strong>ターンあたりの典型的なトークンプロファイル：</strong> 2,000入力（コンテキスト+履歴）+400出力（応答+ツール呼び出し）=2,400トークン。解決までの平均3ターン=チケットあたり7,200トークン。</p>
+  <p><strong>Terraコスト：</strong> (2,000 × $2.50/1M) + (400 × $15/1M) = $0.0080/ターン or $0.0240 per チケット。</p>
+  <p><strong>90%がエスカレーションなしで解決した場合：</strong> $0.0240 / 0.90 = $0.0267 per 成功したチケット。</p>
+  <p><strong>月間10Kチケットで：</strong> $267/月。</p>
+  <p><strong>代わりにLunaを使用した場合：</strong> (2,000 × $1 + 400 × $6) / 1M = $0.0044 per ターン = $0.0132/チケット。しかしLunaのエージェントループ成功は65%に低下（ツール呼び出しが失敗、推論が浅い）。成功あたりのコスト：$0.0132 / 0.65 = $0.0203。純粋な節約：$29/月ですがチケットの25%が失敗してエスカレート、サポートコストが$400以上上昇。Lunaはここでは機能しません。</p>
+</div>
+
+<div class="cost-example">
+  <h3>例3：コード生成（Terra vs Sol）</h3>
+  <p><strong>タスク：</strong> 要件文字列からPython関数を生成。</p>
+  <p><strong>典型的なトークンプロファイル：</strong> 1,500入力（仕様+例）+600出力（コード+説明）=2,100トークン。</p>
+  <p><strong>Terraコスト：</strong> (1,500 × $2.50 + 600 × $15) / 1M = $0.0134 per リクエスト。85%の初回成功（コードがコンパイル+基本テスト合格）：$0.0158 per 動作する関数。</p>
+  <p><strong>Solコスト：</strong> (1,500 × $5 + 600 × $30) / 1M = $0.0255 per リクエスト。90%の初回成功：$0.0283 per 動作する関数。</p>
+  <p><strong>Terraでの節約：</strong> 動作する結果あたり44%安い。成功率の5%の差とコード品質が下流のデバッグコストを測定可能に削減した場合のみSolを使用してください。</p>
+</div>
+
+<h2>4. カスケード &amp; フォールバック ルーティング パターン</h2>
+
+<p>ほとんどのFinOpsチームはすべての作業に単一のティアを使用すべきではありません。代わりに、カスケードパターンを実装します：最も安いティアから始め、確信度を測定し、低い確信度でエスカレート。</p>
+
+<table>
+<thead>
+<tr>
+  <th>ステップ</th>
+  <th>モデル</th>
+  <th>確信度の閾値</th>
+  <th>閾値を満たさない場合のアクション</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>1</strong></td>
+  <td>Luna</td>
+  <td>確信度 > 85%</td>
+  <td>結果を返す</td>
+</tr>
+<tr>
+  <td><strong>2</strong></td>
+  <td>Terra</td>
+  <td>確信度 > 75%</td>
+  <td>結果を返す（エスカレート済み）</td>
+</tr>
+<tr>
+  <td><strong>3</strong></td>
+  <td>Sol</td>
+  <td>確信度 > 60%</td>
+  <td>結果を返すか明示的に失敗</td>
+</tr>
+<tr>
+  <td><strong>4</strong></td>
+  <td>人間による確認</td>
+  <td>—</td>
+  <td>人間にエスカレート</td>
+</tr>
+</tbody>
+</table>
+
+<p><strong>実際のシナリオ：</strong> インボイスの文書分類（ベンダー別に分類）を行っています。Lunaは高い確信度の結果（~94%成功）を返し、1Kあたり~$1.20のコストです。Lunaが確信度<85%を返す曖昧なインボイスの6%では、Terra（困難な場合で~94%の成功）にエスカレート、1K エスカレーションあたり~$3.75のコスト。10Kドキュメントの6%がエスカレートした場合：600 × $3.75 = $2.25追加、合計$12 + $2.25 = $14.25/10K。純粋なTerraは~$37.50のコストになります。カスケードは62%節約しながら境界ケースでの精度を向上させます。</p>
+
+<h2>5. プロンプトキャッシュの経済学</h2>
+
+<p>GPT-5.6はキャッシュコストを変更しました：キャッシュ書き込みは<strong>キャッシュなしの入力レート1.25倍</strong>（フリーではない）、キャッシュ読み取りは入力の10%のコストです。</p>
+
+<table>
+<thead>
+<tr>
+  <th>シナリオ</th>
+  <th>プレフィックスサイズ</th>
+  <th>書き込みコスト</th>
+  <th>読み取りコスト（ヒットあたり）</th>
+  <th>損益分岐点ヒット</th>
+  <th>10ヒット/月での節約</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>Lunaキャッシュ検索コンテキスト</strong></td>
+  <td>100Kトークン</td>
+  <td class="number">$0.125</td>
+  <td class="number">$0.010</td>
+  <td class="number">15 ヒット</td>
+  <td class="number">-$0.025 （損失）</td>
+</tr>
+<tr>
+  <td><strong>Lunaキャッシュシステムプロンプト + ドキュメント</strong></td>
+  <td>50Kトークン</td>
+  <td class="number">$0.063</td>
+  <td class="number">$0.005</td>
+  <td class="number">8 ヒット</td>
+  <td class="number">$0.032</td>
+</tr>
+<tr>
+  <td><strong>Terraキャッシュエージェント コンテキスト</strong></td>
+  <td>80Kトークン</td>
+  <td class="number">$0.250</td>
+  <td class="number">$0.020</td>
+  <td class="number">14 ヒット</td>
+  <td class="number">$0.030</td>
+</tr>
+<tr>
+  <td><strong>Solキャッシュ推論コンテキスト</strong></td>
+  <td>100Kトークン</td>
+  <td class="number">$0.625</td>
+  <td class="number">$0.050</td>
+  <td class="number">13 ヒット</td>
+  <td class="number">$0.025</td>
+</tr>
+</tbody>
+</table>
+
+<p><strong>キャッシュをいつ：</strong> プロンプトに安定したプレフィックス（システム指示、ドキュメント、少数ショット例）が30分ウィンドウ内に5～10回以上再利用される場合、キャッシュは通常お金を節約します。バッチAPI（50%割引）はキャッシュのコストと競い合っています — ドキュメントをバッチで分類する場合、バッチ割引がキャッシュのオーバーヘッドを上回ります。</p>
+
+<h2>6. Claude Sonnet 5、Gemini 3.1 Pro、DeepSeek V4との比較</h2>
+
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+  <th>モデル</th>
+  <th>入力 $/1M</th>
+  <th>出力 $/1M</th>
+  <th>スピード</th>
+  <th>推論能力</th>
+  <th>選ぶべき場合</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>GPT-5.6 Luna</strong></td>
+  <td class="number">$1.00</td>
+  <td class="number">$6.00</td>
+  <td>高速</td>
+  <td>指示追従、ルーティング</td>
+  <td>分類、抽出、スループット</td>
+</tr>
+<tr>
+  <td><strong>GPT-5.6 Terra</strong></td>
+  <td class="number">$2.50</td>
+  <td class="number">$15.00</td>
+  <td>中程度</td>
+  <td>中程度の推論、ツール利用</td>
+  <td>エージェント、マルチターン、中コード</td>
+</tr>
+<tr>
+  <td><strong>GPT-5.6 Sol</strong></td>
+  <td class="number">$5.00</td>
+  <td class="number">$30.00</td>
+  <td>低速</td>
+  <td>フロンティア推論、研究</td>
+  <td>複雑なコード、困難な推論、新規問題</td>
+</tr>
+<tr>
+  <td><strong>Claude Sonnet 5</strong></td>
+  <td class="number">$2.00–$3.00</td>
+  <td class="number">$10.00–$15.00</td>
+  <td>中-高速</td>
+  <td>強い推論、長い推論トークン</td>
+  <td>推論、コーディング（Solと競争）</td>
+</tr>
+<tr>
+  <td><strong>Gemini 3.1 Pro</strong></td>
+  <td class="number">$2.00</td>
+  <td class="number">$12.00</td>
+  <td>中程度</td>
+  <td>マルチモーダル、研究能力</td>
+  <td>マルチモーダルタスク、Terraと競争</td>
+</tr>
+<tr class="highlight">
+  <td><strong>DeepSeek V4 Flash</strong></td>
+  <td class="number">$0.14</td>
+  <td class="number">$0.28</td>
+  <td>非常に高速</td>
+  <td>基本推論、キャッシュ入力フォーカス</td>
+  <td>大量ルーティング、キャッシュ重視ワークロード（7～35倍安い）</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<p><strong>コスト仲裁：</strong> 単純な分類と抽出については、DeepSeek V4 Flashはlunaより7～20倍安いです。データに対してベンチマークしてください — 90%以上の精度を達成した場合、これを使用し差分を確保してください。Claude Sonnet 5はTerraより2倍高価ですが、モデル能力請求あたり強い推論を提供しています；Terraベンチマークが不十分な品質を示した場合は使用してください。Gemini 3.1 ProはLunaとTerraの間に位置しています — マルチモーダル入力が必要な場合またはVertex AIエコシステムに既にいる場合に有用。</p>
+
+<h2>7. GPT-5/5.5からの移行 &amp; 非推奨ステータス</h2>
+
+<p>OpenAIはGPT-5.6と並んでGPT-5.5（$5/$30、Solと同じ）およびGPT-5.4（$2.50/$15、Terraと同じ）の提供を続けています。古いモデルに対する<strong>非推奨圧力はない</strong> — コードがそれを対象にしている場合、GPT-5.5を使い続けることができます。ただし、GPT-5.6は同じティアでパフォーマンス同等性（またはそれ以上）を主張しているため、新しいデプロイメント向けに5.6に移行してください。</p>
+
+<p>ChatGPTインターフェースは古いモデルのローリング廃止を続けています（GPT-4o mini、GPT-4 turboは読み取り専用）；API アクセスは安定しています。APIに対して構築する場合、モデル非推奨ステータスの年1回のレビューを計画してください。ただし急いで期待しないでください。</p>
+
+<h2>コスト測定フレームワーク</h2>
+
+<div class="routing-guide">
+  <h3>ステップ 1：ティア別にベースラインを確立</h3>
+  <p>1週間のトラフィックを実行し、どのティアが各リクエストを処理したかをログします。これはベースライン分布とコストを提供します。</p>
+</div>
+
+<div class="routing-guide">
+  <h3>ステップ 2：確信度スコアとフォールバックレートを測定</h3>
+  <p>各ティアについて、返された確信度をログします。計算：Luna呼び出しの何％が確信度>85%を持ちますか？何％がTerraにカスケードしますか？これはカスケードがバランスしているかを示します。</p>
+</div>
+
+<div class="routing-guide">
+  <h3>ステップ 3：ティア別成功/失敗を監査</h3>
+  <p>モデル出力を1週間の真実と比較します。どのティアがあなたのデータで不十分なパフォーマンスを示しますか？OpenAI主張ではなく、実際の精度に基づいてしきい値またはティア選択を調整します。</p>
+</div>
+
+<div class="routing-guide">
+  <h3>ステップ 4：成功したレスポンスあたりの実際のコストを計算</h3>
+  <p>実際のコスト = (tier_cost) / (success_rate)。Lunaが94%の成功で1Kあたり$1.20のコストの場合、動作するレスポンスあたりのコストは$1.28です。これは最適化する指標です。</p>
+</div>
+
+<h2>クイックティア選択チェックリスト</h2>
+
+<ul>
+  <li><input type="checkbox"> これは分類、抽出、またはルーティングタスクですか？→ 精度が重要でない限りLuna。</li>
+  <li><input type="checkbox"> タスクはツール利用またはマルチターン推論に関与しますか？→ Terra。</li>
+  <li><input type="checkbox"> これは新規推論、複雑なコード、またはマルチホップ分析ですか？→ Sol（または最初にClaude Sonnet 5をベンチマーク）。</li>
+  <li><input type="checkbox"> カスケード（Luna → Terra → Sol）を実装できますか？→ はい、これは通常最適です。</li>
+  <li><input type="checkbox"> 安定したプレフィックス（システムプロンプト、ドキュメント）が月に10回以上再利用されていますか？→ キャッシュし、損益分岐点（5～15ヒット）でROIを測定してください。</li>
+  <li><input type="checkbox"> これはバッチ処理か対話的か？→ バッチ作業は50%割引の対象；バッチAPIでROIを再計算してください。</li>
+  <li><input type="checkbox"> 代替品（Claude、DeepSeek、Gemini）をベンチマークしましたか？→ マーケティング主張ではなく、データで行ってください。</li>
+</ul>
+
+<hr style="margin:48px 0 24px;border:none;border-top:1px solid #1E2A3F" />
+
+<p>ティア選択は分類問題です：ワークロードプロパティをティア経済学にマッチさせます。理想はカスケードルーティング — 最初にLunaにルート、確信度を測定、不確実性でエスカレート。これはコストを最小化しながら品質を維持します。FinOps LLMはLLMトラフィックのコスト監査を実行し、ティアの不一致がテーブルにお金を残しているはどこかを示します。<a href="/ja/book">無料監査を予約</a>。</p>
+
+<p>参照してください：<a href="/ja/research/how-much-does-gpt5-cost">GPT-5 はいくらかかる？</a> 完全なGPT価格設定状況のための、と <a href="/ja/research/hidden-llm-costs">隠れたLLMコスト</a> トークンあたりの手数料を超えたインフラストラクチャとフォールバックオーバーヘッド。</p>
+
+<p><a href="/ja/research">リサーチに戻る</a></p>
+
+{% endblock %}{% block suffix %}</main></body></html>
+{% endblock %}

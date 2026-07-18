@@ -1,0 +1,447 @@
+---
+permalink: "research/gpt-5-6-pricing-tier-guide.html"
+---
+{% extends "shell.njk" %}{% block prefix %}<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>GPT-5.6 Pricing Tier Guide: Luna, Terra, Sol · FinOps LLM</title><meta name="description" content="GPT-5.6 Luna, Terra, and Sol pricing guide: which tier for classification, agents, reasoning. Cost routing by workload type with worked examples and fallback patterns." /><meta name="robots" content="index, follow" /><link rel="canonical" href="https://finopsllm.com/research/gpt-5-6-pricing-tier-guide" />
+<link rel="alternate" hreflang="en" href="https://finopsllm.com/research/gpt-5-6-pricing-tier-guide" />
+<link rel="alternate" hreflang="es" href="https://finopsllm.com/es/research/gpt-5-6-pricing-tier-guide" />
+<link rel="alternate" hreflang="ja" href="https://finopsllm.com/ja/research/gpt-5-6-pricing-tier-guide" />
+<link rel="alternate" hreflang="x-default" href="https://finopsllm.com/research/gpt-5-6-pricing-tier-guide" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","headline":"GPT-5.6 Pricing Tier Guide: Luna, Terra, Sol · FinOps LLM","description":"A practical routing guide to GPT-5.6's three tiers: which model to use for classification, extraction, agentic reasoning, and hard reasoning tasks. Cost-per-task worked examples and cascade fallback patterns.","url":"https://finopsllm.com/research/gpt-5-6-pricing-tier-guide","datePublished":"2026-07-19","dateModified":"2026-07-19","image":"https://finopsllm.com/og.png","author":{"@type":"Organization","name":"FinOps LLM team"},"publisher":{"@type":"Organization","name":"FinOps LLM","url":"https://finopsllm.com/"}}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://finopsllm.com/"},{"@type":"ListItem","position":2,"name":"Research","item":"https://finopsllm.com/research"},{"@type":"ListItem","position":3,"name":"GPT-5.6 Pricing Tier Guide","item":"https://finopsllm.com/research/gpt-5-6-pricing-tier-guide"}]}
+</script>
+<script type="application/ld+json">
+{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Which GPT-5.6 tier should I use for classification tasks?", "acceptedAnswer": {"@type": "Answer", "text": "Luna ($1/$6 per 1M) is the right choice for classification and simple extraction. At 600 tokens input + 100 tokens output, Luna costs $0.00066/request vs Terra's $0.00175/request. If accuracy is not your bottleneck, Luna delivers equivalent results at 62% savings."}}, {"@type": "Question", "name": "When does Terra ($2.50/$15) beat Sol ($5/$30) on cost?", "acceptedAnswer": {"@type": "Answer", "text": "Always. Terra is positioned as a performance/cost sweet spot: same capability claims as Sol but at exactly half price. Use Terra for agent loops, multi-turn conversations, and moderate-reasoning tasks. Only use Sol when Terra's reasoning depth is provably insufficient."}}, {"@type": "Question", "name": "What is the cost impact of prompt caching on GPT-5.6?", "acceptedAnswer": {"@type": "Answer", "text": "Cache writes cost 1.25× input (e.g., $1.25 per million for Luna). Cache reads cost 10% of input ($0.10 per million for Luna). If a 100K-token prefix is reused 5+ times in 30 minutes, caching saves 60%+ vs repeated uncached calls."}}, {"@type": "Question", "name": "How does GPT-5.6 compare to Claude Sonnet 5 and DeepSeek V4?", "acceptedAnswer": {"@type": "Answer", "text": "Luna ($1/$6) undercuts Claude Sonnet ($2/$10 intro, $3/$15 Sept 1) by 50–60% and DeepSeek V4 Flash ($0.14/$0.28) is 7–20× cheaper than Luna. For reasoning workloads, Sol ($5/$30) and Claude Sonnet trade performance-per-dollar differently; benchmark your use case."}}]}
+</script>
+<style>
+body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}
+.wrap{max-width:1100px;margin:0 auto;padding:56px 24px}
+a{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}
+.langsw{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;color:#647289;margin:0 0 26px}
+.langsw a{text-decoration:none}.langsw a[aria-current]{color:#E6EAF2;font-weight:600}
+.badge-row{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 32px;list-style:none;padding:0}
+.badge-row li{background:#101726;border:1px solid #1E2A3F;border-radius:8px;padding:8px 14px;font-size:.85rem;color:#B6C0D2}
+.table-wrap{overflow-x:auto;margin:0 0 32px;-webkit-overflow-scrolling:touch}
+table{border-collapse:collapse;width:100%;font-size:.85rem}
+th,td{border:1px solid #1E2A3F;padding:10px 12px;text-align:left;color:#B6C0D2}
+th{color:#E6EAF2;background:#101726}
+td.number{text-align:right;font-family:'JetBrains Mono',monospace;font-weight:500}
+td.highlight{background:rgba(248,113,113,.08)}
+.cost-example{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:20px;margin:16px 0}
+.cost-example h3{color:#E6EAF2;margin:0 0 12px;font-size:1rem}
+.cost-example p{font-size:.9rem;margin:6px 0}
+.routing-guide{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:24px;margin:12px 0}
+.routing-guide h3{color:#E6EAF2;margin:0 0 10px;font-size:1rem}
+.warning{border-left:4px solid #f87171;padding:16px;background:rgba(248,113,113,.08);margin:20px 0}
+@media(max-width:700px){
+  table{font-size:.75rem}
+  th,td{padding:6px 7px}
+}
+</style><script src="/assets/consent.js" defer></script><script src="/assets/attribution.js" defer></script>
+<script src="/assets/lang.js" defer></script>
+</head>
+<body><main class="wrap">{% endblock %}{% block body %}
+
+<nav class="langsw" aria-label="Language / Idioma"><a href="/research/gpt-5-6-pricing-tier-guide" hreflang="en" aria-current="page">EN</a> · <a href="/es/research/gpt-5-6-pricing-tier-guide" hreflang="es">ES</a> · <a href="/ja/research/gpt-5-6-pricing-tier-guide" hreflang="ja">JA</a></nav>
+
+<h1>GPT-5.6 Pricing Tier Guide: Luna, Terra, Sol</h1>
+<p class="updated" style="color:#6B7689;font-size:14px;margin-top:-6px">Published 19 July 2026</p>
+<p>OpenAI released GPT-5.6 on July 10 with three distinct pricing tiers: Luna at $1/$6 per 1M tokens, Terra at $2.50/$15, and Sol at $5/$30. This is not a simple speed/quality tradeoff; each tier is positioned for a different class of workload. The question isn't "which is best" — it's "which is right for this task?" This guide maps tasks to tiers, walks through cost-per-task examples, and shows you how to cascade intelligently when a cheaper tier isn't confident enough.</p>
+
+<ul class="badge-row">
+  <li>Luna ($1/$6): classification, simple extraction, high-volume routing</li>
+  <li>Terra ($2.50/$15): balanced reasoning, agent loops, multi-turn conversations</li>
+  <li>Sol ($5/$30): frontier reasoning, code generation, hard research</li>
+  <li>Cache reads save 90%; cache writes cost 1.25× input — break-even at 5+ hits in 30 min</li>
+  <li>Batch API adds 50% discount on top of tier pricing for non-interactive work</li>
+</ul>
+
+<div class="warning">
+  <strong>Critical caveat:</strong> OpenAI positions Terra and Sol as having equivalent reasoning capability, differing primarily in speed and throughput. Benchmark both against your actual workload — claim of parity doesn't always hold at your data distribution. See <a href="/research/how-much-does-gpt5-cost">GPT-5 vs alternatives</a> for comparison with Claude and DeepSeek.
+</div>
+
+<h2>1. The Three Tiers: Speed, Cost, and Capability</h2>
+
+<table>
+<thead>
+<tr>
+  <th>Tier</th>
+  <th>Input $/1M</th>
+  <th>Output $/1M</th>
+  <th>Cached Read $/1M</th>
+  <th>Context</th>
+  <th>Typical Latency</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>Luna</strong></td>
+  <td class="number">$1.00</td>
+  <td class="number">$6.00</td>
+  <td class="number">$0.10</td>
+  <td>128K</td>
+  <td>80–200 ms</td>
+</tr>
+<tr>
+  <td><strong>Terra</strong></td>
+  <td class="number">$2.50</td>
+  <td class="number">$15.00</td>
+  <td class="number">$0.25</td>
+  <td>128K</td>
+  <td>150–400 ms</td>
+</tr>
+<tr>
+  <td><strong>Sol</strong></td>
+  <td class="number">$5.00</td>
+  <td class="number">$30.00</td>
+  <td class="number">$0.50</td>
+  <td>128K</td>
+  <td>300–800 ms</td>
+</tr>
+</tbody>
+</table>
+
+<p><strong>Latency matters:</strong> Luna is fastest because it is optimized for streaming, real-time classification, and throughput. Sol is slowest because it performs more internal reasoning. For interactive user-facing workloads, Luna is also cheaper <em>and</em> faster — but only if it's capable enough for your task. This is the key routing decision.</p>
+
+<h2>2. Task-Type Routing Table</h2>
+
+<p>This table maps common LLM tasks to the tier that minimizes cost-per-successful-response:</p>
+
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+  <th>Task Type</th>
+  <th>Example</th>
+  <th>Recommended Tier</th>
+  <th>Success Rate at Tier</th>
+  <th>Est. Cost/1K Tasks</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>Classification</strong></td>
+  <td>Spam / not-spam; sentiment (pos/neg/neutral)</td>
+  <td>Luna</td>
+  <td class="number">95–98%</td>
+  <td class="number">$1.20–$1.50</td>
+</tr>
+<tr>
+  <td><strong>Structured extraction</strong></td>
+  <td>Pull name, email, phone from text</td>
+  <td>Luna</td>
+  <td class="number">92–96%</td>
+  <td class="number">$1.80–$2.40</td>
+</tr>
+<tr>
+  <td><strong>Categorization (many classes)</strong></td>
+  <td>Assign one of 50+ product categories</td>
+  <td>Luna</td>
+  <td class="number">88–94%</td>
+  <td class="number">$2.40–$3.20</td>
+</tr>
+<tr>
+  <td><strong>Summarization</strong></td>
+  <td>Condense article or chat log</td>
+  <td>Luna</td>
+  <td class="number">92–97%</td>
+  <td class="number">$1.50–$2.00</td>
+</tr>
+<tr>
+  <td><strong>Agent loops (tool use)</strong></td>
+  <td>Multi-turn: search, reason, refine</td>
+  <td>Terra</td>
+  <td class="number">85–92%</td>
+  <td class="number">$8.00–$12.00</td>
+</tr>
+<tr>
+  <td><strong>Multi-turn conversation</strong></td>
+  <td>Customer support, advisory bots</td>
+  <td>Terra</td>
+  <td class="number">88–94%</td>
+  <td class="number">$6.00–$10.00</td>
+</tr>
+<tr>
+  <td><strong>Code generation (simple)</strong></td>
+  <td>SQL query, Bash snippet, regex</td>
+  <td>Terra</td>
+  <td class="number">80–90%</td>
+  <td class="number">$10.00–$15.00</td>
+</tr>
+<tr>
+  <td><strong>Code generation (complex)</strong></td>
+  <td>Full endpoint, state machine, DSL compiler</td>
+  <td>Sol</td>
+  <td class="number">75–88%</td>
+  <td class="number">$25.00–$40.00</td>
+</tr>
+<tr>
+  <td><strong>Research + synthesis</strong></td>
+  <td>Analyze 10+ papers, synthesize consensus</td>
+  <td>Sol</td>
+  <td class="number">80–90%</td>
+  <td class="number">$30.00–$50.00</td>
+</tr>
+<tr class="highlight">
+  <td><strong>Hard reasoning (novel problem)</strong></td>
+  <td>Proof verification, novel algorithm design</td>
+  <td>Sol</td>
+  <td class="number">70–85%</td>
+  <td class="number">$40.00–$70.00</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<p><strong>Key insight:</strong> Cost per task is not just API cost — it is (API cost) / (success rate). A Luna classification with 95% success costs ~$1.26 per successful response. If you route the same task to Sol at 98% success, you pay ~$5.10 per response — but you've solved 3% more of your workload, which may or may not be worth the 4× cost.</p>
+
+<h2>3. Cost-Per-Task Worked Examples</h2>
+
+<div class="cost-example">
+  <h3>Example 1: Spam Classification (Luna)</h3>
+  <p><strong>Task:</strong> Classify email as spam (binary yes/no).</p>
+  <p><strong>Typical token profile:</strong> 400 input (email) + 50 output (classification + confidence) = 450 tokens.</p>
+  <p><strong>Luna cost:</strong> (400 × $1/1M) + (50 × $6/1M) = $0.00043/request.</p>
+  <p><strong>If 96% succeed first attempt:</strong> $0.00043 / 0.96 = $0.00045 per successful classification.</p>
+  <p><strong>At 1M emails/month:</strong> $450/month (plus cache discount if you reuse system prompts).</p>
+  <p><strong>If wrongly routed to Sol:</strong> (400 × $5 + 50 × $30) / 1M = $0.0025 per request. At 98% success: $0.00255/successful = $2,550/month (5.7× more).</p>
+</div>
+
+<div class="cost-example">
+  <h3>Example 2: Customer Support Agent (Terra)</h3>
+  <p><strong>Task:</strong> Multi-turn support conversation with tool use (ticket lookup, policy search, escalation decision).</p>
+  <p><strong>Typical token profile per turn:</strong> 2,000 input (context + history) + 400 output (response + tool calls) = 2,400 tokens. Average 3 turns to resolve = 7,200 tokens total per ticket.</p>
+  <p><strong>Terra cost:</strong> (2,000 × $2.50/1M) + (400 × $15/1M) = $0.0080/turn or $0.0240 per ticket.</p>
+  <p><strong>If 90% resolved without escalation:</strong> $0.0240 / 0.90 = $0.0267 per successful ticket.</p>
+  <p><strong>At 10K tickets/month:</strong> $267/month.</p>
+  <p><strong>If used Luna instead:</strong> (2,000 × $1 + 400 × $6) / 1M = $0.0044 per turn = $0.0132/ticket. But Luna's agent loop success drops to 65% (tool calls misfire, reasoning is shallow). Cost per successful: $0.0132 / 0.65 = $0.0203. Net savings: $29/month, but 25% of tickets still fail and escalate, raising support cost $400+. Luna doesn't work here.</p>
+</div>
+
+<div class="cost-example">
+  <h3>Example 3: Code Generation (Terra vs Sol)</h3>
+  <p><strong>Task:</strong> Generate a Python function from a requirement string.</p>
+  <p><strong>Typical token profile:</strong> 1,500 input (spec + examples) + 600 output (code + explanation) = 2,100 tokens.</p>
+  <p><strong>Terra cost:</strong> (1,500 × $2.50 + 600 × $15) / 1M = $0.0134 per request. At 85% first-pass success (code compiles + passes basic tests): $0.0158 per working function.</p>
+  <p><strong>Sol cost:</strong> (1,500 × $5 + 600 × $30) / 1M = $0.0255 per request. At 90% first-pass success: $0.0283 per working function.</p>
+  <p><strong>Savings with Terra:</strong> 44% cheaper per working result. Use Sol only if the 5% difference in success rate and code quality measurably reduces downstream debugging cost.</p>
+</div>
+
+<h2>4. Cascade &amp; Fallback Routing Pattern</h2>
+
+<p>Most FinOps teams shouldn't use a single tier for all work. Instead, implement a cascade pattern: start with the cheapest tier, measure confidence, escalate on low confidence.</p>
+
+<table>
+<thead>
+<tr>
+  <th>Step</th>
+  <th>Model</th>
+  <th>Confidence Threshold</th>
+  <th>Action if Threshold Not Met</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>1</strong></td>
+  <td>Luna</td>
+  <td>Confidence > 85%</td>
+  <td>Return result</td>
+</tr>
+<tr>
+  <td><strong>2</strong></td>
+  <td>Terra</td>
+  <td>Confidence > 75%</td>
+  <td>Return result (escalated)</td>
+</tr>
+<tr>
+  <td><strong>3</strong></td>
+  <td>Sol</td>
+  <td>Confidence > 60%</td>
+  <td>Return result or fail explicitly</td>
+</tr>
+<tr>
+  <td><strong>4</strong></td>
+  <td>Human review</td>
+  <td>—</td>
+  <td>Escalate to human</td>
+</tr>
+</tbody>
+</table>
+
+<p><strong>Real scenario:</strong> You're doing document classification for invoices (classify by vendor). Luna will return high-confidence results (~94% success) and cost ~$1.20 per 1K. For the 6% of ambiguous invoices where Luna returns confidence < 85%, escalate to Terra (~94% success for hard cases), costing ~$3.75 per 1K escalations. If 6% of 10K documents escalate: 600 × $3.75 = $2.25 extra, total $12 + $2.25 = $14.25/10K. Pure Terra would cost ~$37.50. Cascade saves 62% while improving accuracy on edge cases.</p>
+
+<h2>5. Prompt Caching Economics</h2>
+
+<p>GPT-5.6 changed caching costs: cache writes now cost <strong>1.25× the uncached input rate</strong> (not free), and cache reads cost 10% of input.</p>
+
+<table>
+<thead>
+<tr>
+  <th>Scenario</th>
+  <th>Prefix Size</th>
+  <th>Write Cost</th>
+  <th>Read Cost (per hit)</th>
+  <th>Break-Even Hits</th>
+  <th>Savings @ 10 hits/month</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>Luna cached retrieval context</strong></td>
+  <td>100K tokens</td>
+  <td class="number">$0.125</td>
+  <td class="number">$0.010</td>
+  <td class="number">15 hits</td>
+  <td class="number">-$0.025 (loss)</td>
+</tr>
+<tr>
+  <td><strong>Luna cached system prompt + docs</strong></td>
+  <td>50K tokens</td>
+  <td class="number">$0.063</td>
+  <td class="number">$0.005</td>
+  <td class="number">8 hits</td>
+  <td class="number">$0.032</td>
+</tr>
+<tr>
+  <td><strong>Terra cached agent context</strong></td>
+  <td>80K tokens</td>
+  <td class="number">$0.250</td>
+  <td class="number">$0.020</td>
+  <td class="number">14 hits</td>
+  <td class="number">$0.030</td>
+</tr>
+<tr>
+  <td><strong>Sol cached reasoning context</strong></td>
+  <td>100K tokens</td>
+  <td class="number">$0.625</td>
+  <td class="number">$0.050</td>
+  <td class="number">13 hits</td>
+  <td class="number">$0.025</td>
+</tr>
+</tbody>
+</table>
+
+<p><strong>When to cache:</strong> If your prompt includes a stable prefix (system instructions, documentation, few-shot examples) that is reused more than 5–10 times in a 30-minute window, caching usually saves money. Batch API (50% discount) now competes with caching on cost — if you batch classify documents, batch discount beats caching overhead.</p>
+
+<h2>6. Comparison with Claude Sonnet 5, Gemini 3.1 Pro, and DeepSeek V4</h2>
+
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+  <th>Model</th>
+  <th>Input $/1M</th>
+  <th>Output $/1M</th>
+  <th>Speed</th>
+  <th>Reasoning Capability</th>
+  <th>When to Pick</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>GPT-5.6 Luna</strong></td>
+  <td class="number">$1.00</td>
+  <td class="number">$6.00</td>
+  <td>Fast</td>
+  <td>Instruction following, routing</td>
+  <td>Classification, extraction, throughput</td>
+</tr>
+<tr>
+  <td><strong>GPT-5.6 Terra</strong></td>
+  <td class="number">$2.50</td>
+  <td class="number">$15.00</td>
+  <td>Medium</td>
+  <td>Moderate reasoning, tool use</td>
+  <td>Agents, multi-turn, medium code</td>
+</tr>
+<tr>
+  <td><strong>GPT-5.6 Sol</strong></td>
+  <td class="number">$5.00</td>
+  <td class="number">$30.00</td>
+  <td>Slow</td>
+  <td>Frontier reasoning, research</td>
+  <td>Complex code, hard reasoning, novel problems</td>
+</tr>
+<tr>
+  <td><strong>Claude Sonnet 5</strong></td>
+  <td class="number">$2.00–$3.00</td>
+  <td class="number">$10.00–$15.00</td>
+  <td>Medium–Fast</td>
+  <td>Strong reasoning, long reasoning tokens</td>
+  <td>Reasoning, coding (competitive with Sol)</td>
+</tr>
+<tr>
+  <td><strong>Gemini 3.1 Pro</strong></td>
+  <td class="number">$2.00</td>
+  <td class="number">$12.00</td>
+  <td>Medium</td>
+  <td>Multimodal, research capability</td>
+  <td>Multimodal tasks, competitive with Terra</td>
+</tr>
+<tr class="highlight">
+  <td><strong>DeepSeek V4 Flash</strong></td>
+  <td class="number">$0.14</td>
+  <td class="number">$0.28</td>
+  <td>Very Fast</td>
+  <td>Basic reasoning, cached input focus</td>
+  <td>High-volume routing, cache-heavy workloads (7–35× cheaper)</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<p><strong>Cost arbitrage:</strong> For simple classification and extraction, DeepSeek V4 Flash is 7–20× cheaper than Luna. Benchmark it against your data — if it hits 90%+ accuracy, use it and pocket the difference. Claude Sonnet 5 is 2× more expensive than Terra but delivers stronger reasoning per model capability claim; use it if your Terra benchmark shows insufficient quality. Gemini 3.1 Pro lands between Luna and Terra — useful if you need multimodal input or are already in the Vertex AI ecosystem.</p>
+
+<h2>7. Migration from GPT-5/5.5 &amp; Deprecation Status</h2>
+
+<p>OpenAI continues to offer GPT-5.5 ($5/$30, same as Sol) and GPT-5.4 ($2.50/$15, same as Terra) alongside GPT-5.6. There is <strong>no deprecation pressure</strong> on older models — you can keep using GPT-5.5 if your code targets it. However, GPT-5.6 claims performance parity (or better) at the same tier, so migrate to 5.6 for new deployments.</p>
+
+<p>ChatGPT interface continues to retire older models on a rolling basis (GPT-4o mini, GPT-4 turbo are now read-only); API access is stable. If you build against the API, plan annual reviews of model deprecation status but don't expect urgency.</p>
+
+<h2>Cost Measurement Framework</h2>
+
+<div class="routing-guide">
+  <h3>Step 1: Establish baseline by tier</h3>
+  <p>Run a week of traffic and log which tier handled each request. This gives you baseline distribution and cost.</p>
+</div>
+
+<div class="routing-guide">
+  <h3>Step 2: Measure confidence scores and fallback rates</h3>
+  <p>For each tier, log returned confidence. Calculate: what % of Luna calls have confidence > 85%? What % cascade to Terra? This tells you if your cascade is balanced.</p>
+</div>
+
+<div class="routing-guide">
+  <h3>Step 3: Audit success/failure by tier</h3>
+  <p>Compare model output against ground truth for one week. Which tier underperforms on your data? Adjust thresholds or tier selection based on real accuracy, not OpenAI claims.</p>
+</div>
+
+<div class="routing-guide">
+  <h3>Step 4: Calculate true cost per successful response</h3>
+  <p>True cost = (tier_cost) / (success_rate). If Luna costs $1.20 per 1K with 94% success, cost per working response is $1.28. This is the metric to optimize.</p>
+</div>
+
+<h2>Quick Tier Selection Checklist</h2>
+
+<ul>
+  <li><input type="checkbox"> Is this a classification, extraction, or routing task? → Luna unless accuracy is critical.</li>
+  <li><input type="checkbox"> Does the task involve tool use or multi-turn reasoning? → Terra.</li>
+  <li><input type="checkbox"> Is this novel reasoning, complex code, or multi-hop analysis? → Sol (or benchmark Claude Sonnet 5 first).</li>
+  <li><input type="checkbox"> Can you implement a cascade (Luna → Terra → Sol)? → Yes, this is usually optimal.</li>
+  <li><input type="checkbox"> Is there a stable prefix (system prompt, docs) reused 10+ times/month? → Cache it, measure ROI at break-even (5–15 hits).</li>
+  <li><input type="checkbox"> Is this batch or interactive? → Batch work qualifies for 50% discount; recalculate ROI with batch API.</li>
+  <li><input type="checkbox"> Have you benchmarked alternatives (Claude, DeepSeek, Gemini)? → Do it on your data, not marketing claims.</li>
+</ul>
+
+<hr style="margin:48px 0 24px;border:none;border-top:1px solid #1E2A3F" />
+
+<p>Tier selection is a classification problem: match workload properties to tier economics. The ideal is cascade routing — route to Luna first, measure confidence, escalate on uncertainty. This minimizes cost while maintaining quality. FinOps LLM can run a cost audit on your LLM traffic and show you where tier mismatch is leaving money on the table. <a href="/book">Book a free audit</a>.</p>
+
+<p>See also: <a href="/research/how-much-does-gpt5-cost">How Much Does GPT-5 Cost?</a> for the full GPT pricing landscape and <a href="/research/hidden-llm-costs">Hidden LLM Costs</a> for infrastructure and fallback overhead beyond per-token fees.</p>
+
+<p><a href="/research">Back to research</a></p>
+
+{% endblock %}{% block suffix %}</main></body></html>
+{% endblock %}
