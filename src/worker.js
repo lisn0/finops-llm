@@ -25,43 +25,50 @@ const DEFAULT_TITLE = 'FinOps LLM';
 const CONTENT_SIGNAL = 'search=yes, ai-input=yes, ai-train=no';
 
 // Languages with a full published translation mirror. Order is not significant.
-const LANGS = ['es', 'fr', 'de', 'ja'];
+const LANGS = ['es', 'fr', 'de', 'ja', 'pt'];
 
-// English paths that have a published translation, PER LANGUAGE, so a language
-// redirect can never land a visitor on a 404. es/ja carry more translations
-// than de/fr, so the sets differ. Keep each set in sync with the files that
-// actually exist under src/<lang>/ — list them with:
-//   ls src/<lang>/research/*.njk
-const CORE = ['/', '/research'];
-const DEEP = [
-	'/research/finops-for-llm',
-	'/research/ai-finops',
-	'/research/llm-cost-attribution',
-	'/research/openai-cost-attribution',
-	'/research/llm-chargeback-showback',
-	'/research/anomaly-detection',
-];
-const EXTENDED = [
+// English paths that have a published translation, so a language redirect can
+// never land a visitor on a 404. All five mirrors are at parity — every locale
+// carries all 22 articles — so this is one list, not per-language sets.
+//
+// This is the ONLY thing standing between a new untranslated article and a
+// redirect into a 404, so it must stay in sync with what exists on disk. Adding
+// an English-only article? Leave it out. Verify with:
+//   scripts/worker-translated.test.mjs
+const TRANSLATED_PATHS = [
+	'/',
+	'/research',
 	'/research/agent-economics',
+	'/research/ai-finops',
+	'/research/anomaly-detection',
 	'/research/caching-strategies-compared',
 	'/research/cheapest-ai-code-generation',
 	'/research/coding-plan-comparison',
+	'/research/finops-for-llm',
+	'/research/gpt-5-6-pricing-tier-guide',
 	'/research/how-much-does-gpt5-cost',
 	'/research/how-to-audit-llm-spend',
 	'/research/llm-api-pricing-tracker',
+	'/research/llm-chargeback-showback',
+	'/research/llm-cost-attribution',
 	'/research/llm-cost-calculator',
 	'/research/llm-cost-trends-2025-2026',
 	'/research/mcp-server-cost-impact',
 	'/research/open-source-vs-closed-cost',
+	'/research/openai-cost-attribution',
+	'/research/openai-fine-tuning-sunset-economics',
 	'/research/reasoning-model-cost-guide',
+	'/research/sonnet-5-intro-pricing-deadline',
 	'/research/token-budget-implementation-guide',
 ];
-const TRANSLATED = {
-	es: new Set([...CORE, ...DEEP, ...EXTENDED]),
-	ja: new Set([...CORE, ...DEEP, ...EXTENDED]),
-	fr: new Set([...CORE, ...DEEP]),
-	de: new Set([...CORE, ...DEEP]),
-};
+const TRANSLATED = Object.fromEntries(LANGS.map((l) => [l, new Set(TRANSLATED_PATHS)]));
+
+// Derived from LANGS, never hand-written: a hardcoded (es|fr|de|ja) list silently
+// desyncs the moment a locale is added, and the failure is invisible — the new
+// locale just never matches.
+const LANG_PREFIX_RE = new RegExp(`^/(${LANGS.join('|')})(/|$)`);
+const LANG_COOKIE_RE = new RegExp(`(?:^|;\\s*)lang=(en|${LANGS.join('|')})\\b`);
+export const __TRANSLATED_PATHS = TRANSLATED_PATHS; // for the sync test
 
 // Map an English path to its translated equivalent: '/' -> '/es/', '/research'
 // -> '/fr/research', etc. Mirrors the structure built by the i18n clone script.
@@ -75,7 +82,7 @@ function targetFor(lang, path) {
 // advertise the other-language URLs, so an agent can fetch and cite the version
 // matching its user's language. Non-translated pages just report their language.
 function langInfo(url) {
-	const m = url.pathname.match(/^\/(es|fr|de|ja)(\/|$)/);
+	const m = url.pathname.match(LANG_PREFIX_RE);
 	const lang = m ? m[1] : 'en';
 	const base = normalizePath(m ? url.pathname.slice(lang.length + 1) || '/' : url.pathname);
 	const langsWithPage = LANGS.filter((l) => TRANSLATED[l].has(base));
@@ -89,9 +96,80 @@ function langInfo(url) {
 // for — never auto-redirect them, or hreflang clusters break.
 const BOT_RE = /bot|crawl|spider|slurp|mediapartners|facebookexternalhit|embedly|quora|pinterest|whatsapp|telegram|googlebot|bingbot|duckduckbot|yandex|baidu|applebot|amazonbot|gptbot|claudebot|claude-|oai-searchbot|chatgpt-user|perplexity|mistralai|meta-externalagent|google-extended/i;
 
+/* ------------------------------------------------------------------ */
+/* AI crawler logging (GEO analytics)                                  */
+/* ------------------------------------------------------------------ */
+
+// AI crawlers self-identify in the User-Agent — they WANT to be found — so
+// detection is a lookup table, not bot-scoring. Cloudflare's botScore is for
+// catching bots that lie; it costs money and answers a question we don't have.
+//
+// `kind` is the part that matters commercially:
+//   live  — a human asked the assistant something and it fetched this page NOW.
+//           The strongest available evidence of an actual citation.
+//   search— indexing for the assistant's answer engine (citation-eligible).
+//   train — corpus collection for model training. No citation value.
+//
+// Longest/most specific token first: 'chatgpt-user' must win before any
+// substring of it could match something broader.
+const AI_CRAWLERS = [
+	{ token: 'chatgpt-user', name: 'ChatGPT-User', kind: 'live' },
+	{ token: 'oai-searchbot', name: 'OAI-SearchBot', kind: 'search' },
+	{ token: 'gptbot', name: 'GPTBot', kind: 'train' },
+	{ token: 'claude-searchbot', name: 'Claude-SearchBot', kind: 'search' },
+	{ token: 'claude-user', name: 'Claude-User', kind: 'live' },
+	{ token: 'claudebot', name: 'ClaudeBot', kind: 'train' },
+	{ token: 'perplexity-user', name: 'Perplexity-User', kind: 'live' },
+	{ token: 'perplexitybot', name: 'PerplexityBot', kind: 'search' },
+	{ token: 'google-extended', name: 'Google-Extended', kind: 'train' },
+	{ token: 'bingbot', name: 'Bingbot', kind: 'search' },
+	{ token: 'duckassistbot', name: 'DuckAssistBot', kind: 'search' },
+	{ token: 'meta-externalagent', name: 'Meta-ExternalAgent', kind: 'train' },
+	{ token: 'mistralai-user', name: 'MistralAI-User', kind: 'live' },
+	{ token: 'bytespider', name: 'Bytespider', kind: 'train' },
+	{ token: 'amazonbot', name: 'Amazonbot', kind: 'search' },
+	{ token: 'applebot-extended', name: 'Applebot-Extended', kind: 'train' },
+	{ token: 'youbot', name: 'YouBot', kind: 'search' },
+	{ token: 'ccbot', name: 'CCBot', kind: 'train' },
+	{ token: 'cohere-ai', name: 'Cohere', kind: 'train' },
+];
+
+// Returns the matching crawler descriptor, or null for humans and non-AI bots.
+export function detectAiCrawler(userAgent) {
+	const ua = (userAgent || '').toLowerCase();
+	if (!ua) return null;
+	return AI_CRAWLERS.find((c) => ua.includes(c.token)) || null;
+}
+
+// Fire-and-forget write to Workers Analytics Engine. Deliberately never throws:
+// a logging fault must not take down page serving. Note AE itself also fails
+// SILENTLY on malformed data — `npx wrangler tail` is the only way to see that,
+// so detectAiCrawler carries a self-check (scripts/worker-crawlers.test.mjs).
+function logAiCrawler(request, env, url) {
+	if (!env || !env.AI_HITS) return; // binding absent in local dev — fine.
+	const hit = detectAiCrawler(request.headers.get('User-Agent'));
+	if (!hit) return;
+	try {
+		env.AI_HITS.writeDataPoint({
+			// Path is attacker-controlled and unbounded; AE drops the whole data
+			// point (silently) past ~5KB, so cap it. Real paths are well under 200.
+			blobs: [hit.name, hit.kind, normalizePath(url.pathname).slice(0, 200), url.hostname],
+			doubles: [1],
+			indexes: [hit.name],
+		});
+	} catch (e) {
+		// Swallowed on purpose: analytics must never break the response.
+	}
+}
+
 export default {
 	async fetch(request, env) {
 		const url = new URL(request.url);
+
+		// 0. Record AI crawler hits before any redirect, so a bot that lands on
+		//    www or a translated path is still counted against the URL it asked
+		//    for. Non-blocking and never throws.
+		logAiCrawler(request, env, url);
 
 		// 1. www -> apex (301).
 		if (url.hostname === 'www.' + APEX) {
@@ -153,8 +231,8 @@ function languageRedirect(request, url) {
 	// Never bounce crawlers/agents.
 	if (BOT_RE.test(request.headers.get('User-Agent') || '')) return null;
 
-	// Already inside a translated tree (/es, /fr, /de, /ja).
-	if (/^\/(es|fr|de|ja)(\/|$)/.test(url.pathname)) return null;
+	// Already inside a translated tree (/es, /fr, /de, /ja, /pt).
+	if (LANG_PREFIX_RE.test(url.pathname)) return null;
 
 	const path = normalizePath(url.pathname);
 
@@ -185,7 +263,7 @@ function normalizePath(p) {
 
 function langCookie(request) {
 	const c = request.headers.get('Cookie') || '';
-	const m = c.match(/(?:^|;\s*)lang=(en|es|fr|de|ja)\b/);
+	const m = c.match(LANG_COOKIE_RE);
 	return m ? m[1] : null;
 }
 
