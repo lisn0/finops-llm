@@ -1,0 +1,248 @@
+---
+permalink: "fr/research/coding-plan-comparison.html"
+---
+{% extends "shell.njk" %}{% block prefix %}<!DOCTYPE html>
+<html lang="fr"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Comparaison des Plans de Codage IA · FinOps LLM</title><meta name="description" content="Comparaison basée sur des preuves des principaux plans de codage IA. Tarifs, limites et scores de modèles dans un tableau normalisé avec sources vérifiables." /><meta name="robots" content="index, follow" /><link rel="canonical" href="https://finopsllm.com/fr/research/coding-plan-comparison" />
+<link rel="alternate" hreflang="en" href="https://finopsllm.com/research/coding-plan-comparison" />
+<link rel="alternate" hreflang="es" href="https://finopsllm.com/es/research/coding-plan-comparison" />
+<link rel="alternate" hreflang="fr" href="https://finopsllm.com/fr/research/coding-plan-comparison" />
+<link rel="alternate" hreflang="de" href="https://finopsllm.com/de/research/coding-plan-comparison" />
+<link rel="alternate" hreflang="ja" href="https://finopsllm.com/ja/research/coding-plan-comparison" />
+<link rel="alternate" hreflang="x-default" href="https://finopsllm.com/research/coding-plan-comparison" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","headline":"Comparaison des Plans de Codage IA · FinOps LLM","description":"Comparaison basée sur des preuves des principaux plans de codage IA. Tarifs, limites et scores de modèles dans un tableau normalisé.","url":"https://finopsllm.com/fr/research/coding-plan-comparison","datePublished":"2026-07-04","dateModified":"2026-07-04","image":"https://finopsllm.com/og.png","author":{"@type":"Organization","name":"FinOps LLM team"},"publisher":{"@type":"Organization","name":"FinOps LLM","url":"https://finopsllm.com/"}}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Accueil","item":"https://finopsllm.com/fr/"},{"@type":"ListItem","position":2,"name":"Recherche","item":"https://finopsllm.com/fr/research"},{"@type":"ListItem","position":3,"name":"Comparaison des Plans de Codage IA","item":"https://finopsllm.com/fr/research/coding-plan-comparison"}]}
+</script>
+<style>
+body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}
+.wrap{max-width:1100px;margin:0 auto;padding:56px 24px}
+a{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}
+.langsw{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;color:#647289;margin:0 0 26px}
+.langsw a{text-decoration:none}.langsw a[aria-current]{color:#E6EAF2;font-weight:600}
+.hero-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:16px;margin:28px 0 36px}
+.hero-stat{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:18px 16px;text-align:center}
+.hero-stat .num{font-size:2rem;font-weight:700;color:#7AAFFF;display:block}
+.hero-stat .lbl{font-size:.82rem;color:#647289;margin-top:4px}
+.badge-row{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 32px;list-style:none;padding:0}
+.badge-row li{background:#101726;border:1px solid #1E2A3F;border-radius:8px;padding:8px 14px;font-size:.85rem;color:#B6C0D2}
+.method-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin:20px 0 32px}
+.method-card{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:18px}
+.method-card h3{font-size:.95rem;color:#E6EAF2;margin:0 0 8px}
+.method-card p{font-size:.85rem;margin:0}
+.feed-item{border-left:3px solid #7AAFFF;padding:12px 0 12px 16px;margin:0 0 4px}
+.feed-item .feed-date{font-size:.78rem;color:#647289;font-family:'JetBrains Mono',monospace}
+.feed-item h3{font-size:.95rem;margin:4px 0 4px;color:#E6EAF2}
+.feed-item p{font-size:.85rem;margin:0}
+.controls{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:18px 20px;margin:28px 0 20px;display:flex;flex-wrap:wrap;align-items:center;gap:20px}
+.controls label{font-size:.85rem;color:#B6C0D2}
+.controls select,.controls input[type=range]{background:#0A0F1A;border:1px solid #1E2A3F;color:#E6EAF2;border-radius:6px;padding:6px 10px;font-size:.85rem}
+.controls select:focus,.controls input:focus{outline:none;border-color:#7AAFFF}
+.conv-display{font-family:'JetBrains Mono',monospace;color:#7AAFFF;font-weight:600;font-size:.95rem}
+.table-wrap{overflow-x:auto;margin:0 0 32px;-webkit-overflow-scrolling:touch}
+table{border-collapse:collapse;width:100%;font-size:.82rem;white-space:nowrap}
+th,td{border:1px solid #1E2A3F;padding:8px 10px;text-align:left;color:#B6C0D2}
+th{color:#E6EAF2;background:#101726;cursor:pointer;position:sticky;top:0;user-select:none}
+th:hover{background:#162035}
+th .sort-arrow{font-size:.7rem;margin-left:4px;opacity:.4}
+th.sorted .sort-arrow{opacity:1;color:#7AAFFF}
+td.provider-cell{white-space:normal;min-width:140px}
+td.price-cell{text-align:right;font-variant-numeric:tabular-nums}
+td.limit-cell{text-align:right;font-variant-numeric:tabular-nums;min-width:55px}
+td.model-cell{font-size:.78rem}
+tr:hover{background:rgba(122,175,255,.04)}
+.est{color:#647289}
+.official{color:#B6C0D2}
+.score{display:inline-block;padding:2px 7px;border-radius:4px;font-size:.75rem;font-weight:600;margin:1px}
+.score-high{background:rgba(74,222,128,.15);color:#4ade80}
+.score-mid{background:rgba(250,204,21,.12);color:#facc15}
+.score-low{background:rgba(248,113,113,.12);color:#f87171}
+.ref-link{font-size:.75rem;color:#7AAFFF;text-decoration:none;border-bottom:1px dotted rgba(122,175,255,.3)}
+.ref-link:hover{border-bottom-color:#7AAFFF}
+.footnotes{font-size:.8rem;color:#64748b;margin:16px 0 0}
+.footnotes p{margin:6px 0}
+.guide-section{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:24px;margin:12px 0}
+.guide-section h3{color:#E6EAF2;margin:0 0 10px;font-size:1rem}
+@media(max-width:700px){.controls{flex-direction:column;align-items:flex-start}.hero-stats{grid-template-columns:repeat(2,1fr)}table{font-size:.75rem}th,td{padding:6px 7px}}
+.toggle-row{display:flex;gap:8px;align-items:center}
+.toggle-btn{background:#0A0F1A;border:1px solid #1E2A3F;color:#647289;padding:5px 12px;border-radius:6px;font-size:.8rem;cursor:pointer}
+.toggle-btn.active{background:rgba(122,175,255,.12);border-color:#7AAFFF;color:#7AAFFF}
+</style><script src="/assets/consent.js" defer></script><script src="/assets/attribution.js" defer></script>
+<script src="/assets/lang.js" defer></script>
+</head>
+<body><main class="wrap">{% endblock %}{% block body %}
+<nav class="langsw" aria-label="Langue"><a href="/research/coding-plan-comparison" hreflang="en">EN</a> · <a href="/es/research/coding-plan-comparison" hreflang="es">ES</a> · <a href="/fr/research/coding-plan-comparison" hreflang="fr" aria-current="page">FR</a> · <a href="/de/research/coding-plan-comparison" hreflang="de">DE</a> · <a href="/ja/research/coding-plan-comparison" hreflang="ja">JA</a></nav>
+
+<h1>Comparaison des Plans de Codage IA</h1>
+<p>Comparez les principaux plans de codage IA avec des preuves vérifiables. Tarifs, limites et scores de modèles dans un tableau normalisé. Construit à partir de la documentation des fournisseurs et de règles de conversion explicites pour une comparaison équitable.</p>
+
+<div class="hero-stats">
+  <div class="hero-stat"><span class="num">9</span><span class="lbl">Fournisseurs suivis</span></div>
+  <div class="hero-stat"><span class="num">29</span><span class="lbl">Plans comparés</span></div>
+  <div class="hero-stat"><span class="num">62</span><span class="lbl">Modèles répertoriés</span></div>
+  <div class="hero-stat"><span class="num">Juil 2026</span><span class="lbl">Dernière mise à jour</span></div>
+</div>
+
+<ul class="badge-row">
+  <li>Chaque mise à jour est liée à des preuves publiques</li>
+  <li>Les règles de conversion Prompt/Requête sont explicites</li>
+  <li>La logique de calcul fixe maintient les comparaisons cohérentes</li>
+</ul>
+
+<h2>Méthodologie</h2>
+<div class="method-grid">
+  <div class="method-card"><h3>Collecte</h3><p>Les données de plans, de limites et de modèles sont collectées à partir de sources publiques des fournisseurs.</p></div>
+  <div class="method-card"><h3>Normalisation</h3><p>Les formats Prompt/Requête/Période sont normalisés dans un modèle de comparaison unique.</p></div>
+  <div class="method-card"><h3>Règles de conversion</h3><p>Requête/Prompt = 15 et Hebdomadaire × 4 = Mensuel sont appliqués explicitement.</p></div>
+  <div class="method-card"><h3>Politique d'affichage</h3><p>Les valeurs officielles et estimées sont clairement séparées dans l'interface.</p></div>
+</div>
+
+<h2>Flux de Mise à Jour</h2>
+<div style="margin:0 0 32px">
+  <div class="feed-item">
+    <span class="feed-date">4 juil 2026</span>
+    <h3>Page de recherche de comparaison de plans lancée</h3>
+    <p>Comparaison de plans de codage IA basée sur des preuves publiée en tant qu'article de recherche FinOps LLM.</p>
+  </div>
+  <div class="feed-item">
+    <span class="feed-date">27 mai 2026</span>
+    <h3>Quota Xiaomi MiMO augmenté</h3>
+    <p>Xiaomi MiMO a augmenté les limites d'utilisation disponibles, et le tableau de comparaison a été mis à jour.</p>
+  </div>
+  <div class="feed-item">
+    <span class="feed-date">1er mai 2026</span>
+    <h3>Alibaba abandonne le Plan de Codage, ajoute le Plan de Jetons (Édition Équipe)</h3>
+    <p>Alibaba a fermé le Plan de Codage précédent et introduit le Plan de Jetons (Édition Équipe).</p>
+  </div>
+</div>
+
+<h2 id="plans">Liste de Comparaison des Plans de Codage</h2>
+
+<div class="controls">
+  <label>Taux de conversion Requête/Prompt (par défaut = 15)
+    <div style="display:flex;align-items:center;gap:10px;margin-top:6px">
+      <input type="range" id="convRate" min="5" max="30" value="15" step="1" style="width:160px" />
+      <span class="conv-display">1 Prompt = <span id="convVal">15</span> Requêtes</span>
+    </div>
+  </label>
+  <label>Tri
+    <select id="sortMode">
+      <option value="default">Ordre par défaut</option>
+      <option value="vfm10">Meilleure valeur ≤ 10 $</option>
+      <option value="vfm30">Meilleure valeur ≤ 30 $</option>
+      <option value="vfmAll">Meilleure valeur (tous)</option>
+    </select>
+  </label>
+  <div class="toggle-row">
+    <label>Afficher :</label>
+    <button class="toggle-btn active" data-show="all">Tous</button>
+    <button class="toggle-btn" data-show="coding">Codage</button>
+    <button class="toggle-btn" data-show="agent">Agent</button>
+  </div>
+</div>
+
+<div class="table-wrap">
+<table id="planTable">
+<thead>
+<tr>
+  <th data-col="provider">Fournisseur <span class="sort-arrow">↕</span></th>
+  <th data-col="plan">Plan <span class="sort-arrow">↕</span></th>
+  <th data-col="price">Tarif <span class="sort-arrow">↕</span></th>
+  <th>Utilisation</th>
+  <th data-col="promptMo" class="limit-cell">Prompt / mois <span class="sort-arrow">↕</span></th>
+  <th data-col="reqMo" class="limit-cell">Requête / mois <span class="sort-arrow">↕</span></th>
+  <th data-col="promptUsd" class="limit-cell">Prompt / 1 $ <span class="sort-arrow">↕</span></th>
+  <th data-col="reqUsd" class="limit-cell">Requête / 1 $ <span class="sort-arrow">↕</span></th>
+  <th>Modèles</th>
+  <th data-col="intelligence">Intel <span class="sort-arrow">↕</span></th>
+  <th data-col="coding">Codage <span class="sort-arrow">↕</span></th>
+  <th data-col="agentic">Agentic <span class="sort-arrow">↕</span></th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="provider-cell"><strong>GLM</strong></td><td>Lite</td><td class="price-cell">10 $</td><td>Codage + Agent</td><td class="limit-cell official" data-val="160">160</td><td class="limit-cell est" data-val="2400">2 400</td><td class="limit-cell official" data-val="16">16</td><td class="limit-cell est" data-val="240">240</td><td class="model-cell">GLM-5.1 (×3), GLM-5-Turbo (×3), GLM-4.7 (×1)</td><td class="score-mid score" data-val="47">47</td><td class="score-mid score" data-val="37">37</td><td class="score-high score" data-val="66">66</td></tr>
+<tr><td class="provider-cell"><strong>GLM</strong></td><td>Pro</td><td class="price-cell">30 $</td><td>Codage + Agent</td><td class="limit-cell official" data-val="267">267</td><td class="limit-cell est" data-val="4000">4 000</td><td class="limit-cell official" data-val="8.9">8,9</td><td class="limit-cell est" data-val="133">133</td><td class="model-cell">GLM-5.1 (×3), GLM-5-Turbo (×3), GLM-5 (×3)</td><td class="score-mid score" data-val="50">50</td><td class="score-mid score" data-val="44">44</td><td class="score-high score" data-val="63">63</td></tr>
+<tr><td class="provider-cell"><strong>GLM</strong></td><td>Max</td><td class="price-cell">80 $</td><td>Codage + Agent</td><td class="limit-cell official" data-val="400">400</td><td class="limit-cell est" data-val="6000">6 000</td><td class="limit-cell official" data-val="5">5</td><td class="limit-cell est" data-val="75">75</td><td class="model-cell">GLM-5.1 (×3), GLM-5-Turbo (×3), GLM-5 (×3)</td><td class="score-mid score" data-val="50">50</td><td class="score-mid score" data-val="44">44</td><td class="score-high score" data-val="63">63</td></tr>
+<tr><td class="provider-cell"><strong>MiniMax</strong></td><td>Starter</td><td class="price-cell">10 $</td><td>Codage + Agent</td><td class="limit-cell est" data-val="400">400</td><td class="limit-cell official" data-val="6000">6 000</td><td class="limit-cell est" data-val="40">40</td><td class="limit-cell official" data-val="600">600</td><td class="model-cell">MiniMax-M2.7 (×1)</td><td class="score-mid score" data-val="50">50</td><td class="score-mid score" data-val="42">42</td><td class="score-high score" data-val="61">61</td></tr>
+<tr><td class="provider-cell"><strong>MiniMax</strong></td><td>Plus</td><td class="price-cell">20 $</td><td>Codage + Agent</td><td class="limit-cell est" data-val="600">600</td><td class="limit-cell official" data-val="9000">9 000</td><td class="limit-cell est" data-val="30">30</td><td class="limit-cell official" data-val="450">450</td><td class="model-cell">MiniMax-M2.7 (×1)</td><td class="score-mid score" data-val="50">50</td><td class="score-mid score" data-val="42">42</td><td class="score-high score" data-val="61">61</td></tr>
+<tr><td class="provider-cell"><strong>MiniMax</strong></td><td>Max</td><td class="price-cell">45 $</td><td>Codage + Agent</td><td class="limit-cell est" data-val="889">889</td><td class="limit-cell official" data-val="13333">13 333</td><td class="limit-cell est" data-val="19.8">19,8</td><td class="limit-cell official" data-val="296">296</td><td class="model-cell">MiniMax-M2.7 (×1)</td><td class="score-mid score" data-val="50">50</td><td class="score-mid score" data-val="42">42</td><td class="score-high score" data-val="61">61</td></tr>
+<tr><td class="provider-cell"><strong>MiniMax</strong></td><td>Plus-HighSpeed</td><td class="price-cell">40 $</td><td>Codage + Agent</td><td class="limit-cell est" data-val="300">300</td><td class="limit-cell official" data-val="4500">4 500</td><td class="limit-cell est" data-val="7.5">7,5</td><td class="limit-cell official" data-val="112.5">112,5</td><td class="model-cell">MiniMax-M2.7-highspeed (×1)</td><td class="score-mid score" data-val="50">50</td><td class="score-mid score" data-val="42">42</td><td class="score-high score" data-val="61">61</td></tr>
+<tr><td class="provider-cell"><strong>MiniMax</strong></td><td>Max-HighSpeed</td><td class="price-cell">80 $</td><td>Codage + Agent</td><td class="limit-cell est" data-val="500">500</td><td class="limit-cell official" data-val="7500">7 500</td><td class="limit-cell est" data-val="6.25">6,25</td><td class="limit-cell official" data-val="93.75">93,75</td><td class="model-cell">MiniMax-M2.7-highspeed (×1)</td><td class="score-mid score" data-val="50">50</td><td class="score-mid score" data-val="42">42</td><td class="score-high score" data-val="61">61</td></tr>
+<tr><td class="provider-cell"><strong>MiniMax</strong></td><td>Ultra-HighSpeed</td><td class="price-cell">150 $</td><td>Codage + Agent</td><td class="limit-cell est" data-val="533">533</td><td class="limit-cell official" data-val="8000">8 000</td><td class="limit-cell est" data-val="3.55">3,55</td><td class="limit-cell official" data-val="53.3">53,3</td><td class="model-cell">MiniMax-M2.7 (×1)</td><td class="score-mid score" data-val="50">50</td><td class="score-mid score" data-val="42">42</td><td class="score-high score" data-val="61">61</td></tr>
+<tr><td class="provider-cell"><strong>BytePlus</strong></td><td>Lite</td><td class="price-cell">10 $</td><td>Codage + Agent</td><td class="limit-cell est" data-val="120">120</td><td class="limit-cell official" data-val="1800">1 800</td><td class="limit-cell est" data-val="12">12</td><td class="limit-cell official" data-val="180">180</td><td class="model-cell">Seed-Code (×1), GLM-4.7 (×1), DeepSeek-V3.2 (×1), kimi-k2.5 (×1)</td><td class="score-low score" data-val="34">34</td><td class="score-low score" data-val="31">31</td><td class="score-mid score" data-val="36">36</td></tr>
+<tr><td class="provider-cell"><strong>BytePlus</strong></td><td>Pro</td><td class="price-cell">50 $</td><td>Codage + Agent</td><td class="limit-cell est" data-val="120">120</td><td class="limit-cell official" data-val="1800">1 800</td><td class="limit-cell est" data-val="2.4">2,4</td><td class="limit-cell official" data-val="36">36</td><td class="model-cell">Seed-Code (×1), GLM-4.7 (×1), DeepSeek-V3.2 (×1), kimi-k2.5 (×1)</td><td class="score-low score" data-val="34">34</td><td class="score-low score" data-val="31">31</td><td class="score-mid score" data-val="36">36</td></tr>
+<tr><td class="provider-cell"><strong>StepFun</strong></td><td>Flash Mini</td><td class="price-cell">6,99 $</td><td>Codage</td><td class="limit-cell official" data-val="229">229</td><td class="limit-cell est" data-val="3433">3 433</td><td class="limit-cell official" data-val="32.8">32,8</td><td class="limit-cell est" data-val="491">491</td><td class="model-cell">step-3.5-flash (×1)</td><td class="score-low score" data-val="38">38</td><td class="score-low score" data-val="32">32</td><td class="score-mid score" data-val="52">52</td></tr>
+<tr><td class="provider-cell"><strong>StepFun</strong></td><td>Flash Plus</td><td class="price-cell">9,99 $</td><td>Codage</td><td class="limit-cell official" data-val="641">641</td><td class="limit-cell est" data-val="9610">9 610</td><td class="limit-cell official" data-val="64.2">64,2</td><td class="limit-cell est" data-val="962">962</td><td class="model-cell">step-3.5-flash (×1)</td><td class="score-low score" data-val="38">38</td><td class="score-low score" data-val="32">32</td><td class="score-mid score" data-val="52">52</td></tr>
+<tr><td class="provider-cell"><strong>StepFun</strong></td><td>Flash Pro</td><td class="price-cell">29 $</td><td>Codage</td><td class="limit-cell official" data-val="828">828</td><td class="limit-cell est" data-val="12414">12 414</td><td class="limit-cell official" data-val="28.6">28,6</td><td class="limit-cell est" data-val="428">428</td><td class="model-cell">step-3.5-flash (×1)</td><td class="score-low score" data-val="38">38</td><td class="score-low score" data-val="32">32</td><td class="score-mid score" data-val="52">52</td></tr>
+<tr><td class="provider-cell"><strong>StepFun</strong></td><td>Flash Max</td><td class="price-cell">99 $</td><td>Codage</td><td class="limit-cell official" data-val="808">808</td><td class="limit-cell est" data-val="12121">12 121</td><td class="limit-cell official" data-val="8.16">8,16</td><td class="limit-cell est" data-val="122.4">122,4</td><td class="model-cell">step-3.5-flash (×1)</td><td class="score-low score" data-val="38">38</td><td class="score-low score" data-val="32">32</td><td class="score-mid score" data-val="52">52</td></tr>
+<tr><td class="provider-cell"><strong>KwaiKAT</strong></td><td>Mini</td><td class="price-cell">5 $</td><td>Codage</td><td class="limit-cell official" data-val="1075">1 075</td><td class="limit-cell est" data-val="16128">16 128</td><td class="limit-cell official" data-val="215">215</td><td class="limit-cell est" data-val="3225.6">3 226</td><td class="model-cell">KAT-Coder-Pro V2 (×1)</td><td class="score-mid score" data-val="44">44</td><td class="score-mid score" data-val="46">46</td><td class="score-mid score" data-val="51">51</td></tr>
+<tr><td class="provider-cell"><strong>KwaiKAT</strong></td><td>Starter</td><td class="price-cell">10 $</td><td>Codage</td><td class="limit-cell official" data-val="1344">1 344</td><td class="limit-cell est" data-val="20160">20 160</td><td class="limit-cell official" data-val="134.4">134,4</td><td class="limit-cell est" data-val="2016">2 016</td><td class="model-cell">KAT-Coder-Pro V2 (×1)</td><td class="score-mid score" data-val="44">44</td><td class="score-mid score" data-val="46">46</td><td class="score-mid score" data-val="51">51</td></tr>
+<tr><td class="provider-cell"><strong>KwaiKAT</strong></td><td>Pro</td><td class="price-cell">20 $</td><td>Codage</td><td class="limit-cell official" data-val="2016">2 016</td><td class="limit-cell est" data-val="30240">30 240</td><td class="limit-cell official" data-val="100.8">100,8</td><td class="limit-cell est" data-val="1512">1 512</td><td class="model-cell">KAT-Coder-Pro V2 (×1)</td><td class="score-mid score" data-val="44">44</td><td class="score-mid score" data-val="46">46</td><td class="score-mid score" data-val="51">51</td></tr>
+<tr><td class="provider-cell"><strong>KwaiKAT</strong></td><td>Max</td><td class="price-cell">50 $</td><td>Codage</td><td class="limit-cell official" data-val="2688">2 688</td><td class="limit-cell est" data-val="40320">40 320</td><td class="limit-cell official" data-val="53.76">53,76</td><td class="limit-cell est" data-val="806.4">806,4</td><td class="model-cell">KAT-Coder-Pro V2 (×1)</td><td class="score-mid score" data-val="44">44</td><td class="score-mid score" data-val="46">46</td><td class="score-mid score" data-val="51">51</td></tr>
+<tr><td class="provider-cell"><strong>OpenCode</strong></td><td>Go</td><td class="price-cell">10 $</td><td>Codage + Agent</td><td class="limit-cell est" data-val="667">667</td><td class="limit-cell est" data-val="10000">10 000</td><td class="limit-cell est" data-val="66.7">66,7</td><td class="limit-cell est" data-val="1000">1 000</td><td class="model-cell">MiniMax-M2.5 (×1), M2.7 (×1.4), MiMo-V2-Pro (×16), kimi-k2.5 (×11), GLM-5 (×17)</td><td class="score-mid score" data-val="50">50</td><td class="score-mid score" data-val="44">44</td><td class="score-high score" data-val="63">63</td></tr>
+<tr><td class="provider-cell"><strong>Xiaomi MiMO</strong><br /><a class="ref-link" href="https://platform.xiaomimimo.com?ref=LHT8UJ">Inscription - chacun 2 $ ↗</a></td><td>Lite</td><td class="price-cell">6 $</td><td>Codage + Agent</td><td class="limit-cell est" data-val="380">380</td><td class="limit-cell est" data-val="5693">5 693</td><td class="limit-cell est" data-val="63.3">63,3</td><td class="limit-cell est" data-val="949">949</td><td class="model-cell">MiMo-V2-Pro (×1), MiMo-V2-Omni (×1)</td><td class="score-mid score" data-val="49">49</td><td class="score-mid score" data-val="41">41</td><td class="score-high score" data-val="63">63</td></tr>
+<tr><td class="provider-cell"><strong>Xiaomi MiMO</strong><br /><a class="ref-link" href="https://platform.xiaomimimo.com?ref=LHT8UJ">Inscription - chacun 2 $ ↗</a></td><td>Standard</td><td class="price-cell">16 $</td><td>Codage + Agent</td><td class="limit-cell est" data-val="382">382</td><td class="limit-cell est" data-val="5729">5 729</td><td class="limit-cell est" data-val="23.9">23,9</td><td class="limit-cell est" data-val="578">578</td><td class="model-cell">MiMo-V2-Pro (×1), MiMo-V2-Omni (×1)</td><td class="score-mid score" data-val="49">49</td><td class="score-mid score" data-val="41">41</td><td class="score-high score" data-val="63">63</td></tr>
+<tr><td class="provider-cell"><strong>Xiaomi MiMO</strong><br /><a class="ref-link" href="https://platform.xiaomimimo.com?ref=LHT8UJ">Inscription - chacun 2 $ ↗</a></td><td>Pro</td><td class="price-cell">50 $</td><td>Codage + Agent</td><td class="limit-cell est" data-val="422">422</td><td class="limit-cell est" data-val="6333">6 333</td><td class="limit-cell est" data-val="8.44">8,44</td><td class="limit-cell est" data-val="126.7">126,7</td><td class="model-cell">MiMo-V2-Pro (×1), MiMo-V2-Omni (×1)</td><td class="score-mid score" data-val="49">49</td><td class="score-mid score" data-val="41">41</td><td class="score-high score" data-val="63">63</td></tr>
+<tr><td class="provider-cell"><strong>Xiaomi MiMO</strong><br /><a class="ref-link" href="https://platform.xiaomimimo.com?ref=LHT8UJ">Inscription - chacun 2 $ ↗</a></td><td>Max</td><td class="price-cell">100 $</td><td>Codage + Agent</td><td class="limit-cell est" data-val="456">456</td><td class="limit-cell est" data-val="6833">6 833</td><td class="limit-cell est" data-val="4.56">4,56</td><td class="limit-cell est" data-val="68.3">68,3</td><td class="model-cell">MiMo-V2-Pro (×1), MiMo-V2-Omni (×1)</td><td class="score-mid score" data-val="49">49</td><td class="score-mid score" data-val="41">41</td><td class="score-high score" data-val="63">63</td></tr>
+<tr><td class="provider-cell"><strong>Alibaba</strong></td><td>Standard</td><td class="price-cell">30 $</td><td>Codage + Agent</td><td class="limit-cell est" data-val="17">17</td><td class="limit-cell official" data-val="262">262</td><td class="limit-cell est" data-val="0.57">0,57</td><td class="limit-cell official" data-val="8.73">8,73</td><td class="model-cell">qwen3.6-plus (×1), deepseek-v3.2 (×1), GLM-5 (×1), MiniMax-M2.5 (×1)</td><td class="score-mid score" data-val="50">50</td><td class="score-mid score" data-val="43">43</td><td class="score-high score" data-val="62">62</td></tr>
+<tr><td class="provider-cell"><strong>Alibaba</strong></td><td>Advanced</td><td class="price-cell">100 $</td><td>Codage + Agent</td><td class="limit-cell est" data-val="21">21</td><td class="limit-cell official" data-val="314">314</td><td class="limit-cell est" data-val="0.21">0,21</td><td class="limit-cell official" data-val="3.14">3,14</td><td class="model-cell">qwen3.6-plus (×1), deepseek-v3.2 (×1), GLM-5 (×1), MiniMax-M2.5 (×1)</td><td class="score-mid score" data-val="50">50</td><td class="score-mid score" data-val="43">43</td><td class="score-high score" data-val="62">62</td></tr>
+<tr><td class="provider-cell"><strong>Alibaba</strong></td><td>Premium</td><td class="price-cell">200 $</td><td>Codage + Agent</td><td class="limit-cell est" data-val="26">26</td><td class="limit-cell official" data-val="393">393</td><td class="limit-cell est" data-val="0.13">0,13</td><td class="limit-cell official" data-val="1.97">1,97</td><td class="model-cell">qwen3.6-plus (×1), deepseek-v3.2 (×1), GLM-5 (×1), MiniMax-M2.5 (×1)</td><td class="score-mid score" data-val="50">50</td><td class="score-mid score" data-val="43">43</td><td class="score-high score" data-val="62">62</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="footnotes">
+  <p>Les valeurs non fournies explicitement par les fournisseurs sont affichées en <span class="est">gris</span>.</p>
+  <p>De nombreux fournisseurs limitent soit les quotas de Prompt, soit les quotas de Requête. Nous convertissons dynamiquement à l'aide du contrôle de taux Requête/Prompt ci-dessus (par défaut : 15).</p>
+  <p>Si la limite officielle la plus élevée est hebdomadaire, la limite mensuelle est estimée à Hebdomadaire × 4.</p>
+  <p>Le score Artificial Analysis est mesuré par <a href="https://artificialanalysis.ai" rel="noopener">artificialanalysis.ai</a>.</p>
+  <p>Certains liens peuvent inclure des codes de parrainage.</p>
+  <p>Les détails des plans peuvent changer fréquemment. Vérifiez toujours les informations les plus récentes sur les pages officielles des fournisseurs.</p>
+</div>
+
+<h2>Guide Pratique</h2>
+<p>Le tarif seul ne suffit pas. Adaptez chaque plan à votre style de travail d'abord. Commencez par la politique Agent, le type de limite et l'horizon du contrat.</p>
+
+<div class="guide-section">
+  <h3>1) Vérifiez la politique Agent d'abord</h3>
+  <p>Certains fournisseurs ou plans restreignent l'utilisation d'Agent. Si les flux de travail Agent sont importants, vérifiez les conditions et la colonne Utilisation (Codage/Agent) avant de vous abonner.</p>
+</div>
+<div class="guide-section">
+  <h3>2) Limites de Prompt vs Limites de Requête</h3>
+  <p>Pour une utilisation manuelle intensive de chat, regrouper le travail en moins de tours s'aligne généralement mieux avec les limites de type Prompt. Pour l'automatisation et les flux de travail Agent intensifs, le volume de requêtes backend peut croître rapidement, donc priorisez les plans avec suffisamment de marge de Requête.</p>
+</div>
+<div class="guide-section">
+  <h3>3) Préférez mensuel, utilisez annuel quand les conditions initiales sont supérieures</h3>
+  <p>Les révisions de plans et les changements d'inscription sont de plus en plus courants. Le mensuel offre de la flexibilité, tandis que l'annuel peut être efficace quand les conditions de la période de lancement sont clairement avantageuses.</p>
+</div>
+<div class="guide-section">
+  <h3>4) La vitesse (jetons/s) est un vrai facteur de productivité</h3>
+  <p>Avec le même quota, les réponses plus lentes coûtent toujours plus de temps de travail. Nous prévoyons d'ajouter des métriques de jetons par seconde dans une mise à jour future.</p>
+</div>
+
+<h3>Vérifications supplémentaires</h3>
+<ul>
+  <li>Séparez les valeurs Fournies des valeurs Estimées (les estimations peuvent changer)</li>
+  <li>Confirmez la disponibilité de modèles de même classe (aucun signifie non disponible)</li>
+  <li>Adaptez le cycle de réinitialisation (5h/quotidien/mensuel) à votre fenêtre d'utilisation réelle</li>
+</ul>
+
+<hr style="margin:48px 0 24px;border:none;border-top:1px solid #1E2A3F" />
+<p>Voulez-vous que cela soit appliqué à vos propres dépenses d'IA ? FinOps LLM effectue un audit gratuit de vos coûts d'IA et montre où se trouvent les économies. <a href="/book">Réserver un audit gratuit &rarr;</a></p>
+<p><a href="/fr/research">Retour à la recherche</a></p>
+
+<script>
+(function(){
+  var rateSlider=document.getElementById('convRate'),rateDisplay=document.getElementById('convVal'),sortSelect=document.getElementById('sortMode'),table=document.getElementById('planTable'),tbody=table.querySelector('tbody'),headers=table.querySelectorAll('th[data-col]'),toggleBtns=document.querySelectorAll('.toggle-btn');
+  rateSlider.addEventListener('input',function(){rateDisplay.textContent=this.value});
+  var currentSort={col:null,asc:true};
+  headers.forEach(function(th){th.addEventListener('click',function(){var col=this.dataset.col;if(currentSort.col===col){currentSort.asc=!currentSort.asc}else{currentSort.col=col;currentSort.asc=true}headers.forEach(function(h){h.classList.remove('sorted')});this.classList.add('sorted');this.querySelector('.sort-arrow').textContent=currentSort.asc?'↑':'↓';sortTable(col,currentSort.asc)})});
+  function sortTable(col,asc){var rows=Array.from(tbody.querySelectorAll('tr'));var colMap={provider:0,plan:1,price:2,promptMo:4,reqMo:5,promptUsd:6,reqUsd:7,intelligence:9,coding:10,agentic:11};var idx=colMap[col];if(idx===undefined)return;rows.sort(function(a,b){var va,vb;if(col==='price'){va=parseFloat(a.cells[idx].textContent.replace(/[^0-9.]/g,''));vb=parseFloat(b.cells[idx].textContent.replace(/[^0-9.]/g,''))}else if(col==='provider'||col==='plan'){va=a.cells[idx].textContent.trim();vb=b.cells[idx].textContent.trim();return asc?va.localeCompare(vb):vb.localeCompare(va)}else{va=parseFloat(a.cells[idx].dataset.val||0);vb=parseFloat(b.cells[idx].dataset.val||0)}return asc?va-vb:vb-va});rows.forEach(function(r){tbody.appendChild(r)})}
+  sortSelect.addEventListener('change',function(){var mode=this.value;if(mode==='default')return;var maxPrice=mode==='vfm10'?10:mode==='vfm30'?30:Infinity;var rows=Array.from(tbody.querySelectorAll('tr'));rows.sort(function(a,b){var pa=parseFloat(a.cells[2].textContent.replace(/[^0-9.]/g,''));var pb=parseFloat(b.cells[2].textContent.replace(/[^0-9.]/g,''));var inRangeA=pa<=maxPrice?1:0;var inRangeB=pb<=maxPrice?1:0;if(inRangeA!==inRangeB)return inRangeB-inRangeA;var va=parseFloat(a.cells[7].dataset.val||0);var vb=parseFloat(b.cells[7].dataset.val||0);return vb-va});rows.forEach(function(r){tbody.appendChild(r)})});
+  toggleBtns.forEach(function(btn){btn.addEventListener('click',function(){toggleBtns.forEach(function(b){b.classList.remove('active')});this.classList.add('active');var show=this.dataset.show;var rows=tbody.querySelectorAll('tr');rows.forEach(function(r){var uses=r.cells[3].textContent.toLowerCase();if(show==='all')r.style.display='';else if(show==='coding')r.style.display=uses.includes('coding')?'':'none';else if(show==='agent')r.style.display=uses.includes('agent')?'':'none'})})});
+})();
+</script>
+{% endblock %}{% block suffix %}</main></body></html>
+{% endblock %}

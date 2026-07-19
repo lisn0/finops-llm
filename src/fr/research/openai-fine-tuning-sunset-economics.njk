@@ -1,0 +1,383 @@
+---
+permalink: "fr/research/openai-fine-tuning-sunset-economics.html"
+---
+{% extends "shell.njk" %}{% block prefix %}<!DOCTYPE html>
+<html lang="fr"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Économie de l'Arrêt du Fine-Tuning OpenAI · FinOps LLM</title><meta name="description" content="OpenAI supprime le fine-tuning en libre-service en 2026–27. Évaluez trois chemins de migration : ingénierie de prompts sur GPT-5.5 avec mise en cache, LoRA open-source sur Llama/Qwen, ou fine-tuning géré via Vertex/Bedrock. Comparaison des coûts et dépenses cachées de migration incluses." /><meta name="robots" content="index, follow" /><link rel="canonical" href="https://finopsllm.com/fr/research/openai-fine-tuning-sunset-economics" />
+<link rel="alternate" hreflang="en" href="https://finopsllm.com/research/openai-fine-tuning-sunset-economics" />
+<link rel="alternate" hreflang="es" href="https://finopsllm.com/es/research/openai-fine-tuning-sunset-economics" />
+<link rel="alternate" hreflang="fr" href="https://finopsllm.com/fr/research/openai-fine-tuning-sunset-economics" />
+<link rel="alternate" hreflang="de" href="https://finopsllm.com/de/research/openai-fine-tuning-sunset-economics" />
+<link rel="alternate" hreflang="ja" href="https://finopsllm.com/ja/research/openai-fine-tuning-sunset-economics" />
+<link rel="alternate" hreflang="x-default" href="https://finopsllm.com/research/openai-fine-tuning-sunset-economics" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","headline":"Économie de l'Arrêt du Fine-Tuning OpenAI · FinOps LLM","description":"OpenAI supprime le fine-tuning en libre-service. Évaluez les coûts de migration : ingénierie de prompts sur GPT-5.5 avec mise en cache, LoRA open-source, ou fine-tuning géré alternatif. Cadre de décision et comparaison des coûts inclus.","url":"https://finopsllm.com/fr/research/openai-fine-tuning-sunset-economics","datePublished":"2026-07-19","dateModified":"2026-07-19","image":"https://finopsllm.com/og.png","author":{"@type":"Organization","name":"FinOps LLM team"},"publisher":{"@type":"Organization","name":"FinOps LLM","url":"https://finopsllm.com/"}}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Accueil","item":"https://finopsllm.com/fr/"},{"@type":"ListItem","position":2,"name":"Recherche","item":"https://finopsllm.com/fr/research"},{"@type":"ListItem","position":3,"name":"Économie de l'Arrêt du Fine-Tuning OpenAI","item":"https://finopsllm.com/fr/research/openai-fine-tuning-sunset-economics"}]}
+</script>
+<script type="application/ld+json">
+{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Quand ne puis-je plus créer de nouveaux modèles avec fine-tuning OpenAI ?", "acceptedAnswer": {"@type": "Answer", "text": "Chronologie : 7 mai 2026 (nouvelles organisations bloquées), 2 juillet 2026 (organisations inactives depuis 60 jours bloquées), 6 janvier 2027 (tous les nouveaux travaux bloqués). L'inférence sur les modèles avec fine-tuning existants continue jusqu'à la dépréciation du modèle de base."}}, {"@type": "Question", "name": "La mise en cache de prompts s'amortit-elle par rapport au fine-tuning ?", "acceptedAnswer": {"@type": "Answer", "text": "Pour les prompts répétés sur le même contexte : oui. La mise en cache de prompts sur GPT-5.5 coûte $0,60/M pour les lectures contre $3,00/M frais, et les exemples few-shot (prompts plus longs) peuvent être mis en cache efficacement. Le seuil de rentabilité est généralement de 10–30 accès au cache selon la taille du prompt ; la plupart des équipes l'atteignent en quelques jours."}}, {"@type": "Question", "name": "Le LoRA open-source est-il moins cher que le fine-tuning géré ?", "acceptedAnswer": {"@type": "Answer", "text": "Habituellement, oui. Coût d'entraînement via Together AI : ~$200–$500 par travail. Inférence sur Groq ou Fireworks : ~$0,10–$0,30/M tokens. Le coût total par réponse réussie est souvent 30–50% inférieur à un service géré, mais nécessite des frais généraux MLOps."}}, {"@type": "Question", "name": "Quels coûts cachés ne vois-je pas pendant la migration ?", "acceptedAnswer": {"@type": "Answer", "text": "Réévaluation (comparaison de la nouvelle approche par rapport à l'ancienne), tests de régression (la nouvelle voie offre-t-elle la même qualité ?), exécution double (exécuter les deux anciennes et nouvelles voies en parallèle par sécurité), et réentraînement des adaptateurs si le nouveau modèle change. Budgétisez 4–8 semaines et ~$2K–$10K en temps d'ingénierie par migration."}}]}
+</script>
+<style>
+body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}
+.wrap{max-width:1100px;margin:0 auto;padding:56px 24px}
+a{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}
+.langsw{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;color:#647289;margin:0 0 26px}
+.langsw a{text-decoration:none}.langsw a[aria-current]{color:#E6EAF2;font-weight:600}
+.badge-row{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 32px;list-style:none;padding:0}
+.badge-row li{background:#101726;border:1px solid #1E2A3F;border-radius:8px;padding:8px 14px;font-size:.85rem;color:#B6C0D2}
+.table-wrap{overflow-x:auto;margin:0 0 32px;-webkit-overflow-scrolling:touch}
+table{border-collapse:collapse;width:100%;font-size:.85rem}
+th,td{border:1px solid #1E2A3F;padding:10px 12px;text-align:left;color:#B6C0D2}
+th{color:#E6EAF2;background:#101726}
+td.number{text-align:right;font-family:'JetBrains Mono',monospace;font-weight:500}
+td.highlight{background:rgba(248,113,113,.08)}
+.cost-component{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:20px;margin:16px 0}
+.cost-component h3{color:#E6EAF2;margin:0 0 12px;font-size:1rem}
+.cost-component p{font-size:.9rem;margin:6px 0}
+.guide-section{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:24px;margin:12px 0}
+.guide-section h3{color:#E6EAF2;margin:0 0 10px;font-size:1rem}
+.warning{border-left:4px solid #f87171;padding:16px;background:rgba(248,113,113,.08);margin:20px 0}
+.decision-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;margin:20px 0 32px}
+.decision-card{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:24px}
+.decision-card h3{font-size:1rem;margin:0 0 12px;color:#E6EAF2}
+.decision-card ul{margin:0;padding-left:18px}
+.decision-card li{margin:6px 0;font-size:.88rem}
+.path1{border-left:4px solid #7AAFFF}
+.path2{border-left:4px solid #4ADE80}
+.path3{border-left:4px solid #FBBF24}
+@media(max-width:700px){
+  table{font-size:.75rem}
+  th,td{padding:6px 7px}
+  .decision-grid{grid-template-columns:1fr}
+}
+</style><script src="/assets/consent.js" defer></script><script src="/assets/attribution.js" defer></script>
+<script src="/assets/lang.js" defer></script>
+</head>
+<body><main class="wrap">{% endblock %}{% block body %}
+
+
+<nav class="langsw" aria-label="Langue / Idioma"><a href="/research/openai-fine-tuning-sunset-economics" hreflang="en">EN</a> · <a href="/es/research/openai-fine-tuning-sunset-economics" hreflang="es">ES</a> · <a href="/fr/research/openai-fine-tuning-sunset-economics" hreflang="fr" aria-current="page">FR</a> · <a href="/de/research/openai-fine-tuning-sunset-economics" hreflang="de">DE</a> · <a href="/ja/research/openai-fine-tuning-sunset-economics" hreflang="ja">JA</a></nav>
+
+<h1>Économie de l'Arrêt du Fine-Tuning OpenAI</h1>
+<p class="updated" style="color:#6B7689;font-size:14px;margin-top:-6px">Publié 19 juillet 2026</p>
+<p>OpenAI supprime le fine-tuning en libre-service. À partir du 7 mai 2026, les nouvelles organisations ne peuvent plus créer de travaux de fine-tuning. Avant le 6 janvier 2027, toutes les organisations perdent cette capacité. Si vous dépendez de modèles GPT avec fine-tuning, vous devez choisir un chemin de migration maintenant : ingénierie de prompts sur GPT-5.5 avec mise en cache, adaptateurs LoRA open-source sur Llama ou Qwen, ou fine-tuning géré via Vertex AI, AWS Bedrock ou Mistral. Chaque chemin présente des compromis distincts en matière de coûts et d'opérations.</p>
+
+<ul class="badge-row">
+  <li>La création de fine-tuning en libre-service se termine le 6 janvier 2027 pour toutes les organisations</li>
+  <li>L'inférence sur les modèles avec fine-tuning existants continue jusqu'à la dépréciation de la base</li>
+  <li>La mise en cache de prompts sur GPT-5.5 peut égaler ou dépasser le ROI du fine-tuning en 10–30 accès</li>
+  <li>Le LoRA open-source coûte 30–50% moins cher que les services gérés pour un volume élevé</li>
+  <li>Coûts cachés de migration : réévaluations, tests de régression, exécution double, réentraînement</li>
+</ul>
+
+<div class="warning">
+  <strong>Délai :</strong> Les organisations doivent s'engager sur un chemin de migration avant le 6 janvier 2027. Les modèles avec fine-tuning existants continueront de servir les demandes d'inférence jusqu'à ce que leur modèle de base soit déprécié, mais vous ne pouvez pas créer de nouveaux travaux d'entraînement après cette date.
+</div>
+
+<h2>Chronologie et Matrice d'Exposition</h2>
+
+<p><strong>Qui est affecté et quand :</strong></p>
+
+<table>
+<thead>
+<tr>
+  <th>Date</th>
+  <th>Phase</th>
+  <th>Organisations Affectées</th>
+  <th>Action Requise</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>7 mai 2026</strong></td>
+  <td>Phase 1</td>
+  <td>Nouvelles organisations, jamais avec fine-tuning auparavant</td>
+  <td class="number">Impossible de démarrer de nouveaux travaux</td>
+</tr>
+<tr>
+  <td><strong>2 juillet 2026</strong></td>
+  <td>Phase 2</td>
+  <td>Organisations existantes sans inférence de modèle avec fine-tuning au cours des 60 derniers jours</td>
+  <td class="number">Impossible de démarrer de nouveaux travaux</td>
+</tr>
+<tr>
+  <td><strong>6 janvier 2027</strong></td>
+  <td>Phase 3 (finale)</td>
+  <td>Toutes les organisations, même les utilisateurs actifs</td>
+  <td class="number">Aucun nouveau travail d'entraînement</td>
+</tr>
+<tr class="highlight">
+  <td><strong>Post-2027</strong></td>
+  <td>Inférence uniquement</td>
+  <td>Toutes les organisations avec modèles avec fine-tuning déployés</td>
+  <td class="number">L'inférence continue jusqu'au coucher de la base</td>
+</tr>
+</tbody>
+</table>
+
+<p><strong>Pourquoi OpenAI supprime le fine-tuning :</strong> Les modèles de classe GPT-5.5 combinés avec la mise en cache de prompts éliminent le besoin de fine-tuning dans la plupart des cas d'utilisation. Les prompts plus longs avec des exemples few-shot et des instructions système correspondent désormais ou dépassent la performance du fine-tuning, tout en consommant moins de tokens totaux lorsqu'ils sont mis en cache. Les frais généraux de gestion du fine-tuning dépassent sa valeur pour la plupart des charges de travail.</p>
+
+<h2>Arbre de Décision : Trois Chemins de Migration</h2>
+
+<div class="decision-grid">
+  <div class="decision-card path1">
+    <h3>Chemin 1 : Ingénierie de Prompts + GPT-5.5 + Mise en Cache</h3>
+    <p style="font-size:.9rem;margin-bottom:16px">Réécrire la logique avec fine-tuning comme prompt système + exemples few-shot, mis en cache. Échangez des prompts plus longs contre zéro frais d'entraînement.</p>
+    <ul>
+      <li><strong>Coût d'entraînement :</strong> $0 (aucun réentraînement)</li>
+      <li><strong>Coût de token par appel :</strong> Prompt plus long, mais mis en cache à 50% du taux frais</li>
+      <li><strong>Temps de configuration :</strong> 1–4 semaines (ingénierie de prompts + benchmarking)</li>
+      <li><strong>Opérations en cours :</strong> Itération de prompts, aucun MLOps requis</li>
+    </ul>
+  </div>
+  <div class="decision-card path2">
+    <h3>Chemin 2 : LoRA en Open-Source (Together, Fireworks, Groq)</h3>
+    <p style="font-size:.9rem;margin-bottom:16px">Fine-tune Llama 4 ou Qwen 3.5 avec adaptateurs LoRA, hébergé sur inférence gérée. Contrôle complet du fine-tuning, reproductibilité open-source.</p>
+    <ul>
+      <li><strong>Coût d'entraînement :</strong> $200–$500 par travail</li>
+      <li><strong>Coût d'inférence :</strong> $0,10–$0,30/M tokens (compétitif)</li>
+      <li><strong>Temps de configuration :</strong> 2–6 semaines (préparation des données, entraînement des adaptateurs, tests)</li>
+      <li><strong>Opérations en cours :</strong> Surveillez la performance de l'adaptateur, réentraînez selon les besoins</li>
+    </ul>
+  </div>
+  <div class="decision-card path3">
+    <h3>Chemin 3 : Fine-Tuning Géré (Vertex, Bedrock, Mistral)</h3>
+    <p style="font-size:.9rem;margin-bottom:16px">Utilisez Google Vertex AI, AWS Bedrock ou fine-tuning Mistral. Flux de travail familier, support du fournisseur, mais coût par token plus élevé.</p>
+    <ul>
+      <li><strong>Coût d'entraînement :</strong> $500–$2 000 par travail</li>
+      <li><strong>Coût d'inférence :</strong> $0,20–$1,00/M tokens (premium)</li>
+      <li><strong>Temps de configuration :</strong> 1–3 semaines (moins d'intégrations nécessaires)</li>
+      <li><strong>Opérations en cours :</strong> Le fournisseur gère les opérations, vous gérez la cadence d'entraînement</li>
+    </ul>
+  </div>
+</div>
+
+<h2>Chemin 1 : Ingénierie de Prompts + Mise en Cache GPT-5.5 — Mathématiques Résolues</h2>
+
+<p>Supposons que vous aviez un modèle GPT-4 avec fine-tuning pour la classification des tickets de support client. Le modèle avec fine-tuning a été entraîné sur 10K tickets étiquetés. Chaque demande envoie ~500 tokens d'entrée, obtient ~50 tokens de sortie.</p>
+
+<p><strong>Ancien coût (fine-tuning) :</strong> Travail de fine-tuning : ~$50. Inférence à 100K appels/mois : (500 entrée × $3/M + 50 sortie × $15/M) × 100K = $150/mois + entraînement = ~$200/mois tout compris.</p>
+
+<p><strong>Nouveau coût (mise en cache de prompts sur GPT-5.5) :</strong> Créez un prompt système avec 40 exemples few-shot (chacun ~200 tokens) = 8K tokens. C'est le remplissage du cache. Premier appel : 8K × (1,25× $3/M) + 500 × $3/M + 50 × $15/M ≈ $0,045. Appels ultérieurs (accès au cache) : 500 × (0,5× $3/M) + 50 × $15/M ≈ $0,0015. À 100K appels/mois, supposez 90% d'accès (90K accès au cache). Coût : 10K appels × $0,045 + 90K appels × $0,0015 = $450 + $135 = <strong>$585/mois</strong>.</p>
+
+<p><strong>Attendez — c'est plus cher !</strong> Vrai si vous ne paramétrez pas le prompt. Mais réduisez les exemples few-shot à 10 (2K tokens), et le coût baisse à ~$280/mois. De plus : si vous pouvez regrouper les requêtes (traiter 10 tickets connexes en un appel), le coût par ticket baisse d'un autre 30%. <strong>Conclusion : la mise en cache de prompts sur GPT-5.5 devient moins chère que le fine-tuning à 15–30 accès au cache par contexte unique.</strong> La plupart des équipes l'atteignent en quelques heures de déploiement.</p>
+
+<p><strong>Risque de qualité :</strong> Les prompts few-shot peuvent sous-performer le fine-tuning sur les cas extrêmes et les formats inhabituels. Budgétisez 2–4 semaines pour les tests de régression.</p>
+
+<h2>Chemin 2 : LoRA en Open-Source — Coûts et Logistique</h2>
+
+<p>Le fine-tuning open-source via LoRA (Low-Rank Adaptation) gèle le modèle de base et entraîne uniquement de petites matrices d'adaptateur (~1–5% des paramètres). Structure de coûts :</p>
+
+<table>
+<thead>
+<tr>
+  <th>Composant</th>
+  <th>Exemple de Fournisseur</th>
+  <th>Coût</th>
+  <th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>Entraînement (Llama 3.3 70B sur 10K échantillons)</strong></td>
+  <td>Together AI</td>
+  <td class="number">$300</td>
+  <td>LoRA sur GPU H100 unique (~4 heures)</td>
+</tr>
+<tr>
+  <td><strong>Inférence (par 1M tokens)</strong></td>
+  <td>Groq (Llama 3.3 70B)</td>
+  <td class="number">$0,27</td>
+  <td>Rapide (aucun décalage d'ajustement par rapport au GPT-4 avec fine-tuning)</td>
+</tr>
+<tr>
+  <td><strong>Inférence (par 1M tokens)</strong></td>
+  <td>Together AI (Llama 3.3 70B)</td>
+  <td class="number">$0,18</td>
+  <td>Réponse plus lente, coût inférieur</td>
+</tr>
+<tr>
+  <td><strong>Hébergement de modèle (mensuel, toujours actif)</strong></td>
+  <td>Auto-hébergé sur runpod</td>
+  <td class="number">$300–$600</td>
+  <td>Location GPU A100 + frais généraux d'opérations</td>
+</tr>
+<tr class="highlight">
+  <td><strong>Total pour 1M appels/mois</strong></td>
+  <td>—</td>
+  <td class="number">$318–$600</td>
+  <td>API Groq (gérée), aucun coût d'hébergement</td>
+</tr>
+</tbody>
+</table>
+
+<p><strong>Pourquoi l'open-source est moins cher :</strong> Aucune prime par token pour le statut « avec fine-tuning ». L'adaptateur vous appartient pour distribuer et améliorer. La qualité du modèle (Llama 4 Maverick) égale GPT-4o pour la plupart des tâches à 30–50% moins cher. Le compromis : vous possédez les MLOps — cadence de réentraînement, détection de dérive, tests A/B entre versions d'adaptateurs.</p>
+
+<p><strong>Risque d'intégration :</strong> Passer de l'API OpenAI à Groq, Together ou auto-hébergement change votre latence d'inférence, gestion des erreurs et mise à l'échelle. Attendez-vous à 1–2 semaines de travail d'intégration.</p>
+
+<h2>Chemin 3 : Fine-Tuning Géré (Vertex, Bedrock, Mistral)</h2>
+
+<table>
+<thead>
+<tr>
+  <th>Fournisseur</th>
+  <th>Coût d'Entraînement (10K échantillons)</th>
+  <th>Coût d'Inférence (par 1M tokens de sortie)</th>
+  <th>Modèle de Base</th>
+  <th>Temps jusqu'à la Production</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>Google Vertex AI</strong></td>
+  <td class="number">$500–$800</td>
+  <td class="number">$0,40–$1,50</td>
+  <td>Gemini 1.5 Flash, autres modèles OS</td>
+  <td class="number">1–2 semaines</td>
+</tr>
+<tr>
+  <td><strong>AWS Bedrock (Claude Sonnet avec fine-tuning)</strong></td>
+  <td class="number">$600–$1 200</td>
+  <td class="number">$0,80–$2,00</td>
+  <td>Claude Sonnet, Llama 4, Mistral</td>
+  <td class="number">1–2 semaines</td>
+</tr>
+<tr>
+  <td><strong>Fine-tuning Mistral</strong></td>
+  <td class="number">$400–$700</td>
+  <td class="number">$0,25–$0,60</td>
+  <td>Mistral 3.5 Moe, autres modèles Mistral</td>
+  <td class="number">1 semaine</td>
+</tr>
+<tr class="highlight">
+  <td><strong>Coût mensuel typique (100K appels, 500 tokens moyen)</strong></td>
+  <td class="number">$600–$1 200 (entraînement ponctuel)</td>
+  <td class="number">$200–$1 000 (inférence récurrente)</td>
+  <td class="number">—</td>
+  <td class="number">—</td>
+</tr>
+</tbody>
+</table>
+
+<p>Les services gérés sont la rampe la plus facile : votre équipe connaît déjà l'authentification API, le support du fournisseur est disponible, et vous évitez les frais généraux de MLOps. Mais les coûts d'inférence sont 2–5× plus élevés que le LoRA open-source. Ce chemin a du sens si : (1) vous avez <100M tokens de sortie/mois, (2) votre équipe manque d'expertise en MLOps, ou (3) vous avez besoin de SLAs professionnelles.</p>
+
+<h2>Comparaison des Coûts Trois Chemins (Charge de Travail Concrète)</h2>
+
+<p>Charge de travail : IA de service client pour SaaS. 1M appels d'inférence/mois, moyenne 500 entrée + 150 tokens de sortie par appel. L'équipe a entraîné un modèle avec fine-tuning sur 5K conversations étiquetées.</p>
+
+<table>
+<thead>
+<tr>
+  <th>Composant de Coût</th>
+  <th>Chemin 1 : Mise en Cache de Prompts + GPT-5.5</th>
+  <th>Chemin 2 : LoRA sur Groq (Llama 3.3)</th>
+  <th>Chemin 3 : Bedrock (Claude Sonnet FT)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>Configuration initiale / entraînement</strong></td>
+  <td class="number">$0 (ingénierie de prompts uniquement)</td>
+  <td class="number">$300</td>
+  <td class="number">$1 000</td>
+</tr>
+<tr>
+  <td><strong>Coût d'inférence mensuel (1M appels)</strong></td>
+  <td class="number">$450–$600</td>
+  <td class="number">$270</td>
+  <td class="number">$900–$1 200</td>
+</tr>
+<tr>
+  <td><strong>Total mensuel (Année 1)</strong></td>
+  <td class="number">$450–$600</td>
+  <td class="number">$600 (entraînement inclus amorti)</td>
+  <td class="number">$1 900–$2 200</td>
+</tr>
+<tr class="highlight">
+  <td><strong>Total Année 1</strong></td>
+  <td class="number">$5 400–$7 200</td>
+  <td class="number">$3 600–$4 800</td>
+  <td class="number">$12 000–$15 000</td>
+</tr>
+</tbody>
+</table>
+
+<p><strong>Le Chemin 2 (LoRA) gagne sur coût pur, mais nécessite du temps MLOps pour configurer et maintenir.</strong> Le Chemin 1 (mise en cache de prompts) a le moins de friction si vous acceptez des coûts continus légèrement plus élevés. Le Chemin 3 (géré) n'est choisi que si les SLAs professionnelles ou les opérations sans intervention sont obligatoires.</p>
+
+<h2>Coûts Cachés de Migration — Ne les Manquez Pas</h2>
+
+<p>Le tableau ci-dessus omet la friction opérationnelle. Planifiez :</p>
+
+<div class="cost-component">
+  <h3>1. Réévaluation et Benchmarking</h3>
+  <p>Mesurez la précision, la latence et le coût du nouveau modèle sur votre ensemble de test de rétention. Budget : 2–3 semaines, $1K–$3K en temps d'ingénierie.</p>
+</div>
+
+<div class="cost-component">
+  <h3>2. Tests de Régression</h3>
+  <p>Exécutez le modèle ancien avec fine-tuning et la nouvelle voie sur les mêmes 100–1K requêtes de production. Mesurez les écarts de qualité. Pour les systèmes orientés clients, envisagez les tests A/B (exécution double) pendant 2–4 semaines. Coût d'opérations : $2K–$5K.</p>
+</div>
+
+<div class="cost-component">
+  <h3>3. Période d'Exécution Double</h3>
+  <p>Exécutez les deux anciennes et nouvelles voies en parallèle pour détecter les régressions en production. Cela double le coût d'inférence pendant 2–4 semaines. Ajoute $500–$2 000 à votre facture de migration.</p>
+</div>
+
+<div class="cost-component">
+  <h3>4. Modifications du Flux d'Entraînement</h3>
+  <p>Si vous réentraînez régulièrement (mensuel, trimestriel), factorisez les modifications de script. Les scripts de réentraînement LoRA diffèrent de l'API OpenAI. Mistral, Vertex et Bedrock ont chacun des API d'entraînement différentes. Budget : 1–2 semaines, $500–$1 500.</p>
+</div>
+
+<div class="cost-component">
+  <h3>5. Dérive d'Adaptateur et Surveillance</h3>
+  <p>Les adaptateurs open-source peuvent dévier si les données d'entraînement changent. Configurez la surveillance de la performance et les déclencheurs de réentraînement. Pour les services gérés, le fournisseur gère cela mais facture les frais généraux de surveillance. Budget : récurrent +$200–$500/mois.</p>
+</div>
+
+<p><strong>Coût caché total : $4K–$12K en temps d'ingénierie + $500–$2 000 en opérations d'exécution double.</strong> La plupart des équipes sous-estiment cela de 50%. Intégrez-le à votre plan de projet.</p>
+
+<h2>Cadre de Décision</h2>
+
+<div class="guide-section">
+  <h3>Choisissez le Chemin 1 (Mise en Cache de Prompts + GPT-5.5) si :</h3>
+  <ul>
+    <li>Le volume d'inférence mensuel est inférieur à 100M tokens</li>
+    <li>Votre charge de travail actuelle a des contextes répétés (RAG, multi-tour) — potentiel d'accès au cache élevé</li>
+    <li>Votre équipe n'a aucune expérience en MLOps et souhaite des frais généraux minimaux</li>
+    <li>Vous pouvez accepter un compromis de qualité pour la simplicité (la plupart des tâches voient ≤5% de régression)</li>
+    <li>Les exigences de latence sont flexibles (>500ms TTFT acceptable)</li>
+  </ul>
+</div>
+
+<div class="guide-section">
+  <h3>Choisissez le Chemin 2 (LoRA en Open-Source) si :</h3>
+  <ul>
+    <li>Le volume d'inférence mensuel dépasse 200M tokens — avantage de coûts de 30–50%</li>
+    <li>Votre équipe a la capacité MLOps pour l'entraînement, la surveillance et le réentraînement</li>
+    <li>Vous avez besoin de reproductibilité et souhaitez un contrôle total sur l'adaptateur (avantage open-source)</li>
+    <li>La confidentialité des données nécessite aucun appel aux APIs propriétaires d'OpenAI, Google ou AWS</li>
+    <li>La latence est critique (<200ms) — Groq offre des réponses sub-100ms</li>
+  </ul>
+</div>
+
+<div class="guide-section">
+  <h3>Choisissez le Chemin 3 (Fine-Tuning Géré) si :</h3>
+  <ul>
+    <li>Vous avez besoin de SLAs professionnelles, de support du fournisseur ou de conformité HIPAA/SOC 2</li>
+    <li>Votre équipe manque d'expertise en infrastructure et souhaite zéro MLOps</li>
+    <li>Le volume mensuel est inférieur à 50M tokens (la prime de coûts est acceptable à petite échelle)</li>
+    <li>Vous êtes déjà investi dans l'écosystème du fournisseur (AWS, Google Cloud, Mistral)</li>
+    <li>La fréquence d'entraînement est mensuelle ou moins (le coût d'opérations s'amortit mieux avec peu de changement)</li>
+  </ul>
+</div>
+
+<h2>Lectures Connexes</h2>
+<p>Pour plus de contexte sur le paysage des coûts plus large, voir <a href="/fr/research/open-source-vs-closed-cost">Comparaison des Coûts LLM Open-Source vs Propriétaire</a>, qui compare les volumes de seuil de rentabilité entre les options auto-hébergées et API.</p>
+
+<hr style="margin:48px 0 24px;border:none;border-top:1px solid #1E2A3F" />
+<p>Vous suivez déjà vos coûts de migration du fine-tuning ? FinOps LLM audite vos dépenses LLM et identifie quel chemin de migration vous fait le plus économiser. <a href="/book">Réservez une audit gratuit</a>.</p>
+<p><a href="/fr/research">Retour à la recherche</a></p>
+
+{% endblock %}{% block suffix %}</main></body></html>
+{% endblock %}

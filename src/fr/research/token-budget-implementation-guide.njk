@@ -1,0 +1,131 @@
+---
+permalink: "fr/research/token-budget-implementation-guide.html"
+---
+{% extends "shell.njk" %}{% block prefix %}<!DOCTYPE html>
+<html lang="fr"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Guide de mise en œuvre des budgets de tokens · FinOps LLM</title><meta name="description" content="Comment mettre en œuvre les budgets de tokens en production : limites par requête, quotas par équipe, budgets par période, limites rigides vs souples et dégradation gracieuse." /><meta name="robots" content="index, follow" /><link rel="canonical" href="https://finopsllm.com/fr/research/token-budget-implementation-guide" />
+<link rel="alternate" hreflang="en" href="https://finopsllm.com/research/token-budget-implementation-guide" />
+<link rel="alternate" hreflang="es" href="https://finopsllm.com/es/research/token-budget-implementation-guide" />
+<link rel="alternate" hreflang="fr" href="https://finopsllm.com/fr/research/token-budget-implementation-guide" />
+<link rel="alternate" hreflang="de" href="https://finopsllm.com/de/research/token-budget-implementation-guide" />
+<link rel="alternate" hreflang="ja" href="https://finopsllm.com/ja/research/token-budget-implementation-guide" />
+<link rel="alternate" hreflang="x-default" href="https://finopsllm.com/research/token-budget-implementation-guide" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","headline":"Guide de mise en œuvre des budgets de tokens","description":"Comment mettre en œuvre les budgets de tokens en production : limites par requête, quotas par équipe, budgets par période, limites rigides vs souples et dégradation gracieuse.","url":"https://finopsllm.com/fr/research/token-budget-implementation-guide","datePublished":"2026-07-04","dateModified":"2026-07-04","image":"https://finopsllm.com/og.png","author":{"@type":"Organization","name":"FinOps LLM team"},"publisher":{"@type":"Organization","name":"FinOps LLM","url":"https://finopsllm.com/"}}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Accueil","item":"https://finopsllm.com/"},{"@type":"ListItem","position":2,"name":"Recherche","item":"https://finopsllm.com/fr/research"},{"@type":"ListItem","position":3,"name":"Guide de mise en œuvre des budgets de tokens","item":"https://finopsllm.com/fr/research/token-budget-implementation-guide"}]}
+</script>
+<style>body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}.wrap{max-width:860px;margin:0 auto;padding:56px 24px}a{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}table{width:100%;border-collapse:collapse;margin:20px 0}th,td{padding:10px 12px;border:1px solid #1E2A3F;text-align:left;font-size:14px}th{background:#111829;color:#E6EAF2;font-weight:600}td{color:#B6C0D2}pre{background:#111829;border:1px solid #1E2A3F;border-radius:6px;padding:16px;overflow-x:auto;font-size:13px;color:#B6C0D2}.langsw{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;color:#647289;margin:0 0 26px}.langsw a{text-decoration:none}.langsw a[aria-current]{color:#E6EAF2;font-weight:600}</style><script src="/assets/consent.js" defer></script><script src="/assets/attribution.js" defer></script>
+</head>
+<body><main class="wrap">{% endblock %}{% block body %}<nav class="langsw" aria-label="Langue"><a href="/research/token-budget-implementation-guide" hreflang="en">EN</a> · <a href="/es/research/token-budget-implementation-guide" hreflang="es">ES</a> · <a href="/fr/research/token-budget-implementation-guide" hreflang="fr" aria-current="page">FR</a> · <a href="/de/research/token-budget-implementation-guide" hreflang="de">DE</a> · <a href="/ja/research/token-budget-implementation-guide" hreflang="ja">JA</a></nav><h1>Guide de mise en œuvre des budgets de tokens</h1>
+<p>Les budgets de tokens sont la couche opérationnelle du contrôle des coûts des LLM. L'attribution vous indique où va l'argent ; les budgets empêchent qu'il aille où vous ne le souhaitez pas. Sans budgets, une boucle d'agent mal configurée ou un pic du trafic utilisateur peut consommer une allocation mensuelle en quelques heures. Ce guide couvre la mise en œuvre de quatre types de budgets de tokens en production, avec du pseudocode pour chaque modèle.</p>
+<h2>Types de budgets</h2>
+<table><thead><tr><th>Type de budget</th><th>Granularité</th><th>Application</th><th>Cas d'usage</th></tr></thead>
+<tbody><tr><td>Par requête</td><td>Un seul appel API</td><td>Limite rigide via le paramètre max_tokens</td><td>Prévenir les complétions incontrôlables, limiter la latence</td></tr>
+<tr><td>Quota par équipe</td><td>Équipe ou projet sur une période</td><td>Limite souple avec alertes, limite rigide au seuil</td><td>Allocation des coûts par département, empêcher une équipe de consommer le budget partagé</td></tr>
+<tr><td>Par période de temps</td><td>Quotidien, hebdomadaire ou mensuel</td><td>Limite rigide avec période de grâce</td><td>Plafonds de budget mensuel, dépenses au niveau du sprint</td></tr>
+<tr><td>Par flux de travail</td><td>Un seul pipeline ou exécution d'agent</td><td>Limite rigide par étape et totale</td><td>Agents multi-étapes, pipelines RAG, exécutions d'évaluation</td></tr></tbody>
+</table>
+<h2>Limites par requête</h2>
+<p>Le budget le plus simple : limiter chaque requête avec <code>max_tokens</code>. C'est obligatoire - chaque requête de production devrait avoir une limite explicite de tokens de sortie. Sans elle, une réponse verbale du modèle peut consommer des tokens inattendus et augmenter la latence.</p>
+<pre>// Application du budget par requête
+function appellerLLM(prompt, config):
+    reponse = fournisseur.completer(
+        prompt: prompt,
+        modele: config.modele,
+        max_tokens: config.max_tokens_sortie,    // limite rigide
+        temperature: config.temperature
+    )
+    if reponse.usage.tokens_totaux > config.seuil_alerte:
+        log.avertir("La requête a dépassé la limite souple",
+            tokens: reponse.usage.tokens_totaux,
+            seuil: config.seuil_alerte
+        )
+    return reponse</pre>
+<h2>Quotas par équipe</h2>
+<p>Les quotas par équipe nécessitent un compteur partagé qui persiste entre les requêtes. Le modèle : vérifier le budget restant avant chaque appel, refuser ou rétrograder si le budget est épuisé.</p>
+<pre>// Quota d'équipe avec compteur sauvegardé dans Redis
+function verifierBudgetEquipe(equipoId, tokensEstimes):
+    cle = "budget:" + equipoId + ":" + periodeActuelle()
+    restant = redis.obtenir(cle) or obtenirQuotaEquipe(equipoId)
+
+    if restant < tokensEstimes:
+        if restant < tokensEstimes * 0.1:
+            return REFUSER    // limite rigide : rejeter la requête
+        else:
+            return RETROGRADER   // limite souple : utiliser un modèle moins coûteux
+
+    return PERMETTRE
+
+function enregistrerUtilisation(equipoId, tokensReels):
+    cle = "budget:" + equipoId + ":" + periodeActuelle()
+    redis.decrementer(cle, tokensReels)
+    restant = redis.obtenir(cle)
+    if restant < obtenirQuotaEquipe(equipoId) * 0.2:
+        alerte.quotaBasse(equipoId, restant)</pre>
+<h2>Budgets par période de temps</h2>
+<p>Les budgets par période de temps associent les quotas d'équipe avec une fenêtre temporelle. La différence clé : vous avez besoin d'un mécanisme de période de grâce. Quand une équipe atteint 80% de son budget mensuel, envoyer une alerte. À 100%, permettre une période de grâce configurable (par exemple, 24 heures) avant que l'application rigide n'entre en vigueur. Cela empêche une équipe d'être bloquée au milieu d'une tâche le dernier jour du mois.</p>
+<pre>// Budget par période avec période de grâce
+function appliquerBudget(equipoId):
+    utilisation = obtenirUtilisationPeriode(equipoId, moisActuel())
+    limite = obtenirLimiteMensuelleEquipe(equipoId)
+
+    if utilisation < limite * 0.8:
+        return PERMETTRE
+
+    if utilisation < limite * 1.0:
+        alerte.avisiBudget(equipoId, utilisation, limite)
+        return PERMETTRE   // zone d'avertissement souple
+
+    if utilisation < limite * 1.1 and dansLaperiodeGrace(equipoId):
+        alerte.budgetDepasse(equipoId, utilisation, limite)
+        return PERMETTRE   // période de grâce : permettre le dépassement
+
+    return REFUSER  // arrêt rigide</pre>
+<h2>Budgets par flux de travail</h2>
+<p>Les agents et pipelines multi-étapes nécessitent des budgets à deux niveaux : par étape (empêcher une seule étape de consommer trop) et par exécution (empêcher tout le pipeline de dépasser son allocation). Tracer les deux dans le contexte du flux de travail.</p>
+<pre>// Suivi du budget du flux de travail
+class BudgetFlux:
+    constructeur(maxParEtape, maxTotal):
+        this.maxParEtape = maxParEtape
+        this.maxTotal = maxTotal
+        this.depense = 0
+
+    function executerEtape(fnEtape, prompt):
+        if this.depense >= this.maxTotal:
+            return reponseSecours("Budget dépassé")
+
+        reponse = appellerLLM(prompt, {
+            max_tokens: min(this.maxParEtape,
+                           this.maxTotal - this.depense)
+        })
+
+        this.depense += reponse.usage.tokens_totaux
+        return reponse</pre>
+<h2>Dégradation gracieuse quand le budget est dépassé</h2>
+<p>Ne pas simplement retourner une erreur quand un budget est atteint. Rétrograder avec grâce. Passer à un modèle moins coûteux (GPT-4o-mini au lieu de GPT-4o), réduire la taille de la fenêtre de contexte, sauter les étapes de traitement optionnelles ou retourner un résultat partiel avec une note indiquant que le traitement complet nécessite une approbation budgétaire. L'expérience utilisateur devrait se dégrader, pas se casser.</p>
+<pre>// Chaîne de dégradation
+function appellerAvecDegradation(prompt, config):
+    if verifierBudget(config.equipoId, MODELE_COMPLET):
+        return appellerLLM(prompt, { modele: config.modelePrimaire })
+
+    if verifierBudget(config.equipoId, MODELE_ECONOMIQUE):
+        log.info("Rétrogradation du modèle pour budget")
+        return appellerLLM(prompt, { modele: config.modeleSecours })
+
+    if verifierBudget(config.equipoId, TOKENS_MINIMES):
+        tronque = tronquerContexte(prompt, 50%)
+        return appellerLLM(tronque, {
+            modele: config.modeleSecours,
+            max_tokens: 256
+        })
+
+    return cacheeOuSecours(prompt)</pre>
+<h2>Surveillance de la santé du budget</h2>
+<p>Tracer trois métriques : taux de consommation (tokens consommés par heure par rapport au budget), prévision (au rythme actuel, quand le budget sera-t-il épuisé) et nombre de dérogations (combien de fois la période de grâce a-t-elle été utilisée). Si l'utilisation de la période de grâce dépasse 10% des requêtes totales, le budget est défini trop bas pour la charge de travail.</p>
+<h2>Associé</h2>
+<ul><li><a href="/fr/research/llm-budget-governance">Gouvernance des budgets LLM</a> - politiques organisationnelles derrière les budgets.</li><li><a href="/fr/research/agent-spend-guardrails">Garde-fous de dépenses d'agent</a> - modèles de budget pour les agents autonomes.</li><li><a href="/fr/research/cap-inference-costs">Comment plafonner les coûts d'inférence</a> - contrôles de coûts côté fournisseur.</li></ul>
+<hr style="margin:48px 0 24px;border:none;border-top:1px solid #1E2A3F" /><p>Voulez-vous appliquer cela à vos propres dépenses en LLM ? FinOps LLM effectue un audit gratuit de vos coûts d'IA et montre où se trouvent les économies. <a href="/book">Réserver un audit gratuit &rarr;</a></p><p><a href="/fr/research">Retour à la recherche</a></p>{% endblock %}{% block suffix %}</main></body></html>
+
+{% endblock %}

@@ -1,0 +1,53 @@
+---
+permalink: "fr/research/how-to-audit-llm-spend.html"
+---
+{% extends "shell.njk" %}{% block prefix %}<!DOCTYPE html>
+<html lang="fr"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Comment auditer votre dépense LLM en 30 minutes · FinOps LLM</title><meta name="description" content="Un guide pas à pas pour auditer vos coûts LLM en 30 minutes : collectez les données de facturation, normalisez les tokens, attribuez les dépenses et configurez les alertes." /><meta name="robots" content="index, follow" /><link rel="canonical" href="https://finopsllm.com/fr/research/how-to-audit-llm-spend" />
+<link rel="alternate" hreflang="en" href="https://finopsllm.com/research/how-to-audit-llm-spend" />
+<link rel="alternate" hreflang="es" href="https://finopsllm.com/es/research/how-to-audit-llm-spend" />
+<link rel="alternate" hreflang="fr" href="https://finopsllm.com/fr/research/how-to-audit-llm-spend" />
+<link rel="alternate" hreflang="de" href="https://finopsllm.com/de/research/how-to-audit-llm-spend" />
+<link rel="alternate" hreflang="ja" href="https://finopsllm.com/ja/research/how-to-audit-llm-spend" />
+<link rel="alternate" hreflang="x-default" href="https://finopsllm.com/research/how-to-audit-llm-spend" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","headline":"Comment auditer votre dépense LLM en 30 minutes","description":"Un guide pas à pas pour auditer vos coûts LLM en 30 minutes : collectez les données de facturation, normalisez les tokens, attribuez les dépenses et configurez les alertes.","url":"https://finopsllm.com/fr/research/how-to-audit-llm-spend","datePublished":"2026-07-04","dateModified":"2026-07-04","image":"https://finopsllm.com/og.png","author":{"@type":"Organization","name":"FinOps LLM team"},"publisher":{"@type":"Organization","name":"FinOps LLM","url":"https://finopsllm.com/"}}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Accueil","item":"https://finopsllm.com/"},{"@type":"ListItem","position":2,"name":"Recherche","item":"https://finopsllm.com/fr/research"},{"@type":"ListItem","position":3,"name":"Comment auditer votre dépense LLM","item":"https://finopsllm.com/fr/research/how-to-audit-llm-spend"}]}
+</script>
+<style>body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}.wrap{max-width:860px;margin:0 auto;padding:56px 24px}a{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}table{width:100%;border-collapse:collapse;margin:20px 0}th,td{padding:10px 12px;border:1px solid #1E2A3F;text-align:left;font-size:14px}th{background:#111829;color:#E6EAF2;font-weight:600}td{color:#B6C0D2}.langsw{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;color:#647289;margin:0 0 26px}.langsw a{text-decoration:none}.langsw a[aria-current]{color:#E6EAF2;font-weight:600}</style><script src="/assets/consent.js" defer></script><script src="/assets/attribution.js" defer></script>
+</head>
+<body><main class="wrap">{% endblock %}{% block body %}<nav class="langsw" aria-label="Langue"><a href="/research/how-to-audit-llm-spend" hreflang="en">EN</a> · <a href="/es/research/how-to-audit-llm-spend" hreflang="es">ES</a> · <a href="/fr/research/how-to-audit-llm-spend" hreflang="fr" aria-current="page">FR</a> · <a href="/de/research/how-to-audit-llm-spend" hreflang="de">DE</a> · <a href="/ja/research/how-to-audit-llm-spend" hreflang="ja">JA</a></nav><h1>Comment auditer votre dépense LLM en 30 minutes</h1>
+<p>La plupart des équipes ne savent pas comment se décompose leur budget LLM. Les coûts sont masqués derrière les tableaux de bord des fournisseurs qui affichent les totaux mais pas l'attribution, les types de tokens facturés à des tarifs différents, et les modèles d'utilisation qui changent d'une semaine à l'autre. Ce guide vous propose un audit structuré que vous pouvez exécuter en une demi-heure avec les outils que vous avez déjà.</p>
+<h2>Étape 1 - Collectez les données de facturation des fournisseurs</h2>
+<p>Exportez les 30 derniers jours d'utilisation de chaque fournisseur LLM que vous utilisez. Pour OpenAI, utilisez l'API d'utilisation ou téléchargez le CSV depuis le tableau de bord. Pour Anthropic, extrayez les données de l'API de facturation. Pour Google, exportez depuis la console Cloud Billing. Pour les modèles auto-hébergés, extrayez les journaux de requêtes de votre serveur d'inférence. Stockez tout dans un dossier. Vous avez besoin de données brutes, pas de résumés.</p>
+<h2>Étape 2 - Normalisez les décomptes de tokens entre les fournisseurs</h2>
+<p>Chaque fournisseur compte les tokens différemment. OpenAI et Anthropic utilisent leurs propres tokeniseurs ; Google utilise SentencePiece. Pour comparer, convertissez tous les décomptes en une unité commune. L'approche la plus simple : utilisez le prix par token publié de chaque fournisseur pour calculer le coût par requête, puis comparez les coûts directement plutôt que les décomptes de tokens bruts. Cela évite complètement les incompatibilités de tokeniseurs.</p>
+<h2>Étape 3 - Divisez par tokens d'entrée, sortie, cache et raisonnement</h2>
+<p>Les fournisseurs facturent des tarifs différents pour différents types de tokens. Les tokens d'entrée en cache coûtent généralement 50 % moins cher sur OpenAI et Anthropic. Les tokens de raisonnement (sur les modèles o-series et similaires) peuvent coûter 2 à 4 fois les tokens de sortie standard. Divisez votre dépense en quatre catégories : entrée, sortie, entrée en cache et raisonnement. Si votre fournisseur n'expose pas cette division, estimez-la à partir du type de modèle et du modèle de requête.</p>
+<h2>Étape 4 - Attribuez aux équipes et fonctionnalités</h2>
+<p>Mappez chaque clé API ou projet à l'équipe ou à la fonctionnalité qui le possède. Si vous n'avez pas de séparation au niveau des clés, utilisez les métadonnées de requête - en-têtes, étiquettes ou le paramètre <code>user</code> que la plupart des fournisseurs supportent. L'objectif est un tableau : quelle équipe dépense combien pour quelle fonctionnalité. Sans cela, vous ne pouvez responsabiliser personne pour le coût.</p>
+<h2>Étape 5 - Identifiez les 3 principaux moteurs de coût</h2>
+<p>Triez par dépense totale décroissante. Dans la plupart des organisations, 80 % du coût LLM provient de 3 à 5 modèles d'utilisation. Les moteurs courants : un chatbot avec de longues fenêtres de contexte, une fonctionnalité de génération de code qui utilise des modèles coûteux pour toutes les requêtes, ou un travail d'enrichissement en arrière-plan qui s'exécute sur chaque document sans filtrage. Nommez-les. C'est là que vous concentrez l'effort d'optimisation.</p>
+<h2>Étape 6 - Calculez le coût par tâche pour les flux clés</h2>
+<p>Choisissez vos 3 flux principaux. Pour chacun, divisez la dépense totale par le nombre de tâches complétées. Cela vous donne un numéro d'économie unitaire que vous pouvez suivre au fil du temps. Un flux de support client qui coûte 0,12 $ par ticket est gérable. Un qui coûte 1,40 $ par ticket a besoin d'attention. Le nombre absolu importe moins que la tendance et la comparaison entre les flux.</p>
+<h2>Étape 7 - Configurez les alertes pour les anomalies</h2>
+<p>Configurez les alertes à deux niveaux : dépense quotidienne totale (détecte les travaux incontrôlables) et dépense par flux (détecte la dérive). La plupart des fournisseurs supportent les alertes de facturation de manière native. Pour les alertes multi-fournisseurs, canalisez vos données d'utilisation dans un tableau de bord ou utilisez un outil comme <a href="https://platform.xiaomimimo.com?ref=LHT8UJ" target="_blank" rel="noopener">MiMO</a> qui agrège entre les fournisseurs. Une règle simple : alerte si un jour quelconque dépasse 150 % de la moyenne mobile sur 7 jours.</p>
+<h2>Liste de contrôle d'audit rapide</h2>
+<table><thead><tr><th>Étape</th><th>Outil nécessaire</th><th>Temps estimé</th><th>Résultat</th></tr></thead>
+<tbody><tr><td>1. Collectez les données de facturation</td><td>Tableaux de bord ou API des fournisseurs</td><td>5 min</td><td>CSV/JSON brut par fournisseur</td></tr>
+<tr><td>2. Normalisez les tokens</td><td>Feuille de calcul ou script</td><td>5 min</td><td>Tableau du coût par requête</td></tr>
+<tr><td>3. Divisez les types de tokens</td><td>API des fournisseurs avec ventilation des tokens</td><td>5 min</td><td>Division entrée/sortie/cache/raisonnement</td></tr>
+<tr><td>4. Attribuez aux équipes</td><td>Mappage des clés API ou métadonnées</td><td>5 min</td><td>Matrice des coûts équipe-fonctionnalité</td></tr>
+<tr><td>5. Identifiez les principaux moteurs</td><td>Tri/feuille de calcul</td><td>3 min</td><td>Liste classée des modèles de coût</td></tr>
+<tr><td>6. Coût par tâche</td><td>Nombre de tâches à partir des journaux d'application</td><td>5 min</td><td>Économie unitaire par flux</td></tr>
+<tr><td>7. Configurez les alertes</td><td>Alertes de facturation + tableau de bord</td><td>2 min</td><td>Détection d'anomalies active</td></tr></tbody>
+</table>
+<h2>Que faire ensuite</h2>
+<p>Cet audit vous donne un instantané. La vraie valeur vient de l'exécuter régulièrement - hebdomadaire pour les équipes à forte dépense, mensuel pour tous les autres. Automatisez la collecte de données et faites de la métrique de coût par tâche une métrique de produit de première classe. Si vous voulez de l'aide pour construire cela dans un processus continu, <a href="https://platform.xiaomimimo.com?ref=LHT8UJ" target="_blank" rel="noopener">MiMO</a> fournit des tableaux de bord multi-fournisseurs et une attribution automatisée prêts à l'emploi.</p>
+<h2>Connexes</h2>
+<ul><li><a href="/fr/research/llm-cost-attribution">Attribution des coûts LLM</a> - approfondissement des modèles d'attribution.</li><li><a href="/fr/research/anomaly-detection">Détection des anomalies de coûts LLM</a> - stratégies d'alertes automatisées.</li><li><a href="/research/how-to-budget-for-ai-spend">Comment budgéter la dépense en IA</a> - passer de l'audit au budget.</li></ul>
+<hr style="margin:48px 0 24px;border:none;border-top:1px solid #1E2A3F" /><p>Voulez-vous que ceci soit appliqué à votre propre dépense LLM ? FinOps LLM exécute un audit gratuit de vos coûts d'IA et montre où se trouvent les économies. <a href="/book">Réservez un audit gratuit &rarr;</a></p><p><a href="/fr/research">Retour à la recherche</a></p>{% endblock %}{% block suffix %}</main></body></html>
+
+{% endblock %}

@@ -1,0 +1,353 @@
+---
+permalink: "fr/research/open-source-vs-closed-cost.html"
+---
+{% extends "shell.njk" %}{% block prefix %}<!DOCTYPE html>
+<html lang="fr"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Modèles Open-Source vs Propriétaires : Comparaison des Coûts LLM · FinOps LLM</title><meta name="description" content="Quand est-il rentable d'auto-héberger Llama, Qwen ou DeepSeek par rapport à l'accès par API ? Coûts GPU, optimisation de l'inférence, frais opérationnels, et cadre décisionnel pour votre charge de travail." /><meta name="robots" content="index, follow" /><link rel="canonical" href="https://finopsllm.com/fr/research/open-source-vs-closed-cost" />
+<link rel="alternate" hreflang="en" href="https://finopsllm.com/research/open-source-vs-closed-cost" />
+<link rel="alternate" hreflang="es" href="https://finopsllm.com/es/research/open-source-vs-closed-cost" />
+<link rel="alternate" hreflang="fr" href="https://finopsllm.com/fr/research/open-source-vs-closed-cost" />
+<link rel="alternate" hreflang="de" href="https://finopsllm.com/de/research/open-source-vs-closed-cost" />
+<link rel="alternate" hreflang="ja" href="https://finopsllm.com/ja/research/open-source-vs-closed-cost" />
+<link rel="alternate" hreflang="x-default" href="https://finopsllm.com/research/open-source-vs-closed-cost" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","headline":"Modèles Open-Source vs Propriétaires : Comparaison des Coûts LLM · FinOps LLM","description":"Quand est-il rentable d'auto-héberger Llama, Qwen ou DeepSeek par rapport à l'accès par API ? Coûts GPU, optimisation de l'inférence, frais opérationnels, et cadre décisionnel.","url":"https://finopsllm.com/fr/research/open-source-vs-closed-cost","datePublished":"2026-07-04","dateModified":"2026-07-15","image":"https://finopsllm.com/og.png","author":{"@type":"Organization","name":"FinOps LLM team"},"publisher":{"@type":"Organization","name":"FinOps LLM","url":"https://finopsllm.com/"}}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Accueil","item":"https://finopsllm.com/"},{"@type":"ListItem","position":2,"name":"Recherche","item":"https://finopsllm.com/fr/research"},{"@type":"ListItem","position":3,"name":"Modèles Open-Source vs Propriétaires : Coût","item":"https://finopsllm.com/fr/research/open-source-vs-closed-cost"}]}
+</script>
+<script type="application/ld+json">
+{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Quelle est la méthodologie ?", "acceptedAnswer": {"@type": "Answer", "text": "Tarifs standards publiés depuis chaque page de tarification du fournisseur. Aucune réduction par volume ou batch appliquée. GPU dans le cloud pour l'infrastructure auto-hébergée utilisant les prix à la demande (Lambda, RunPod, AWS) avec des configurations optimisées pour l'inférence avec vLLM ou TensorRT-LLM."}}, {"@type": "Question", "name": "Quel est le tableau de comparaison des coûts ?", "acceptedAnswer": {"@type": "Answer", "text": "Coût API/mois suppose 100M tokens de sortie + 300M tokens d'entrée par mois aux tarifs standards. Coût d'auto-hébergement comprend la location GPU, les frais opérationnels de 15%, et l'infrastructure d'inférence (vLLM). N'inclut pas le temps d'ingénierie initiale."}}, {"@type": "Question", "name": "Quels sont les facteurs clés de coût ?", "acceptedAnswer": {"@type": "Answer", "text": "Un nœud 8x H100 pour Llama 4 Maverick coûte 2 000 à 3 500 $/mois à la demande depuis Lambda, RunPod ou AWS. Les instances spot/préemptibles peuvent réduire cela de 40 à 60 % mais ajoutent une latence de redémarrage et un risque de disponibilité. Pour les charges de production, les instances réservées (engagement 1 an) économisent généralement 30 à 40 % par rapport à la demande."}}, {"@type": "Question", "name": "Quel est le cadre décisionnel ?", "acceptedAnswer": {"@type": "Answer", "text": "La plupart des équipes se retrouvent en hybride : utiliser l'API pour les tâches de raisonnement frontalier et les charges faibles, auto-héberger des modèles open-source pour les tâches à fort volume et tolérantes à la latence (génération de contenu, extraction de données, outils internes)."}}, {"@type": "Question", "name": "Où exécuter les modèles open-source ?", "acceptedAnswer": {"@type": "Answer", "text": "Les prix GPU sont des tarifs horaires à la demande à partir de juillet 2026. Les prix réservés/spot varient considérablement. MiMO offre un accès basé sur API à MiMo-V2-Pro et MiMo-V2-Omni à des tarifs compétitifs - un juste milieu entre l'auto-hébergement complet et les prix API premium."}}]}
+</script>
+<style>
+body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}
+.wrap{max-width:1100px;margin:0 auto;padding:56px 24px}
+a{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}
+.langsw{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;color:#647289;margin:0 0 26px}
+.langsw a{text-decoration:none}.langsw a[aria-current]{color:#E6EAF2;font-weight:600}
+
+/* Hero stats */
+.hero-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:16px;margin:28px 0 36px}
+.hero-stat{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:18px 16px;text-align:center}
+.hero-stat .num{font-size:2rem;font-weight:700;color:#7AAFFF;display:block}
+.hero-stat .lbl{font-size:.82rem;color:#647289;margin-top:4px}
+
+/* Badges */
+.badge-row{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 32px;list-style:none;padding:0}
+.badge-row li{background:#101726;border:1px solid #1E2A3F;border-radius:8px;padding:8px 14px;font-size:.85rem;color:#B6C0D2}
+
+/* Methodology */
+.method-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin:20px 0 32px}
+.method-card{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:18px}
+.method-card h3{font-size:.95rem;color:#E6EAF2;margin:0 0 8px}
+.method-card p{font-size:.85rem;margin:0}
+
+/* Table */
+.table-wrap{overflow-x:auto;margin:0 0 32px;-webkit-overflow-scrolling:touch}
+table{border-collapse:collapse;width:100%;font-size:.82rem;white-space:nowrap}
+th,td{border:1px solid #1E2A3F;padding:8px 10px;text-align:left;color:#B6C0D2}
+th{color:#E6EAF2;background:#101726;cursor:pointer;position:sticky;top:0;user-select:none}
+th:hover{background:#162035}
+th .sort-arrow{font-size:.7rem;margin-left:4px;opacity:.4}
+th.sorted .sort-arrow{opacity:1;color:#7AAFFF}
+td.provider-cell{white-space:normal;min-width:140px}
+td.price-cell{text-align:right;font-variant-numeric:tabular-nums}
+td.limit-cell{text-align:right;font-variant-numeric:tabular-nums;min-width:55px}
+td.model-cell{font-size:.78rem}
+tr:hover{background:rgba(122,175,255,.04)}
+
+/* Gray for estimated values */
+.est{color:#647289}
+.official{color:#B6C0D2}
+
+/* Referral links */
+.ref-link{font-size:.75rem;color:#7AAFFF;text-decoration:none;border-bottom:1px dotted rgba(122,175,255,.3)}
+.ref-link:hover{border-bottom-color:#7AAFFF}
+
+/* Footnotes */
+.footnotes{font-size:.8rem;color:#64748b;margin:16px 0 0}
+.footnotes p{margin:6px 0}
+
+/* Guide */
+.guide-section{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:24px;margin:12px 0}
+.guide-section h3{color:#E6EAF2;margin:0 0 10px;font-size:1rem}
+
+/* Decision framework */
+.decision-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;margin:20px 0 32px}
+.decision-card{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:24px}
+.decision-card.api{border-left:4px solid #7AAFFF}
+.decision-card.self{border-left:4px solid #4ADE80}
+.decision-card h3{font-size:1rem;margin:0 0 12px;color:#E6EAF2}
+.decision-card ul{margin:0;padding-left:18px}
+.decision-card li{margin:6px 0;font-size:.88rem}
+
+/* Responsive */
+@media(max-width:700px){
+  .hero-stats{grid-template-columns:repeat(2,1fr)}
+  table{font-size:.75rem}
+  th,td{padding:6px 7px}
+  .decision-grid{grid-template-columns:1fr}
+}
+</style><script src="/assets/consent.js" defer></script><script src="/assets/attribution.js" defer></script>
+<script src="/assets/lang.js" defer></script>
+</head>
+<body><main class="wrap">{% endblock %}{% block body %}
+<nav class="langsw" aria-label="Language / Idioma"><a href="/research/open-source-vs-closed-cost" hreflang="en">EN</a> · <a href="/es/research/open-source-vs-closed-cost" hreflang="es">ES</a> · <a href="/fr/research/open-source-vs-closed-cost" hreflang="fr" aria-current="page">FR</a> · <a href="/de/research/open-source-vs-closed-cost" hreflang="de">DE</a> · <a href="/ja/research/open-source-vs-closed-cost" hreflang="ja">JA</a></nav>
+
+<h1>Modèles Open-Source vs Propriétaires : Comparaison des Coûts LLM</h1><p class="updated" style="color:#6B7689;font-size:14px;margin-top:-6px">Mis à jour 15 juillet 2026 · publié pour la première fois le 4 juillet 2026</p>
+<p>Quand est-il rentable d'auto-héberger Llama, Qwen ou DeepSeek par rapport à payer pour l'accès à l'API ? Cette analyse couvre les coûts GPU, l'optimisation de l'inférence, les frais opérationnels, et vous offre un cadre décisionnel pour votre charge de travail spécifique.</p>
+
+<div class="hero-stats">
+  <div class="hero-stat"><span class="num">8</span><span class="lbl">Modèles comparés</span></div>
+  <div class="hero-stat"><span class="num">5</span><span class="lbl">Niveaux GPU analysés</span></div>
+  <div class="hero-stat"><span class="num">3</span><span class="lbl">Scénarios d'équilibre</span></div>
+  <div class="hero-stat"><span class="num">Jul 2026</span><span class="lbl">Dernière mise à jour</span></div>
+</div>
+
+<ul class="badge-row">
+  <li>Les coûts d'auto-hébergement supposent des tarifs GPU cloud (à la demande)</li>
+  <li>Les coûts API utilisent les tarifs de sortie standards par fournisseur</li>
+  <li>L'équilibre est basé sur 70% d'utilisation, disponibilité 24/7</li>
+</ul>
+
+<h2>Méthodologie</h2>
+<div class="method-grid">
+  <div class="method-card"><h3>Tarification API</h3><p>Tarifs standards publiés depuis chaque page de tarification du fournisseur. Aucune réduction par volume ou batch appliquée.</p></div>
+  <div class="method-card"><h3>GPU cloud pour auto-hébergement</h3><p>Tarifs à la demande en cloud (Lambda, RunPod, AWS) pour des configurations optimisées pour l'inférence avec vLLM ou TensorRT-LLM.</p></div>
+  <div class="method-card"><h3>Frais opérationnels</h3><p>Inclut la surveillance, la mise à l'échelle, les mises à jour de modèles, et une surcharge opérationnelle de 15% sur les coûts GPU bruts pour l'infrastructure gérée.</p></div>
+  <div class="method-card"><h3>Écart de qualité</h3><p>Relatif à GPT-4o / Claude Sonnet 4 comme ligne de base 100%. Basé sur les benchmarks publics et les performances pratiques en tâches.</p></div>
+</div>
+
+<h2 id="comparison">Tableau de Comparaison des Coûts</h2>
+
+<div class="table-wrap">
+<table id="comparisonTable">
+<thead>
+<tr>
+  <th data-col="model">Modèle <span class="sort-arrow">↕</span></th>
+  <th data-col="apiCost" class="price-cell">Coût API/mois <span class="sort-arrow">↕</span></th>
+  <th data-col="selfCost" class="price-cell">Coût Auto-hébergement (GPU cloud) <span class="sort-arrow">↕</span></th>
+  <th data-col="breakeven" class="price-cell">Volume d'Équilibre <span class="sort-arrow">↕</span></th>
+  <th data-col="quality">Écart de Qualité</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>Llama 4 Maverick (DeepInfra)</td>
+  <td class="price-cell official" data-val="260">$260/mois</td>
+  <td class="price-cell official" data-val="2800">$2 800/mois</td>
+  <td class="price-cell official" data-val="350">~350M tokens/mois</td>
+  <td>~95% de GPT-4o</td>
+</tr>
+<tr>
+  <td>Llama 3.3 70B (Groq)</td>
+  <td class="price-cell official" data-val="277">$277/mois</td>
+  <td class="price-cell official" data-val="1200">$1 200/mois</td>
+  <td class="price-cell official" data-val="210">~210M tokens/mois</td>
+  <td>~87% de GPT-4o</td>
+</tr>
+<tr>
+  <td>Llama 4 Scout (Groq)</td>
+  <td class="price-cell official" data-val="136">$136/mois</td>
+  <td class="price-cell official" data-val="1400">$1 400/mois</td>
+  <td class="price-cell official" data-val="350">~350M tokens/mois</td>
+  <td>~88% de GPT-4o</td>
+</tr>
+<tr>
+  <td>Qwen 3.7-Max</td>
+  <td class="price-cell official" data-val="525">$525/mois</td>
+  <td class="price-cell official" data-val="1600">$1 600/mois</td>
+  <td class="price-cell official" data-val="100">~100M tokens/mois</td>
+  <td>~92% de GPT-4o</td>
+</tr>
+<tr>
+  <td>DeepSeek V4 Pro</td>
+  <td class="price-cell official" data-val="435">$435/mois</td>
+  <td class="price-cell official" data-val="1800">$1 800/mois</td>
+  <td class="price-cell official" data-val="130">~130M tokens/mois</td>
+  <td>~96% de GPT-4o</td>
+</tr>
+<tr>
+  <td>DeepSeek V4 Flash</td>
+  <td class="price-cell official" data-val="140">$140/mois</td>
+  <td class="price-cell official" data-val="1400">$1 400/mois</td>
+  <td class="price-cell official" data-val="450">~450M tokens/mois</td>
+  <td>~82% de GPT-4o</td>
+</tr>
+<tr>
+  <td>Mistral Medium 3.5</td>
+  <td class="price-cell official" data-val="525">$525/mois</td>
+  <td class="price-cell official" data-val="2000">$2 000/mois</td>
+  <td class="price-cell official" data-val="120">~120M tokens/mois</td>
+  <td>~91% de GPT-4o</td>
+</tr>
+<tr>
+  <td>GPT-4o (API uniquement)</td>
+  <td class="price-cell official" data-val="750">$750/mois</td>
+  <td class="price-cell est" data-val="0">N/A</td>
+  <td class="price-cell est" data-val="0">N/A</td>
+  <td>Ligne de base (100%)</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<div class="footnotes">
+  <p>Coût API/mois suppose 100M tokens de sortie + 300M tokens d'entrée par mois aux tarifs standards.</p>
+  <p>Coût d'auto-hébergement comprend la location GPU, les frais opérationnels de 15%, et l'infrastructure d'inférence (vLLM). N'inclut pas le temps d'ingénierie initiale.</p>
+  <p>Volume d'équilibre est le nombre de tokens de sortie mensuels où l'auto-hébergement devient moins cher que l'API.</p>
+  <p>Écart de qualité est approximatif et dépend de la tâche. Les benchmarks comme MMLU, HumanEval et GPQA informent ces estimations.</p>
+  <p>Certains liens peuvent inclure des codes de parrainage.</p>
+</div>
+
+<h2 id="cost-factors">Facteurs Clés de Coût</h2>
+
+<div class="guide-section">
+  <h3>1) La location GPU est le coût dominant</h3>
+  <p>Un nœud 8x H100 pour Llama 4 Maverick coûte 2 000 à 3 500 $/mois à la demande depuis Lambda, RunPod ou AWS. Les instances spot/préemptibles peuvent réduire cela de 40 à 60 % mais ajoutent une latence de redémarrage et un risque de disponibilité. Pour les charges de production, les instances réservées (engagement 1 an) économisent généralement 30 à 40 % par rapport à la demande.</p>
+</div>
+<div class="guide-section">
+  <h3>2) L'optimisation de l'inférence change l'équation</h3>
+  <p>vLLM avec batching continu, pagination du cache KV, et quantification (GPTQ/AWQ 4-bit) peut augmenter le débit de 2 à 4x sur le même matériel. TensorRT-LLM ajoute un autre 20 à 40% pour les architectures supportées. Un Llama 4 Scout bien réglé en 4-bit sur un seul A100 peut égaler une configuration naïve fp16 sur 2x A100s.</p>
+</div>
+<div class="guide-section">
+  <h3>3) Les frais opérationnels sont réels mais diminuent</h3>
+  <p>L'exécution d'une infrastructure d'inférence nécessite la surveillance GPU, les mises à jour de modèles, l'équilibrage de charge et le basculement. Budgétisez 15 à 25% du coût GPU brut pour les ops. Les plates-formes gérées (Anyscale, Modal, Replicate) absorbent cela mais facturent une surcharge de 30 à 50% sur le GPU brut - c'est utile pour moins de ~5 000 $/mois de dépenses GPU.</p>
+</div>
+<div class="guide-section">
+  <h3>4) La mise en cache des prompts réduit l'écart pour l'API</h3>
+  <p>Les fournisseurs d'API offrent de plus en plus la mise en cache des prompts (réduction de 50 à 90% sur les préfixes répétés). Si votre charge est cache-friendly (RAG, multi-tour), les coûts API chutent considérablement, repoussant le volume d'équilibre plus haut pour l'auto-hébergement.</p>
+</div>
+
+<h2 id="framework">Cadre Décisionnel</h2>
+
+<div class="decision-grid">
+  <div class="decision-card api">
+    <h3>Utilisez l'API si...</h3>
+    <ul>
+      <li>Le volume de sortie mensuel est inférieur à 100M tokens</li>
+      <li>Vous avez besoin de la qualité des modèles frontaliers (GPT-4o, Claude Opus 4)</li>
+      <li>Votre équipe n'a pas d'expertise GPU/MLOps</li>
+      <li>Les exigences de latence sont strictes (TTFT &lt;200ms)</li>
+      <li>Vous voulez zéro frais opérationnels</li>
+      <li>Votre charge de travail est imprévisible ou saisonnière</li>
+    </ul>
+  </div>
+  <div class="decision-card self">
+    <h3>Auto-hébergez si...</h3>
+    <ul>
+      <li>Le volume de sortie mensuel dépasse régulièrement 200M tokens</li>
+      <li>La confidentialité des données nécessite aucun accès à l'API tiers</li>
+      <li>Vous avez besoin de modèles personnalisés fine-tuned</li>
+      <li>Votre équipe a une capacité MLOps</li>
+      <li>La charge de travail est en état stable (utilisation GPU prévisible)</li>
+      <li>Vous pouvez vous engager sur les instances GPU réservées 1 an</li>
+    </ul>
+  </div>
+</div>
+
+<div class="guide-section">
+  <h3>Approche hybride : le juste milieu pragmatique</h3>
+  <p>La plupart des équipes se retrouvent en hybride : utiliser l'API pour les tâches de raisonnement frontalier et les charges faibles, auto-héberger des modèles open-source pour les tâches à fort volume et tolérantes à la latence (génération de contenu, extraction de données, outils internes). Cela maintient les dépenses d'API sous contrôle tout en construisant une capacité d'auto-hébergement de façon progressive.</p>
+</div>
+
+<h2 id="providers">Où Exécuter les Modèles Open-Source</h2>
+
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+  <th>Plateforme</th>
+  <th>Options GPU</th>
+  <th>Prix A100 80GB</th>
+  <th>Prix H100</th>
+  <th>Inférence Gérée</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>Lambda Cloud</td>
+  <td>A100, H100, H200</td>
+  <td class="price-cell">$1,10/heure</td>
+  <td class="price-cell">$2,49/heure</td>
+  <td>Non (apportez le vôtre)</td>
+</tr>
+<tr>
+  <td>RunPod</td>
+  <td>A100, H100, L40S</td>
+  <td class="price-cell">$1,19/heure</td>
+  <td class="price-cell">$2,69/heure</td>
+  <td>Option sans serveur</td>
+</tr>
+<tr>
+  <td>AWS (p4d/p5)</td>
+  <td>A100, H100</td>
+  <td class="price-cell">$3,67/heure</td>
+  <td class="price-cell">$6,37/heure</td>
+  <td>SageMaker</td>
+</tr>
+<tr>
+  <td>Google Cloud</td>
+  <td>A100, H100</td>
+  <td class="price-cell">$3,22/heure</td>
+  <td class="price-cell">$5,07/heure</td>
+  <td>Vertex AI</td>
+</tr>
+<tr>
+  <td><a class="ref-link" href="https://platform.xiaomimimo.com?ref=LHT8UJ">Xiaomi MiMO ↗</a></td>
+  <td>Basé sur API</td>
+  <td class="price-cell">N/A</td>
+  <td class="price-cell">N/A</td>
+  <td>API ($0,50/$2,00 par 1M)</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<div class="footnotes">
+  <p>Les prix GPU sont des tarifs horaires à la demande à partir de juillet 2026. Les prix réservés/spot varient considérablement.</p>
+  <p>MiMO offre un accès basé sur API à MiMo-V2-Pro et MiMo-V2-Omni à des tarifs compétitifs - un juste milieu entre l'auto-hébergement complet et les tarifs API premium.</p>
+</div>
+
+<hr style="margin:48px 0 24px;border:none;border-top:1px solid #1E2A3F" />
+<p>Voulez-vous appliquer cela à vos propres dépenses en LLM ? FinOps LLM réalise un audit gratuit de vos coûts d'IA et montre où se trouvent les économies. <a href="/book">Réserver audit gratuit &rarr;</a></p>
+<p><a href="/fr/research">Retour à la recherche</a></p>
+
+<script>
+(function(){
+  const table=document.getElementById('comparisonTable');
+  const tbody=table.querySelector('tbody');
+  const headers=table.querySelectorAll('th[data-col]');
+  let currentSort={col:null,asc:true};
+
+  headers.forEach(function(th){
+    th.addEventListener('click',function(){
+      const col=this.dataset.col;
+      if(currentSort.col===col){currentSort.asc=!currentSort.asc}
+      else{currentSort.col=col;currentSort.asc=true}
+      headers.forEach(function(h){h.classList.remove('sorted')});
+      this.classList.add('sorted');
+      this.querySelector('.sort-arrow').textContent=currentSort.asc?'↑':'↓';
+      sortTable(col,currentSort.asc);
+    });
+  });
+
+  function sortTable(col,asc){
+    const rows=Array.from(tbody.querySelectorAll('tr'));
+    const colMap={model:0,apiCost:1,selfCost:2,breakeven:3,quality:4};
+    const idx=colMap[col];if(idx===undefined)return;
+    rows.sort(function(a,b){
+      let va,vb;
+      if(col==='model'||col==='quality'){
+        va=a.cells[idx].textContent.trim();vb=b.cells[idx].textContent.trim();
+        return asc?va.localeCompare(vb):vb.localeCompare(va);
+      }
+      va=parseFloat(a.cells[idx].dataset.val||0);vb=parseFloat(b.cells[idx].dataset.val||0);
+      return asc?va-vb:vb-va;
+    });
+    rows.forEach(function(r){tbody.appendChild(r)});
+  }
+})();
+</script>
+{% endblock %}{% block suffix %}</main></body></html>
+{% endblock %}

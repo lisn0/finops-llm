@@ -1,0 +1,53 @@
+---
+permalink: "de/research/how-to-audit-llm-spend.html"
+---
+{% extends "shell.njk" %}{% block prefix %}<!DOCTYPE html>
+<html lang="de"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>So führen Sie eine LLM-Ausgabenprüfung in 30 Minuten durch · FinOps LLM</title><meta name="description" content="Schritt-für-Schritt-Anleitung zur Prüfung der LLM-Kosten in 30 Minuten: Abrechnungsdaten erfassen, Token normalisieren, Ausgaben zuordnen und Warnmeldungen einrichten." /><meta name="robots" content="index, follow" /><link rel="canonical" href="https://finopsllm.com/de/research/how-to-audit-llm-spend" />
+<link rel="alternate" hreflang="en" href="https://finopsllm.com/research/how-to-audit-llm-spend" />
+<link rel="alternate" hreflang="es" href="https://finopsllm.com/es/research/how-to-audit-llm-spend" />
+<link rel="alternate" hreflang="fr" href="https://finopsllm.com/fr/research/how-to-audit-llm-spend" />
+<link rel="alternate" hreflang="de" href="https://finopsllm.com/de/research/how-to-audit-llm-spend" />
+<link rel="alternate" hreflang="ja" href="https://finopsllm.com/ja/research/how-to-audit-llm-spend" />
+<link rel="alternate" hreflang="x-default" href="https://finopsllm.com/research/how-to-audit-llm-spend" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","headline":"So führen Sie eine LLM-Ausgabenprüfung in 30 Minuten durch","description":"Schritt-für-Schritt-Anleitung zur Prüfung der LLM-Kosten in 30 Minuten: Abrechnungsdaten erfassen, Token normalisieren, Ausgaben zuordnen und Warnmeldungen einrichten.","url":"https://finopsllm.com/de/research/how-to-audit-llm-spend","datePublished":"2026-07-04","dateModified":"2026-07-04","image":"https://finopsllm.com/og.png","author":{"@type":"Organization","name":"FinOps LLM team"},"publisher":{"@type":"Organization","name":"FinOps LLM","url":"https://finopsllm.com/"}}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Startseite","item":"https://finopsllm.com/"},{"@type":"ListItem","position":2,"name":"Forschung","item":"https://finopsllm.com/de/research"},{"@type":"ListItem","position":3,"name":"So führen Sie eine LLM-Ausgabenprüfung in 30 Minuten durch","item":"https://finopsllm.com/de/research/how-to-audit-llm-spend"}]}
+</script>
+<style>body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}.wrap{max-width:860px;margin:0 auto;padding:56px 24px}a{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}table{width:100%;border-collapse:collapse;margin:20px 0}th,td{padding:10px 12px;border:1px solid #1E2A3F;text-align:left;font-size:14px}th{background:#111829;color:#E6EAF2;font-weight:600}td{color:#B6C0D2}.langsw{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;color:#647289;margin:0 0 26px}.langsw a{text-decoration:none}.langsw a[aria-current]{color:#E6EAF2;font-weight:600}</style><script src="/assets/consent.js" defer></script><script src="/assets/attribution.js" defer></script>
+</head>
+<body><main class="wrap">{% endblock %}{% block body %}<nav class="langsw" aria-label="Sprache / Idioma"><a href="/research/how-to-audit-llm-spend" hreflang="en">EN</a> · <a href="/es/research/how-to-audit-llm-spend" hreflang="es">ES</a> · <a href="/fr/research/how-to-audit-llm-spend" hreflang="fr">FR</a> · <a href="/de/research/how-to-audit-llm-spend" hreflang="de" aria-current="page">DE</a> · <a href="/ja/research/how-to-audit-llm-spend" hreflang="ja">JA</a></nav><h1>So führen Sie eine LLM-Ausgabenprüfung in 30 Minuten durch</h1>
+<p>Die meisten Teams wissen nicht, wie ihr LLM-Budget aufgeschlüsselt ist. Die Kosten sind in Provider-Dashboards verborgen, die nur Gesamtwerte, aber keine Kostenzuordnung anzeigen, Token-Typen werden mit unterschiedlichen Sätzen abgerechnet, und Nutzungsmuster ändern sich Woche für Woche. Diese Anleitung bietet eine strukturierte Prüfung, die Sie in einer halben Stunde mit Werkzeugen durchführen können, die Sie bereits haben.</p>
+<h2>Schritt 1 - Abrechnungsdaten von Providern erfassen</h2>
+<p>Exportieren Sie die letzten 30 Tage der Nutzung von jedem LLM-Provider, den Sie verwenden. Verwenden Sie für OpenAI die Usage-API oder laden Sie CSV aus dem Dashboard herunter. Für Anthropic rufen Sie die Billing-API ab. Für Google exportieren Sie aus der Cloud-Billing-Konsole. Für selbst gehostete Modelle rufen Sie Anfragelogs von Ihrem Inferenzserver ab. Speichern Sie alles in einem Ordner. Sie benötigen Rohdaten, keine Zusammenfassungen.</p>
+<h2>Schritt 2 - Token-Anzahl über Provider normalisieren</h2>
+<p>Jeder Provider zählt Token unterschiedlich. OpenAI und Anthropic verwenden ihre eigenen Tokenisierer; Google verwendet SentencePiece. Um die Ergebnisse zu vergleichen, konvertieren Sie alle Zählungen in eine gemeinsame Einheit. Der einfachste Ansatz: Verwenden Sie den von jedem Provider veröffentlichten Pro-Token-Preis, um die Kosten pro Anfrage zu berechnen, und vergleichen Sie dann die Kosten direkt, anstatt rohe Token-Zählungen zu vergleichen. Dies vermeidet Tokenisierer-Unterschiede vollständig.</p>
+<h2>Schritt 3 - Nach Input-, Output-, Cache- und Reasoning-Tokens unterteilen</h2>
+<p>Provider berechnen unterschiedliche Sätze für verschiedene Token-Typen. Zwischengespeicherte Input-Tokens sind typischerweise 50 % günstiger bei OpenAI und Anthropic. Reasoning-Tokens (in o-series und ähnlichen Modellen) können 2–4-mal so teuer sein wie Standard-Output-Tokens. Teilen Sie Ihre Ausgaben in diese vier Kategorien ein: Input, Output, zwischengespeicherte Input und Reasoning. Wenn Ihr Provider diese Aufteilung nicht offenlegt, schätzen Sie diese anhand des Modelltyps und des Anfrage-Musters.</p>
+<h2>Schritt 4 - Teams und Funktionen zuordnen</h2>
+<p>Ordnen Sie jeden API-Schlüssel oder jedes Projekt dem Team oder der Funktion zu, das oder die es besitzt. Wenn Sie keine Trennung auf Schlüsselebene haben, verwenden Sie Anfrage-Metadaten – Header, Tags oder den <code>user</code>-Parameter, den die meisten Provider unterstützen. Das Ziel ist eine Tabelle: Welches Team gibt wie viel für welche Funktion aus. Ohne dies können Sie niemanden für Kosten verantwortlich machen.</p>
+<h2>Schritt 5 - Identifizieren Sie die 3 wichtigsten Kostentreiber</h2>
+<p>Sortieren Sie nach Gesamtausgaben in absteigender Reihenfolge. In den meisten Organisationen stammen 80 % der LLM-Kosten aus 3–5 Nutzungsmustern. Häufige Kostentreiber: Ein Chatbot mit langen Kontextfenstern, eine Code-Generierungsfunktion, die für alle Anfragen teure Modelle verwendet, oder ein Hintergrund-Enrichment-Job, der auf jedem Dokument ohne Filterung ausgeführt wird. Nennen Sie diese. Hier konzentriert sich die Optimierungsarbeit.</p>
+<h2>Schritt 6 - Kosten pro Aufgabe für wichtige Workflows berechnen</h2>
+<p>Wählen Sie Ihre Top-3-Workflows. Dividieren Sie für jeden die Gesamtausgaben durch die Anzahl der abgeschlossenen Aufgaben. Dies gibt Ihnen eine Unit-Economics-Zahl, die Sie im Laufe der Zeit nachverfolgen können. Ein Customer-Support-Workflow, der 0,12 USD pro Ticket kostet, ist handhabbar. Einer, der 1,40 USD pro Ticket kostet, bedarf aufmerksamkeit. Die absolute Zahl ist weniger wichtig als der Trend und der Vergleich zwischen Workflows.</p>
+<h2>Schritt 7 - Warnmeldungen für Anomalien einrichten</h2>
+<p>Konfigurieren Sie Warnmeldungen auf zwei Ebenen: Tägliche Gesamtausgaben (erkennt Runaway-Jobs) und Ausgaben pro Workflow (erkennt Abweichungen). Die meisten Provider unterstützen Abrechnungswarnmeldungen nativ. Für Provider-übergreifende Warnmeldungen leiten Sie Ihre Nutzungsdaten in ein Dashboard ein oder verwenden ein Tool wie <a href="https://platform.xiaomimimo.com?ref=LHT8UJ" target="_blank" rel="noopener">MiMO</a>, das Provider-übergreifend aggregiert. Eine einfache Regel: Warnmeldung, wenn ein beliebiger Tag 150 % des durchschnittlichen 7-Tage-Trends überschreitet.</p>
+<h2>Schnelle Audit-Checkliste</h2>
+<table><thead><tr><th>Schritt</th><th>Erforderliches Tool</th><th>Geschätzter Zeitaufwand</th><th>Ergebnis</th></tr></thead>
+<tbody><tr><td>1. Abrechnungsdaten erfassen</td><td>Provider-Dashboards oder APIs</td><td>5 Min</td><td>Rohe CSV/JSON pro Provider</td></tr>
+<tr><td>2. Tokens normalisieren</td><td>Tabellenkalkulation oder Skript</td><td>5 Min</td><td>Kosten pro Anfrage-Tabelle</td></tr>
+<tr><td>3. Token-Typen unterteilen</td><td>Provider-APIs mit Token-Aufteilung</td><td>5 Min</td><td>Input/Output/Cache/Reasoning-Aufteilung</td></tr>
+<tr><td>4. Teams zuordnen</td><td>API-Schlüssel-Zuordnung oder Metadaten</td><td>5 Min</td><td>Team-zu-Funktion Kostenmatrix</td></tr>
+<tr><td>5. Wichtigste Kostentreiber identifizieren</td><td>Sortierung/Tabellenkalkulation</td><td>3 Min</td><td>Rangierte Liste von Kostenmustern</td></tr>
+<tr><td>6. Kosten pro Aufgabe</td><td>Aufgabenzahl aus App-Logs</td><td>5 Min</td><td>Unit Economics pro Workflow</td></tr>
+<tr><td>7. Warnmeldungen einrichten</td><td>Provider-Abrechnungswarnmeldungen + Dashboard</td><td>2 Min</td><td>Anomalieerkennung aktiv</td></tr></tbody>
+</table>
+<h2>Was Sie danach tun sollten</h2>
+<p>Diese Prüfung bietet eine Momentaufnahme. Der echte Wert kommt von der regelmäßigen Durchführung – wöchentlich für Teams mit hohen Ausgaben, monatlich für alle anderen. Automatisieren Sie die Datenerfassung und machen Sie die Kosten-pro-Aufgabe-Metrik zu einer erstklassigen Produktmetrik. Wenn Sie Hilfe beim Aufbau eines kontinuierlichen Prozesses benötigen, bietet <a href="https://platform.xiaomimimo.com?ref=LHT8UJ" target="_blank" rel="noopener">MiMO</a> Provider-übergreifende Dashboards und automatisierte Zuordnung aus dem Kasten.</p>
+<h2>Verwandte Artikel</h2>
+<ul><li><a href="/de/research/llm-cost-attribution">LLM-Kostenzuordnung</a> – tieferer Einblick in Zuordnungsmuster.</li><li><a href="/de/research/anomaly-detection">LLM-Kostenanomalieserkennung</a> – automatisierte Warnstrategien.</li><li><a href="/research/how-to-budget-for-ai-spend">Wie man für KI-Ausgaben budgetiert</a> – von der Prüfung zum Budgetplan.</li></ul>
+<hr style="margin:48px 0 24px;border:none;border-top:1px solid #1E2A3F" /><p>Möchten Sie diesen Audit auf Ihre eigenen LLM-Ausgaben anwenden? FinOps LLM führt eine kostenlose Prüfung Ihrer KI-Kosten durch und zeigt, wo die Einsparungen sind. <a href="/book">Kostenlose Audit buchen &rarr;</a></p><p><a href="/de/research">Zurück zur Forschung</a></p>{% endblock %}{% block suffix %}</main></body></html>
+
+{% endblock %}
