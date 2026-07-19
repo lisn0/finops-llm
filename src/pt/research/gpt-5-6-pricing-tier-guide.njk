@@ -1,0 +1,450 @@
+---
+permalink: "pt/research/gpt-5-6-pricing-tier-guide.html"
+---
+{% extends "shell.njk" %}{% block prefix %}<!DOCTYPE html>
+<html lang="pt-BR"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Guia de Preços de GPT-5.6: Luna, Terra, Sol · FinOps LLM</title><meta name="description" content="Guia de preços de GPT-5.6 Luna, Terra e Sol: qual nível para classificação, agentes, raciocínio. Roteamento de custos por tipo de carga de trabalho com exemplos resolvidos e padrões de fallback em cascata." /><meta name="robots" content="index, follow" /><link rel="canonical" href="https://finopsllm.com/pt/research/gpt-5-6-pricing-tier-guide" />
+<link rel="alternate" hreflang="en" href="https://finopsllm.com/research/gpt-5-6-pricing-tier-guide" />
+<link rel="alternate" hreflang="es" href="https://finopsllm.com/es/research/gpt-5-6-pricing-tier-guide" />
+<link rel="alternate" hreflang="fr" href="https://finopsllm.com/fr/research/gpt-5-6-pricing-tier-guide" />
+<link rel="alternate" hreflang="de" href="https://finopsllm.com/de/research/gpt-5-6-pricing-tier-guide" />
+<link rel="alternate" hreflang="pt" href="https://finopsllm.com/pt/research/gpt-5-6-pricing-tier-guide" />
+<link rel="alternate" hreflang="ja" href="https://finopsllm.com/ja/research/gpt-5-6-pricing-tier-guide" />
+<link rel="alternate" hreflang="x-default" href="https://finopsllm.com/research/gpt-5-6-pricing-tier-guide" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","headline":"Guia de Preços de GPT-5.6: Luna, Terra, Sol · FinOps LLM","description":"Um guia prático de roteamento para os três níveis de GPT-5.6: qual modelo usar para classificação, extração, raciocínio agente e tarefas de raciocínio difícil. Exemplos de custo por tarefa resolvidos e padrões de fallback em cascata.","url":"https://finopsllm.com/pt/research/gpt-5-6-pricing-tier-guide","datePublished":"2026-07-19","dateModified":"2026-07-19","image":"https://finopsllm.com/og.png","author":{"@type":"Organization","name":"FinOps LLM team"},"publisher":{"@type":"Organization","name":"FinOps LLM","url":"https://finopsllm.com/"}}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Início","item":"https://finopsllm.com/pt/"},{"@type":"ListItem","position":2,"name":"Pesquisa","item":"https://finopsllm.com/pt/research"},{"@type":"ListItem","position":3,"name":"Guia de Preços de GPT-5.6","item":"https://finopsllm.com/pt/research/gpt-5-6-pricing-tier-guide"}]}
+</script>
+<script type="application/ld+json">
+{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Qual nível de GPT-5.6 devo usar para tarefas de classificação?", "acceptedAnswer": {"@type": "Answer", "text": "Luna ($1/$6 por 1M) é a escolha certa para classificação e extração simples. Com 600 tokens de entrada + 100 tokens de saída, Luna custa $0,00066/solicitação versus $0,00175/solicitação do Terra. Se a precisão não é seu gargalo, Luna fornece resultados equivalentes com 62% de economia."}}, {"@type": "Question", "name": "Quando Terra ($2,50/$15) vence Sol ($5/$30) em custo?", "acceptedAnswer": {"@type": "Answer", "text": "Sempre. Terra é posicionado como o ponto ideal de desempenho/custo: mesmas pretensões de capacidade que Sol, mas exatamente pela metade do preço. Use Terra para loops de agentes, conversas multi-turno e tarefas de raciocínio moderado. Use Sol apenas quando a profundidade de raciocínio do Terra for comprovadamente insuficiente."}}, {"@type": "Question", "name": "Qual é o impacto de custo do cache de prompts no GPT-5.6?", "acceptedAnswer": {"@type": "Answer", "text": "Gravações de cache custam 1,25× entrada (por exemplo, $1,25 por milhão para Luna). Leituras de cache custam 10% de entrada ($0,10 por milhão para Luna). Se um prefixo de 100K tokens for reutilizado 5+ vezes em 30 minutos, o cache economiza 60%+ versus chamadas repetidas sem cache."}}, {"@type": "Question", "name": "Como GPT-5.6 se compara a Claude Sonnet 5 e DeepSeek V4?", "acceptedAnswer": {"@type": "Answer", "text": "Luna ($1/$6) é 50-60% mais barato que Claude Sonnet ($2/$10 intro, $3/$15 Sept 1) e DeepSeek V4 Flash ($0,14/$0,28) é 7-20× mais barato que Luna. Para cargas de trabalho de raciocínio, Sol ($5/$30) e Claude Sonnet trocam desempenho por dólar de forma diferente; faça benchmark do seu caso de uso."}}]}
+</script>
+<style>
+body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}
+.wrap{max-width:1100px;margin:0 auto;padding:56px 24px}
+a{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}
+.langsw{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;color:#647289;margin:0 0 26px}
+.langsw a{text-decoration:none}.langsw a[aria-current]{color:#E6EAF2;font-weight:600}
+.badge-row{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 32px;list-style:none;padding:0}
+.badge-row li{background:#101726;border:1px solid #1E2A3F;border-radius:8px;padding:8px 14px;font-size:.85rem;color:#B6C0D2}
+.table-wrap{overflow-x:auto;margin:0 0 32px;-webkit-overflow-scrolling:touch}
+table{border-collapse:collapse;width:100%;font-size:.85rem}
+th,td{border:1px solid #1E2A3F;padding:10px 12px;text-align:left;color:#B6C0D2}
+th{color:#E6EAF2;background:#101726}
+td.number{text-align:right;font-family:'JetBrains Mono',monospace;font-weight:500}
+td.highlight{background:rgba(248,113,113,.08)}
+.cost-example{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:20px;margin:16px 0}
+.cost-example h3{color:#E6EAF2;margin:0 0 12px;font-size:1rem}
+.cost-example p{font-size:.9rem;margin:6px 0}
+.routing-guide{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:24px;margin:12px 0}
+.routing-guide h3{color:#E6EAF2;margin:0 0 10px;font-size:1rem}
+.warning{border-left:4px solid #f87171;padding:16px;background:rgba(248,113,113,.08);margin:20px 0}
+@media(max-width:700px){
+  table{font-size:.75rem}
+  th,td{padding:6px 7px}
+}
+</style><script src="/assets/consent.js" defer></script><script src="/assets/attribution.js" defer></script>
+<script src="/assets/lang.js" defer></script>
+</head>
+<body><main class="wrap">{% endblock %}{% block body %}
+
+<nav class="langsw" aria-label="Idioma"><a href="/research/gpt-5-6-pricing-tier-guide" hreflang="en">EN</a> · <a href="/es/research/gpt-5-6-pricing-tier-guide" hreflang="es">ES</a> · <a href="/fr/research/gpt-5-6-pricing-tier-guide" hreflang="fr">FR</a> · <a href="/de/research/gpt-5-6-pricing-tier-guide" hreflang="de">DE</a> · <a href="/pt/research/gpt-5-6-pricing-tier-guide" hreflang="pt" aria-current="page">PT</a> · <a href="/ja/research/gpt-5-6-pricing-tier-guide" hreflang="ja">JA</a></nav>
+
+<h1>Guia de Preços de GPT-5.6: Luna, Terra, Sol</h1>
+<p class="updated" style="color:#6B7689;font-size:14px;margin-top:-6px">Publicado em 19 de julho de 2026</p>
+<p>A OpenAI lançou o GPT-5.6 em 10 de julho com três níveis de preços distintos: Luna a $1/$6 por 1M de tokens, Terra a $2,50/$15 e Sol a $5/$30. Isso não é um simples tradeoff de velocidade/qualidade; cada nível é posicionado para uma classe diferente de carga de trabalho. A pergunta não é "qual é o melhor" — é "qual é o certo para esta tarefa?" Este guia mapeia tarefas para níveis, percorre exemplos de custo por tarefa e mostra como escalar inteligentemente quando um nível mais barato não é confiável o suficiente.</p>
+
+<ul class="badge-row">
+  <li>Luna ($1/$6): classificação, extração simples, roteamento de alto volume</li>
+  <li>Terra ($2,50/$15): raciocínio equilibrado, loops de agentes, conversas multi-turno</li>
+  <li>Sol ($5/$30): raciocínio de fronteira, geração de código, pesquisa difícil</li>
+  <li>Leituras de cache economizam 90%; gravações de cache custam 1,25× entrada — ponto de equilíbrio em 5+ acertos em 30 min</li>
+  <li>A API de lote adiciona 50% de desconto além dos preços de nível para trabalho não interativo</li>
+</ul>
+
+<div class="warning">
+  <strong>Ressalva crítica:</strong> A OpenAI posiciona Terra e Sol como tendo capacidade de raciocínio equivalente, diferenciando-se principalmente em velocidade e rendimento. Compare ambos contra sua carga de trabalho real — a pretensão de paridade nem sempre se mantém em sua distribuição de dados. Veja <a href="/pt/research/how-much-does-gpt5-cost">GPT-5 vs alternativas</a> para comparação com Claude e DeepSeek.
+</div>
+
+<h2>1. Os Três Níveis: Velocidade, Custo e Capacidade</h2>
+
+<table>
+<thead>
+<tr>
+  <th>Nível</th>
+  <th>Entrada $/1M</th>
+  <th>Saída $/1M</th>
+  <th>Leitura de Cache $/1M</th>
+  <th>Contexto</th>
+  <th>Latência Típica</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>Luna</strong></td>
+  <td class="number">$1,00</td>
+  <td class="number">$6,00</td>
+  <td class="number">$0,10</td>
+  <td>128K</td>
+  <td>80–200 ms</td>
+</tr>
+<tr>
+  <td><strong>Terra</strong></td>
+  <td class="number">$2,50</td>
+  <td class="number">$15,00</td>
+  <td class="number">$0,25</td>
+  <td>128K</td>
+  <td>150–400 ms</td>
+</tr>
+<tr>
+  <td><strong>Sol</strong></td>
+  <td class="number">$5,00</td>
+  <td class="number">$30,00</td>
+  <td class="number">$0,50</td>
+  <td>128K</td>
+  <td>300–800 ms</td>
+</tr>
+</tbody>
+</table>
+
+<p><strong>A latência importa:</strong> Luna é mais rápido porque é otimizado para streaming, classificação em tempo real e rendimento. Sol é mais lento porque realiza mais raciocínio interno. Para cargas de trabalho interativas voltadas para o usuário, Luna também é mais barato <em>e</em> mais rápido — mas apenas se for capaz o suficiente para sua tarefa. Essa é a decisão-chave de roteamento.</p>
+
+<h2>2. Tabela de Roteamento por Tipo de Tarefa</h2>
+
+<p>Esta tabela mapeia tarefas comuns de LLM para o nível que minimiza o custo por resposta bem-sucedida:</p>
+
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+  <th>Tipo de Tarefa</th>
+  <th>Exemplo</th>
+  <th>Nível Recomendado</th>
+  <th>Taxa de Sucesso no Nível</th>
+  <th>Custo Est./1K Tarefas</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>Classificação</strong></td>
+  <td>Spam / não-spam; sentimento (pos/neg/neutro)</td>
+  <td>Luna</td>
+  <td class="number">95–98%</td>
+  <td class="number">$1,20–$1,50</td>
+</tr>
+<tr>
+  <td><strong>Extração estruturada</strong></td>
+  <td>Extrair nome, email, telefone do texto</td>
+  <td>Luna</td>
+  <td class="number">92–96%</td>
+  <td class="number">$1,80–$2,40</td>
+</tr>
+<tr>
+  <td><strong>Categorização (muitas classes)</strong></td>
+  <td>Atribuir uma de 50+ categorias de produto</td>
+  <td>Luna</td>
+  <td class="number">88–94%</td>
+  <td class="number">$2,40–$3,20</td>
+</tr>
+<tr>
+  <td><strong>Resumo</strong></td>
+  <td>Condensar artigo ou log de chat</td>
+  <td>Luna</td>
+  <td class="number">92–97%</td>
+  <td class="number">$1,50–$2,00</td>
+</tr>
+<tr>
+  <td><strong>Loops de agentes (uso de ferramentas)</strong></td>
+  <td>Multi-turno: pesquisar, raciocinar, refinar</td>
+  <td>Terra</td>
+  <td class="number">85–92%</td>
+  <td class="number">$8,00–$12,00</td>
+</tr>
+<tr>
+  <td><strong>Conversa multi-turno</strong></td>
+  <td>Bots de suporte ao cliente, consultoria</td>
+  <td>Terra</td>
+  <td class="number">88–94%</td>
+  <td class="number">$6,00–$10,00</td>
+</tr>
+<tr>
+  <td><strong>Geração de código (simples)</strong></td>
+  <td>Consulta SQL, snippet Bash, regex</td>
+  <td>Terra</td>
+  <td class="number">80–90%</td>
+  <td class="number">$10,00–$15,00</td>
+</tr>
+<tr>
+  <td><strong>Geração de código (complexa)</strong></td>
+  <td>Endpoint completo, máquina de estados, compilador DSL</td>
+  <td>Sol</td>
+  <td class="number">75–88%</td>
+  <td class="number">$25,00–$40,00</td>
+</tr>
+<tr>
+  <td><strong>Pesquisa + síntese</strong></td>
+  <td>Analisar 10+ artigos, sintetizar consenso</td>
+  <td>Sol</td>
+  <td class="number">80–90%</td>
+  <td class="number">$30,00–$50,00</td>
+</tr>
+<tr class="highlight">
+  <td><strong>Raciocínio difícil (problema novel)</strong></td>
+  <td>Verificação de prova, design de algoritmo novel</td>
+  <td>Sol</td>
+  <td class="number">70–85%</td>
+  <td class="number">$40,00–$70,00</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<p><strong>Insight-chave:</strong> O custo por tarefa não é apenas custo de API — é (custo de API) / (taxa de sucesso). Uma classificação Luna com 95% de sucesso custa ~$1,26 por resposta bem-sucedida. Se você rotear a mesma tarefa para Sol com 98% de sucesso, paga ~$5,10 por resposta — mas resolveu 3% mais de sua carga de trabalho, o que pode ou não valer o custo 4×.</p>
+
+<h2>3. Exemplos Resolvidos de Custo Por Tarefa</h2>
+
+<div class="cost-example">
+  <h3>Exemplo 1: Classificação de Spam (Luna)</h3>
+  <p><strong>Tarefa:</strong> Classificar email como spam (sim/não binário).</p>
+  <p><strong>Perfil de tokens típico:</strong> 400 entrada (email) + 50 saída (classificação + confiança) = 450 tokens.</p>
+  <p><strong>Custo Luna:</strong> (400 × $1/1M) + (50 × $6/1M) = $0,00043/solicitação.</p>
+  <p><strong>Se 96% têm sucesso na primeira tentativa:</strong> $0,00043 / 0,96 = $0,00045 por classificação bem-sucedida.</p>
+  <p><strong>A 1M de emails/mês:</strong> $450/mês (mais desconto de cache se você reutilizar prompts do sistema).</p>
+  <p><strong>Se roteado incorretamente para Sol:</strong> (400 × $5 + 50 × $30) / 1M = $0,0025 por solicitação. Com 98% de sucesso: $0,00255/bem-sucedida = $2.550/mês (5,7× mais).</p>
+</div>
+
+<div class="cost-example">
+  <h3>Exemplo 2: Agente de Suporte ao Cliente (Terra)</h3>
+  <p><strong>Tarefa:</strong> Conversa de suporte multi-turno com uso de ferramentas (busca de tickets, busca de políticas, decisão de escalação).</p>
+  <p><strong>Perfil de tokens típico por turno:</strong> 2.000 entrada (contexto + histórico) + 400 saída (resposta + chamadas de ferramentas) = 2.400 tokens. Média de 3 turnos para resolver = 7.200 tokens totais por ticket.</p>
+  <p><strong>Custo Terra:</strong> (2.000 × $2,50/1M) + (400 × $15/1M) = $0,0080/turno ou $0,0240 por ticket.</p>
+  <p><strong>Se 90% são resolvidos sem escalação:</strong> $0,0240 / 0,90 = $0,0267 por ticket bem-sucedido.</p>
+  <p><strong>A 10K tickets/mês:</strong> $267/mês.</p>
+  <p><strong>Se usava Luna em seu lugar:</strong> (2.000 × $1 + 400 × $6) / 1M = $0,0044 por turno = $0,0132/ticket. Mas o sucesso do loop de agentes de Luna cai para 65% (chamadas de ferramentas falham, o raciocínio é raso). Custo por bem-sucedida: $0,0132 / 0,65 = $0,0203. Economia líquida: $29/mês, mas 25% dos tickets falham e escalam, elevando o custo de suporte em $400+. Luna não funciona aqui.</p>
+</div>
+
+<div class="cost-example">
+  <h3>Exemplo 3: Geração de Código (Terra vs Sol)</h3>
+  <p><strong>Tarefa:</strong> Gerar função Python a partir de string de requisito.</p>
+  <p><strong>Perfil de tokens típico:</strong> 1.500 entrada (especificação + exemplos) + 600 saída (código + explicação) = 2.100 tokens.</p>
+  <p><strong>Custo Terra:</strong> (1.500 × $2,50 + 600 × $15) / 1M = $0,0134 por solicitação. Com 85% de sucesso na primeira passagem (código compila + passa testes básicos): $0,0158 por função que funciona.</p>
+  <p><strong>Custo Sol:</strong> (1.500 × $5 + 600 × $30) / 1M = $0,0255 por solicitação. Com 90% de sucesso na primeira passagem: $0,0283 por função que funciona.</p>
+  <p><strong>Economia com Terra:</strong> 44% mais barato por resultado que funciona. Use Sol apenas se a diferença de 5% na taxa de sucesso e qualidade de código reduzir mensuravelmente o custo de debugging descendente.</p>
+</div>
+
+<h2>4. Padrão de Roteamento em Cascata &amp; Fallback</h2>
+
+<p>A maioria das equipes de FinOps não deveria usar um único nível para todo trabalho. Em vez disso, implemente um padrão em cascata: comece com o nível mais barato, meça confiança, escale em baixa confiança.</p>
+
+<table>
+<thead>
+<tr>
+  <th>Passo</th>
+  <th>Modelo</th>
+  <th>Limite de Confiança</th>
+  <th>Ação se Limite Não for Atendido</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>1</strong></td>
+  <td>Luna</td>
+  <td>Confiança > 85%</td>
+  <td>Retornar resultado</td>
+</tr>
+<tr>
+  <td><strong>2</strong></td>
+  <td>Terra</td>
+  <td>Confiança > 75%</td>
+  <td>Retornar resultado (escalado)</td>
+</tr>
+<tr>
+  <td><strong>3</strong></td>
+  <td>Sol</td>
+  <td>Confiança > 60%</td>
+  <td>Retornar resultado ou falhar explicitamente</td>
+</tr>
+<tr>
+  <td><strong>4</strong></td>
+  <td>Revisão humana</td>
+  <td>—</td>
+  <td>Escalar para humano</td>
+</tr>
+</tbody>
+</table>
+
+<p><strong>Cenário real:</strong> Você está fazendo classificação de documentos para faturas (classificar por fornecedor). Luna retornará resultados de alta confiança (~94% de sucesso) e custará ~$1,20 por 1K. Para os 6% de faturas ambíguas onde Luna retorna confiança < 85%, escale para Terra (~94% de sucesso para casos difíceis), custando ~$3,75 por 1K de escalações. Se 6% de 10K documentos escalam: 600 × $3,75 = $2,25 extras, total $12 + $2,25 = $14,25/10K. Terra puro custaria ~$37,50. Cascata economiza 62% enquanto melhora a precisão em casos limites.</p>
+
+<h2>5. Economia de Cache de Prompts</h2>
+
+<p>GPT-5.6 mudou os custos de cache: gravações de cache agora custam <strong>1,25× a taxa de entrada sem cache</strong> (não gratuito), e leituras de cache custam 10% de entrada.</p>
+
+<table>
+<thead>
+<tr>
+  <th>Cenário</th>
+  <th>Tamanho de Prefixo</th>
+  <th>Custo de Gravação</th>
+  <th>Custo de Leitura (por acerto)</th>
+  <th>Acertos de Ponto de Equilíbrio</th>
+  <th>Economia @ 10 acertos/mês</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>Contexto de recuperação em cache Luna</strong></td>
+  <td>100K tokens</td>
+  <td class="number">$0,125</td>
+  <td class="number">$0,010</td>
+  <td class="number">15 acertos</td>
+  <td class="number">-$0,025 (perda)</td>
+</tr>
+<tr>
+  <td><strong>Prompt do sistema em cache Luna + docs</strong></td>
+  <td>50K tokens</td>
+  <td class="number">$0,063</td>
+  <td class="number">$0,005</td>
+  <td class="number">8 acertos</td>
+  <td class="number">$0,032</td>
+</tr>
+<tr>
+  <td><strong>Contexto de agentes em cache Terra</strong></td>
+  <td>80K tokens</td>
+  <td class="number">$0,250</td>
+  <td class="number">$0,020</td>
+  <td class="number">14 acertos</td>
+  <td class="number">$0,030</td>
+</tr>
+<tr>
+  <td><strong>Contexto de raciocínio em cache Sol</strong></td>
+  <td>100K tokens</td>
+  <td class="number">$0,625</td>
+  <td class="number">$0,050</td>
+  <td class="number">13 acertos</td>
+  <td class="number">$0,025</td>
+</tr>
+</tbody>
+</table>
+
+<p><strong>Quando cachear:</strong> Se seu prompt inclui um prefixo estável (instruções do sistema, documentação, exemplos com poucos disparos) que é reutilizado mais de 5–10 vezes em uma janela de 30 minutos, o cache geralmente economiza dinheiro. A API de lote (50% de desconto) agora compete com cache em custo — se você classifica documentos em lote, o desconto de lote vence a sobrecarga de cache.</p>
+
+<h2>6. Comparação com Claude Sonnet 5, Gemini 3.1 Pro e DeepSeek V4</h2>
+
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+  <th>Modelo</th>
+  <th>Entrada $/1M</th>
+  <th>Saída $/1M</th>
+  <th>Velocidade</th>
+  <th>Capacidade de Raciocínio</th>
+  <th>Quando Escolher</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>GPT-5.6 Luna</strong></td>
+  <td class="number">$1,00</td>
+  <td class="number">$6,00</td>
+  <td>Rápido</td>
+  <td>Seguimento de instruções, roteamento</td>
+  <td>Classificação, extração, rendimento</td>
+</tr>
+<tr>
+  <td><strong>GPT-5.6 Terra</strong></td>
+  <td class="number">$2,50</td>
+  <td class="number">$15,00</td>
+  <td>Médio</td>
+  <td>Raciocínio moderado, uso de ferramentas</td>
+  <td>Agentes, multi-turno, código médio</td>
+</tr>
+<tr>
+  <td><strong>GPT-5.6 Sol</strong></td>
+  <td class="number">$5,00</td>
+  <td class="number">$30,00</td>
+  <td>Lento</td>
+  <td>Raciocínio de fronteira, pesquisa</td>
+  <td>Código complexo, raciocínio difícil, problemas novel</td>
+</tr>
+<tr>
+  <td><strong>Claude Sonnet 5</strong></td>
+  <td class="number">$2,00–$3,00</td>
+  <td class="number">$10,00–$15,00</td>
+  <td>Médio–Rápido</td>
+  <td>Raciocínio forte, tokens de raciocínio longo</td>
+  <td>Raciocínio, codificação (competitivo com Sol)</td>
+</tr>
+<tr>
+  <td><strong>Gemini 3.1 Pro</strong></td>
+  <td class="number">$2,00</td>
+  <td class="number">$12,00</td>
+  <td>Médio</td>
+  <td>Multimodal, capacidade de pesquisa</td>
+  <td>Tarefas multimodais, competitivo com Terra</td>
+</tr>
+<tr class="highlight">
+  <td><strong>DeepSeek V4 Flash</strong></td>
+  <td class="number">$0,14</td>
+  <td class="number">$0,28</td>
+  <td>Muito Rápido</td>
+  <td>Raciocínio básico, foco em entrada em cache</td>
+  <td>Roteamento de alto volume, cargas de trabalho com foco em cache (7–35× mais barato)</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<p><strong>Arbitragem de custos:</strong> Para classificação simples e extração, DeepSeek V4 Flash é 7–20× mais barato que Luna. Compare com seus dados — se atinge 90%+ de precisão, use-o e guarde a diferença. Claude Sonnet 5 é 2× mais caro que Terra, mas fornece raciocínio mais forte por pretensão de capacidade de modelo; use-o se seu benchmark de Terra mostrar qualidade insuficiente. Gemini 3.1 Pro fica entre Luna e Terra — útil se você precisa de entrada multimodal ou já está no ecossistema Vertex AI.</p>
+
+<h2>7. Migração de GPT-5/5.5 &amp; Status de Deprecação</h2>
+
+<p>A OpenAI continua oferecendo GPT-5.5 ($5/$30, igual ao Sol) e GPT-5.4 ($2,50/$15, igual ao Terra) junto com GPT-5.6. Não há <strong>pressão de deprecação</strong> em modelos mais antigos — você pode continuar usando GPT-5.5 se seu código o alvo. No entanto, GPT-5.6 pretende paridade de desempenho (ou melhor) no mesmo nível, portanto migre para 5.6 para novas implantações.</p>
+
+<p>A interface ChatGPT continua aposentando modelos mais antigos continuamente (GPT-4o mini, GPT-4 turbo agora são apenas leitura); o acesso pela API é estável. Se você constrói contra a API, planeje revisões anuais do status de deprecação de modelo, mas não espere urgência.</p>
+
+<h2>Estrutura de Medição de Custos</h2>
+
+<div class="routing-guide">
+  <h3>Passo 1: Estabelecer linha de base por nível</h3>
+  <p>Execute uma semana de tráfego e registre qual nível lidou com cada solicitação. Isso fornece distribuição de linha de base e custo.</p>
+</div>
+
+<div class="routing-guide">
+  <h3>Passo 2: Medir pontuações de confiança e taxas de fallback</h3>
+  <p>Para cada nível, registre confiança retornada. Calcule: qual % de chamadas Luna têm confiança > 85%? Qual % escala para Terra? Isso diz se sua cascata está equilibrada.</p>
+</div>
+
+<div class="routing-guide">
+  <h3>Passo 3: Auditar sucesso/fracasso por nível</h3>
+  <p>Compare saída do modelo contra verdade fundamental por uma semana. Qual nível tem desempenho insuficiente em seus dados? Ajuste limites ou seleção de nível com base em precisão real, não em pretensões da OpenAI.</p>
+</div>
+
+<div class="routing-guide">
+  <h3>Passo 4: Calcular custo verdadeiro por resposta bem-sucedida</h3>
+  <p>Custo verdadeiro = (custo_nível) / (taxa_sucesso). Se Luna custa $1,20 por 1K com 94% de sucesso, o custo por resposta que funciona é $1,28. Essa é a métrica a otimizar.</p>
+</div>
+
+<h2>Lista de Verificação Rápida de Seleção de Nível</h2>
+
+<ul>
+  <li><input type="checkbox"> Esta é uma tarefa de classificação, extração ou roteamento? → Luna a menos que a precisão seja crítica.</li>
+  <li><input type="checkbox"> A tarefa envolve uso de ferramentas ou raciocínio multi-turno? → Terra.</li>
+  <li><input type="checkbox"> Isso é raciocínio novel, código complexo ou análise multi-hop? → Sol (ou compare Claude Sonnet 5 primeiro).</li>
+  <li><input type="checkbox"> Você pode implementar uma cascata (Luna → Terra → Sol)? → Sim, isso geralmente é ideal.</li>
+  <li><input type="checkbox"> Há um prefixo estável (prompt do sistema, docs) reutilizado 10+ vezes/mês? → Cachear, medir ROI no ponto de equilíbrio (5–15 acertos).</li>
+  <li><input type="checkbox"> Isso é lote ou interativo? → Trabalho em lote se qualifica para 50% de desconto; recalcule ROI com API de lote.</li>
+  <li><input type="checkbox"> Você comparou alternativas (Claude, DeepSeek, Gemini)? → Faça no seu dados, não em pretensões de marketing.</li>
+</ul>
+
+<hr style="margin:48px 0 24px;border:none;border-top:1px solid #1E2A3F" />
+
+<p>A seleção de nível é um problema de classificação: combine propriedades de carga de trabalho com economia de nível. O ideal é roteamento em cascata — rotei para Luna primeiro, meça confiança, escale na incerteza. Isso minimiza custo mantendo qualidade. A FinOps LLM pode executar uma auditoria de custos em seu tráfego de LLM e mostrar onde o desajuste de nível está deixando dinheiro na mesa. <a href="/pt/book">Agende uma auditoria gratuita</a>.</p>
+
+<p>Veja também: <a href="/pt/research/how-much-does-gpt5-cost">Quanto Custa GPT-5?</a> para o panorama completo de preços de GPT e <a href="/pt/research/hidden-llm-costs">Custos Ocultos de LLM</a> para infraestrutura e gastos indiretos de fallback além de taxas por token.</p>
+
+<p><a href="/pt/research">Voltar para pesquisa</a></p>
+
+{% endblock %}{% block suffix %}</main></body></html>
+{% endblock %}

@@ -1,0 +1,132 @@
+---
+permalink: "pt/research/token-budget-implementation-guide.html"
+---
+{% extends "shell.njk" %}{% block prefix %}<!DOCTYPE html>
+<html lang="pt-BR"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Guia de implementação de orçamentos de tokens · FinOps LLM</title><meta name="description" content="Como implementar orçamentos de tokens em produção: limites por solicitação, cotas por equipe, orçamentos por período, limites rígidos vs suaves e degradação graciosa." /><meta name="robots" content="index, follow" /><link rel="canonical" href="https://finopsllm.com/pt/research/token-budget-implementation-guide" />
+<link rel="alternate" hreflang="en" href="https://finopsllm.com/research/token-budget-implementation-guide" />
+<link rel="alternate" hreflang="es" href="https://finopsllm.com/es/research/token-budget-implementation-guide" />
+<link rel="alternate" hreflang="fr" href="https://finopsllm.com/fr/research/token-budget-implementation-guide" />
+<link rel="alternate" hreflang="de" href="https://finopsllm.com/de/research/token-budget-implementation-guide" />
+<link rel="alternate" hreflang="pt" href="https://finopsllm.com/pt/research/token-budget-implementation-guide" />
+<link rel="alternate" hreflang="ja" href="https://finopsllm.com/ja/research/token-budget-implementation-guide" />
+<link rel="alternate" hreflang="x-default" href="https://finopsllm.com/research/token-budget-implementation-guide" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","headline":"Guia de implementação de orçamentos de tokens","description":"Como implementar orçamentos de tokens em produção: limites por solicitação, cotas por equipe, orçamentos por período, limites rígidos vs suaves e degradação graciosa.","url":"https://finopsllm.com/pt/research/token-budget-implementation-guide","datePublished":"2026-07-04","dateModified":"2026-07-04","image":"https://finopsllm.com/og.png","author":{"@type":"Organization","name":"FinOps LLM team"},"publisher":{"@type":"Organization","name":"FinOps LLM","url":"https://finopsllm.com/"}}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Início","item":"https://finopsllm.com/pt/"},{"@type":"ListItem","position":2,"name":"Pesquisa","item":"https://finopsllm.com/pt/research"},{"@type":"ListItem","position":3,"name":"Guia de implementação de orçamentos de tokens","item":"https://finopsllm.com/pt/research/token-budget-implementation-guide"}]}
+</script>
+<style>body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}.wrap{max-width:860px;margin:0 auto;padding:56px 24px}a{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}table{width:100%;border-collapse:collapse;margin:20px 0}th,td{padding:10px 12px;border:1px solid #1E2A3F;text-align:left;font-size:14px}th{background:#111829;color:#E6EAF2;font-weight:600}td{color:#B6C0D2}pre{background:#111829;border:1px solid #1E2A3F;border-radius:6px;padding:16px;overflow-x:auto;font-size:13px;color:#B6C0D2}.langsw{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;color:#647289;margin:0 0 26px}.langsw a{text-decoration:none}.langsw a[aria-current]{color:#E6EAF2;font-weight:600}</style><script src="/assets/consent.js" defer></script><script src="/assets/attribution.js" defer></script>
+</head>
+<body><main class="wrap">{% endblock %}{% block body %}<nav class="langsw" aria-label="Idioma"><a href="/research/token-budget-implementation-guide" hreflang="en">EN</a> · <a href="/es/research/token-budget-implementation-guide" hreflang="es">ES</a> · <a href="/fr/research/token-budget-implementation-guide" hreflang="fr">FR</a> · <a href="/de/research/token-budget-implementation-guide" hreflang="de">DE</a> · <a href="/pt/research/token-budget-implementation-guide" hreflang="pt" aria-current="page">PT</a> · <a href="/ja/research/token-budget-implementation-guide" hreflang="ja">JA</a></nav><h1>Guia de implementação de orçamentos de tokens</h1>
+<p>Orçamentos de tokens são a camada operacional do controle de custos de LLM. A atribuição informa aonde o dinheiro vai; orçamentos evitam que vá para lugares que você não deseja. Sem orçamentos, um único loop de agente mal configurado ou um aumento no tráfego de usuários pode consumir uma alocação mensal em horas. Este guia cobre como implementar quatro tipos de orçamentos de tokens em produção, com pseudocódigo para cada padrão.</p>
+<h2>Tipos de orçamento</h2>
+<table><thead><tr><th>Tipo de orçamento</th><th>Granularidade</th><th>Aplicação</th><th>Caso de uso</th></tr></thead>
+<tbody><tr><td>Por solicitação</td><td>Uma única chamada de API</td><td>Limite rígido via parâmetro max_tokens</td><td>Prevenir conclusões descontroladas, limitar latência</td></tr>
+<tr><td>Cota por equipe</td><td>Equipe ou projeto durante um período</td><td>Limite suave com alertas, limite rígido em limite</td><td>Alocação de custo departamental, evitar que uma equipe consuma orçamento compartilhado</td></tr>
+<tr><td>Por período de tempo</td><td>Diário, semanal ou mensal</td><td>Limite rígido com período de carência</td><td>Limites de orçamento mensal, gastos de nível de sprint</td></tr>
+<tr><td>Por fluxo de trabalho</td><td>Um único pipeline ou execução de agente</td><td>Limite rígido por etapa e total</td><td>Agentes multi-etapa, pipelines de RAG, execuções de avaliação</td></tr></tbody>
+</table>
+<h2>Limites por solicitação</h2>
+<p>O orçamento mais simples: limite cada solicitação com <code>max_tokens</code>. Isso não é opcional - cada solicitação de produção deve ter um limite explícito de tokens de saída. Sem ele, uma resposta verbosa do modelo pode consumir tokens inesperados e inflacionar a latência.</p>
+<pre>// Aplicação de orçamento por solicitação
+function chameLLM(prompt, config):
+    resposta = provedor.completar(
+        prompt: prompt,
+        modelo: config.modelo,
+        max_tokens: config.max_tokens_saida,    // limite rígido
+        temperatura: config.temperatura
+    )
+    if resposta.uso.tokens_totais > config.limite_aviso:
+        log.aviso("Solicitação excedeu limite suave",
+            tokens: resposta.uso.tokens_totais,
+            limite: config.limite_aviso
+        )
+    return resposta</pre>
+<h2>Cotas por equipe</h2>
+<p>As cotas por equipe requerem um contador compartilhado que persista entre solicitações. O padrão: verifique o orçamento restante antes de cada chamada, rejeite ou degrade se o orçamento se esgotar.</p>
+<pre>// Cota de equipe com contador apoiado por Redis
+function verificarOrçamentoEquipe(idEquipe, tokensEstimados):
+    chave = "orçamento:" + idEquipe + ":" + periodoAtual()
+    restante = redis.obter(chave) or obterCotaEquipe(idEquipe)
+
+    if restante &lt; tokensEstimados:
+        if restante &lt; tokensEstimados * 0.1:
+            return NEGAR    // limite rígido: rejeitar solicitação
+        else:
+            return DEGRADAR   // limite suave: usar modelo mais barato
+
+    return PERMITIR
+
+function registrarUso(idEquipe, tokensReais):
+    chave = "orçamento:" + idEquipe + ":" + periodoAtual()
+    redis.decrementar(chave, tokensReais)
+    restante = redis.obter(chave)
+    if restante &lt; obterCotaEquipe(idEquipe) * 0.2:
+        alerta.cotaBaixa(idEquipe, restante)</pre>
+<h2>Orçamentos por período de tempo</h2>
+<p>Orçamentos por período de tempo envolvem cotas de equipe com uma janela de tempo. A diferença chave: você precisa de um mecanismo de período de carência. Quando uma equipe atinge 80% de seu orçamento mensal, envie um alerta. Com 100%, permita um período de carência configurável (por exemplo, 24 horas) antes que o cumprimento rígido entre em vigor. Isso evita que uma equipe seja bloqueada no meio de uma tarefa no último dia do mês.</p>
+<pre>// Orçamento por período com período de carência
+function aplicarOrçamento(idEquipe):
+    uso = obterUsoPeriodo(idEquipe, mesAtual())
+    limite = obterLimiteOrcamentoMensalEquipe(idEquipe)
+
+    if uso &lt; limite * 0.8:
+        return PERMITIR
+
+    if uso &lt; limite * 1.0:
+        alerta.avisoOrcamento(idEquipe, uso, limite)
+        return PERMITIR   // zona de aviso suave
+
+    if uso &lt; limite * 1.1 and dentroPeriodoCarencia(idEquipe):
+        alerta.orcamentoExcedido(idEquipe, uso, limite)
+        return PERMITIR   // período de carência: permitir excesso
+
+    return NEGAR  // parada rígida</pre>
+<h2>Orçamentos por fluxo de trabalho</h2>
+<p>Agentes e pipelines multi-etapa precisam de orçamentos em dois níveis: por etapa (evita que uma única etapa consuma demais) e por execução (evita que todo o pipeline exceda sua alocação). Acompanhe ambos no contexto do fluxo de trabalho.</p>
+<pre>// Rastreador de orçamento de fluxo de trabalho
+class OrçamentoFluxo:
+    construtor(maxPorEtapa, maxTotal):
+        this.maxPorEtapa = maxPorEtapa
+        this.maxTotal = maxTotal
+        this.gasto = 0
+
+    function executarEtapa(fnEtapa, prompt):
+        if this.gasto &gt;= this.maxTotal:
+            return respostaReserva("Orçamento excedido")
+
+        resposta = chameLLM(prompt, {
+            max_tokens: min(this.maxPorEtapa,
+                           this.maxTotal - this.gasto)
+        })
+
+        this.gasto += resposta.uso.tokens_totais
+        return resposta</pre>
+<h2>Degradação graciosa quando o orçamento é excedido</h2>
+<p>Não simplesmente retorne um erro quando um orçamento é atingido. Degrade graciosamente. Mude para um modelo mais barato (GPT-4o-mini em vez de GPT-4o), reduza o tamanho da janela de contexto, pule etapas de processamento opcionais ou retorne um resultado parcial com uma nota de que o processamento completo requer aprovação de orçamento. A experiência do usuário deve degradar, não quebrar.</p>
+<pre>// Cadeia de degradação
+function chamarComDegradacao(prompt, config):
+    if verificarOrçamento(config.idEquipe, MODELO_COMPLETO):
+        return chameLLM(prompt, { modelo: config.modeloPrimario })
+
+    if verificarOrçamento(config.idEquipe, MODELO_BARATO):
+        log.info("Degradando modelo por orçamento")
+        return chameLLM(prompt, { modelo: config.modeloReserva })
+
+    if verificarOrçamento(config.idEquipe, TOKENS_MINIMOS):
+        truncado = truncarContexto(prompt, 50%)
+        return chameLLM(truncado, {
+            modelo: config.modeloReserva,
+            max_tokens: 256
+        })
+
+    return cacheadoOuFallback(prompt)</pre>
+<h2>Monitoração da saúde do orçamento</h2>
+<p>Acompanhe três métricas: taxa de consumo (tokens consumidos por hora vs. orçamento), previsão (no ritmo atual, quando o orçamento se esgotará) e contagem de substituições (quantas vezes o período de carência foi usado). Se o uso do período de carência exceder 10% do total de solicitações, o orçamento está definido muito baixo para a carga de trabalho.</p>
+<h2>Relacionado</h2>
+<ul><li><a href="/pt/research/llm-budget-governance">Governança de orçamento de LLM</a> - políticas organizacionais por trás dos orçamentos.</li><li><a href="/pt/research/agent-spend-guardrails">Grades de proteção de despesas de agentes</a> - padrões de orçamento para agentes autônomos.</li><li><a href="/pt/research/cap-inference-costs">Como limitar custos de inferência</a> - controles de custo do lado do provedor.</li></ul>
+<hr style="margin:48px 0 24px;border:none;border-top:1px solid #1E2A3F" /><p>Quer isso aplicado aos seus próprios gastos com LLM? O FinOps LLM executa uma auditoria gratuita dos seus custos de IA e mostra onde estão as economias. <a href="/book">Agendar auditoria gratuita &rarr;</a></p><p><a href="/pt/research">Voltar à pesquisa</a></p>{% endblock %}{% block suffix %}</main></body></html>
+
+{% endblock %}

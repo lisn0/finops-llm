@@ -1,0 +1,538 @@
+---
+permalink: "pt/research/llm-api-pricing-tracker.html"
+---
+{% extends "shell.njk" %}{% block prefix %}<!DOCTYPE html>
+<html lang="pt-BR"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Rastreamento de Preços de API LLM · FinOps LLM</title><meta name="description" content="Rastreamento de preços por token em mais de 12 provedores de LLM e 50+ modelos. Entrada, saída, leitura/gravação de cache, janelas de contexto e descontos em lotes em uma tabela normalizada." /><meta name="robots" content="index, follow" /><link rel="canonical" href="https://finopsllm.com/pt/research/llm-api-pricing-tracker" />
+<link rel="alternate" hreflang="en" href="https://finopsllm.com/research/llm-api-pricing-tracker" />
+<link rel="alternate" hreflang="es" href="https://finopsllm.com/es/research/llm-api-pricing-tracker" />
+<link rel="alternate" hreflang="fr" href="https://finopsllm.com/fr/research/llm-api-pricing-tracker" />
+<link rel="alternate" hreflang="de" href="https://finopsllm.com/de/research/llm-api-pricing-tracker" />
+<link rel="alternate" hreflang="pt" href="https://finopsllm.com/pt/research/llm-api-pricing-tracker" />
+<link rel="alternate" hreflang="ja" href="https://finopsllm.com/ja/research/llm-api-pricing-tracker" />
+<link rel="alternate" hreflang="x-default" href="https://finopsllm.com/research/llm-api-pricing-tracker" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","headline":"Rastreamento de Preços de API LLM · FinOps LLM","description":"Rastreamento de preços por token em mais de 12 provedores de LLM e 50+ modelos em uma tabela normalizada.","url":"https://finopsllm.com/pt/research/llm-api-pricing-tracker","datePublished":"2026-07-04","dateModified":"2026-07-15","image":"https://finopsllm.com/og.png","author":{"@type":"Organization","name":"FinOps LLM team"},"publisher":{"@type":"Organization","name":"FinOps LLM","url":"https://finopsllm.com/"}}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Início","item":"https://finopsllm.com/pt/"},{"@type":"ListItem","position":2,"name":"Pesquisa","item":"https://finopsllm.com/pt/research"},{"@type":"ListItem","position":3,"name":"Rastreamento de Preços de API LLM","item":"https://finopsllm.com/pt/research/llm-api-pricing-tracker"}]}
+</script>
+<style>
+body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}
+.wrap{max-width:1100px;margin:0 auto;padding:56px 24px}
+a{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}
+.langsw{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;color:#647289;margin:0 0 26px}
+.langsw a{text-decoration:none}.langsw a[aria-current]{color:#E6EAF2;font-weight:600}
+.hero-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:16px;margin:28px 0 36px}
+.hero-stat{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:18px 16px;text-align:center}
+.hero-stat .num{font-size:2rem;font-weight:700;color:#7AAFFF;display:block}
+.hero-stat .lbl{font-size:.82rem;color:#647289;margin-top:4px}
+.badge-row{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 32px;list-style:none;padding:0}
+.badge-row li{background:#101726;border:1px solid #1E2A3F;border-radius:8px;padding:8px 14px;font-size:.85rem;color:#B6C0D2}
+.method-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin:20px 0 32px}
+.method-card{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:18px}
+.method-card h3{font-size:.95rem;color:#E6EAF2;margin:0 0 8px}
+.method-card p{font-size:.85rem;margin:0}
+.feed-item{border-left:3px solid #7AAFFF;padding:12px 0 12px 16px;margin:0 0 4px}
+.feed-item .feed-date{font-size:.78rem;color:#647289;font-family:'JetBrains Mono',monospace}
+.feed-item h3{font-size:.95rem;margin:4px 0 4px;color:#E6EAF2}
+.feed-item p{font-size:.85rem;margin:0}
+.table-wrap{overflow-x:auto;margin:0 0 32px;-webkit-overflow-scrolling:touch}
+table{border-collapse:collapse;width:100%;font-size:.82rem;white-space:nowrap}
+th,td{border:1px solid #1E2A3F;padding:8px 10px;text-align:left;color:#B6C0D2}
+th{color:#E6EAF2;background:#101726;cursor:pointer;position:sticky;top:0;user-select:none}
+th:hover{background:#162035}
+th .sort-arrow{font-size:.7rem;margin-left:4px;opacity:.4}
+th.sorted .sort-arrow{opacity:1;color:#7AAFFF}
+td.provider-cell{white-space:normal;min-width:140px}
+td.price-cell{text-align:right;font-variant-numeric:tabular-nums}
+td.limit-cell{text-align:right;font-variant-numeric:tabular-nums;min-width:55px}
+tr:hover{background:rgba(122,175,255,.04)}
+.est{color:#647289}
+.official{color:#B6C0D2}
+.ref-link{font-size:.75rem;color:#7AAFFF;text-decoration:none;border-bottom:1px dotted rgba(122,175,255,.3)}
+.ref-link:hover{border-bottom-color:#7AAFFF}
+.footnotes{font-size:.8rem;color:#64748b;margin:16px 0 0}
+.footnotes p{margin:6px 0}
+.guide-section{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:24px;margin:12px 0}
+.guide-section h3{color:#E6EAF2;margin:0 0 10px;font-size:1rem}
+@media(max-width:700px){.hero-stats{grid-template-columns:repeat(2,1fr)}table{font-size:.75rem}th,td{padding:6px 7px}}
+</style><script src="/assets/consent.js" defer></script><script src="/assets/attribution.js" defer></script>
+<script src="/assets/lang.js" defer></script>
+</head>
+<body><main class="wrap">{% endblock %}{% block body %}
+<nav class="langsw" aria-label="Language / Idioma"><a href="/research/llm-api-pricing-tracker" hreflang="en">EN</a> · <a href="/es/research/llm-api-pricing-tracker" hreflang="es">ES</a> · <a href="/fr/research/llm-api-pricing-tracker" hreflang="fr">FR</a> · <a href="/de/research/llm-api-pricing-tracker" hreflang="de">DE</a> · <a href="/pt/research/llm-api-pricing-tracker" hreflang="pt" aria-current="page">PT</a> · <a href="/ja/research/llm-api-pricing-tracker" hreflang="ja">JA</a></nav>
+
+<h1>Rastreamento de Preços de API LLM</h1>
+<p class="updated" style="color:#6B7689;font-size:14px;margin-top:-6px">Atualizado em 15 de julho de 2026 · publicado pela primeira vez em 4 de julho de 2026</p>
+<p>Rastreamento de preços por token em todos os principais provedores de LLM. Entrada, saída, leitura/gravação de cache, janelas de contexto e descontos em lotes em uma tabela normalizada. Atualizado mensalmente com dados verificáveis dos provedores.</p>
+
+<div class="hero-stats">
+  <div class="hero-stat"><span class="num">12+</span><span class="lbl">Provedores rastreados</span></div>
+  <div class="hero-stat"><span class="num">25+</span><span class="lbl">Modelos listados</span></div>
+  <div class="hero-stat"><span class="num">6</span><span class="lbl">Colunas de preço</span></div>
+  <div class="hero-stat"><span class="num">Jul 2026</span><span class="lbl">Última atualização</span></div>
+</div>
+
+<ul class="badge-row">
+  <li>Todos os preços em USD por 1 milhão de tokens</li>
+  <li>Valores estimados mostrados em <span class="est">cinza</span></li>
+  <li>Os preços de cache refletem o cache de prompts onde está disponível</li>
+</ul>
+
+<h2>Metodologia</h2>
+<div class="method-grid">
+  <div class="method-card"><h3>Coleta</h3><p>Dados de preços coletados das páginas oficiais de preços e documentação de API dos provedores.</p></div>
+  <div class="method-card"><h3>Normalização</h3><p>Todos os preços normalizados em USD por 1 milhão de tokens para comparação direta.</p></div>
+  <div class="method-card"><h3>Preços de cache</h3><p>As colunas de Leitura/Gravação de cache mostram descontos de cache de prompts onde os provedores os suportam.</p></div>
+  <div class="method-card"><h3>Política de visualização</h3><p>Os valores oficiais e estimados estão claramente separados. As estimativas são marcadas em cinza.</p></div>
+</div>
+
+<h2>Histórico de Atualizações</h2>
+<div style="margin:0 0 32px">
+  <div class="feed-item">
+    <span class="feed-date">4 jul 2026</span>
+    <h3>Rastreamento de Preços de API LLM lançado</h3>
+    <p>Publicada a comparação de preços por token em mais de 12 principais provedores de LLM como artigo de pesquisa do FinOps LLM.</p>
+  </div>
+</div>
+
+<h2 id="pricing">Tabela de Preços por Token</h2>
+
+<div class="table-wrap">
+<table id="pricingTable">
+<thead>
+<tr>
+  <th data-col="provider">Provedor <span class="sort-arrow">↕</span></th>
+  <th data-col="model">Modelo <span class="sort-arrow">↕</span></th>
+  <th data-col="input" class="price-cell">Entrada $/1M <span class="sort-arrow">↕</span></th>
+  <th data-col="output" class="price-cell">Saída $/1M <span class="sort-arrow">↕</span></th>
+  <th data-col="cacheRead" class="price-cell">Leitura de Cache $/1M <span class="sort-arrow">↕</span></th>
+  <th data-col="cacheWrite" class="price-cell">Gravação de Cache $/1M <span class="sort-arrow">↕</span></th>
+  <th data-col="context" class="limit-cell">Janela de Contexto <span class="sort-arrow">↕</span></th>
+  <th data-col="batch">Desconto em Lotes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td class="provider-cell"><strong>OpenAI</strong></td>
+  <td>GPT-5.6-Sol</td>
+  <td class="price-cell official" data-val="5.00">$5.00</td>
+  <td class="price-cell official" data-val="30.00">$30.00</td>
+  <td class="price-cell official" data-val="0.50">$0.50</td>
+  <td class="price-cell official" data-val="6.25">$6.25</td>
+  <td class="limit-cell official" data-val="128000">128K</td>
+  <td>50%</td>
+</tr>
+<tr>
+  <td class="provider-cell"><strong>OpenAI</strong></td>
+  <td>GPT-5.6-Terra</td>
+  <td class="price-cell official" data-val="2.50">$2.50</td>
+  <td class="price-cell official" data-val="15.00">$15.00</td>
+  <td class="price-cell official" data-val="0.25">$0.25</td>
+  <td class="price-cell official" data-val="3.13">$3.13</td>
+  <td class="limit-cell official" data-val="128000">128K</td>
+  <td>50%</td>
+</tr>
+<tr>
+  <td class="provider-cell"><strong>OpenAI</strong></td>
+  <td>GPT-5.6-Luna</td>
+  <td class="price-cell official" data-val="1.00">$1.00</td>
+  <td class="price-cell official" data-val="6.00">$6.00</td>
+  <td class="price-cell official" data-val="0.10">$0.10</td>
+  <td class="price-cell official" data-val="1.25">$1.25</td>
+  <td class="limit-cell official" data-val="128000">128K</td>
+  <td>50%</td>
+</tr>
+<tr>
+  <td class="provider-cell"><strong>OpenAI</strong></td>
+  <td>GPT-5.5</td>
+  <td class="price-cell official" data-val="5.00">$5.00</td>
+  <td class="price-cell official" data-val="30.00">$30.00</td>
+  <td class="price-cell official" data-val="0.50">$0.50</td>
+  <td class="price-cell official" data-val="6.25">$6.25</td>
+  <td class="limit-cell official" data-val="128000">128K</td>
+  <td>50%</td>
+</tr>
+<tr>
+  <td class="provider-cell"><strong>OpenAI</strong></td>
+  <td>GPT-5.4</td>
+  <td class="price-cell official" data-val="2.50">$2.50</td>
+  <td class="price-cell official" data-val="15.00">$15.00</td>
+  <td class="price-cell official" data-val="0.25">$0.25</td>
+  <td class="price-cell official" data-val="3.13">$3.13</td>
+  <td class="limit-cell official" data-val="128000">128K</td>
+  <td>50%</td>
+</tr>
+<tr>
+  <td class="provider-cell"><strong>OpenAI</strong></td>
+  <td>o3</td>
+  <td class="price-cell official" data-val="2.00">$2.00</td>
+  <td class="price-cell official" data-val="8.00">$8.00</td>
+  <td class="price-cell official" data-val="0.50">$0.50</td>
+  <td class="price-cell official" data-val="2.00">$2.00</td>
+  <td class="limit-cell official" data-val="200000">200K</td>
+  <td>50%</td>
+</tr>
+<tr>
+  <td class="provider-cell"><strong>OpenAI</strong></td>
+  <td>o4-mini</td>
+  <td class="price-cell official" data-val="1.10">$1.10</td>
+  <td class="price-cell official" data-val="4.40">$4.40</td>
+  <td class="price-cell official" data-val="0.28">$0.28</td>
+  <td class="price-cell official" data-val="1.10">$1.10</td>
+  <td class="limit-cell official" data-val="200000">200K</td>
+  <td>50%</td>
+</tr>
+<!-- Anthropic -->
+<tr>
+  <td class="provider-cell"><strong>Anthropic</strong></td>
+  <td>Claude Fable 5</td>
+  <td class="price-cell official" data-val="10.00">$10.00</td>
+  <td class="price-cell official" data-val="50.00">$50.00</td>
+  <td class="price-cell official" data-val="1.00">$1.00</td>
+  <td class="price-cell official" data-val="12.50">$12.50</td>
+  <td class="limit-cell official" data-val="200000">200K</td>
+  <td>50%</td>
+</tr>
+<tr>
+  <td class="provider-cell"><strong>Anthropic</strong></td>
+  <td>Claude Opus 4.8</td>
+  <td class="price-cell official" data-val="5.00">$5.00</td>
+  <td class="price-cell official" data-val="25.00">$25.00</td>
+  <td class="price-cell official" data-val="0.50">$0.50</td>
+  <td class="price-cell official" data-val="6.25">$6.25</td>
+  <td class="limit-cell official" data-val="200000">200K</td>
+  <td>50%</td>
+</tr>
+<tr>
+  <td class="provider-cell"><strong>Anthropic</strong></td>
+  <td>Claude Sonnet 5<sup>*</sup></td>
+  <td class="price-cell official" data-val="2.00">$2.00</td>
+  <td class="price-cell official" data-val="10.00">$10.00</td>
+  <td class="price-cell official" data-val="0.20">$0.20</td>
+  <td class="price-cell official" data-val="2.50">$2.50</td>
+  <td class="limit-cell official" data-val="200000">200K</td>
+  <td>50%</td>
+</tr>
+<tr>
+  <td class="provider-cell"><strong>Anthropic</strong></td>
+  <td>Claude Haiku 4.5</td>
+  <td class="price-cell official" data-val="1.00">$1.00</td>
+  <td class="price-cell official" data-val="5.00">$5.00</td>
+  <td class="price-cell official" data-val="0.10">$0.10</td>
+  <td class="price-cell official" data-val="1.25">$1.25</td>
+  <td class="limit-cell official" data-val="200000">200K</td>
+  <td>50%</td>
+</tr>
+<!-- Google -->
+<tr>
+  <td class="provider-cell"><strong>Google</strong></td>
+  <td>Gemini 3.5 Flash</td>
+  <td class="price-cell official" data-val="1.50">$1.50</td>
+  <td class="price-cell official" data-val="9.00">$9.00</td>
+  <td class="price-cell official" data-val="0.15">$0.15</td>
+  <td class="price-cell official" data-val="1.88">$1.88</td>
+  <td class="limit-cell official" data-val="1000000">1M</td>
+  <td>50%</td>
+</tr>
+<tr>
+  <td class="provider-cell"><strong>Google</strong></td>
+  <td>Gemini 3.1 Pro Preview</td>
+  <td class="price-cell official" data-val="2.00">$2.00</td>
+  <td class="price-cell official" data-val="12.00">$12.00</td>
+  <td class="price-cell official" data-val="0.20">$0.20</td>
+  <td class="price-cell official" data-val="2.50">$2.50</td>
+  <td class="limit-cell official" data-val="1000000">1M</td>
+  <td>50%</td>
+</tr>
+<tr>
+  <td class="provider-cell"><strong>Google</strong></td>
+  <td>Gemini 2.5 Pro</td>
+  <td class="price-cell official" data-val="1.25">$1.25</td>
+  <td class="price-cell official" data-val="5.00">$5.00</td>
+  <td class="price-cell official" data-val="0.31">$0.31</td>
+  <td class="price-cell official" data-val="4.50">$4.50</td>
+  <td class="limit-cell official" data-val="1000000">1M</td>
+  <td>50%</td>
+</tr>
+<tr>
+  <td class="provider-cell"><strong>Google</strong></td>
+  <td>Gemini 2.5 Flash</td>
+  <td class="price-cell official" data-val="0.15">$0.15</td>
+  <td class="price-cell official" data-val="0.60">$0.60</td>
+  <td class="price-cell official" data-val="0.04">$0.04</td>
+  <td class="price-cell official" data-val="0.15">$0.15</td>
+  <td class="limit-cell official" data-val="1000000">1M</td>
+  <td>50%</td>
+</tr>
+<!-- xAI -->
+<tr>
+  <td class="provider-cell"><strong>xAI</strong></td>
+  <td>Grok 4.5</td>
+  <td class="price-cell official" data-val="2.00">$2.00</td>
+  <td class="price-cell official" data-val="6.00">$6.00</td>
+  <td class="price-cell official" data-val="0.50">$0.50</td>
+  <td class="price-cell official" data-val="1.50">$1.50</td>
+  <td class="limit-cell official" data-val="1000000">1M</td>
+  <td>50%</td>
+</tr>
+<tr>
+  <td class="provider-cell"><strong>xAI</strong></td>
+  <td>Grok 4.3</td>
+  <td class="price-cell official" data-val="1.25">$1.25</td>
+  <td class="price-cell official" data-val="2.50">$2.50</td>
+  <td class="price-cell official" data-val="">-</td>
+  <td class="price-cell official" data-val="">-</td>
+  <td class="limit-cell official" data-val="1000000">1M</td>
+  <td>50%</td>
+</tr>
+
+<!-- Meta -->
+<tr>
+  <td class="provider-cell"><strong>Meta</strong></td>
+  <td>Llama 4 Maverick (DeepInfra)</td>
+  <td class="price-cell official" data-val="0.20">$0.20</td>
+  <td class="price-cell official" data-val="0.80">$0.80</td>
+  <td class="price-cell est">-</td>
+  <td class="price-cell est">-</td>
+  <td class="limit-cell est" data-val="1000000">1M</td>
+  <td class="est">-</td>
+</tr>
+<tr>
+  <td class="provider-cell"><strong>Meta</strong></td>
+  <td>Llama 4 Scout (Groq)</td>
+  <td class="price-cell official" data-val="0.11">$0.11</td>
+  <td class="price-cell official" data-val="0.34">$0.34</td>
+  <td class="price-cell est">-</td>
+  <td class="price-cell est">-</td>
+  <td class="limit-cell est" data-val="5000000">5M</td>
+  <td class="est">-</td>
+</tr>
+<tr>
+  <td class="provider-cell"><strong>Meta</strong></td>
+  <td>Llama 3.3 70B (Groq)</td>
+  <td class="price-cell official" data-val="0.59">$0.59</td>
+  <td class="price-cell official" data-val="0.79">$0.79</td>
+  <td class="price-cell est">-</td>
+  <td class="price-cell est">-</td>
+  <td class="limit-cell est" data-val="8000000">8M</td>
+  <td class="est">-</td>
+</tr>
+<!-- Mistral -->
+<tr>
+  <td class="provider-cell"><strong>Mistral</strong></td>
+  <td>Mistral Large 2/3</td>
+  <td class="price-cell official" data-val="2.00">$2.00</td>
+  <td class="price-cell official" data-val="6.00">$6.00</td>
+  <td class="price-cell est">-</td>
+  <td class="price-cell est">-</td>
+  <td class="limit-cell official" data-val="128000">128K</td>
+  <td>-</td>
+</tr>
+<tr>
+  <td class="provider-cell"><strong>Mistral</strong></td>
+  <td>Mistral Medium 3.5</td>
+  <td class="price-cell official" data-val="1.50">$1.50</td>
+  <td class="price-cell official" data-val="7.50">$7.50</td>
+  <td class="price-cell est">-</td>
+  <td class="price-cell est">-</td>
+  <td class="limit-cell est" data-val="128000">128K</td>
+  <td class="est">-</td>
+</tr>
+<tr>
+  <td class="provider-cell"><strong>Mistral</strong></td>
+  <td>Mistral Small 3</td>
+  <td class="price-cell official" data-val="0.10">$0.10</td>
+  <td class="price-cell official" data-val="0.30">$0.30</td>
+  <td class="price-cell est">-</td>
+  <td class="price-cell est">-</td>
+  <td class="limit-cell est" data-val="128000">128K</td>
+  <td class="est">-</td>
+</tr>
+<tr>
+  <td class="provider-cell"><strong>Mistral</strong></td>
+  <td>Codestral</td>
+  <td class="price-cell official" data-val="0.30">$0.30</td>
+  <td class="price-cell official" data-val="0.90">$0.90</td>
+  <td class="price-cell est">-</td>
+  <td class="price-cell est">-</td>
+  <td class="limit-cell est" data-val="128000">128K</td>
+  <td class="est">-</td>
+</tr>
+<!-- DeepSeek -->
+<tr>
+  <td class="provider-cell"><strong>DeepSeek</strong></td>
+  <td>DeepSeek V4 Flash</td>
+  <td class="price-cell official" data-val="0.14">$0.14</td>
+  <td class="price-cell official" data-val="0.28">$0.28</td>
+  <td class="price-cell official" data-val="0.0028">$0.0028</td>
+  <td class="price-cell est">-</td>
+  <td class="limit-cell official" data-val="128000">128K</td>
+  <td>-</td>
+</tr>
+<tr>
+  <td class="provider-cell"><strong>DeepSeek</strong></td>
+  <td>DeepSeek V4 Pro</td>
+  <td class="price-cell official" data-val="0.435">$0.435</td>
+  <td class="price-cell official" data-val="0.87">$0.87</td>
+  <td class="price-cell official" data-val="0.0036">$0.0036</td>
+  <td class="price-cell est">-</td>
+  <td class="limit-cell official" data-val="128000">128K</td>
+  <td>-</td>
+</tr>
+<!-- Qwen -->
+<tr>
+  <td class="provider-cell"><strong>Alibaba Qwen</strong></td>
+  <td>Qwen 3.7-Max</td>
+  <td class="price-cell official" data-val="2.50">$2.50</td>
+  <td class="price-cell official" data-val="7.50">$7.50</td>
+  <td class="price-cell est">-</td>
+  <td class="price-cell est">-</td>
+  <td class="limit-cell est" data-val="131072">131K</td>
+  <td class="est">-</td>
+</tr>
+
+<!-- Moonshot -->
+<tr>
+  <td class="provider-cell"><strong>Moonshot Kimi</strong></td>
+  <td>Kimi K2.6</td>
+  <td class="price-cell official" data-val="0.95">$0.95</td>
+  <td class="price-cell official" data-val="4.00">$4.00</td>
+  <td class="price-cell official" data-val="0.16">$0.16</td>
+  <td class="price-cell est">-</td>
+  <td class="limit-cell est" data-val="200000">200K</td>
+  <td class="est">-</td>
+</tr>
+<tr>
+  <td class="provider-cell"><strong>Xiaomi MiMO</strong><br /><a class="ref-link" href="https://platform.xiaomimimo.com?ref=LHT8UJ">Cadastre-se - ambos ganham $2 ↗</a></td>
+  <td>MiMo-V2-Pro</td>
+  <td class="price-cell est" data-val="0.50">$0.50</td>
+  <td class="price-cell est" data-val="2.00">$2.00</td>
+  <td class="price-cell est">-</td>
+  <td class="price-cell est">-</td>
+  <td class="limit-cell est" data-val="128000">128K</td>
+  <td class="est">-</td>
+</tr>
+<tr>
+  <td class="provider-cell"><strong>Xiaomi MiMO</strong><br /><a class="ref-link" href="https://platform.xiaomimimo.com?ref=LHT8UJ">Cadastre-se - ambos ganham $2 ↗</a></td>
+  <td>MiMo-V2-Omni</td>
+  <td class="price-cell est" data-val="0.40">$0.40</td>
+  <td class="price-cell est" data-val="1.60">$1.60</td>
+  <td class="price-cell est">-</td>
+  <td class="price-cell est">-</td>
+  <td class="limit-cell est" data-val="128000">128K</td>
+  <td class="est">-</td>
+</tr>
+<tr>
+  <td class="provider-cell"><strong>Zhipu AI</strong></td>
+  <td>GLM-5</td>
+  <td class="price-cell est" data-val="1.00">$1.00</td>
+  <td class="price-cell est" data-val="4.00">$4.00</td>
+  <td class="price-cell est">-</td>
+  <td class="price-cell est">-</td>
+  <td class="limit-cell est" data-val="128000">128K</td>
+  <td class="est">-</td>
+</tr>
+<tr>
+  <td class="provider-cell"><strong>Zhipu AI</strong></td>
+  <td>GLM-5-Turbo</td>
+  <td class="price-cell est" data-val="0.30">$0.30</td>
+  <td class="price-cell est" data-val="1.20">$1.20</td>
+  <td class="price-cell est">-</td>
+  <td class="price-cell est">-</td>
+  <td class="limit-cell est" data-val="128000">128K</td>
+  <td class="est">-</td>
+</tr>
+<tr>
+  <td class="provider-cell"><strong>MiniMax</strong></td>
+  <td>M2.7</td>
+  <td class="price-cell est" data-val="0.40">$0.40</td>
+  <td class="price-cell est" data-val="1.60">$1.60</td>
+  <td class="price-cell est">-</td>
+  <td class="price-cell est">-</td>
+  <td class="limit-cell est" data-val="128000">128K</td>
+  <td class="est">-</td>
+</tr>
+<tr>
+  <td class="provider-cell"><strong>StepFun</strong></td>
+  <td>step-3.5-flash</td>
+  <td class="price-cell est" data-val="0.30">$0.30</td>
+  <td class="price-cell est" data-val="1.20">$1.20</td>
+  <td class="price-cell est">-</td>
+  <td class="price-cell est">-</td>
+  <td class="limit-cell est" data-val="128000">128K</td>
+  <td class="est">-</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<div class="footnotes">
+  <p><sup>*</sup> Claude Sonnet 5: preços introdutórios de $2/$10 por 1M tokens em vigor até 31 de agosto de 2026; os preços padrão de $3/$15 começam em 1º de setembro de 2026.</p>
+  <p>Os valores não fornecidos explicitamente pelos provedores são mostrados em <span class="est">cinza</span>.</p>
+  <p>Os preços do Meta Llama refletem preços de API hospedada (Fireworks, Together, etc.), não o custo de auto-hospedagem. A economia de auto-hospedagem é abordada em nossa <a href="/pt/research/open-source-vs-closed-cost">Comparação de Custos de Código Aberto vs Código Fechado</a>.</p>
+  <p>As janelas de contexto são as máximas suportadas; a disponibilidade real pode variar por nível.</p>
+  <p>Os preços de Leitura/Gravação de cache refletem o cache de prompts específico do provedor onde disponível. "-" significa que o provedor não oferece cache ou o preço não está publicado.</p>
+  <p>O Desconto em Lotes mostra a economia aproximada ao usar APIs de lote/assincromía onde disponível.</p>
+  <p>Alguns links podem incluir códigos de referência.</p>
+  <p>Os preços podem mudar com frequência. Sempre verifique as informações mais recentes nas páginas oficiais dos provedores.</p>
+</div>
+
+<h2>Guia Prático</h2>
+<p class="guide-section" style="background:none;border:none;padding:0">Como usar esses dados de preços para planejamento de custos</p>
+
+<div class="guide-section">
+  <h3>1) Calcule primeiro seu volume de tokens</h3>
+  <p>Antes de comparar preços, estime seus volumes mensais de tokens de entrada e saída. Os tokens de saída são tipicamente 3-5x mais caros que os de entrada, então reduzir o comprimento da saída tem o maior impacto no custo.</p>
+</div>
+<div class="guide-section">
+  <h3>2) Considere as economias de cache</h3>
+  <p>Se sua carga de trabalho tem prompts de sistema ou contexto repetidos (RAG, conversas de múltiplos turnos), o cache de prompts pode reduzir os custos de entrada em 50-90%. Verifique a coluna de Leitura de Cache para os descontos aplicáveis.</p>
+</div>
+<div class="guide-section">
+  <h3>3) Use APIs em lote para trabalhos não urgentes</h3>
+  <p>A maioria dos principais provedores oferece descontos de 50% em chamadas de API em lote/assincromía. Se sua carga de trabalho tolera latência (avaliações, processamento de dados, geração de conteúdo), os preços em lote reduzem os custos pela metade.</p>
+</div>
+<div class="guide-section">
+  <h3>4) Compare o custo total, não apenas o preço por token</h3>
+  <p>Um modelo barato que precisa de 3x mais tokens para igualar a qualidade pode custar mais no total. Considere a qualidade do modelo e o desempenho específico da tarefa junto com os preços brutos.</p>
+</div>
+
+<hr style="margin:48px 0 24px;border:none;border-top:1px solid #1E2A3F" />
+<p>Quer isso aplicado ao seu próprio gasto em LLM? FinOps LLM realiza uma auditoria gratuita de seus custos de IA e mostra onde estão as economias. <a href="/book">Agende auditoria gratuita &rarr;</a></p>
+<p><a href="/pt/research">Voltar à pesquisa</a></p>
+
+<script>
+(function(){
+  const table=document.getElementById('pricingTable');
+  const tbody=table.querySelector('tbody');
+  const headers=table.querySelectorAll('th[data-col]');
+  let currentSort={col:null,asc:true};
+  headers.forEach(function(th){
+    th.addEventListener('click',function(){
+      const col=this.dataset.col;
+      if(currentSort.col===col){currentSort.asc=!currentSort.asc}
+      else{currentSort.col=col;currentSort.asc=true}
+      headers.forEach(function(h){h.classList.remove('sorted')});
+      this.classList.add('sorted');
+      this.querySelector('.sort-arrow').textContent=currentSort.asc?'↑':'↓';
+      sortTable(col,currentSort.asc);
+    });
+  });
+  function sortTable(col,asc){
+    const rows=Array.from(tbody.querySelectorAll('tr'));
+    const colMap={provider:0,model:1,input:2,output:3,cacheRead:4,cacheWrite:5,context:6,batch:7};
+    const idx=colMap[col];if(idx===undefined)return;
+    rows.sort(function(a,b){
+      let va,vb;
+      if(col==='provider'||col==='model'||col==='batch'){va=a.cells[idx].textContent.trim();vb=b.cells[idx].textContent.trim();return asc?va.localeCompare(vb):vb.localeCompare(va)}
+      va=parseFloat(a.cells[idx].dataset.val||0);vb=parseFloat(b.cells[idx].dataset.val||0);
+      return asc?va-vb:vb-va;
+    });
+    rows.forEach(function(r){tbody.appendChild(r)});
+  }
+})();
+</script>
+{% endblock %}{% block suffix %}</main></body></html>
+{% endblock %}

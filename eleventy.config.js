@@ -46,6 +46,7 @@ module.exports = function (eleventyConfig) {
   eleventyConfig.addPassthroughCopy({ "src/sitemap-fr.xml": "sitemap-fr.xml" });
   eleventyConfig.addPassthroughCopy({ "src/sitemap-index.xml": "sitemap-index.xml" });
   eleventyConfig.addPassthroughCopy({ "src/sitemap-ja.xml": "sitemap-ja.xml" });
+  eleventyConfig.addPassthroughCopy({ "src/sitemap-pt.xml": "sitemap-pt.xml" });
   eleventyConfig.addPassthroughCopy({ "src/sitemap.xml": "sitemap.xml" });
   eleventyConfig.addPassthroughCopy({ "src/worker.js": "worker.js" });
   eleventyConfig.addPassthroughCopy({ "src/wrangler.jsonc": "wrangler.jsonc" });
