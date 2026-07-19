@@ -1,0 +1,237 @@
+---
+permalink: "research/agent-total-cost-of-ownership.html"
+---
+{% extends "shell.njk" %}{% block prefix %}<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Agent Total Cost of Ownership: The 70% of Cost That Isn't Tokens · FinOps LLM</title><meta name="description" content="The real cost of running AI agents in production: evaluation burn, observability, platform staffing, model drift, compliance, and retry waste. A TCO formula and worked example." /><meta name="robots" content="index, follow" /><link rel="canonical" href="https://finopsllm.com/research/agent-total-cost-of-ownership" />
+<link rel="alternate" hreflang="en" href="https://finopsllm.com/research/agent-total-cost-of-ownership" />
+<link rel="alternate" hreflang="x-default" href="https://finopsllm.com/research/agent-total-cost-of-ownership" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","headline":"Agent Total Cost of Ownership: The 70% of Cost That Isn't Tokens · FinOps LLM","description":"Model tokens are only 10–30% of real agent cost. The rest hides in evaluation, observability, staffing, drift correction, compliance, and retry waste. A practical TCO formula and annual cost breakdown.","url":"https://finopsllm.com/research/agent-total-cost-of-ownership","datePublished":"2026-07-19","dateModified":"2026-07-19","image":"https://finopsllm.com/og.png","author":{"@type":"Organization","name":"FinOps LLM team"},"publisher":{"@type":"Organization","name":"FinOps LLM","url":"https://finopsllm.com/"}}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://finopsllm.com/"},{"@type":"ListItem","position":2,"name":"Research","item":"https://finopsllm.com/research"},{"@type":"ListItem","position":3,"name":"Agent TCO","item":"https://finopsllm.com/research/agent-total-cost-of-ownership"}]}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"What percentage of agent cost is production token spend?","acceptedAnswer":{"@type":"Answer","text":"Production token spend is typically 10–30% of total agent cost. The remaining 70–90% covers evaluation burns, observability infrastructure, platform staffing, model drift correction, compliance overhead, and retry/loop waste."}},{"@type":"Question","name":"How much do agent evaluations cost?","acceptedAnswer":{"@type":"Answer","text":"Evaluation costs depend on suite size and frequency. A comprehensive eval suite (1K test cases, running 3×/week) consumes 20–150M tokens/month — often more than production traffic. Industry reports show eval token spend as high as 59% of total token consumption for code-review agents."}},{"@type":"Question","name":"What is the TCO formula for agents?","acceptedAnswer":{"@type":"Answer","text":"TCO = Production tokens + Evaluation tokens + Observability infrastructure + (Platform staffing cost / agent count) + Model drift correction + Compliance & audit overhead + (Retry waste rate × production token cost). Divide by annual successful agent executions for true cost per useful task."}},{"@type":"Question","name":"How do I reduce agent TCO?","acceptedAnswer":{"@type":"Answer","text":"Reduce eval frequency and coverage (but not below quality threshold), consolidate observability tooling, automate drift detection, batch compliance audits, and set retry budgets. The biggest wins typically come from eval optimization and staffing efficiency (shared platform team across multiple agents)."}},{"@type":"Question","name":"Should I build or buy agent platforms?","acceptedAnswer":{"@type":"Answer","text":"For 1–5 agents, buy (use existing platforms). Platform staffing costs become justified around 8–15 agents where a dedicated team can share infrastructure. Below that threshold, overhead per agent exceeds the cost of per-SaaS pricing."}},{"@type":"Question","name":"How much platform staffing per agent?","acceptedAnswer":{"@type":"Answer","text":"A platform engineering team of 2–3 FTE can support 8–15 agents in steady state. Each FTE costs ~$120–180K/year loaded. Attributing this to 10 agents means ~$24–54K per-agent-per-year in staffing, on top of token and infrastructure costs."}}]}
+</script>
+<style>body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}.wrap{max-width:840px;margin:0 auto;padding:56px 24px}a{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}table{border-collapse:collapse;width:100%;margin:24px 0;font-size:.95em}th,td{border:1px solid #1E2A3F;padding:10px 12px;text-align:left;color:#B6C0D2}th{color:#E6EAF2;background:#101726}td.number{text-align:right;font-family:'JetBrains Mono',ui-monospace,monospace;font-weight:500}.cost-component{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:20px;margin:16px 0}.cost-component h3{color:#E6EAF2;margin:0 0 12px;font-size:1rem}.cost-component p{font-size:.9rem;margin:6px 0}.warning{border-left:4px solid #f87171;padding:16px;background:rgba(248,113,113,.08);margin:20px 0}</style><script src="/assets/consent.js" defer></script><script src="/assets/attribution.js" defer></script>
+</head>
+<body><main class="wrap">{% endblock %}{% block body %}<h1>Agent total cost of ownership: the 70% of agent cost that isn't tokens</h1>
+<p class="updated" style="color:#6B7689;font-size:14px;margin-top:-6px">Updated 19 July 2026</p>
+
+<p>Teams running production AI agents often track only one cost: model tokens. The bill from OpenAI or Anthropic feels like "the" LLM cost. But that's typically only 10–30% of the real expense. The rest hides in evaluation burn, observability tooling, platform staffing, model drift correction, compliance overhead, and retry waste — costs that grow faster than token spend and often go unbudgeted until they surprise you.</p>
+
+<p>This article gives you a practical total cost of ownership (TCO) formula, breaks down each component with realistic numbers, and walks through a worked example. By the end, you'll know where to measure and what levers to pull to reduce agent cost.</p>
+
+<h2>The TCO anatomy: where agent cost really lives</h2>
+
+<p><strong>Production token spend (10–30%)</strong> — tokens consumed by live agent execution. This is the most visible cost and the one most teams track first.</p>
+
+<p><strong>Evaluation token burn (20–60%)</strong> — tokens consumed by test suites, validation runs, and regression testing. A comprehensive evaluation suite runs on every release and often consumes more tokens than production traffic. Industry reports on code-review agents show evaluation token spend as high as 59% of total token consumption.</p>
+
+<p><strong>Observability and monitoring (5–15%)</strong> — infrastructure for logging, tracing, metrics, and alerting. As agents get more complex, observability cost grows faster than production workload.</p>
+
+<p><strong>Platform staffing (15–35%)</strong> — engineering time to maintain the agent framework, handle model updates, debug failures, and tune performance. A team running 8–15 agents might need 2–3 full-time platform engineers; attributing this cost fairly shows why most solo agents are expensive.</p>
+
+<p><strong>Model drift correction (5–10%)</strong> — evaluation and retraining runs triggered by new model releases or performance degradation. When a provider ships a new model version, you run your eval suite against it; when performance drifts, you run corrective fine-tuning or re-prompting.</p>
+
+<p><strong>Compliance and audit overhead (3–8%)</strong> — token audits, data retention, anonymization, and regulatory logging. In regulated industries (finance, healthcare), this cost is often overlooked in early pilots but becomes material at scale.</p>
+
+<p><strong>Retry and loop waste (2–15%)</strong> — tokens burned on failed attempts, retries after errors, and loops that produce no user value. Poorly tuned retry logic or uncontrolled agentic loops can waste 10–20% of your token budget.</p>
+
+<h2>The TCO formula</h2>
+
+<p>Total Cost of Ownership (annual) = </p>
+
+<div style="background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:20px;margin:16px 0;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:.9em;line-height:1.6">
+(Production tokens × rate) +<br/>
+(Evaluation tokens × rate) +<br/>
+(Observability cost) +<br/>
+(Platform staffing / agent count) +<br/>
+(Model drift evaluation cost) +<br/>
+(Compliance overhead) +<br/>
+(Retry waste cost)
+</div>
+
+<p>Then divide by annual successful agent executions to get <strong>real cost per useful task</strong>:</p>
+
+<div style="background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:20px;margin:16px 0;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:.9em;line-height:1.6">
+Cost per useful task = TCO / Successful executions
+</div>
+
+<p>This differs from "cost per token" or "cost per execution" because it includes all the hidden expenses and only counts tasks that produce value.</p>
+
+<h2>Worked example: a code-review agent</h2>
+
+<p>Let's build out a realistic scenario for a team running an AI code-review agent in production. This agent reviews pull requests, checks for common issues, and suggests refactors. The team is 30 engineers, and ~50 PRs are opened per day (or ~1,500 per month).</p>
+
+<h3>Component 1: Production token spend</h3>
+
+<table>
+<thead><tr><th>Item</th><th>Volume</th><th>Rate</th><th>Monthly cost</th><th>Annual cost</th></tr></thead>
+<tbody>
+<tr><td>Avg tokens per review</td><td>2,500 input + 500 output</td><td>—</td><td>—</td><td>—</td></tr>
+<tr><td>Monthly reviews</td><td>1,500</td><td>—</td><td>—</td><td>—</td></tr>
+<tr><td>Total production tokens</td><td class="number">4.5M input + 0.75M output</td><td>Claude Sonnet 4 ($3/M in, $15/M out)</td><td class="number">$25.65</td><td class="number">$308</td></tr>
+</tbody>
+</table>
+
+<h3>Component 2: Evaluation token burn</h3>
+
+<p>The team maintains a regression test suite of 800 test cases (real PRs with known good answers). They run it before every release (2×/week), plus on-demand when debugging failures. Each test case consumes ~4,000 tokens end-to-end.</p>
+
+<table>
+<thead><tr><th>Item</th><th>Volume</th><th>Rate</th><th>Monthly cost</th><th>Annual cost</th></tr></thead>
+<tbody>
+<tr><td>Test cases</td><td>800</td><td>—</td><td>—</td><td>—</td></tr>
+<tr><td>Tokens per test</td><td>4,000</td><td>—</td><td>—</td><td>—</td></tr>
+<tr><td>Scheduled runs/month</td><td>8 (2×/week)</td><td>—</td><td>—</td><td>—</td></tr>
+<tr><td>On-demand runs/month</td><td>4 (debug, pre-release)</td><td>—</td><td>—</td><td>—</td></tr>
+<tr><td>Total eval runs</td><td>12</td><td>—</td><td>—</td><td>—</td></tr>
+<tr><td>Total eval tokens</td><td class="number">38.4M</td><td>Claude Sonnet 4 ($3/M in, $15/M out)</td><td class="number">$230.40</td><td class="number">$2,765</td></tr>
+</tbody>
+</table>
+
+<p><strong>Key observation:</strong> Evaluation tokens (2.765K/year) exceed production tokens (308/year) by ~9×. This is typical for code-review agents where correctness matters and model updates need validation.</p>
+
+<h3>Component 3: Observability infrastructure</h3>
+
+<p>The agent logs every review request + response to a tracing backend (OpenTelemetry), metrics to Prometheus, and stores structured logs for audit. Infrastructure cost breakdown:</p>
+
+<table>
+<thead><tr><th>Component</th><th>Cost/month</th><th>Annual cost</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td>OpenTelemetry backend (self-hosted EC2)</td><td class="number">$150</td><td class="number">$1,800</td><td>1 t3.large for trace storage + retention</td></tr>
+<tr><td>Structured logs (S3 + Athena)</td><td class="number">$80</td><td class="number">$960</td><td>~1,500 logs/month × 2KB each; query cost</td></tr>
+<tr><td>Metrics (Prometheus SaaS tier)</td><td class="number">$200</td><td class="number">$2,400</td><td>1M+ series for per-model/per-project tracking</td></tr>
+<tr><td>Alerting (PagerDuty for on-call)</td><td class="number">$50</td><td class="number">$600</td><td>Minimal tier, basic escalation</td></tr>
+<tr><td>Total observability</td><td class="number">$480</td><td class="number">$5,760</td><td>—</td></tr>
+</tbody>
+</table>
+
+<h3>Component 4: Platform staffing</h3>
+
+<p>The team has 1.5 FTE platform engineers (a lead + a junior, shared across 3 agents) dedicated to: agent framework maintenance, model updates, debugging, performance tuning, and integration with the CI/CD pipeline. Allocated staffing cost per agent:</p>
+
+<table>
+<thead><tr><th>Item</th><th>Annual cost</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td>Platform team (1.5 FTE)</td><td class="number">$240,000</td><td>$120K lead + $80K junior + 40% benefits/overhead</td></tr>
+<tr><td>Agents supported</td><td>3</td><td>code-review, security-scan, performance-audit</td></tr>
+<tr><td>Cost per agent</td><td class="number">$80,000</td><td>Allocated evenly</td></tr>
+</tbody>
+</table>
+
+<h3>Component 5: Model drift correction</h3>
+
+<p>When Claude ships a new version (2–3× per year), the team runs the full eval suite against it and benchmarks performance. If performance dips, they run targeted re-evals and sometimes fine-tuning experiments. Estimated annual cost:</p>
+
+<table>
+<thead><tr><th>Item</th><th>Cost</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td>Per-model release eval (3/year)</td><td class="number">$2,400</td><td>Full 800-test suite × 3 times = 2.4M tokens × $0.003/token avg</td></tr>
+<tr><td>Performance investigation (2 instances/year)</td><td class="number">$800</td><td>Targeted evals + manual review</td></tr>
+<tr><td>Fine-tuning experiments (if needed)</td><td class="number">$1,500</td><td>Training + validation; happens ~1 time/year</td></tr>
+<tr><td>Total drift correction</td><td class="number">$4,700</td><td>—</td></tr>
+</tbody>
+</table>
+
+<h3>Component 6: Compliance and audit overhead</h3>
+
+<p>The team's company is in fintech and subject to compliance audits. For each agent, they log: who triggered it, inputs, outputs, reasoning chain, timestamp. This requires:</p>
+
+<table>
+<thead><tr><th>Item</th><th>Cost</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td>Compliance log storage (encrypted S3)</td><td class="number">$300/year</td><td>~1.5 GB/month compressed; 7-year retention</td></tr>
+<tr><td>Quarterly audit runs (prepare audit data)</td><td class="number">$600/year</td><td>Manual work: extract, anonymize, prepare for auditors (4 hrs × $150/hr)</td></tr>
+<tr><td>Data retention & deletion (policy enforcement)</td><td class="number">$200/year</td><td>Cron jobs to handle GDPR/CCPA deletion requests</td></tr>
+<tr><td>Total compliance</td><td class="number">$1,100/year</td><td>Higher in regulated industries; lower elsewhere</td></tr>
+</tbody>
+</table>
+
+<h3>Component 7: Retry and loop waste</h3>
+
+<p>The agent is configured to retry failed reviews up to 2 times before escalating to a human. In practice:</p>
+
+<table>
+<thead><tr><th>Item</th><th>Rate</th><th>Volume</th><th>Cost</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td>First-pass success rate</td><td>92%</td><td>—</td><td>—</td><td>—</td></tr>
+<tr><td>Retried (failed once, succeeded on retry)</td><td>6%</td><td>90 reviews/month</td><td class="number">$1.84</td><td>Counts as 50% cost of full review</td></tr>
+<tr><td>Escalated (failed twice, sent to human)</td><td>2%</td><td>30 reviews/month</td><td class="number">$0</td><td>No token cost (human takes over)</td></tr>
+<tr><td>Total retry waste</td><td>—</td><td>—</td><td class="number">$22/year</td><td>~7% of production token cost</td></tr>
+</tbody>
+</table>
+
+<h2>Annual TCO and cost per useful task</h2>
+
+<p>Putting it all together:</p>
+
+<table>
+<thead><tr><th>Component</th><th>Annual cost</th><th>% of TCO</th></tr></thead>
+<tbody>
+<tr><td>Production tokens</td><td class="number">$308</td><td class="number">0.2%</td></tr>
+<tr><td>Evaluation tokens</td><td class="number">$2,765</td><td class="number">1.8%</td></tr>
+<tr><td>Observability</td><td class="number">$5,760</td><td class="number">3.8%</td></tr>
+<tr><td>Platform staffing</td><td class="number">$80,000</td><td class="number">52.8%</td></tr>
+<tr><td>Model drift correction</td><td class="number">$4,700</td><td class="number">3.1%</td></tr>
+<tr><td>Compliance overhead</td><td class="number">$1,100</td><td class="number">0.7%</td></tr>
+<tr><td>Retry waste</td><td class="number">$22</td><td class="number">0.01%</td></tr>
+<tr style="background:#1E2A3F"><td><strong>Total annual TCO</strong></td><td class="number"><strong>$94,655</strong></td><td class="number"><strong>100%</strong></td></tr>
+</tbody>
+</table>
+
+<p>The team runs 1,500 reviews/month; 92% are successful on first pass, yielding ~16,560 useful reviews per year. Cost per useful task:</p>
+
+<div style="background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:20px;margin:16px 0">
+<p style="margin:0"><strong>$94,655 / 16,560 useful reviews = $5.71 per review</strong></p>
+<p style="margin:6px 0 0;font-size:.9em;color:#6B7689">Even though the token cost per review is ~$0.017, the real cost to the business is $5.71 once you account for staffing, evals, and infrastructure. That's 336× higher.</p>
+</div>
+
+<h2>The leverage points: where to cut</h2>
+
+<p><strong>Reduce evaluation frequency and coverage.</strong> The example spends $2,765/year on evals — 9× production tokens. If the team runs evals 2×/month instead of 2×/week, they save ~$2,070/year. But cut too much and you miss drift or regressions. The minimum is probably 1–2 eval runs per release, not on-demand.</p>
+
+<p><strong>Consolidate observability tooling.</strong> Running a full OpenTelemetry stack, Prometheus, and custom audit logging costs $5,760/year. Many teams use a SaaS platform (Datadog, New Relic) instead, which costs $500–1,000/month but includes all three. For a single agent, SaaS is cheaper; at 3+ agents, self-hosted infrastructure wins because you share the cost across agents.</p>
+
+<p><strong>Share platform staffing.</strong> The biggest lever is staffing. One agent with 1.5 dedicated FTE is expensive; 10 agents with a shared 3-FTE team is much cheaper per agent. But this only works if the team operates a common framework that agents can plug into. The crossover is around 8–15 agents where dedicated platform investment starts paying for itself.</p>
+
+<p><strong>Automate drift detection.</strong> Instead of running full evals on every new model release, run a fast smoke test (10% of test cases) first. If that passes, assume the model is safe. If it fails, escalate to a full eval. This cuts model drift cost from $4,700 to ~$1,000/year.</p>
+
+<p><strong>Set retry budgets and escalate early.</strong> Poorly configured retry loops can waste 10–20% of tokens. Set a hard retry limit (2 attempts max) and escalate to humans. The token waste is small in this example ($22/year) because retries are already capped.</p>
+
+<p><strong>Batch compliance audits.</strong> Instead of preparing audit data on demand, run a batch job quarterly. This shifts from $600/year of manual work to $200/year of automated ETL. Requires upfront investment in audit log infrastructure but pays for itself quickly.</p>
+
+<h2>When to build vs. buy agent infrastructure</h2>
+
+<p>The staffing cost in the example ($80K/agent/year) suggests a buy-vs-build decision:</p>
+
+<p><strong>For 1–5 agents:</strong> Buy. Use an existing platform (Langchain, Anthropic's Agents API, or a SaaS wrapper). Your agent can't justify a dedicated platform team, so outsourced infrastructure is cheaper.</p>
+
+<p><strong>For 5–15 agents:</strong> Evaluate. A 2-FTE platform team (~$240K/year) can support 8–15 agents, pushing per-agent staffing cost down to $16–30K/year. At 10 agents, that's a $50–70K savings vs. buying a SaaS for each. But only if you build a reusable framework; ad-hoc infrastructure per agent is expensive and doesn't scale.</p>
+
+<p><strong>For 15+ agents:</strong> Build. A shared platform pays for itself and becomes a competitive advantage. Teams at scale (50+ agents) invest in proprietary frameworks and dedicated platform teams.</p>
+
+<h2>Measuring your own agent TCO</h2>
+
+<p><strong>Start here:</strong></p>
+
+<ul>
+<li><strong>Production tokens:</strong> Query your LLM provider's dashboard or billing API. Break down by agent and model.</li>
+<li><strong>Evaluation tokens:</strong> Track eval runs in a spreadsheet. Multiply (test cases × tokens per case × runs per month × 12). Don't estimate; measure for one month and extrapolate.</li>
+<li><strong>Observability cost:</strong> Audit your cloud and SaaS bills. Tag expenses by agent. If you don't tag, use allocation: (observability cost) × (agent traffic / total traffic).</li>
+<li><strong>Platform staffing:</strong> Ask your engineering leadership. Get a load factor (% of time each engineer spends on agent infrastructure). Allocate fairly across agents.</li>
+<li><strong>Drift correction & compliance:</strong> Use the examples above as a starting point. Your numbers will differ based on industry and release cadence.</li>
+<li><strong>Retry waste:</strong> Log every LLM call with (attempt_number, success). Calculate (tokens where attempt > 1) / (total_tokens).</li>
+</ul>
+
+<p>Once you have a baseline TCO, prioritize cuts by impact. Staffing is usually 50%+ of cost; observability and evals are the next levers. Focus there first.</p>
+
+<h2>Related</h2>
+<ul><li><a href="/research/agent-economics">Agent economics: how much does a coding agent actually cost?</a> - subscription vs. API pricing for user-facing agents.</li><li><a href="/research/agent-spend-attribution">Agent spend attribution</a> - how to track costs across multiple agents and projects.</li><li><a href="/research/eval-cost-allocation">Eval cost allocation</a> - breaking down evaluation spend by model, task, and test suite.</li><li><a href="/research/hidden-llm-costs">Hidden LLM costs</a> - infrastructure, retry chains, and observability overhead beyond tokens.</li></ul>
+
+<hr style="margin:48px 0 24px;border:none;border-top:1px solid #1E2A3F" /><p>Ready to audit your agent TCO? FinOps LLM runs a free analysis of your LLM spend—production, evaluation, infrastructure, staffing—and shows where to cut. <a href="/book">Book free audit &rarr;</a></p><p><a href="/research">Back to research</a></p>{% endblock %}{% block suffix %}</main></body></html>
+
+{% endblock %}
