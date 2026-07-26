@@ -1,53 +1,66 @@
----
-permalink: "research/gpt-5-6-pricing-tier-guide.html"
----
-{% extends "shell.njk" %}{% block prefix %}<!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>GPT-5.6 Pricing Tier Guide: Luna, Terra, Sol · FinOps LLM</title><meta name="description" content="GPT-5.6 Luna, Terra, and Sol pricing guide: which tier for classification, agents, reasoning. Cost routing by workload type with worked examples and fallback patterns." /><meta name="robots" content="index, follow" /><link rel="canonical" href="https://finopsllm.com/research/gpt-5-6-pricing-tier-guide" />
-<link rel="alternate" hreflang="en" href="https://finopsllm.com/research/gpt-5-6-pricing-tier-guide" />
-<link rel="alternate" hreflang="es" href="https://finopsllm.com/es/research/gpt-5-6-pricing-tier-guide" />
-<link rel="alternate" hreflang="fr" href="https://finopsllm.com/fr/research/gpt-5-6-pricing-tier-guide" />
-<link rel="alternate" hreflang="de" href="https://finopsllm.com/de/research/gpt-5-6-pricing-tier-guide" />
-<link rel="alternate" hreflang="pt" href="https://finopsllm.com/pt/research/gpt-5-6-pricing-tier-guide" />
-<link rel="alternate" hreflang="ja" href="https://finopsllm.com/ja/research/gpt-5-6-pricing-tier-guide" />
-<link rel="alternate" hreflang="x-default" href="https://finopsllm.com/research/gpt-5-6-pricing-tier-guide" />
-<script type="application/ld+json">
-{"@context":"https://schema.org","@type":"TechArticle","headline":"GPT-5.6 Pricing Tier Guide: Luna, Terra, Sol · FinOps LLM","description":"A practical routing guide to GPT-5.6's three tiers: which model to use for classification, extraction, agentic reasoning, and hard reasoning tasks. Cost-per-task worked examples and cascade fallback patterns.","url":"https://finopsllm.com/research/gpt-5-6-pricing-tier-guide","datePublished":"2026-07-19","dateModified":"2026-07-19","image":"https://finopsllm.com/og.png","author":{"@type":"Organization","name":"FinOps LLM team"},"publisher":{"@type":"Organization","name":"FinOps LLM","url":"https://finopsllm.com/"}}
-</script>
-<script type="application/ld+json">
-{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://finopsllm.com/"},{"@type":"ListItem","position":2,"name":"Research","item":"https://finopsllm.com/research"},{"@type":"ListItem","position":3,"name":"GPT-5.6 Pricing Tier Guide","item":"https://finopsllm.com/research/gpt-5-6-pricing-tier-guide"}]}
-</script>
-<script type="application/ld+json">
-{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Which GPT-5.6 tier should I use for classification tasks?", "acceptedAnswer": {"@type": "Answer", "text": "Luna ($1/$6 per 1M) is the right choice for classification and simple extraction. At 600 tokens input + 100 tokens output, Luna costs $0.00066/request vs Terra's $0.00175/request. If accuracy is not your bottleneck, Luna delivers equivalent results at 62% savings."}}, {"@type": "Question", "name": "When does Terra ($2.50/$15) beat Sol ($5/$30) on cost?", "acceptedAnswer": {"@type": "Answer", "text": "Always. Terra is positioned as a performance/cost sweet spot: same capability claims as Sol but at exactly half price. Use Terra for agent loops, multi-turn conversations, and moderate-reasoning tasks. Only use Sol when Terra's reasoning depth is provably insufficient."}}, {"@type": "Question", "name": "What is the cost impact of prompt caching on GPT-5.6?", "acceptedAnswer": {"@type": "Answer", "text": "Cache writes cost 1.25× input (e.g., $1.25 per million for Luna). Cache reads cost 10% of input ($0.10 per million for Luna). If a 100K-token prefix is reused 5+ times in 30 minutes, caching saves 60%+ vs repeated uncached calls."}}, {"@type": "Question", "name": "How does GPT-5.6 compare to Claude Sonnet 5 and DeepSeek V4?", "acceptedAnswer": {"@type": "Answer", "text": "Luna ($1/$6) undercuts Claude Sonnet ($2/$10 intro, $3/$15 Sept 1) by 50–60% and DeepSeek V4 Flash ($0.14/$0.28) is 7–20× cheaper than Luna. For reasoning workloads, Sol ($5/$30) and Claude Sonnet trade performance-per-dollar differently; benchmark your use case."}}]}
-</script>
-<style>
-body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}
-.wrap{max-width:1100px;margin:0 auto;padding:56px 24px}
-a{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}
-.langsw{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;color:#647289;margin:0 0 26px}
-.langsw a{text-decoration:none}.langsw a[aria-current]{color:#E6EAF2;font-weight:600}
-.badge-row{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 32px;list-style:none;padding:0}
-.badge-row li{background:#101726;border:1px solid #1E2A3F;border-radius:8px;padding:8px 14px;font-size:.85rem;color:#B6C0D2}
-.table-wrap{overflow-x:auto;margin:0 0 32px;-webkit-overflow-scrolling:touch}
-table{border-collapse:collapse;width:100%;font-size:.85rem}
-th,td{border:1px solid #1E2A3F;padding:10px 12px;text-align:left;color:#B6C0D2}
-th{color:#E6EAF2;background:#101726}
-td.number{text-align:right;font-family:'JetBrains Mono',monospace;font-weight:500}
-td.highlight{background:rgba(248,113,113,.08)}
-.cost-example{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:20px;margin:16px 0}
-.cost-example h3{color:#E6EAF2;margin:0 0 12px;font-size:1rem}
-.cost-example p{font-size:.9rem;margin:6px 0}
-.routing-guide{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:24px;margin:12px 0}
-.routing-guide h3{color:#E6EAF2;margin:0 0 10px;font-size:1rem}
-.warning{border-left:4px solid #f87171;padding:16px;background:rgba(248,113,113,.08);margin:20px 0}
-@media(max-width:700px){
-  table{font-size:.75rem}
-  th,td{padding:6px 7px}
+---json
+{
+  "permalink": "research/gpt-5-6-pricing-tier-guide.html",
+  "lang": "en",
+  "head": {
+    "title": "GPT-5.6 Pricing Tier Guide: Luna, Terra, Sol · FinOps LLM",
+    "description": "GPT-5.6 Luna, Terra, and Sol pricing guide: which tier for classification, agents, reasoning. Cost routing by workload type with worked examples and fallback patterns.",
+    "robots": "index, follow",
+    "canonical": "https://finopsllm.com/research/gpt-5-6-pricing-tier-guide",
+    "hreflang": [
+      {
+        "lang": "en",
+        "href": "https://finopsllm.com/research/gpt-5-6-pricing-tier-guide"
+      },
+      {
+        "lang": "es",
+        "href": "https://finopsllm.com/es/research/gpt-5-6-pricing-tier-guide"
+      },
+      {
+        "lang": "fr",
+        "href": "https://finopsllm.com/fr/research/gpt-5-6-pricing-tier-guide"
+      },
+      {
+        "lang": "de",
+        "href": "https://finopsllm.com/de/research/gpt-5-6-pricing-tier-guide"
+      },
+      {
+        "lang": "pt",
+        "href": "https://finopsllm.com/pt/research/gpt-5-6-pricing-tier-guide"
+      },
+      {
+        "lang": "ja",
+        "href": "https://finopsllm.com/ja/research/gpt-5-6-pricing-tier-guide"
+      },
+      {
+        "lang": "x-default",
+        "href": "https://finopsllm.com/research/gpt-5-6-pricing-tier-guide"
+      }
+    ],
+    "style": "body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}\n.wrap{max-width:1100px;margin:0 auto;padding:56px 24px}\na{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}\n.langsw{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;color:#647289;margin:0 0 26px}\n.langsw a{text-decoration:none}.langsw a[aria-current]{color:#E6EAF2;font-weight:600}\n.badge-row{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 32px;list-style:none;padding:0}\n.badge-row li{background:#101726;border:1px solid #1E2A3F;border-radius:8px;padding:8px 14px;font-size:.85rem;color:#B6C0D2}\n.table-wrap{overflow-x:auto;margin:0 0 32px;-webkit-overflow-scrolling:touch}\ntable{border-collapse:collapse;width:100%;font-size:.85rem}\nth,td{border:1px solid #1E2A3F;padding:10px 12px;text-align:left;color:#B6C0D2}\nth{color:#E6EAF2;background:#101726}\ntd.number{text-align:right;font-family:'JetBrains Mono',monospace;font-weight:500}\ntd.highlight{background:rgba(248,113,113,.08)}\n.cost-example{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:20px;margin:16px 0}\n.cost-example h3{color:#E6EAF2;margin:0 0 12px;font-size:1rem}\n.cost-example p{font-size:.9rem;margin:6px 0}\n.routing-guide{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:24px;margin:12px 0}\n.routing-guide h3{color:#E6EAF2;margin:0 0 10px;font-size:1rem}\n.warning{border-left:4px solid #f87171;padding:16px;background:rgba(248,113,113,.08);margin:20px 0}\n@media(max-width:700px){\n  table{font-size:.75rem}\n  th,td{padding:6px 7px}\n}",
+    "scripts": [
+      {
+        "src": "/assets/consent.js",
+        "defer": true
+      },
+      {
+        "src": "/assets/attribution.js",
+        "defer": true
+      },
+      {
+        "src": "/assets/lang.js",
+        "defer": true
+      }
+    ],
+    "jsonLd": [
+      "{\"@context\":\"https://schema.org\",\"@type\":\"TechArticle\",\"headline\":\"GPT-5.6 Pricing Tier Guide: Luna, Terra, Sol · FinOps LLM\",\"description\":\"A practical routing guide to GPT-5.6's three tiers: which model to use for classification, extraction, agentic reasoning, and hard reasoning tasks. Cost-per-task worked examples and cascade fallback patterns.\",\"url\":\"https://finopsllm.com/research/gpt-5-6-pricing-tier-guide\",\"datePublished\":\"2026-07-19\",\"dateModified\":\"2026-07-19\",\"image\":\"https://finopsllm.com/og.png\",\"author\":{\"@type\":\"Organization\",\"name\":\"FinOps LLM team\"},\"publisher\":{\"@type\":\"Organization\",\"name\":\"FinOps LLM\",\"url\":\"https://finopsllm.com/\"}}",
+      "{\"@context\":\"https://schema.org\",\"@type\":\"BreadcrumbList\",\"itemListElement\":[{\"@type\":\"ListItem\",\"position\":1,\"name\":\"Home\",\"item\":\"https://finopsllm.com/\"},{\"@type\":\"ListItem\",\"position\":2,\"name\":\"Research\",\"item\":\"https://finopsllm.com/research\"},{\"@type\":\"ListItem\",\"position\":3,\"name\":\"GPT-5.6 Pricing Tier Guide\",\"item\":\"https://finopsllm.com/research/gpt-5-6-pricing-tier-guide\"}]}",
+      "{\"@context\": \"https://schema.org\", \"@type\": \"FAQPage\", \"mainEntity\": [{\"@type\": \"Question\", \"name\": \"Which GPT-5.6 tier should I use for classification tasks?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"Luna ($1/$6 per 1M) is the right choice for classification and simple extraction. At 600 tokens input + 100 tokens output, Luna costs $0.00066/request vs Terra's $0.00175/request. If accuracy is not your bottleneck, Luna delivers equivalent results at 62% savings.\"}}, {\"@type\": \"Question\", \"name\": \"When does Terra ($2.50/$15) beat Sol ($5/$30) on cost?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"Always. Terra is positioned as a performance/cost sweet spot: same capability claims as Sol but at exactly half price. Use Terra for agent loops, multi-turn conversations, and moderate-reasoning tasks. Only use Sol when Terra's reasoning depth is provably insufficient.\"}}, {\"@type\": \"Question\", \"name\": \"What is the cost impact of prompt caching on GPT-5.6?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"Cache writes cost 1.25× input (e.g., $1.25 per million for Luna). Cache reads cost 10% of input ($0.10 per million for Luna). If a 100K-token prefix is reused 5+ times in 30 minutes, caching saves 60%+ vs repeated uncached calls.\"}}, {\"@type\": \"Question\", \"name\": \"How does GPT-5.6 compare to Claude Sonnet 5 and DeepSeek V4?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"Luna ($1/$6) undercuts Claude Sonnet ($2/$10 intro, $3/$15 Sept 1) by 50–60% and DeepSeek V4 Flash ($0.14/$0.28) is 7–20× cheaper than Luna. For reasoning workloads, Sol ($5/$30) and Claude Sonnet trade performance-per-dollar differently; benchmark your use case.\"}}]}"
+    ]
+  }
 }
-</style><script src="/assets/consent.js" defer></script><script src="/assets/attribution.js" defer></script>
-<script src="/assets/lang.js" defer></script>
-</head>
-<body><main class="wrap">{% endblock %}{% block body %}
+---
+{% extends "shell.njk" %}{% block body %}
 
 <nav class="langsw" aria-label="Language / Idioma"><a href="/research/gpt-5-6-pricing-tier-guide" hreflang="en" aria-current="page">EN</a> · <a href="/es/research/gpt-5-6-pricing-tier-guide" hreflang="es">ES</a> · <a href="/fr/research/gpt-5-6-pricing-tier-guide" hreflang="fr">FR</a> · <a href="/de/research/gpt-5-6-pricing-tier-guide" hreflang="de">DE</a> · <a href="/pt/research/gpt-5-6-pricing-tier-guide" hreflang="pt">PT</a> · <a href="/ja/research/gpt-5-6-pricing-tier-guide" hreflang="ja">JA</a></nav>
 
@@ -446,5 +459,4 @@ td.highlight{background:rgba(248,113,113,.08)}
 
 <p><a href="/research">Back to research</a></p>
 
-{% endblock %}{% block suffix %}</main></body></html>
 {% endblock %}

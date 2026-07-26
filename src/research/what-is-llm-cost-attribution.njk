@@ -1,33 +1,84 @@
+---json
+{
+  "permalink": "research/what-is-llm-cost-attribution.html",
+  "lang": "en",
+  "head": {
+    "title": "What is LLM cost attribution? A plain-English explainer · FinOps LLM",
+    "description": "A plain-English explainer of LLM cost attribution: what it means to trace AI spend back to a feature, team, or customer, why total-spend dashboards aren't enough, and how attribution actually works.",
+    "robots": "index, follow",
+    "canonical": "https://finopsllm.com/research/what-is-llm-cost-attribution",
+    "openGraph": [
+      {
+        "property": "og:type",
+        "content": "article"
+      },
+      {
+        "property": "og:url",
+        "content": "https://finopsllm.com/research/what-is-llm-cost-attribution"
+      },
+      {
+        "property": "og:title",
+        "content": "What is LLM cost attribution? A plain-English explainer"
+      },
+      {
+        "property": "og:description",
+        "content": "What it means to trace AI spend back to a feature, team, or customer, why total-spend dashboards aren't enough, and how attribution actually works."
+      },
+      {
+        "property": "og:image",
+        "content": "https://finopsllm.com/og.svg"
+      },
+      {
+        "property": "og:site_name",
+        "content": "FinOps LLM"
+      },
+      {
+        "property": "og:locale",
+        "content": "en_US"
+      }
+    ],
+    "twitter": [
+      {
+        "name": "twitter:card",
+        "content": "summary_large_image"
+      },
+      {
+        "name": "twitter:site",
+        "content": "@finopsllm"
+      },
+      {
+        "name": "twitter:title",
+        "content": "What is LLM cost attribution? A plain-English explainer"
+      },
+      {
+        "name": "twitter:description",
+        "content": "Tracing AI spend back to a feature, team, or customer - and why total-spend dashboards aren't enough."
+      },
+      {
+        "name": "twitter:image",
+        "content": "https://finopsllm.com/og.svg"
+      }
+    ],
+    "style": "body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}.wrap{max-width:840px;margin:0 auto;padding:56px 24px}a{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}h3{margin-top:22px;color:#E6EAF2}",
+    "scripts": [
+      {
+        "src": "/assets/consent.js",
+        "defer": true
+      },
+      {
+        "src": "/assets/attribution.js",
+        "defer": true
+      }
+    ],
+    "jsonLd": [
+      "{\"@context\":\"https://schema.org\",\"@type\":\"TechArticle\",\"headline\":\"What is LLM cost attribution? A plain-English explainer\",\"description\":\"A plain-English explainer of LLM cost attribution: what it means to trace AI spend back to a feature, team, or customer, why total-spend dashboards aren't enough, and how attribution actually works.\",\"url\":\"https://finopsllm.com/research/what-is-llm-cost-attribution\",\"datePublished\":\"2026-05-31\",\"dateModified\":\"2026-06-11\",\"image\":\"https://finopsllm.com/og.png\",\"author\":{\"@type\":\"Organization\",\"name\":\"FinOps LLM team\"},\"publisher\":{\"@type\":\"Organization\",\"name\":\"FinOps LLM\",\"url\":\"https://finopsllm.com/\"}}",
+      "{\"@context\":\"https://schema.org\",\"@type\":\"BreadcrumbList\",\"itemListElement\":[{\"@type\":\"ListItem\",\"position\":1,\"name\":\"Home\",\"item\":\"https://finopsllm.com/\"},{\"@type\":\"ListItem\",\"position\":2,\"name\":\"Research\",\"item\":\"https://finopsllm.com/research\"},{\"@type\":\"ListItem\",\"position\":3,\"name\":\"What is LLM cost attribution?\",\"item\":\"https://finopsllm.com/research/what-is-llm-cost-attribution\"}]}",
+      "{\"@context\": \"https://schema.org\", \"@type\": \"FAQPage\", \"mainEntity\": [{\"@type\": \"Question\", \"name\": \"What is the problem attribution solves?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"A provider invoice arrives aggregated and lagging. You get a line item per model per day - not \\\"the checkout summarizer cost $14,000 last month.\\\" If spend jumps 30%, the invoice tells you that it happened, never why.\"}}, {\"@type\": \"Question\", \"name\": \"What \\\"attribution\\\" actually means in practice?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"Concretely, attribution means every LLM request leaves a structured trace carrying at minimum: Feature / surface - the product capability that made the call. Environment - production vs staging vs eval vs internal tooling, so test spend never masquerades as revenue-feature spend.\"}}, {\"@type\": \"Question\", \"name\": \"Why total spend isn't enough?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"Three questions that only attribution can answer, and that every team eventually gets asked:\"}}, {\"@type\": \"Question\", \"name\": \"What is attribution vs observability vs reconciliation?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"These get conflated. They are different layers: Observability tells you what happened to a request - latency, errors, traces. It is necessary plumbing, but a trace without cost tags is telemetry, not attribution. Attribution maps cost to an owner.\"}}, {\"@type\": \"Question\", \"name\": \"How accurate does it need to be?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"Attribution does not have to be perfect to be useful - it has to be trusted and improving.\"}}, {\"@type\": \"Question\", \"name\": \"Where to start?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"Attribution is the first step in any AI cost program, before budgets and before optimization. The minimum viable version is a tagging contract - what every request must carry - enforced at the gateway, plus a breakdown of spend by feature, environment, and token type.\"}}]}"
+    ]
+  }
+}
 ---
-permalink: "research/what-is-llm-cost-attribution.html"
----
-{% extends "shell.njk" %}{% block prefix %}<!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>What is LLM cost attribution? A plain-English explainer · FinOps LLM</title><meta name="description" content="A plain-English explainer of LLM cost attribution: what it means to trace AI spend back to a feature, team, or customer, why total-spend dashboards aren't enough, and how attribution actually works." /><meta name="robots" content="index, follow" /><link rel="canonical" href="https://finopsllm.com/research/what-is-llm-cost-attribution" />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://finopsllm.com/research/what-is-llm-cost-attribution" />
-<meta property="og:title" content="What is LLM cost attribution? A plain-English explainer" />
-<meta property="og:description" content="What it means to trace AI spend back to a feature, team, or customer, why total-spend dashboards aren't enough, and how attribution actually works." />
-<meta property="og:image" content="https://finopsllm.com/og.svg" />
-<meta property="og:site_name" content="FinOps LLM" />
-<meta property="og:locale" content="en_US" />
-<meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:site" content="@finopsllm" />
-<meta name="twitter:title" content="What is LLM cost attribution? A plain-English explainer" />
-<meta name="twitter:description" content="Tracing AI spend back to a feature, team, or customer - and why total-spend dashboards aren't enough." />
-<meta name="twitter:image" content="https://finopsllm.com/og.svg" />
-<script type="application/ld+json">
-{"@context":"https://schema.org","@type":"TechArticle","headline":"What is LLM cost attribution? A plain-English explainer","description":"A plain-English explainer of LLM cost attribution: what it means to trace AI spend back to a feature, team, or customer, why total-spend dashboards aren't enough, and how attribution actually works.","url":"https://finopsllm.com/research/what-is-llm-cost-attribution","datePublished":"2026-05-31","dateModified":"2026-06-11","image":"https://finopsllm.com/og.png","author":{"@type":"Organization","name":"FinOps LLM team"},"publisher":{"@type":"Organization","name":"FinOps LLM","url":"https://finopsllm.com/"}}
-</script>
-<script type="application/ld+json">
-{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://finopsllm.com/"},{"@type":"ListItem","position":2,"name":"Research","item":"https://finopsllm.com/research"},{"@type":"ListItem","position":3,"name":"What is LLM cost attribution?","item":"https://finopsllm.com/research/what-is-llm-cost-attribution"}]}
-</script>
-<script type="application/ld+json">
-{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "What is the problem attribution solves?", "acceptedAnswer": {"@type": "Answer", "text": "A provider invoice arrives aggregated and lagging. You get a line item per model per day - not \"the checkout summarizer cost $14,000 last month.\" If spend jumps 30%, the invoice tells you that it happened, never why."}}, {"@type": "Question", "name": "What \"attribution\" actually means in practice?", "acceptedAnswer": {"@type": "Answer", "text": "Concretely, attribution means every LLM request leaves a structured trace carrying at minimum: Feature / surface - the product capability that made the call. Environment - production vs staging vs eval vs internal tooling, so test spend never masquerades as revenue-feature spend."}}, {"@type": "Question", "name": "Why total spend isn't enough?", "acceptedAnswer": {"@type": "Answer", "text": "Three questions that only attribution can answer, and that every team eventually gets asked:"}}, {"@type": "Question", "name": "What is attribution vs observability vs reconciliation?", "acceptedAnswer": {"@type": "Answer", "text": "These get conflated. They are different layers: Observability tells you what happened to a request - latency, errors, traces. It is necessary plumbing, but a trace without cost tags is telemetry, not attribution. Attribution maps cost to an owner."}}, {"@type": "Question", "name": "How accurate does it need to be?", "acceptedAnswer": {"@type": "Answer", "text": "Attribution does not have to be perfect to be useful - it has to be trusted and improving."}}, {"@type": "Question", "name": "Where to start?", "acceptedAnswer": {"@type": "Answer", "text": "Attribution is the first step in any AI cost program, before budgets and before optimization. The minimum viable version is a tagging contract - what every request must carry - enforced at the gateway, plus a breakdown of spend by feature, environment, and token type."}}]}
-</script>
-<style>body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}.wrap{max-width:840px;margin:0 auto;padding:56px 24px}a{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}h3{margin-top:22px;color:#E6EAF2}</style><script src="/assets/consent.js" defer></script><script src="/assets/attribution.js" defer></script>
-</head>
-<body><main class="wrap">{% endblock %}{% block body %}<h1>What is LLM cost attribution?</h1><p class="updated" style="color:#6B7689;font-size:14px;margin-top:-6px">Updated 11 June 2026 · first published 31 May 2026</p>
+{% extends "shell.njk" %}{% block body %}<h1>What is LLM cost attribution?</h1><p class="updated" style="color:#6B7689;font-size:14px;margin-top:-6px">Updated 11 June 2026 · first published 31 May 2026</p>
 <p>LLM cost attribution is the practice of tracing every dollar of language-model spend back to the thing that caused it - a feature, a team, an environment, or a specific customer. It answers the question a provider invoice never will: not "what did we spend on OpenAI," but "<em>which</em> part of our product spent it, and on whose behalf." Attribution is the foundation everything else in AI cost management is built on; without it, budgets are guesses and savings claims are unverifiable.</p>
 <h2>The problem attribution solves</h2>
 <p>A provider invoice arrives aggregated and lagging. You get a line item per model per day - not "the checkout summarizer cost $14,000 last month." If spend jumps 30%, the invoice tells you <em>that</em> it happened, never <em>why</em>. A dashboard that shows total spend has the same blind spot: it is a number going up, with no owner attached.</p>
@@ -68,5 +119,4 @@ permalink: "research/what-is-llm-cost-attribution.html"
 <li><a href="/research/what-is-llm-finops">What is LLM FinOps?</a> - the broader discipline attribution sits inside.</li>
 <li><a href="/research/how-to-budget-for-ai-spend">How to budget for AI spend</a> - the step attribution unlocks.</li>
 </ul>
-<hr style="margin:48px 0 24px;border:none;border-top:1px solid #1E2A3F" /><p>Want this applied to your own LLM spend? FinOps LLM runs a free audit of your AI costs and shows where the savings are. <a href="/book">Book free audit &rarr;</a></p><p><a href="/research">Back to research</a></p>{% endblock %}{% block suffix %}</main></body></html>
-{% endblock %}
+<hr style="margin:48px 0 24px;border:none;border-top:1px solid #1E2A3F" /><p>Want this applied to your own LLM spend? FinOps LLM runs a free audit of your AI costs and shows where the savings are. <a href="/book">Book free audit &rarr;</a></p><p><a href="/research">Back to research</a></p>{% endblock %}

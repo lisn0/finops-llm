@@ -1,93 +1,66 @@
----
-permalink: "research/reasoning-model-cost-guide.html"
----
-{% extends "shell.njk" %}{% block prefix %}<!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Reasoning Model Cost Guide · FinOps LLM</title><meta name="description" content="How reasoning models like o3, o4-mini, DeepSeek-R1, QwQ, and MiMo cost 5-30x more due to thinking tokens. When to use them and when to skip." /><meta name="robots" content="index, follow" /><link rel="canonical" href="https://finopsllm.com/research/reasoning-model-cost-guide" />
-<link rel="alternate" hreflang="en" href="https://finopsllm.com/research/reasoning-model-cost-guide" />
-<link rel="alternate" hreflang="es" href="https://finopsllm.com/es/research/reasoning-model-cost-guide" />
-<link rel="alternate" hreflang="fr" href="https://finopsllm.com/fr/research/reasoning-model-cost-guide" />
-<link rel="alternate" hreflang="de" href="https://finopsllm.com/de/research/reasoning-model-cost-guide" />
-<link rel="alternate" hreflang="pt" href="https://finopsllm.com/pt/research/reasoning-model-cost-guide" />
-<link rel="alternate" hreflang="ja" href="https://finopsllm.com/ja/research/reasoning-model-cost-guide" />
-<link rel="alternate" hreflang="x-default" href="https://finopsllm.com/research/reasoning-model-cost-guide" />
-<script type="application/ld+json">
-{"@context":"https://schema.org","@type":"TechArticle","headline":"Reasoning Model Cost Guide \u00b7 FinOps LLM","description":"How reasoning models cost 5-30x more due to thinking tokens. When to use them and when to skip for optimal cost efficiency.","url":"https://finopsllm.com/research/reasoning-model-cost-guide","datePublished":"2026-07-04","dateModified":"2026-07-12","image":"https://finopsllm.com/og.png","author":{"@type":"Organization","name":"FinOps LLM team"},"publisher":{"@type":"Organization","name":"FinOps LLM","url":"https://finopsllm.com/"}}
-</script>
-<script type="application/ld+json">
-{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://finopsllm.com/"},{"@type":"ListItem","position":2,"name":"Research","item":"https://finopsllm.com/research"},{"@type":"ListItem","position":3,"name":"Reasoning Model Cost Guide","item":"https://finopsllm.com/research/reasoning-model-cost-guide"}]}
-</script>
-<script type="application/ld+json">
-{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "What is methodology?", "acceptedAnswer": {"@type": "Answer", "text": "Output token price for normal (non-reasoning) completion, from official provider pages. Reasoning pricingEffective cost including thinking tokens. Measured as standard output price × average thinking multiplier for each model."}}, {"@type": "Question", "name": "What is reasoning model pricing table?", "acceptedAnswer": {"@type": "Answer", "text": "Reasoning Output $/1M includes thinking tokens billed at output rates. Multiplier is average across typical tasks; actual multiplier varies by prompt complexity. DeepSeek R1 and QwQ output thinking tokens by default. OpenAI o3/o4-mini charge thinking tokens separately from visible output."}}, {"@type": "Question", "name": "When to Use Reasoning Models?", "acceptedAnswer": {"@type": "Answer", "text": "Reasoning models excel at tasks requiring planning: refactoring across multiple files, debugging complex state, or writing algorithms with edge cases. The thinking tokens let the model \"work through\" the problem rather than pattern-match."}}, {"@type": "Question", "name": "When to Skip Reasoning Models?", "acceptedAnswer": {"@type": "Answer", "text": "Pulling data from documents, reformatting JSON, summarising text, or translating content. These tasks need pattern matching, not reasoning. Using o3 for extraction is like hiring a mathematician to sort mail - expensive and unnecessary."}}, {"@type": "Question", "name": "What is cost optimisation strategies?", "acceptedAnswer": {"@type": "Answer", "text": "Use a cheap standard model (GPT-4o-mini, Gemini Flash) as a router. If the task is simple, answer directly. If complex, escalate to a reasoning model. This \"cascade\" pattern can cut reasoning-model usage by 60-80% while preserving quality where it matters."}}]}
-</script>
-<style>
-body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}
-.wrap{max-width:1100px;margin:0 auto;padding:56px 24px}
-a{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}
-.langsw{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;color:#647289;margin:0 0 26px}
-.langsw a{text-decoration:none}.langsw a[aria-current]{color:#E6EAF2;font-weight:600}
-
-/* Hero stats */
-.hero-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:16px;margin:28px 0 36px}
-.hero-stat{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:18px 16px;text-align:center}
-.hero-stat .num{font-size:2rem;font-weight:700;color:#7AAFFF;display:block}
-.hero-stat .lbl{font-size:.82rem;color:#647289;margin-top:4px}
-
-/* Badges */
-.badge-row{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 32px;list-style:none;padding:0}
-.badge-row li{background:#101726;border:1px solid #1E2A3F;border-radius:8px;padding:8px 14px;font-size:.85rem;color:#B6C0D2}
-
-/* Methodology */
-.method-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin:20px 0 32px}
-.method-card{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:18px}
-.method-card h3{font-size:.95rem;color:#E6EAF2;margin:0 0 8px}
-.method-card p{font-size:.85rem;margin:0}
-
-/* Table */
-.table-wrap{overflow-x:auto;margin:0 0 32px;-webkit-overflow-scrolling:touch}
-table{border-collapse:collapse;width:100%;font-size:.82rem;white-space:nowrap}
-th,td{border:1px solid #1E2A3F;padding:8px 10px;text-align:left;color:#B6C0D2}
-th{color:#E6EAF2;background:#101726;cursor:pointer;position:sticky;top:0;user-select:none}
-th:hover{background:#162035}
-th .sort-arrow{font-size:.7rem;margin-left:4px;opacity:.4}
-th.sorted .sort-arrow{opacity:1;color:#7AAFFF}
-td.provider-cell{white-space:normal;min-width:140px}
-td.price-cell{text-align:right;font-variant-numeric:tabular-nums}
-td.limit-cell{text-align:right;font-variant-numeric:tabular-nums;min-width:55px}
-td.model-cell{font-size:.78rem}
-tr:hover{background:rgba(122,175,255,.04)}
-
-/* Gray for estimated values */
-.est{color:#647289}
-.official{color:#B6C0D2}
-
-/* Referral links */
-.ref-link{font-size:.75rem;color:#7AAFFF;text-decoration:none;border-bottom:1px dotted rgba(122,175,255,.3)}
-.ref-link:hover{border-bottom-color:#7AAFFF}
-
-/* Footnotes */
-.footnotes{font-size:.8rem;color:#64748b;margin:16px 0 0}
-.footnotes p{margin:6px 0}
-
-/* Guide */
-.guide-section{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:24px;margin:12px 0}
-.guide-section h3{color:#E6EAF2;margin:0 0 10px;font-size:1rem}
-
-/* Callout */
-.callout{background:#101726;border-left:4px solid #F59E0B;border-radius:10px;padding:20px 24px;margin:20px 0}
-.callout h3{color:#F59E0B;margin:0 0 8px;font-size:.95rem}
-.callout p{margin:0;font-size:.88rem}
-
-/* Responsive */
-@media(max-width:700px){
-  .hero-stats{grid-template-columns:repeat(2,1fr)}
-  table{font-size:.75rem}
-  th,td{padding:6px 7px}
+---json
+{
+  "permalink": "research/reasoning-model-cost-guide.html",
+  "lang": "en",
+  "head": {
+    "title": "Reasoning Model Cost Guide · FinOps LLM",
+    "description": "How reasoning models like o3, o4-mini, DeepSeek-R1, QwQ, and MiMo cost 5-30x more due to thinking tokens. When to use them and when to skip.",
+    "robots": "index, follow",
+    "canonical": "https://finopsllm.com/research/reasoning-model-cost-guide",
+    "hreflang": [
+      {
+        "lang": "en",
+        "href": "https://finopsllm.com/research/reasoning-model-cost-guide"
+      },
+      {
+        "lang": "es",
+        "href": "https://finopsllm.com/es/research/reasoning-model-cost-guide"
+      },
+      {
+        "lang": "fr",
+        "href": "https://finopsllm.com/fr/research/reasoning-model-cost-guide"
+      },
+      {
+        "lang": "de",
+        "href": "https://finopsllm.com/de/research/reasoning-model-cost-guide"
+      },
+      {
+        "lang": "pt",
+        "href": "https://finopsllm.com/pt/research/reasoning-model-cost-guide"
+      },
+      {
+        "lang": "ja",
+        "href": "https://finopsllm.com/ja/research/reasoning-model-cost-guide"
+      },
+      {
+        "lang": "x-default",
+        "href": "https://finopsllm.com/research/reasoning-model-cost-guide"
+      }
+    ],
+    "style": "body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}\n.wrap{max-width:1100px;margin:0 auto;padding:56px 24px}\na{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}\n.langsw{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;color:#647289;margin:0 0 26px}\n.langsw a{text-decoration:none}.langsw a[aria-current]{color:#E6EAF2;font-weight:600}\n\n/* Hero stats */\n.hero-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:16px;margin:28px 0 36px}\n.hero-stat{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:18px 16px;text-align:center}\n.hero-stat .num{font-size:2rem;font-weight:700;color:#7AAFFF;display:block}\n.hero-stat .lbl{font-size:.82rem;color:#647289;margin-top:4px}\n\n/* Badges */\n.badge-row{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 32px;list-style:none;padding:0}\n.badge-row li{background:#101726;border:1px solid #1E2A3F;border-radius:8px;padding:8px 14px;font-size:.85rem;color:#B6C0D2}\n\n/* Methodology */\n.method-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin:20px 0 32px}\n.method-card{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:18px}\n.method-card h3{font-size:.95rem;color:#E6EAF2;margin:0 0 8px}\n.method-card p{font-size:.85rem;margin:0}\n\n/* Table */\n.table-wrap{overflow-x:auto;margin:0 0 32px;-webkit-overflow-scrolling:touch}\ntable{border-collapse:collapse;width:100%;font-size:.82rem;white-space:nowrap}\nth,td{border:1px solid #1E2A3F;padding:8px 10px;text-align:left;color:#B6C0D2}\nth{color:#E6EAF2;background:#101726;cursor:pointer;position:sticky;top:0;user-select:none}\nth:hover{background:#162035}\nth .sort-arrow{font-size:.7rem;margin-left:4px;opacity:.4}\nth.sorted .sort-arrow{opacity:1;color:#7AAFFF}\ntd.provider-cell{white-space:normal;min-width:140px}\ntd.price-cell{text-align:right;font-variant-numeric:tabular-nums}\ntd.limit-cell{text-align:right;font-variant-numeric:tabular-nums;min-width:55px}\ntd.model-cell{font-size:.78rem}\ntr:hover{background:rgba(122,175,255,.04)}\n\n/* Gray for estimated values */\n.est{color:#647289}\n.official{color:#B6C0D2}\n\n/* Referral links */\n.ref-link{font-size:.75rem;color:#7AAFFF;text-decoration:none;border-bottom:1px dotted rgba(122,175,255,.3)}\n.ref-link:hover{border-bottom-color:#7AAFFF}\n\n/* Footnotes */\n.footnotes{font-size:.8rem;color:#64748b;margin:16px 0 0}\n.footnotes p{margin:6px 0}\n\n/* Guide */\n.guide-section{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:24px;margin:12px 0}\n.guide-section h3{color:#E6EAF2;margin:0 0 10px;font-size:1rem}\n\n/* Callout */\n.callout{background:#101726;border-left:4px solid #F59E0B;border-radius:10px;padding:20px 24px;margin:20px 0}\n.callout h3{color:#F59E0B;margin:0 0 8px;font-size:.95rem}\n.callout p{margin:0;font-size:.88rem}\n\n/* Responsive */\n@media(max-width:700px){\n  .hero-stats{grid-template-columns:repeat(2,1fr)}\n  table{font-size:.75rem}\n  th,td{padding:6px 7px}\n}",
+    "scripts": [
+      {
+        "src": "/assets/consent.js",
+        "defer": true
+      },
+      {
+        "src": "/assets/attribution.js",
+        "defer": true
+      },
+      {
+        "src": "/assets/lang.js",
+        "defer": true
+      }
+    ],
+    "jsonLd": [
+      "{\"@context\":\"https://schema.org\",\"@type\":\"TechArticle\",\"headline\":\"Reasoning Model Cost Guide \\u00b7 FinOps LLM\",\"description\":\"How reasoning models cost 5-30x more due to thinking tokens. When to use them and when to skip for optimal cost efficiency.\",\"url\":\"https://finopsllm.com/research/reasoning-model-cost-guide\",\"datePublished\":\"2026-07-04\",\"dateModified\":\"2026-07-12\",\"image\":\"https://finopsllm.com/og.png\",\"author\":{\"@type\":\"Organization\",\"name\":\"FinOps LLM team\"},\"publisher\":{\"@type\":\"Organization\",\"name\":\"FinOps LLM\",\"url\":\"https://finopsllm.com/\"}}",
+      "{\"@context\":\"https://schema.org\",\"@type\":\"BreadcrumbList\",\"itemListElement\":[{\"@type\":\"ListItem\",\"position\":1,\"name\":\"Home\",\"item\":\"https://finopsllm.com/\"},{\"@type\":\"ListItem\",\"position\":2,\"name\":\"Research\",\"item\":\"https://finopsllm.com/research\"},{\"@type\":\"ListItem\",\"position\":3,\"name\":\"Reasoning Model Cost Guide\",\"item\":\"https://finopsllm.com/research/reasoning-model-cost-guide\"}]}",
+      "{\"@context\": \"https://schema.org\", \"@type\": \"FAQPage\", \"mainEntity\": [{\"@type\": \"Question\", \"name\": \"What is methodology?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"Output token price for normal (non-reasoning) completion, from official provider pages. Reasoning pricingEffective cost including thinking tokens. Measured as standard output price × average thinking multiplier for each model.\"}}, {\"@type\": \"Question\", \"name\": \"What is reasoning model pricing table?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"Reasoning Output $/1M includes thinking tokens billed at output rates. Multiplier is average across typical tasks; actual multiplier varies by prompt complexity. DeepSeek R1 and QwQ output thinking tokens by default. OpenAI o3/o4-mini charge thinking tokens separately from visible output.\"}}, {\"@type\": \"Question\", \"name\": \"When to Use Reasoning Models?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"Reasoning models excel at tasks requiring planning: refactoring across multiple files, debugging complex state, or writing algorithms with edge cases. The thinking tokens let the model \\\"work through\\\" the problem rather than pattern-match.\"}}, {\"@type\": \"Question\", \"name\": \"When to Skip Reasoning Models?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"Pulling data from documents, reformatting JSON, summarising text, or translating content. These tasks need pattern matching, not reasoning. Using o3 for extraction is like hiring a mathematician to sort mail - expensive and unnecessary.\"}}, {\"@type\": \"Question\", \"name\": \"What is cost optimisation strategies?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"Use a cheap standard model (GPT-4o-mini, Gemini Flash) as a router. If the task is simple, answer directly. If complex, escalate to a reasoning model. This \\\"cascade\\\" pattern can cut reasoning-model usage by 60-80% while preserving quality where it matters.\"}}]}"
+    ]
+  }
 }
-</style><script src="/assets/consent.js" defer></script><script src="/assets/attribution.js" defer></script>
-<script src="/assets/lang.js" defer></script>
-</head>
-<body><main class="wrap">{% endblock %}{% block body %}
+---
+{% extends "shell.njk" %}{% block body %}
 <nav class="langsw" aria-label="Language"><a href="/research/reasoning-model-cost-guide" hreflang="en" aria-current="page">EN</a> · <a href="/es/research/reasoning-model-cost-guide" hreflang="es">ES</a> · <a href="/fr/research/reasoning-model-cost-guide" hreflang="fr">FR</a> · <a href="/de/research/reasoning-model-cost-guide" hreflang="de">DE</a> · <a href="/pt/research/reasoning-model-cost-guide" hreflang="pt">PT</a> · <a href="/ja/research/reasoning-model-cost-guide" hreflang="ja">JA</a></nav>
 
 <h1>Reasoning Model Cost Guide</h1><p class="updated" style="color:#6B7689;font-size:14px;margin-top:-6px">Updated 12 July 2026 · first published 4 July 2026</p>
@@ -314,5 +287,4 @@ tr:hover{background:rgba(122,175,255,.04)}
   }
 })();
 </script>
-{% endblock %}{% block suffix %}</main></body></html>
 {% endblock %}

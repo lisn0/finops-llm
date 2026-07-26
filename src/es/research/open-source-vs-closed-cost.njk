@@ -1,98 +1,66 @@
----
-permalink: "es/research/open-source-vs-closed-cost.html"
----
-{% extends "shell.njk" %}{% block prefix %}<!DOCTYPE html>
-<html lang="es"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Modelos Abiertos vs. Cerrados: Comparativa de Costes LLM · FinOps LLM</title><meta name="description" content="¿Cuándo es rentable autoalojar Llama, Qwen o DeepSeek frente a acceso a API? Costes GPU, optimización de inferencia, gastos operativos, y marco de decisión para tu carga de trabajo." /><meta name="robots" content="index, follow" /><link rel="canonical" href="https://finopsllm.com/es/research/open-source-vs-closed-cost" />
-<link rel="alternate" hreflang="en" href="https://finopsllm.com/research/open-source-vs-closed-cost" />
-<link rel="alternate" hreflang="es" href="https://finopsllm.com/es/research/open-source-vs-closed-cost" />
-<link rel="alternate" hreflang="fr" href="https://finopsllm.com/fr/research/open-source-vs-closed-cost" />
-<link rel="alternate" hreflang="de" href="https://finopsllm.com/de/research/open-source-vs-closed-cost" />
-<link rel="alternate" hreflang="pt" href="https://finopsllm.com/pt/research/open-source-vs-closed-cost" />
-<link rel="alternate" hreflang="ja" href="https://finopsllm.com/ja/research/open-source-vs-closed-cost" />
-<link rel="alternate" hreflang="x-default" href="https://finopsllm.com/research/open-source-vs-closed-cost" />
-<script type="application/ld+json">
-{"@context":"https://schema.org","@type":"TechArticle","headline":"Modelos Abiertos vs. Cerrados: Comparativa de Costes LLM · FinOps LLM","description":"¿Cuándo es rentable autoalojar Llama, Qwen o DeepSeek frente a acceso a API? Costes GPU, optimización de inferencia, gastos operativos, y marco de decisión.","url":"https://finopsllm.com/es/research/open-source-vs-closed-cost","datePublished":"2026-07-04","dateModified":"2026-07-15","image":"https://finopsllm.com/og.png","author":{"@type":"Organization","name":"FinOps LLM team"},"publisher":{"@type":"Organization","name":"FinOps LLM","url":"https://finopsllm.com/"}}
-</script>
-<script type="application/ld+json">
-{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Inicio","item":"https://finopsllm.com/"},{"@type":"ListItem","position":2,"name":"Investigación","item":"https://finopsllm.com/es/research"},{"@type":"ListItem","position":3,"name":"Modelos Abiertos vs. Cerrados: Coste","item":"https://finopsllm.com/es/research/open-source-vs-closed-cost"}]}
-</script>
-<script type="application/ld+json">
-{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "¿Cuál es la metodología?", "acceptedAnswer": {"@type": "Answer", "text": "Tarifas estándar publicadas de cada página de precios del proveedor. Sin descuentos por volumen o lotes aplicados. GPU en nube para infraestructura autoalojada usando precios bajo demanda (Lambda, RunPod, AWS) con configuraciones optimizadas para inferencia con vLLM o TensorRT-LLM."}}, {"@type": "Question", "name": "¿Cuál es la tabla de comparación de costes?", "acceptedAnswer": {"@type": "Answer", "text": "API Cost/mes asume 100M tokens de salida + 300M tokens de entrada por mes a tarifas estándar. Coste de autoalojamiento incluye alquiler GPU, gastos operativos del 15%, e infraestructura de inferencia (vLLM). No incluye tiempo de ingeniería inicial."}}, {"@type": "Question", "name": "¿Cuáles son los factores clave de coste?", "acceptedAnswer": {"@type": "Answer", "text": "Un nodo 8x H100 para Llama 4 Maverick cuesta $2.000-$3.500/mes bajo demanda desde Lambda, RunPod o AWS. Las instancias spot/preemptibles pueden reducir esto 40-60% pero añaden latencia de reinicio y riesgo de disponibilidad. Para cargas de producción, las instancias reservadas (compromiso 1 año) típicamente ahorran 30-40% frente a bajo demanda."}}, {"@type": "Question", "name": "¿Cuál es el marco de decisión?", "acceptedAnswer": {"@type": "Answer", "text": "La mayoría de equipos terminan en híbrido: usar API para tareas de razonamiento frontera y cargas bajas, autoalojar modelos abiertos para tareas de alto volumen y tolerantes a latencia (generación de contenido, extracción de datos, herramientas internas)."}}, {"@type": "Question", "name": "¿Dónde ejecutar modelos abiertos?", "acceptedAnswer": {"@type": "Answer", "text": "Los precios GPU son tarifas por hora bajo demanda a partir de julio 2026. Los precios reservados/spot varían significativamente. MiMO ofrece acceso basado en API a MiMo-V2-Pro y MiMo-V2-Omni a tarifas competitivas - un punto medio entre autoalojamiento completo y precios API premium."}}]}
-</script>
-<style>
-body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}
-.wrap{max-width:1100px;margin:0 auto;padding:56px 24px}
-a{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}
-.langsw{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;color:#647289;margin:0 0 26px}
-.langsw a{text-decoration:none}.langsw a[aria-current]{color:#E6EAF2;font-weight:600}
-
-/* Hero stats */
-.hero-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:16px;margin:28px 0 36px}
-.hero-stat{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:18px 16px;text-align:center}
-.hero-stat .num{font-size:2rem;font-weight:700;color:#7AAFFF;display:block}
-.hero-stat .lbl{font-size:.82rem;color:#647289;margin-top:4px}
-
-/* Badges */
-.badge-row{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 32px;list-style:none;padding:0}
-.badge-row li{background:#101726;border:1px solid #1E2A3F;border-radius:8px;padding:8px 14px;font-size:.85rem;color:#B6C0D2}
-
-/* Methodology */
-.method-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin:20px 0 32px}
-.method-card{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:18px}
-.method-card h3{font-size:.95rem;color:#E6EAF2;margin:0 0 8px}
-.method-card p{font-size:.85rem;margin:0}
-
-/* Table */
-.table-wrap{overflow-x:auto;margin:0 0 32px;-webkit-overflow-scrolling:touch}
-table{border-collapse:collapse;width:100%;font-size:.82rem;white-space:nowrap}
-th,td{border:1px solid #1E2A3F;padding:8px 10px;text-align:left;color:#B6C0D2}
-th{color:#E6EAF2;background:#101726;cursor:pointer;position:sticky;top:0;user-select:none}
-th:hover{background:#162035}
-th .sort-arrow{font-size:.7rem;margin-left:4px;opacity:.4}
-th.sorted .sort-arrow{opacity:1;color:#7AAFFF}
-td.provider-cell{white-space:normal;min-width:140px}
-td.price-cell{text-align:right;font-variant-numeric:tabular-nums}
-td.limit-cell{text-align:right;font-variant-numeric:tabular-nums;min-width:55px}
-td.model-cell{font-size:.78rem}
-tr:hover{background:rgba(122,175,255,.04)}
-
-/* Gray for estimated values */
-.est{color:#647289}
-.official{color:#B6C0D2}
-
-/* Referral links */
-.ref-link{font-size:.75rem;color:#7AAFFF;text-decoration:none;border-bottom:1px dotted rgba(122,175,255,.3)}
-.ref-link:hover{border-bottom-color:#7AAFFF}
-
-/* Footnotes */
-.footnotes{font-size:.8rem;color:#64748b;margin:16px 0 0}
-.footnotes p{margin:6px 0}
-
-/* Guide */
-.guide-section{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:24px;margin:12px 0}
-.guide-section h3{color:#E6EAF2;margin:0 0 10px;font-size:1rem}
-
-/* Decision framework */
-.decision-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;margin:20px 0 32px}
-.decision-card{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:24px}
-.decision-card.api{border-left:4px solid #7AAFFF}
-.decision-card.self{border-left:4px solid #4ADE80}
-.decision-card h3{font-size:1rem;margin:0 0 12px;color:#E6EAF2}
-.decision-card ul{margin:0;padding-left:18px}
-.decision-card li{margin:6px 0;font-size:.88rem}
-
-/* Responsive */
-@media(max-width:700px){
-  .hero-stats{grid-template-columns:repeat(2,1fr)}
-  table{font-size:.75rem}
-  th,td{padding:6px 7px}
-  .decision-grid{grid-template-columns:1fr}
+---json
+{
+  "permalink": "es/research/open-source-vs-closed-cost.html",
+  "lang": "es",
+  "head": {
+    "title": "Modelos Abiertos vs. Cerrados: Comparativa de Costes LLM · FinOps LLM",
+    "description": "¿Cuándo es rentable autoalojar Llama, Qwen o DeepSeek frente a acceso a API? Costes GPU, optimización de inferencia, gastos operativos, y marco de decisión para tu carga de trabajo.",
+    "robots": "index, follow",
+    "canonical": "https://finopsllm.com/es/research/open-source-vs-closed-cost",
+    "hreflang": [
+      {
+        "lang": "en",
+        "href": "https://finopsllm.com/research/open-source-vs-closed-cost"
+      },
+      {
+        "lang": "es",
+        "href": "https://finopsllm.com/es/research/open-source-vs-closed-cost"
+      },
+      {
+        "lang": "fr",
+        "href": "https://finopsllm.com/fr/research/open-source-vs-closed-cost"
+      },
+      {
+        "lang": "de",
+        "href": "https://finopsllm.com/de/research/open-source-vs-closed-cost"
+      },
+      {
+        "lang": "pt",
+        "href": "https://finopsllm.com/pt/research/open-source-vs-closed-cost"
+      },
+      {
+        "lang": "ja",
+        "href": "https://finopsllm.com/ja/research/open-source-vs-closed-cost"
+      },
+      {
+        "lang": "x-default",
+        "href": "https://finopsllm.com/research/open-source-vs-closed-cost"
+      }
+    ],
+    "style": "body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}\n.wrap{max-width:1100px;margin:0 auto;padding:56px 24px}\na{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}\n.langsw{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;color:#647289;margin:0 0 26px}\n.langsw a{text-decoration:none}.langsw a[aria-current]{color:#E6EAF2;font-weight:600}\n\n/* Hero stats */\n.hero-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:16px;margin:28px 0 36px}\n.hero-stat{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:18px 16px;text-align:center}\n.hero-stat .num{font-size:2rem;font-weight:700;color:#7AAFFF;display:block}\n.hero-stat .lbl{font-size:.82rem;color:#647289;margin-top:4px}\n\n/* Badges */\n.badge-row{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 32px;list-style:none;padding:0}\n.badge-row li{background:#101726;border:1px solid #1E2A3F;border-radius:8px;padding:8px 14px;font-size:.85rem;color:#B6C0D2}\n\n/* Methodology */\n.method-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin:20px 0 32px}\n.method-card{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:18px}\n.method-card h3{font-size:.95rem;color:#E6EAF2;margin:0 0 8px}\n.method-card p{font-size:.85rem;margin:0}\n\n/* Table */\n.table-wrap{overflow-x:auto;margin:0 0 32px;-webkit-overflow-scrolling:touch}\ntable{border-collapse:collapse;width:100%;font-size:.82rem;white-space:nowrap}\nth,td{border:1px solid #1E2A3F;padding:8px 10px;text-align:left;color:#B6C0D2}\nth{color:#E6EAF2;background:#101726;cursor:pointer;position:sticky;top:0;user-select:none}\nth:hover{background:#162035}\nth .sort-arrow{font-size:.7rem;margin-left:4px;opacity:.4}\nth.sorted .sort-arrow{opacity:1;color:#7AAFFF}\ntd.provider-cell{white-space:normal;min-width:140px}\ntd.price-cell{text-align:right;font-variant-numeric:tabular-nums}\ntd.limit-cell{text-align:right;font-variant-numeric:tabular-nums;min-width:55px}\ntd.model-cell{font-size:.78rem}\ntr:hover{background:rgba(122,175,255,.04)}\n\n/* Gray for estimated values */\n.est{color:#647289}\n.official{color:#B6C0D2}\n\n/* Referral links */\n.ref-link{font-size:.75rem;color:#7AAFFF;text-decoration:none;border-bottom:1px dotted rgba(122,175,255,.3)}\n.ref-link:hover{border-bottom-color:#7AAFFF}\n\n/* Footnotes */\n.footnotes{font-size:.8rem;color:#64748b;margin:16px 0 0}\n.footnotes p{margin:6px 0}\n\n/* Guide */\n.guide-section{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:24px;margin:12px 0}\n.guide-section h3{color:#E6EAF2;margin:0 0 10px;font-size:1rem}\n\n/* Decision framework */\n.decision-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;margin:20px 0 32px}\n.decision-card{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:24px}\n.decision-card.api{border-left:4px solid #7AAFFF}\n.decision-card.self{border-left:4px solid #4ADE80}\n.decision-card h3{font-size:1rem;margin:0 0 12px;color:#E6EAF2}\n.decision-card ul{margin:0;padding-left:18px}\n.decision-card li{margin:6px 0;font-size:.88rem}\n\n/* Responsive */\n@media(max-width:700px){\n  .hero-stats{grid-template-columns:repeat(2,1fr)}\n  table{font-size:.75rem}\n  th,td{padding:6px 7px}\n  .decision-grid{grid-template-columns:1fr}\n}",
+    "scripts": [
+      {
+        "src": "/assets/consent.js",
+        "defer": true
+      },
+      {
+        "src": "/assets/attribution.js",
+        "defer": true
+      },
+      {
+        "src": "/assets/lang.js",
+        "defer": true
+      }
+    ],
+    "jsonLd": [
+      "{\"@context\":\"https://schema.org\",\"@type\":\"TechArticle\",\"headline\":\"Modelos Abiertos vs. Cerrados: Comparativa de Costes LLM · FinOps LLM\",\"description\":\"¿Cuándo es rentable autoalojar Llama, Qwen o DeepSeek frente a acceso a API? Costes GPU, optimización de inferencia, gastos operativos, y marco de decisión.\",\"url\":\"https://finopsllm.com/es/research/open-source-vs-closed-cost\",\"datePublished\":\"2026-07-04\",\"dateModified\":\"2026-07-15\",\"image\":\"https://finopsllm.com/og.png\",\"author\":{\"@type\":\"Organization\",\"name\":\"FinOps LLM team\"},\"publisher\":{\"@type\":\"Organization\",\"name\":\"FinOps LLM\",\"url\":\"https://finopsllm.com/\"}}",
+      "{\"@context\":\"https://schema.org\",\"@type\":\"BreadcrumbList\",\"itemListElement\":[{\"@type\":\"ListItem\",\"position\":1,\"name\":\"Inicio\",\"item\":\"https://finopsllm.com/\"},{\"@type\":\"ListItem\",\"position\":2,\"name\":\"Investigación\",\"item\":\"https://finopsllm.com/es/research\"},{\"@type\":\"ListItem\",\"position\":3,\"name\":\"Modelos Abiertos vs. Cerrados: Coste\",\"item\":\"https://finopsllm.com/es/research/open-source-vs-closed-cost\"}]}",
+      "{\"@context\": \"https://schema.org\", \"@type\": \"FAQPage\", \"mainEntity\": [{\"@type\": \"Question\", \"name\": \"¿Cuál es la metodología?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"Tarifas estándar publicadas de cada página de precios del proveedor. Sin descuentos por volumen o lotes aplicados. GPU en nube para infraestructura autoalojada usando precios bajo demanda (Lambda, RunPod, AWS) con configuraciones optimizadas para inferencia con vLLM o TensorRT-LLM.\"}}, {\"@type\": \"Question\", \"name\": \"¿Cuál es la tabla de comparación de costes?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"API Cost/mes asume 100M tokens de salida + 300M tokens de entrada por mes a tarifas estándar. Coste de autoalojamiento incluye alquiler GPU, gastos operativos del 15%, e infraestructura de inferencia (vLLM). No incluye tiempo de ingeniería inicial.\"}}, {\"@type\": \"Question\", \"name\": \"¿Cuáles son los factores clave de coste?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"Un nodo 8x H100 para Llama 4 Maverick cuesta $2.000-$3.500/mes bajo demanda desde Lambda, RunPod o AWS. Las instancias spot/preemptibles pueden reducir esto 40-60% pero añaden latencia de reinicio y riesgo de disponibilidad. Para cargas de producción, las instancias reservadas (compromiso 1 año) típicamente ahorran 30-40% frente a bajo demanda.\"}}, {\"@type\": \"Question\", \"name\": \"¿Cuál es el marco de decisión?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"La mayoría de equipos terminan en híbrido: usar API para tareas de razonamiento frontera y cargas bajas, autoalojar modelos abiertos para tareas de alto volumen y tolerantes a latencia (generación de contenido, extracción de datos, herramientas internas).\"}}, {\"@type\": \"Question\", \"name\": \"¿Dónde ejecutar modelos abiertos?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"Los precios GPU son tarifas por hora bajo demanda a partir de julio 2026. Los precios reservados/spot varían significativamente. MiMO ofrece acceso basado en API a MiMo-V2-Pro y MiMo-V2-Omni a tarifas competitivas - un punto medio entre autoalojamiento completo y precios API premium.\"}}]}"
+    ]
+  }
 }
-</style><script src="/assets/consent.js" defer></script><script src="/assets/attribution.js" defer></script>
-<script src="/assets/lang.js" defer></script>
-</head>
-<body><main class="wrap">{% endblock %}{% block body %}
+---
+{% extends "shell.njk" %}{% block body %}
 <nav class="langsw" aria-label="Language"><a href="/research/open-source-vs-closed-cost" hreflang="en">EN</a> · <a href="/es/research/open-source-vs-closed-cost" hreflang="es" aria-current="page">ES</a> · <a href="/fr/research/open-source-vs-closed-cost" hreflang="fr">FR</a> · <a href="/de/research/open-source-vs-closed-cost" hreflang="de">DE</a> · <a href="/pt/research/open-source-vs-closed-cost" hreflang="pt">PT</a> · <a href="/ja/research/open-source-vs-closed-cost" hreflang="ja">JA</a></nav>
 
 <h1>Modelos Abiertos vs. Cerrados: Comparativa de Costes LLM</h1><p class="updated" style="color:#6B7689;font-size:14px;margin-top:-6px">Actualizado 15 julio 2026 · publicado por primera vez 4 julio 2026</p>
@@ -350,5 +318,4 @@ tr:hover{background:rgba(122,175,255,.04)}
   }
 })();
 </script>
-{% endblock %}{% block suffix %}</main></body></html>
 {% endblock %}

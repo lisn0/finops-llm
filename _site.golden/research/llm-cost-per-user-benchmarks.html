@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>LLM Cost Per User Benchmarks · FinOps LLM</title><meta name="description" content="Modeled LLM cost per user per month across roles and teams. Compare developer, knowledge worker, and customer-facing chatbot costs using published pricing." /><meta name="robots" content="index, follow" /><link rel="canonical" href="https://finopsllm.com/research/llm-cost-per-user-benchmarks" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","headline":"LLM Cost Per User Benchmarks · FinOps LLM","description":"Modeled monthly LLM cost per user by role and team. Based on published LLM pricing and typical token consumption patterns.","url":"https://finopsllm.com/research/llm-cost-per-user-benchmarks","datePublished":"2026-07-12","dateModified":"2026-07-12","image":"https://finopsllm.com/og.png","author":{"@type":"Organization","name":"FinOps LLM team"},"publisher":{"@type":"Organization","name":"FinOps LLM","url":"https://finopsllm.com/"}}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://finopsllm.com/"},{"@type":"ListItem","position":2,"name":"Research","item":"https://finopsllm.com/research"},{"@type":"ListItem","position":3,"name":"LLM Cost Per User Benchmarks","item":"https://finopsllm.com/research/llm-cost-per-user-benchmarks"}]}
+</script>
+<script type="application/ld+json">
+{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "What is cost per user?", "acceptedAnswer": {"@type": "Answer", "text": "Cost per user (CPU) is total LLM spend divided by active users in a period. These benchmarks show modeled monthly LLM cost by role: developers ($26–$281 typical, up to ~$875 for heavy agent-based use), knowledge workers ($7–$151 for light-to-typical use), customer-facing agents (shared pool cost / concurrent users)."}}, {"@type": "Question", "name": "Why does cost vary by role?", "acceptedAnswer": {"@type": "Answer", "text": "Token volume scales with task complexity and frequency. Developers using code generation use more tokens per day. Knowledge workers using LLMs for writing use moderate tokens. Customer service chatbots amortize cost across hundreds or thousands of conversations."}}, {"@type": "Question", "name": "How do I benchmark my own team?", "acceptedAnswer": {"@type": "Answer", "text": "Divide total monthly LLM spend by active users. Compare your per-user cost to these benchmarks. If you're above the range, investigate high-usage outliers and consider model routing or caching."}}, {"@type": "Question", "name": "Should cost per user include infrastructure?", "acceptedAnswer": {"@type": "Answer", "text": "These benchmarks cover LLM API spend only, not hosting or compute infrastructure. If you self-host models, add your infra cost per user (typically $5–$50/user/month for on-prem LLMs)."}}]}
+</script>
+<style>
+body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}
+.wrap{max-width:1100px;margin:0 auto;padding:56px 24px}
+a{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}
+.langsw{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;color:#647289;margin:0 0 26px}
+.langsw a{text-decoration:none}.langsw a[aria-current]{color:#E6EAF2;font-weight:600}
+.badge-row{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 32px;list-style:none;padding:0}
+.badge-row li{background:#101726;border:1px solid #1E2A3F;border-radius:8px;padding:8px 14px;font-size:.85rem;color:#B6C0D2}
+.table-wrap{overflow-x:auto;margin:0 0 32px;-webkit-overflow-scrolling:touch}
+table{border-collapse:collapse;width:100%;font-size:.85rem}
+th,td{border:1px solid #1E2A3F;padding:10px 12px;text-align:left;color:#B6C0D2}
+th{color:#E6EAF2;background:#101726}
+td.number{text-align:right;font-family:'JetBrains Mono',monospace;font-weight:500}
+.insight-card{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:20px;margin:16px 0}
+.insight-card h3{color:#E6EAF2;margin:0 0 12px;font-size:1rem}
+.insight-card p{font-size:.9rem;margin:6px 0}
+.guide-section{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:24px;margin:12px 0}
+.guide-section h3{color:#E6EAF2;margin:0 0 10px;font-size:1rem}
+@media(max-width:700px){
+  table{font-size:.75rem}
+  th,td{padding:6px 7px}
+}
+</style><script src="/assets/consent.js" defer></script><script src="/assets/attribution.js" defer></script>
+<script src="/assets/lang.js" defer></script>
+</head>
+<body><main class="wrap"><aside style="border-left:3px solid #7AAFFF;background:rgba(122,175,255,.10);padding:16px 20px;margin:0 0 28px;color:#E6EAF2"><strong style="color:#fff">Auditing your own LLM spend?</strong> FinOps LLM runs a free audit of your AI costs and shows where the savings are. <a href="/book">Book free audit &rarr;</a></aside>
+
+
+<h1>LLM Cost Per User Benchmarks</h1>
+<p class="updated" style="color:#6B7689;font-size:14px;margin-top:-6px">Updated 12 July 2026</p>
+<p>Modeled monthly LLM cost per active user by role and team type. Use these benchmarks to compare your spending against similar companies and identify cost optimization opportunities.</p>
+
+<ul class="badge-row">
+  <li>Modeled scenarios from published LLM pricing</li>
+  <li>Benchmarks by role: developers, analysts, customer-facing</li>
+  <li>Includes low, typical, and high-use tiers</li>
+  <li>All prices current as of July 2026</li>
+</ul>
+
+<h2>Developer Tier (Coding Assistants)</h2>
+
+<p>Developers using AI code generation and debugging consume the highest tokens per user. Typical daily usage: 4–8 hours of IDE time with continuous LLM interactions.</p>
+
+<table>
+<thead>
+<tr>
+  <th>Usage Level</th>
+  <th>Daily Interactions</th>
+  <th>Est. Monthly Tokens</th>
+  <th>Model Mix</th>
+  <th>Cost/User/Month</th>
+  <th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>Light</strong></td>
+  <td>10–20</td>
+  <td class="number">5M in / 2M out</td>
+  <td>Gemini Flash (80%), Sonnet (20%)</td>
+  <td class="number">$26–$30</td>
+  <td>Occasional code completions, not relying on LLM for design</td>
+</tr>
+<tr>
+  <td><strong>Typical</strong></td>
+  <td>40–60</td>
+  <td class="number">20M in / 10M out</td>
+  <td>Opus (70%), Flash (30%)</td>
+  <td class="number">$225–$281</td>
+  <td>Regular use of chat, debugging, test generation</td>
+</tr>
+<tr>
+  <td><strong>Heavy</strong></td>
+  <td>100+</td>
+  <td class="number">50M in / 25M out</td>
+  <td>Opus 4.8 (100%)</td>
+  <td class="number">$695–$875</td>
+  <td>Full-day LLM pair programming, agent-based workflows</td>
+</tr>
+</tbody>
+</table>
+
+<p><strong>Cost calculation (all three tiers, from list prices):</strong> <em>Light</em> — input 4M × $1.50 (Gemini 3.5 Flash) + 1M × $2–$3 (Sonnet 5), output 1.6M × $9 + 0.4M × $10–$15 = <strong>$26–$30</strong>; the range reflects Sonnet 5's introductory $2/$10 pricing through August 31, 2026 ($3/$15 from September 1). <em>Typical</em> — input 14M × $5 (Opus 4.8) + 6M × $1.50, output 7M × $25 + 3M × $9 = <strong>$281</strong>; routing ~40% of the workload through the 50%-off Batch API brings it to ~$225. <em>Heavy</em> — 50M × $5 + 25M × $25 = <strong>$875</strong> on pure Opus 4.8; with prompt caching serving 60–80% of input tokens as $0.50/M cache reads, $695–$740.</p>
+
+<p><strong>Coding assistant subscription vs. API cost:</strong> GitHub Copilot Pro+ ($39/month) offers 7,000 credits ($70 value), covering ~$70 of monthly API cost. For typical developers, a $20–$100/month subscription plan often beats self-managed API billing.</p>
+
+<h2>Knowledge Worker Tier (Writing, Research, Analysis)</h2>
+
+<p>Analysts, content creators, researchers, and product managers use LLMs for writing, research, and decision support. Moderate token consumption (1–3 hours/day).</p>
+
+<table>
+<thead>
+<tr>
+  <th>Usage Level</th>
+  <th>Daily Sessions</th>
+  <th>Est. Monthly Tokens</th>
+  <th>Model Mix</th>
+  <th>Cost/User/Month</th>
+  <th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>Light</strong></td>
+  <td>5–10</td>
+  <td class="number">3M in / 1.5M out</td>
+  <td>Flash (90%), Sonnet (10%)</td>
+  <td class="number">$7–$19</td>
+  <td>Occasional brainstorming, research summaries</td>
+</tr>
+<tr>
+  <td><strong>Typical</strong></td>
+  <td>20–30</td>
+  <td class="number">12M in / 6M out</td>
+  <td>Sonnet (70%), Opus (30%)</td>
+  <td class="number">$120–$151</td>
+  <td>Daily writing support, document analysis, idea generation</td>
+</tr>
+<tr>
+  <td><strong>Heavy</strong></td>
+  <td>50+</td>
+  <td class="number">30M in / 15M out</td>
+  <td>Opus (100%)</td>
+  <td class="number">$425–$525</td>
+  <td>Research-heavy roles, policy writing, strategic analysis</td>
+</tr>
+</tbody>
+</table>
+
+<p><strong>Cost calculation (all tiers, list prices):</strong> Light — 3M input × (90% Gemini 2.5 Flash $0.30/M + 10% Sonnet 5 $3/M) = $1.71, plus 1.5M output × (90% × $2.50/M + 10% × $15/M) = $5.63 → <strong>~$7</strong>; on Gemini 3.5 Flash ($1.50/$9) instead, the same mix is <strong>~$19</strong>. Typical — 12M input × (70% Sonnet 5 $3/M + 30% Opus 4.8 $5/M) = $43.20, plus 6M output × (70% × $15/M + 30% × $25/M) = $108 → <strong>$151 list</strong>; batching overnight analysis (50% off batched tokens) brings it toward <strong>$120</strong>. Heavy — (30M × $5/M) + (15M × $25/M) = $150 + $375 = <strong>$525 list</strong>; with ~75% cache hits on reused research documents (cached input $0.50/M) input drops to ~$49, total <strong>~$425</strong>.</p>
+
+<p><strong>Optimization tip:</strong> Most knowledge workers can reduce per-user cost to $15–$25 by using cheaper models (Gemini Flash, DeepSeek) for routine tasks and reserving Claude/GPT-5.5 for complex analysis.</p>
+
+<h2>Customer-Facing Tier (Support Agents, Chatbots)</h2>
+
+<p>Customer service chatbots and RAG systems handle high volume but amortize LLM cost across many conversations. Cost per active user is typically calculated as (total monthly LLM spend / concurrent active users).</p>
+
+<table>
+<thead>
+<tr>
+  <th>Deployment Scale</th>
+  <th>Monthly Conversations</th>
+  <th>Avg Tokens/Conversation</th>
+  <th>Model</th>
+  <th>Monthly LLM Cost</th>
+  <th>Cost per Concurrent User</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>Small (1,000/mo)</strong></td>
+  <td class="number">1,000</td>
+  <td class="number">2,000</td>
+  <td>Gemini Flash</td>
+  <td class="number">$10–$15</td>
+  <td class="number">$0.10 (100 concurrent)</td>
+</tr>
+<tr>
+  <td><strong>Medium (10,000/mo)</strong></td>
+  <td class="number">10,000</td>
+  <td class="number">2,000</td>
+  <td>Gemini Flash + caching</td>
+  <td class="number">$90–$105</td>
+  <td class="number">$0.90–$1.05 (100 concurrent)</td>
+</tr>
+<tr>
+  <td><strong>Large (100,000/mo)</strong></td>
+  <td class="number">100,000</td>
+  <td class="number">2,000</td>
+  <td>Gemini Flash + batch</td>
+  <td class="number">$525–$1,050</td>
+  <td class="number">$5–$11 (100 concurrent)</td>
+</tr>
+</tbody>
+</table>
+
+<p><strong>Cost calculation (Medium):</strong> 10,000 conversations × 2,000 tokens ≈ 20M tokens, split roughly 50/50 input/output. Gemini 3.5 Flash: (10M × $1.50/M) + (10M × $9/M) = $15 + $90 = <strong>$105 at list</strong>. Prompt caching on the customer KB only discounts the input side, so it trims the total to ~$90–$105 — the bigger lever is the model: the same workload on Gemini 2.5 Flash ($0.30/$2.50) is (10M × $0.30/M) + (10M × $2.50/M) = <strong>~$28/month</strong>. Large tier: 200M tokens on Gemini 3.5 Flash = $1,050 at list, ~$525 if fully batched (50% batch discount).</p>
+
+<p><strong>Key insight:</strong> For chatbots, use low-cost models (Gemini Flash $0.30–$2.50, DeepSeek V4 Flash $0.14–$0.28) with prompt caching to maximize token efficiency. Cost per customer interaction can be as low as $0.001.</p>
+
+<h2>Data Processing Tier (Batch &amp; ETL)</h2>
+
+<p>Teams processing documents, logs, or datasets via LLM batch jobs consume massive token volume but benefit from 50% batch discount on all input/output.</p>
+
+<table>
+<thead>
+<tr>
+  <th>Workload</th>
+  <th>Monthly Records</th>
+  <th>Avg Tokens/Record</th>
+  <th>Model (w/ 50% Batch)</th>
+  <th>Monthly Cost</th>
+  <th>Cost per 1M Tokens</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>Light (100k records)</strong></td>
+  <td class="number">100,000</td>
+  <td class="number">1,000</td>
+  <td>Gemini 2.5 Flash + Batch</td>
+  <td class="number">$26–$37</td>
+  <td class="number">$0.15 in / $1.25 out (50% disc)</td>
+</tr>
+<tr>
+  <td><strong>Medium (1M records)</strong></td>
+  <td class="number">1,000,000</td>
+  <td class="number">1,000</td>
+  <td>Gemini 2.5 Flash + Batch</td>
+  <td class="number">$260–$370</td>
+  <td class="number">$0.15 in / $1.25 out (50% disc)</td>
+</tr>
+<tr>
+  <td><strong>Heavy (10M records)</strong></td>
+  <td class="number">10,000,000</td>
+  <td class="number">1,000</td>
+  <td>Claude Haiku 4.5 + Batch</td>
+  <td class="number">$7,000–$9,000</td>
+  <td class="number">$0.50 in / $2.50 out (50% disc)</td>
+</tr>
+</tbody>
+</table>
+
+<p><strong>Cost calculation (Medium):</strong> 1M records × 1,000 tokens = 1B tokens, roughly 80% input / 20% output for classification-style jobs. Gemini 2.5 Flash with the 50% batch discount: (800M × $0.30/M × 0.5) + (200M × $2.50/M × 0.5) = $120 + $250 = <strong>$370/month</strong> — about $0.0004 per record. At 90% input share the same job is ~$260. Heavy tier on Claude Haiku 4.5 batch ($0.50/$2.50 after discount): (8B × $0.50/M) + (2B × $2.50/M) = $4,000 + $5,000 = <strong>$9,000/month</strong>; ~$7,000 at 90% input share.</p>
+
+<h2>Cross-Team Cost Per User Rollup</h2>
+
+<p>If your organization has mixed roles, calculate weighted average cost per user:</p>
+
+<table>
+<thead>
+<tr>
+  <th>Team Composition</th>
+  <th>Developers</th>
+  <th>Knowledge Workers</th>
+  <th>Support/Ops</th>
+  <th>Avg Cost/User</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>Tech Startup</strong></td>
+  <td class="number">50% ($250)</td>
+  <td class="number">30% ($135)</td>
+  <td class="number">20% ($5)</td>
+  <td class="number">$167/month</td>
+</tr>
+<tr>
+  <td><strong>Enterprise (mixed)</strong></td>
+  <td class="number">25% ($250)</td>
+  <td class="number">50% ($135)</td>
+  <td class="number">25% ($10)</td>
+  <td class="number">$133/month</td>
+</tr>
+<tr>
+  <td><strong>Customer Success Org</strong></td>
+  <td class="number">10% ($250)</td>
+  <td class="number">40% ($135)</td>
+  <td class="number">50% ($8)</td>
+  <td class="number">$83/month</td>
+</tr>
+</tbody>
+</table>
+
+<p><strong>How to use this table:</strong> Role costs use the mid-point of each typical tier above (developers ~$250, knowledge workers ~$135) plus a modeled $5–$10/employee for shared support tooling. If your org is 50% developers and 50% support staff, expect roughly 0.5 × $250 + 0.5 × $8 ≈ <strong>$129/month per user</strong>. If your whole-org average is well above your composition's estimate, you have heavy agent-based developer use or missed optimization opportunities.</p>
+
+<h2>Optimization Strategies by Role</h2>
+
+<div class="insight-card">
+  <h3>For Developers</h3>
+  <p>Use coding-plan subscriptions ($20–$100/month) to replace raw API billing. They often provide better value due to UI optimizations and bundled models. Implement model routing: use Gemini Flash for autocomplete, Claude for complex reasoning.</p>
+</div>
+
+<div class="insight-card">
+  <h3>For Knowledge Workers</h3>
+  <p>Enable prompt caching if using the same documents repeatedly (e.g., internal policy PDFs, research datasets). Cache hits cost 90% less. Batch reusable tasks (tomorrow's reports, weekly analyses) to save 50% on those tokens.</p>
+</div>
+
+<div class="insight-card">
+  <h3>For Support/Chatbots</h3>
+  <p>Use lowest-cost models (Gemini Flash, DeepSeek). Implement aggressive prompt caching with your customer KB. If volume is high, negotiate volume pricing or consider self-hosted models (Llama, Qwen).</p>
+</div>
+
+<div class="insight-card">
+  <h3>For Data Processing</h3>
+  <p>Always use batch API (50% discount). Use smallest sufficient model (Haiku, Flash) for classification tasks. Consider open-source self-hosted models (Llama 3.3 70B) if processing volume exceeds $2,000/month.</p>
+</div>
+
+<h2>Benchmarking Your Own Team</h2>
+
+<div class="guide-section">
+  <h3>Step 1: Calculate average cost per user</h3>
+  <p>Total LLM spend for the month ÷ active users in that month. Active = anyone who triggered an LLM call.</p>
+</div>
+
+<div class="guide-section">
+  <h3>Step 2: Segment by role or team</h3>
+  <p>Break down by department. Are your developers at $225–$281/month? That's in the typical range for daily AI-assisted development. Are knowledge workers well above the ~$120–$151 typical band? Look for caching and model-routing opportunities.</p>
+</div>
+
+<div class="guide-section">
+  <h3>Step 3: Identify outliers</h3>
+  <p>Which individuals or teams are above their role benchmark? Investigate: Are they using the most expensive models unnecessarily? Missing batch opportunities? Not using caching?</p>
+</div>
+
+<div class="guide-section">
+  <h3>Step 4: Test optimizations</h3>
+  <p>Pilot model routing, prompt caching, or batch API for a high-use team. Re-measure cost per user after 4 weeks. Aim for 20–30% reduction.</p>
+</div>
+
+<hr style="margin:48px 0 24px;border:none;border-top:1px solid #1E2A3F" />
+<p>To get a detailed per-user cost breakdown of your actual LLM spend, <a href="/book">book a free audit with FinOps LLM</a>. We'll show your per-user cost by team and suggest specific optimizations.</p>
+<p><a href="/research">Back to research</a></p>
+
+</main></body></html>
+

@@ -1,33 +1,84 @@
+---json
+{
+  "permalink": "research/cap-inference-costs.html",
+  "lang": "en",
+  "head": {
+    "title": "How to cap inference costs and prevent runaway spending · FinOps LLM",
+    "description": "Hard limits at the API, gateway, and application level: budget caps, per-key ceilings, request rejection, runaway-agent kill switches, and idle GPU autoscaling to stop surprise costs before they happen.",
+    "robots": "index, follow",
+    "canonical": "https://finopsllm.com/research/cap-inference-costs",
+    "openGraph": [
+      {
+        "property": "og:type",
+        "content": "article"
+      },
+      {
+        "property": "og:url",
+        "content": "https://finopsllm.com/research/cap-inference-costs"
+      },
+      {
+        "property": "og:title",
+        "content": "How to cap inference costs and prevent runaway spending"
+      },
+      {
+        "property": "og:description",
+        "content": "Hard limits at API, gateway, and application level - budget caps, per-key ceilings, request rejection, agent kill switches, and idle GPU autoscaling."
+      },
+      {
+        "property": "og:image",
+        "content": "https://finopsllm.com/og.svg"
+      },
+      {
+        "property": "og:site_name",
+        "content": "FinOps LLM"
+      },
+      {
+        "property": "og:locale",
+        "content": "en_US"
+      }
+    ],
+    "twitter": [
+      {
+        "name": "twitter:card",
+        "content": "summary_large_image"
+      },
+      {
+        "name": "twitter:site",
+        "content": "@finopsllm"
+      },
+      {
+        "name": "twitter:title",
+        "content": "How to cap inference costs and prevent runaway spending"
+      },
+      {
+        "name": "twitter:description",
+        "content": "API budget caps, gateway per-key limits, request rejection, agent kill switches, and idle GPU autoscaling."
+      },
+      {
+        "name": "twitter:image",
+        "content": "https://finopsllm.com/og.svg"
+      }
+    ],
+    "style": "body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}.wrap{max-width:840px;margin:0 auto;padding:56px 24px}a{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}h3{margin-top:22px;color:#E6EAF2}",
+    "scripts": [
+      {
+        "src": "/assets/consent.js",
+        "defer": true
+      },
+      {
+        "src": "/assets/attribution.js",
+        "defer": true
+      }
+    ],
+    "jsonLd": [
+      "{\"@context\":\"https://schema.org\",\"@type\":\"TechArticle\",\"headline\":\"How to cap inference costs and prevent runaway spending\",\"description\":\"Hard limits at the API, gateway, and application level: budget caps, per-key ceilings, request rejection, runaway-agent kill switches, and idle GPU autoscaling to stop surprise costs before they happen.\",\"url\":\"https://finopsllm.com/research/cap-inference-costs\",\"datePublished\":\"2026-07-01\",\"dateModified\":\"2026-07-01\",\"image\":\"https://finopsllm.com/og.png\",\"author\":{\"@type\":\"Organization\",\"name\":\"FinOps LLM team\"},\"publisher\":{\"@type\":\"Organization\",\"name\":\"FinOps LLM\",\"url\":\"https://finopsllm.com/\"}}",
+      "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"mainEntity\":[{\"@type\":\"Question\",\"name\":\"How do I cap my OpenAI or Anthropic bill?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Most providers offer organization-level spend limits and per-API-key budget caps. OpenAI allows setting a hard usage limit in the billing settings; Anthropic uses per-key budgets tied to spend thresholds. These caps reject new requests when the limit is reached, preventing overage. They work best paired with alerts that fire at 50 percent and 80 percent of the limit so you have time to investigate before hitting the hard stop.\"}},{\"@type\":\"Question\",\"name\":\"Why are idle GPUs costing money and how do I stop it?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Self-hosted GPU infrastructure incurs cost whenever instances are running, even if no inference is happening. The fix is autoscaling: spin down instances to zero when idle, use spot/preemptible instances to lower per-unit cost, and right-size to actual throughput (a GPU sitting unused for 18 hours a day is oversized). Measure idle time via queue depth and request latency; if p99 latency is still acceptable with fewer instances, you are paying for idle capacity.\"}},{\"@type\":\"Question\",\"name\":\"How do I stop a runaway AI agent from spending unlimited money?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Agents need per-run token budgets (total input + output cap), per-run cost budgets (hard dollar limit), and step/loop limits (max planning steps, max tool calls). Kill-switches let on-call engineers disable an agent entirely without deploying code. Paired with metrics on cost-per-task and retry rates, these guards catch runaway loops before they become a monthly surprise.\"}},{\"@type\":\"Question\",\"name\":\"What happens when I hit a cost cap - does the request fail or degrade?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Hard caps reject incoming requests with an error (usually HTTP 429 or a timeout). Graceful degradation is a separate strategy: instead of failing, the system falls back to a cheaper model or returns a cached result. Hard caps are safer for preventing surprise costs; degradation is better for availability. Most teams use both - hard caps at the organization level and graceful degradation at the feature level.\"}},{\"@type\":\"Question\",\"name\":\"How do I set per-team or per-feature cost budgets?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"API keys can be tagged with metadata (team, feature, environment). A gateway or proxy layer routes requests based on those tags and enforces spend caps per tag. If team-search is capped at $500/month and hits that limit, requests for team-search return an error or degrade, but team-support continues normally. This requires a gateway (LiteLLM, Ollama with a cost middleware, or a custom reverse proxy).\"}},{\"@type\":\"Question\",\"name\":\"Can I set hard caps and still have monitoring and alerts?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Yes. Hard caps are the last line of defense; alerts and monitoring are the first. Best practice is to alert at 50%, 75%, and 90% of budget so engineers have time to investigate before the cap hits. Use budget as a circuit-breaker only when alerts fail or when a cost event is happening faster than humans can respond.\"}}]}",
+      "{\"@context\":\"https://schema.org\",\"@type\":\"BreadcrumbList\",\"itemListElement\":[{\"@type\":\"ListItem\",\"position\":1,\"name\":\"Home\",\"item\":\"https://finopsllm.com/\"},{\"@type\":\"ListItem\",\"position\":2,\"name\":\"Research\",\"item\":\"https://finopsllm.com/research\"},{\"@type\":\"ListItem\",\"position\":3,\"name\":\"How to cap inference costs\",\"item\":\"https://finopsllm.com/research/cap-inference-costs\"}]}"
+    ]
+  }
+}
 ---
-permalink: "research/cap-inference-costs.html"
----
-{% extends "shell.njk" %}{% block prefix %}<!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>How to cap inference costs and prevent runaway spending · FinOps LLM</title><meta name="description" content="Hard limits at the API, gateway, and application level: budget caps, per-key ceilings, request rejection, runaway-agent kill switches, and idle GPU autoscaling to stop surprise costs before they happen." /><meta name="robots" content="index, follow" /><link rel="canonical" href="https://finopsllm.com/research/cap-inference-costs" />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://finopsllm.com/research/cap-inference-costs" />
-<meta property="og:title" content="How to cap inference costs and prevent runaway spending" />
-<meta property="og:description" content="Hard limits at API, gateway, and application level - budget caps, per-key ceilings, request rejection, agent kill switches, and idle GPU autoscaling." />
-<meta property="og:image" content="https://finopsllm.com/og.svg" />
-<meta property="og:site_name" content="FinOps LLM" />
-<meta property="og:locale" content="en_US" />
-<meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:site" content="@finopsllm" />
-<meta name="twitter:title" content="How to cap inference costs and prevent runaway spending" />
-<meta name="twitter:description" content="API budget caps, gateway per-key limits, request rejection, agent kill switches, and idle GPU autoscaling." />
-<meta name="twitter:image" content="https://finopsllm.com/og.svg" />
-<script type="application/ld+json">
-{"@context":"https://schema.org","@type":"TechArticle","headline":"How to cap inference costs and prevent runaway spending","description":"Hard limits at the API, gateway, and application level: budget caps, per-key ceilings, request rejection, runaway-agent kill switches, and idle GPU autoscaling to stop surprise costs before they happen.","url":"https://finopsllm.com/research/cap-inference-costs","datePublished":"2026-07-01","dateModified":"2026-07-01","image":"https://finopsllm.com/og.png","author":{"@type":"Organization","name":"FinOps LLM team"},"publisher":{"@type":"Organization","name":"FinOps LLM","url":"https://finopsllm.com/"}}
-</script>
-<script type="application/ld+json">
-{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"How do I cap my OpenAI or Anthropic bill?","acceptedAnswer":{"@type":"Answer","text":"Most providers offer organization-level spend limits and per-API-key budget caps. OpenAI allows setting a hard usage limit in the billing settings; Anthropic uses per-key budgets tied to spend thresholds. These caps reject new requests when the limit is reached, preventing overage. They work best paired with alerts that fire at 50 percent and 80 percent of the limit so you have time to investigate before hitting the hard stop."}},{"@type":"Question","name":"Why are idle GPUs costing money and how do I stop it?","acceptedAnswer":{"@type":"Answer","text":"Self-hosted GPU infrastructure incurs cost whenever instances are running, even if no inference is happening. The fix is autoscaling: spin down instances to zero when idle, use spot/preemptible instances to lower per-unit cost, and right-size to actual throughput (a GPU sitting unused for 18 hours a day is oversized). Measure idle time via queue depth and request latency; if p99 latency is still acceptable with fewer instances, you are paying for idle capacity."}},{"@type":"Question","name":"How do I stop a runaway AI agent from spending unlimited money?","acceptedAnswer":{"@type":"Answer","text":"Agents need per-run token budgets (total input + output cap), per-run cost budgets (hard dollar limit), and step/loop limits (max planning steps, max tool calls). Kill-switches let on-call engineers disable an agent entirely without deploying code. Paired with metrics on cost-per-task and retry rates, these guards catch runaway loops before they become a monthly surprise."}},{"@type":"Question","name":"What happens when I hit a cost cap - does the request fail or degrade?","acceptedAnswer":{"@type":"Answer","text":"Hard caps reject incoming requests with an error (usually HTTP 429 or a timeout). Graceful degradation is a separate strategy: instead of failing, the system falls back to a cheaper model or returns a cached result. Hard caps are safer for preventing surprise costs; degradation is better for availability. Most teams use both - hard caps at the organization level and graceful degradation at the feature level."}},{"@type":"Question","name":"How do I set per-team or per-feature cost budgets?","acceptedAnswer":{"@type":"Answer","text":"API keys can be tagged with metadata (team, feature, environment). A gateway or proxy layer routes requests based on those tags and enforces spend caps per tag. If team-search is capped at $500/month and hits that limit, requests for team-search return an error or degrade, but team-support continues normally. This requires a gateway (LiteLLM, Ollama with a cost middleware, or a custom reverse proxy)."}},{"@type":"Question","name":"Can I set hard caps and still have monitoring and alerts?","acceptedAnswer":{"@type":"Answer","text":"Yes. Hard caps are the last line of defense; alerts and monitoring are the first. Best practice is to alert at 50%, 75%, and 90% of budget so engineers have time to investigate before the cap hits. Use budget as a circuit-breaker only when alerts fail or when a cost event is happening faster than humans can respond."}}]}
-</script>
-<script type="application/ld+json">
-{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://finopsllm.com/"},{"@type":"ListItem","position":2,"name":"Research","item":"https://finopsllm.com/research"},{"@type":"ListItem","position":3,"name":"How to cap inference costs","item":"https://finopsllm.com/research/cap-inference-costs"}]}
-</script>
-<style>body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}.wrap{max-width:840px;margin:0 auto;padding:56px 24px}a{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}h3{margin-top:22px;color:#E6EAF2}</style><script src="/assets/consent.js" defer></script><script src="/assets/attribution.js" defer></script>
-</head>
-<body><main class="wrap">{% endblock %}{% block body %}<h1>How to cap inference costs and prevent runaway spending</h1>
+{% extends "shell.njk" %}{% block body %}<h1>How to cap inference costs and prevent runaway spending</h1>
 <p>A cap on inference spending is a hard limit that stops new requests when cost reaches a threshold, preventing runaway bills from agent loops, misconfigured retries, or unexpected traffic spikes. Caps exist at three levels: the API provider (budget caps on your account), the gateway or proxy layer (per-key or per-team limits), and the application (per-run token budgets, agent step limits, and idle-instance autoscaling). Most cost explosions can be prevented by implementing hard caps at all three, paired with alerting that fires before the cap is reached.</p>
 <p>This page covers the mechanics of capping costs, when each cap works, and the tradeoffs between hard stops and graceful degradation.</p>
 <h2>Provider-level budget caps</h2>
@@ -75,5 +126,4 @@ permalink: "research/cap-inference-costs.html"
 <li><a href="/research/on-prem-llm-finops">On-prem and self-hosted LLM FinOps</a> - cost governance for self-hosted infrastructure.</li>
 <li><a href="/research/token-budget-implementation">Token budget implementation</a> - tracking and enforcing per-run token limits.</li>
 </ul>
-<hr style="margin:48px 0 24px;border:none;border-top:1px solid #1E2A3F" /><p>Want this applied to your own LLM spend? FinOps LLM runs a free audit of your AI costs and shows where the savings are. <a href="/book">Book free audit &rarr;</a></p><p><a href="/research">Back to research</a></p>{% endblock %}{% block suffix %}</main></body></html>
-{% endblock %}
+<hr style="margin:48px 0 24px;border:none;border-top:1px solid #1E2A3F" /><p>Want this applied to your own LLM spend? FinOps LLM runs a free audit of your AI costs and shows where the savings are. <a href="/book">Book free audit &rarr;</a></p><p><a href="/research">Back to research</a></p>{% endblock %}
