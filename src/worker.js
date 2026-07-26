@@ -24,6 +24,44 @@ const APEX = 'finopsllm.com';
 const DEFAULT_TITLE = 'FinOps LLM';
 const CONTENT_SIGNAL = 'search=yes, ai-input=yes, ai-train=no';
 
+/* ------------------------------------------------------------------ */
+/* A/B test: English homepage variant (control vs v2 mockup)          */
+/* ------------------------------------------------------------------ */
+
+const AB_COOKIE = 'ab_test';
+const AB_PATHS = new Set(['/', '/index.html']);
+
+function isBotForAb(request) {
+	const ua = request.headers.get('User-Agent') || '';
+	return /bot|crawl|spider|slurp|mediapartners|facebookexternalhit|embedly|quora|pinterest|whatsapp|googlebot|bingbot|duckduckbot|yandex|baidu|applebot|amazonbot|gptbot|claudebot|claude-|oai-searchbot|chatgpt-user|perplexity|mistralai|meta-externalagent|google-extended|preview|lighthouse/i.test(ua);
+}
+
+function abCookieValue(request) {
+	const c = request.headers.get('Cookie') || '';
+	const m = c.match(/(?:^|;\s*)ab_test=(control|v2)\b/);
+	return m ? m[1] : null;
+}
+
+function pickVariant(request) {
+	const existing = abCookieValue(request);
+	if (existing) return existing;
+	return Math.random() < 0.5 ? 'control' : 'v2';
+}
+
+function abTargetUrl(url, variant) {
+	if (variant === 'v2') {
+		const u = new URL(url.toString());
+		u.pathname = '/index-v2.html';
+		return u;
+	}
+	return url;
+}
+
+function abCookieHeader(variant) {
+	const maxAge = 60 * 60 * 24 * 30;
+	return `ab_test=${variant}; Max-Age=${maxAge}; Path=/; SameSite=Lax; Secure`;
+}
+
 // Languages with a full published translation mirror. Order is not significant.
 const LANGS = ['es', 'fr', 'de', 'ja', 'pt'];
 
@@ -181,19 +219,45 @@ export default {
 		const langHop = languageRedirect(request, url);
 		if (langHop) return langHop;
 
-		// 3. Fetch whatever the static host would serve (also applies _redirects/_headers).
-		const assetResponse = await env.ASSETS.fetch(request);
-
-		// 4. Only transform GET requests that explicitly negotiate markdown.
-		const accept = request.headers.get('Accept') || '';
-		if (request.method !== 'GET' || !/text\/markdown/i.test(accept)) {
-			return assetResponse;
+		// 3. English homepage A/B test: humans only, crawlers always see control.
+		let abVariant = null;
+		let abRequest = request;
+		if (!isBotForAb(request) && request.method === 'GET' && AB_PATHS.has(url.pathname)) {
+			abVariant = pickVariant(request);
+			const targetUrl = abTargetUrl(url, abVariant);
+			if (targetUrl.toString() !== url.toString()) {
+				abRequest = new Request(targetUrl, request);
+			}
 		}
 
-		// 5. Only transform real HTML pages.
+		// 4. Fetch whatever the static host would serve (also applies _redirects/_headers).
+		const assetResponse = await env.ASSETS.fetch(abRequest);
+
+		// 5. Attach A/B cookie/headers if we ran the experiment on this request.
+		let response = assetResponse;
+		if (abVariant) {
+			const headers = new Headers(assetResponse.headers);
+			headers.set('X-AB-Variant', abVariant);
+			if (!abCookieValue(request)) {
+				headers.append('Set-Cookie', abCookieHeader(abVariant));
+			}
+			response = new Response(assetResponse.body, {
+				status: assetResponse.status,
+				statusText: assetResponse.statusText,
+				headers,
+			});
+		}
+
+		// 6. Only transform GET requests that explicitly negotiate markdown.
+		const accept = request.headers.get('Accept') || '';
+		if (request.method !== 'GET' || !/text\/markdown/i.test(accept)) {
+			return response;
+		}
+
+		// 7. Only transform real HTML pages.
 		const contentType = assetResponse.headers.get('Content-Type') || '';
 		if (assetResponse.status !== 200 || !contentType.includes('text/html')) {
-			return assetResponse;
+			return response;
 		}
 
 		const html = await assetResponse.text();
