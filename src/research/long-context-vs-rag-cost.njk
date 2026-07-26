@@ -1,21 +1,38 @@
+---json
+{
+  "permalink": "research/long-context-vs-rag-cost.html",
+  "lang": "en",
+  "head": {
+    "title": "Long context vs RAG: where the cost breakeven actually is · FinOps LLM",
+    "description": "When to drop your RAG stack and stuff context directly, and when the embedding + retrieval economics still win. The actual breakeven formula with worked examples.",
+    "robots": "index, follow",
+    "canonical": "https://finopsllm.com/research/long-context-vs-rag-cost",
+    "hreflang": [
+      {
+        "lang": "x-default",
+        "href": "https://finopsllm.com/research/long-context-vs-rag-cost"
+      }
+    ],
+    "style": "body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}.wrap{max-width:840px;margin:0 auto;padding:56px 24px}a{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}h3{margin-top:22px;color:#E6EAF2}code{background:#1E2A3F;color:#A0D1FF;padding:2px 6px;border-radius:3px;font-size:13px}pre{background:#1E2A3F;padding:16px;border-radius:6px;overflow-x:auto;font-size:13px}table{width:100%;border-collapse:collapse;margin:24px 0}th,td{padding:12px;text-align:left;border-bottom:1px solid #2A3A50}th{color:#E6EAF2;font-weight:600}td{color:#B6C0D2}",
+    "scripts": [
+      {
+        "src": "/assets/consent.js",
+        "defer": true
+      },
+      {
+        "src": "/assets/attribution.js",
+        "defer": true
+      }
+    ],
+    "jsonLd": [
+      "{\"@context\":\"https://schema.org\",\"@type\":\"TechArticle\",\"headline\":\"Long context vs RAG: where the cost breakeven actually is · FinOps LLM\",\"description\":\"When to drop your RAG stack and stuff context directly, and when the embedding + retrieval economics still win. The actual breakeven formula with worked examples.\",\"url\":\"https://finopsllm.com/research/long-context-vs-rag-cost\",\"datePublished\":\"2026-07-19\",\"dateModified\":\"2026-07-19\",\"image\":\"https://finopsllm.com/og.png\",\"author\":{\"@type\":\"Organization\",\"name\":\"FinOps LLM team\"},\"publisher\":{\"@type\":\"Organization\",\"name\":\"FinOps LLM\",\"url\":\"https://finopsllm.com/\"}}",
+      "{\"@context\":\"https://schema.org\",\"@type\":\"BreadcrumbList\",\"itemListElement\":[{\"@type\":\"ListItem\",\"position\":1,\"name\":\"Home\",\"item\":\"https://finopsllm.com/\"},{\"@type\":\"ListItem\",\"position\":2,\"name\":\"Research\",\"item\":\"https://finopsllm.com/research\"},{\"@type\":\"ListItem\",\"position\":3,\"name\":\"Long context vs RAG: where the cost breakeven actually is\",\"item\":\"https://finopsllm.com/research/long-context-vs-rag-cost\"}]}",
+      "{\"@context\": \"https://schema.org\", \"@type\": \"FAQPage\", \"mainEntity\": [{\"@type\": \"Question\", \"name\": \"When is long context cheaper than RAG?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"Below a certain query volume against a stable document set, padding every request with full context costs less than maintaining retrieval infrastructure. The breakeven depends on context size, query volume, embedding cost, and document churn rate.\"}}, {\"@type\": \"Question\", \"name\": \"Does prompt caching change the long-context economics?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"Dramatically. A cached long prefix against a stable corpus can beat RAG economics outright. Cache invalidation on a churning corpus destroys the advantage and can force re-entry to a higher-cost regime.\"}}, {\"@type\": \"Question\", \"name\": \"What is the fully-loaded cost of RAG?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"RAG cost includes provider embedding API charges, vector store infrastructure, retrieval latency, re-ranking models, cache misses on retrieval calls, and the engineering cost to build and maintain retrieval quality. Most teams undercount by omitting infrastructure and engineering.\"}}, {\"@type\": \"Question\", \"name\": \"Why does document churn matter?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"A stable corpus lets you amortize embedding cost over many queries. A churning corpus forces constant re-embedding, invalidates cached prefixes, and amplifies the variable cost per request. High-churn workloads favor long context with cache acceptance over strict RAG.\"}}, {\"@type\": \"Question\", \"name\": \"What costs should go in the breakeven equation?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"Long context: full model input token cost per request, minus cache savings if cached. RAG: embedding cost per request divided by cache hits per embedding, plus vector DB query cost, plus retrieval latency cost if you pay for latency SLA, plus re-ranking cost if used.\"}}]}"
+    ]
+  }
+}
 ---
-permalink: "research/long-context-vs-rag-cost.html"
----
-{% extends "shell.njk" %}{% block prefix %}<!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Long context vs RAG: where the cost breakeven actually is · FinOps LLM</title><meta name="description" content="When to drop your RAG stack and stuff context directly, and when the embedding + retrieval economics still win. The actual breakeven formula with worked examples." /><meta name="robots" content="index, follow" /><link rel="canonical" href="https://finopsllm.com/research/long-context-vs-rag-cost" /><link rel="alternate" hreflang="x-default" href="https://finopsllm.com/research/long-context-vs-rag-cost" />
-<script type="application/ld+json">
-{"@context":"https://schema.org","@type":"TechArticle","headline":"Long context vs RAG: where the cost breakeven actually is · FinOps LLM","description":"When to drop your RAG stack and stuff context directly, and when the embedding + retrieval economics still win. The actual breakeven formula with worked examples.","url":"https://finopsllm.com/research/long-context-vs-rag-cost","datePublished":"2026-07-19","dateModified":"2026-07-19","image":"https://finopsllm.com/og.png","author":{"@type":"Organization","name":"FinOps LLM team"},"publisher":{"@type":"Organization","name":"FinOps LLM","url":"https://finopsllm.com/"}}
-</script>
-<script type="application/ld+json">
-{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://finopsllm.com/"},{"@type":"ListItem","position":2,"name":"Research","item":"https://finopsllm.com/research"},{"@type":"ListItem","position":3,"name":"Long context vs RAG: where the cost breakeven actually is","item":"https://finopsllm.com/research/long-context-vs-rag-cost"}]}
-</script>
-<script type="application/ld+json">
-{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "When is long context cheaper than RAG?", "acceptedAnswer": {"@type": "Answer", "text": "Below a certain query volume against a stable document set, padding every request with full context costs less than maintaining retrieval infrastructure. The breakeven depends on context size, query volume, embedding cost, and document churn rate."}}, {"@type": "Question", "name": "Does prompt caching change the long-context economics?", "acceptedAnswer": {"@type": "Answer", "text": "Dramatically. A cached long prefix against a stable corpus can beat RAG economics outright. Cache invalidation on a churning corpus destroys the advantage and can force re-entry to a higher-cost regime."}}, {"@type": "Question", "name": "What is the fully-loaded cost of RAG?", "acceptedAnswer": {"@type": "Answer", "text": "RAG cost includes provider embedding API charges, vector store infrastructure, retrieval latency, re-ranking models, cache misses on retrieval calls, and the engineering cost to build and maintain retrieval quality. Most teams undercount by omitting infrastructure and engineering."}}, {"@type": "Question", "name": "Why does document churn matter?", "acceptedAnswer": {"@type": "Answer", "text": "A stable corpus lets you amortize embedding cost over many queries. A churning corpus forces constant re-embedding, invalidates cached prefixes, and amplifies the variable cost per request. High-churn workloads favor long context with cache acceptance over strict RAG."}}, {"@type": "Question", "name": "What costs should go in the breakeven equation?", "acceptedAnswer": {"@type": "Answer", "text": "Long context: full model input token cost per request, minus cache savings if cached. RAG: embedding cost per request divided by cache hits per embedding, plus vector DB query cost, plus retrieval latency cost if you pay for latency SLA, plus re-ranking cost if used."}}]}
-</script>
-<style>body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}.wrap{max-width:840px;margin:0 auto;padding:56px 24px}a{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}h3{margin-top:22px;color:#E6EAF2}code{background:#1E2A3F;color:#A0D1FF;padding:2px 6px;border-radius:3px;font-size:13px}pre{background:#1E2A3F;padding:16px;border-radius:6px;overflow-x:auto;font-size:13px}table{width:100%;border-collapse:collapse;margin:24px 0}th,td{padding:12px;text-align:left;border-bottom:1px solid #2A3A50}th{color:#E6EAF2;font-weight:600}td{color:#B6C0D2}</style><script src="/assets/consent.js" defer></script><script src="/assets/attribution.js" defer></script>
-</head>
-<body><main class="wrap">{% endblock %}{% block body %}<h1>Long context vs RAG: where the cost breakeven actually is</h1><p class="updated" style="color:#6B7689;font-size:14px;margin-top:-6px">Updated 19 July 2026 · first published 19 July 2026</p>
+{% extends "shell.njk" %}{% block body %}<h1>Long context vs RAG: where the cost breakeven actually is</h1><p class="updated" style="color:#6B7689;font-size:14px;margin-top:-6px">Updated 19 July 2026 · first published 19 July 2026</p>
 <p>Twelve months ago, 1M-token context windows existed in research papers. Today they are the baseline. The first product question that follows is inevitable: can we drop the RAG stack and just stuff all the context into every request? The honest answer is yes—if your query volume, document corpus, and caching strategy align. But "if" is doing heavy lifting. For teams still running on high-volume search workloads against churning corpora, RAG is still cheaper. For teams with stable documents and moderate request volume, long context with prompt caching can win outright. And for most teams in between, the answer is "it depends on your numbers."</p>
 <p>This page is about making that "it depends" concrete. We will build a cost model for each approach, work through the breakeven math, and show when to pick long context, when to pick RAG, and when a hybrid might be the right call. The models are illustrative—your numbers will differ—but the framework and the formula stay the same.</p>
 <h2>The cost shape of long context</h2>
@@ -78,5 +95,4 @@ permalink: "research/long-context-vs-rag-cost.html"
 <p>Your break-even query volume is where RAG cost per request equals long-context cost per request at your actual numbers. If you are below it, long context is cheaper. If you are above it, RAG is cheaper. The width of the band where neither is obviously better is where hybrid and operational complexity should drive the decision.</p>
 <h2>Related</h2>
 <ul><li><a href="/research/llm-cost-attribution">LLM cost attribution</a></li><li><a href="/research/prompt-cache-cost-attribution">Prompt cache attribution</a></li><li><a href="/research/llm-cost-monitoring">LLM cost monitoring</a></li><li><a href="/research/llm-token-tracking">LLM token tracking</a></li></ul>
-<hr style="margin:48px 0 24px;border:none;border-top:1px solid #1E2A3F" /><p>Want this applied to your own LLM spend? FinOps LLM runs a free audit of your AI costs and shows where the savings are. <a href="/book">Book free audit →</a></p><p><a href="/research">Back to research</a></p>{% endblock %}{% block suffix %}</main></body></html>
-{% endblock %}
+<hr style="margin:48px 0 24px;border:none;border-top:1px solid #1E2A3F" /><p>Want this applied to your own LLM spend? FinOps LLM runs a free audit of your AI costs and shows where the savings are. <a href="/book">Book free audit →</a></p><p><a href="/research">Back to research</a></p>{% endblock %}

@@ -1,33 +1,84 @@
+---json
+{
+  "permalink": "research/why-llm-bills-spike.html",
+  "lang": "en",
+  "head": {
+    "title": "Why does my LLM bill spike? The most common causes · FinOps LLM",
+    "description": "The most common reasons an OpenAI or Anthropic bill jumps without warning - model-mix drift, broken cache hits, reasoning tokens, retrieval depth, retries, and runaway agents - and how to catch each one early.",
+    "robots": "index, follow",
+    "canonical": "https://finopsllm.com/research/why-llm-bills-spike",
+    "openGraph": [
+      {
+        "property": "og:type",
+        "content": "article"
+      },
+      {
+        "property": "og:url",
+        "content": "https://finopsllm.com/research/why-llm-bills-spike"
+      },
+      {
+        "property": "og:title",
+        "content": "Why does my LLM bill spike? The most common causes"
+      },
+      {
+        "property": "og:description",
+        "content": "The most common reasons an LLM bill jumps without warning - model drift, broken caches, reasoning tokens, retrieval depth, retries, runaway agents - and how to catch each early."
+      },
+      {
+        "property": "og:image",
+        "content": "https://finopsllm.com/og.svg"
+      },
+      {
+        "property": "og:site_name",
+        "content": "FinOps LLM"
+      },
+      {
+        "property": "og:locale",
+        "content": "en_US"
+      }
+    ],
+    "twitter": [
+      {
+        "name": "twitter:card",
+        "content": "summary_large_image"
+      },
+      {
+        "name": "twitter:site",
+        "content": "@finopsllm"
+      },
+      {
+        "name": "twitter:title",
+        "content": "Why does my LLM bill spike? The most common causes"
+      },
+      {
+        "name": "twitter:description",
+        "content": "Model drift, broken caches, reasoning tokens, retrieval depth, retries, and runaway agents - and how to catch each early."
+      },
+      {
+        "name": "twitter:image",
+        "content": "https://finopsllm.com/og.svg"
+      }
+    ],
+    "style": "body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}.wrap{max-width:840px;margin:0 auto;padding:56px 24px}a{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}h3{margin-top:22px;color:#E6EAF2}",
+    "scripts": [
+      {
+        "src": "/assets/consent.js",
+        "defer": true
+      },
+      {
+        "src": "/assets/attribution.js",
+        "defer": true
+      }
+    ],
+    "jsonLd": [
+      "{\"@context\":\"https://schema.org\",\"@type\":\"TechArticle\",\"headline\":\"Why does my LLM bill spike? The most common causes\",\"description\":\"The most common reasons an OpenAI or Anthropic bill jumps without warning - model-mix drift, broken cache hits, reasoning tokens, retrieval depth, retries, and runaway agents - and how to catch each one early.\",\"url\":\"https://finopsllm.com/research/why-llm-bills-spike\",\"datePublished\":\"2026-05-31\",\"dateModified\":\"2026-05-31\",\"image\":\"https://finopsllm.com/og.png\",\"author\":{\"@type\":\"Organization\",\"name\":\"FinOps LLM team\"},\"publisher\":{\"@type\":\"Organization\",\"name\":\"FinOps LLM\",\"url\":\"https://finopsllm.com/\"}}",
+      "{\"@context\":\"https://schema.org\",\"@type\":\"BreadcrumbList\",\"itemListElement\":[{\"@type\":\"ListItem\",\"position\":1,\"name\":\"Home\",\"item\":\"https://finopsllm.com/\"},{\"@type\":\"ListItem\",\"position\":2,\"name\":\"Research\",\"item\":\"https://finopsllm.com/research\"},{\"@type\":\"ListItem\",\"position\":3,\"name\":\"Why does my LLM bill spike?\",\"item\":\"https://finopsllm.com/research/why-llm-bills-spike\"}]}",
+      "{\"@context\": \"https://schema.org\", \"@type\": \"FAQPage\", \"mainEntity\": [{\"@type\": \"Question\", \"name\": \"What is 1. model-mix drift?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"Someone changes a default, raises a router threshold, or \\\"temporarily\\\" points a feature at the flagship model to fix a quality complaint - and forgets to point it back.\"}}, {\"@type\": \"Question\", \"name\": \"What is 2. a broken cache?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"If you rely on prompt caching, your discount depends on a stable prompt prefix. Change a system prompt, reorder context, or inject a timestamp into the cached region, and the cache-hit rate collapses.\"}}, {\"@type\": \"Question\", \"name\": \"What is 3. reasoning tokens you can't see?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"Adopting a reasoning model, or raising its reasoning budget, can multiply the cost of a request without changing the visible output at all. The reasoning tokens are billed but never shown, so the spike has no obvious cause in the UI.\"}}, {\"@type\": \"Question\", \"name\": \"What is 4. retrieval depth crept up?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"In a RAG system, the number and size of retrieved documents go straight into the prompt as input tokens. A relevance fix that bumps top-k from 5 to 20, or a chunk-size change, raises input cost on every single request.\"}}, {\"@type\": \"Question\", \"name\": \"What is 5. retries, timeouts, and fallback chains?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"Aggressive retry logic and fallback chains are good for reliability and dangerous for cost.\"}}, {\"@type\": \"Question\", \"name\": \"What is 6. a runaway agent loop?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"Agentic workloads call models in loops. A planning bug, a tool that returns noise, or a missing stop condition can send an agent into dozens of model calls for a task that should have taken three. Multiply that across production traffic and the bill moves fast.\"}}]}"
+    ]
+  }
+}
 ---
-permalink: "research/why-llm-bills-spike.html"
----
-{% extends "shell.njk" %}{% block prefix %}<!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Why does my LLM bill spike? The most common causes · FinOps LLM</title><meta name="description" content="The most common reasons an OpenAI or Anthropic bill jumps without warning - model-mix drift, broken cache hits, reasoning tokens, retrieval depth, retries, and runaway agents - and how to catch each one early." /><meta name="robots" content="index, follow" /><link rel="canonical" href="https://finopsllm.com/research/why-llm-bills-spike" />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://finopsllm.com/research/why-llm-bills-spike" />
-<meta property="og:title" content="Why does my LLM bill spike? The most common causes" />
-<meta property="og:description" content="The most common reasons an LLM bill jumps without warning - model drift, broken caches, reasoning tokens, retrieval depth, retries, runaway agents - and how to catch each early." />
-<meta property="og:image" content="https://finopsllm.com/og.svg" />
-<meta property="og:site_name" content="FinOps LLM" />
-<meta property="og:locale" content="en_US" />
-<meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:site" content="@finopsllm" />
-<meta name="twitter:title" content="Why does my LLM bill spike? The most common causes" />
-<meta name="twitter:description" content="Model drift, broken caches, reasoning tokens, retrieval depth, retries, and runaway agents - and how to catch each early." />
-<meta name="twitter:image" content="https://finopsllm.com/og.svg" />
-<script type="application/ld+json">
-{"@context":"https://schema.org","@type":"TechArticle","headline":"Why does my LLM bill spike? The most common causes","description":"The most common reasons an OpenAI or Anthropic bill jumps without warning - model-mix drift, broken cache hits, reasoning tokens, retrieval depth, retries, and runaway agents - and how to catch each one early.","url":"https://finopsllm.com/research/why-llm-bills-spike","datePublished":"2026-05-31","dateModified":"2026-05-31","image":"https://finopsllm.com/og.png","author":{"@type":"Organization","name":"FinOps LLM team"},"publisher":{"@type":"Organization","name":"FinOps LLM","url":"https://finopsllm.com/"}}
-</script>
-<script type="application/ld+json">
-{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://finopsllm.com/"},{"@type":"ListItem","position":2,"name":"Research","item":"https://finopsllm.com/research"},{"@type":"ListItem","position":3,"name":"Why does my LLM bill spike?","item":"https://finopsllm.com/research/why-llm-bills-spike"}]}
-</script>
-<script type="application/ld+json">
-{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "What is 1. model-mix drift?", "acceptedAnswer": {"@type": "Answer", "text": "Someone changes a default, raises a router threshold, or \"temporarily\" points a feature at the flagship model to fix a quality complaint - and forgets to point it back."}}, {"@type": "Question", "name": "What is 2. a broken cache?", "acceptedAnswer": {"@type": "Answer", "text": "If you rely on prompt caching, your discount depends on a stable prompt prefix. Change a system prompt, reorder context, or inject a timestamp into the cached region, and the cache-hit rate collapses."}}, {"@type": "Question", "name": "What is 3. reasoning tokens you can't see?", "acceptedAnswer": {"@type": "Answer", "text": "Adopting a reasoning model, or raising its reasoning budget, can multiply the cost of a request without changing the visible output at all. The reasoning tokens are billed but never shown, so the spike has no obvious cause in the UI."}}, {"@type": "Question", "name": "What is 4. retrieval depth crept up?", "acceptedAnswer": {"@type": "Answer", "text": "In a RAG system, the number and size of retrieved documents go straight into the prompt as input tokens. A relevance fix that bumps top-k from 5 to 20, or a chunk-size change, raises input cost on every single request."}}, {"@type": "Question", "name": "What is 5. retries, timeouts, and fallback chains?", "acceptedAnswer": {"@type": "Answer", "text": "Aggressive retry logic and fallback chains are good for reliability and dangerous for cost."}}, {"@type": "Question", "name": "What is 6. a runaway agent loop?", "acceptedAnswer": {"@type": "Answer", "text": "Agentic workloads call models in loops. A planning bug, a tool that returns noise, or a missing stop condition can send an agent into dozens of model calls for a task that should have taken three. Multiply that across production traffic and the bill moves fast."}}]}
-</script>
-<style>body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}.wrap{max-width:840px;margin:0 auto;padding:56px 24px}a{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}h3{margin-top:22px;color:#E6EAF2}</style><script src="/assets/consent.js" defer></script><script src="/assets/attribution.js" defer></script>
-</head>
-<body><main class="wrap">{% endblock %}{% block body %}<h1>Why does my LLM bill spike?</h1><p class="updated" style="color:#6B7689;font-size:14px;margin-top:-6px">Updated 31 May 2026 · first published 31 May 2026</p>
+{% extends "shell.njk" %}{% block body %}<h1>Why does my LLM bill spike?</h1><p class="updated" style="color:#6B7689;font-size:14px;margin-top:-6px">Updated 31 May 2026 · first published 31 May 2026</p>
 <p>A spike in an LLM bill almost never comes from a price change. It comes from a change in <em>how</em> your code uses the models - a change that often ships in an ordinary pull request, with no line item that says "this will double our token cost." Because providers bill per <a href="/research/how-llm-providers-charge">token and per model</a>, a single deploy can move the bill sharply while request volume stays flat.</p>
 <p>Here are the causes that show up again and again, roughly in order of how often they catch teams out, and how to catch each one before the invoice does.</p>
 <h2>1. Model-mix drift</h2>
@@ -62,5 +113,4 @@ permalink: "research/why-llm-bills-spike.html"
 <li><a href="/research/anomaly-detection">LLM cost anomaly detection</a> - catching spikes before the invoice.</li>
 <li><a href="/research/how-to-budget-for-ai-spend">How to budget for AI spend</a> - setting envelopes so spikes are bounded.</li>
 </ul>
-<hr style="margin:48px 0 24px;border:none;border-top:1px solid #1E2A3F" /><p>Want this applied to your own LLM spend? FinOps LLM runs a free audit of your AI costs and shows where the savings are. <a href="/book">Book free audit &rarr;</a></p><p><a href="/research">Back to research</a></p>{% endblock %}{% block suffix %}</main></body></html>
-{% endblock %}
+<hr style="margin:48px 0 24px;border:none;border-top:1px solid #1E2A3F" /><p>Want this applied to your own LLM spend? FinOps LLM runs a free audit of your AI costs and shows where the savings are. <a href="/book">Book free audit &rarr;</a></p><p><a href="/research">Back to research</a></p>{% endblock %}

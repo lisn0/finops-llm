@@ -1,62 +1,66 @@
----
-permalink: "de/research/openai-fine-tuning-sunset-economics.html"
----
-{% extends "shell.njk" %}{% block prefix %}<!DOCTYPE html>
-<html lang="de"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Kostenstruktur der OpenAI Fine-Tuning Sunset · FinOps LLM</title><meta name="description" content="OpenAI phaseout des Self-Service Fine-Tuning bis 2026–27. Evaluieren Sie drei Migrationspfade: Prompt Engineering auf GPT-5.5 mit Caching, Open-Source LoRA auf Llama/Qwen, oder verwaltetes Fine-Tuning über Vertex/Bedrock. Kostenvergleich und versteckte Migrationsausgaben inklusive." /><meta name="robots" content="index, follow" /><link rel="canonical" href="https://finopsllm.com/de/research/openai-fine-tuning-sunset-economics" />
-<link rel="alternate" hreflang="en" href="https://finopsllm.com/research/openai-fine-tuning-sunset-economics" />
-<link rel="alternate" hreflang="es" href="https://finopsllm.com/es/research/openai-fine-tuning-sunset-economics" />
-<link rel="alternate" hreflang="fr" href="https://finopsllm.com/fr/research/openai-fine-tuning-sunset-economics" />
-<link rel="alternate" hreflang="de" href="https://finopsllm.com/de/research/openai-fine-tuning-sunset-economics" />
-<link rel="alternate" hreflang="pt" href="https://finopsllm.com/pt/research/openai-fine-tuning-sunset-economics" />
-<link rel="alternate" hreflang="ja" href="https://finopsllm.com/ja/research/openai-fine-tuning-sunset-economics" />
-<link rel="alternate" hreflang="x-default" href="https://finopsllm.com/research/openai-fine-tuning-sunset-economics" />
-<script type="application/ld+json">
-{"@context":"https://schema.org","@type":"TechArticle","headline":"Kostenstruktur der OpenAI Fine-Tuning Sunset · FinOps LLM","description":"OpenAI beendet Self-Service Fine-Tuning. Evaluieren Sie Migrationskosten: Prompt Engineering auf GPT-5.5 mit Caching, Open-Source LoRA, oder alternatives verwaltetes Fine-Tuning. Entscheidungsrahmen und Kostenvergleich enthalten.","url":"https://finopsllm.com/de/research/openai-fine-tuning-sunset-economics","datePublished":"2026-07-19","dateModified":"2026-07-19","image":"https://finopsllm.com/og.png","author":{"@type":"Organization","name":"FinOps LLM team"},"publisher":{"@type":"Organization","name":"FinOps LLM","url":"https://finopsllm.com/"}}
-</script>
-<script type="application/ld+json">
-{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Startseite","item":"https://finopsllm.com/de/"},{"@type":"ListItem","position":2,"name":"Forschung","item":"https://finopsllm.com/de/research"},{"@type":"ListItem","position":3,"name":"Kostenstruktur der OpenAI Fine-Tuning Sunset","item":"https://finopsllm.com/de/research/openai-fine-tuning-sunset-economics"}]}
-</script>
-<script type="application/ld+json">
-{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Wann kann ich keine neuen OpenAI Fine-Tuning-Modelle mehr erstellen?", "acceptedAnswer": {"@type": "Answer", "text": "Zeitplan: 7. Mai 2026 (neue Organisationen blockiert), 2. Juli 2026 (inaktive Organisationen 60 Tage blockiert), 6. Januar 2027 (alle neuen Jobs blockiert). Inferenz für bestehende Fine-Tuning-Modelle läuft bis zur Deprecation des Basismodells weiter."}}, {"@type": "Question", "name": "Rentiert sich Prompt Caching gegenüber Fine-Tuning?", "acceptedAnswer": {"@type": "Answer", "text": "Für wiederholte Prompts über demselben Kontext: ja. Prompt Caching auf GPT-5.5 kostet $0,60/M für Lesevorgänge vs $3,00/M frisch, und Few-Shot-Beispiele (längere Prompts) können effizient gecacht werden. Break-Even liegt typischerweise bei 10–30 Cache-Treffern je nach Promptgröße; die meisten Teams erreichen dies innerhalb von Tagen."}}, {"@type": "Question", "name": "Ist Open-Source LoRA günstiger als verwaltetes Fine-Tuning?", "acceptedAnswer": {"@type": "Answer", "text": "Normalerweise ja. Trainingskosten über Together AI: ~$200–$500 pro Job. Inferenz auf Groq oder Fireworks: ~$0,10–$0,30/M Tokens. Die Gesamtkosten pro erfolgreichem Response sind oft 30–50% niedriger als bei einem verwalteten Service, erfordern aber MLOps-Overhead."}}, {"@type": "Question", "name": "Welche versteckten Kosten sehe ich nicht während der Migration?", "acceptedAnswer": {"@type": "Answer", "text": "Neubewertung (Benchmarking neuer vs. alter Ansatz), Regressionstests (liefert der Ersatzpfad die gleiche Qualität?), Dual-Running (parallele Ausführung alter und neuer Pfade zur Sicherheit), und Adapter-Umschulung wenn sich das neue Modell ändert. Budgetieren Sie 4–8 Wochen und ~$2.000–$10.000 an Engineerzeit pro Migration."}}]}
-</script>
-<style>
-body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}
-.wrap{max-width:1100px;margin:0 auto;padding:56px 24px}
-a{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}
-.langsw{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;color:#647289;margin:0 0 26px}
-.langsw a{text-decoration:none}.langsw a[aria-current]{color:#E6EAF2;font-weight:600}
-.badge-row{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 32px;list-style:none;padding:0}
-.badge-row li{background:#101726;border:1px solid #1E2A3F;border-radius:8px;padding:8px 14px;font-size:.85rem;color:#B6C0D2}
-.table-wrap{overflow-x:auto;margin:0 0 32px;-webkit-overflow-scrolling:touch}
-table{border-collapse:collapse;width:100%;font-size:.85rem}
-th,td{border:1px solid #1E2A3F;padding:10px 12px;text-align:left;color:#B6C0D2}
-th{color:#E6EAF2;background:#101726}
-td.number{text-align:right;font-family:'JetBrains Mono',monospace;font-weight:500}
-td.highlight{background:rgba(248,113,113,.08)}
-.cost-component{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:20px;margin:16px 0}
-.cost-component h3{color:#E6EAF2;margin:0 0 12px;font-size:1rem}
-.cost-component p{font-size:.9rem;margin:6px 0}
-.guide-section{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:24px;margin:12px 0}
-.guide-section h3{color:#E6EAF2;margin:0 0 10px;font-size:1rem}
-.warning{border-left:4px solid #f87171;padding:16px;background:rgba(248,113,113,.08);margin:20px 0}
-.decision-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;margin:20px 0 32px}
-.decision-card{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:24px}
-.decision-card h3{font-size:1rem;margin:0 0 12px;color:#E6EAF2}
-.decision-card ul{margin:0;padding-left:18px}
-.decision-card li{margin:6px 0;font-size:.88rem}
-.path1{border-left:4px solid #7AAFFF}
-.path2{border-left:4px solid #4ADE80}
-.path3{border-left:4px solid #FBBF24}
-@media(max-width:700px){
-  table{font-size:.75rem}
-  th,td{padding:6px 7px}
-  .decision-grid{grid-template-columns:1fr}
+---json
+{
+  "permalink": "de/research/openai-fine-tuning-sunset-economics.html",
+  "lang": "de",
+  "head": {
+    "title": "Kostenstruktur der OpenAI Fine-Tuning Sunset · FinOps LLM",
+    "description": "OpenAI phaseout des Self-Service Fine-Tuning bis 2026–27. Evaluieren Sie drei Migrationspfade: Prompt Engineering auf GPT-5.5 mit Caching, Open-Source LoRA auf Llama/Qwen, oder verwaltetes Fine-Tuning über Vertex/Bedrock. Kostenvergleich und versteckte Migrationsausgaben inklusive.",
+    "robots": "index, follow",
+    "canonical": "https://finopsllm.com/de/research/openai-fine-tuning-sunset-economics",
+    "hreflang": [
+      {
+        "lang": "en",
+        "href": "https://finopsllm.com/research/openai-fine-tuning-sunset-economics"
+      },
+      {
+        "lang": "es",
+        "href": "https://finopsllm.com/es/research/openai-fine-tuning-sunset-economics"
+      },
+      {
+        "lang": "fr",
+        "href": "https://finopsllm.com/fr/research/openai-fine-tuning-sunset-economics"
+      },
+      {
+        "lang": "de",
+        "href": "https://finopsllm.com/de/research/openai-fine-tuning-sunset-economics"
+      },
+      {
+        "lang": "pt",
+        "href": "https://finopsllm.com/pt/research/openai-fine-tuning-sunset-economics"
+      },
+      {
+        "lang": "ja",
+        "href": "https://finopsllm.com/ja/research/openai-fine-tuning-sunset-economics"
+      },
+      {
+        "lang": "x-default",
+        "href": "https://finopsllm.com/research/openai-fine-tuning-sunset-economics"
+      }
+    ],
+    "style": "body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}\n.wrap{max-width:1100px;margin:0 auto;padding:56px 24px}\na{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}\n.langsw{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;color:#647289;margin:0 0 26px}\n.langsw a{text-decoration:none}.langsw a[aria-current]{color:#E6EAF2;font-weight:600}\n.badge-row{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 32px;list-style:none;padding:0}\n.badge-row li{background:#101726;border:1px solid #1E2A3F;border-radius:8px;padding:8px 14px;font-size:.85rem;color:#B6C0D2}\n.table-wrap{overflow-x:auto;margin:0 0 32px;-webkit-overflow-scrolling:touch}\ntable{border-collapse:collapse;width:100%;font-size:.85rem}\nth,td{border:1px solid #1E2A3F;padding:10px 12px;text-align:left;color:#B6C0D2}\nth{color:#E6EAF2;background:#101726}\ntd.number{text-align:right;font-family:'JetBrains Mono',monospace;font-weight:500}\ntd.highlight{background:rgba(248,113,113,.08)}\n.cost-component{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:20px;margin:16px 0}\n.cost-component h3{color:#E6EAF2;margin:0 0 12px;font-size:1rem}\n.cost-component p{font-size:.9rem;margin:6px 0}\n.guide-section{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:24px;margin:12px 0}\n.guide-section h3{color:#E6EAF2;margin:0 0 10px;font-size:1rem}\n.warning{border-left:4px solid #f87171;padding:16px;background:rgba(248,113,113,.08);margin:20px 0}\n.decision-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;margin:20px 0 32px}\n.decision-card{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:24px}\n.decision-card h3{font-size:1rem;margin:0 0 12px;color:#E6EAF2}\n.decision-card ul{margin:0;padding-left:18px}\n.decision-card li{margin:6px 0;font-size:.88rem}\n.path1{border-left:4px solid #7AAFFF}\n.path2{border-left:4px solid #4ADE80}\n.path3{border-left:4px solid #FBBF24}\n@media(max-width:700px){\n  table{font-size:.75rem}\n  th,td{padding:6px 7px}\n  .decision-grid{grid-template-columns:1fr}\n}",
+    "scripts": [
+      {
+        "src": "/assets/consent.js",
+        "defer": true
+      },
+      {
+        "src": "/assets/attribution.js",
+        "defer": true
+      },
+      {
+        "src": "/assets/lang.js",
+        "defer": true
+      }
+    ],
+    "jsonLd": [
+      "{\"@context\":\"https://schema.org\",\"@type\":\"TechArticle\",\"headline\":\"Kostenstruktur der OpenAI Fine-Tuning Sunset · FinOps LLM\",\"description\":\"OpenAI beendet Self-Service Fine-Tuning. Evaluieren Sie Migrationskosten: Prompt Engineering auf GPT-5.5 mit Caching, Open-Source LoRA, oder alternatives verwaltetes Fine-Tuning. Entscheidungsrahmen und Kostenvergleich enthalten.\",\"url\":\"https://finopsllm.com/de/research/openai-fine-tuning-sunset-economics\",\"datePublished\":\"2026-07-19\",\"dateModified\":\"2026-07-19\",\"image\":\"https://finopsllm.com/og.png\",\"author\":{\"@type\":\"Organization\",\"name\":\"FinOps LLM team\"},\"publisher\":{\"@type\":\"Organization\",\"name\":\"FinOps LLM\",\"url\":\"https://finopsllm.com/\"}}",
+      "{\"@context\":\"https://schema.org\",\"@type\":\"BreadcrumbList\",\"itemListElement\":[{\"@type\":\"ListItem\",\"position\":1,\"name\":\"Startseite\",\"item\":\"https://finopsllm.com/de/\"},{\"@type\":\"ListItem\",\"position\":2,\"name\":\"Forschung\",\"item\":\"https://finopsllm.com/de/research\"},{\"@type\":\"ListItem\",\"position\":3,\"name\":\"Kostenstruktur der OpenAI Fine-Tuning Sunset\",\"item\":\"https://finopsllm.com/de/research/openai-fine-tuning-sunset-economics\"}]}",
+      "{\"@context\": \"https://schema.org\", \"@type\": \"FAQPage\", \"mainEntity\": [{\"@type\": \"Question\", \"name\": \"Wann kann ich keine neuen OpenAI Fine-Tuning-Modelle mehr erstellen?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"Zeitplan: 7. Mai 2026 (neue Organisationen blockiert), 2. Juli 2026 (inaktive Organisationen 60 Tage blockiert), 6. Januar 2027 (alle neuen Jobs blockiert). Inferenz für bestehende Fine-Tuning-Modelle läuft bis zur Deprecation des Basismodells weiter.\"}}, {\"@type\": \"Question\", \"name\": \"Rentiert sich Prompt Caching gegenüber Fine-Tuning?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"Für wiederholte Prompts über demselben Kontext: ja. Prompt Caching auf GPT-5.5 kostet $0,60/M für Lesevorgänge vs $3,00/M frisch, und Few-Shot-Beispiele (längere Prompts) können effizient gecacht werden. Break-Even liegt typischerweise bei 10–30 Cache-Treffern je nach Promptgröße; die meisten Teams erreichen dies innerhalb von Tagen.\"}}, {\"@type\": \"Question\", \"name\": \"Ist Open-Source LoRA günstiger als verwaltetes Fine-Tuning?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"Normalerweise ja. Trainingskosten über Together AI: ~$200–$500 pro Job. Inferenz auf Groq oder Fireworks: ~$0,10–$0,30/M Tokens. Die Gesamtkosten pro erfolgreichem Response sind oft 30–50% niedriger als bei einem verwalteten Service, erfordern aber MLOps-Overhead.\"}}, {\"@type\": \"Question\", \"name\": \"Welche versteckten Kosten sehe ich nicht während der Migration?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"Neubewertung (Benchmarking neuer vs. alter Ansatz), Regressionstests (liefert der Ersatzpfad die gleiche Qualität?), Dual-Running (parallele Ausführung alter und neuer Pfade zur Sicherheit), und Adapter-Umschulung wenn sich das neue Modell ändert. Budgetieren Sie 4–8 Wochen und ~$2.000–$10.000 an Engineerzeit pro Migration.\"}}]}"
+    ]
+  }
 }
-</style><script src="/assets/consent.js" defer></script><script src="/assets/attribution.js" defer></script>
-<script src="/assets/lang.js" defer></script>
-</head>
-<body><main class="wrap">{% endblock %}{% block body %}
+---
+{% extends "shell.njk" %}{% block body %}
 
 
 <nav class="langsw" aria-label="Sprache / Idioma"><a href="/research/openai-fine-tuning-sunset-economics" hreflang="en">EN</a> · <a href="/es/research/openai-fine-tuning-sunset-economics" hreflang="es">ES</a> · <a href="/fr/research/openai-fine-tuning-sunset-economics" hreflang="fr">FR</a> · <a href="/de/research/openai-fine-tuning-sunset-economics" hreflang="de" aria-current="page">DE</a> · <a href="/pt/research/openai-fine-tuning-sunset-economics" hreflang="pt">PT</a> · <a href="/ja/research/openai-fine-tuning-sunset-economics" hreflang="ja">JA</a></nav>
@@ -380,5 +384,4 @@ td.highlight{background:rgba(248,113,113,.08)}
 <p>Verfolgen Sie bereits Ihre Fine-Tuning-Migrationskosten? FinOps LLM auditet Ihre LLM-Ausgaben und identifiziert, welcher Migrationspfad Sie am meisten spart. <a href="/book">Buchen Sie ein kostenloses Audit</a>.</p>
 <p><a href="/de/research">Zurück zur Forschung</a></p>
 
-{% endblock %}{% block suffix %}</main></body></html>
 {% endblock %}

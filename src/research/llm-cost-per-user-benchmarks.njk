@@ -1,44 +1,36 @@
----
-permalink: "research/llm-cost-per-user-benchmarks.html"
----
-{% extends "shell.njk" %}{% block prefix %}<!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>LLM Cost Per User Benchmarks · FinOps LLM</title><meta name="description" content="Modeled LLM cost per user per month across roles and teams. Compare developer, knowledge worker, and customer-facing chatbot costs using published pricing." /><meta name="robots" content="index, follow" /><link rel="canonical" href="https://finopsllm.com/research/llm-cost-per-user-benchmarks" />
-<script type="application/ld+json">
-{"@context":"https://schema.org","@type":"TechArticle","headline":"LLM Cost Per User Benchmarks · FinOps LLM","description":"Modeled monthly LLM cost per user by role and team. Based on published LLM pricing and typical token consumption patterns.","url":"https://finopsllm.com/research/llm-cost-per-user-benchmarks","datePublished":"2026-07-12","dateModified":"2026-07-12","image":"https://finopsllm.com/og.png","author":{"@type":"Organization","name":"FinOps LLM team"},"publisher":{"@type":"Organization","name":"FinOps LLM","url":"https://finopsllm.com/"}}
-</script>
-<script type="application/ld+json">
-{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://finopsllm.com/"},{"@type":"ListItem","position":2,"name":"Research","item":"https://finopsllm.com/research"},{"@type":"ListItem","position":3,"name":"LLM Cost Per User Benchmarks","item":"https://finopsllm.com/research/llm-cost-per-user-benchmarks"}]}
-</script>
-<script type="application/ld+json">
-{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "What is cost per user?", "acceptedAnswer": {"@type": "Answer", "text": "Cost per user (CPU) is total LLM spend divided by active users in a period. These benchmarks show modeled monthly LLM cost by role: developers ($26–$281 typical, up to ~$875 for heavy agent-based use), knowledge workers ($7–$151 for light-to-typical use), customer-facing agents (shared pool cost / concurrent users)."}}, {"@type": "Question", "name": "Why does cost vary by role?", "acceptedAnswer": {"@type": "Answer", "text": "Token volume scales with task complexity and frequency. Developers using code generation use more tokens per day. Knowledge workers using LLMs for writing use moderate tokens. Customer service chatbots amortize cost across hundreds or thousands of conversations."}}, {"@type": "Question", "name": "How do I benchmark my own team?", "acceptedAnswer": {"@type": "Answer", "text": "Divide total monthly LLM spend by active users. Compare your per-user cost to these benchmarks. If you're above the range, investigate high-usage outliers and consider model routing or caching."}}, {"@type": "Question", "name": "Should cost per user include infrastructure?", "acceptedAnswer": {"@type": "Answer", "text": "These benchmarks cover LLM API spend only, not hosting or compute infrastructure. If you self-host models, add your infra cost per user (typically $5–$50/user/month for on-prem LLMs)."}}]}
-</script>
-<style>
-body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}
-.wrap{max-width:1100px;margin:0 auto;padding:56px 24px}
-a{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}
-.langsw{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;color:#647289;margin:0 0 26px}
-.langsw a{text-decoration:none}.langsw a[aria-current]{color:#E6EAF2;font-weight:600}
-.badge-row{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 32px;list-style:none;padding:0}
-.badge-row li{background:#101726;border:1px solid #1E2A3F;border-radius:8px;padding:8px 14px;font-size:.85rem;color:#B6C0D2}
-.table-wrap{overflow-x:auto;margin:0 0 32px;-webkit-overflow-scrolling:touch}
-table{border-collapse:collapse;width:100%;font-size:.85rem}
-th,td{border:1px solid #1E2A3F;padding:10px 12px;text-align:left;color:#B6C0D2}
-th{color:#E6EAF2;background:#101726}
-td.number{text-align:right;font-family:'JetBrains Mono',monospace;font-weight:500}
-.insight-card{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:20px;margin:16px 0}
-.insight-card h3{color:#E6EAF2;margin:0 0 12px;font-size:1rem}
-.insight-card p{font-size:.9rem;margin:6px 0}
-.guide-section{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:24px;margin:12px 0}
-.guide-section h3{color:#E6EAF2;margin:0 0 10px;font-size:1rem}
-@media(max-width:700px){
-  table{font-size:.75rem}
-  th,td{padding:6px 7px}
+---json
+{
+  "permalink": "research/llm-cost-per-user-benchmarks.html",
+  "lang": "en",
+  "head": {
+    "title": "LLM Cost Per User Benchmarks · FinOps LLM",
+    "description": "Modeled LLM cost per user per month across roles and teams. Compare developer, knowledge worker, and customer-facing chatbot costs using published pricing.",
+    "robots": "index, follow",
+    "canonical": "https://finopsllm.com/research/llm-cost-per-user-benchmarks",
+    "style": "body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}\n.wrap{max-width:1100px;margin:0 auto;padding:56px 24px}\na{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}\n.langsw{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;color:#647289;margin:0 0 26px}\n.langsw a{text-decoration:none}.langsw a[aria-current]{color:#E6EAF2;font-weight:600}\n.badge-row{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 32px;list-style:none;padding:0}\n.badge-row li{background:#101726;border:1px solid #1E2A3F;border-radius:8px;padding:8px 14px;font-size:.85rem;color:#B6C0D2}\n.table-wrap{overflow-x:auto;margin:0 0 32px;-webkit-overflow-scrolling:touch}\ntable{border-collapse:collapse;width:100%;font-size:.85rem}\nth,td{border:1px solid #1E2A3F;padding:10px 12px;text-align:left;color:#B6C0D2}\nth{color:#E6EAF2;background:#101726}\ntd.number{text-align:right;font-family:'JetBrains Mono',monospace;font-weight:500}\n.insight-card{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:20px;margin:16px 0}\n.insight-card h3{color:#E6EAF2;margin:0 0 12px;font-size:1rem}\n.insight-card p{font-size:.9rem;margin:6px 0}\n.guide-section{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:24px;margin:12px 0}\n.guide-section h3{color:#E6EAF2;margin:0 0 10px;font-size:1rem}\n@media(max-width:700px){\n  table{font-size:.75rem}\n  th,td{padding:6px 7px}\n}",
+    "scripts": [
+      {
+        "src": "/assets/consent.js",
+        "defer": true
+      },
+      {
+        "src": "/assets/attribution.js",
+        "defer": true
+      },
+      {
+        "src": "/assets/lang.js",
+        "defer": true
+      }
+    ],
+    "jsonLd": [
+      "{\"@context\":\"https://schema.org\",\"@type\":\"TechArticle\",\"headline\":\"LLM Cost Per User Benchmarks · FinOps LLM\",\"description\":\"Modeled monthly LLM cost per user by role and team. Based on published LLM pricing and typical token consumption patterns.\",\"url\":\"https://finopsllm.com/research/llm-cost-per-user-benchmarks\",\"datePublished\":\"2026-07-12\",\"dateModified\":\"2026-07-12\",\"image\":\"https://finopsllm.com/og.png\",\"author\":{\"@type\":\"Organization\",\"name\":\"FinOps LLM team\"},\"publisher\":{\"@type\":\"Organization\",\"name\":\"FinOps LLM\",\"url\":\"https://finopsllm.com/\"}}",
+      "{\"@context\":\"https://schema.org\",\"@type\":\"BreadcrumbList\",\"itemListElement\":[{\"@type\":\"ListItem\",\"position\":1,\"name\":\"Home\",\"item\":\"https://finopsllm.com/\"},{\"@type\":\"ListItem\",\"position\":2,\"name\":\"Research\",\"item\":\"https://finopsllm.com/research\"},{\"@type\":\"ListItem\",\"position\":3,\"name\":\"LLM Cost Per User Benchmarks\",\"item\":\"https://finopsllm.com/research/llm-cost-per-user-benchmarks\"}]}",
+      "{\"@context\": \"https://schema.org\", \"@type\": \"FAQPage\", \"mainEntity\": [{\"@type\": \"Question\", \"name\": \"What is cost per user?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"Cost per user (CPU) is total LLM spend divided by active users in a period. These benchmarks show modeled monthly LLM cost by role: developers ($26–$281 typical, up to ~$875 for heavy agent-based use), knowledge workers ($7–$151 for light-to-typical use), customer-facing agents (shared pool cost / concurrent users).\"}}, {\"@type\": \"Question\", \"name\": \"Why does cost vary by role?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"Token volume scales with task complexity and frequency. Developers using code generation use more tokens per day. Knowledge workers using LLMs for writing use moderate tokens. Customer service chatbots amortize cost across hundreds or thousands of conversations.\"}}, {\"@type\": \"Question\", \"name\": \"How do I benchmark my own team?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"Divide total monthly LLM spend by active users. Compare your per-user cost to these benchmarks. If you're above the range, investigate high-usage outliers and consider model routing or caching.\"}}, {\"@type\": \"Question\", \"name\": \"Should cost per user include infrastructure?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"These benchmarks cover LLM API spend only, not hosting or compute infrastructure. If you self-host models, add your infra cost per user (typically $5–$50/user/month for on-prem LLMs).\"}}]}"
+    ]
+  }
 }
-</style><script src="/assets/consent.js" defer></script><script src="/assets/attribution.js" defer></script>
-<script src="/assets/lang.js" defer></script>
-</head>
-<body><main class="wrap">{% endblock %}{% block body %}
+---
+{% extends "shell.njk" %}{% block body %}
 
 
 <h1>LLM Cost Per User Benchmarks</h1>
@@ -327,5 +319,4 @@ td.number{text-align:right;font-family:'JetBrains Mono',monospace;font-weight:50
 <p>To get a detailed per-user cost breakdown of your actual LLM spend, <a href="/book">book a free audit with FinOps LLM</a>. We'll show your per-user cost by team and suggest specific optimizations.</p>
 <p><a href="/research">Back to research</a></p>
 
-{% endblock %}{% block suffix %}</main></body></html>
 {% endblock %}

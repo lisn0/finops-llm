@@ -1,46 +1,36 @@
----
-permalink: "research/hidden-llm-costs.html"
----
-{% extends "shell.njk" %}{% block prefix %}<!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Hidden LLM Costs Beyond Per-Token Pricing · FinOps LLM</title><meta name="description" content="Beyond per-token pricing: infrastructure, latency, cache overhead, and fallback chains add hidden costs to LLM deployments. A practical guide to finding them." /><meta name="robots" content="index, follow" /><link rel="canonical" href="https://finopsllm.com/research/hidden-llm-costs" />
-<script type="application/ld+json">
-{"@context":"https://schema.org","@type":"TechArticle","headline":"Hidden LLM Costs · FinOps LLM","description":"Identify and measure hidden costs beyond per-token pricing: infrastructure, cache overhead, redundancy, and retry logic.","url":"https://finopsllm.com/research/hidden-llm-costs","datePublished":"2026-07-12","dateModified":"2026-07-12","image":"https://finopsllm.com/og.png","author":{"@type":"Organization","name":"FinOps LLM team"},"publisher":{"@type":"Organization","name":"FinOps LLM","url":"https://finopsllm.com/"}}
-</script>
-<script type="application/ld+json">
-{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://finopsllm.com/"},{"@type":"ListItem","position":2,"name":"Research","item":"https://finopsllm.com/research"},{"@type":"ListItem","position":3,"name":"Hidden LLM Costs","item":"https://finopsllm.com/research/hidden-llm-costs"}]}
-</script>
-<script type="application/ld+json">
-{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "What costs are hidden beyond per-token pricing?", "acceptedAnswer": {"@type": "Answer", "text": "Vector database storage, cache infrastructure, retry/fallback chains, redundant model calls, embedding generation, and observability overhead. These can add 20–50% to your measured token bill."}}, {"@type": "Question", "name": "How much does vector search add to cost?", "acceptedAnswer": {"@type": "Answer", "text": "Vector DB operations (embedding + retrieval) cost $0.001–$0.05 per query depending on vector dimension, chunk size, and k-NN matching. For a RAG system with 10K QPS, this adds $10–$500/day."}}, {"@type": "Question", "name": "Do retry loops waste money?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. A 2-tier fallback (primary model + fallback to cheaper model) can multiply token cost 1.2–2x if your primary model fails 30–50% of the time. Monitor fallback rates closely."}}, {"@type": "Question", "name": "How do I measure these hidden costs?", "acceptedAnswer": {"@type": "Answer", "text": "Track infrastructure cost separately from API cost. Log every LLM call with (attempt number, model, token count, success/failure). Calculate cost-per-successful-response, not cost-per-call."}}]}
-</script>
-<style>
-body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}
-.wrap{max-width:1100px;margin:0 auto;padding:56px 24px}
-a{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}
-.langsw{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;color:#647289;margin:0 0 26px}
-.langsw a{text-decoration:none}.langsw a[aria-current]{color:#E6EAF2;font-weight:600}
-.badge-row{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 32px;list-style:none;padding:0}
-.badge-row li{background:#101726;border:1px solid #1E2A3F;border-radius:8px;padding:8px 14px;font-size:.85rem;color:#B6C0D2}
-.table-wrap{overflow-x:auto;margin:0 0 32px;-webkit-overflow-scrolling:touch}
-table{border-collapse:collapse;width:100%;font-size:.85rem}
-th,td{border:1px solid #1E2A3F;padding:10px 12px;text-align:left;color:#B6C0D2}
-th{color:#E6EAF2;background:#101726}
-td.number{text-align:right;font-family:'JetBrains Mono',monospace;font-weight:500}
-td.highlight{background:rgba(248,113,113,.08)}
-.cost-component{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:20px;margin:16px 0}
-.cost-component h3{color:#E6EAF2;margin:0 0 12px;font-size:1rem}
-.cost-component p{font-size:.9rem;margin:6px 0}
-.guide-section{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:24px;margin:12px 0}
-.guide-section h3{color:#E6EAF2;margin:0 0 10px;font-size:1rem}
-.warning{border-left:4px solid #f87171;padding:16px;background:rgba(248,113,113,.08);margin:20px 0}
-@media(max-width:700px){
-  table{font-size:.75rem}
-  th,td{padding:6px 7px}
+---json
+{
+  "permalink": "research/hidden-llm-costs.html",
+  "lang": "en",
+  "head": {
+    "title": "Hidden LLM Costs Beyond Per-Token Pricing · FinOps LLM",
+    "description": "Beyond per-token pricing: infrastructure, latency, cache overhead, and fallback chains add hidden costs to LLM deployments. A practical guide to finding them.",
+    "robots": "index, follow",
+    "canonical": "https://finopsllm.com/research/hidden-llm-costs",
+    "style": "body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}\n.wrap{max-width:1100px;margin:0 auto;padding:56px 24px}\na{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}\n.langsw{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;color:#647289;margin:0 0 26px}\n.langsw a{text-decoration:none}.langsw a[aria-current]{color:#E6EAF2;font-weight:600}\n.badge-row{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 32px;list-style:none;padding:0}\n.badge-row li{background:#101726;border:1px solid #1E2A3F;border-radius:8px;padding:8px 14px;font-size:.85rem;color:#B6C0D2}\n.table-wrap{overflow-x:auto;margin:0 0 32px;-webkit-overflow-scrolling:touch}\ntable{border-collapse:collapse;width:100%;font-size:.85rem}\nth,td{border:1px solid #1E2A3F;padding:10px 12px;text-align:left;color:#B6C0D2}\nth{color:#E6EAF2;background:#101726}\ntd.number{text-align:right;font-family:'JetBrains Mono',monospace;font-weight:500}\ntd.highlight{background:rgba(248,113,113,.08)}\n.cost-component{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:20px;margin:16px 0}\n.cost-component h3{color:#E6EAF2;margin:0 0 12px;font-size:1rem}\n.cost-component p{font-size:.9rem;margin:6px 0}\n.guide-section{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:24px;margin:12px 0}\n.guide-section h3{color:#E6EAF2;margin:0 0 10px;font-size:1rem}\n.warning{border-left:4px solid #f87171;padding:16px;background:rgba(248,113,113,.08);margin:20px 0}\n@media(max-width:700px){\n  table{font-size:.75rem}\n  th,td{padding:6px 7px}\n}",
+    "scripts": [
+      {
+        "src": "/assets/consent.js",
+        "defer": true
+      },
+      {
+        "src": "/assets/attribution.js",
+        "defer": true
+      },
+      {
+        "src": "/assets/lang.js",
+        "defer": true
+      }
+    ],
+    "jsonLd": [
+      "{\"@context\":\"https://schema.org\",\"@type\":\"TechArticle\",\"headline\":\"Hidden LLM Costs · FinOps LLM\",\"description\":\"Identify and measure hidden costs beyond per-token pricing: infrastructure, cache overhead, redundancy, and retry logic.\",\"url\":\"https://finopsllm.com/research/hidden-llm-costs\",\"datePublished\":\"2026-07-12\",\"dateModified\":\"2026-07-12\",\"image\":\"https://finopsllm.com/og.png\",\"author\":{\"@type\":\"Organization\",\"name\":\"FinOps LLM team\"},\"publisher\":{\"@type\":\"Organization\",\"name\":\"FinOps LLM\",\"url\":\"https://finopsllm.com/\"}}",
+      "{\"@context\":\"https://schema.org\",\"@type\":\"BreadcrumbList\",\"itemListElement\":[{\"@type\":\"ListItem\",\"position\":1,\"name\":\"Home\",\"item\":\"https://finopsllm.com/\"},{\"@type\":\"ListItem\",\"position\":2,\"name\":\"Research\",\"item\":\"https://finopsllm.com/research\"},{\"@type\":\"ListItem\",\"position\":3,\"name\":\"Hidden LLM Costs\",\"item\":\"https://finopsllm.com/research/hidden-llm-costs\"}]}",
+      "{\"@context\": \"https://schema.org\", \"@type\": \"FAQPage\", \"mainEntity\": [{\"@type\": \"Question\", \"name\": \"What costs are hidden beyond per-token pricing?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"Vector database storage, cache infrastructure, retry/fallback chains, redundant model calls, embedding generation, and observability overhead. These can add 20–50% to your measured token bill.\"}}, {\"@type\": \"Question\", \"name\": \"How much does vector search add to cost?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"Vector DB operations (embedding + retrieval) cost $0.001–$0.05 per query depending on vector dimension, chunk size, and k-NN matching. For a RAG system with 10K QPS, this adds $10–$500/day.\"}}, {\"@type\": \"Question\", \"name\": \"Do retry loops waste money?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"Yes. A 2-tier fallback (primary model + fallback to cheaper model) can multiply token cost 1.2–2x if your primary model fails 30–50% of the time. Monitor fallback rates closely.\"}}, {\"@type\": \"Question\", \"name\": \"How do I measure these hidden costs?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"Track infrastructure cost separately from API cost. Log every LLM call with (attempt number, model, token count, success/failure). Calculate cost-per-successful-response, not cost-per-call.\"}}]}"
+    ]
+  }
 }
-</style><script src="/assets/consent.js" defer></script><script src="/assets/attribution.js" defer></script>
-<script src="/assets/lang.js" defer></script>
-</head>
-<body><main class="wrap">{% endblock %}{% block body %}
+---
+{% extends "shell.njk" %}{% block body %}
 
 
 <h1>Hidden LLM Costs</h1>
@@ -366,5 +356,4 @@ td.highlight{background:rgba(248,113,113,.08)}
 <p>Ready to find your hidden costs? FinOps LLM's cost audit digs into infrastructure, waste, and cache efficiency. <a href="/book">Book a free audit</a> and we'll quantify the real spend.</p>
 <p><a href="/research">Back to research</a></p>
 
-{% endblock %}{% block suffix %}</main></body></html>
 {% endblock %}
