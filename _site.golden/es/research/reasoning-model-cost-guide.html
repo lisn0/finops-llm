@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Guía de Costes de Modelos de Razonamiento · FinOps LLM</title><meta name="description" content="Por qué los modelos de razonamiento cuestan 5-30x más debido a tokens de pensamiento ocultos. Cuándo usarlos vs. evitarlos. Cómo presupuestar o3, DeepSeek-R1, QwQ y MiMo." /><meta name="robots" content="index, follow" /><link rel="canonical" href="https://finopsllm.com/es/research/reasoning-model-cost-guide" />
+<link rel="alternate" hreflang="en" href="https://finopsllm.com/research/reasoning-model-cost-guide" />
+<link rel="alternate" hreflang="es" href="https://finopsllm.com/es/research/reasoning-model-cost-guide" />
+<link rel="alternate" hreflang="fr" href="https://finopsllm.com/fr/research/reasoning-model-cost-guide" />
+<link rel="alternate" hreflang="de" href="https://finopsllm.com/de/research/reasoning-model-cost-guide" />
+<link rel="alternate" hreflang="pt" href="https://finopsllm.com/pt/research/reasoning-model-cost-guide" />
+<link rel="alternate" hreflang="ja" href="https://finopsllm.com/ja/research/reasoning-model-cost-guide" />
+<link rel="alternate" hreflang="x-default" href="https://finopsllm.com/research/reasoning-model-cost-guide" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","headline":"Gu\u00eda de Costes de Modelos de Razonamiento \u00b7 FinOps LLM","description":"Por qu\u00e9 los modelos de razonamiento cuestan 5-30x m\u00e1s debido a tokens de pensamiento ocultos. Cu\u00e1ndo usarlos y cu\u00e1ndo evitarlos para optimizar costes.","url":"https://finopsllm.com/es/research/reasoning-model-cost-guide","datePublished":"2026-07-04","dateModified":"2026-07-15","image":"https://finopsllm.com/og.png","author":{"@type":"Organization","name":"FinOps LLM team"},"publisher":{"@type":"Organization","name":"FinOps LLM","url":"https://finopsllm.com/"}}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Inicio","item":"https://finopsllm.com/"},{"@type":"ListItem","position":2,"name":"Investigaci\u00f3n","item":"https://finopsllm.com/es/research"},{"@type":"ListItem","position":3,"name":"Gu\u00eda de Costes de Modelos de Razonamiento","item":"https://finopsllm.com/es/research/reasoning-model-cost-guide"}]}
+</script>
+<script type="application/ld+json">
+{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "\u00bfQu\u00e9 es la metodolog\u00eda?", "acceptedAnswer": {"@type": "Answer", "text": "Precio de token de salida para finalizaci\u00f3n est\u00e1ndar (no razonamiento), desde p\u00e1ginas oficiales del proveedor. Precio de razonamiento: costo efectivo incluyendo tokens de pensamiento. Se mide como precio de salida est\u00e1ndar \u00d7 multiplicador de pensamiento promedio para cada modelo."}}, {"@type": "Question", "name": "\u00bfQu\u00e9 es la tabla de precios de modelos de razonamiento?", "acceptedAnswer": {"@type": "Answer", "text": "Salida de razonamiento $/1M incluye tokens de pensamiento facturados a tasas de salida. El multiplicador es promedio entre tareas t\u00edpicas; el multiplicador real var\u00eda por complejidad de solicitud. DeepSeek R1 produce tokens de pensamiento por defecto. OpenAI o3/o4-mini cobra tokens de pensamiento por separado de la salida visible."}}, {"@type": "Question", "name": "\u00bfCu\u00e1ndo usar modelos de razonamiento?", "acceptedAnswer": {"@type": "Answer", "text": "Los modelos de razonamiento destacan en tareas que requieren planificaci\u00f3n: refactorizar m\u00faltiples archivos, depurar estados complejos, o escribir algoritmos con casos l\u00edmite. Los tokens de pensamiento permiten al modelo 'trabajar a trav\u00e9s' del problema en lugar de simple coincidencia de patrones."}}, {"@type": "Question", "name": "\u00bfCu\u00e1ndo evitar modelos de razonamiento?", "acceptedAnswer": {"@type": "Answer", "text": "Extraer datos de documentos, reformatear JSON, resumir texto, o traducir contenido. Estas tareas necesitan coincidencia de patrones, no razonamiento. Usar o3 para extracci\u00f3n es como contratar un matem\u00e1tico para clasificar correo - caro e innecesario."}}, {"@type": "Question", "name": "\u00bfQu\u00e9 son estrategias de optimizaci\u00f3n de costes?", "acceptedAnswer": {"@type": "Answer", "text": "Usar un modelo est\u00e1ndar barato (GPT-4o-mini, Gemini Flash) como enrutador. Si la tarea es simple, responder directamente. Si es compleja, escalar a un modelo de razonamiento. Este patr\u00f3n 'cascada' puede reducir uso de modelos de razonamiento un 60-80% preservando calidad donde importa."}}]}
+</script>
+<style>
+body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}
+.wrap{max-width:1100px;margin:0 auto;padding:56px 24px}
+a{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}
+.langsw{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;color:#647289;margin:0 0 26px}
+.langsw a{text-decoration:none}.langsw a[aria-current]{color:#E6EAF2;font-weight:600}
+.hero-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:16px;margin:28px 0 36px}
+.hero-stat{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:18px 16px;text-align:center}
+.hero-stat .num{font-size:2rem;font-weight:700;color:#7AAFFF;display:block}
+.hero-stat .lbl{font-size:.82rem;color:#647289;margin-top:4px}
+.badge-row{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 32px;list-style:none;padding:0}
+.badge-row li{background:#101726;border:1px solid #1E2A3F;border-radius:8px;padding:8px 14px;font-size:.85rem;color:#B6C0D2}
+.method-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin:20px 0 32px}
+.method-card{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:18px}
+.method-card h3{font-size:.95rem;color:#E6EAF2;margin:0 0 8px}
+.method-card p{font-size:.85rem;margin:0}
+.table-wrap{overflow-x:auto;margin:0 0 32px;-webkit-overflow-scrolling:touch}
+table{border-collapse:collapse;width:100%;font-size:.82rem;white-space:nowrap}
+th,td{border:1px solid #1E2A3F;padding:8px 10px;text-align:left;color:#B6C0D2}
+th{color:#E6EAF2;background:#101726;cursor:pointer;position:sticky;top:0;user-select:none}
+th:hover{background:#162035}
+th .sort-arrow{font-size:.7rem;margin-left:4px;opacity:.4}
+th.sorted .sort-arrow{opacity:1;color:#7AAFFF}
+td.provider-cell{white-space:normal;min-width:140px}
+td.price-cell{text-align:right;font-variant-numeric:tabular-nums}
+td.limit-cell{text-align:right;font-variant-numeric:tabular-nums;min-width:55px}
+tr:hover{background:rgba(122,175,255,.04)}
+.est{color:#647289}
+.official{color:#B6C0D2}
+.ref-link{font-size:.75rem;color:#7AAFFF;text-decoration:none;border-bottom:1px dotted rgba(122,175,255,.3)}
+.ref-link:hover{border-bottom-color:#7AAFFF}
+.footnotes{font-size:.8rem;color:#64748b;margin:16px 0 0}
+.footnotes p{margin:6px 0}
+.guide-section{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:24px;margin:12px 0}
+.guide-section h3{color:#E6EAF2;margin:0 0 10px;font-size:1rem}
+.highlight-box{background:rgba(122,175,255,.08);border:1px solid rgba(122,175,255,.2);border-radius:10px;padding:20px;margin:16px 0}
+.highlight-box p{margin:6px 0}
+@media(max-width:700px){.hero-stats{grid-template-columns:repeat(2,1fr)}table{font-size:.75rem}th,td{padding:6px 7px}}
+</style><script src="/assets/consent.js" defer></script><script src="/assets/attribution.js" defer></script>
+<script src="/assets/lang.js" defer></script>
+</head>
+<body><main class="wrap">
+<nav class="langsw" aria-label="Language / Idioma"><a href="/research/reasoning-model-cost-guide" hreflang="en">EN</a> · <a href="/es/research/reasoning-model-cost-guide" hreflang="es" aria-current="page">ES</a> · <a href="/fr/research/reasoning-model-cost-guide" hreflang="fr">FR</a> · <a href="/de/research/reasoning-model-cost-guide" hreflang="de">DE</a> · <a href="/pt/research/reasoning-model-cost-guide" hreflang="pt">PT</a> · <a href="/ja/research/reasoning-model-cost-guide" hreflang="ja">JA</a></nav>
+
+<h1>Guía de Costes de Modelos de Razonamiento</h1><p class="updated" style="color:#6B7689;font-size:14px;margin-top:-6px">Actualizada 15 de julio de 2026 · publicada por primera vez 4 de julio de 2026</p>
+<p>Los modelos de razonamiento como o3, o4-mini, DeepSeek-R1, QwQ, y MiMo generan tokens de "pensamiento" internos antes de producir salida. Este costo oculto puede inflar tu factura 5-30x. Esta guía desglosa cuándo los modelos de razonamiento valen la prima y cuándo un modelo estándar es el gasto más inteligente.</p>
+
+<div class="hero-stats">
+  <div class="hero-stat"><span class="num">5-30x</span><span class="lbl">Multiplicador de coste</span></div>
+  <div class="hero-stat"><span class="num">10</span><span class="lbl">Modelos comparados</span></div>
+  <div class="hero-stat"><span class="num">4</span><span class="lbl">Proveedores</span></div>
+  <div class="hero-stat"><span class="num">Jul 2026</span><span class="lbl">Última actualización</span></div>
+</div>
+
+<ul class="badge-row">
+  <li>Todos los precios en USD por 1 millón de tokens</li>
+  <li>Los conteos de tokens de razonamiento varían por complejidad de tarea</li>
+  <li>Los tokens de pensamiento se facturan como tokens de salida</li>
+</ul>
+
+<div class="callout">
+  <h3>¿Qué son los tokens de "pensamiento"?</h3>
+  <p>Los modelos de razonamiento gastan tokens en cadena de pensamiento interna antes de responder. Una pregunta simple podría desencadenar 2.000 tokens de pensamiento; una tarea de codificación compleja puede producir 30.000+. Estos tokens son invisibles en la respuesta de API pero se facturan a tarifas de salida - a menudo el nivel más caro.</p>
+</div>
+
+<h2>Metodología</h2>
+<div class="method-grid">
+  <div class="method-card"><h3>Precios estándar</h3><p>Precio de token de salida para finalización estándar (no razonamiento), desde páginas oficiales del proveedor.</p></div>
+  <div class="method-card"><h3>Precio de razonamiento</h3><p>Costo efectivo incluyendo tokens de pensamiento. Se mide como precio de salida estándar × multiplicador de pensamiento promedio para cada modelo.</p></div>
+  <div class="method-card"><h3>Multiplicador de pensamiento</h3><p>Proporción promedio de tokens totales facturados a tokens de salida visibles entre evaluaciones de codificación, matemáticas y análisis.</p></div>
+  <div class="method-card"><h3>Mejores casos de uso</h3><p>Tareas donde los modelos de razonamiento demuestran superioridad sobre modelos estándar por suficiente para justificar la prima de coste.</p></div>
+</div>
+
+<h2 id="pricing">Tabla de Precios de Modelos de Razonamiento</h2>
+
+<div class="table-wrap">
+<table id="reasoningTable">
+<thead>
+<tr>
+  <th data-col="model">Modelo <span class="sort-arrow">↕</span></th>
+  <th data-col="provider">Proveedor <span class="sort-arrow">↕</span></th>
+  <th data-col="stdPrice" class="price-cell">Salida Estándar $/1M <span class="sort-arrow">↕</span></th>
+  <th data-col="reasonPrice" class="price-cell">Salida Razonamiento $/1M <span class="sort-arrow">↕</span></th>
+  <th data-col="multiplier" class="price-cell">Multiplicador <span class="sort-arrow">↕</span></th>
+  <th data-col="usecase">Mejores Casos de Uso</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>Claude Fable 5</td>
+  <td class="provider-cell"><strong>Anthropic</strong></td>
+  <td class="price-cell official" data-val="50.00">$50.00</td>
+  <td class="price-cell official" data-val="200.00">$200.00</td>
+  <td class="price-cell official" data-val="4">4x</td>
+  <td>Razonamiento frontera, vulnerabilidades complejas, análisis profundo</td>
+</tr>
+<tr>
+  <td>Claude Opus 4.8</td>
+  <td class="provider-cell"><strong>Anthropic</strong></td>
+  <td class="price-cell official" data-val="25.00">$25.00</td>
+  <td class="price-cell official" data-val="100.00">$100.00</td>
+  <td class="price-cell official" data-val="4">4x</td>
+  <td>Razonamiento frontera, análisis complejo, flujos agénticos</td>
+</tr>
+<tr>
+  <td>GPT-5.6-Sol</td>
+  <td class="provider-cell"><strong>OpenAI</strong></td>
+  <td class="price-cell official" data-val="30.00">$30.00</td>
+  <td class="price-cell official" data-val="120.00">$120.00</td>
+  <td class="price-cell official" data-val="4">4x</td>
+  <td>Razonamiento frontera, código complejo, matemáticas, análisis multianivel</td>
+</tr>
+<tr>
+  <td>GPT-5.6-Terra</td>
+  <td class="provider-cell"><strong>OpenAI</strong></td>
+  <td class="price-cell official" data-val="15.00">$15.00</td>
+  <td class="price-cell official" data-val="60.00">$60.00</td>
+  <td class="price-cell official" data-val="4">4x</td>
+  <td>Razonamiento, generación de código, análisis estructurado</td>
+</tr>
+<tr>
+  <td>Grok 4.5</td>
+  <td class="provider-cell"><strong>xAI</strong></td>
+  <td class="price-cell official" data-val="6.00">$6.00</td>
+  <td class="price-cell official" data-val="24.00">$24.00</td>
+  <td class="price-cell official" data-val="4">4x</td>
+  <td>Matemáticas, razonamiento, inteligencia general</td>
+</tr>
+<tr>
+  <td>o3</td>
+  <td class="provider-cell"><strong>OpenAI</strong></td>
+  <td class="price-cell official" data-val="8.00">$8.00</td>
+  <td class="price-cell official" data-val="40.00">$40.00</td>
+  <td class="price-cell official" data-val="5">5x</td>
+  <td>Codificación compleja, pruebas matemáticas, razonamiento profundo</td>
+</tr>
+<tr>
+  <td>o4-mini</td>
+  <td class="provider-cell"><strong>OpenAI</strong></td>
+  <td class="price-cell official" data-val="4.40">$4.40</td>
+  <td class="price-cell official" data-val="17.60">$17.60</td>
+  <td class="price-cell official" data-val="4">4x</td>
+  <td>Razonamiento sensible al coste, codificación, análisis</td>
+</tr>
+<tr>
+  <td>DeepSeek R1</td>
+  <td class="provider-cell"><strong>DeepSeek</strong></td>
+  <td class="price-cell official" data-val="2.19">$2.19</td>
+  <td class="price-cell official" data-val="8.76">$8.76</td>
+  <td class="price-cell official" data-val="4">4x</td>
+  <td>Matemáticas, código, razonamiento, tareas en idioma chino</td>
+</tr>
+<tr>
+  <td>Claude Sonnet 5</td>
+  <td class="provider-cell"><strong>Anthropic</strong></td>
+  <td class="price-cell official" data-val="10.00">$10.00</td>
+  <td class="price-cell official" data-val="40.00">$40.00</td>
+  <td class="price-cell official" data-val="4">4x</td>
+  <td>Razonamiento general, codificación, análisis (equilibrado)</td>
+</tr>
+<tr>
+  <td>GPT-5.5 (estándar)</td>
+  <td class="provider-cell"><strong>OpenAI</strong></td>
+  <td class="price-cell official" data-val="30.00">$30.00</td>
+  <td class="price-cell official" data-val="30.00">$30.00</td>
+  <td class="price-cell official" data-val="1">1x</td>
+  <td>Chat general, codificación, análisis complejo</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<h2 id="when-to-use">Cuándo Usar Modelos de Razonamiento</h2>
+
+<div class="guide-section">
+  <h3>1) Codificación y depuración multianivel</h3>
+  <p>Los modelos de razonamiento destacan en tareas que requieren planificación: refactorizar múltiples archivos, depurar estados complejos, o escribir algoritmos con casos límite. Los tokens de pensamiento permiten al modelo "trabajar a través" del problema en lugar de simple coincidencia de patrones. Vale la pena la prima de 4-5x cuando la alternativa es un humano pasando 30+ minutos.</p>
+</div>
+<div class="guide-section">
+  <h3>2) Pruebas matemáticas y lógicas</h3>
+  <p>Las tareas que requieren razonamiento formal - pruebas, problemas de optimización, satisfacción de restricciones - ven el mayor salto de calidad. Los modelos estándar a menudo producen respuestas plausibles pero incorrectas; los modelos de razonamiento se auto-verifican. La prima de coste se justifica cuando la corrección importa más que la velocidad.</p>
+</div>
+<div class="guide-section">
+  <h3>3) Análisis de datos complejo con múltiples pasos</h3>
+  <p>Analizar un conjunto de datos con lógica condicional, referencias cruzadas de múltiples fuentes, o construcción de tuberías multianivel se beneficia de cadena de pensamiento. Un modelo estándar podría perder un paso; un modelo de razonamiento trabaja a través de cada uno explícitamente.</p>
+</div>
+
+<h2 id="when-to-skip">Cuándo Evitar Modelos de Razonamiento</h2>
+
+<div class="guide-section">
+  <h3>1) Extracción y formateo simple</h3>
+  <p>Extraer datos de documentos, reformatear JSON, resumir texto, o traducir contenido. Estas tareas necesitan coincidencia de patrones, no razonamiento. Usar o3 para extracción es como contratar un matemático para clasificar correo - caro e innecesario.</p>
+</div>
+<div class="guide-section">
+  <h3>2) Cargas de trabajo de alto volumen y baja complejidad</h3>
+  <p>Generación de contenido, respuestas FAQ, respuestas básicas de chatbot, y etiquetado de datos. Con 10M+ tokens/mes, el multiplicador de razonamiento de 4-5x suma rápidamente. Un modelo estándar a $10/1M de salida vence un modelo de razonamiento a $40-60/1M para tareas donde la calidad es "suficientemente buena".</p>
+</div>
+<div class="guide-section">
+  <h3>3) Aplicaciones sensibles a latencia</h3>
+  <p>Los modelos de razonamiento tardan más - los tokens de pensamiento añaden 2-10 segundos de latencia. Para chat en tiempo real, herramientas interactivas, o respuestas orientadas al usuario donde la velocidad importa, los modelos estándar entregan más rápido a menor coste.</p>
+</div>
+
+<h2 id="optimisation">Estrategias de Optimización de Costes</h2>
+
+<div class="guide-section">
+  <h3>Enrutamiento por complejidad</h3>
+  <p>Usa un modelo estándar barato (GPT-4o-mini, Gemini Flash) como enrutador. Si la tarea es simple, responder directamente. Si es compleja, escalar a un modelo de razonamiento. Este patrón "cascada" puede reducir uso de modelos de razonamiento un 60-80% preservando calidad donde importa.</p>
+</div>
+<div class="guide-section">
+  <h3>Limita el presupuesto de pensamiento</h3>
+  <p>Algunos proveedores (OpenAI, Google) te permiten establecer un presupuesto máximo de tokens de pensamiento por solicitud. Limitar a 4.000-8.000 tokens de pensamiento previene costes descontrolados en tareas que no necesitan razonamiento profundo. Comienza ajustado y aumenta solo cuando baje la calidad.</p>
+</div>
+<div class="guide-section">
+  <h3>Cachea tus prompts</h3>
+  <p>Si tus tareas de razonamiento comparten un prompt de sistema común o contexto (base de código, documentación), el almacenamiento en caché de prompts puede reducir costes de entrada un 50-90%. Esto no reduce tokens de pensamiento pero reduce significativamente el coste por solicitud.</p>
+</div>
+<div class="guide-section">
+  <h3>Procesa razonamiento no urgente en lotes</h3>
+  <p>Para evaluaciones, generación de pruebas, o análisis que toleran latencia, las APIs de lotes ofrecen descuentos de 50%. Combinadas con modelos de razonamiento, obtienes el beneficio de calidad a mitad del costo de salida.</p>
+</div>
+
+<div class="footnotes">
+  <p>Salida de razonamiento $/1M incluye tokens de pensamiento facturados a tarifas de salida. El multiplicador es promedio entre tareas típicas; el multiplicador real varía por complejidad de solicitud.</p>
+  <p>DeepSeek R1 produce tokens de pensamiento por defecto. OpenAI o3/o4-mini cobra tokens de pensamiento por separado de la salida visible.</p>
+  <p>Gemini 2.5 Pro cobra "tokens de pensamiento" a una tarifa reducida vs. salida visible - el multiplicador es costo combinado efectivo.</p>
+  <p>Algunos enlaces pueden incluir códigos de referido.</p>
+</div>
+
+<hr style="margin:48px 0 24px;border:none;border-top:1px solid #1E2A3F" />
+<p>¿Quieres esto aplicado a tu propio gasto en LLM? FinOps LLM realiza una auditoría gratuita de tus costes de IA y muestra dónde están los ahorros. <a href="/book">Reserva auditoría gratuita &rarr;</a></p>
+<p><a href="/es/research">Volver a investigación</a></p>
+
+<script>
+(function(){
+  const table=document.getElementById('reasoningTable');
+  const tbody=table.querySelector('tbody');
+  const headers=table.querySelectorAll('th[data-col]');
+  let currentSort={col:null,asc:true};
+
+  headers.forEach(function(th){
+    th.addEventListener('click',function(){
+      const col=this.dataset.col;
+      if(currentSort.col===col){currentSort.asc=!currentSort.asc}
+      else{currentSort.col=col;currentSort.asc=true}
+      headers.forEach(function(h){h.classList.remove('sorted')});
+      this.classList.add('sorted');
+      this.querySelector('.sort-arrow').textContent=currentSort.asc?'↑':'↓';
+      sortTable(col,currentSort.asc);
+    });
+  });
+
+  function sortTable(col,asc){
+    const rows=Array.from(tbody.querySelectorAll('tr'));
+    const colMap={model:0,provider:1,stdPrice:2,reasonPrice:3,multiplier:4,usecase:5};
+    const idx=colMap[col];if(idx===undefined)return;
+    rows.sort(function(a,b){
+      let va,vb;
+      if(col==='model'||col==='provider'||col==='usecase'){
+        va=a.cells[idx].textContent.trim();vb=b.cells[idx].textContent.trim();
+        return asc?va.localeCompare(vb):vb.localeCompare(va);
+      }
+      va=parseFloat(a.cells[idx].dataset.val||0);vb=parseFloat(b.cells[idx].dataset.val||0);
+      return asc?va-vb:vb-va;
+    });
+    rows.forEach(function(r){tbody.appendChild(r)});
+  }
+})();
+</script>
+</main></body></html>
+
