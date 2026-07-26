@@ -1,0 +1,50 @@
+---
+permalink: "research/llm-cost-tracking.html"
+---
+{% extends "shell.njk" %}{% block prefix %}<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>LLM Cost Tracking: Tools, Tags and Telemetry · FinOps LLM</title><meta name="description" content="A practical guide to LLM cost tracking: what to tag, which metrics to collect, and how to build a telemetry pipeline that makes AI spend explainable." /><meta name="robots" content="index, follow" /><link rel="canonical" href="https://finopsllm.com/research/llm-cost-tracking" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","headline":"LLM Cost Tracking \u00b7 FinOps LLM","description":"A practical guide to LLM cost tracking: what to tag, which metrics to collect, and how to build a telemetry pipeline.","url":"https://finopsllm.com/research/llm-cost-tracking","datePublished":"2026-07-26","dateModified":"2026-07-26","image":"https://finopsllm.com/og.png","author":{"@type":"Organization","name":"FinOps LLM team"},"publisher":{"@type":"Organization","name":"FinOps LLM","url":"https://finopsllm.com/"}}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"How do you track LLM costs?","acceptedAnswer":{"@type":"Answer","text":"Track LLM costs by tagging every request with team, project, feature, model, provider, and environment, then aggregating provider invoices and gateway logs into a dashboard that shows spend, tokens, and cost per task."}},{"@type":"Question","name":"What metrics should you track for LLM costs?","acceptedAnswer":{"@type":"Answer","text":"Track total spend, tokens by type, cost per request, cost per task, latency, error rate, and spend concentration across teams and features."}},{"@type":"Question","name":"What is the best tool for LLM cost tracking?","acceptedAnswer":{"@type":"Answer","text":"The best tool is the one your team will actually use. Options range from provider dashboards and gateway logs for small teams to observability platforms and custom pipelines for larger deployments."}}]}
+</script>
+<style>body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}.wrap{max-width:840px;margin:0 auto;padding:56px 24px}a{color:#7AAFFF}p,li{color:#B6C0D2}h2{margin-top:34px}</style><script src="/assets/consent.js" defer></script><script src="/assets/attribution.js" defer></script>
+</head>
+<body><main class="wrap">{% endblock %}{% block body %}<h1>LLM cost tracking</h1>
+<p>LLM cost tracking is the practice of collecting, tagging, and aggregating the data you need to explain every dollar of AI spend. Without it, the monthly invoice is just a number. With it, you can answer who spent what, on which model, for which feature, and whether it was worth it.</p>
+
+<h2>What to tag on every request</h2>
+<p>The minimum viable attribution set is:</p>
+<ul>
+<li><strong>Team or cost center</strong> — who owns the workload.</li>
+<li><strong>Project or feature</strong> — what the workload supports.</li>
+<li><strong>Model and provider</strong> — which model was called and through which provider.</li>
+<li><strong>Environment</strong> — production, staging, or development.</li>
+<li><strong>Token type</strong> — input, output, cache-read, cache-write, reasoning.</li>
+<li><strong>Request context</strong> — user ID, session ID, or task ID for tracing.</li>
+</ul>
+
+<h2>Where the data comes from</h2>
+<p>There are three sources, and each has gaps:</p>
+<ul>
+<li><strong>Provider invoices</strong> — the ground truth for dollars, but coarse-grained and delayed.</li>
+<li><strong>Gateway or proxy logs</strong> — rich per-request detail, but may miss retries, fallbacks, and reasoning tokens.</li>
+<li><strong>Application telemetry</strong> — links cost to business outcomes, but needs instrumentation.</li>
+</ul>
+<p>Reconcile all three. Use the invoice as the final number, gateway logs for attribution, and application telemetry for cost-per-task.</p>
+
+<h2>Metrics that matter</h2>
+<ul>
+<li><strong>Cost per request</strong> — the average cost of a single API call.</li>
+<li><strong>Cost per task</strong> — the cost to complete a business outcome.</li>
+<li><strong>Spend concentration</strong> — which endpoints and teams drive most of the cost.</li>
+<li><strong>Variance</strong> — actual spend vs. budget, by week or by feature.</li>
+</ul>
+
+<h2>Getting started</h2>
+<p>Start with gateway logs if you use a proxy like LiteLLM, Helicone, or Langfuse. Add custom tags to your requests and export the data to a dashboard. If you do not use a proxy, instrument your application to log model, tokens, and task ID on every call. See also our guides to <a href="/research/llm-cost-management">LLM cost management</a> and <a href="/research/llm-cost-monitoring">LLM cost monitoring</a>.</p>
+
+<hr style="margin:48px 0 24px;border:none;border-top:1px solid #1E2A3F" /><p>Want this applied to your own LLM spend? FinOps LLM runs a free audit of your AI costs and shows where the savings are. <a href="/book">Book free audit &rarr;</a></p><p><a href="/research">Back to research</a></p>{% endblock %}{% block suffix %}</main></body></html>
+{% endblock %}
