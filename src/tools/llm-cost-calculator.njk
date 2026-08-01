@@ -1,0 +1,316 @@
+---
+permalink: "tools/llm-cost-calculator.html"
+---
+{% extends "shell.njk" %}{% block body %}<div class="eye">FREE TOOL</div>
+<h1 class="page-title">LLM Cost <em>Calculator.</em></h1>
+<p class="lede">Compare costs across providers for your exact workload. Input your token usage, see real-time estimates for 20+ models.</p>
+
+<div class="tool-container">
+  <div class="input-section">
+    <h2>Your workload</h2>
+    
+    <div class="input-group">
+      <label for="inputTokens">Input tokens per request</label>
+      <input type="number" id="inputTokens" value="4000" min="0">
+      <span class="hint">System prompt + user message</span>
+    </div>
+    
+    <div class="input-group">
+      <label for="outputTokens">Output tokens per request</label>
+      <input type="number" id="outputTokens" value="500" min="0">
+      <span class="hint">Expected response length</span>
+    </div>
+    
+    <div class="input-group">
+      <label for="requestsPerDay">Requests per day</label>
+      <input type="number" id="requestsPerDay" value="1000" min="1">
+      <span class="hint">Daily volume</span>
+    </div>
+    
+    <div class="input-group">
+      <label for="cacheHitRate">Cache hit rate (%)</label>
+      <input type="number" id="cacheHitRate" value="0" min="0" max="100">
+      <span class="hint">0 = no caching, 70 = aggressive caching</span>
+    </div>
+  </div>
+  
+  <div class="results-section">
+    <h2>Cost comparison</h2>
+    <div class="results-table-container">
+      <table class="results-table" id="resultsTable">
+        <thead>
+          <tr>
+            <th>Model</th>
+            <th>Provider</th>
+            <th>Cost per 1K requests</th>
+            <th>Daily cost</th>
+            <th>Monthly cost</th>
+            <th>vs cheapest</th>
+          </tr>
+        </thead>
+        <tbody id="resultsBody">
+          <!-- Populated by JS -->
+        </tbody>
+      </table>
+    </div>
+    
+    <div class="summary" id="summary">
+      <!-- Populated by JS -->
+    </div>
+  </div>
+</div>
+
+<div class="methodology">
+  <h2>Methodology</h2>
+  <p>Prices are per-model list prices as of August 2026. Cache-read tokens are discounted where applicable. Actual costs vary based on retries, latency requirements, and volume discounts.</p>
+  <p>This calculator is for estimation only. For a precise audit of your actual spend, <a href="/book">book a free audit</a>.</p>
+</div>
+
+<style>
+.tool-container {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 40px;
+  margin: 40px 0;
+}
+
+@media (max-width: 900px) {
+  .tool-container {
+    grid-template-columns: 1fr;
+  }
+}
+
+.input-section {
+  background: #161b22;
+  border: 1px solid #21262d;
+  border-radius: 12px;
+  padding: 24px;
+  height: fit-content;
+}
+
+.input-section h2 {
+  font-size: 18px;
+  margin-bottom: 20px;
+  color: #e6edf3;
+}
+
+.input-group {
+  margin-bottom: 20px;
+}
+
+.input-group label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #8b949e;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 10px 12px;
+  background: #0d1117;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  color: #e6edf3;
+  font-size: 16px;
+}
+
+.input-group input:focus {
+  outline: none;
+  border-color: #5eead4;
+}
+
+.hint {
+  display: block;
+  font-size: 12px;
+  color: #6e7681;
+  margin-top: 4px;
+}
+
+.results-section h2 {
+  font-size: 18px;
+  margin-bottom: 20px;
+  color: #e6edf3;
+}
+
+.results-table-container {
+  overflow-x: auto;
+  border: 1px solid #21262d;
+  border-radius: 12px;
+}
+
+.results-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.results-table th {
+  background: #161b22;
+  padding: 12px;
+  text-align: left;
+  font-weight: 600;
+  color: #e6edf3;
+  border-bottom: 1px solid #21262d;
+  position: sticky;
+  top: 0;
+}
+
+.results-table td {
+  padding: 12px;
+  border-bottom: 1px solid #21262d;
+  color: #8b949e;
+}
+
+.results-table tr:hover td {
+  background: #161b22;
+  color: #e6edf3;
+}
+
+.results-table .cheapest {
+  color: #5eead4;
+  font-weight: 600;
+}
+
+.results-table .expensive {
+  color: #f85149;
+}
+
+.summary {
+  margin-top: 20px;
+  padding: 20px;
+  background: #161b22;
+  border: 1px solid #21262d;
+  border-radius: 12px;
+  font-size: 14px;
+  color: #8b949e;
+}
+
+.summary strong {
+  color: #e6edf3;
+}
+
+.methodology {
+  margin-top: 60px;
+  padding-top: 40px;
+  border-top: 1px solid #21262d;
+  color: #8b949e;
+  font-size: 14px;
+}
+
+.methodology h2 {
+  color: #e6edf3;
+  font-size: 18px;
+  margin-bottom: 12px;
+}
+</style>
+
+<script>
+const MODELS = [
+  { name: "GPT-4o", provider: "OpenAI", inputPrice: 2.50, outputPrice: 10.00, cacheReadPrice: 1.25 },
+  { name: "GPT-4o mini", provider: "OpenAI", inputPrice: 0.15, outputPrice: 0.60, cacheReadPrice: 0.075 },
+  { name: "o3", provider: "OpenAI", inputPrice: 10.00, outputPrice: 40.00, cacheReadPrice: 5.00 },
+  { name: "o3-mini", provider: "OpenAI", inputPrice: 1.10, outputPrice: 4.40, cacheReadPrice: 0.55 },
+  { name: "Claude Sonnet 4", provider: "Anthropic", inputPrice: 3.00, outputPrice: 15.00, cacheReadPrice: 0.30 },
+  { name: "Claude Haiku 4", provider: "Anthropic", inputPrice: 0.80, outputPrice: 4.00, cacheReadPrice: 0.08 },
+  { name: "Claude Opus 4", provider: "Anthropic", inputPrice: 15.00, outputPrice: 75.00, cacheReadPrice: 1.50 },
+  { name: "Gemini 2.5 Pro", provider: "Google", inputPrice: 1.25, outputPrice: 10.00, cacheReadPrice: 0.31 },
+  { name: "Gemini 2.5 Flash", provider: "Google", inputPrice: 0.30, outputPrice: 2.50, cacheReadPrice: 0.075 },
+  { name: "Gemini 2.0 Flash", provider: "Google", inputPrice: 0.10, outputPrice: 0.40, cacheReadPrice: 0.025 },
+  { name: "Llama 3.3 70B", provider: "Meta", inputPrice: 0.60, outputPrice: 0.60, cacheReadPrice: 0.60 },
+  { name: "Mistral Large 2", provider: "Mistral", inputPrice: 2.00, outputPrice: 6.00, cacheReadPrice: 1.00 },
+  { name: "DeepSeek V3", provider: "DeepSeek", inputPrice: 0.27, outputPrice: 1.10, cacheReadPrice: 0.07 },
+  { name: "Command R+", provider: "Cohere", inputPrice: 2.50, outputPrice: 10.00, cacheReadPrice: 1.25 },
+];
+
+function calculateCosts() {
+  const inputTokens = parseInt(document.getElementById('inputTokens').value) || 0;
+  const outputTokens = parseInt(document.getElementById('outputTokens').value) || 0;
+  const requestsPerDay = parseInt(document.getElementById('requestsPerDay').value) || 0;
+  const cacheHitRate = parseInt(document.getElementById('cacheHitRate').value) || 0;
+  
+  const results = MODELS.map(model => {
+    // Calculate cache splits
+    const cacheHitTokens = Math.round(inputTokens * (cacheHitRate / 100));
+    const cacheMissTokens = inputTokens - cacheHitTokens;
+    
+    // Cost per request
+    const inputCost = (cacheMissTokens * model.inputPrice / 1000000) + 
+                      (cacheHitTokens * model.cacheReadPrice / 1000000);
+    const outputCost = outputTokens * model.outputPrice / 1000000;
+    const costPerRequest = inputCost + outputCost;
+    
+    const costPer1K = costPerRequest * 1000;
+    const dailyCost = costPerRequest * requestsPerDay;
+    const monthlyCost = dailyCost * 30;
+    
+    return {
+      ...model,
+      costPerRequest,
+      costPer1K,
+      dailyCost,
+      monthlyCost
+    };
+  });
+  
+  // Sort by monthly cost
+  results.sort((a, b) => a.monthlyCost - b.monthlyCost);
+  
+  // Find cheapest
+  const cheapest = results[0]?.monthlyCost || 1;
+  
+  // Render table
+  const tbody = document.getElementById('resultsBody');
+  tbody.innerHTML = results.map((r, i) => {
+    const vsCheapest = ((r.monthlyCost / cheapest - 1) * 100).toFixed(0);
+    const isCheapest = i === 0;
+    const isExpensive = i >= results.length - 3;
+    
+    return `
+      <tr>
+        <td><strong>${r.name}</strong></td>
+        <td>${r.provider}</td>
+        <td>$${r.costPer1K.toFixed(2)}</td>
+        <td>$${r.dailyCost.toFixed(2)}</td>
+        <td class="${isCheapest ? 'cheapest' : isExpensive ? 'expensive' : ''}">$${r.monthlyCost.toFixed(0)}</td>
+        <td>${isCheapest ? '—' : `+${vsCheapest}%`}</td>
+      </tr>
+    `;
+  }).join('');
+  
+  // Render summary
+  const summary = document.getElementById('summary');
+  const best = results[0];
+  const worst = results[results.length - 1];
+  const savings = worst.monthlyCost - best.monthlyCost;
+  
+  summary.innerHTML = `
+    <strong>Best option:</strong> ${best.name} (${best.provider}) at $${best.monthlyCost.toFixed(0)}/month.<br>
+    <strong>Worst option:</strong> ${worst.name} (${worst.provider}) at $${worst.monthlyCost.toFixed(0)}/month.<br>
+    <strong>Spread:</strong> $${savings.toFixed(0)}/month (${((worst.monthlyCost / best.monthlyCost - 1) * 100).toFixed(0)}% more expensive).<br><br>
+    <strong>With ${cacheHitRate}% caching:</strong> You save approximately $${(best.monthlyCost * (1 - cacheHitRate / 200)).toFixed(0)}/month vs no caching on the best model.
+  `;
+}
+
+// Attach listeners
+document.querySelectorAll('input').forEach(input => {
+  input.addEventListener('input', calculateCosts);
+});
+
+// Initial calculation
+calculateCosts();
+</script>
+
+<h2>Related</h2>
+<ul>
+  <li><a href="/research/llm-api-pricing-tracker">LLM API pricing tracker</a> — daily updated prices</li>
+  <li><a href="/research/how-much-does-gpt5-cost">How much does GPT-5 cost?</a> — pricing analysis</li>
+  <li><a href="/research/model-routing">Model routing</a> — when to use which model</li>
+  <li><a href="/research/prompt-caching-economics">Prompt caching economics</a> — calculate caching ROI</li>
+</ul>
+
+<a class="back" href="/">&larr; Back to finopsllm.com</a>
+{% endblock %}
