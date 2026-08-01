@@ -1,0 +1,106 @@
+---json
+{
+  "permalink": "research/prompt-caching-economics.html",
+  "lang": "en",
+  "head": {
+    "title": "Prompt Caching ROI and Attribution: Calculating Real Savings · FinOps LLM",
+    "description": "How to calculate real savings from prompt caching, attribute them correctly, and avoid the most common accounting mistakes.",
+    "robots": "index, follow",
+    "canonical": "https://finopsllm.com/research/prompt-caching-economics",
+    "style": "body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}.wrap{max-width:840px;margin:0 auto;padding:56px 24px}a{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}table{border-collapse:collapse;width:100%;margin:24px 0;font-size:.95em}th,td{border:1px solid #1E2A3F;padding:10px 12px;text-align:left;color:#B6C0D2}th{color:#E6EAF2;background:#101726}.langsw{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;color:#647289;margin:0 0 26px}.langsw a{text-decoration:none}.langsw a[aria-current]{color:#E6EAF2;font-weight:600}",
+    "scripts": [
+      {
+        "src": "/assets/consent.js",
+        "defer": true
+      },
+      {
+        "src": "/assets/attribution.js",
+        "defer": true
+      }
+    ],
+    "jsonLd": [
+      "{\"@context\":\"https://schema.org\",\"@type\":\"TechArticle\",\"headline\":\"Prompt Caching ROI and Attribution\",\"description\":\"How to calculate real savings from prompt caching, attribute them correctly, and avoid the most common accounting mistakes.\",\"url\":\"https://finopsllm.com/research/prompt-caching-economics\",\"datePublished\":\"2026-08-01\",\"dateModified\":\"2026-08-01\",\"image\":\"https://finopsllm.com/og.png\",\"author\":{\"@type\":\"Organization\",\"name\":\"FinOps LLM team\"},\"publisher\":{\"@type\":\"Organization\",\"name\":\"FinOps LLM\",\"url\":\"https://finopsllm.com/\"}}",
+      "{\"@context\":\"https://schema.org\",\"@type\":\"BreadcrumbList\",\"itemListElement\":[{\"@type\":\"ListItem\",\"position\":1,\"name\":\"Home\",\"item\":\"https://finopsllm.com/\"},{\"@type\":\"ListItem\",\"position\":2,\"name\":\"Research\",\"item\":\"https://finopsllm.com/research\"},{\"@type\":\"ListItem\",\"position\":3,\"name\":\"Prompt Caching ROI and Attribution\",\"item\":\"https://finopsllm.com/research/prompt-caching-economics\"}]}",
+      "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"mainEntity\":[{\"@type\":\"Question\",\"name\":\"How much can prompt caching save?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"For workloads with long, repeated system prompts or few-shot examples, prompt caching typically saves 20-40% on input tokens. The exact figure depends on cache hit rate: the percentage of requests that share a prefix with a previous request. Hit rates below 30% rarely justify the complexity.\"}},{\"@type\":\"Question\",\"name\":\"How do I calculate prompt caching savings correctly?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Savings = (full_price_input_tokens - cache_read_tokens × cache_read_price_ratio) × model_input_price. Do not count cache_read_tokens as full savings. The discount applies only to the cache-read portion, and cache writes still cost full price.\"}},{\"@type\":\"Question\",\"name\":\"What is a good cache hit rate?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Production systems typically see 30-70% hit rates. Below 30%, caching adds complexity without meaningful savings. Above 70%, the workload is highly repetitive and caching is usually the single biggest optimization lever.\"}}]}"
+    ]
+  }
+}
+---
+{% extends "shell.njk" %}{% block body %}<nav class="langsw" aria-label="Language"><a href="/research/prompt-caching-economics" hreflang="en" aria-current="page">EN</a></nav><h1>Prompt caching ROI and attribution</h1>
+<p class="updated" style="color:#6B7689;font-size:14px;margin-top:-6px">Published 1 August 2026</p>
+<p>Prompt caching is the most misreported optimization in LLM cost management. Teams enable it, see cache-read tokens on their invoice, and claim 50% savings. The real figure is usually half that. The mistake is counting cache-read tokens as full savings instead of calculating the actual discount.</p>
+<p>This article shows how to calculate real savings, attribute them to the right workloads, and decide whether caching is worth the complexity for your use case.</p>
+<h2>How prompt caching actually works</h2>
+<p>Providers cache the prefix of your prompt: system instructions, few-shot examples, retrieved context. If the next request shares that prefix, the provider charges a discounted rate for the repeated portion. The discount varies by provider:</p>
+<table>
+<thead><tr><th>Provider</th><th>Cache-read discount</th><th>Cache write cost</th><th>TTL</th></tr></thead>
+<tbody>
+<tr><td>OpenAI</td><td>~50% of input price</td><td>Full input price</td><td>5-10 minutes</td></tr>
+<tr><td>Anthropic</td><td>~10% of input price</td><td>~25% premium over input price</td><td>5 minutes</td></tr>
+<tr><td>Google Gemini</td><td>~25% of input price</td><td>Full input price</td><td>1 hour</td></tr>
+</tbody>
+</table>
+<p>The economics are not intuitive. Anthropic charges a premium to write to cache, so the first request is more expensive. Savings only materialize on subsequent requests within the TTL window. OpenAI and Gemini charge full price for cache writes, so the first request costs the same as without caching.</p>
+<h2>Calculating real savings</h2>
+<p>The formula is:</p>
+<pre style="background:#101726;padding:16px;border-radius:8px;overflow-x:auto;font-size:14px">Savings = (input_tokens_without_caching × input_price)
+        - (cache_write_tokens × cache_write_price)
+        - (cache_read_tokens × cache_read_price)
+        - (output_tokens × output_price)</pre>
+<p>A concrete example. A support summarization endpoint sends 4,000 input tokens per request: 3,000 tokens of system prompt + 1,000 tokens of user ticket. Without caching, at $2.50 per 1M input tokens:</p>
+<ul>
+<li>Cost per request: 4,000 × $2.50/1M = $0.010</li>
+<li>1,000 requests/day: $10.00</li>
+</ul>
+<p>With caching, 70% of requests share the 3,000-token system prompt. OpenAI charges $1.25 per 1M cache-read tokens:</p>
+<ul>
+<li>300 requests (miss): 4,000 × $2.50/1M = $0.010 each</li>
+<li>700 requests (hit): 3,000 × $1.25/1M + 1,000 × $2.50/1M = $0.00625 each</li>
+<li>Daily cost: (300 × $0.010) + (700 × $0.00625) = $3.00 + $4.375 = $7.375</li>
+<li>Real savings: 26%, not 50%</li>
+</ul>
+<p>The 50% figure would come from counting all cache-read tokens as free. That is wrong. Cache reads are discounted, not free, and cache misses still cost full price.</p>
+<h2>Attributing savings correctly</h2>
+<p>Cache savings belong to the workload that generates the cache hits. If you share a system prompt across support, sales, and engineering endpoints, the savings belong to each endpoint proportionally to its hit rate.</p>
+<p>Attribution requires per-request records with:</p>
+<ul>
+<li>cache_write_tokens (full price)</li>
+<li>cache_read_tokens (discounted price)</li>
+<li>cache_hit (boolean or hit rate)</li>
+<li>feature / endpoint</li>
+</ul>
+<p>Without this split, you cannot answer: "Did the support endpoint save money, or did the eval suite?" The answer matters because you optimize the endpoint with the worst hit rate, not the one with the most tokens.</p>
+<h2>When caching is not worth it</h2>
+<p>Three cases where caching adds cost instead of saving it:</p>
+<p><strong>Low hit rate.</strong> Below 30%, the cache write premium (Anthropic) or TTL expiry (all providers) eats the discount. Short, unique prompts do not benefit.</p>
+<p><strong>Short prompts.</strong> A 500-token prompt saves fractions of a cent per request. The engineering time to implement and monitor caching exceeds the savings.</p>
+<p><strong>Anthropic with low volume.</strong> Anthropic charges a 25% premium on cache writes. If your volume is low and your hit rate is below 50%, the first-request premium exceeds subsequent discounts.</p>
+<h2>Measuring hit rate</h2>
+<p>Hit rate is the percentage of requests that share a cached prefix with a previous request within the TTL. Measure it per endpoint, not globally:</p>
+<pre style="background:#101726;padding:16px;border-radius:8px;overflow-x:auto;font-size:14px">SELECT
+  feature,
+  COUNT(*) AS total_requests,
+  SUM(CASE WHEN cache_read_tokens > 0 THEN 1 ELSE 0 END) AS cache_hits,
+  SUM(cache_read_tokens) AS total_cache_read,
+  AVG(cache_read_tokens * 1.0 / input_tokens) AS avg_prefix_ratio
+FROM llm_usage
+WHERE date >= CURRENT_DATE - 7
+GROUP BY feature
+ORDER BY cache_hits DESC</pre>
+<p>A healthy cache shows hit rate >50% and prefix ratio >0.6 (most of the input is cached). A hit rate below 30% means the TTL is too short or the prompts are too unique.</p>
+<h2>Provider-specific gotchas</h2>
+<p><strong>OpenAI.</strong> Cache is automatic for prompts >1,024 tokens. No explicit cache control. TTL is short (5-10 minutes), so batch workloads with gaps between requests lose the cache.</p>
+<p><strong>Anthropic.</strong> Explicit cache control via `cache_control` markers. You choose what to cache. This is powerful but requires code changes. The 25% write premium means you need hit rate >55% to break even on a two-request sequence.</p>
+<p><strong>Gemini.</strong> Context caching is explicit and has a 1-hour TTL. Good for batch jobs that run within the hour. The 75% discount on cache reads is the most aggressive, but the setup is the most manual.</p>
+<h2>Decision framework</h2>
+<p>Use this checklist before enabling caching:</p>
+<ol>
+<li>Is the average input prompt >1,000 tokens? If no, skip.</li>
+<li>Is the hit rate likely >30%? If no, skip.</li>
+<li>Is the workload latency-sensitive? If yes, cache reads also reduce latency — a secondary benefit.</li>
+<li>Can you measure cache_write_tokens and cache_read_tokens separately? If no, implement metering first.</li>
+<li>Is the provider Anthropic? If yes, require hit rate >55% to justify the write premium.</li>
+</ol>
+<p>If you answer yes to all, caching is likely your highest-ROI optimization. If you answer no to any, model routing or prompt compression is probably a better first lever.</p><h2>Related</h2>
+<ul><li><a href="/research/prompt-caching-explained">Prompt caching explained</a> - the mechanics of how providers cache prefixes.</li><li><a href="/research/llm-usage-metering">LLM usage metering and billing</a> - how to meter cache tokens correctly.</li><li><a href="/research/semantic-cache-economics">Semantic cache economics</a> - caching semantically similar prompts, not just exact prefixes.</li><li><a href="/research/model-routing">Model routing</a> - when routing beats caching as the first lever.</li></ul>
+<hr style="margin:48px 0 24px;border:none;border-top:1px solid #1E2A3F" /><p>Want this applied to your own LLM spend? FinOps LLM runs a free audit of your AI costs and shows where the savings are. <a href="/book">Book free audit &rarr;</a></p><p><a href="/research">Back to research</a></p>{% endblock %}

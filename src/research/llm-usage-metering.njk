@@ -1,0 +1,91 @@
+---json
+{
+  "permalink": "research/llm-usage-metering.html",
+  "lang": "en",
+  "head": {
+    "title": "LLM Usage Metering and Billing: How to Meter Internal AI Spend · FinOps LLM",
+    "description": "How to meter LLM usage accurately, allocate costs to teams and customers, and build internal billing for multi-tenant AI products.",
+    "robots": "index, follow",
+    "canonical": "https://finopsllm.com/research/llm-usage-metering",
+    "style": "body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}.wrap{max-width:840px;margin:0 auto;padding:56px 24px}a{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}table{border-collapse:collapse;width:100%;margin:24px 0;font-size:.95em}th,td{border:1px solid #1E2A3F;padding:10px 12px;text-align:left;color:#B6C0D2}th{color:#E6EAF2;background:#101726}.langsw{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;color:#647289;margin:0 0 26px}.langsw a{text-decoration:none}.langsw a[aria-current]{color:#E6EAF2;font-weight:600}",
+    "scripts": [
+      {
+        "src": "/assets/consent.js",
+        "defer": true
+      },
+      {
+        "src": "/assets/attribution.js",
+        "defer": true
+      }
+    ],
+    "jsonLd": [
+      "{\"@context\":\"https://schema.org\",\"@type\":\"TechArticle\",\"headline\":\"LLM Usage Metering and Billing\",\"description\":\"How to meter LLM usage accurately, allocate costs to teams and customers, and build internal billing for multi-tenant AI products.\",\"url\":\"https://finopsllm.com/research/llm-usage-metering\",\"datePublished\":\"2026-08-01\",\"dateModified\":\"2026-08-01\",\"image\":\"https://finopsllm.com/og.png\",\"author\":{\"@type\":\"Organization\",\"name\":\"FinOps LLM team\"},\"publisher\":{\"@type\":\"Organization\",\"name\":\"FinOps LLM\",\"url\":\"https://finopsllm.com/\"}}",
+      "{\"@context\":\"https://schema.org\",\"@type\":\"BreadcrumbList\",\"itemListElement\":[{\"@type\":\"ListItem\",\"position\":1,\"name\":\"Home\",\"item\":\"https://finopsllm.com/\"},{\"@type\":\"ListItem\",\"position\":2,\"name\":\"Research\",\"item\":\"https://finopsllm.com/research\"},{\"@type\":\"ListItem\",\"position\":3,\"name\":\"LLM Usage Metering and Billing\",\"item\":\"https://finopsllm.com/research/llm-usage-metering\"}]}",
+      "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"mainEntity\":[{\"@type\":\"Question\",\"name\":\"What is the difference between metering and billing?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Metering is the accurate measurement of usage: tokens, requests, latency, errors. Billing is the assignment of cost to that usage: per-team chargeback, per-customer invoicing, or internal showback. You cannot bill accurately without metering first.\"}},{\"@type\":\"Question\",\"name\":\"How do I meter LLM usage across multiple providers?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Use an OpenTelemetry collector or a gateway (LiteLLM, Helicone, Langfuse) that normalizes provider-specific usage records into a common schema. Each request should carry provider, model, input tokens, output tokens, cache-read tokens, cache-write tokens, retry count, and latency.\"}},{\"@type\":\"Question\",\"name\":\"What is the minimum viable metering setup?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"A single OpenTelemetry span per LLM request with attributes for provider, model, input_tokens, output_tokens, and cost_estimate. Ship these to a ClickHouse or BigQuery table and aggregate daily. That is enough for showback within a week.\"}}]}"
+    ]
+  }
+}
+---
+{% extends "shell.njk" %}{% block body %}<nav class="langsw" aria-label="Language"><a href="/research/llm-usage-metering" hreflang="en" aria-current="page">EN</a></nav><h1>LLM usage metering and billing</h1>
+<p class="updated" style="color:#6B7689;font-size:14px;margin-top:-6px">Published 1 August 2026</p>
+<p>Most teams cannot answer a simple question: which feature, team, or customer caused this LLM bill? Provider invoices group everything into one line item. Metering is the fix. It means recording every request with enough metadata to allocate cost later. Billing is what you do with that data: chargeback to teams, invoicing to customers, or showback to leadership.</p>
+<p>This is not theoretical. Companies running multi-tenant AI products need per-customer metering to invoice accurately. Companies running internal AI platforms need per-team metering to allocate budget. Both need the same underlying records.</p>
+<h2>What to meter</h2>
+<p>Every LLM request should produce one record with these fields:</p>
+<table>
+<thead><tr><th>Field</th><th>Why it matters</th><th>Example</th></tr></thead>
+<tbody>
+<tr><td>Provider</td><td>Cross-provider cost comparison</td><td>openai, anthropic, bedrock</td></tr>
+<tr><td>Model</td><td>Model mix drives cost</td><td>gpt-4o, claude-sonnet-4, llama-3-70b</td></tr>
+<tr><td>Input tokens</td><td>Largest cost driver for most workloads</td><td>1,247</td></tr>
+<tr><td>Output tokens</td><td>Second largest cost driver</td><td>89</td></tr>
+<tr><td>Cache-read tokens</td><td>Discounted input — do not count as savings</td><td>3,400</td></tr>
+<tr><td>Cache-write tokens</td><td>Full-price input that primes the cache</td><td>1,200</td></tr>
+<tr><td>Retry count</td><td>Retries multiply cost silently</td><td>2</td></tr>
+<tr><td>Latency</td><td>Quality-of-service signal</td><td>847ms</td></tr>
+<tr><td>Feature / endpoint</td><td>Attribution to product surface</td><td>support-summarize, agent-research, eval-suite</td></tr>
+<tr><td>Team / owner</td><td>Attribution to budget owner</td><td>support-eng, platform, data-science</td></tr>
+<tr><td>Customer / tenant</td><td>Attribution for external billing</td><td>acme-corp, internal</td></tr>
+</tbody>
+</table>
+<p>Without cache-read and cache-write split, teams miscount savings. Prompt caching reduces input cost, but the cache-read discount only applies to repeated prefixes. If you count cache-read tokens as full savings, you overstate the benefit by 2-3x.</p>
+<h2>How to collect the data</h2>
+<p>Three patterns work in production:</p>
+<p><strong>Gateway pattern.</strong> Route all LLM traffic through a proxy (LiteLLM, Helicone, Langfuse, or a custom gateway). The gateway logs every request with metadata. This is the fastest to deploy and gives you one place to enforce budgets and rate limits. Downside: single point of failure, and you must route all traffic through it.</p>
+<p><strong>SDK instrumentation.</strong> Use OpenTelemetry auto-instrumentation or a thin wrapper around the provider SDK. Each request emits a span with attributes. This works when you control the application code and want per-request granularity without a gateway. Downside: you must instrument every service, and teams can forget.</p>
+<p><strong>Provider log export.</strong> Some providers (OpenAI, Anthropic) offer usage APIs or log exports. This is the easiest to set up but gives you daily aggregates, not per-request records. Use this as a reconciliation source, not as primary metering.</p>
+<p>The strongest setups use a gateway for enforcement plus SDK instrumentation for redundancy, then reconcile against provider invoices monthly.</p>
+<h2>Building the billing layer</h2>
+<p>Once you have daily usage records, the billing layer is a SQL aggregation:</p>
+<pre style="background:#101726;padding:16px;border-radius:8px;overflow-x:auto;font-size:14px">SELECT
+  team,
+  feature,
+  model,
+  SUM(input_tokens) AS input_tokens,
+  SUM(output_tokens) AS output_tokens,
+  SUM(cache_read_tokens) AS cache_read_tokens,
+  SUM(cost_estimate) AS total_cost
+FROM llm_usage
+WHERE date >= '2026-07-01'
+GROUP BY team, feature, model
+ORDER BY total_cost DESC</pre>
+<p>From this you can produce three outputs:</p>
+<p><strong>Showback.</strong> A monthly report per team: "You spent $4,230 on LLMs. $2,100 was support-summarize, $1,400 was agent-research, $730 was eval-suite." No money changes hands, but teams see their footprint. This is the right first step.</p>
+<p><strong>Chargeback.</strong> The same numbers, but finance actually deducts budget from each team. This requires trust in the data and agreement on allocation rules. Do not start here.</p>
+<p><strong>Customer billing.</strong> For multi-tenant products: per-tenant usage × your pricing model (per-token, per-request, or subscription overage). This needs the most accurate metering because customers dispute invoices.</p>
+<h2>Common mistakes</h2>
+<p><strong>Counting cache-read tokens as savings.</strong> A cache-read token costs less than a full input token, but it is not free. The savings are the difference between what you would have paid and what you paid, not the full cache-read volume.</p>
+<p><strong>Ignoring retries.</strong> A request that retries three times costs 3x the tokens. If your metering only records successful requests, you under-report cost by 10-30% for unreliable endpoints.</p>
+<p><strong>Daily aggregates only.</strong> Daily totals hide spikes. A single runaway agent loop can burn $500 in an hour and vanish into the daily average. Keep per-request records for at least 30 days, aggregate for reporting.</p>
+<p><strong>No reconciliation.</strong> Your internal metering will not match provider invoices exactly. Reconcile monthly: internal total vs invoice total. If the gap is >5%, find out why. Common causes: unlogged providers, timestamp skew, or retries counted differently.</p>
+<h2>Minimum viable setup</h2>
+<p>You can have showback running in a week:</p>
+<ol>
+<li>Instrument one service with OpenTelemetry. Emit one span per LLM request with provider, model, input_tokens, output_tokens, feature, team.</li>
+<li>Ship spans to ClickHouse or BigQuery. A simple table with the fields above is enough.</li>
+<li>Write a daily aggregation query. Run it as a scheduled job.</li>
+<li>Publish a monthly report. Email it to team leads.</li>
+</ol>
+<p>Do not build a custom dashboard before you have the data flowing. A CSV export emailed monthly is better than a beautiful dashboard with no data.</p><h2>Related</h2>
+<ul><li><a href="/research/ai-chargeback-showback">AI chargeback and showback</a> - moving cost to owners once you trust the numbers.</li><li><a href="/research/llm-cost-attribution">LLM cost attribution</a> - the broader attribution framework.</li><li><a href="/research/prompt-caching-explained">Prompt caching explained</a> - why cache-read tokens need separate accounting.</li><li><a href="/research/agent-spend-guardrails">Agent spend guardrails</a> - preventing runaway spend once you can meter it.</li></ul>
+<hr style="margin:48px 0 24px;border:none;border-top:1px solid #1E2A3F" /><p>Want this applied to your own LLM spend? FinOps LLM runs a free audit of your AI costs and shows where the savings are. <a href="/book">Book free audit &rarr;</a></p><p><a href="/research">Back to research</a></p>{% endblock %}
