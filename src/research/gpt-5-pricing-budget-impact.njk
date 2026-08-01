@@ -1,0 +1,105 @@
+---json
+{
+  "permalink": "research/gpt-5-pricing-budget-impact.html",
+  "lang": "en",
+  "head": {
+    "title": "GPT-5 Pricing and Budget Impact: A 2026 Planning Guide · FinOps LLM",
+    "description": "Plan your AI budget around GPT-5 pricing. Worked scenarios for support, coding, and research workloads, plus the hidden cost drivers that blow up forecasts.",
+    "robots": "index, follow",
+    "canonical": "https://finopsllm.com/research/gpt-5-pricing-budget-impact",
+    "style": "body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}.wrap{max-width:860px;margin:0 auto;padding:56px 24px}a{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}table{border-collapse:collapse;width:100%;margin:24px 0;font-size:.95em}th,td{border:1px solid #1E2A3F;padding:10px 12px;text-align:left;color:#B6C0D2}th{color:#E6EAF2;background:#101726}.callout{border-left:4px solid #7AAFFF;padding-left:16px;margin:24px 0;font-style:italic;color:#B6C0D2}",
+    "scripts": [
+      {"src": "/assets/consent.js", "defer": true},
+      {"src": "/assets/attribution.js", "defer": true}
+    ],
+    "jsonLd": [
+      "{\"@context\":\"https://schema.org\",\"@type\":\"TechArticle\",\"headline\":\"GPT-5 Pricing and Budget Impact: A 2026 Planning Guide\",\"description\":\"Plan your AI budget around GPT-5 pricing. Worked scenarios for support, coding, and research workloads, plus the hidden cost drivers that blow up forecasts.\",\"url\":\"https://finopsllm.com/research/gpt-5-pricing-budget-impact\",\"datePublished\":\"2026-08-01\",\"dateModified\":\"2026-08-01\",\"image\":\"https://finopsllm.com/og.png\",\"author\":{\"@type\":\"Organization\",\"name\":\"FinOps LLM team\"},\"publisher\":{\"@type\":\"Organization\",\"name\":\"FinOps LLM\",\"url\":\"https://finopsllm.com/\"}}",
+      "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"mainEntity\":[{\"@type\":\"Question\",\"name\":\"How much should I budget for GPT-5 per month?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Monthly GPT-5 budget depends on use case. A support bot handling 10K tickets per month on Terra costs roughly $267. A coding assistant generating 600 functions per day on Sol can exceed $6,000 per month. Reasoning and research workloads scale fastest.\"}},{\"@type\":\"Question\",\"name\":\"What hidden costs increase GPT-5 spend?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Hidden GPT-5 costs include reasoning tokens billed at output rates, cache misses, retry loops, tool-call tokens, and evaluation spend during development. These can multiply the sticker price by 2–5x.\"}},{\"@type\":\"Question\",\"name\":\"Is GPT-5 more expensive than GPT-4o?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Yes. GPT-5 input and output rates are roughly 2–3x higher than GPT-4o. However, GPT-5 may reduce total cost on complex tasks by succeeding in a single pass where GPT-4o needs multiple retries.\"}}]}"
+    ]
+  }
+}
+---
+{% extends "shell.njk" %}{% block body %}<h1>GPT-5 pricing and budget impact</h1>
+<p class="updated" style="color:#6B7689;font-size:14px;margin-top:-6px">Updated 1 August 2026</p>
+<p>GPT-5 is OpenAI's most capable model family, but capability comes at a price. Budgeting for GPT-5 is not as simple as multiplying token volume by a rate card. The effective cost depends on workload type, reasoning depth, cache efficiency, and how often the model retries. This guide walks through realistic 2026 budgets for three common workloads.</p>
+
+<h2>GPT-5 API pricing at a glance</h2>
+<table>
+<thead><tr><th>Model</th><th>Input $/1M</th><th>Output $/1M</th><th>Cache read $/1M</th><th>Best for</th></tr></thead>
+<tbody>
+<tr><td>GPT-5.6 Luna</td><td>$1.00</td><td>$6.00</td><td>$0.10</td><td>Classification, routing, extraction</td></tr>
+<tr><td>GPT-5.6 Terra</td><td>$2.50</td><td>$15.00</td><td>$0.25</td><td>Agents, multi-turn, moderate reasoning</td></tr>
+<tr><td>GPT-5.6 Sol</td><td>$5.00</td><td>$30.00</td><td>$0.50</td><td>Complex code, research, hard reasoning</td></tr>
+<tr><td>GPT-5.5</td><td>$5.00</td><td>$30.00</td><td>$0.50</td><td>Frontier reasoning, legacy targeting</td></tr>
+</tbody>
+</table>
+<p>These are API rates. ChatGPT subscriptions are a different economic model and suit individuals or small teams, not production applications.</p>
+
+<h2>Budget scenario 1: customer support bot</h2>
+<p>A support bot resolves tickets with multi-turn conversations and occasional tool use. We assume Terra is the right tier because the task requires reasoning but not frontier coding.</p>
+<ul>
+<li>10,000 tickets per month</li>
+<li>2,000 input tokens and 400 output tokens per turn</li>
+<li>Average 3 turns per ticket</li>
+<li>90% resolution rate without escalation</li>
+</ul>
+<p><strong>Cost per ticket:</strong> (2,000 × $2.50 + 400 × $15.00) / 1,000,000 × 3 = $0.024<br>
+<strong>Cost per resolved ticket:</strong> $0.024 / 0.90 = $0.0267<br>
+<strong>Monthly budget:</strong> 10,000 × $0.0267 = <strong>$267</strong></p>
+<p>If the same workload runs on Sol, the monthly cost jumps to roughly $534, with only marginal improvement on routine tickets. Routing simple tickets to Luna could cut the bill to under $120.</p>
+
+<h2>Budget scenario 2: coding assistant</h2>
+<p>A development team uses GPT-5 for code generation and review. Sol is appropriate for complex functions; Terra may suffice for simpler snippets.</p>
+<ul>
+<li>600 functions generated per day, 22 working days per month</li>
+<li>1,500 input tokens and 600 output tokens per function</li>
+<li>Sol success rate: 88% first pass</li>
+<li>Terra success rate: 75% first pass</li>
+</ul>
+<p><strong>Sol cost per function:</strong> (1,500 × $5.00 + 600 × $30.00) / 1,000,000 = $0.0255<br>
+<strong>Sol cost per working function:</strong> $0.0255 / 0.88 = $0.0290<br>
+<strong>Monthly Sol budget:</strong> 600 × 22 × $0.0290 = <strong>$6,108</strong></p>
+<p><strong>Terra cost per function:</strong> (1,500 × $2.50 + 600 × $15.00) / 1,000,000 = $0.0135<br>
+<strong>Terra cost per working function:</strong> $0.0135 / 0.75 = $0.0180<br>
+<strong>Monthly Terra budget:</strong> 600 × 22 × $0.0180 = $3,564</p>
+<p>The cheaper tier saves $2,544 per month, but the 13-point drop in first-pass success may increase downstream engineering time. The right choice depends on how much debugging costs.</p>
+
+<h2>Budget scenario 3: research and synthesis</h2>
+<p>A research team uses GPT-5 Sol to analyze documents, synthesize findings, and generate reports. This workload is dominated by long context and reasoning tokens.</p>
+<ul>
+<li>500 research queries per month</li>
+<li>50,000 input tokens per query, including context</li>
+<li>5,000 output tokens per query, including reasoning</li>
+</ul>
+<p><strong>Cost per query:</strong> (50,000 × $5.00 + 5,000 × $30.00) / 1,000,000 = $0.40<br>
+<strong>Monthly budget:</strong> 500 × $0.40 = <strong>$200</strong></p>
+<p>This looks modest, but if the team moves from 500 to 5,000 queries per month, the budget becomes $2,000. Cache reads can help, but only if the same context is reused multiple times.</p>
+
+<h2>Hidden costs that blow up GPT-5 budgets</h2>
+<ul>
+<li><strong>Reasoning tokens.</strong> Billed as output, these can multiply effective output volume by 2–5x on hard problems.</li>
+<li><strong>Cache misses.</strong> A stable prefix must be reused within 30 minutes; otherwise you pay full input price again.</li>
+<li><strong>Retry loops.</strong> Failed or ambiguous prompts still consume tokens. A brittle parser can double effective cost.</li>
+<li><strong>Tool calls.</strong> Each tool invocation sends and receives tokens. Multi-tool agents compound quickly.</li>
+<li><strong>Evaluation spend.</strong> Development and benchmarking can exceed production spend if not tracked separately.</li>
+</ul>
+
+<h2>How to build a GPT-5 budget that survives reality</h2>
+<ol>
+<li><strong>Start with a workload model.</strong> Estimate requests per month, tokens per request, and success rate by tier.</li>
+<li><strong>Add a 30–50% contingency.</strong> Reasoning tokens, retries, and growth will consume it.</li>
+<li><strong>Track cost per successful task.</strong> Divide total spend by completed, validated outcomes, not raw requests.</li>
+<li><strong>Benchmark alternatives.</strong> Claude Sonnet, Gemini, and DeepSeek may deliver similar quality at lower cost for some tasks.</li>
+<li><strong>Review monthly.</strong> Model pricing and capability change fast. A budget set in January will be wrong by June.</li>
+</ol>
+<div class="callout">The headline GPT-5 rate is only the starting point. The budget that matters is cost per successful outcome, and that number depends on how well you route, cache, and guardrail the workload.</div>
+
+<h2>Related</h2>
+<ul>
+<li><a href="/research/gpt-5-vs-gpt-4o-cost-comparison">GPT-5 vs GPT-4o cost comparison</a> — when the upgrade pays for itself.</li>
+<li><a href="/research/how-much-does-gpt5-cost">How much does GPT-5 cost?</a> — full pricing breakdown.</li>
+<li><a href="/research/gpt-5-6-pricing-tier-guide">GPT-5.6 pricing tier guide</a> — Luna, Terra, and Sol routing.</li>
+<li><a href="/research/model-routing">Model routing</a> — sending requests to the right cost tier.</li>
+</ul>
+
+<hr style="margin:48px 0 24px;border:none;border-top:1px solid #1E2A3F" /><p>Want this applied to your own LLM spend? FinOps LLM runs a free audit of your AI costs and shows where the savings are. <a href="/book">Book free audit &rarr;</a></p><p><a href="/research">Back to research</a></p>{% endblock %}

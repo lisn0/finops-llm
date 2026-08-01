@@ -1,0 +1,97 @@
+---json
+{
+  "permalink": "research/gpt-5-vs-gpt-4o-cost-comparison.html",
+  "lang": "en",
+  "head": {
+    "title": "GPT-5 vs GPT-4o Cost Comparison: When to Upgrade · FinOps LLM",
+    "description": "GPT-5 vs GPT-4o: compare API pricing, output quality, and total cost per task. See when GPT-5 is cheaper despite the higher rate card.",
+    "robots": "index, follow",
+    "canonical": "https://finopsllm.com/research/gpt-5-vs-gpt-4o-cost-comparison",
+    "style": "body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}.wrap{max-width:860px;margin:0 auto;padding:56px 24px}a{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}table{border-collapse:collapse;width:100%;margin:24px 0;font-size:.95em}th,td{border:1px solid #1E2A3F;padding:10px 12px;text-align:left;color:#B6C0D2}th{color:#E6EAF2;background:#101726}.callout{border-left:4px solid #7AAFFF;padding-left:16px;margin:24px 0;font-style:italic;color:#B6C0D2}",
+    "scripts": [
+      {"src": "/assets/consent.js", "defer": true},
+      {"src": "/assets/attribution.js", "defer": true}
+    ],
+    "jsonLd": [
+      "{\"@context\":\"https://schema.org\",\"@type\":\"TechArticle\",\"headline\":\"GPT-5 vs GPT-4o Cost Comparison: When to Upgrade\",\"description\":\"GPT-5 vs GPT-4o: compare API pricing, output quality, and total cost per task. See when GPT-5 is cheaper despite the higher rate card.\",\"url\":\"https://finopsllm.com/research/gpt-5-vs-gpt-4o-cost-comparison\",\"datePublished\":\"2026-08-01\",\"dateModified\":\"2026-08-01\",\"image\":\"https://finopsllm.com/og.png\",\"author\":{\"@type\":\"Organization\",\"name\":\"FinOps LLM team\"},\"publisher\":{\"@type\":\"Organization\",\"name\":\"FinOps LLM\",\"url\":\"https://finopsllm.com/\"}}",
+      "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"mainEntity\":[{\"@type\":\"Question\",\"name\":\"Is GPT-5 more expensive than GPT-4o?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Yes, GPT-5 API rates are roughly 2–3x higher than GPT-4o. However, GPT-5 can be cheaper per successful task on complex workloads because it often succeeds in one pass where GPT-4o needs retries.\"}},{\"@type\":\"Question\",\"name\":\"When should I use GPT-5 instead of GPT-4o?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Use GPT-5 for multi-step reasoning, complex code generation, long-document analysis, and agentic workflows. Use GPT-4o for classification, extraction, summarization, and high-volume simple tasks.\"}},{\"@type\":\"Question\",\"name\":\"How do I compare GPT-5 and GPT-4o costs fairly?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Divide total API cost by the number of successful outcomes. A cheaper model that fails more often can cost more per successful task than an expensive model that succeeds on the first try.\"}}]}"
+    ]
+  }
+}
+---
+{% extends "shell.njk" %}{% block body %}<h1>GPT-5 vs GPT-4o cost comparison</h1>
+<p class="updated" style="color:#6B7689;font-size:14px;margin-top:-6px">Updated 1 August 2026</p>
+<p>GPT-5 is more expensive than GPT-4o at the rate-card level. The question is whether it is more expensive at the outcome level. On simple tasks, GPT-4o usually wins. On complex tasks, GPT-5's higher success rate can make it cheaper per successful result. The right comparison is not price per token; it is cost per completed task.</p>
+
+<h2>Rate card comparison</h2>
+<table>
+<thead><tr><th>Model</th><th>Input $/1M</th><th>Output $/1M</th><th>Cache read $/1M</th></tr></thead>
+<tbody>
+<tr><td>GPT-4o</td><td>$2.50</td><td>$10.00</td><td>$1.25</td></tr>
+<tr><td>GPT-4o mini</td><td>$0.15</td><td>$0.60</td><td>$0.075</td></tr>
+<tr><td>GPT-5.6 Luna</td><td>$1.00</td><td>$6.00</td><td>$0.10</td></tr>
+<tr><td>GPT-5.6 Terra</td><td>$2.50</td><td>$15.00</td><td>$0.25</td></tr>
+<tr><td>GPT-5.6 Sol</td><td>$5.00</td><td>$30.00</td><td>$0.50</td></tr>
+</tbody>
+</table>
+<p>At first glance, GPT-5.6 Sol is 2x more expensive than GPT-4o on input and 3x on output. But the rate card does not tell the whole story.</p>
+
+<h2>Cost per successful task: the fair metric</h2>
+<p>Imagine a coding task with 1,500 input tokens and 600 output tokens. We compare GPT-4o and GPT-5.6 Sol, including the retries needed to get working code.</p>
+<table>
+<thead><tr><th>Model</th><th>Cost per call</th><th>First-pass success</th><th>Cost per working function</th></tr></thead>
+<tbody>
+<tr><td>GPT-4o</td><td>$0.00975</td><td>65%</td><td>$0.0150</td></tr>
+<tr><td>GPT-5.6 Terra</td><td>$0.0135</td><td>80%</td><td>$0.0169</td></tr>
+<tr><td>GPT-5.6 Sol</td><td>$0.0255</td><td>88%</td><td>$0.0290</td></tr>
+</tbody>
+</table>
+<p>On this task, GPT-4o is cheaper per working function than Sol. Terra sits in the middle. But this changes as task complexity increases.</p>
+
+<h2>When GPT-5 becomes cheaper than GPT-4o</h2>
+<p>GPT-5 pulls ahead when complexity raises the retry gap. Consider a multi-step reasoning task where GPT-4o succeeds 40% of the time and GPT-5.6 Sol succeeds 80%.</p>
+<ul>
+<li><strong>GPT-4o:</strong> $0.00975 per call / 0.40 = $0.0244 per success</li>
+<li><strong>GPT-5.6 Sol:</strong> $0.0255 per call / 0.80 = $0.0319 per success</li>
+</ul>
+<p>Sol is still more expensive here, but the gap narrows. If the task also requires longer reasoning tokens on GPT-4o retries, or if a failed GPT-4o result requires human intervention, GPT-5 can become the cheaper total solution.</p>
+<p>Tasks where GPT-5 typically wins on total cost:</p>
+<ul>
+<li>Multi-hop research and synthesis</li>
+<li>Complex code generation with strict correctness requirements</li>
+<li>Agentic workflows with tool use and planning</li>
+<li>Long-document analysis where context understanding reduces follow-up questions</li>
+</ul>
+
+<h2>When GPT-4o is the clear choice</h2>
+<p>GPT-4o remains the better economic choice for high-volume, low-complexity work. Good candidates include:</p>
+<ul>
+<li>Classification and intent routing</li>
+<li>Structured extraction from short documents</li>
+<li>Simple summarization</li>
+<li>High-volume batch processing</li>
+<li>Any task where a cheaper model can be verified automatically</li>
+</ul>
+<p>For these tasks, GPT-5's quality advantage is wasted. The cheaper model does the job and the savings scale directly with volume.</p>
+
+<h2>The routing answer: use both</h2>
+<p>Most production systems should not choose one model. They should route requests based on complexity. A lightweight classifier sends simple work to GPT-4o or GPT-4o mini and escalates hard work to GPT-5. This captures most of the savings of GPT-4o while keeping GPT-5 for the tasks where it earns its price.</p>
+<div class="callout">The cheapest production architecture is usually a cascade: GPT-4o mini for routing, GPT-4o for standard tasks, and GPT-5 only for tasks that genuinely need frontier reasoning.</div>
+
+<h2>Other factors beyond token cost</h2>
+<ul>
+<li><strong>Latency.</strong> GPT-5 is slower. For real-time applications, the user-experience cost may outweigh token savings.</li>
+<li><strong>Context window.</strong> Both models support long context, but GPT-5 uses it more efficiently on complex documents.</li>
+<li><strong>Reasoning tokens.</strong> GPT-5's reasoning is billed but visible in cost tracking. GPT-4o may hide reasoning in longer outputs.</li>
+<li><strong>Provider risk.</strong> Relying on a single model increases exposure to price changes and outages.</li>
+</ul>
+
+<h2>Related</h2>
+<ul>
+<li><a href="/research/gpt-5-pricing-budget-impact">GPT-5 pricing and budget impact</a> — worked budget scenarios.</li>
+<li><a href="/research/how-much-does-gpt5-cost">How much does GPT-5 cost?</a> — full pricing guide.</li>
+<li><a href="/research/gpt-5-6-pricing-tier-guide">GPT-5.6 pricing tier guide</a> — Luna, Terra, Sol routing.</li>
+<li><a href="/research/model-routing">Model routing</a> — building a cost-effective cascade.</li>
+</ul>
+
+<hr style="margin:48px 0 24px;border:none;border-top:1px solid #1E2A3F" /><p>Want this applied to your own LLM spend? FinOps LLM runs a free audit of your AI costs and shows where the savings are. <a href="/book">Book free audit &rarr;</a></p><p><a href="/research">Back to research</a></p>{% endblock %}

@@ -1,0 +1,79 @@
+---json
+{
+  "permalink": "research/it-chargeback-showback-ai.html",
+  "lang": "en",
+  "head": {
+    "title": "IT Chargeback and Showback for AI: A Practical Guide · FinOps LLM",
+    "description": "How to apply IT chargeback and showback to AI and LLM spend. Allocation models, implementation steps, and the right starting point for enterprise FinOps teams.",
+    "robots": "index, follow",
+    "canonical": "https://finopsllm.com/research/it-chargeback-showback-ai",
+    "style": "body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}.wrap{max-width:860px;margin:0 auto;padding:56px 24px}a{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}ol li,ul li{margin-bottom:8px}.callout{border-left:4px solid #7AAFFF;padding-left:16px;margin:24px 0;font-style:italic;color:#B6C0D2}",
+    "scripts": [
+      {"src": "/assets/consent.js", "defer": true},
+      {"src": "/assets/attribution.js", "defer": true}
+    ],
+    "jsonLd": [
+      "{\"@context\":\"https://schema.org\",\"@type\":\"TechArticle\",\"headline\":\"IT Chargeback and Showback for AI: A Practical Guide\",\"description\":\"How to apply IT chargeback and showback to AI and LLM spend. Allocation models, implementation steps, and the right starting point for enterprise FinOps teams.\",\"url\":\"https://finopsllm.com/research/it-chargeback-showback-ai\",\"datePublished\":\"2026-08-01\",\"dateModified\":\"2026-08-01\",\"image\":\"https://finopsllm.com/og.png\",\"author\":{\"@type\":\"Organization\",\"name\":\"FinOps LLM team\"},\"publisher\":{\"@type\":\"Organization\",\"name\":\"FinOps LLM\",\"url\":\"https://finopsllm.com/\"}}",
+      "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"mainEntity\":[{\"@type\":\"Question\",\"name\":\"What is IT chargeback for AI?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"IT chargeback for AI bills business units directly for the AI services they consume, such as LLM API calls, inference compute, and vector storage. It moves budget ownership to the team that controls usage.\"}},{\"@type\":\"Question\",\"name\":\"What is IT showback for AI?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"IT showback for AI reports AI costs to business units without billing them. It creates visibility into which teams, features, and experiments drive spend while the central IT budget remains unchanged.\"}},{\"@type\":\"Question\",\"name\":\"Should we start with chargeback or showback for LLM spend?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Most enterprises start with showback for AI because LLM costs are new, spiky, and hard to allocate precisely. Once tagging is trusted and teams understand their usage, they move the most controllable services to chargeback.\"}}]}"
+    ]
+  }
+}
+---
+{% extends "shell.njk" %}{% block body %}<h1>IT chargeback and showback for AI</h1>
+<p class="updated" style="color:#6B7689;font-size:14px;margin-top:-6px">Updated 1 August 2026</p>
+<p>AI spend does not behave like traditional IT spend. A single prompt can cost fractions of a cent or several dollars depending on model choice, context size, and reasoning depth. A feature launch can multiply monthly AI costs overnight. That volatility makes chargeback and showback more important for AI than for almost any other technology category.</p>
+
+<h2>The AI-specific case for allocation</h2>
+<p>Without allocation, AI costs sit in a central budget where no one feels ownership. Product teams optimize for engagement and capability; infrastructure teams optimize for reliability. Cost falls between the two. Chargeback and showback fix this by making AI spend visible to the people who can influence it.</p>
+<p>AI workloads are particularly well suited to allocation because:</p>
+<ul>
+<li>Usage is measurable at the request level.</li>
+<li>Costs map clearly to features, teams, or customer cohorts.</li>
+<li>Teams have real levers: model tier, prompt design, caching, batching, and routing.</li>
+<li>Small optimizations repeated at scale produce large savings.</li>
+</ul>
+
+<h2>Showback first: why almost every AI program starts here</h2>
+<p>Showback is the right starting point for most AI FinOps programs. It lets teams see their footprint without the political friction of budget transfer. This matters because AI cost attribution is harder than it looks in the beginning.</p>
+<p>Common showback challenges for AI include:</p>
+<ul>
+<li><strong>Shared models.</strong> A single endpoint may serve multiple teams or products.</li>
+<li><strong>Prompt context.</strong> The same system prompt may be reused across features, making per-feature attribution fuzzy.</li>
+<li><strong>Experimentation.</strong> Research and prototype spend can spike and then disappear, distorting monthly averages.</li>
+<li><strong>Provider invoices.</strong> Cloud marketplaces and resellers can delay or obscure usage detail.</li>
+</ul>
+<p>Showback surfaces these issues before anyone's budget is at stake. It gives finance and engineering time to agree on allocation rules.</p>
+
+<h2>Moving to chargeback for controllable AI services</h2>
+<p>Once showback is stable, the most controllable AI services can move to chargeback. Good early candidates include:</p>
+<ol>
+<li><strong>Direct LLM API usage.</strong> Teams can control model choice, prompt length, and caching.</li>
+<li><strong>Production inference.</strong> Stable workloads with clear feature ownership.</li>
+<li><strong>Agent workloads.</strong> Teams can add guardrails, retry caps, and model-tier ceilings.</li>
+<li><strong>Batch and evaluation jobs.</strong> Non-urgent workloads that can be scheduled and optimized.</li>
+</ol>
+<p>Keep showback for shared foundation models, platform infrastructure, and research sandboxes where precise allocation is unfair or impossible.</p>
+
+<h2>Implementation checklist</h2>
+<ol>
+<li><strong>Tag every AI request.</strong> Capture team, feature, environment, model, provider, and request type.</li>
+<li><strong>Build a cost allocation model.</strong> Decide how shared costs are split: by request count, token volume, or negotiated rule.</li>
+<li><strong>Run showback for one quarter.</strong> Distribute reports, collect feedback, and fix data quality issues.</li>
+<li><strong>Define chargeback candidates.</strong> Identify services with clean attribution and controllable usage.</li>
+<li><strong>Agree on budget mechanics.</strong> Work with finance to decide how charged-back costs flow into team budgets.</li>
+<li><strong>Automate the pipeline.</strong> Export monthly chargeback and showback reports to NetSuite, QuickBooks, CSV, or API.</li>
+</ol>
+
+<h2>Avoid the most common mistakes</h2>
+<p>The biggest mistake is charging back costs that teams cannot control. If a team is forced to use a shared model with no ability to choose a cheaper alternative, chargeback becomes a tax, not a lever. The second biggest mistake is allocating too finely too early. Start with a few dimensions that everyone trusts, then add granularity as the data improves.</p>
+<div class="callout">The goal is not perfect allocation. The goal is fair enough allocation that teams change behavior. Showback gets you there safely; chargeback locks in the accountability.</div>
+
+<h2>Related</h2>
+<ul>
+<li><a href="/research/chargeback-vs-showback">Chargeback vs showback</a> — the foundational comparison.</li>
+<li><a href="/research/showback-comes-first-chargeback">Why showback comes before chargeback</a> — the migration path.</li>
+<li><a href="/research/llm-chargeback-showback">LLM chargeback and showback</a> — technical implementation details.</li>
+<li><a href="/research/agent-spend-guardrails">Agent spend guardrails</a> — controls for agentic AI workloads.</li>
+</ul>
+
+<hr style="margin:48px 0 24px;border:none;border-top:1px solid #1E2A3F" /><p>Want this applied to your own LLM spend? FinOps LLM runs a free audit of your AI costs and shows where the savings are. <a href="/book">Book free audit &rarr;</a></p><p><a href="/research">Back to research</a></p>{% endblock %}

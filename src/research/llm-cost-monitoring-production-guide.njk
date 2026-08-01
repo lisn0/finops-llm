@@ -1,0 +1,101 @@
+---json
+{
+  "permalink": "research/llm-cost-monitoring-production-guide.html",
+  "lang": "en",
+  "head": {
+    "title": "LLM Cost Monitoring in Production: A Field Guide · FinOps LLM",
+    "description": "How to monitor LLM costs in production: metrics, alerts, dashboards, and runbooks that catch spikes before they hit your invoice.",
+    "robots": "index, follow",
+    "canonical": "https://finopsllm.com/research/llm-cost-monitoring-production-guide",
+    "style": "body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}.wrap{max-width:860px;margin:0 auto;padding:56px 24px}a{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}table{border-collapse:collapse;width:100%;margin:24px 0;font-size:.95em}th,td{border:1px solid #1E2A3F;padding:10px 12px;text-align:left;color:#B6C0D2}th{color:#E6EAF2;background:#101726}.callout{border-left:4px solid #7AAFFF;padding-left:16px;margin:24px 0;font-style:italic;color:#B6C0D2}",
+    "scripts": [
+      {"src": "/assets/consent.js", "defer": true},
+      {"src": "/assets/attribution.js", "defer": true}
+    ],
+    "jsonLd": [
+      "{\"@context\":\"https://schema.org\",\"@type\":\"TechArticle\",\"headline\":\"LLM Cost Monitoring in Production: A Field Guide\",\"description\":\"How to monitor LLM costs in production: metrics, alerts, dashboards, and runbooks that catch spikes before they hit your invoice.\",\"url\":\"https://finopsllm.com/research/llm-cost-monitoring-production-guide\",\"datePublished\":\"2026-08-01\",\"dateModified\":\"2026-08-01\",\"image\":\"https://finopsllm.com/og.png\",\"author\":{\"@type\":\"Organization\",\"name\":\"FinOps LLM team\"},\"publisher\":{\"@type\":\"Organization\",\"name\":\"FinOps LLM\",\"url\":\"https://finopsllm.com/\"}}",
+      "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"mainEntity\":[{\"@type\":\"Question\",\"name\":\"What should I monitor for LLM costs in production?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Monitor spend by feature, model, provider, team, and customer. Track token classes separately, including input, output, cache read, reasoning, and tool-call tokens. Watch for prompt growth, model drift, retry storms, and cache-hit regressions.\"}},{\"@type\":\"Question\",\"name\":\"How do I alert on LLM cost spikes?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Set daily spend thresholds tied to a feature's rolling baseline, not a global number. Alert on unexpected model shifts, cache-hit regressions, retry storms, and reconciliation variance between internal estimates and provider invoices.\"}},{\"@type\":\"Question\",\"name\":\"What is the minimum telemetry schema for LLM cost monitoring?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Capture provider, model, feature or endpoint, user or team, input tokens, output tokens, cache-read tokens, reasoning tokens, retries, tool calls, and estimated cost per request. OpenTelemetry GenAI semantic conventions are a strong baseline.\"}}]}"
+    ]
+  }
+}
+---
+{% extends "shell.njk" %}{% block body %}<h1>LLM cost monitoring in production</h1>
+<p class="updated" style="color:#6B7689;font-size:14px;margin-top:-6px">Updated 1 August 2026</p>
+<p>Monitoring LLM costs in production is different from monitoring traditional cloud infrastructure. The unit of cost is a token, not a server hour. A single request can cost anywhere from a fraction of a cent to several dollars. Spikes can come from prompt growth, model drift, retry loops, or one noisy customer. If your monitoring only shows the monthly invoice, you are not monitoring; you are autopsying.</p>
+
+<h2>The production monitoring stack</h2>
+<p>A production-ready LLM cost monitoring stack has four layers:</p>
+<ul>
+<li><strong>Instrumentation.</strong> Capture the right fields on every request.</li>
+<li><strong>Aggregation.</strong> Roll request-level data into useful dimensions.</li>
+<li><strong>Alerting.</strong> Detect deviations from baseline before they compound.</li>
+<li><strong>Runbooks.</strong> Tell the on-call engineer what to do when an alert fires.</li>
+</ul>
+
+<h2>Instrumentation: what to capture on every request</h2>
+<p>The minimum viable telemetry schema for cost monitoring includes:</p>
+<table>
+<thead><tr><th>Field</th><th>Why it matters</th></tr></thead>
+<tbody>
+<tr><td>Provider and exact model</td><td>Pricing differs by model version, not just family.</td></tr>
+<tr><td>Feature or endpoint</td><td>The fastest path to actionable attribution.</td></tr>
+<tr><td>Team or customer</td><td>Needed for chargeback and abuse detection.</td></tr>
+<tr><td>Input tokens</td><td>Largest controllable cost driver.</td></tr>
+<tr><td>Output tokens</td><td>Usually priced higher than input.</td></tr>
+<tr><td>Cache-read tokens</td><td>Discounted; must be tracked separately.</td></tr>
+<tr><td>Reasoning tokens</td><td>Billed as output; invisible to users.</td></tr>
+<tr><td>Retries</td><td>Failed work often looks like legitimate usage.</td></tr>
+<tr><td>Tool calls</td><td>Agents can fan out into many billed calls.</td></tr>
+<tr><td>Estimated cost</td><td>Lets you alert before invoice close.</td></tr>
+</tbody>
+</table>
+<p>OpenTelemetry's GenAI semantic conventions standardize most of these fields. Use them as the baseline rather than inventing your own schema.</p>
+
+<h2>Dashboards that matter</h2>
+<p>Most teams overbuild their dashboard layer. Start with five views:</p>
+<ol>
+<li><strong>Spend by feature.</strong> Top ten endpoints or workflows by cost and trend.</li>
+<li><strong>Spend by model and provider.</strong> Where expensive models are actually used.</li>
+<li><strong>Spend by team or customer.</strong> The foundation of chargeback and margin analysis.</li>
+<li><strong>Token trends.</strong> Input growth, output verbosity, and cache-read share over time.</li>
+<li><strong>Operational ratios.</strong> Cache hit rate, retry rate, and tool-call rate.</li>
+</ol>
+<p>If a dashboard does not help someone take action, remove it. Visibility without action is noise.</p>
+
+<h2>Alerts worth setting up</h2>
+<table>
+<thead><tr><th>Alert</th><th>Trigger</th><th>Why it matters</th></tr></thead>
+<tbody>
+<tr><td>Daily spend by feature</td><td>Spend > 150% of rolling 7-day baseline</td><td>Catches feature-level spikes same day.</td></tr>
+<tr><td>Unexpected model shift</td><td>Cheap endpoint suddenly routes to frontier model</td><td>Deployment or routing bug.</td></tr>
+<tr><td>Cache-hit regression</td><td>Cache-read share drops >10 percentage points</td><td>Paying full price for reprocessing.</td></tr>
+<tr><td>Retry storm</td><td>Median retries per task doubles</td><td>Downstream failure or brittle prompt.</td></tr>
+<tr><td>Agent loop</td><td>Tool-call count exceeds threshold</td><td>Runaway agent cost.</td></tr>
+<tr><td>Reconciliation variance</td><td>Internal estimate drifts >10% from provider</td><td>Missing or misclassified usage.</td></tr>
+</tbody>
+</table>
+<p>Alert thresholds should be tied to baselines, not static numbers. A startup's spike is an enterprise's normal Tuesday.</p>
+
+<h2>Runbooks: what to do when an alert fires</h2>
+<p>Every alert needs a runbook. For LLM cost spikes, the runbook usually follows this order:</p>
+<ol>
+<li><strong>Identify the dimension.</strong> Is it one feature, one model, one team, or one customer?</li>
+<li><strong>Check for recent deploys.</strong> Did a model default change, prompt template change, or routing rule change?</li>
+<li><strong>Look at token composition.</strong> Is the spike from input growth, output growth, retries, or tool calls?</li>
+<li><strong>Implement a guardrail.</strong> Cap output length, switch a default model, or throttle the noisy customer.</li>
+<li><strong>Validate the fix.</strong> Compare estimated cost before and after the change.</li>
+</ol>
+
+<h2>Monitoring is not the solution</h2>
+<p>Monitoring tells you where the waste is. It does not remove it. The actual savings come from the optimization work that follows: routing to cheaper models, compacting prompts, enabling caching, batching non-urgent work, and adding agent guardrails. Treat monitoring as the input to a weekly cost review, not a project that ends once the dashboard ships.</p>
+<div class="callout">If your cost monitoring cannot answer whether a spike came from prompt growth, model drift, retries, cache-share changes, or a noisy customer, your instrumentation is still too thin.</div>
+
+<h2>Related</h2>
+<ul>
+<li><a href="/research/llm-cost-monitoring">LLM cost monitoring</a> — the foundational telemetry guide.</li>
+<li><a href="/research/ai-cost-optimization-six-levers">Six levers for AI cost optimization</a> — what to do after monitoring finds the waste.</li>
+<li><a href="/research/anomaly-detection">LLM cost anomaly detection</a> — statistical methods for catching spikes.</li>
+<li><a href="/research/agent-spend-guardrails">Agent spend guardrails</a> — controls for runaway agent costs.</li>
+</ul>
+
+<hr style="margin:48px 0 24px;border:none;border-top:1px solid #1E2A3F" /><p>Want this applied to your own LLM spend? FinOps LLM runs a free audit of your AI costs and shows where the savings are. <a href="/book">Book free audit &rarr;</a></p><p><a href="/research">Back to research</a></p>{% endblock %}

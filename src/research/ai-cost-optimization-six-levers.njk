@@ -1,0 +1,80 @@
+---json
+{
+  "permalink": "research/ai-cost-optimization-six-levers.html",
+  "lang": "en",
+  "head": {
+    "title": "AI Cost Optimization: Six Levers That Actually Work · FinOps LLM",
+    "description": "Six proven levers for AI cost optimization: model routing, caching, prompt compression, batch pricing, provider arbitrage, and fallback controls. Impact ranges and when to use each.",
+    "robots": "index, follow",
+    "canonical": "https://finopsllm.com/research/ai-cost-optimization-six-levers",
+    "style": "body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}.wrap{max-width:860px;margin:0 auto;padding:56px 24px}a{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}table{border-collapse:collapse;width:100%;margin:24px 0;font-size:.95em}th,td{border:1px solid #1E2A3F;padding:10px 12px;text-align:left;color:#B6C0D2}th{color:#E6EAF2;background:#101726}.callout{border-left:4px solid #7AAFFF;padding-left:16px;margin:24px 0;font-style:italic;color:#B6C0D2}",
+    "scripts": [
+      {"src": "/assets/consent.js", "defer": true},
+      {"src": "/assets/attribution.js", "defer": true}
+    ],
+    "jsonLd": [
+      "{\"@context\":\"https://schema.org\",\"@type\":\"TechArticle\",\"headline\":\"AI Cost Optimization: Six Levers That Actually Work\",\"description\":\"Six proven levers for AI cost optimization: model routing, caching, prompt compression, batch pricing, provider arbitrage, and fallback controls. Impact ranges and when to use each.\",\"url\":\"https://finopsllm.com/research/ai-cost-optimization-six-levers\",\"datePublished\":\"2026-08-01\",\"dateModified\":\"2026-08-01\",\"image\":\"https://finopsllm.com/og.png\",\"author\":{\"@type\":\"Organization\",\"name\":\"FinOps LLM team\"},\"publisher\":{\"@type\":\"Organization\",\"name\":\"FinOps LLM\",\"url\":\"https://finopsllm.com/\"}}",
+      "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"mainEntity\":[{\"@type\":\"Question\",\"name\":\"What are the main levers for AI cost optimization?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"The six main levers are model routing, prompt caching, prompt compression, batch and async pricing, provider arbitrage, and fallback controls. Each has a typical savings range of 5–50%.\"}},{\"@type\":\"Question\",\"name\":\"Which AI cost optimization lever has the biggest impact?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Model routing usually has the biggest impact, with savings of 30–50%, because it sends each request to the cheapest model that meets the quality bar.\"}},{\"@type\":\"Question\",\"name\":\"How do I prioritize AI cost optimization work?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Start with attribution. Rank features by total spend and variance. Then apply the lever with the highest return for each feature, measuring cost per successful outcome rather than cost per token.\"}}]}"
+    ]
+  }
+}
+---
+{% extends "shell.njk" %}{% block body %}<h1>AI cost optimization: six levers</h1>
+<p class="updated" style="color:#6B7689;font-size:14px;margin-top:-6px">Updated 1 August 2026</p>
+<p>AI cost optimization is not about finding one magic setting. It is about stacking small, repeatable improvements across the lifecycle of a request. The six levers below are the ones we see produce measurable savings in production. Each has a quality tradeoff, a typical impact range, and a set of workloads where it works best.</p>
+
+<h2>The six levers at a glance</h2>
+<table>
+<thead><tr><th>Lever</th><th>Typical impact</th><th>Best for</th><th>Quality risk</th></tr></thead>
+<tbody>
+<tr><td>Model routing</td><td>30–50%</td><td>Mixed workloads with simple and complex requests</td><td>Low if confidence threshold is tuned</td></tr>
+<tr><td>Prompt caching</td><td>20–40%</td><td>Repeated prefixes, system prompts, documentation</td><td>Very low</td></tr>
+<tr><td>Prompt compression</td><td>15–30%</td><td>Long prompts with redundant context</td><td>Low if A/B tested</td></tr>
+<tr><td>Batch & async pricing</td><td>10–50%</td><td>Evals, enrichment, reporting, non-urgent jobs</td><td>Low; latency increases</td></tr>
+<tr><td>Provider arbitrage</td><td>20–35%</td><td>Tasks where multiple models meet quality bar</td><td>Medium; requires benchmarking</td></tr>
+<tr><td>Fallback controls</td><td>5–15%</td><td>Retry storms, outages, model degradation</td><td>Low</td></tr>
+</tbody>
+</table>
+
+<h2>1. Model routing</h2>
+<p>Model routing sends each request to the cheapest model that can handle it. A lightweight classifier scores request complexity and chooses a tier. Simple classification goes to a small model; hard reasoning goes to a frontier model.</p>
+<p>The savings come from volume. Most production traffic is not frontier-hard. Routing even half of it to a cheaper model cuts the bill substantially. The key is measuring success rate by tier and adjusting the routing threshold so quality does not regress.</p>
+
+<h2>2. Prompt caching</h2>
+<p>Prompt caching reuses a previously computed prefix. If your prompt starts with system instructions, documentation, or few-shot examples that do not change, caching can reduce input cost by 50–90% on repeated calls.</p>
+<p>Caching works best when the same prefix is reused multiple times within a short window. It does not help one-off queries or prompts where the entire context changes every time. Track cache-hit rate as a first-class metric.</p>
+
+<h2>3. Prompt compression</h2>
+<p>Prompt compression removes redundant context, deduplicates examples, and summarizes long inputs before sending them to the model. The goal is to send only the evidence the model needs for the specific task.</p>
+<p>This lever is high leverage for applications that pass large documents or conversation history. Every removed input token is a direct cost reduction. Compression must be A/B tested because aggressive summarization can hurt quality.</p>
+
+<h2>4. Batch and async pricing</h2>
+<p>Most providers offer discounted pricing for asynchronous batch workloads. OpenAI's batch API offers up to 50% off for non-urgent jobs. The tradeoff is latency: results arrive hours later, not seconds.</p>
+<p>Good candidates include evaluation runs, data enrichment, report generation, and reprocessing jobs. If a workload does not need an immediate response, batch pricing is often the fastest way to cut its cost.</p>
+
+<h2>5. Provider arbitrage</h2>
+<p>Provider arbitrage means sending the same task to whichever provider offers the best capability-per-dollar. For many tasks, models from DeepSeek, Gemini, or Anthropic can match OpenAI quality at a lower price.</p>
+<p>This lever requires benchmarking on your own data, not relying on leaderboard scores. The cheapest model that meets your quality bar is the right model. Re-evaluate quarterly because pricing and capability change fast.</p>
+
+<h2>6. Fallback controls</h2>
+<p>Fallback controls limit the cost of failure. They include retry caps, circuit breakers, model-tier ceilings, and agent step limits. Without them, a single outage or buggy prompt can generate thousands of expensive retry calls.</p>
+<p>This lever has a smaller direct savings range than routing or caching, but it prevents catastrophic spikes. It also protects the savings from the other five levers by stopping runaway spend.</p>
+
+<h2>How to prioritize the levers</h2>
+<p>Start with attribution. Break spend by feature, owner, model, provider, and workload type. Then rank by total spend and variance. Apply the lever with the highest expected return to the largest spenders first.</p>
+<p>Always measure cost per successful outcome, not cost per token. A cheaper model that fails more often can cost more per completed task than an expensive model that succeeds once.</p>
+
+<h2>The optimization operating rhythm</h2>
+<p>Strong teams review AI cost weekly. They compare the largest drivers, pick one or two optimization candidates, test behind feature flags, and reconcile results against provider data. This turns cost reduction from a one-time project into a repeatable habit.</p>
+<div class="callout">The best AI cost optimization programs do not use one lever. They stack them: route simple work to cheap models, cache repeated prefixes, compress prompts, move batch jobs to async lanes, benchmark alternatives, and guard against runaway retries.</div>
+
+<h2>Related</h2>
+<ul>
+<li><a href="/research/ai-cost-optimization">AI cost optimization</a> — the strategic overview.</li>
+<li><a href="/research/model-routing">Model routing</a> — building a routing layer.</li>
+<li><a href="/research/prompt-caching-explained">Prompt caching explained</a> — when caching pays off.</li>
+<li><a href="/research/provider-arbitrage">Provider arbitrage</a> — benchmarking cheaper alternatives.</li>
+<li><a href="/research/agent-spend-guardrails">Agent spend guardrails</a> — fallback controls for agents.</li>
+</ul>
+
+<hr style="margin:48px 0 24px;border:none;border-top:1px solid #1E2A3F" /><p>Want this applied to your own LLM spend? FinOps LLM runs a free audit of your AI costs and shows where the savings are. <a href="/book">Book free audit &rarr;</a></p><p><a href="/research">Back to research</a></p>{% endblock %}
