@@ -11,6 +11,10 @@
 {% if head.verification %}<meta name="msvalidate.01" content="{{ head.verification | safe }}" />{% endif %}
 {% if head.canonical %}<link rel="canonical" href="{{ head.canonical | safe }}" />{% endif %}
 {% for alt in head.hreflang %}<link rel="alternate" hreflang="{{ alt.lang }}" href="{{ alt.href | safe }}" />{% endfor %}
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="icon" type="image/x-icon" href="/favicon.ico" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+<link rel="manifest" href="/site.webmanifest" />
 {% if head.openGraph %}{% for tag in head.openGraph %}<meta property="{{ tag.property }}" content="{{ tag.content | safe }}" />{% endfor %}{% endif %}
 {% if head.twitter %}{% for tag in head.twitter %}<meta name="{{ tag.name }}" content="{{ tag.content | safe }}" />{% endfor %}{% endif %}
 {% for link in head.links %}{% if link.rel == 'preconnect' %}<link rel="{{ link.rel }}" href="{{ link.href | safe }}"{% if link.crossorigin %} crossorigin{% endif %} />{% else %}<link rel="{{ link.rel }}"{% if link.type %} type="{{ link.type }}"{% endif %}{% if link.sizes %} sizes="{{ link.sizes }}"{% endif %}{% if link.title %} title="{{ link.title }}"{% endif %} href="{{ link.href | safe }}" />{% endif %}{% endfor %}
