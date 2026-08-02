@@ -1,0 +1,162 @@
+{%- set article = articles[slug] -%}
+{%- if not article -%}
+  {{ throw("Missing article data for slug: " + slug) }}
+{%- endif -%}
+{%- set lang = lang or 'en' -%}
+{%- set locale = article.languages[lang] or article.languages['en'] -%}
+{%- if not locale -%}
+  {{ throw("Missing language " + lang + " and no English fallback for article: " + slug) }}
+{%- endif -%}
+{%- set siteUrl = 'https://finopsllm.com' -%}
+{%- set canonicalPath = ('/' + lang + '/' + slug) if lang != 'en' else ('/' + slug) -%}
+{%- set canonicalUrl = siteUrl + canonicalPath -%}
+
+{%- set hreflangs = [] -%}
+{%- for code in article.languages | keys -%}
+  {%- set prefix = '/' + code if code != 'en' else '' -%}
+  {%- set _ = hreflangs.push({ lang: code, href: siteUrl + prefix + '/' + slug }) -%}
+{%- endfor -%}
+{%- set _ = hreflangs.push({ lang: 'x-default', href: siteUrl + '/' + slug }) -%}
+
+{%- set jsonLdArticle = {
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": locale.title,
+  "description": locale.description,
+  "url": canonicalUrl,
+  "datePublished": article.datePublished,
+  "dateModified": article.dateModified,
+  "image": article.image,
+  "author": { "@type": "Organization", "name": "FinOps LLM team" },
+  "publisher": { "@type": "Organization", "name": "FinOps LLM", "url": siteUrl + '/' }
+} -%}
+
+{%- set breadcrumb = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": siteUrl + '/' },
+    { "@type": "ListItem", "position": 2, "name": "Research", "item": siteUrl + '/research' },
+    { "@type": "ListItem", "position": 3, "name": locale.titleCore or locale.title, "item": canonicalUrl }
+  ]
+} -%}
+
+
+<!DOCTYPE html>
+<html lang="{{ lang }}">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>{{ locale.title }} · FinOps LLM</title>
+<meta name="description" content="{{ locale.description }}" />
+<meta name="robots" content="index, follow" />
+<meta name="theme-color" content="#0A0F1A" />
+{%- if article.agentMode -%}
+<meta name="content-signal" content="search=yes, ai-input=yes, ai-train=yes" />
+{%- endif -%}
+<link rel="canonical" href="{{ canonicalUrl }}" />
+{%- for alt in hreflangs -%}
+<link rel="alternate" hreflang="{{ alt.lang }}" href="{{ alt.href }}" />
+{%- endfor -%}
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="icon" type="image/x-icon" href="/favicon.ico" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+<link rel="manifest" href="/site.webmanifest" />
+<style>
+body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}
+.wrap{max-width:840px;margin:0 auto;padding:56px 24px}
+a{color:#7AAFFF}
+p,li{color:#B6C0D2}
+h1{line-height:1.08}
+h2{margin-top:34px}
+table{border-collapse:collapse;width:100%;margin:24px 0;font-size:.95em}
+th,td{border:1px solid #1E2A3F;padding:10px 12px;text-align:left;color:#B6C0D2}
+th{color:#E6EAF2;background:#101726}
+.langsw{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;color:#647289;margin:0 0 26px}
+.langsw a{text-decoration:none}
+.langsw a[aria-current]{color:#E6EAF2;font-weight:600}
+.agent-summary{border-left:3px solid #7AAFFF;background:rgba(122,175,255,.10);padding:16px 20px;margin:0 0 28px;color:#E6EAF2}
+</style>
+<script type="application/ld+json">{{ jsonLdArticle | dump | safe }}</script>
+<script type="application/ld+json">{{ breadcrumb | dump | safe }}</script>
+{%- if locale.faq.length > 0 -%}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {%- for q in locale.faq -%}
+    {
+      "@type": "Question",
+      "name": {{ q.question | dump | safe }},
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": {{ q.answer | dump | safe }}
+      }
+    }{%- if not loop.last -%},{%- endif -%}
+    {%- endfor -%}
+  ]
+}
+</script>
+{%- endif -%}
+{%- if article.agentMode -%}
+<script type="text/x-llms-txt">
+# {{ locale.title }}
+> {{ locale.description }}
+- URL: {{ canonicalUrl }}
+- Content-Signal: search=yes, ai-input=yes, ai-train=yes
+{%- for q in locale.faq %}
+Q: {{ q.question }}
+A: {{ q.answer }}
+{%- endfor %}
+</script>
+{%- endif -%}
+<script src="/assets/consent.js" defer></script>
+<script src="/assets/attribution.js" defer></script>
+<script src="/assets/lang.js" defer></script>
+</head>
+<body>
+<main class="wrap">
+{%- if page.url == "/research/" or page.url.startsWith("/research/") -%}
+<aside style="border-left:3px solid #7AAFFF;background:rgba(122,175,255,.10);padding:16px 20px;margin:0 0 28px;color:#E6EAF2">
+  <strong style="color:#fff">Auditing your own LLM spend?</strong> FinOps LLM runs a free audit of your AI costs and shows where the savings are. <a href="/book">Book free audit &rarr;</a>
+</aside>
+{%- endif -%}
+
+<nav class="langsw" aria-label="Language / Idioma">
+{%- for code in article.languages | keys -%}
+  {%- set prefix = '/' + code if code != 'en' else '' -%}
+  {%- set label = code | upper -%}
+  {%- if code == lang -%}<a href="{{ prefix }}/{{ slug }}" hreflang="{{ code }}" aria-current="page">{{ label }}</a>
+  {%- else -%}<a href="{{ prefix }}/{{ slug }}" hreflang="{{ code }}">{{ label }}</a>
+  {%- endif -%}
+  {%- if not loop.last -%} · {%- endif -%}
+{%- endfor -%}
+</nav>
+
+{%- if article.agentMode -%}
+<section class="agent-summary" aria-label="Agent summary">
+  <strong>Quick answer:</strong> {{ locale.body | striptags | truncate(200) }}
+</section>
+{%- endif -%}
+
+<h1>{{ locale.titleCore or locale.title }}</h1>
+<p class="updated" style="color:#6B7689;font-size:14px;margin-top:-6px">Updated {{ article.dateModified | formatDate }} · first published {{ article.datePublished | formatDate }}</p>
+
+{{ locale.body | safe }}
+
+{%- if locale.related.length > 0 -%}
+<h2>Related</h2>
+<ul>
+{%- for link in locale.related -%}
+  <li><a href="{{ link.slug }}">{{ link.label }}</a></li>
+{%- endfor -%}
+</ul>
+{%- endif -%}
+
+<hr style="margin:48px 0 24px;border:none;border-top:1px solid #1E2A3F" />
+<p>Want this applied to your own LLM spend? FinOps LLM runs a free audit of your AI costs and shows where the savings are. <a href="/book">Book free audit &rarr;</a></p>
+<p><a href="/research">Back to research</a></p>
+</main>
+</body>
+</html>
