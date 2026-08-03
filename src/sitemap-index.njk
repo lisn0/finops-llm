@@ -1,0 +1,16 @@
+---json
+{
+  "permalink": "sitemap-index.xml",
+  "eleventyExcludeFromCollections": true
+}
+---
+<?xml version="1.0" encoding="UTF-8"?>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+{%- for code in langs -%}
+{%- set entries = [] -%}
+{%- for u in collections.sitemap -%}{%- if u.lang == code -%}{%- set _ = entries.push(u.lastmod) -%}{%- endif -%}{%- endfor -%}
+{%- if entries.length %}
+  <sitemap><loc>https://finopsllm.com/{% if code == 'en' %}sitemap.xml{% else %}sitemap-{{ code }}.xml{% endif %}</loc><lastmod>{{ entries | sort | last }}</lastmod></sitemap>
+{%- endif -%}
+{%- endfor %}
+</sitemapindex>

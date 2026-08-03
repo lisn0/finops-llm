@@ -8,15 +8,19 @@
   {{ throw("Missing language " + lang + " and no English fallback for article: " + slug) }}
 {%- endif -%}
 {%- set siteUrl = 'https://finopsllm.com' -%}
-{%- set canonicalPath = ('/' + lang + '/' + slug) if lang != 'en' else ('/' + slug) -%}
+{#- `slug` is the _data/articles key (a bare filename); article.slug is the URL
+    path ("research/..."). Using the key for URLs drops the /research prefix and
+    every canonical/hreflang/langswitcher on that article 404s. -#}
+{%- set urlSlug = article.slug or slug -%}
+{%- set canonicalPath = ('/' + lang + '/' + urlSlug) if lang != 'en' else ('/' + urlSlug) -%}
 {%- set canonicalUrl = siteUrl + canonicalPath -%}
 
 {%- set hreflangs = [] -%}
 {%- for code in article.languages | keys -%}
   {%- set prefix = '/' + code if code != 'en' else '' -%}
-  {%- set _ = hreflangs.push({ lang: code, href: siteUrl + prefix + '/' + slug }) -%}
+  {%- set _ = hreflangs.push({ lang: code, href: siteUrl + prefix + '/' + urlSlug }) -%}
 {%- endfor -%}
-{%- set _ = hreflangs.push({ lang: 'x-default', href: siteUrl + '/' + slug }) -%}
+{%- set _ = hreflangs.push({ lang: 'x-default', href: siteUrl + '/' + urlSlug }) -%}
 
 {%- set jsonLdArticle = {
   "@context": "https://schema.org",
@@ -127,8 +131,8 @@ A: {{ q.answer }}
 {%- for code in article.languages | keys -%}
   {%- set prefix = '/' + code if code != 'en' else '' -%}
   {%- set label = code | upper -%}
-  {%- if code == lang -%}<a href="{{ prefix }}/{{ slug }}" hreflang="{{ code }}" aria-current="page">{{ label }}</a>
-  {%- else -%}<a href="{{ prefix }}/{{ slug }}" hreflang="{{ code }}">{{ label }}</a>
+  {%- if code == lang -%}<a href="{{ prefix }}/{{ urlSlug }}" hreflang="{{ code }}" aria-current="page">{{ label }}</a>
+  {%- else -%}<a href="{{ prefix }}/{{ urlSlug }}" hreflang="{{ code }}">{{ label }}</a>
   {%- endif -%}
   {%- if not loop.last -%} · {%- endif -%}
 {%- endfor -%}

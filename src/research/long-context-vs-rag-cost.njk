@@ -5,7 +5,7 @@
   "head": {
     "title": "Long context vs RAG: where the cost breakeven actually is · FinOps LLM",
     "description": "When to drop your RAG stack and stuff context directly, and when the embedding + retrieval economics still win. The actual breakeven formula with worked examples.",
-    "robots": "index, follow",
+    "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
     "canonical": "https://finopsllm.com/research/long-context-vs-rag-cost",
     "hreflang": [
       {
@@ -94,5 +94,5 @@
 <ol><li>Measure your query volume per day and your average context size (full corpus for long-context model, retrieved subset for RAG model).</li><li>Get your current embedding cost per query and your vector DB infrastructure cost per query. If you do not track the latter, divide your monthly vector DB bill by your queries per month.</li><li>Measure your corpus churn rate: what fraction of your documents change per day? If less than 5%, caching strategies matter; if over 50%, assume churn invalidates any cache.</li><li>Plug into the formula. Compute long-context cost and RAG cost per request. Multiply by daily query volume to get daily spend for each approach.</li><li>Run the numbers for a 20% and 50% increase in query volume (common for scaling) to see which approach scales better.</li></ol>
 <p>Your break-even query volume is where RAG cost per request equals long-context cost per request at your actual numbers. If you are below it, long context is cheaper. If you are above it, RAG is cheaper. The width of the band where neither is obviously better is where hybrid and operational complexity should drive the decision.</p>
 <h2>Related</h2>
-<ul><li><a href="/research/llm-cost-attribution">LLM cost attribution</a></li><li><a href="/research/prompt-cache-cost-attribution">Prompt cache attribution</a></li><li><a href="/research/llm-cost-monitoring">LLM cost monitoring</a></li><li><a href="/research/llm-token-tracking">LLM token tracking</a></li></ul>
+<ul><li><a href="/research/llm-cost-attribution">LLM cost attribution</a></li><li><a href="/research/prompt-cache-attribution">Prompt cache attribution</a></li><li><a href="/research/llm-cost-monitoring">LLM cost monitoring</a></li><li><a href="/research/llm-token-tracking">LLM token tracking</a></li></ul>
 <hr style="margin:48px 0 24px;border:none;border-top:1px solid #1E2A3F" /><p>Want this applied to your own LLM spend? FinOps LLM runs a free audit of your AI costs and shows where the savings are. <a href="/book">Book free audit →</a></p><p><a href="/research">Back to research</a></p>{% endblock %}

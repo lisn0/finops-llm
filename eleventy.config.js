@@ -1,6 +1,103 @@
 // Eleventy config for finopsllm.com.
 // HTML pages render from src/ while static and edge files pass through byte-for-byte.
+const fs = require("fs");
+
+const SITE_URL = "https://finopsllm.com";
+const LANGS = require("./src/_data/langs.js").filter((l) => l !== "en");
+// Pages that exist but must never be advertised: the error page and the A/B
+// variant of the homepage (it canonicals to "/").
+const SITEMAP_SKIP = new Set(["/404.html", "/index-v2.html"]);
+
+// Collections only ever contain the first page of a paginated template, so the
+// data-driven article pages (src/articles.njk) are invisible to getAll(). Read
+// them from the same data file the template paginates over.
+const articlePages = require("./src/_data/articlePages.js")();
+const articles = require("./src/_data/articles.js")();
+
+// Strip the .html and any trailing index so the sitemap advertises the same
+// extensionless URLs the site links internally.
+const cleanUrl = (url) => url.replace(/index\.html$/, "").replace(/\.html$/, "");
+
+// Every article already carries datePublished/dateModified inside its JSON-LD.
+// Read it from there rather than duplicating the date in frontmatter; fall back
+// to the source file's mtime so a page can never land without a lastmod.
+const lastmodOf = (item) => {
+  const blob = JSON.stringify(item.data.head?.jsonLd || "") + JSON.stringify(item.data.article || "");
+  const m = blob.match(/dateModified\W+(\d{4}-\d{2}-\d{2})/) || blob.match(/datePublished\W+(\d{4}-\d{2}-\d{2})/);
+  if (m) return m[1];
+  return fs.statSync(item.inputPath).mtime.toISOString().slice(0, 10);
+};
+
 module.exports = function (eleventyConfig) {
+  // The sitemap XML used to be seven hand-maintained files. Every page added
+  // since drifted out of it until someone noticed, which is what orphaned
+  // /research/* from search. Derive it from the build instead.
+  eleventyConfig.addCollection("sitemap", (api) => {
+    const seen = new Set();
+    const fromData = articlePages.map((p) => ({
+      loc: SITE_URL + cleanUrl("/" + p.permalink),
+      lastmod: articles[p.key].dateModified || articles[p.key].datePublished,
+      lang: p.lang,
+      priority: "0.9",
+    }));
+    return api
+      .getAll()
+      .filter((item) => {
+        const url = item.url;
+        if (!url || !(url.endsWith(".html") || url.endsWith("/"))) return false;
+        if (SITEMAP_SKIP.has(url)) return false;
+        if (item.data.sitemap === false) return false;
+        if ((item.data.head?.robots || "").includes("noindex")) return false;
+        // A page that canonicals elsewhere belongs to that URL, not its own.
+        const canonical = item.data.head?.canonical;
+        if (canonical && canonical !== SITE_URL + cleanUrl(url)) return false;
+        return true;
+      })
+      .map((item) => ({
+        loc: SITE_URL + cleanUrl(item.url),
+        lastmod: lastmodOf(item),
+        // Locale comes from the URL, not frontmatter: the `lang` values drifted
+        // (pt pages say "pt-BR") and a typo there would silently empty a sitemap.
+        lang: LANGS.find((l) => item.url.startsWith("/" + l + "/")) || "en",
+        // The homepages get crawled most; research beats the rest of the site.
+        priority: cleanUrl(item.url).replace(/\/$/, "").split("/").filter(Boolean).length === 0 ? "1.0" : item.url.includes("/research/") ? "0.9" : "0.7",
+      }))
+      .concat(fromData)
+      .filter((u) => !seen.has(u.loc) && seen.add(u.loc))
+      .sort((a, b) => a.loc.localeCompare(b.loc));
+  });
+
+  // Every research article, grouped by locale, for the A–Z block on each
+  // /research index. Those indexes are hand-written and drift behind the actual
+  // articles, which orphans the new ones from the internal link graph.
+  eleventyConfig.addCollection("research", (api) => {
+    const byLang = { en: [] };
+    for (const l of LANGS) byLang[l] = [];
+    for (const item of api.getAll()) {
+      if (!item.url || !item.url.includes("/research/")) continue;
+      if (item.url.includes("-v2")) continue;
+      const lang = LANGS.find((l) => item.url.startsWith("/" + l + "/")) || "en";
+      // head.title carries the " · FinOps LLM" suffix; the index only wants the topic.
+      const title = (item.data.head?.title || item.url).split(" · ")[0];
+      byLang[lang].push({ url: cleanUrl(item.url), title, slug: item.url.split("/research/")[1].replace(".html", "") });
+    }
+    for (const p of articlePages) {
+      if (p.permalink.includes("-v2")) continue;
+      const url = cleanUrl("/" + p.permalink);
+      if (byLang[p.lang].some((a) => a.url === url)) continue;
+      byLang[p.lang].push({ url, title: articles[p.key].languages[p.lang].titleCore, slug: p.permalink.split("research/")[1].replace(".html", "") });
+    }
+    // A locale index also links the English articles it has no translation of —
+    // otherwise those pages are reachable from the English index only, and a
+    // reader who lands in /de/ hits a dead end.
+    for (const l of LANGS) {
+      const translated = new Set(byLang[l].map((a) => a.slug));
+      byLang[l].push(...byLang.en.filter((a) => !translated.has(a.slug)).map((a) => ({ ...a, en: true })));
+    }
+    for (const list of Object.values(byLang)) list.sort((a, b) => a.title.localeCompare(b.title));
+    return byLang;
+  });
+
   // Format date as "D Month YYYY" (e.g., "12 July 2026")
   eleventyConfig.addFilter("formatDate", (dateStr) => {
     if (!dateStr) return "";
@@ -42,8 +139,8 @@ module.exports = function (eleventyConfig) {
   // ignores SVG favicons entirely, so the .ico is its only icon.
   eleventyConfig.addPassthroughCopy({ "src/favicon.ico": "favicon.ico" });
   eleventyConfig.addPassthroughCopy({ "src/favicon.svg": "favicon.svg" });
-  eleventyConfig.addPassthroughCopy({ "src/llms.txt": "llms.txt" });
-  eleventyConfig.addPassthroughCopy({ "src/llms-full.txt": "llms-full.txt" });
+  // shell.njk links this on every page; without the passthrough it 404s sitewide.
+  eleventyConfig.addPassthroughCopy({ "src/apple-touch-icon.png": "apple-touch-icon.png" });
   eleventyConfig.addPassthroughCopy({ "src/openapi.json": "openapi.json" });
   eleventyConfig.addPassthroughCopy({ "src/auth.md": "auth.md" });
   eleventyConfig.addPassthroughCopy({ "src/health.json": "health.json" });
@@ -51,13 +148,6 @@ module.exports = function (eleventyConfig) {
   eleventyConfig.addPassthroughCopy({ "src/og.svg": "og.svg" });
   eleventyConfig.addPassthroughCopy({ "src/robots.txt": "robots.txt" });
   eleventyConfig.addPassthroughCopy({ "src/site.webmanifest": "site.webmanifest" });
-  eleventyConfig.addPassthroughCopy({ "src/sitemap-de.xml": "sitemap-de.xml" });
-  eleventyConfig.addPassthroughCopy({ "src/sitemap-es.xml": "sitemap-es.xml" });
-  eleventyConfig.addPassthroughCopy({ "src/sitemap-fr.xml": "sitemap-fr.xml" });
-  eleventyConfig.addPassthroughCopy({ "src/sitemap-index.xml": "sitemap-index.xml" });
-  eleventyConfig.addPassthroughCopy({ "src/sitemap-ja.xml": "sitemap-ja.xml" });
-  eleventyConfig.addPassthroughCopy({ "src/sitemap-pt.xml": "sitemap-pt.xml" });
-  eleventyConfig.addPassthroughCopy({ "src/sitemap.xml": "sitemap.xml" });
   eleventyConfig.addPassthroughCopy({ "src/worker.js": "worker.js" });
   eleventyConfig.addPassthroughCopy({ "src/wrangler.jsonc": "wrangler.jsonc" });
 
