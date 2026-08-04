@@ -85,8 +85,21 @@ const decodeEntities = (s) =>
     .replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&rsquo;/g, "’")
     .replace(/&nbsp;/g, " ").replace(/&amp;/g, "&");
 
+const faqNode = (faq) => ({
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: faq.map((f) => ({
+    "@type": "Question",
+    name: decodeEntities(f.q),
+    acceptedAnswer: { "@type": "Answer", text: decodeEntities(f.a) },
+  })),
+});
+
 const generatedLd = (head, url) => {
-  if (!head || !head.article) return [];
+  if (!head) return [];
+  // A non-article page can still declare `faq` (e.g. /book) and deserves the
+  // FAQPage node — only the TechArticle/BreadcrumbList pair needs `article`.
+  if (!head.article) return head.faq && head.faq.length ? [JSON.stringify(faqNode(head.faq))] : [];
   const lang = (url.match(/^\/([a-z]{2})\//) || [])[1] || "en";
   const titleCore = decodeEntities(head.title).replace(/ · FinOps LLM$/, "");
   const labels = BREADCRUMB_LABELS[lang] || BREADCRUMB_LABELS.en;
@@ -119,17 +132,7 @@ const generatedLd = (head, url) => {
       ],
     },
   ];
-  if (head.faq && head.faq.length) {
-    nodes.push({
-      "@context": "https://schema.org",
-      "@type": "FAQPage",
-      mainEntity: head.faq.map((f) => ({
-        "@type": "Question",
-        name: decodeEntities(f.q),
-        acceptedAnswer: { "@type": "Answer", text: decodeEntities(f.a) },
-      })),
-    });
-  }
+  if (head.faq && head.faq.length) nodes.push(faqNode(head.faq));
   return nodes.map((n) => JSON.stringify(n));
 };
 
