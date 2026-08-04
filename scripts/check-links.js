@@ -112,7 +112,14 @@ for (const f of walk(site).filter((f) => f.endsWith(".html"))) {
     let node;
     try { node = JSON.parse(m[1]); } catch (e) { errors.push(`${rel}: invalid JSON-LD (${e.message})`); continue; }
     if (node["@type"] !== "TechArticle") continue;
-    const core = (title || "").replace(/ · FinOps LLM$/, "");
+    // The generator decodes entities on its way into JSON-LD (a script body is
+    // not entity-decoded, so a raw "&middot;" would ship as five visible chars),
+    // so compare against the decoded title, not the source one.
+    const core = (title || "")
+      .replace(/&middot;/g, "·").replace(/&mdash;/g, "—").replace(/&ndash;/g, "–")
+      .replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&rsquo;/g, "’")
+      .replace(/&nbsp;/g, " ").replace(/&amp;/g, "&")
+      .replace(/ · FinOps LLM$/, "");
     if (node.headline !== core) errors.push(`${rel}: JSON-LD headline does not match <title>`);
     if (node.description !== desc) errors.push(`${rel}: JSON-LD description does not match meta description`);
   }

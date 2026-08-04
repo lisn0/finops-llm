@@ -12,7 +12,13 @@
     path ("research/..."). Using the key for URLs drops the /research prefix and
     every canonical/hreflang/langswitcher on that article 404s. -#}
 {%- set urlSlug = article.slug or slug -%}
-{%- set canonicalPath = ('/' + lang + '/' + urlSlug) if lang != 'en' else ('/' + urlSlug) -%}
+{#- A "-v2" article is an A/B variant of the article at the same slug without the
+    suffix. Both were self-canonical and both sat in the sitemap, so the variant
+    competed with its own control on an identical title and description. It
+    canonicals to the control instead — in every locale, since the controls all
+    exist here. -#}
+{%- set controlSlug = urlSlug | replace('-v2', '') -%}
+{%- set canonicalPath = ('/' + lang + '/' + controlSlug) if lang != 'en' else ('/' + controlSlug) -%}
 {%- set canonicalUrl = siteUrl + canonicalPath -%}
 
 {%- set hreflangs = [] -%}

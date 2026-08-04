@@ -76,10 +76,19 @@ const hreflangsFor = (url) => {
   ];
 };
 
+// Frontmatter titles are written for HTML, so some carry entities. Script bodies
+// are not entity-decoded, so copying one straight into JSON-LD publishes a
+// literal "&middot;" as part of the headline.
+const decodeEntities = (s) =>
+  (s || "")
+    .replace(/&middot;/g, "·").replace(/&mdash;/g, "—").replace(/&ndash;/g, "–")
+    .replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&rsquo;/g, "’")
+    .replace(/&nbsp;/g, " ").replace(/&amp;/g, "&");
+
 const generatedLd = (head, url) => {
   if (!head || !head.article) return [];
   const lang = (url.match(/^\/([a-z]{2})\//) || [])[1] || "en";
-  const titleCore = (head.title || "").replace(/ · FinOps LLM$/, "");
+  const titleCore = decodeEntities(head.title).replace(/ · FinOps LLM$/, "");
   const labels = BREADCRUMB_LABELS[lang] || BREADCRUMB_LABELS.en;
   const prefix = lang === "en" ? "" : "/" + lang;
   const nodes = [
@@ -87,7 +96,7 @@ const generatedLd = (head, url) => {
       "@context": "https://schema.org",
       "@type": "TechArticle",
       headline: titleCore,
-      description: head.description,
+      description: decodeEntities(head.description),
       author: { "@type": "Organization", name: "FinOps LLM team" },
       publisher: { "@type": "Organization", name: "FinOps LLM", url: SITE_URL + "/" },
       datePublished: head.article.datePublished,
@@ -104,7 +113,7 @@ const generatedLd = (head, url) => {
         {
           "@type": "ListItem",
           position: 3,
-          name: head.article.breadcrumb || titleCore,
+          name: decodeEntities(head.article.breadcrumb) || titleCore,
           item: head.canonical,
         },
       ],
@@ -116,8 +125,8 @@ const generatedLd = (head, url) => {
       "@type": "FAQPage",
       mainEntity: head.faq.map((f) => ({
         "@type": "Question",
-        name: f.q,
-        acceptedAnswer: { "@type": "Answer", text: f.a },
+        name: decodeEntities(f.q),
+        acceptedAnswer: { "@type": "Answer", text: decodeEntities(f.a) },
       })),
     });
   }
@@ -188,6 +197,10 @@ module.exports = function (eleventyConfig) {
         priority: cleanUrl(item.url).replace(/\/$/, "").split("/").filter(Boolean).length === 0 ? "1.0" : item.url.includes("/research/") ? "0.9" : "0.7",
       }))
       .concat(fromData)
+      // A/B variants canonical to their control, so listing them asks crawlers to
+      // index a URL that disclaims itself. They reach the sitemap from both
+      // sources above, hence the filter here rather than in either one.
+      .filter((u) => !/-v2$/.test(u.loc))
       .filter((u) => !seen.has(u.loc) && seen.add(u.loc))
       .sort((a, b) => a.loc.localeCompare(b.loc));
   });
