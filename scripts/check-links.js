@@ -103,6 +103,11 @@ for (const f of walk(site).filter((f) => f.endsWith(".html"))) {
 // headline their own <title> had stopped saying. The article schema is
 // generated from these fields now, so this only fires if someone hand-writes a
 // jsonLd block again.
+const decodeEntities = (s) =>
+  (s || "").replace(/&middot;/g, "·").replace(/&mdash;/g, "—").replace(/&ndash;/g, "–")
+    .replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&rsquo;/g, "’")
+    .replace(/&nbsp;/g, " ").replace(/&amp;/g, "&");
+
 for (const f of walk(site).filter((f) => f.endsWith(".html"))) {
   const html = fs.readFileSync(f, "utf8");
   const rel = `/${path.relative(site, f)}`;
@@ -111,6 +116,18 @@ for (const f of walk(site).filter((f) => f.endsWith(".html"))) {
   for (const m of html.matchAll(/<script[^>]+application\/ld\+json[^>]*>([\s\S]*?)<\/script>/gi)) {
     let node;
     try { node = JSON.parse(m[1]); } catch (e) { errors.push(`${rel}: invalid JSON-LD (${e.message})`); continue; }
+    // A FAQPage entry has to read as a question and has to be on the page, or
+    // it is ineligible for rich results and nothing would cite it. 81 of these
+    // were section headings copied verbatim. ？ is the Japanese question mark.
+    if (node["@type"] === "FAQPage") {
+      for (const q of node.mainEntity || []) {
+        const name = (q.name || "").trim();
+        if (!/[?？]$/.test(name)) errors.push(`${rel}: FAQ entry is not a question — "${name}"`);
+        if (!decodeEntities(html).includes(name)) errors.push(`${rel}: FAQ question is not visible on the page — "${name}"`);
+        if (((q.acceptedAnswer || {}).text || "").length < 40) errors.push(`${rel}: FAQ answer is too thin for "${name}"`);
+      }
+      continue;
+    }
     if (node["@type"] !== "TechArticle") continue;
     // The generator decodes entities on its way into JSON-LD (a script body is
     // not entity-decoded, so a raw "&middot;" would ship as five visible chars),
