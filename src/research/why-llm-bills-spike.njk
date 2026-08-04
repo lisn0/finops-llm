@@ -7,6 +7,36 @@
     "description": "Why an OpenAI or Anthropic bill jumps without warning - model-mix drift, broken cache hits, reasoning tokens, retries, runaway agents - and how to catch each.",
     "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
     "canonical": "https://finopsllm.com/research/why-llm-bills-spike",
+    "article": {
+      "datePublished": "2026-05-31",
+      "breadcrumb": "Why does my LLM bill spike?"
+    },
+    "faq": [
+      {
+        "q": "What is 1. model-mix drift?",
+        "a": "Someone changes a default, raises a router threshold, or \"temporarily\" points a feature at the flagship model to fix a quality complaint - and forgets to point it back."
+      },
+      {
+        "q": "What is 2. a broken cache?",
+        "a": "If you rely on prompt caching, your discount depends on a stable prompt prefix. Change a system prompt, reorder context, or inject a timestamp into the cached region, and the cache-hit rate collapses."
+      },
+      {
+        "q": "What is 3. reasoning tokens you can't see?",
+        "a": "Adopting a reasoning model, or raising its reasoning budget, can multiply the cost of a request without changing the visible output at all. The reasoning tokens are billed but never shown, so the spike has no obvious cause in the UI."
+      },
+      {
+        "q": "What is 4. retrieval depth crept up?",
+        "a": "In a RAG system, the number and size of retrieved documents go straight into the prompt as input tokens. A relevance fix that bumps top-k from 5 to 20, or a chunk-size change, raises input cost on every single request."
+      },
+      {
+        "q": "What is 5. retries, timeouts, and fallback chains?",
+        "a": "Aggressive retry logic and fallback chains are good for reliability and dangerous for cost."
+      },
+      {
+        "q": "What is 6. a runaway agent loop?",
+        "a": "Agentic workloads call models in loops. A planning bug, a tool that returns noise, or a missing stop condition can send an agent into dozens of model calls for a task that should have taken three. Multiply that across production traffic and the bill moves fast."
+      }
+    ],
     "openGraph": [
       {
         "property": "og:type",
@@ -69,11 +99,6 @@
         "src": "/assets/attribution.js",
         "defer": true
       }
-    ],
-    "jsonLd": [
-      "{\"@context\":\"https://schema.org\",\"@type\":\"TechArticle\",\"headline\":\"Why does my LLM bill spike? The most common causes\",\"description\":\"The most common reasons an OpenAI or Anthropic bill jumps without warning - model-mix drift, broken cache hits, reasoning tokens, retrieval depth, retries, and runaway agents - and how to catch each one early.\",\"url\":\"https://finopsllm.com/research/why-llm-bills-spike\",\"datePublished\":\"2026-05-31\",\"dateModified\":\"2026-05-31\",\"image\":\"https://finopsllm.com/og.png\",\"author\":{\"@type\":\"Organization\",\"name\":\"FinOps LLM team\"},\"publisher\":{\"@type\":\"Organization\",\"name\":\"FinOps LLM\",\"url\":\"https://finopsllm.com/\"}}",
-      "{\"@context\":\"https://schema.org\",\"@type\":\"BreadcrumbList\",\"itemListElement\":[{\"@type\":\"ListItem\",\"position\":1,\"name\":\"Home\",\"item\":\"https://finopsllm.com/\"},{\"@type\":\"ListItem\",\"position\":2,\"name\":\"Research\",\"item\":\"https://finopsllm.com/research\"},{\"@type\":\"ListItem\",\"position\":3,\"name\":\"Why does my LLM bill spike?\",\"item\":\"https://finopsllm.com/research/why-llm-bills-spike\"}]}",
-      "{\"@context\": \"https://schema.org\", \"@type\": \"FAQPage\", \"mainEntity\": [{\"@type\": \"Question\", \"name\": \"What is 1. model-mix drift?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"Someone changes a default, raises a router threshold, or \\\"temporarily\\\" points a feature at the flagship model to fix a quality complaint - and forgets to point it back.\"}}, {\"@type\": \"Question\", \"name\": \"What is 2. a broken cache?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"If you rely on prompt caching, your discount depends on a stable prompt prefix. Change a system prompt, reorder context, or inject a timestamp into the cached region, and the cache-hit rate collapses.\"}}, {\"@type\": \"Question\", \"name\": \"What is 3. reasoning tokens you can't see?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"Adopting a reasoning model, or raising its reasoning budget, can multiply the cost of a request without changing the visible output at all. The reasoning tokens are billed but never shown, so the spike has no obvious cause in the UI.\"}}, {\"@type\": \"Question\", \"name\": \"What is 4. retrieval depth crept up?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"In a RAG system, the number and size of retrieved documents go straight into the prompt as input tokens. A relevance fix that bumps top-k from 5 to 20, or a chunk-size change, raises input cost on every single request.\"}}, {\"@type\": \"Question\", \"name\": \"What is 5. retries, timeouts, and fallback chains?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"Aggressive retry logic and fallback chains are good for reliability and dangerous for cost.\"}}, {\"@type\": \"Question\", \"name\": \"What is 6. a runaway agent loop?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"Agentic workloads call models in loops. A planning bug, a tool that returns noise, or a missing stop condition can send an agent into dozens of model calls for a task that should have taken three. Multiply that across production traffic and the bill moves fast.\"}}]}"
     ]
   }
 }

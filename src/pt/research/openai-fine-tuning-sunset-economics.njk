@@ -7,34 +7,25 @@
     "description": "OpenAI encerra o fine-tuning de autoatendimento em 2026–27. Três caminhos de migração comparados por custo: prompts com cache, LoRA aberto ou Vertex/Bedrock.",
     "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
     "canonical": "https://finopsllm.com/pt/research/openai-fine-tuning-sunset-economics",
-    "hreflang": [
+    "article": {
+      "datePublished": "2026-07-19"
+    },
+    "faq": [
       {
-        "lang": "en",
-        "href": "https://finopsllm.com/research/openai-fine-tuning-sunset-economics"
+        "q": "Quando não posso mais criar novos modelos com fine-tuning da OpenAI?",
+        "a": "Cronograma: 7 de maio de 2026 (novas organizações bloqueadas), 2 de julho de 2026 (organizações inativas 60 dias bloqueadas), 6 de janeiro de 2027 (todos os trabalhos novos bloqueados). A inferência em modelos com fine-tuning existentes continua até a deprecação do modelo base."
       },
       {
-        "lang": "es",
-        "href": "https://finopsllm.com/es/research/openai-fine-tuning-sunset-economics"
+        "q": "O cache de prompts se equipara ao fine-tuning?",
+        "a": "Para prompts repetidos sobre o mesmo contexto: sim. O cache de prompts em GPT-5.5 custa $0,60/M para leituras vs $3,00/M frescos, e exemplos few-shot (prompts mais longos) podem ser cacheados eficientemente. O ponto de equilíbrio é tipicamente 10–30 acertos de cache dependendo do tamanho do prompt; a maioria das equipes o atinge em dias."
       },
       {
-        "lang": "fr",
-        "href": "https://finopsllm.com/fr/research/openai-fine-tuning-sunset-economics"
+        "q": "LoRA de código aberto é mais barato do que fine-tuning gerenciado?",
+        "a": "Normalmente, sim. Custo de treinamento via Together AI: ~$200–$500 por trabalho. Inferência em Groq ou Fireworks: ~$0,10–$0,30/M tokens. O custo total por resposta bem-sucedida é frequentemente 30–50% mais baixo do que um serviço gerenciado, mas requer despesas gerais de MLOps."
       },
       {
-        "lang": "de",
-        "href": "https://finopsllm.com/de/research/openai-fine-tuning-sunset-economics"
-      },
-      {
-        "lang": "pt",
-        "href": "https://finopsllm.com/pt/research/openai-fine-tuning-sunset-economics"
-      },
-      {
-        "lang": "ja",
-        "href": "https://finopsllm.com/ja/research/openai-fine-tuning-sunset-economics"
-      },
-      {
-        "lang": "x-default",
-        "href": "https://finopsllm.com/research/openai-fine-tuning-sunset-economics"
+        "q": "Quais custos ocultos não estou vendo durante a migração?",
+        "a": "Reavaliação (comparação da nova abordagem vs a anterior), testes de regressão (a rota de substituição entrega a mesma qualidade?), execução dual (executar ambas as rotas antiga e nova em paralelo por segurança), e retreinamento de adaptadores se o novo modelo mudar. Orçamente 4–8 semanas e ~$2K–$10K em tempo de engenharia por migração."
       }
     ],
     "style": "body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}\n.wrap{max-width:1100px;margin:0 auto;padding:56px 24px}\na{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}\n.langsw{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;color:#647289;margin:0 0 26px}\n.langsw a{text-decoration:none}.langsw a[aria-current]{color:#E6EAF2;font-weight:600}\n.badge-row{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 32px;list-style:none;padding:0}\n.badge-row li{background:#101726;border:1px solid #1E2A3F;border-radius:8px;padding:8px 14px;font-size:.85rem;color:#B6C0D2}\n.table-wrap{overflow-x:auto;margin:0 0 32px;-webkit-overflow-scrolling:touch}\ntable{border-collapse:collapse;width:100%;font-size:.85rem}\nth,td{border:1px solid #1E2A3F;padding:10px 12px;text-align:left;color:#B6C0D2}\nth{color:#E6EAF2;background:#101726}\ntd.number{text-align:right;font-family:'JetBrains Mono',monospace;font-weight:500}\ntd.highlight{background:rgba(248,113,113,.08)}\n.cost-component{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:20px;margin:16px 0}\n.cost-component h3{color:#E6EAF2;margin:0 0 12px;font-size:1rem}\n.cost-component p{font-size:.9rem;margin:6px 0}\n.guide-section{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:24px;margin:12px 0}\n.guide-section h3{color:#E6EAF2;margin:0 0 10px;font-size:1rem}\n.warning{border-left:4px solid #f87171;padding:16px;background:rgba(248,113,113,.08);margin:20px 0}\n.decision-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;margin:20px 0 32px}\n.decision-card{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:24px}\n.decision-card h3{font-size:1rem;margin:0 0 12px;color:#E6EAF2}\n.decision-card ul{margin:0;padding-left:18px}\n.decision-card li{margin:6px 0;font-size:.88rem}\n.path1{border-left:4px solid #7AAFFF}\n.path2{border-left:4px solid #4ADE80}\n.path3{border-left:4px solid #FBBF24}\n@media(max-width:700px){\n  table{font-size:.75rem}\n  th,td{padding:6px 7px}\n  .decision-grid{grid-template-columns:1fr}\n}",
@@ -51,11 +42,6 @@
         "src": "/assets/lang.js",
         "defer": true
       }
-    ],
-    "jsonLd": [
-      "{\"@context\":\"https://schema.org\",\"@type\":\"TechArticle\",\"headline\":\"Economia do Encerramento do Fine-Tuning da OpenAI · FinOps LLM\",\"description\":\"OpenAI elimina o fine-tuning de autoatendimento. Avalie custos de migração: engenharia de prompts em GPT-5.5 com cache, LoRA de código aberto, ou fine-tuning gerenciado alternativo. Estrutura de decisão e comparação de custos incluídas.\",\"url\":\"https://finopsllm.com/pt/research/openai-fine-tuning-sunset-economics\",\"datePublished\":\"2026-07-19\",\"dateModified\":\"2026-07-19\",\"image\":\"https://finopsllm.com/og.png\",\"author\":{\"@type\":\"Organization\",\"name\":\"FinOps LLM team\"},\"publisher\":{\"@type\":\"Organization\",\"name\":\"FinOps LLM\",\"url\":\"https://finopsllm.com/\"}}",
-      "{\"@context\":\"https://schema.org\",\"@type\":\"BreadcrumbList\",\"itemListElement\":[{\"@type\":\"ListItem\",\"position\":1,\"name\":\"Início\",\"item\":\"https://finopsllm.com/pt/\"},{\"@type\":\"ListItem\",\"position\":2,\"name\":\"Pesquisa\",\"item\":\"https://finopsllm.com/pt/research\"},{\"@type\":\"ListItem\",\"position\":3,\"name\":\"Economia do Encerramento do Fine-Tuning da OpenAI\",\"item\":\"https://finopsllm.com/pt/research/openai-fine-tuning-sunset-economics\"}]}",
-      "{\"@context\": \"https://schema.org\", \"@type\": \"FAQPage\", \"mainEntity\": [{\"@type\": \"Question\", \"name\": \"Quando não posso mais criar novos modelos com fine-tuning da OpenAI?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"Cronograma: 7 de maio de 2026 (novas organizações bloqueadas), 2 de julho de 2026 (organizações inativas 60 dias bloqueadas), 6 de janeiro de 2027 (todos os trabalhos novos bloqueados). A inferência em modelos com fine-tuning existentes continua até a deprecação do modelo base.\"}}, {\"@type\": \"Question\", \"name\": \"O cache de prompts se equipara ao fine-tuning?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"Para prompts repetidos sobre o mesmo contexto: sim. O cache de prompts em GPT-5.5 custa $0,60/M para leituras vs $3,00/M frescos, e exemplos few-shot (prompts mais longos) podem ser cacheados eficientemente. O ponto de equilíbrio é tipicamente 10–30 acertos de cache dependendo do tamanho do prompt; a maioria das equipes o atinge em dias.\"}}, {\"@type\": \"Question\", \"name\": \"LoRA de código aberto é mais barato do que fine-tuning gerenciado?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"Normalmente, sim. Custo de treinamento via Together AI: ~$200–$500 por trabalho. Inferência em Groq ou Fireworks: ~$0,10–$0,30/M tokens. O custo total por resposta bem-sucedida é frequentemente 30–50% mais baixo do que um serviço gerenciado, mas requer despesas gerais de MLOps.\"}}, {\"@type\": \"Question\", \"name\": \"Quais custos ocultos não estou vendo durante a migração?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"Reavaliação (comparação da nova abordagem vs a anterior), testes de regressão (a rota de substituição entrega a mesma qualidade?), execução dual (executar ambas as rotas antiga e nova em paralelo por segurança), e retreinamento de adaptadores se o novo modelo mudar. Orçamente 4–8 semanas e ~$2K–$10K em tempo de engenharia por migração.\"}}]}"
     ]
   }
 }

@@ -7,6 +7,24 @@
     "description": "How to meter LLM usage accurately, allocate costs to teams and customers, and build internal billing for multi-tenant AI products.",
     "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
     "canonical": "https://finopsllm.com/research/llm-usage-metering",
+    "article": {
+      "datePublished": "2026-08-01",
+      "breadcrumb": "LLM Usage Metering and Billing"
+    },
+    "faq": [
+      {
+        "q": "What is the difference between metering and billing?",
+        "a": "Metering is the accurate measurement of usage: tokens, requests, latency, errors. Billing is the assignment of cost to that usage: per-team chargeback, per-customer invoicing, or internal showback. You cannot bill accurately without metering first."
+      },
+      {
+        "q": "How do I meter LLM usage across multiple providers?",
+        "a": "Use an OpenTelemetry collector or a gateway (LiteLLM, Helicone, Langfuse) that normalizes provider-specific usage records into a common schema. Each request should carry provider, model, input tokens, output tokens, cache-read tokens, cache-write tokens, retry count, and latency."
+      },
+      {
+        "q": "What is the minimum viable metering setup?",
+        "a": "A single OpenTelemetry span per LLM request with attributes for provider, model, input_tokens, output_tokens, and cost_estimate. Ship these to a ClickHouse or BigQuery table and aggregate daily. That is enough for showback within a week."
+      }
+    ],
     "style": "body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}.wrap{max-width:840px;margin:0 auto;padding:56px 24px}a{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}table{border-collapse:collapse;width:100%;margin:24px 0;font-size:.95em}th,td{border:1px solid #1E2A3F;padding:10px 12px;text-align:left;color:#B6C0D2}th{color:#E6EAF2;background:#101726}.langsw{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;color:#647289;margin:0 0 26px}.langsw a{text-decoration:none}.langsw a[aria-current]{color:#E6EAF2;font-weight:600}",
     "scripts": [
       {
@@ -17,11 +35,6 @@
         "src": "/assets/attribution.js",
         "defer": true
       }
-    ],
-    "jsonLd": [
-      "{\"@context\":\"https://schema.org\",\"@type\":\"TechArticle\",\"headline\":\"LLM Usage Metering and Billing\",\"description\":\"How to meter LLM usage accurately, allocate costs to teams and customers, and build internal billing for multi-tenant AI products.\",\"url\":\"https://finopsllm.com/research/llm-usage-metering\",\"datePublished\":\"2026-08-01\",\"dateModified\":\"2026-08-01\",\"image\":\"https://finopsllm.com/og.png\",\"author\":{\"@type\":\"Organization\",\"name\":\"FinOps LLM team\"},\"publisher\":{\"@type\":\"Organization\",\"name\":\"FinOps LLM\",\"url\":\"https://finopsllm.com/\"}}",
-      "{\"@context\":\"https://schema.org\",\"@type\":\"BreadcrumbList\",\"itemListElement\":[{\"@type\":\"ListItem\",\"position\":1,\"name\":\"Home\",\"item\":\"https://finopsllm.com/\"},{\"@type\":\"ListItem\",\"position\":2,\"name\":\"Research\",\"item\":\"https://finopsllm.com/research\"},{\"@type\":\"ListItem\",\"position\":3,\"name\":\"LLM Usage Metering and Billing\",\"item\":\"https://finopsllm.com/research/llm-usage-metering\"}]}",
-      "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"mainEntity\":[{\"@type\":\"Question\",\"name\":\"What is the difference between metering and billing?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Metering is the accurate measurement of usage: tokens, requests, latency, errors. Billing is the assignment of cost to that usage: per-team chargeback, per-customer invoicing, or internal showback. You cannot bill accurately without metering first.\"}},{\"@type\":\"Question\",\"name\":\"How do I meter LLM usage across multiple providers?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Use an OpenTelemetry collector or a gateway (LiteLLM, Helicone, Langfuse) that normalizes provider-specific usage records into a common schema. Each request should carry provider, model, input tokens, output tokens, cache-read tokens, cache-write tokens, retry count, and latency.\"}},{\"@type\":\"Question\",\"name\":\"What is the minimum viable metering setup?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"A single OpenTelemetry span per LLM request with attributes for provider, model, input_tokens, output_tokens, and cost_estimate. Ship these to a ClickHouse or BigQuery table and aggregate daily. That is enough for showback within a week.\"}}]}"
     ]
   }
 }

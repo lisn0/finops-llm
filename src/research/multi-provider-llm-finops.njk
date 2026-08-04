@@ -7,6 +7,31 @@
     "description": "When LLM spend spans OpenAI, Anthropic, and Bedrock, the hard part is the umbrella: one normalized unit, one attribution schema, one reconciliation.",
     "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
     "canonical": "https://finopsllm.com/research/multi-provider-llm-finops",
+    "article": {
+      "datePublished": "2026-06-20"
+    },
+    "faq": [
+      {
+        "q": "Why \"add up the invoices\" doesn't work?",
+        "a": "Each provider counts and discounts differently. Token accounting varies, cache-read discounts differ sharply (OpenAI's cached input runs about 50% off; Anthropic's prompt-cache reads about 90% off; Bedrock depends on the model and region), and reasoning-token billing is not uniform."
+      },
+      {
+        "q": "What is normalize the unit before you compare providers?",
+        "a": "Pick one unit that is provider-agnostic and report everything in it: cost per successful task. Spend per token is not comparable across providers because the work done per token differs; spend per completed unit of work is."
+      },
+      {
+        "q": "What is one attribution schema across teams and providers?",
+        "a": "Every cost record, whichever provider it came from, should carry the same dimensions: team, product surface, environment, provider, and model."
+      },
+      {
+        "q": "What is reconcile per provider, report as one number?",
+        "a": "Gateway logs give a fast, approximate, normalized view across all providers; each provider's invoice is the source of truth for that provider."
+      },
+      {
+        "q": "What is the multi-team trap: showback before chargeback?",
+        "a": "The instinct with multiple teams is to start charging spend back immediately. Resist it until attribution coverage is high and the numbers have survived a couple of monthly reconciliations."
+      }
+    ],
     "style": "body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}.wrap{max-width:840px;margin:0 auto;padding:56px 24px}a{color:#7AAFFF}p,li{color:#B6C0D2}h2{margin-top:34px}",
     "scripts": [
       {
@@ -17,11 +42,6 @@
         "src": "/assets/attribution.js",
         "defer": true
       }
-    ],
-    "jsonLd": [
-      "{\"@context\":\"https://schema.org\",\"@type\":\"TechArticle\",\"headline\":\"Multi-provider, multi-team LLM FinOps \\u00b7 FinOps LLM\",\"description\":\"When LLM spend is spread across OpenAI, Anthropic, and Bedrock and several teams, the hard part is the umbrella: one normalized unit, one attribution schema, and one reconciliation across providers.\",\"url\":\"https://finopsllm.com/research/multi-provider-llm-finops\",\"datePublished\":\"2026-06-20\",\"dateModified\":\"2026-06-20\",\"image\":\"https://finopsllm.com/og.png\",\"author\":{\"@type\":\"Organization\",\"name\":\"FinOps LLM team\"},\"publisher\":{\"@type\":\"Organization\",\"name\":\"FinOps LLM\",\"url\":\"https://finopsllm.com/\"}}",
-      "{\"@context\":\"https://schema.org\",\"@type\":\"BreadcrumbList\",\"itemListElement\":[{\"@type\":\"ListItem\",\"position\":1,\"name\":\"Home\",\"item\":\"https://finopsllm.com/\"},{\"@type\":\"ListItem\",\"position\":2,\"name\":\"Research\",\"item\":\"https://finopsllm.com/research\"},{\"@type\":\"ListItem\",\"position\":3,\"name\":\"Multi-provider, multi-team LLM FinOps\",\"item\":\"https://finopsllm.com/research/multi-provider-llm-finops\"}]}",
-      "{\"@context\": \"https://schema.org\", \"@type\": \"FAQPage\", \"mainEntity\": [{\"@type\": \"Question\", \"name\": \"Why \\\"add up the invoices\\\" doesn't work?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"Each provider counts and discounts differently. Token accounting varies, cache-read discounts differ sharply (OpenAI's cached input runs about 50% off; Anthropic's prompt-cache reads about 90% off; Bedrock depends on the model and region), and reasoning-token billing is not uniform.\"}}, {\"@type\": \"Question\", \"name\": \"What is normalize the unit before you compare providers?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"Pick one unit that is provider-agnostic and report everything in it: cost per successful task. Spend per token is not comparable across providers because the work done per token differs; spend per completed unit of work is.\"}}, {\"@type\": \"Question\", \"name\": \"What is one attribution schema across teams and providers?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"Every cost record, whichever provider it came from, should carry the same dimensions: team, product surface, environment, provider, and model.\"}}, {\"@type\": \"Question\", \"name\": \"What is reconcile per provider, report as one number?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"Gateway logs give a fast, approximate, normalized view across all providers; each provider's invoice is the source of truth for that provider.\"}}, {\"@type\": \"Question\", \"name\": \"What is the multi-team trap: showback before chargeback?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"The instinct with multiple teams is to start charging spend back immediately. Resist it until attribution coverage is high and the numbers have survived a couple of monthly reconciliations.\"}}]}"
     ]
   }
 }

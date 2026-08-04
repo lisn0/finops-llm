@@ -7,6 +7,37 @@
     "description": "What LLM cost attribution means: tracing AI spend back to a feature, team, or customer, why total-spend dashboards aren't enough, and how attribution works.",
     "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
     "canonical": "https://finopsllm.com/research/what-is-llm-cost-attribution",
+    "article": {
+      "datePublished": "2026-05-31",
+      "dateModified": "2026-06-11",
+      "breadcrumb": "What is LLM cost attribution?"
+    },
+    "faq": [
+      {
+        "q": "What is the problem attribution solves?",
+        "a": "A provider invoice arrives aggregated and lagging. You get a line item per model per day - not \"the checkout summarizer cost $14,000 last month.\" If spend jumps 30%, the invoice tells you that it happened, never why."
+      },
+      {
+        "q": "What \"attribution\" actually means in practice?",
+        "a": "Concretely, attribution means every LLM request leaves a structured trace carrying at minimum: Feature / surface - the product capability that made the call. Environment - production vs staging vs eval vs internal tooling, so test spend never masquerades as revenue-feature spend."
+      },
+      {
+        "q": "Why total spend isn't enough?",
+        "a": "Three questions that only attribution can answer, and that every team eventually gets asked:"
+      },
+      {
+        "q": "What is attribution vs observability vs reconciliation?",
+        "a": "These get conflated. They are different layers: Observability tells you what happened to a request - latency, errors, traces. It is necessary plumbing, but a trace without cost tags is telemetry, not attribution. Attribution maps cost to an owner."
+      },
+      {
+        "q": "How accurate does it need to be?",
+        "a": "Attribution does not have to be perfect to be useful - it has to be trusted and improving."
+      },
+      {
+        "q": "Where to start?",
+        "a": "Attribution is the first step in any AI cost program, before budgets and before optimization. The minimum viable version is a tagging contract - what every request must carry - enforced at the gateway, plus a breakdown of spend by feature, environment, and token type."
+      }
+    ],
     "openGraph": [
       {
         "property": "og:type",
@@ -69,11 +100,6 @@
         "src": "/assets/attribution.js",
         "defer": true
       }
-    ],
-    "jsonLd": [
-      "{\"@context\":\"https://schema.org\",\"@type\":\"TechArticle\",\"headline\":\"What is LLM cost attribution? A plain-English explainer\",\"description\":\"A plain-English explainer of LLM cost attribution: what it means to trace AI spend back to a feature, team, or customer, why total-spend dashboards aren't enough, and how attribution actually works.\",\"url\":\"https://finopsllm.com/research/what-is-llm-cost-attribution\",\"datePublished\":\"2026-05-31\",\"dateModified\":\"2026-06-11\",\"image\":\"https://finopsllm.com/og.png\",\"author\":{\"@type\":\"Organization\",\"name\":\"FinOps LLM team\"},\"publisher\":{\"@type\":\"Organization\",\"name\":\"FinOps LLM\",\"url\":\"https://finopsllm.com/\"}}",
-      "{\"@context\":\"https://schema.org\",\"@type\":\"BreadcrumbList\",\"itemListElement\":[{\"@type\":\"ListItem\",\"position\":1,\"name\":\"Home\",\"item\":\"https://finopsllm.com/\"},{\"@type\":\"ListItem\",\"position\":2,\"name\":\"Research\",\"item\":\"https://finopsllm.com/research\"},{\"@type\":\"ListItem\",\"position\":3,\"name\":\"What is LLM cost attribution?\",\"item\":\"https://finopsllm.com/research/what-is-llm-cost-attribution\"}]}",
-      "{\"@context\": \"https://schema.org\", \"@type\": \"FAQPage\", \"mainEntity\": [{\"@type\": \"Question\", \"name\": \"What is the problem attribution solves?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"A provider invoice arrives aggregated and lagging. You get a line item per model per day - not \\\"the checkout summarizer cost $14,000 last month.\\\" If spend jumps 30%, the invoice tells you that it happened, never why.\"}}, {\"@type\": \"Question\", \"name\": \"What \\\"attribution\\\" actually means in practice?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"Concretely, attribution means every LLM request leaves a structured trace carrying at minimum: Feature / surface - the product capability that made the call. Environment - production vs staging vs eval vs internal tooling, so test spend never masquerades as revenue-feature spend.\"}}, {\"@type\": \"Question\", \"name\": \"Why total spend isn't enough?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"Three questions that only attribution can answer, and that every team eventually gets asked:\"}}, {\"@type\": \"Question\", \"name\": \"What is attribution vs observability vs reconciliation?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"These get conflated. They are different layers: Observability tells you what happened to a request - latency, errors, traces. It is necessary plumbing, but a trace without cost tags is telemetry, not attribution. Attribution maps cost to an owner.\"}}, {\"@type\": \"Question\", \"name\": \"How accurate does it need to be?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"Attribution does not have to be perfect to be useful - it has to be trusted and improving.\"}}, {\"@type\": \"Question\", \"name\": \"Where to start?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"Attribution is the first step in any AI cost program, before budgets and before optimization. The minimum viable version is a tagging contract - what every request must carry - enforced at the gateway, plus a breakdown of spend by feature, environment, and token type.\"}}]}"
     ]
   }
 }

@@ -7,6 +7,35 @@
     "description": "How to allocate prompt cache hits, savings, and breakage costs across teams when the cache is shared infrastructure that multiple features depend on.",
     "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
     "canonical": "https://finopsllm.com/research/prompt-cache-attribution",
+    "article": {
+      "datePublished": "2026-05-21"
+    },
+    "faq": [
+      {
+        "q": "What is cache as shared infrastructure?",
+        "a": "A prompt cache is not a per-feature asset. The same cached prefix can be reused by an internal eval suite, a customer-facing copilot, a nightly batch job, and a support workflow."
+      },
+      {
+        "q": "What a clean attribution model needs?",
+        "a": "..."
+      },
+      {
+        "q": "What is allocating the savings?",
+        "a": "There are three reasonable allocation methods. Each is defensible. Pick one and document it before anyone argues about a chargeback. Direct attribution Credit each consumer with the cache-read tokens it actually billed. Simple, auditable, and aligned with provider invoices."
+      },
+      {
+        "q": "What is reporting the cache tax?",
+        "a": "Even when caching is paying off in aggregate, individual teams pay a tax. Cache-friendly architectures cost engineering hours, slow down certain refactors, and force coordination across services that did not previously coordinate."
+      },
+      {
+        "q": "What is who pays when cache breaks?",
+        "a": "Cache breakage is rarely a single bad commit. It is usually a chain. A platform team upgrades a tool schema. A retrieval service starts injecting context one block earlier. A prompt template adds a timestamp inside what used to be the stable prefix."
+      },
+      {
+        "q": "What the data has to look like?",
+        "a": "Attribution falls apart if your usage records cannot separate cache-read tokens from input tokens. Most providers expose the field; most pipelines drop it on the way into the warehouse because the original ingest schema predates caching."
+      }
+    ],
     "style": "body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}.wrap{max-width:840px;margin:0 auto;padding:56px 24px}a{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}h3{margin-top:22px;color:#E6EAF2}",
     "scripts": [
       {
@@ -17,11 +46,6 @@
         "src": "/assets/attribution.js",
         "defer": true
       }
-    ],
-    "jsonLd": [
-      "{\"@context\":\"https://schema.org\",\"@type\":\"TechArticle\",\"headline\":\"Prompt cache attribution \\u00b7 FinOps LLM\",\"description\":\"How to allocate prompt cache hits, savings, and breakage costs across teams when the cache is shared infrastructure that multiple features depend on.\",\"url\":\"https://finopsllm.com/research/prompt-cache-attribution\",\"datePublished\":\"2026-05-21\",\"dateModified\":\"2026-05-21\",\"image\":\"https://finopsllm.com/og.png\",\"author\":{\"@type\":\"Organization\",\"name\":\"FinOps LLM team\"},\"publisher\":{\"@type\":\"Organization\",\"name\":\"FinOps LLM\",\"url\":\"https://finopsllm.com/\"}}",
-      "{\"@context\":\"https://schema.org\",\"@type\":\"BreadcrumbList\",\"itemListElement\":[{\"@type\":\"ListItem\",\"position\":1,\"name\":\"Home\",\"item\":\"https://finopsllm.com/\"},{\"@type\":\"ListItem\",\"position\":2,\"name\":\"Research\",\"item\":\"https://finopsllm.com/research\"},{\"@type\":\"ListItem\",\"position\":3,\"name\":\"Prompt cache attribution\",\"item\":\"https://finopsllm.com/research/prompt-cache-attribution\"}]}",
-      "{\"@context\": \"https://schema.org\", \"@type\": \"FAQPage\", \"mainEntity\": [{\"@type\": \"Question\", \"name\": \"What is cache as shared infrastructure?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"A prompt cache is not a per-feature asset. The same cached prefix can be reused by an internal eval suite, a customer-facing copilot, a nightly batch job, and a support workflow.\"}}, {\"@type\": \"Question\", \"name\": \"What a clean attribution model needs?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"...\"}}, {\"@type\": \"Question\", \"name\": \"What is allocating the savings?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"There are three reasonable allocation methods. Each is defensible. Pick one and document it before anyone argues about a chargeback. Direct attribution Credit each consumer with the cache-read tokens it actually billed. Simple, auditable, and aligned with provider invoices.\"}}, {\"@type\": \"Question\", \"name\": \"What is reporting the cache tax?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"Even when caching is paying off in aggregate, individual teams pay a tax. Cache-friendly architectures cost engineering hours, slow down certain refactors, and force coordination across services that did not previously coordinate.\"}}, {\"@type\": \"Question\", \"name\": \"What is who pays when cache breaks?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"Cache breakage is rarely a single bad commit. It is usually a chain. A platform team upgrades a tool schema. A retrieval service starts injecting context one block earlier. A prompt template adds a timestamp inside what used to be the stable prefix.\"}}, {\"@type\": \"Question\", \"name\": \"What the data has to look like?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"Attribution falls apart if your usage records cannot separate cache-read tokens from input tokens. Most providers expose the field; most pipelines drop it on the way into the warehouse because the original ingest schema predates caching.\"}}]}"
     ]
   }
 }

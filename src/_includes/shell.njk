@@ -10,7 +10,7 @@
 {% if head.themeColor %}<meta name="theme-color" content="{{ head.themeColor | safe }}" />{% endif %}
 {% if head.verification %}<meta name="msvalidate.01" content="{{ head.verification | safe }}" />{% endif %}
 {% if head.canonical %}<link rel="canonical" href="{{ head.canonical | safe }}" />{% endif %}
-{% for alt in head.hreflang %}<link rel="alternate" hreflang="{{ alt.lang }}" href="{{ alt.href | safe }}" />{% endfor %}
+{% for alt in head.hreflang or (page.url | hreflangsFor) %}<link rel="alternate" hreflang="{{ alt.lang }}" href="{{ alt.href | safe }}" />{% endfor %}
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 <link rel="icon" type="image/x-icon" href="/favicon.ico" />
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
@@ -22,6 +22,9 @@
 {% if head.style %}<style>{{ head.style | safe }}</style>{% endif %}
 {% for script in head.scripts %}<script src="{{ script.src | safe }}"{% if script.defer %} defer{% endif %}></script>{% endfor %}
 {% for ld in head.jsonLd %}<script type="application/ld+json">
+{{ ld | safe }}
+</script>{% endfor %}
+{% for ld in head | generatedLd(page.url) %}<script type="application/ld+json">
 {{ ld | safe }}
 </script>{% endfor %}
 </head>

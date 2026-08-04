@@ -7,6 +7,31 @@
     "description": "When to drop your RAG stack and stuff context directly, and when the embedding + retrieval economics still win. The actual breakeven formula with worked examples.",
     "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
     "canonical": "https://finopsllm.com/research/long-context-vs-rag-cost",
+    "article": {
+      "datePublished": "2026-07-19"
+    },
+    "faq": [
+      {
+        "q": "When is long context cheaper than RAG?",
+        "a": "Below a certain query volume against a stable document set, padding every request with full context costs less than maintaining retrieval infrastructure. The breakeven depends on context size, query volume, embedding cost, and document churn rate."
+      },
+      {
+        "q": "Does prompt caching change the long-context economics?",
+        "a": "Dramatically. A cached long prefix against a stable corpus can beat RAG economics outright. Cache invalidation on a churning corpus destroys the advantage and can force re-entry to a higher-cost regime."
+      },
+      {
+        "q": "What is the fully-loaded cost of RAG?",
+        "a": "RAG cost includes provider embedding API charges, vector store infrastructure, retrieval latency, re-ranking models, cache misses on retrieval calls, and the engineering cost to build and maintain retrieval quality. Most teams undercount by omitting infrastructure and engineering."
+      },
+      {
+        "q": "Why does document churn matter?",
+        "a": "A stable corpus lets you amortize embedding cost over many queries. A churning corpus forces constant re-embedding, invalidates cached prefixes, and amplifies the variable cost per request. High-churn workloads favor long context with cache acceptance over strict RAG."
+      },
+      {
+        "q": "What costs should go in the breakeven equation?",
+        "a": "Long context: full model input token cost per request, minus cache savings if cached. RAG: embedding cost per request divided by cache hits per embedding, plus vector DB query cost, plus retrieval latency cost if you pay for latency SLA, plus re-ranking cost if used."
+      }
+    ],
     "hreflang": [
       {
         "lang": "x-default",
@@ -23,11 +48,6 @@
         "src": "/assets/attribution.js",
         "defer": true
       }
-    ],
-    "jsonLd": [
-      "{\"@context\":\"https://schema.org\",\"@type\":\"TechArticle\",\"headline\":\"Long context vs RAG: where the cost breakeven actually is · FinOps LLM\",\"description\":\"When to drop your RAG stack and stuff context directly, and when the embedding + retrieval economics still win. The actual breakeven formula with worked examples.\",\"url\":\"https://finopsllm.com/research/long-context-vs-rag-cost\",\"datePublished\":\"2026-07-19\",\"dateModified\":\"2026-07-19\",\"image\":\"https://finopsllm.com/og.png\",\"author\":{\"@type\":\"Organization\",\"name\":\"FinOps LLM team\"},\"publisher\":{\"@type\":\"Organization\",\"name\":\"FinOps LLM\",\"url\":\"https://finopsllm.com/\"}}",
-      "{\"@context\":\"https://schema.org\",\"@type\":\"BreadcrumbList\",\"itemListElement\":[{\"@type\":\"ListItem\",\"position\":1,\"name\":\"Home\",\"item\":\"https://finopsllm.com/\"},{\"@type\":\"ListItem\",\"position\":2,\"name\":\"Research\",\"item\":\"https://finopsllm.com/research\"},{\"@type\":\"ListItem\",\"position\":3,\"name\":\"Long context vs RAG: where the cost breakeven actually is\",\"item\":\"https://finopsllm.com/research/long-context-vs-rag-cost\"}]}",
-      "{\"@context\": \"https://schema.org\", \"@type\": \"FAQPage\", \"mainEntity\": [{\"@type\": \"Question\", \"name\": \"When is long context cheaper than RAG?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"Below a certain query volume against a stable document set, padding every request with full context costs less than maintaining retrieval infrastructure. The breakeven depends on context size, query volume, embedding cost, and document churn rate.\"}}, {\"@type\": \"Question\", \"name\": \"Does prompt caching change the long-context economics?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"Dramatically. A cached long prefix against a stable corpus can beat RAG economics outright. Cache invalidation on a churning corpus destroys the advantage and can force re-entry to a higher-cost regime.\"}}, {\"@type\": \"Question\", \"name\": \"What is the fully-loaded cost of RAG?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"RAG cost includes provider embedding API charges, vector store infrastructure, retrieval latency, re-ranking models, cache misses on retrieval calls, and the engineering cost to build and maintain retrieval quality. Most teams undercount by omitting infrastructure and engineering.\"}}, {\"@type\": \"Question\", \"name\": \"Why does document churn matter?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"A stable corpus lets you amortize embedding cost over many queries. A churning corpus forces constant re-embedding, invalidates cached prefixes, and amplifies the variable cost per request. High-churn workloads favor long context with cache acceptance over strict RAG.\"}}, {\"@type\": \"Question\", \"name\": \"What costs should go in the breakeven equation?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"Long context: full model input token cost per request, minus cache savings if cached. RAG: embedding cost per request divided by cache hits per embedding, plus vector DB query cost, plus retrieval latency cost if you pay for latency SLA, plus re-ranking cost if used.\"}}]}"
     ]
   }
 }

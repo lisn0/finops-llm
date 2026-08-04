@@ -7,34 +7,29 @@
     "description": "Head-to-head comparison of prompt caching, semantic caching, context caching, and application-level caching for LLM cost reduction.",
     "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
     "canonical": "https://finopsllm.com/research/caching-strategies-compared",
-    "hreflang": [
+    "article": {
+      "datePublished": "2026-07-04"
+    },
+    "faq": [
       {
-        "lang": "en",
-        "href": "https://finopsllm.com/research/caching-strategies-compared"
+        "q": "What is prompt caching in detail?",
+        "a": "Prompt caching is the easiest win. OpenAI automatically caches prompts longer than 1,024 tokens. Anthropic caches prefixes of 2,048+ tokens. The cache is keyed on the exact prefix - same system prompt, same few-shot examples, same document context. Cache-read tokens cost 50-90% less than input tokens."
       },
       {
-        "lang": "es",
-        "href": "https://finopsllm.com/es/research/caching-strategies-compared"
+        "q": "What is semantic caching in detail?",
+        "a": "Semantic caching skips the LLM entirely when a similar question was asked before. The flow: embed the query, search a vector store, check if top result exceeds similarity threshold (0.92-0.97), return cached answer if it does. Useful for support bots and FAQ systems where similar questions repeat."
       },
       {
-        "lang": "fr",
-        "href": "https://finopsllm.com/fr/research/caching-strategies-compared"
+        "q": "What is context caching in detail?",
+        "a": "Google's context caching lets you upload a large document once and pay a reduced rate for subsequent queries against it. Powerful for document Q&A where you process the same 200-page PDF hundreds of times. Tokens in the cached context cost 80-90% less."
       },
       {
-        "lang": "de",
-        "href": "https://finopsllm.com/de/research/caching-strategies-compared"
+        "q": "What is application-level caching in detail?",
+        "a": "Deterministic caching is the most aggressive strategy. Hash the full request payload (prompt, temperature, max tokens, model, tools) and store the response. On exact match, return the cached response instantly - no LLM call, no latency, no cost."
       },
       {
-        "lang": "pt",
-        "href": "https://finopsllm.com/pt/research/caching-strategies-compared"
-      },
-      {
-        "lang": "ja",
-        "href": "https://finopsllm.com/ja/research/caching-strategies-compared"
-      },
-      {
-        "lang": "x-default",
-        "href": "https://finopsllm.com/research/caching-strategies-compared"
+        "q": "What is combining strategies?",
+        "a": "The best implementations layer multiple strategies. A typical stack: application-level cache as first check (cheapest, fastest), semantic cache as second check (catches near-duplicates), then the LLM call with provider-side prompt caching enabled (reduces cost even on cache misses)."
       }
     ],
     "style": "body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}.wrap{max-width:860px;margin:0 auto;padding:56px 24px}a{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}table{width:100%;border-collapse:collapse;margin:20px 0}th,td{padding:10px 12px;border:1px solid #1E2A3F;text-align:left;font-size:14px}th{background:#111829;color:#E6EAF2;font-weight:600}td{color:#B6C0D2}.langsw{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;color:#647289;margin:0 0 26px}.langsw a{text-decoration:none}.langsw a[aria-current]{color:#E6EAF2;font-weight:600}",
@@ -47,11 +42,6 @@
         "src": "/assets/attribution.js",
         "defer": true
       }
-    ],
-    "jsonLd": [
-      "{\"@context\":\"https://schema.org\",\"@type\":\"TechArticle\",\"headline\":\"Caching strategies compared\",\"description\":\"Head-to-head comparison of prompt caching, semantic caching, context caching, and application-level caching for LLM cost reduction.\",\"url\":\"https://finopsllm.com/research/caching-strategies-compared\",\"datePublished\":\"2026-07-04\",\"dateModified\":\"2026-07-04\",\"image\":\"https://finopsllm.com/og.png\",\"author\":{\"@type\":\"Organization\",\"name\":\"FinOps LLM team\"},\"publisher\":{\"@type\":\"Organization\",\"name\":\"FinOps LLM\",\"url\":\"https://finopsllm.com/\"}}",
-      "{\"@context\":\"https://schema.org\",\"@type\":\"BreadcrumbList\",\"itemListElement\":[{\"@type\":\"ListItem\",\"position\":1,\"name\":\"Home\",\"item\":\"https://finopsllm.com/\"},{\"@type\":\"ListItem\",\"position\":2,\"name\":\"Research\",\"item\":\"https://finopsllm.com/research\"},{\"@type\":\"ListItem\",\"position\":3,\"name\":\"Caching strategies compared\",\"item\":\"https://finopsllm.com/research/caching-strategies-compared\"}]}",
-      "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"mainEntity\":[{\"@type\":\"Question\",\"name\":\"What is prompt caching in detail?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Prompt caching is the easiest win. OpenAI automatically caches prompts longer than 1,024 tokens. Anthropic caches prefixes of 2,048+ tokens. The cache is keyed on the exact prefix - same system prompt, same few-shot examples, same document context. Cache-read tokens cost 50-90% less than input tokens.\"}},{\"@type\":\"Question\",\"name\":\"What is semantic caching in detail?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Semantic caching skips the LLM entirely when a similar question was asked before. The flow: embed the query, search a vector store, check if top result exceeds similarity threshold (0.92-0.97), return cached answer if it does. Useful for support bots and FAQ systems where similar questions repeat.\"}},{\"@type\":\"Question\",\"name\":\"What is context caching in detail?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Google's context caching lets you upload a large document once and pay a reduced rate for subsequent queries against it. Powerful for document Q&A where you process the same 200-page PDF hundreds of times. Tokens in the cached context cost 80-90% less.\"}},{\"@type\":\"Question\",\"name\":\"What is application-level caching in detail?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Deterministic caching is the most aggressive strategy. Hash the full request payload (prompt, temperature, max tokens, model, tools) and store the response. On exact match, return the cached response instantly - no LLM call, no latency, no cost.\"}},{\"@type\":\"Question\",\"name\":\"What is combining strategies?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"The best implementations layer multiple strategies. A typical stack: application-level cache as first check (cheapest, fastest), semantic cache as second check (catches near-duplicates), then the LLM call with provider-side prompt caching enabled (reduces cost even on cache misses).\"}}]}"
     ]
   }
 }

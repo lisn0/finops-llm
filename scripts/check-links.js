@@ -98,9 +98,23 @@ for (const f of walk(site).filter((f) => f.endsWith(".html"))) {
 // Malformed JSON-LD is dropped entirely by every consumer — the page keeps
 // rendering, so nothing tells you the schema is gone. One stray quote in a
 // hand-copied FAQ blob is all it takes.
+// Structured data that contradicts the visible page is worse than none: it is
+// what Google calls a mismatch and it is how 157 pages ended up advertising a
+// headline their own <title> had stopped saying. The article schema is
+// generated from these fields now, so this only fires if someone hand-writes a
+// jsonLd block again.
 for (const f of walk(site).filter((f) => f.endsWith(".html"))) {
-  for (const m of fs.readFileSync(f, "utf8").matchAll(/<script[^>]+application\/ld\+json[^>]*>([\s\S]*?)<\/script>/gi)) {
-    try { JSON.parse(m[1]); } catch (e) { errors.push(`/${path.relative(site, f)}: invalid JSON-LD (${e.message})`); }
+  const html = fs.readFileSync(f, "utf8");
+  const rel = `/${path.relative(site, f)}`;
+  const title = (html.match(/<title>([\s\S]*?)<\/title>/) || [])[1];
+  const desc = (html.match(/<meta name="description" content="([^"]*)"/) || [])[1];
+  for (const m of html.matchAll(/<script[^>]+application\/ld\+json[^>]*>([\s\S]*?)<\/script>/gi)) {
+    let node;
+    try { node = JSON.parse(m[1]); } catch (e) { errors.push(`${rel}: invalid JSON-LD (${e.message})`); continue; }
+    if (node["@type"] !== "TechArticle") continue;
+    const core = (title || "").replace(/ · FinOps LLM$/, "");
+    if (node.headline !== core) errors.push(`${rel}: JSON-LD headline does not match <title>`);
+    if (node.description !== desc) errors.push(`${rel}: JSON-LD description does not match meta description`);
   }
 }
 

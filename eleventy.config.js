@@ -22,13 +22,112 @@ const cleanUrl = (url) => url.replace(/index\.html$/, "").replace(/\.html$/, "")
 // Read it from there rather than duplicating the date in frontmatter; fall back
 // to the source file's mtime so a page can never land without a lastmod.
 const lastmodOf = (item) => {
-  const blob = JSON.stringify(item.data.head?.jsonLd || "") + JSON.stringify(item.data.article || "");
+  const blob =
+    JSON.stringify(item.data.head?.jsonLd || "") +
+    JSON.stringify(item.data.head?.article || "") +
+    JSON.stringify(item.data.article || "");
   const m = blob.match(/dateModified\W+(\d{4}-\d{2}-\d{2})/) || blob.match(/datePublished\W+(\d{4}-\d{2}-\d{2})/);
   if (m) return m[1];
   return fs.statSync(item.inputPath).mtime.toISOString().slice(0, 10);
 };
 
+// Research pages used to carry their TechArticle/BreadcrumbList/FAQPage as
+// hand-escaped JSON strings in frontmatter. They drifted: 94 pages had a
+// headline that no longer matched their own <title>, 106 the same for
+// description. Everything except the dates, the short breadcrumb label and the
+// FAQ text is derivable from fields the page already declares, so it is derived
+// here instead of copied per page.
+const BREADCRUMB_LABELS = {
+  en: ["Home", "Research"],
+  de: ["Startseite", "Forschung"],
+  es: ["Inicio", "Investigación"],
+  fr: ["Accueil", "Recherche"],
+  ja: ["ホーム", "リサーチ"],
+  pt: ["Início", "Pesquisa"],
+};
+
+// Which locales actually have a file for a given research slug. Hand-listed
+// hreflang was present on only 143 of 203 pages and had no way to stay honest
+// when a translation was added or removed; the filesystem always knows.
+const localesForSlug = (() => {
+  const index = new Map();
+  for (const lang of ["en", ...LANGS]) {
+    const dir = lang === "en" ? "src/research" : `src/${lang}/research`;
+    if (!fs.existsSync(dir)) continue;
+    for (const name of fs.readdirSync(dir)) {
+      if (!name.endsWith(".njk")) continue;
+      const slug = name.slice(0, -4);
+      if (!index.has(slug)) index.set(slug, []);
+      index.get(slug).push(lang);
+    }
+  }
+  return index;
+})();
+
+const hreflangsFor = (url) => {
+  const m = url.match(/^\/(?:([a-z]{2})\/)?research\/([^/]+?)(?:\.html)?\/?$/);
+  if (!m) return [];
+  const langs = localesForSlug.get(m[2]) || [];
+  if (langs.length < 2) return [];
+  const href = (lang) => `${SITE_URL}${lang === "en" ? "" : "/" + lang}/research/${m[2]}`;
+  return [
+    ...langs.map((lang) => ({ lang, href: href(lang) })),
+    { lang: "x-default", href: href("en") },
+  ];
+};
+
+const generatedLd = (head, url) => {
+  if (!head || !head.article) return [];
+  const lang = (url.match(/^\/([a-z]{2})\//) || [])[1] || "en";
+  const titleCore = (head.title || "").replace(/ · FinOps LLM$/, "");
+  const labels = BREADCRUMB_LABELS[lang] || BREADCRUMB_LABELS.en;
+  const prefix = lang === "en" ? "" : "/" + lang;
+  const nodes = [
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      headline: titleCore,
+      description: head.description,
+      author: { "@type": "Organization", name: "FinOps LLM team" },
+      publisher: { "@type": "Organization", name: "FinOps LLM", url: SITE_URL + "/" },
+      datePublished: head.article.datePublished,
+      dateModified: head.article.dateModified || head.article.datePublished,
+      url: head.canonical,
+      image: SITE_URL + "/og.png",
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: labels[0], item: `${SITE_URL}${prefix}/` },
+        { "@type": "ListItem", position: 2, name: labels[1], item: `${SITE_URL}${prefix}/research` },
+        {
+          "@type": "ListItem",
+          position: 3,
+          name: head.article.breadcrumb || titleCore,
+          item: head.canonical,
+        },
+      ],
+    },
+  ];
+  if (head.faq && head.faq.length) {
+    nodes.push({
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      mainEntity: head.faq.map((f) => ({
+        "@type": "Question",
+        name: f.q,
+        acceptedAnswer: { "@type": "Answer", text: f.a },
+      })),
+    });
+  }
+  return nodes.map((n) => JSON.stringify(n));
+};
+
 module.exports = function (eleventyConfig) {
+  eleventyConfig.addFilter("generatedLd", generatedLd);
+  eleventyConfig.addFilter("hreflangsFor", hreflangsFor);
+
   // Utility pages (about, terms, tools…) ship no schema and no date, so an AI
   // answer engine has nothing to attribute and cites them without a link, if at
   // all. Inject a WebPage node wherever the page carries no dateModified —

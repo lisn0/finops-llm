@@ -7,6 +7,35 @@
     "description": "How to attribute invisible reasoning tokens to products, owners, and customers, and turn routing into a FinOps policy with hard budgets per endpoint.",
     "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
     "canonical": "https://finopsllm.com/research/reasoning-token-attribution",
+    "article": {
+      "datePublished": "2026-05-21"
+    },
+    "faq": [
+      {
+        "q": "What is the attribution gap?",
+        "a": "Most LLM cost allocation pipelines were wired up in the era of input plus visible output. A request enters, a response leaves, both have token counts, both can be tagged with an endpoint, a tenant, or a feature flag."
+      },
+      {
+        "q": "What a reasoning-aware attribution model looks like?",
+        "a": "The fix starts at ingest. The usage record for every request should carry reasoning tokens as a first-class field, separate from visible output tokens, with its own cost line. Most provider APIs already return a reasoning token count in usage metadata."
+      },
+      {
+        "q": "What is chargeback that survives a finance review?",
+        "a": "A chargeback model is only useful if a team can look at their slice and recognize their behavior. For reasoning tokens, that means the chargeback report should answer three questions on its own. Which endpoints generated reasoning tokens this period."
+      },
+      {
+        "q": "What is routing as a finops policy?",
+        "a": "Once attribution is in place, the next question is who gets to use reasoning models at all. In most organizations this has been an engineering decision made request by request, framed as \"should this call go to the reasoning model for quality.\" The FinOps reframe is different."
+      },
+      {
+        "q": "What is hard budgets per endpoint?",
+        "a": "Soft budgets do not survive contact with a long agent loop. The agent does not know what your monthly target is. It will spend reasoning tokens until the task succeeds, the timeout fires, or the provider returns an error."
+      },
+      {
+        "q": "What is operational signals worth tracking?",
+        "a": "Attribution and budgets are the structural fixes. Day to day, FinOps needs a small set of signals that surface reasoning behavior before it becomes a surprise on the invoice. Reasoning token share of total output, by endpoint, week over week."
+      }
+    ],
     "style": "body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}.wrap{max-width:840px;margin:0 auto;padding:56px 24px}a{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}h3{margin-top:22px;color:#E6EAF2}",
     "scripts": [
       {
@@ -17,11 +46,6 @@
         "src": "/assets/attribution.js",
         "defer": true
       }
-    ],
-    "jsonLd": [
-      "{\"@context\":\"https://schema.org\",\"@type\":\"TechArticle\",\"headline\":\"Reasoning token attribution and chargeback \\u00b7 FinOps LLM\",\"description\":\"How to attribute invisible reasoning tokens to products, owners, and customers, and turn routing into a FinOps policy with hard budgets per endpoint.\",\"url\":\"https://finopsllm.com/research/reasoning-token-attribution\",\"datePublished\":\"2026-05-21\",\"dateModified\":\"2026-05-21\",\"image\":\"https://finopsllm.com/og.png\",\"author\":{\"@type\":\"Organization\",\"name\":\"FinOps LLM team\"},\"publisher\":{\"@type\":\"Organization\",\"name\":\"FinOps LLM\",\"url\":\"https://finopsllm.com/\"}}",
-      "{\"@context\":\"https://schema.org\",\"@type\":\"BreadcrumbList\",\"itemListElement\":[{\"@type\":\"ListItem\",\"position\":1,\"name\":\"Home\",\"item\":\"https://finopsllm.com/\"},{\"@type\":\"ListItem\",\"position\":2,\"name\":\"Research\",\"item\":\"https://finopsllm.com/research\"},{\"@type\":\"ListItem\",\"position\":3,\"name\":\"Reasoning token attribution and chargeback\",\"item\":\"https://finopsllm.com/research/reasoning-token-attribution\"}]}",
-      "{\"@context\": \"https://schema.org\", \"@type\": \"FAQPage\", \"mainEntity\": [{\"@type\": \"Question\", \"name\": \"What is the attribution gap?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"Most LLM cost allocation pipelines were wired up in the era of input plus visible output. A request enters, a response leaves, both have token counts, both can be tagged with an endpoint, a tenant, or a feature flag.\"}}, {\"@type\": \"Question\", \"name\": \"What a reasoning-aware attribution model looks like?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"The fix starts at ingest. The usage record for every request should carry reasoning tokens as a first-class field, separate from visible output tokens, with its own cost line. Most provider APIs already return a reasoning token count in usage metadata.\"}}, {\"@type\": \"Question\", \"name\": \"What is chargeback that survives a finance review?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"A chargeback model is only useful if a team can look at their slice and recognize their behavior. For reasoning tokens, that means the chargeback report should answer three questions on its own. Which endpoints generated reasoning tokens this period.\"}}, {\"@type\": \"Question\", \"name\": \"What is routing as a finops policy?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"Once attribution is in place, the next question is who gets to use reasoning models at all. In most organizations this has been an engineering decision made request by request, framed as \\\"should this call go to the reasoning model for quality.\\\" The FinOps reframe is different.\"}}, {\"@type\": \"Question\", \"name\": \"What is hard budgets per endpoint?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"Soft budgets do not survive contact with a long agent loop. The agent does not know what your monthly target is. It will spend reasoning tokens until the task succeeds, the timeout fires, or the provider returns an error.\"}}, {\"@type\": \"Question\", \"name\": \"What is operational signals worth tracking?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"Attribution and budgets are the structural fixes. Day to day, FinOps needs a small set of signals that surface reasoning behavior before it becomes a surprise on the invoice. Reasoning token share of total output, by endpoint, week over week.\"}}]}"
     ]
   }
 }

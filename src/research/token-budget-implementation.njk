@@ -7,6 +7,35 @@
     "description": "Engineering patterns for per-feature token budgets: where to enforce them, what to do on overrun, and how to report burn back to the owning team.",
     "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
     "canonical": "https://finopsllm.com/research/token-budget-implementation",
+    "article": {
+      "datePublished": "2026-05-21"
+    },
+    "faq": [
+      {
+        "q": "Why budgets fail at the policy layer?",
+        "a": "The most common failure mode is a budget defined in a governance document that no service reads. A team writes down \"the contract-redline feature gets ten million tokens per month,\" circulates it for approval, and never instruments the counter that would actually enforce it."
+      },
+      {
+        "q": "What is three places to enforce?",
+        "a": "Enforcement has to attach to something the application cannot easily bypass. There are essentially three options, and most production stacks end up using two of them in combination. The gateway A gateway sits between every caller and every provider. Each request carries a feature tag in a header."
+      },
+      {
+        "q": "What overrun should actually do?",
+        "a": "The most consequential design decision is what happens at the moment of overrun, because the answer has to differ by traffic class. A single global behavior - \"block everything past the cap\" - guarantees a customer-visible outage the first time a feature misforecasts."
+      },
+      {
+        "q": "What is reporting the budget back to the owner?",
+        "a": "The dashboard finance reads is not the dashboard the owning team needs. The owner is trying to decide whether to ship a fix, throttle a customer, or ask for more budget, and the data has to answer those three questions directly. Daily burn rate is the first number."
+      },
+      {
+        "q": "What goes on the per-feature dashboard?",
+        "a": "Anything else is decoration. The owner reads these six tiles, decides, and moves on."
+      },
+      {
+        "q": "What is common implementation traps?",
+        "a": "Most token-budget rollouts trip on the same handful of issues, and they all come from counting the wrong thing or counting it at the wrong moment. Using cost as the budget unit. Provider rates change. A budget in dollars looks stable but quietly redefines itself every time a price card updates."
+      }
+    ],
     "style": "body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}.wrap{max-width:840px;margin:0 auto;padding:56px 24px}a{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}h3{margin-top:22px;color:#E6EAF2}",
     "scripts": [
       {
@@ -17,11 +46,6 @@
         "src": "/assets/attribution.js",
         "defer": true
       }
-    ],
-    "jsonLd": [
-      "{\"@context\":\"https://schema.org\",\"@type\":\"TechArticle\",\"headline\":\"Token budget implementation \\u00b7 FinOps LLM\",\"description\":\"Engineering patterns for per-feature token budgets: where to enforce them, what to do on overrun, and how to report burn back to the owning team.\",\"url\":\"https://finopsllm.com/research/token-budget-implementation\",\"datePublished\":\"2026-05-21\",\"dateModified\":\"2026-05-21\",\"image\":\"https://finopsllm.com/og.png\",\"author\":{\"@type\":\"Organization\",\"name\":\"FinOps LLM team\"},\"publisher\":{\"@type\":\"Organization\",\"name\":\"FinOps LLM\",\"url\":\"https://finopsllm.com/\"}}",
-      "{\"@context\":\"https://schema.org\",\"@type\":\"BreadcrumbList\",\"itemListElement\":[{\"@type\":\"ListItem\",\"position\":1,\"name\":\"Home\",\"item\":\"https://finopsllm.com/\"},{\"@type\":\"ListItem\",\"position\":2,\"name\":\"Research\",\"item\":\"https://finopsllm.com/research\"},{\"@type\":\"ListItem\",\"position\":3,\"name\":\"Token budget implementation\",\"item\":\"https://finopsllm.com/research/token-budget-implementation\"}]}",
-      "{\"@context\": \"https://schema.org\", \"@type\": \"FAQPage\", \"mainEntity\": [{\"@type\": \"Question\", \"name\": \"Why budgets fail at the policy layer?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"The most common failure mode is a budget defined in a governance document that no service reads. A team writes down \\\"the contract-redline feature gets ten million tokens per month,\\\" circulates it for approval, and never instruments the counter that would actually enforce it.\"}}, {\"@type\": \"Question\", \"name\": \"What is three places to enforce?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"Enforcement has to attach to something the application cannot easily bypass. There are essentially three options, and most production stacks end up using two of them in combination. The gateway A gateway sits between every caller and every provider. Each request carries a feature tag in a header.\"}}, {\"@type\": \"Question\", \"name\": \"What overrun should actually do?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"The most consequential design decision is what happens at the moment of overrun, because the answer has to differ by traffic class. A single global behavior - \\\"block everything past the cap\\\" - guarantees a customer-visible outage the first time a feature misforecasts.\"}}, {\"@type\": \"Question\", \"name\": \"What is reporting the budget back to the owner?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"The dashboard finance reads is not the dashboard the owning team needs. The owner is trying to decide whether to ship a fix, throttle a customer, or ask for more budget, and the data has to answer those three questions directly. Daily burn rate is the first number.\"}}, {\"@type\": \"Question\", \"name\": \"What goes on the per-feature dashboard?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"Anything else is decoration. The owner reads these six tiles, decides, and moves on.\"}}, {\"@type\": \"Question\", \"name\": \"What is common implementation traps?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"Most token-budget rollouts trip on the same handful of issues, and they all come from counting the wrong thing or counting it at the wrong moment. Using cost as the budget unit. Provider rates change. A budget in dollars looks stable but quietly redefines itself every time a price card updates.\"}}]}"
     ]
   }
 }

@@ -7,34 +7,26 @@
     "description": "GPT-5.6 Luna、Terra、Solの価格設定ガイド：分類、エージェント、推論に適したティアはどれか。ワークロードタイプ別のコスト経路付き実例とフォールバックパターン。",
     "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
     "canonical": "https://finopsllm.com/ja/research/gpt-5-6-pricing-tier-guide",
-    "hreflang": [
+    "article": {
+      "datePublished": "2026-07-19",
+      "breadcrumb": "GPT-5.6 料金ティアガイド"
+    },
+    "faq": [
       {
-        "lang": "en",
-        "href": "https://finopsllm.com/research/gpt-5-6-pricing-tier-guide"
+        "q": "GPT-5.6の分類タスクにはどのティアを使うべきですか？",
+        "a": "Luna（$1/$6 per 1M）は分類と単純な抽出に適しています。入力600トークン+出力100トークンで、Lunaは$0.00066/リクエスト対Terraの$0.00175/リクエストです。精度がボトルネックでなければ、Lunaは62%の節約で同等の結果を提供します。"
       },
       {
-        "lang": "es",
-        "href": "https://finopsllm.com/es/research/gpt-5-6-pricing-tier-guide"
+        "q": "Terra（$2.50/$15）がSol（$5/$30）を上回るのはいつですか？",
+        "a": "常にです。Terraはパフォーマンス/コストの最適ポイントとして位置付けられています：Solと同じ機能要件ですが、正確に半額です。エージェントループ、マルチターン会話、中程度の推論タスクにTerraを使用してください。Terraの推論深度が明らかに不十分な場合にのみSolを使用します。"
       },
       {
-        "lang": "fr",
-        "href": "https://finopsllm.com/fr/research/gpt-5-6-pricing-tier-guide"
+        "q": "GPT-5.6のプロンプトキャッシュのコスト影響は何ですか？",
+        "a": "キャッシュ書き込みは入力の1.25倍（例：Lunaで$1.25 per 1M）です。キャッシュ読み取りは入力の10%（Lunaで$0.10 per 1M）です。100Kトークンのプレフィックスが30分以内に5回以上再利用される場合、キャッシュはキャッシュなしの繰り返し呼び出しと比べて60%以上の節約となります。"
       },
       {
-        "lang": "de",
-        "href": "https://finopsllm.com/de/research/gpt-5-6-pricing-tier-guide"
-      },
-      {
-        "lang": "pt",
-        "href": "https://finopsllm.com/pt/research/gpt-5-6-pricing-tier-guide"
-      },
-      {
-        "lang": "ja",
-        "href": "https://finopsllm.com/ja/research/gpt-5-6-pricing-tier-guide"
-      },
-      {
-        "lang": "x-default",
-        "href": "https://finopsllm.com/research/gpt-5-6-pricing-tier-guide"
+        "q": "GPT-5.6はClaude Sonnet 5とDeepSeek V4とどう比較しますか？",
+        "a": "Luna（$1/$6）はClaude Sonnet（$2/$10 intro、$3/$15 Sept 1）より50-60%安く、DeepSeek V4 Flash（$0.14/$0.28）はLunaより7-20倍安いです。推論ワークロードについては、Sol（$5/$30）とClaude Sonnetは異なるパフォーマンス対ドルをトレードしています；ユースケースをベンチマークしてください。"
       }
     ],
     "style": "body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}\n.wrap{max-width:1100px;margin:0 auto;padding:56px 24px}\na{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}\n.langsw{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;color:#647289;margin:0 0 26px}\n.langsw a{text-decoration:none}.langsw a[aria-current]{color:#E6EAF2;font-weight:600}\n.badge-row{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 32px;list-style:none;padding:0}\n.badge-row li{background:#101726;border:1px solid #1E2A3F;border-radius:8px;padding:8px 14px;font-size:.85rem;color:#B6C0D2}\n.table-wrap{overflow-x:auto;margin:0 0 32px;-webkit-overflow-scrolling:touch}\ntable{border-collapse:collapse;width:100%;font-size:.85rem}\nth,td{border:1px solid #1E2A3F;padding:10px 12px;text-align:left;color:#B6C0D2}\nth{color:#E6EAF2;background:#101726}\ntd.number{text-align:right;font-family:'JetBrains Mono',monospace;font-weight:500}\ntd.highlight{background:rgba(248,113,113,.08)}\n.cost-example{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:20px;margin:16px 0}\n.cost-example h3{color:#E6EAF2;margin:0 0 12px;font-size:1rem}\n.cost-example p{font-size:.9rem;margin:6px 0}\n.routing-guide{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:24px;margin:12px 0}\n.routing-guide h3{color:#E6EAF2;margin:0 0 10px;font-size:1rem}\n.warning{border-left:4px solid #f87171;padding:16px;background:rgba(248,113,113,.08);margin:20px 0}\n@media(max-width:700px){\n  table{font-size:.75rem}\n  th,td{padding:6px 7px}\n}",
@@ -51,11 +43,6 @@
         "src": "/assets/lang.js",
         "defer": true
       }
-    ],
-    "jsonLd": [
-      "{\"@context\":\"https://schema.org\",\"@type\":\"TechArticle\",\"headline\":\"GPT-5.6 料金ティアガイド：Luna、Terra、Sol · FinOps LLM\",\"description\":\"GPT-5.6の3つのティアの実践的なルーティングガイド：分類、抽出、エージェント型推論、困難な推論タスクに使用するモデル。タスクあたりの実例と段階的フォールバックパターン。\",\"url\":\"https://finopsllm.com/ja/research/gpt-5-6-pricing-tier-guide\",\"datePublished\":\"2026-07-19\",\"dateModified\":\"2026-07-19\",\"image\":\"https://finopsllm.com/og.png\",\"author\":{\"@type\":\"Organization\",\"name\":\"FinOps LLM team\"},\"publisher\":{\"@type\":\"Organization\",\"name\":\"FinOps LLM\",\"url\":\"https://finopsllm.com/\"}}",
-      "{\"@context\":\"https://schema.org\",\"@type\":\"BreadcrumbList\",\"itemListElement\":[{\"@type\":\"ListItem\",\"position\":1,\"name\":\"ホーム\",\"item\":\"https://finopsllm.com/ja/\"},{\"@type\":\"ListItem\",\"position\":2,\"name\":\"リサーチ\",\"item\":\"https://finopsllm.com/ja/research\"},{\"@type\":\"ListItem\",\"position\":3,\"name\":\"GPT-5.6 料金ティアガイド\",\"item\":\"https://finopsllm.com/ja/research/gpt-5-6-pricing-tier-guide\"}]}",
-      "{\"@context\": \"https://schema.org\", \"@type\": \"FAQPage\", \"mainEntity\": [{\"@type\": \"Question\", \"name\": \"GPT-5.6の分類タスクにはどのティアを使うべきですか？\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"Luna（$1/$6 per 1M）は分類と単純な抽出に適しています。入力600トークン+出力100トークンで、Lunaは$0.00066/リクエスト対Terraの$0.00175/リクエストです。精度がボトルネックでなければ、Lunaは62%の節約で同等の結果を提供します。\"}}, {\"@type\": \"Question\", \"name\": \"Terra（$2.50/$15）がSol（$5/$30）を上回るのはいつですか？\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"常にです。Terraはパフォーマンス/コストの最適ポイントとして位置付けられています：Solと同じ機能要件ですが、正確に半額です。エージェントループ、マルチターン会話、中程度の推論タスクにTerraを使用してください。Terraの推論深度が明らかに不十分な場合にのみSolを使用します。\"}}, {\"@type\": \"Question\", \"name\": \"GPT-5.6のプロンプトキャッシュのコスト影響は何ですか？\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"キャッシュ書き込みは入力の1.25倍（例：Lunaで$1.25 per 1M）です。キャッシュ読み取りは入力の10%（Lunaで$0.10 per 1M）です。100Kトークンのプレフィックスが30分以内に5回以上再利用される場合、キャッシュはキャッシュなしの繰り返し呼び出しと比べて60%以上の節約となります。\"}}, {\"@type\": \"Question\", \"name\": \"GPT-5.6はClaude Sonnet 5とDeepSeek V4とどう比較しますか？\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"Luna（$1/$6）はClaude Sonnet（$2/$10 intro、$3/$15 Sept 1）より50-60%安く、DeepSeek V4 Flash（$0.14/$0.28）はLunaより7-20倍安いです。推論ワークロードについては、Sol（$5/$30）とClaude Sonnetは異なるパフォーマンス対ドルをトレードしています；ユースケースをベンチマークしてください。\"}}]}"
     ]
   }
 }

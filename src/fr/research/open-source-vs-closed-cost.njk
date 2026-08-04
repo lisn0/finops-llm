@@ -7,34 +7,31 @@
     "description": "Quand l'auto-hébergement de Llama, Qwen ou DeepSeek devient-il rentable face à l'API ? Coûts GPU, optimisation, frais opérationnels et cadre décisionnel.",
     "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
     "canonical": "https://finopsllm.com/fr/research/open-source-vs-closed-cost",
-    "hreflang": [
+    "article": {
+      "datePublished": "2026-07-04",
+      "dateModified": "2026-07-15",
+      "breadcrumb": "Modèles Open-Source vs Propriétaires : Coût"
+    },
+    "faq": [
       {
-        "lang": "en",
-        "href": "https://finopsllm.com/research/open-source-vs-closed-cost"
+        "q": "Quelle est la méthodologie ?",
+        "a": "Tarifs standards publiés depuis chaque page de tarification du fournisseur. Aucune réduction par volume ou batch appliquée. GPU dans le cloud pour l'infrastructure auto-hébergée utilisant les prix à la demande (Lambda, RunPod, AWS) avec des configurations optimisées pour l'inférence avec vLLM ou TensorRT-LLM."
       },
       {
-        "lang": "es",
-        "href": "https://finopsllm.com/es/research/open-source-vs-closed-cost"
+        "q": "Quel est le tableau de comparaison des coûts ?",
+        "a": "Coût API/mois suppose 100M tokens de sortie + 300M tokens d'entrée par mois aux tarifs standards. Coût d'auto-hébergement comprend la location GPU, les frais opérationnels de 15%, et l'infrastructure d'inférence (vLLM). N'inclut pas le temps d'ingénierie initiale."
       },
       {
-        "lang": "fr",
-        "href": "https://finopsllm.com/fr/research/open-source-vs-closed-cost"
+        "q": "Quels sont les facteurs clés de coût ?",
+        "a": "Un nœud 8x H100 pour Llama 4 Maverick coûte 2 000 à 3 500 $/mois à la demande depuis Lambda, RunPod ou AWS. Les instances spot/préemptibles peuvent réduire cela de 40 à 60 % mais ajoutent une latence de redémarrage et un risque de disponibilité. Pour les charges de production, les instances réservées (engagement 1 an) économisent généralement 30 à 40 % par rapport à la demande."
       },
       {
-        "lang": "de",
-        "href": "https://finopsllm.com/de/research/open-source-vs-closed-cost"
+        "q": "Quel est le cadre décisionnel ?",
+        "a": "La plupart des équipes se retrouvent en hybride : utiliser l'API pour les tâches de raisonnement frontalier et les charges faibles, auto-héberger des modèles open-source pour les tâches à fort volume et tolérantes à la latence (génération de contenu, extraction de données, outils internes)."
       },
       {
-        "lang": "pt",
-        "href": "https://finopsllm.com/pt/research/open-source-vs-closed-cost"
-      },
-      {
-        "lang": "ja",
-        "href": "https://finopsllm.com/ja/research/open-source-vs-closed-cost"
-      },
-      {
-        "lang": "x-default",
-        "href": "https://finopsllm.com/research/open-source-vs-closed-cost"
+        "q": "Où exécuter les modèles open-source ?",
+        "a": "Les prix GPU sont des tarifs horaires à la demande à partir de juillet 2026. Les prix réservés/spot varient considérablement. MiMO offre un accès basé sur API à MiMo-V2-Pro et MiMo-V2-Omni à des tarifs compétitifs - un juste milieu entre l'auto-hébergement complet et les prix API premium."
       }
     ],
     "style": "body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}\n.wrap{max-width:1100px;margin:0 auto;padding:56px 24px}\na{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}\n.langsw{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;color:#647289;margin:0 0 26px}\n.langsw a{text-decoration:none}.langsw a[aria-current]{color:#E6EAF2;font-weight:600}\n\n/* Hero stats */\n.hero-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:16px;margin:28px 0 36px}\n.hero-stat{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:18px 16px;text-align:center}\n.hero-stat .num{font-size:2rem;font-weight:700;color:#7AAFFF;display:block}\n.hero-stat .lbl{font-size:.82rem;color:#647289;margin-top:4px}\n\n/* Badges */\n.badge-row{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 32px;list-style:none;padding:0}\n.badge-row li{background:#101726;border:1px solid #1E2A3F;border-radius:8px;padding:8px 14px;font-size:.85rem;color:#B6C0D2}\n\n/* Methodology */\n.method-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin:20px 0 32px}\n.method-card{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:18px}\n.method-card h3{font-size:.95rem;color:#E6EAF2;margin:0 0 8px}\n.method-card p{font-size:.85rem;margin:0}\n\n/* Table */\n.table-wrap{overflow-x:auto;margin:0 0 32px;-webkit-overflow-scrolling:touch}\ntable{border-collapse:collapse;width:100%;font-size:.82rem;white-space:nowrap}\nth,td{border:1px solid #1E2A3F;padding:8px 10px;text-align:left;color:#B6C0D2}\nth{color:#E6EAF2;background:#101726;cursor:pointer;position:sticky;top:0;user-select:none}\nth:hover{background:#162035}\nth .sort-arrow{font-size:.7rem;margin-left:4px;opacity:.4}\nth.sorted .sort-arrow{opacity:1;color:#7AAFFF}\ntd.provider-cell{white-space:normal;min-width:140px}\ntd.price-cell{text-align:right;font-variant-numeric:tabular-nums}\ntd.limit-cell{text-align:right;font-variant-numeric:tabular-nums;min-width:55px}\ntd.model-cell{font-size:.78rem}\ntr:hover{background:rgba(122,175,255,.04)}\n\n/* Gray for estimated values */\n.est{color:#647289}\n.official{color:#B6C0D2}\n\n/* Referral links */\n.ref-link{font-size:.75rem;color:#7AAFFF;text-decoration:none;border-bottom:1px dotted rgba(122,175,255,.3)}\n.ref-link:hover{border-bottom-color:#7AAFFF}\n\n/* Footnotes */\n.footnotes{font-size:.8rem;color:#64748b;margin:16px 0 0}\n.footnotes p{margin:6px 0}\n\n/* Guide */\n.guide-section{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:24px;margin:12px 0}\n.guide-section h3{color:#E6EAF2;margin:0 0 10px;font-size:1rem}\n\n/* Decision framework */\n.decision-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;margin:20px 0 32px}\n.decision-card{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:24px}\n.decision-card.api{border-left:4px solid #7AAFFF}\n.decision-card.self{border-left:4px solid #4ADE80}\n.decision-card h3{font-size:1rem;margin:0 0 12px;color:#E6EAF2}\n.decision-card ul{margin:0;padding-left:18px}\n.decision-card li{margin:6px 0;font-size:.88rem}\n\n/* Responsive */\n@media(max-width:700px){\n  .hero-stats{grid-template-columns:repeat(2,1fr)}\n  table{font-size:.75rem}\n  th,td{padding:6px 7px}\n  .decision-grid{grid-template-columns:1fr}\n}",
@@ -51,11 +48,6 @@
         "src": "/assets/lang.js",
         "defer": true
       }
-    ],
-    "jsonLd": [
-      "{\"@context\":\"https://schema.org\",\"@type\":\"TechArticle\",\"headline\":\"Modèles Open-Source vs Propriétaires : Comparaison des Coûts LLM · FinOps LLM\",\"description\":\"Quand est-il rentable d'auto-héberger Llama, Qwen ou DeepSeek par rapport à l'accès par API ? Coûts GPU, optimisation de l'inférence, frais opérationnels, et cadre décisionnel.\",\"url\":\"https://finopsllm.com/fr/research/open-source-vs-closed-cost\",\"datePublished\":\"2026-07-04\",\"dateModified\":\"2026-07-15\",\"image\":\"https://finopsllm.com/og.png\",\"author\":{\"@type\":\"Organization\",\"name\":\"FinOps LLM team\"},\"publisher\":{\"@type\":\"Organization\",\"name\":\"FinOps LLM\",\"url\":\"https://finopsllm.com/\"}}",
-      "{\"@context\":\"https://schema.org\",\"@type\":\"BreadcrumbList\",\"itemListElement\":[{\"@type\":\"ListItem\",\"position\":1,\"name\":\"Accueil\",\"item\":\"https://finopsllm.com/\"},{\"@type\":\"ListItem\",\"position\":2,\"name\":\"Recherche\",\"item\":\"https://finopsllm.com/fr/research\"},{\"@type\":\"ListItem\",\"position\":3,\"name\":\"Modèles Open-Source vs Propriétaires : Coût\",\"item\":\"https://finopsllm.com/fr/research/open-source-vs-closed-cost\"}]}",
-      "{\"@context\": \"https://schema.org\", \"@type\": \"FAQPage\", \"mainEntity\": [{\"@type\": \"Question\", \"name\": \"Quelle est la méthodologie ?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"Tarifs standards publiés depuis chaque page de tarification du fournisseur. Aucune réduction par volume ou batch appliquée. GPU dans le cloud pour l'infrastructure auto-hébergée utilisant les prix à la demande (Lambda, RunPod, AWS) avec des configurations optimisées pour l'inférence avec vLLM ou TensorRT-LLM.\"}}, {\"@type\": \"Question\", \"name\": \"Quel est le tableau de comparaison des coûts ?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"Coût API/mois suppose 100M tokens de sortie + 300M tokens d'entrée par mois aux tarifs standards. Coût d'auto-hébergement comprend la location GPU, les frais opérationnels de 15%, et l'infrastructure d'inférence (vLLM). N'inclut pas le temps d'ingénierie initiale.\"}}, {\"@type\": \"Question\", \"name\": \"Quels sont les facteurs clés de coût ?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"Un nœud 8x H100 pour Llama 4 Maverick coûte 2 000 à 3 500 $/mois à la demande depuis Lambda, RunPod ou AWS. Les instances spot/préemptibles peuvent réduire cela de 40 à 60 % mais ajoutent une latence de redémarrage et un risque de disponibilité. Pour les charges de production, les instances réservées (engagement 1 an) économisent généralement 30 à 40 % par rapport à la demande.\"}}, {\"@type\": \"Question\", \"name\": \"Quel est le cadre décisionnel ?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"La plupart des équipes se retrouvent en hybride : utiliser l'API pour les tâches de raisonnement frontalier et les charges faibles, auto-héberger des modèles open-source pour les tâches à fort volume et tolérantes à la latence (génération de contenu, extraction de données, outils internes).\"}}, {\"@type\": \"Question\", \"name\": \"Où exécuter les modèles open-source ?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"Les prix GPU sont des tarifs horaires à la demande à partir de juillet 2026. Les prix réservés/spot varient considérablement. MiMO offre un accès basé sur API à MiMo-V2-Pro et MiMo-V2-Omni à des tarifs compétitifs - un juste milieu entre l'auto-hébergement complet et les prix API premium.\"}}]}"
     ]
   }
 }

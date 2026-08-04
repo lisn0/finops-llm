@@ -7,6 +7,24 @@
     "description": "How to calculate real savings from prompt caching, attribute them correctly, and avoid the most common accounting mistakes.",
     "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
     "canonical": "https://finopsllm.com/research/prompt-caching-economics",
+    "article": {
+      "datePublished": "2026-08-01",
+      "breadcrumb": "Prompt Caching ROI and Attribution"
+    },
+    "faq": [
+      {
+        "q": "How much can prompt caching save?",
+        "a": "For workloads with long, repeated system prompts or few-shot examples, prompt caching typically saves 20-40% on input tokens. The exact figure depends on cache hit rate: the percentage of requests that share a prefix with a previous request. Hit rates below 30% rarely justify the complexity."
+      },
+      {
+        "q": "How do I calculate prompt caching savings correctly?",
+        "a": "Savings = (full_price_input_tokens - cache_read_tokens × cache_read_price_ratio) × model_input_price. Do not count cache_read_tokens as full savings. The discount applies only to the cache-read portion, and cache writes still cost full price."
+      },
+      {
+        "q": "What is a good cache hit rate?",
+        "a": "Production systems typically see 30-70% hit rates. Below 30%, caching adds complexity without meaningful savings. Above 70%, the workload is highly repetitive and caching is usually the single biggest optimization lever."
+      }
+    ],
     "style": "body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}.wrap{max-width:840px;margin:0 auto;padding:56px 24px}a{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}table{border-collapse:collapse;width:100%;margin:24px 0;font-size:.95em}th,td{border:1px solid #1E2A3F;padding:10px 12px;text-align:left;color:#B6C0D2}th{color:#E6EAF2;background:#101726}.langsw{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;color:#647289;margin:0 0 26px}.langsw a{text-decoration:none}.langsw a[aria-current]{color:#E6EAF2;font-weight:600}",
     "scripts": [
       {
@@ -17,11 +35,6 @@
         "src": "/assets/attribution.js",
         "defer": true
       }
-    ],
-    "jsonLd": [
-      "{\"@context\":\"https://schema.org\",\"@type\":\"TechArticle\",\"headline\":\"Prompt Caching ROI and Attribution\",\"description\":\"How to calculate real savings from prompt caching, attribute them correctly, and avoid the most common accounting mistakes.\",\"url\":\"https://finopsllm.com/research/prompt-caching-economics\",\"datePublished\":\"2026-08-01\",\"dateModified\":\"2026-08-01\",\"image\":\"https://finopsllm.com/og.png\",\"author\":{\"@type\":\"Organization\",\"name\":\"FinOps LLM team\"},\"publisher\":{\"@type\":\"Organization\",\"name\":\"FinOps LLM\",\"url\":\"https://finopsllm.com/\"}}",
-      "{\"@context\":\"https://schema.org\",\"@type\":\"BreadcrumbList\",\"itemListElement\":[{\"@type\":\"ListItem\",\"position\":1,\"name\":\"Home\",\"item\":\"https://finopsllm.com/\"},{\"@type\":\"ListItem\",\"position\":2,\"name\":\"Research\",\"item\":\"https://finopsllm.com/research\"},{\"@type\":\"ListItem\",\"position\":3,\"name\":\"Prompt Caching ROI and Attribution\",\"item\":\"https://finopsllm.com/research/prompt-caching-economics\"}]}",
-      "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"mainEntity\":[{\"@type\":\"Question\",\"name\":\"How much can prompt caching save?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"For workloads with long, repeated system prompts or few-shot examples, prompt caching typically saves 20-40% on input tokens. The exact figure depends on cache hit rate: the percentage of requests that share a prefix with a previous request. Hit rates below 30% rarely justify the complexity.\"}},{\"@type\":\"Question\",\"name\":\"How do I calculate prompt caching savings correctly?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Savings = (full_price_input_tokens - cache_read_tokens × cache_read_price_ratio) × model_input_price. Do not count cache_read_tokens as full savings. The discount applies only to the cache-read portion, and cache writes still cost full price.\"}},{\"@type\":\"Question\",\"name\":\"What is a good cache hit rate?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Production systems typically see 30-70% hit rates. Below 30%, caching adds complexity without meaningful savings. Above 70%, the workload is highly repetitive and caching is usually the single biggest optimization lever.\"}}]}"
     ]
   }
 }
