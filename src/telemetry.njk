@@ -1,0 +1,79 @@
+---json
+{
+  "permalink": "telemetry.html",
+  "lang": "en",
+  "head": {
+    "title": "Tidal Telemetry · LLM observability, free in beta · FinOps LLM",
+    "description": "Tidal Telemetry is our LLM observability product: one line of code, plain OpenTelemetry, isolated per-project storage. Free in beta, no engagement required.",
+    "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+    "canonical": "https://finopsllm.com/telemetry",
+    "openGraph": [
+      { "property": "og:type", "content": "website" },
+      { "property": "og:url", "content": "https://finopsllm.com/telemetry" },
+      { "property": "og:title", "content": "Tidal Telemetry · LLM observability, free in beta · FinOps LLM" },
+      { "property": "og:description", "content": "Tidal Telemetry is our LLM observability product: one line of code, plain OpenTelemetry, isolated per-project storage. Free in beta, no engagement required." },
+      { "property": "og:image", "content": "https://finopsllm.com/og.svg" },
+      { "property": "og:site_name", "content": "FinOps LLM" },
+      { "property": "og:locale", "content": "en_US" }
+    ],
+    "twitter": [
+      { "name": "twitter:card", "content": "summary_large_image" },
+      { "name": "twitter:site", "content": "@finopsllm" },
+      { "name": "twitter:title", "content": "Tidal Telemetry · LLM observability, free in beta · FinOps LLM" },
+      { "name": "twitter:description", "content": "Tidal Telemetry is our LLM observability product: one line of code, plain OpenTelemetry, isolated per-project storage. Free in beta, no engagement required." },
+      { "name": "twitter:image", "content": "https://finopsllm.com/og.svg" }
+    ],
+    "style": "body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.65}.wrap{max-width:760px;margin:0 auto;padding:56px 24px}a{color:#7AAFFF}p,li{color:#B6C0D2}",
+    "scripts": [
+      { "src": "/assets/consent.js", "defer": true },
+      { "src": "/assets/attribution.js", "defer": true }
+    ],
+    "faq": [
+      {
+        "q": "What is Tidal Telemetry?",
+        "a": "A hosted LLM observability product from the same team as FinOps LLM. You install an SDK, call one init function, and every model call arrives as a trace with model, token counts, estimated cost, latency and errors attached."
+      },
+      {
+        "q": "Do I have to use Tidal Telemetry to work with FinOps LLM?",
+        "a": "No, and the reverse is also true. Engagements are measured against your raw provider invoices and whatever tooling you already run, and nothing in our pricing licenses a dashboard to you. You can sign up for Telemetry without ever speaking to us."
+      },
+      {
+        "q": "What does Tidal Telemetry cost?",
+        "a": "It is free during the beta with no credit card. Paid tiers are planned, and beta users keep a free plan when they arrive."
+      },
+      {
+        "q": "Do I have to install your SDK to send data?",
+        "a": "No. Ingest is plain OTLP over HTTPS with a bearer token, so any OpenTelemetry exporter can point at your project endpoint directly. The SDK is a convenience wrapper over the Apache-licensed OpenLIT SDK, not a requirement."
+      }
+    ]
+  }
+}
+---
+{% extends "shell.njk" %}{% block body %}<h1>Tidal Telemetry</h1>
+
+<p>Everything else on this site is people doing work on your bill. <a href="https://telemetry.llmcfo.com">Tidal Telemetry</a> is software you sign up for and run yourself. It is free during beta, it requires no engagement with us, and this page exists so the difference is not confusing.</p>
+
+<h2>What it is</h2>
+<p>Hosted LLM observability. Install the SDK, call the init function, and every model call your application makes starts arriving as a trace: model, tokens in and out, an estimated cost per call, latency, errors.</p>
+<ul>
+<li><strong>One line, roughly 50 libraries.</strong> Auto-instrumentation covers OpenAI, Anthropic, Mistral, Bedrock, LangChain, LlamaIndex, vector databases and the common agent frameworks. Python and Node get the one-line install.</li>
+<li><strong>Plain OpenTelemetry, so the SDK is optional.</strong> Ingest is OTLP over HTTPS with a bearer token. Point any OpenTelemetry exporter at your project endpoint and it behaves identically. The SDK is a thin wrapper over the Apache-licensed OpenLIT SDK.</li>
+<li><strong>Isolated per-project storage.</strong> Each project gets its own database and its own ingest key, enforced at the storage layer rather than by a filter in a query.</li>
+<li><strong>A built-in MCP server.</strong> Agents can verify the setup, send a test trace and pull usage reports directly, which is a faster loop than reading a dashboard.</li>
+</ul>
+
+<h2>What it costs</h2>
+<p>Nothing, currently. It is in beta and free with no credit card, paid tiers are planned, and beta users keep a free plan when those arrive. That is the actual state of it rather than a launch offer with a countdown attached.</p>
+
+<h2>How it relates to the engagement</h2>
+<p>Telemetry shows you what your LLMs spend. The <a href="/">FinOps LLM engagement</a> is the work that reduces it, priced on <a href="/pricing">verified savings</a>. The two are cross-promoted and deliberately not bundled.</p>
+<ul>
+<li><strong>Use Telemetry and never talk to us.</strong> There is no sales gate on it and no engagement prerequisite.</li>
+<li><strong>Hire us and never use Telemetry.</strong> Audits run against provider billing data - the <a href="/audit/openai">OpenAI</a> Costs endpoint, the <a href="/audit/bedrock">Bedrock</a> CUR, the <a href="/audit/vertex-ai">Vertex</a> BigQuery export - not against our own product.</li>
+<li><strong>Below the engagement minimum, this is the better answer.</strong> Instrument it yourself, read your own numbers, and use the <a href="/templates">free templates</a> to allocate them.</li>
+</ul>
+<p>Keeping the two apart is a constraint we put on ourselves for a reason. A cost consultant who also owns the meter has an obvious problem, so every baseline behind every fee comes from raw provider invoices.</p>
+
+<p>Product, docs and signup are at <a href="https://telemetry.llmcfo.com">telemetry.llmcfo.com</a>. If what you want instead is someone to read your invoice and tell you where the money went, that is the <a href="/book">free audit</a>.</p>
+
+<p><a href="/">Back to FinOps LLM</a></p>{% endblock %}
