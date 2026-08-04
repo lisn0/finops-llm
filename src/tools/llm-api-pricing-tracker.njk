@@ -106,7 +106,19 @@
 </div>
 
 <div class="methodology">
-  <h2>How we track prices</h2>
+<h2>Why list prices don't predict your bill</h2>
+<p>The per-million-token numbers in this table are the starting point of a cost estimate, not the estimate. Four things move the real figure, usually by more than the gap between two providers on this page.</p>
+<ul>
+<li><strong>Cache reads.</strong> Where a provider supports prompt caching, cached input tokens bill at a fraction of the list price. A workload with a large fixed system prompt and a high hit rate pays an effective input price far below the number shown here.</li>
+<li><strong>Output-heavy work.</strong> Output tokens cost several times input tokens on every provider. A model that looks cheap on input and expensive on output is cheap for retrieval-augmented answers and expensive for long-form generation.</li>
+<li><strong>Retries and fallbacks.</strong> Every retry bills again. A model with a lower price and a higher failure rate on your task can cost more per completed request than the more expensive one.</li>
+<li><strong>Reasoning tokens.</strong> Models that think before answering bill those tokens at the output rate, and the count is not visible in the prompt you wrote. Budget from measured usage, not from expected response length.</li>
+</ul>
+<h2>How often do these prices change?</h2>
+<p>Less often than model availability, but often enough that a quarterly review is the minimum. Providers cut prices when competitors do, introduce cheaper tiers of existing models, and deprecate older ones with a migration window. The practical consequence is that routing rules and budget assumptions both go stale — a routing table written six months ago is usually still correct and occasionally sending traffic to a model that is no longer the cheapest option that clears your quality bar.</p>
+<h2>Context windows are a ceiling, not a target</h2>
+<p>The context column shows the maximum a model accepts. It is not a budget to fill. Cost scales with what you actually send, and retrieval that grows context faster than it improves answers is one of the most common causes of a bill that rises without the product getting better. Measure the p95 context length you send in production; that number, not the ceiling, is what your invoice reflects.</p>
+<h2>How we track prices</h2>
   <p>Prices are scraped daily from provider pricing pages and verified against API responses. Cache prices apply only where providers support prompt caching. Context windows are maximum supported; effective context may be lower for reasoning models.</p>
   <p>Last updated: <span id="lastUpdated">—</span></p>
 </div>

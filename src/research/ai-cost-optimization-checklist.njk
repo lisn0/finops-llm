@@ -55,4 +55,19 @@
 
 <p>For a deeper explanation of each lever, see <a href="/research/ai-cost-optimization">AI cost optimization</a>.</p>
 
+
+<h2>What order should you run these in?</h2>
+<p>Sequence by effort-to-savings, not by size of the prize. A realistic first 90 days:</p>
+<ol>
+<li><strong>Weeks 1-2</strong> — reconcile to the invoice, tag the top five endpoints, and set a quality baseline. No optimization yet; you are building the ability to tell whether anything worked.</li>
+<li><strong>Weeks 3-4</strong> — turn on prompt caching. It is the only lever on this list that needs no quality testing, because the cached tokens are byte-identical to what you were already sending.</li>
+<li><strong>Weeks 5-8</strong> — move eligible asynchronous work to batch, then A/B model routing on one endpoint. Both are reversible in a deploy.</li>
+<li><strong>Weeks 9-12</strong> — semantic caching and provider arbitrage, which change what the user sees and therefore need the quality baseline you built in week 1.</li>
+</ol>
+
+<h2>How much should you expect to save?</h2>
+<p>The levers are not additive. Routing 40% of traffic to a cheaper model shrinks the base that caching then applies to. A stack of caching, routing, and batch that looks like 90% on paper typically lands between 40% and 60% in production. Measure each lever against the invoice after it ships rather than summing the vendor claims.</p>
+
+<h2>When should you stop optimizing?</h2>
+<p>When the next lever costs more engineering time than it saves in a year, or when quality regressions start appearing in your evals. Both are worth writing down in advance. Re-open the checklist quarterly instead — provider prices, model tiers, and your own traffic mix all move enough that the answer changes.</p>
 <hr style="margin:48px 0 24px;border:none;border-top:1px solid #1E2A3F" /><p>Want this applied to your own LLM spend? FinOps LLM runs a free audit of your AI costs and shows where the savings are. <a href="/book">Book free audit &rarr;</a></p><p><a href="/research">Back to research</a></p>{% endblock %}

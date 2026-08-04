@@ -136,7 +136,20 @@
 </div>
 
 <div class="methodology">
-  <h2>Methodology</h2>
+<h2>How to read the comparison</h2>
+<p>The monthly figure this calculator produces is a floor, not a forecast. It assumes every request succeeds on the first attempt, that your input and output lengths hold steady, and that traffic is flat across the month. Real workloads violate all three. Treat the output as a way to compare models against each other under identical assumptions — which is what it is good for — rather than as a number to put in a budget.</p>
+<h2>What the estimate leaves out</h2>
+<ul>
+<li><strong>Retries and fallbacks.</strong> Add your measured retry rate on top. A 15% retry rate is a 15% cost increase that no per-token comparison shows.</li>
+<li><strong>Reasoning tokens.</strong> For models that reason before answering, the billed output exceeds the visible response, sometimes by several times. Enter measured output tokens rather than expected answer length.</li>
+<li><strong>Traffic shape.</strong> Cost distributions have long tails — a small share of requests with large contexts often drives most of the bill. A single average request understates that; run the calculator once at your median and once at your p95 to see the spread.</li>
+<li><strong>Discounts and batch pricing.</strong> Committed-use terms and batch endpoints change the effective rate substantially for eligible work, and neither is reflected in list prices.</li>
+</ul>
+<h2>What cache hit rate should you enter?</h2>
+<p>If you have not enabled prompt caching, enter zero — the default — because that is what you are paying today. If you have, use your measured hit rate rather than an aspiration. Rates depend almost entirely on workload shape: a large fixed system prompt with short variable user input caches well, while retrieval that injects different chunks on every call caches poorly no matter how the request is structured. Entering 70% because a vendor page mentioned it produces a confident number describing a system you do not operate.</p>
+<h2>Using this to make a routing decision</h2>
+<p>Cost alone cannot pick a model. Set the quality floor first — the eval your task has to pass — then compare cost only among the models that clear it. A model that halves the cost and fails one request in twenty has not saved anything once the retry, the latency, and the support ticket are counted. Run the comparison, pick the two or three candidates that are plausible, and A/B them on real traffic before changing the routing rule.</p>
+<h2>Methodology</h2>
   <p>Prices are per-model list prices as of August 2026. Cache-read tokens are discounted where applicable. Actual costs vary based on retries, latency requirements, and volume discounts.</p>
   <p>This calculator is for estimation only. For a precise audit of your actual spend, <a href="/book">book a free audit</a>.</p>
 </div>

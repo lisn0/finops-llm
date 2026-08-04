@@ -51,4 +51,14 @@
 <h2>From allocation to action</h2>
 <p>Once costs are allocated, you can show them back to teams, charge them back, set budgets, and identify optimization opportunities. For the billing mechanics, see <a href="/research/llm-chargeback-showback">LLM chargeback and showback</a>.</p>
 
+
+<h2>Where allocation usually breaks</h2>
+<p>Three gaps account for most unallocated LLM spend. <strong>Retries and fallbacks</strong> bill against a request the user only saw once, so a naive join under-counts the expensive endpoints. <strong>Shared infrastructure</strong> — an embedding index or a re-ranking model serving several features — has no single owner, and teams either drop it or dump it on whoever built it. <strong>Background work</strong> such as nightly evals, enrichment, and index rebuilds carries no user context at all, so it lands in an "unattributed" bucket that quietly grows into the largest line item.</p>
+<p>Fix them in that order. Tag the retry with the parent request ID, allocate shared services proportionally by a driver everyone accepts, and give background jobs their own cost center rather than forcing them into a product tag.</p>
+
+<h2>How accurate does allocation need to be?</h2>
+<p>Accurate enough that no owner disputes it, which is usually 90-95%, not 100%. Chasing the last few percent costs more engineering time than the spend it explains. Set an explicit unallocated threshold — 5% is a reasonable starting target — publish it alongside the report, and treat crossing it as the signal to invest in tagging again.</p>
+
+<h2>Should allocation happen at request time or in the warehouse?</h2>
+<p>Both. Attach ownership metadata at request time, because that context is unrecoverable later, and do the arithmetic in the warehouse, where you can reconcile against the invoice and restate history when a tagging bug is found. Systems that only allocate at query time cannot answer "who spent this" for any traffic that predates the fix.</p>
 <hr style="margin:48px 0 24px;border:none;border-top:1px solid #1E2A3F" /><p>Want this applied to your own LLM spend? FinOps LLM runs a free audit of your AI costs and shows where the savings are. <a href="/book">Book free audit &rarr;</a></p><p><a href="/research">Back to research</a></p>{% endblock %}

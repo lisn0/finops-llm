@@ -56,4 +56,18 @@
 <h2>From visibility to action</h2>
 <p>Visibility is not the end goal. The goal is to act on it. Use dashboards to set budgets, trigger alerts, and identify optimization candidates. Once you can see the cost, you can manage it. For the tracking mechanics, see <a href="/research/llm-cost-tracking">LLM cost tracking</a>.</p>
 
+
+<h2>Which metrics mislead?</h2>
+<p>Three common ones do more harm than good:</p>
+<ul>
+<li><strong>Total spend on its own.</strong> It rises when the product succeeds. Without a unit denominator you cannot tell growth from waste, and you will end up asking a team to cut costs in the month they doubled usage.</li>
+<li><strong>Cost per token.</strong> It rewards shorter outputs regardless of whether the task was completed. Cost per successful task is the number that maps to value.</li>
+<li><strong>Average cost per request.</strong> LLM cost distributions have long tails — a small share of requests with large contexts or heavy retries often drives most of the bill. Track the p95 alongside the mean, or the expensive traffic stays invisible.</li>
+</ul>
+
+<h2>How fresh does cost data need to be?</h2>
+<p>It depends who is reading it. Finance needs monthly accuracy reconciled to the invoice. Engineering needs same-day estimates, because a prompt change that triples context length should surface before it runs for a week. Those are two different pipelines, and trying to serve both from one usually produces data that is too slow to act on and too approximate to book.</p>
+
+<h2>Why doesn't the provider dashboard cover this?</h2>
+<p>Provider consoles report by API key and model, which is infrastructure, not ownership. They cannot tell you which feature, customer, or workflow caused a call, and they stop at the boundary of one vendor. The moment you use two providers — or route between them — the reconciled view has to be yours.</p>
 <hr style="margin:48px 0 24px;border:none;border-top:1px solid #1E2A3F" /><p>Want this applied to your own LLM spend? FinOps LLM runs a free audit of your AI costs and shows where the savings are. <a href="/book">Book free audit &rarr;</a></p><p><a href="/research">Back to research</a></p>{% endblock %}
