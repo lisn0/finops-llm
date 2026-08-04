@@ -1,0 +1,82 @@
+---json
+{
+  "permalink": "audit/bedrock.html",
+  "lang": "en",
+  "head": {
+    "title": "Amazon Bedrock cost audit · Where the bill goes · FinOps LLM",
+    "description": "What a Bedrock cost audit examines: application inference profiles as the only tagging handle, idle provisioned throughput, cross-region billing, batch.",
+    "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+    "canonical": "https://finopsllm.com/audit/bedrock",
+    "openGraph": [
+      { "property": "og:type", "content": "article" },
+      { "property": "og:url", "content": "https://finopsllm.com/audit/bedrock" },
+      { "property": "og:title", "content": "Amazon Bedrock cost audit · Where the bill goes · FinOps LLM" },
+      { "property": "og:description", "content": "What a Bedrock cost audit examines: application inference profiles as the only tagging handle, idle provisioned throughput, cross-region billing, batch." },
+      { "property": "og:image", "content": "https://finopsllm.com/og.svg" },
+      { "property": "og:site_name", "content": "FinOps LLM" },
+      { "property": "og:locale", "content": "en_US" }
+    ],
+    "twitter": [
+      { "name": "twitter:card", "content": "summary_large_image" },
+      { "name": "twitter:site", "content": "@finopsllm" },
+      { "name": "twitter:title", "content": "Amazon Bedrock cost audit · Where the bill goes · FinOps LLM" },
+      { "name": "twitter:description", "content": "What a Bedrock cost audit examines: application inference profiles as the only tagging handle, idle provisioned throughput, cross-region billing, batch." },
+      { "name": "twitter:image", "content": "https://finopsllm.com/og.svg" }
+    ],
+    "style": "body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.65}.wrap{max-width:760px;margin:0 auto;padding:56px 24px}a{color:#7AAFFF}p,li{color:#B6C0D2}",
+    "scripts": [
+      { "src": "/assets/consent.js", "defer": true },
+      { "src": "/assets/attribution.js", "defer": true }
+    ],
+    "faq": [
+      {
+        "q": "How do you apply cost allocation tags to Bedrock spend?",
+        "a": "Through application inference profiles. A foundation model is not a resource you own, so there is nothing to tag directly; you create a profile per workload or team, tag the profile, and route invocations through it instead of calling the model id."
+      },
+      {
+        "q": "Can Bedrock spend be attributed retroactively?",
+        "a": "No. Tags apply from creation forward, so months already billed under an untagged setup cannot be split in Cost Explorer. Reconstructing that history means going to CloudTrail or your own request logs."
+      },
+      {
+        "q": "Why does Bedrock spend appear in regions we never deployed to?",
+        "a": "Cross-region inference profiles route to whichever region has capacity, so tokens are billed where they are served. Per-region prices differ and any data-residency assumption in a compliance document should be re-read against what the profile actually does."
+      },
+      {
+        "q": "When is provisioned throughput cheaper than on-demand?",
+        "a": "Only when committed model units run at high utilisation. An idle unit costs the same as a saturated one, so if realised throughput sits well below the commitment and traffic is not spiky, on-demand is usually cheaper outright."
+      }
+    ]
+  }
+}
+---
+{% extends "shell.njk" %}{% block body %}<h1>Amazon Bedrock cost audit</h1>
+
+<p>Bedrock lands in Cost Explorer alongside your other AWS spend, which makes it feel governable with habits your platform team already has. Most of those habits do not transfer, and the gaps are specific.</p>
+
+<h2>1. There is nothing to tag until you create something to tag</h2>
+<p>Cost allocation tags are the standard AWS attribution mechanism, and on Bedrock a foundation model is not a resource you own, so there is nothing to attach them to. The handle is the application inference profile: create one per workload or team, tag it, and route invocations through it rather than calling the model id directly.</p>
+<p>Teams that skipped this have one untagged Bedrock line in Cost Explorer and no way to split it afterwards, because tags apply from creation forward. Reconstructing attribution for months already billed means CloudTrail or your own request logs, which is why the profile inventory is the first thing we ask for.</p>
+
+<h2>2. Provisioned throughput bills whether or not you use it</h2>
+<p>Provisioned throughput is bought in model units on an hourly commitment, and an idle unit costs exactly what a saturated one costs. Two failure modes recur: capacity bought for a launch that never reached its projected volume, and units left running against a superseded model version after a migration.</p>
+<p>The audit compares committed capacity with actual token throughput per hour across a representative month. Low utilisation on non-spiky traffic means on-demand is cheaper outright, and that comparison is a spreadsheet rather than an experiment.</p>
+
+<h2>3. Cross-region inference moves where the tokens are billed</h2>
+<p>Cross-region inference profiles improve availability by routing to whichever region has capacity. That is a good default, and it quietly changes the billing picture: spend appears in regions nobody deployed to, per-region prices differ, and residency assumptions written into a compliance document need re-reading against the profile's real behaviour.</p>
+<p>This rarely produces a large saving by itself. It produces a correct baseline, without which the rest of the numbers are unreliable.</p>
+
+<h2>4. Batch and caching are left on the table</h2>
+<p>Bedrock's batch inference runs at a substantial discount for work that tolerates a completion window, and prompt caching is supported on a subset of models with the usual rules: identical prefix, reused inside the window. The audit looks for asynchronous workloads still on the synchronous path and for stable system prompts that never get cached, because both fixes are configuration rather than architecture.</p>
+
+<h2>What the audit needs from you</h2>
+<ul>
+<li>Cost Explorer access, or a Cost and Usage Report export for the last 90 days filtered to Bedrock.</li>
+<li>Your inference profile inventory and current tagging scheme, in whatever state it is in.</li>
+<li>Provisioned throughput commitments: what is running, on which model, since when.</li>
+<li>For your top workloads, a representative request and any documented latency requirement.</li>
+</ul>
+<p>About a week, ending in a written document with a ranked savings list and an effort cost against each item. Free, and implementable without us.</p>
+
+<p>Running <a href="/audit/openai">OpenAI</a> or <a href="/audit/vertex-ai">Vertex AI</a> alongside Bedrock? That is the common case, and the audit covers them together - the same workload priced in two places is usually the most useful finding in the document. <a href="/book">Book the audit</a>.</p>
+
+<p><a href="/">Back to FinOps LLM</a></p>{% endblock %}

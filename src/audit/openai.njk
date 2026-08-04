@@ -1,0 +1,83 @@
+---json
+{
+  "permalink": "audit/openai.html",
+  "lang": "en",
+  "head": {
+    "title": "OpenAI cost audit · Where the bill goes · FinOps LLM",
+    "description": "What an OpenAI cost audit examines: project-level attribution, the Costs API, cached input ratios, reasoning tokens billed as output, and the Batch tier.",
+    "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+    "canonical": "https://finopsllm.com/audit/openai",
+    "openGraph": [
+      { "property": "og:type", "content": "article" },
+      { "property": "og:url", "content": "https://finopsllm.com/audit/openai" },
+      { "property": "og:title", "content": "OpenAI cost audit · Where the bill goes · FinOps LLM" },
+      { "property": "og:description", "content": "What an OpenAI cost audit examines: project-level attribution, the Costs API, cached input ratios, reasoning tokens billed as output, and the Batch tier." },
+      { "property": "og:image", "content": "https://finopsllm.com/og.svg" },
+      { "property": "og:site_name", "content": "FinOps LLM" },
+      { "property": "og:locale", "content": "en_US" }
+    ],
+    "twitter": [
+      { "name": "twitter:card", "content": "summary_large_image" },
+      { "name": "twitter:site", "content": "@finopsllm" },
+      { "name": "twitter:title", "content": "OpenAI cost audit · Where the bill goes · FinOps LLM" },
+      { "name": "twitter:description", "content": "What an OpenAI cost audit examines: project-level attribution, the Costs API, cached input ratios, reasoning tokens billed as output, and the Batch tier." },
+      { "name": "twitter:image", "content": "https://finopsllm.com/og.svg" }
+    ],
+    "style": "body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.65}.wrap{max-width:760px;margin:0 auto;padding:56px 24px}a{color:#7AAFFF}p,li{color:#B6C0D2}",
+    "scripts": [
+      { "src": "/assets/consent.js", "defer": true },
+      { "src": "/assets/attribution.js", "defer": true }
+    ],
+    "faq": [
+      {
+        "q": "How granular can OpenAI spend attribution get?",
+        "a": "The platform attributes to the project and the model, because keys belong to projects and the Costs endpoint buckets on those dimensions. Anything finer, such as per customer or per feature, has to come from your own request logging."
+      },
+      {
+        "q": "Why is my cached input discount not applying?",
+        "a": "Prompt caching requires a byte-identical prefix above a minimum length, reused inside the cache window. A timestamp, session id or retrieved chunk placed near the top of the prompt breaks the prefix and silently removes the discount."
+      },
+      {
+        "q": "Why does the bill exceed what the response lengths suggest?",
+        "a": "Reasoning models bill thinking tokens at the output rate and those tokens never appear in the returned text. A workload measured on visible response length will read as inexplicable until reasoning tokens are counted separately."
+      },
+      {
+        "q": "When is the Batch API worth moving a workload to?",
+        "a": "Whenever the workload tolerates a completion window measured in hours, which covers nightly enrichment, backfills and evaluation runs. It runs at roughly half price, so the only question is whether a latency requirement is actually documented."
+      }
+    ]
+  }
+}
+---
+{% extends "shell.njk" %}{% block body %}<h1>OpenAI cost audit</h1>
+
+<p>This is the OpenAI-specific half of a cost audit. The generic advice - use a cheaper model, cache more - is worth close to nothing until you know which of these four is driving your invoice.</p>
+
+<h2>1. Attribution stops at the project boundary</h2>
+<p>OpenAI's attribution unit is the project. Keys belong to projects, and the Costs and Usage endpoints under the organization admin API bucket spend by project and by model. That is the entire granularity the platform offers.</p>
+<p>If teams share a project, or share a key, the invoice is one number and no dashboard work will split it. The fix is dull and comes first: one project per workload or owning team, keys reissued accordingly, then the Costs endpoint pulled on a schedule into whatever finance already reads. Anything finer - per customer, per feature, per endpoint - has to come from your own logging, because the platform does not carry it.</p>
+
+<h2>2. Cached input is either a large discount or nothing</h2>
+<p>Prompt caching applies automatically above a minimum prefix length and discounts the cached portion sharply, but only when the prefix is byte-identical and reused inside the cache window. Two habits destroy it: a timestamp, session id or retrieved chunk near the top of the prompt, and system prompt variants rotating per request.</p>
+<p>Cached input tokens are reported separately, which makes the test trivial: pull the ratio of cached to uncached input tokens per workload. A high-volume workload with a stable system prompt and a near-zero cache ratio is usually the largest recoverable line on an OpenAI bill, and the remedy is prompt reordering rather than a migration.</p>
+
+<h2>3. Reasoning tokens bill as output and never appear in the response</h2>
+<p>On reasoning models, tokens spent thinking are billed at the output rate and are absent from the text you received. A team tracking cost against response length will find the invoice inexplicable, because the expensive part is invisible by design.</p>
+<p>The audit compares reasoning token counts per workload against the configured effort level, because most workloads run higher effort than the task needs. Classification, extraction and routing rarely justify extended reasoning, and lowering the effort there is usually a same-day change with a measurable before and after.</p>
+
+<h2>4. The Batch tier is unused on work that is already asynchronous</h2>
+<p>Batch runs at roughly half price with a completion window measured in hours. The audit looks for workloads that already tolerate minutes or hours of latency - nightly enrichment, backfills, evaluation runs, document queues - and are still on the synchronous endpoint because that is what the prototype used.</p>
+<p>This is arithmetic rather than engineering. Either the workload has a documented latency requirement or it does not, and if it does not, half the cost is available for a queue change.</p>
+
+<h2>What the audit needs from you</h2>
+<ul>
+<li>Organization-level read access, or an export from the Costs endpoint covering the last 90 days.</li>
+<li>The project list and roughly what each serves.</li>
+<li>For your top two or three workloads, a representative request including the system prompt.</li>
+<li>Your latency requirements, if they are written down anywhere.</li>
+</ul>
+<p>About a week, ending in a written document with a ranked savings list and an effort cost against each item. Free, not a slide deck, and implementable without us.</p>
+
+<p>Also running <a href="/audit/bedrock">Amazon Bedrock</a> or <a href="/audit/vertex-ai">Google Vertex AI</a>? Multi-provider is the normal case and the audit covers them together, because the same workload priced in two places is usually the most useful finding in the document. <a href="/book">Book the audit</a>.</p>
+
+<p><a href="/">Back to FinOps LLM</a></p>{% endblock %}

@@ -1,0 +1,72 @@
+---json
+{
+  "permalink": "templates.html",
+  "lang": "en",
+  "head": {
+    "title": "Free LLM cost templates · FinOps LLM",
+    "description": "Two free downloads, no email gate: a cost allocation sheet that attributes LLM spend to workloads and teams, and an LLM spend policy template you can enforce.",
+    "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+    "canonical": "https://finopsllm.com/templates",
+    "openGraph": [
+      { "property": "og:type", "content": "website" },
+      { "property": "og:url", "content": "https://finopsllm.com/templates" },
+      { "property": "og:title", "content": "Free LLM cost templates · FinOps LLM" },
+      { "property": "og:description", "content": "Two free downloads, no email gate: a cost allocation sheet that attributes LLM spend to workloads and teams, and an LLM spend policy template you can enforce." },
+      { "property": "og:image", "content": "https://finopsllm.com/og.svg" },
+      { "property": "og:site_name", "content": "FinOps LLM" },
+      { "property": "og:locale", "content": "en_US" }
+    ],
+    "twitter": [
+      { "name": "twitter:card", "content": "summary_large_image" },
+      { "name": "twitter:site", "content": "@finopsllm" },
+      { "name": "twitter:title", "content": "Free LLM cost templates · FinOps LLM" },
+      { "name": "twitter:description", "content": "Two free downloads, no email gate: a cost allocation sheet that attributes LLM spend to workloads and teams, and an LLM spend policy template you can enforce." },
+      { "name": "twitter:image", "content": "https://finopsllm.com/og.svg" }
+    ],
+    "style": "body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.65}.wrap{max-width:760px;margin:0 auto;padding:56px 24px}a{color:#7AAFFF}p,li{color:#B6C0D2}code{background:#131C2E;padding:1px 5px;border-radius:3px;font-size:13px}",
+    "scripts": [
+      { "src": "/assets/consent.js", "defer": true },
+      { "src": "/assets/attribution.js", "defer": true }
+    ],
+    "faq": [
+      {
+        "q": "Do I have to give an email address to download these?",
+        "a": "No. Both files are static downloads with no form, no gate and no tracking beyond ordinary site analytics. Gating a spreadsheet mostly produces a list of people who wanted a spreadsheet."
+      },
+      {
+        "q": "Why does the allocation sheet track cost per unit instead of total spend?",
+        "a": "Total spend rises with growth and says nothing about efficiency. Cost per ticket, per document or per conversation survives a growth month, which makes it the only figure worth trending over time."
+      },
+      {
+        "q": "Can I use these templates commercially without attribution?",
+        "a": "Yes. Use them internally, adapt them, put them in your own handbook. There is no licence to accept and no attribution requirement attached to either file."
+      }
+    ]
+  }
+}
+---
+{% extends "shell.njk" %}{% block body %}<h1>Free LLM cost templates</h1>
+
+<p>No email gate, no form, no drip sequence. These are the working artefacts from the first week of a cost audit, published as they are. If they are enough on their own, that is a good outcome.</p>
+
+<h2>1. LLM cost allocation sheet</h2>
+<p><a href="/assets/templates/llm-cost-allocation.csv" download>Download the CSV</a> - opens in Excel, Numbers or Sheets.</p>
+<p>One row per month, provider, model and workload, with the columns that make an LLM invoice legible to a budget owner. The layout is opinionated in three ways that matter more than the file itself.</p>
+<ul>
+<li><strong>Cost per unit of work, not total spend.</strong> Total spend rises with growth and says nothing about efficiency. Cost per ticket or per document survives a growth month, which is what makes it trendable.</li>
+<li><strong>Units delivered is not requests.</strong> Retried calls, abandoned sessions and agent loops that hit their step cap bill in full and deliver nothing. They belong in the cost column and not the units column, which is exactly what makes them visible.</li>
+<li><strong>The quality column is mandatory.</strong> A cost per unit that fell alongside accuracy is not a saving, and a sheet that cannot express that will eventually be used to claim one.</li>
+</ul>
+<p>Reasoning tokens get a separate column because they bill as output on most providers but scale with prompt design rather than response length. Merged into output tokens, the lever disappears.</p>
+
+<h2>2. LLM spend policy</h2>
+<p><a href="/assets/templates/llm-spend-policy.md" download>Download the Markdown</a> - paste into Notion, Confluence or a repo.</p>
+<p>A policy skeleton with every organisation-specific value left as a bracket: attribution requirements, budgets and thresholds, model selection rules, mandatory cost controls and a review cadence. It covers the five controls that surface in almost every audit - caching on stable prefixes, <code>max_tokens</code> on every call, a capped retry budget, a step cap on agent loops that emits a metric, and batch tiers for anything without a documented latency requirement.</p>
+<p>The instruction at the top is the important part: delete any section you will not enforce. One decorative clause teaches the reader that the whole document is decorative, and the enforced sections stop working shortly after.</p>
+
+<h2>What the sheet usually reveals first</h2>
+<p>The row that ends up mattering is normally the one labelled unattributed. Teams arrive expecting the finding to be an expensive model on a cheap task, and the actual finding is that thirty or forty percent of the invoice cannot be assigned to a workload at all. Everything downstream - chargeback, budgets, a routing decision anyone will defend - is blocked until that number comes down, which is why the template asks you to write it in rather than leave the rows out.</p>
+
+<p><strong>Filled one in and the numbers look wrong?</strong> That is usually attribution rather than arithmetic. The <a href="/book">free audit</a> rebuilds the same sheet from your raw provider exports, and the <a href="/tools/llm-cost-calculator">cost calculator</a> will size a single lever in about a minute.</p>
+
+<p><a href="/">Back to FinOps LLM</a></p>{% endblock %}

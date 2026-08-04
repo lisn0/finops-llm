@@ -1,0 +1,83 @@
+---json
+{
+  "permalink": "audit/vertex-ai.html",
+  "lang": "en",
+  "head": {
+    "title": "Vertex AI cost audit · Where the bill goes · FinOps LLM",
+    "description": "What a Vertex AI cost audit examines: the BigQuery billing export, request labels as the attribution handle, provisioned throughput, and cache storage cost.",
+    "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+    "canonical": "https://finopsllm.com/audit/vertex-ai",
+    "openGraph": [
+      { "property": "og:type", "content": "article" },
+      { "property": "og:url", "content": "https://finopsllm.com/audit/vertex-ai" },
+      { "property": "og:title", "content": "Vertex AI cost audit · Where the bill goes · FinOps LLM" },
+      { "property": "og:description", "content": "What a Vertex AI cost audit examines: the BigQuery billing export, request labels as the attribution handle, provisioned throughput, and cache storage cost." },
+      { "property": "og:image", "content": "https://finopsllm.com/og.svg" },
+      { "property": "og:site_name", "content": "FinOps LLM" },
+      { "property": "og:locale", "content": "en_US" }
+    ],
+    "twitter": [
+      { "name": "twitter:card", "content": "summary_large_image" },
+      { "name": "twitter:site", "content": "@finopsllm" },
+      { "name": "twitter:title", "content": "Vertex AI cost audit · Where the bill goes · FinOps LLM" },
+      { "name": "twitter:description", "content": "What a Vertex AI cost audit examines: the BigQuery billing export, request labels as the attribution handle, provisioned throughput, and cache storage cost." },
+      { "name": "twitter:image", "content": "https://finopsllm.com/og.svg" }
+    ],
+    "style": "body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.65}.wrap{max-width:760px;margin:0 auto;padding:56px 24px}a{color:#7AAFFF}p,li{color:#B6C0D2}",
+    "scripts": [
+      { "src": "/assets/consent.js", "defer": true },
+      { "src": "/assets/attribution.js", "defer": true }
+    ],
+    "faq": [
+      {
+        "q": "Why is the Google Cloud billing console not enough for Vertex AI cost work?",
+        "a": "The console rolls Vertex up into a handful of lines. Model-level SKUs, request counts and label dimensions only exist together in the detailed usage cost export in BigQuery, which is where every useful query is run."
+      },
+      {
+        "q": "Is the BigQuery billing export backfilled when you enable it?",
+        "a": "No. History starts on the day it is enabled, so a project without it needs an approximate baseline reconstructed from invoices while the export accumulates real data. Enabling it costs very little and everything downstream depends on it."
+      },
+      {
+        "q": "How do you attribute Vertex AI spend to a team or feature?",
+        "a": "With labels attached at request time, which flow into the billing export as queryable columns and can split one model in one project across teams or customers. Traffic sent without labels is unattributable permanently."
+      },
+      {
+        "q": "Does explicit context caching always save money on Vertex AI?",
+        "a": "No. Cached tokens are billed for storage per hour on top of the discounted read, so a cache whose traffic pattern changed can cost more than it saves. Compare storage cost against read savings per workload before assuming a gain."
+      }
+    ]
+  }
+}
+---
+{% extends "shell.njk" %}{% block body %}<h1>Vertex AI cost audit</h1>
+
+<p>Vertex AI spend is legible at SKU level, and the billing console will not show you that level. Almost every Vertex audit begins by getting the data somewhere it can actually be queried.</p>
+
+<h2>1. The BigQuery billing export is the audit</h2>
+<p>The detailed usage cost export into BigQuery is the only place model-level SKUs, request counts and label dimensions exist together. The console rolls Vertex up into a handful of lines that give a total and nothing else.</p>
+<p>If the export is not enabled, enable it today and accept that history starts now - it is not backfilled. That single fact reorders the work: on projects without it, week one is standing it up and reconstructing an approximate baseline from invoices rather than running queries. It costs almost nothing and every subsequent question depends on it.</p>
+
+<h2>2. Labels are the attribution mechanism and must be set at request time</h2>
+<p>Labels attach to requests and resources and flow into the billing export as queryable columns. Unlike a project split, they let you attribute the same model in the same project across teams, features or customers, which is what most organisations actually need.</p>
+<p>The catch is that they must be attached when the call is made. Unlabelled traffic is unattributable forever, and the usual finding is that a large share of spend sits in exactly that bucket. The remedy is a small change in whatever client wrapper your services share, and it should land before anyone argues about chargeback.</p>
+
+<h2>3. Provisioned throughput is bought in units and burns while idle</h2>
+<p>Provisioned throughput reserves capacity in units on a term commitment and bills for the term regardless of use. The recurring pattern is a commitment sized for a forecast that did not arrive, or one carried through a model migration and left pointed at a version the traffic no longer uses.</p>
+<p>The audit compares committed units against realised throughput in the export. Consistently low utilisation on non-spiky traffic means pay-as-you-go is cheaper, and a mixed shape - commitment sized to the traffic floor, overflow on demand - is usually right rather than an all-or-nothing choice.</p>
+
+<h2>4. Context caching bills for storage, not only for hits</h2>
+<p>This is the Vertex-specific trap. Explicit context caching charges for cached tokens held per hour on top of the discounted read. Cache a large document set, let the traffic pattern shift, and you are paying rent on tokens nobody reads.</p>
+<p>The check is the ratio of cache storage cost to cache read savings per workload. It is one query against the export and it comes out negative more often than teams expect, especially where a cache was sized during a launch and never revisited. Where it is positive, it is among the largest levers available.</p>
+
+<h2>What the audit needs from you</h2>
+<ul>
+<li>Read access to the detailed billing export in BigQuery, or an export covering the last 90 days. If it is not enabled, say so - that changes the plan rather than blocking it.</li>
+<li>Your current labelling convention, if one exists.</li>
+<li>Provisioned throughput commitments: units, model, term, start date.</li>
+<li>Any explicit caches you have created and roughly what they hold.</li>
+</ul>
+<p>About a week, ending in a written document with a ranked savings list and an effort cost against each item. Free, and yours to implement without us.</p>
+
+<p>Also on <a href="/audit/openai">OpenAI</a> or <a href="/audit/bedrock">Amazon Bedrock</a>? Multi-provider is the normal case and the audit covers them together, because the same workload priced in two places is usually the most useful line in the document. <a href="/book">Book the audit</a>.</p>
+
+<p><a href="/">Back to FinOps LLM</a></p>{% endblock %}
