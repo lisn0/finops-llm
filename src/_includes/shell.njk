@@ -28,4 +28,9 @@
 {{ ld | safe }}
 </script>{% endfor %}
 </head>
-<body><main class="wrap">{%- if page.url == "/research/" or page.url.startsWith("/research/") -%}<aside style="border-left:3px solid #7AAFFF;background:rgba(122,175,255,.10);padding:16px 20px;margin:0 0 28px;color:#E6EAF2"><strong style="color:#fff">Auditing your own LLM spend?</strong> FinOps LLM runs a free audit of your AI costs and shows where the savings are. <a href="/book">Book free audit &rarr;</a></aside>{%- endif -%}{%- block body -%}{%- endblock -%}</main></body></html>
+<body><main class="wrap">{%- if page.url == "/research/" or page.url.startsWith("/research/") -%}<aside style="border-left:3px solid #7AAFFF;background:rgba(122,175,255,.10);padding:16px 20px;margin:0 0 28px;color:#E6EAF2"><strong style="color:#fff">Auditing your own LLM spend?</strong> FinOps LLM runs a free audit of your AI costs and shows where the savings are. <a href="/book">Book free audit &rarr;</a></aside>{%- endif -%}{%- block body -%}{%- endblock -%}
+{#- FAQPage schema used to be the only place these lived. Google requires the
+    Q&A be visible on the page, and a question nobody can see is also a question
+    nobody can cite. Rendering from head.faq means schema and page cannot drift. -#}
+{%- if head.faq and head.faq.length -%}<section class="faq" aria-labelledby="faq-heading" style="margin-top:48px;border-top:1px solid #1E2A3F;padding-top:28px"><h2 id="faq-heading">FAQ</h2>{%- for f in head.faq -%}<h3 style="margin:24px 0 6px;font-size:17px">{{ f.q }}</h3><p>{{ f.a }}</p>{%- endfor -%}</section>{%- endif -%}
+</main></body></html>

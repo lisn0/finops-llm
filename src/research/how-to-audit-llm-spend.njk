@@ -13,27 +13,27 @@
     },
     "faq": [
       {
-        "q": "What is step 1 - gather billing data from providers?",
+        "q": "How do you gather billing data from providers?",
         "a": "Export the last 30 days of usage from every LLM provider. For OpenAI use the Usage API or CSV from the dashboard. For Anthropic pull from the Billing API. For Google export from Cloud Billing. For self-hosted pull request logs from your inference server. Store everything in one folder - you need raw data, not summaries."
       },
       {
-        "q": "What is step 2 - normalize token counts across providers?",
+        "q": "How do you normalize token counts across providers?",
         "a": "Each provider counts tokens differently (OpenAI/Anthropic use own tokenizers, Google uses SentencePiece). To compare, convert all to a common unit. Simplest: use each provider's per-token price to calculate cost per request, then compare costs directly. This avoids tokenizer mismatch entirely."
       },
       {
-        "q": "What is step 3 - split by input, output, cache, and reasoning tokens?",
+        "q": "Why split spend by input, output, cache, and reasoning tokens?",
         "a": "Providers charge different rates for different token types. Cached input costs 50% less. Reasoning tokens cost 2-4x output tokens. Break spend into four buckets: input, output, cached input, and reasoning. If not exposed by provider, estimate from model type and request pattern."
       },
       {
-        "q": "What is step 4 - attribute to teams and features?",
+        "q": "How do you attribute spend to teams and features?",
         "a": "Map each API key or project to the owning team or feature. Without key-level separation, use request metadata (headers, tags, user parameter). Goal: a table showing which team spends how much on which feature. Without attribution, you cannot hold anyone accountable for cost."
       },
       {
-        "q": "What is step 5 - identify the top 3 cost drivers?",
+        "q": "How do you identify your top cost drivers?",
         "a": "Sort spend descending. In most organizations, 80% of LLM cost comes from 3-5 usage patterns. Common drivers: chatbots with long context, expensive models used for all requests, background enrichment without filtering. Name them - this is where optimization effort focuses."
       },
       {
-        "q": "What is step 6 - calculate cost-per-task for key workflows?",
+        "q": "How do you calculate cost-per-task for key workflows?",
         "a": "Pick top 3 workflows. Divide total spend by completed tasks to get unit economics. A $0.12-per-ticket support workflow is manageable, while $1.40 needs attention. Absolute number matters less than trend and comparison between workflows."
       }
     ],

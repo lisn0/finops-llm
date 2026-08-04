@@ -12,7 +12,7 @@
     },
     "faq": [
       {
-        "q": "What is cost-per-lookup as the primary metric?",
+        "q": "Why is cost-per-lookup the primary cache metric?",
         "a": "Total cache spend is the wrong number to watch. The cache lives or dies on cost-per-lookup, which has three components: the embedding call on the incoming request, the vector-store query, and the amortized write cost of populating the cache in the first place."
       },
       {
@@ -20,7 +20,7 @@
         "a": "The embedding cost is the awkward part of cache accounting. It is incurred on every request, including misses. If the platform team pays for it out of a shared budget, three things go wrong. Teams that contribute the most miss traffic look free on the cost dashboard."
       },
       {
-        "q": "What is hit rate as a chargeback input?",
+        "q": "How does cache hit rate feed chargeback?",
         "a": "Hit rate is the variable that turns the cache from infrastructure into a finance instrument. A workload running at sixty percent hit rate is paying roughly forty percent of its uncached cost plus a tiny embedding tax."
       },
       {
@@ -28,11 +28,11 @@
         "a": "Every cache has a population of workloads for which it is a tax with no return. The signals are blunt and easy to read once the accounting is in place. Hit rate sits under the break-even line for two consecutive weeks. Net cache contribution is negative on the chargeback."
       },
       {
-        "q": "What is threshold changes are budget changes?",
+        "q": "Why is the similarity threshold a budget knob?",
         "a": "Similarity threshold is usually treated as a quality knob. It is also a budget knob. Loosening the threshold raises hit rate and lowers cache cost-per-lookup for the workloads that match more broadly, while raising the risk of bad answers that downstream teams may not feel until later."
       },
       {
-        "q": "What is cache cost is real cost?",
+        "q": "Should a semantic cache be treated as a cost center?",
         "a": "The shorthand version of this page: treat the semantic cache as a cost center with its own P&L. Allocate the embedding tax at the lookup, credit savings to the workload that hit, expose net contribution per team on the chargeback, and review the tenant list on a calendar."
       }
     ],

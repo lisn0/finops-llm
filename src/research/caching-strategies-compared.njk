@@ -12,23 +12,23 @@
     },
     "faq": [
       {
-        "q": "What is prompt caching in detail?",
+        "q": "How does prompt caching work in practice?",
         "a": "Prompt caching is the easiest win. OpenAI automatically caches prompts longer than 1,024 tokens. Anthropic caches prefixes of 2,048+ tokens. The cache is keyed on the exact prefix - same system prompt, same few-shot examples, same document context. Cache-read tokens cost 50-90% less than input tokens."
       },
       {
-        "q": "What is semantic caching in detail?",
+        "q": "How does semantic caching work?",
         "a": "Semantic caching skips the LLM entirely when a similar question was asked before. The flow: embed the query, search a vector store, check if top result exceeds similarity threshold (0.92-0.97), return cached answer if it does. Useful for support bots and FAQ systems where similar questions repeat."
       },
       {
-        "q": "What is context caching in detail?",
+        "q": "How does Google context caching work?",
         "a": "Google's context caching lets you upload a large document once and pay a reduced rate for subsequent queries against it. Powerful for document Q&A where you process the same 200-page PDF hundreds of times. Tokens in the cached context cost 80-90% less."
       },
       {
-        "q": "What is application-level caching in detail?",
+        "q": "How does application-level caching work?",
         "a": "Deterministic caching is the most aggressive strategy. Hash the full request payload (prompt, temperature, max tokens, model, tools) and store the response. On exact match, return the cached response instantly - no LLM call, no latency, no cost."
       },
       {
-        "q": "What is combining strategies?",
+        "q": "How do caching strategies combine?",
         "a": "The best implementations layer multiple strategies. A typical stack: application-level cache as first check (cheapest, fastest), semantic cache as second check (catches near-duplicates), then the LLM call with provider-side prompt caching enabled (reduces cost even on cache misses)."
       }
     ],
