@@ -1,0 +1,535 @@
+---json
+{
+  "permalink": "research/alibaba-vs-claude-cost-audit.html",
+  "lang": "en",
+  "head": {
+    "title": "Cloud Infrastructure Cost Audit: Alibaba vs Claude Max · FinOps LLM",
+    "description": "Independent audit: Alibaba Coding Plan and Token Pro vs Claude Max 5× and 20×. Hard quota math, cache economics, and break-even analysis.",
+    "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+    "canonical": "https://finopsllm.com/research/alibaba-vs-claude-cost-audit",
+    "article": {
+      "datePublished": "2026-08-06",
+      "breadcrumb": "Alibaba vs Claude Cost Audit"
+    },
+    "faq": [
+      {
+        "q": "Which AI coding plan has the lowest unit cost?",
+        "a": "Alibaba Coding Plan at $50/month provides the lowest predictable cost per model call at $0.000556 per call. Alibaba Token Plan Pro at $70/month provides the best economics for repeatedly reusing a large cached codebase, particularly with Qwen 3.7-Plus at approximately $0.000408 per credit at theoretical continuous utilization."
+      },
+      {
+        "q": "How does Alibaba Token Pro compare to Claude Max on a per-session basis?",
+        "a": "Under a 100K-token repository benchmark with 40 turns, Qwen 3.7-Plus consumes approximately 146 credits (concise) to 249 credits (verbose) per session on Token Pro. At $70/month with rolling seven-day quotas, that yields 39 concise or 23 verbose sessions per day. Claude Max does not disclose equivalent capacity figures, so the break-even can only be estimated through API shadow pricing."
+      },
+      {
+        "q": "What is Alibaba's off-peak discount and when does it apply?",
+        "a": "Alibaba applies 0.4× credit consumption to Qwen 3.7-Plus and 0.2× to Qwen 3.8-Max between 22:00 and 08:00 UTC+8. In Lisbon during August, that corresponds approximately to 15:00–01:00 local time. This discount materially changes the economics: Qwen 3.8-Max becomes viable for sustained use when workloads can be shifted into the discounted window."
+      },
+      {
+        "q": "Why can't Claude Max unit economics be calculated?",
+        "a": "Anthropic publishes only '5× Pro' and '20× Pro' capacity multipliers plus the existence of weekly limits. It does not disclose the token, compute, or dollar-equivalent quantity contained in either Max tier. The company explicitly retains discretion to apply additional model, feature, weekly, or monthly restrictions."
+      },
+      {
+        "q": "Does verbosity cost more under Alibaba Coding Plan?",
+        "a": "No. The Coding Plan is call-sensitive, not token-sensitive. A 6,000-token response and a 500-token response cost the same when both are produced by one model call. However, longer reasoning can indirectly cause more tool calls, retries, and continuations — and Alibaba counts those underlying calls."
+      },
+      {
+        "q": "When should I choose Coding Plan over Token Plan Pro?",
+        "a": "The Coding Plan wins when interactions are simple and close to one direct completion per turn. Token Pro wins when tools, file exploration, testing, and retries amplify each visible turn into several model calls. For long Qwen 3.7-Plus agent sessions, Token Pro provides more session capacity than the Coding Plan despite costing $20 more."
+      }
+    ],
+    "openGraph": [
+      {
+        "property": "og:type",
+        "content": "article"
+      },
+      {
+        "property": "og:url",
+        "content": "https://finopsllm.com/research/alibaba-vs-claude-cost-audit"
+      },
+      {
+        "property": "og:title",
+        "content": "Cloud Infrastructure Cost Audit: Alibaba vs Claude Max"
+      },
+      {
+        "property": "og:description",
+        "content": "Independent audit: Alibaba sells measurable capacity with some coefficient opacity. Anthropic sells an opaque fair-use tier. Hard quota math, prompt-cache economics, and break-even analysis."
+      },
+      {
+        "property": "og:image",
+        "content": "https://finopsllm.com/og.svg"
+      },
+      {
+        "property": "og:site_name",
+        "content": "FinOps LLM"
+      },
+      {
+        "property": "og:locale",
+        "content": "en_US"
+      }
+    ],
+    "twitter": [
+      {
+        "name": "twitter:card",
+        "content": "summary_large_image"
+      },
+      {
+        "name": "twitter:site",
+        "content": "@finopsllm"
+      },
+      {
+        "name": "twitter:title",
+        "content": "Cloud Infrastructure Cost Audit: Alibaba vs Claude Max"
+      },
+      {
+        "name": "twitter:description",
+        "content": "Hard quota math, prompt-cache economics, verbosity tax, and break-even analysis across Alibaba and Claude plans."
+      },
+      {
+        "name": "twitter:image",
+        "content": "https://finopsllm.com/og.svg"
+      }
+    ],
+    "style": "body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}.wrap{max-width:900px;margin:0 auto;padding:56px 24px}a{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:40px;padding-top:16px;border-top:1px solid #1E2A3F}h3{margin-top:22px;color:#E6EAF2}table{border-collapse:collapse;width:100%;margin:24px 0;font-size:.9em}th,td{border:1px solid #1E2A3F;padding:10px 12px;text-align:left;color:#B6C0D2}th{color:#E6EAF2;background:#101726}td.num{text-align:right;font-variant-numeric:tabular-nums}code{background:#101726;padding:1px 5px;border-radius:4px;font-size:.9em;color:#7AAFFF}.langsw{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;color:#647289;margin:0 0 26px}.langsw a{text-decoration:none}.langsw a[aria-current]{color:#E6EAF2;font-weight:600}.callout{border-left:3px solid #7AAFFF;padding:14px 18px;margin:24px 0;background:#101726;border-radius:0 8px 8px 0}.callout strong{color:#7AAFFF}.callout-warn{border-left-color:#facc15}.callout-warn strong{color:#facc15}.verdict-table td:first-child{font-weight:600;white-space:nowrap;color:#E6EAF2}.hero-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:16px;margin:28px 0 36px}.hero-stat{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:18px 16px;text-align:center}.hero-stat .num{font-size:1.8rem;font-weight:700;color:#7AAFFF;display:block}.hero-stat .lbl{font-size:.82rem;color:#647289;margin-top:4px}.toc{background:#101726;border:1px solid #1E2A3F;border-radius:10px;padding:18px 24px;margin:0 0 32px}.toc h2{margin:0 0 10px;border:none;padding:0;font-size:1rem}.toc ol{margin:0;padding-left:20px}.toc li{margin:4px 0;font-size:.9rem}.toc a{text-decoration:none}@media(max-width:700px){table{font-size:.8rem}th,td{padding:6px 8px}.hero-stats{grid-template-columns:repeat(2,1fr)}}",
+    "scripts": [
+      {
+        "src": "/assets/consent.js",
+        "defer": true
+      },
+      {
+        "src": "/assets/attribution.js",
+        "defer": true
+      },
+      {
+        "src": "/assets/lang.js",
+        "defer": true
+      }
+    ]
+  }
+}
+---
+{% extends "shell.njk" %}{% block body %}
+<h1>Cloud Infrastructure Cost Audit: Alibaba vs&nbsp;Claude&nbsp;Max</h1>
+<p class="updated" style="color:#6B7689;font-size:14px;margin-top:-6px">Audit date: 6 August 2026</p>
+
+<div class="hero-stats">
+  <div class="hero-stat"><span class="num">4</span><span class="lbl">Plans audited</span></div>
+  <div class="hero-stat"><span class="num">$50–$200</span><span class="lbl">Monthly range</span></div>
+  <div class="hero-stat"><span class="num">100K</span><span class="lbl">Benchmark prefix</span></div>
+  <div class="hero-stat"><span class="num">40</span><span class="lbl">Turns per session</span></div>
+</div>
+
+<h2 style="border:none;padding:0;margin-top:8px">Executive conclusion</h2>
+<p>On auditable unit economics, <strong>Alibaba wins decisively</strong>:</p>
+<ul>
+<li><strong>Alibaba Coding Plan</strong> provides the lowest predictable cost per model call.</li>
+<li><strong>Alibaba Token Plan Pro</strong> provides the best economics for repeatedly reusing a large cached codebase, particularly with Qwen&nbsp;3.7&#8209;Plus.</li>
+<li><strong>Claude Max</strong> is a capability subscription, not a transparent compute allocation. Anthropic does not publish the token, compute, or dollar-equivalent quantity contained in either Max tier.</li>
+</ul>
+<p>For one developer running a 100K-token repository through long interactive sessions, Alibaba Token Pro is probably the strongest raw-capacity option. For sustained Claude Code use where Claude's task-completion quality is itself the deciding factor, Max&nbsp;5× is reasonable. Max&nbsp;20× is primarily justified by Opus use or sustained parallel agents — not by transparent cost efficiency.</p>
+
+<div class="callout callout-warn"><strong>Important correction to a common premise:</strong> Alibaba Individual Pro does not provide a 160,000-credit monthly wallet. It provides 12,000 credits in a rolling five-hour window and 40,000 credits in a rolling seven-day window. The often-quoted 160,000 figure is simply four seven-day windows, or 28&nbsp;days. <a href="https://www.alibabacloud.com/help/en/model-studio/token-plan-personal-overview">Source</a></div>
+
+<nav class="toc">
+<h2>Contents</h2>
+<ol>
+<li><a href="#s1">Hard quota and unit-math comparison</a></li>
+<li><a href="#s2">Billing mechanics</a></li>
+<li><a href="#s3">Prompt-cache economics</a></li>
+<li><a href="#s4">Long-context benchmark</a></li>
+<li><a href="#s5">The verbosity-tax audit</a></li>
+<li><a href="#s6">Parallel multi-agent workflows</a></li>
+<li><a href="#s7">Break-even volume analysis</a></li>
+<li><a href="#s8">Final verdict</a></li>
+</ol>
+</nav>
+
+<!-- ───────────────────────────── Section 1 ───────────────────────────── -->
+<h2 id="s1">1. Hard quota and unit-math comparison</h2>
+
+<table>
+<thead><tr><th>Plan</th><th>Price</th><th>Meter</th><th>Five-hour limit</th><th>Longer-term limit</th><th>Full-utilization unit economics</th></tr></thead>
+<tbody>
+<tr><td>Alibaba Coding Plan</td><td class="num">$50/mo</td><td>Model calls</td><td class="num">6,000 rolling</td><td class="num">45,000/wk · 90,000/mo</td><td class="num">$0.000556 per call</td></tr>
+<tr><td>Alibaba Token Personal Pro</td><td class="num">$70/mo</td><td>Credits (model, tokens, thinking, tools)</td><td class="num">12,000 rolling</td><td class="num">40,000 rolling/7&nbsp;days</td><td class="num">$0.000408 per credit</td></tr>
+<tr><td>Claude Max 5×</td><td class="num">$100/mo</td><td>Undisclosed weighted usage</td><td>5× Pro session capacity</td><td>Undisclosed weekly limits</td><td>Not calculable publicly</td></tr>
+<tr><td>Claude Max 20×</td><td class="num">$200/mo</td><td>Undisclosed weighted usage</td><td>20× Pro session capacity</td><td>Undisclosed weekly limits</td><td>Not calculable publicly</td></tr>
+</tbody>
+</table>
+
+<p>Alibaba states that a single top-level Coding Plan query normally produces 5–10 underlying model calls for simple tasks and 10–30 or more for complex tasks. Its five-hour allowance rolls continuously, while weekly and monthly quotas have fixed reset points. <a href="https://www.alibabacloud.com/help/en/model-studio/coding-plan">Source</a></p>
+
+<p>For Token Pro, a continuously utilized 40,000-credit seven-day allowance yields:</p>
+<p style="text-align:center;font-size:1.1em;color:#E6EAF2"><code>40,000 × 30/7 = 171,429 credits per 30 days</code></p>
+<p style="text-align:center;font-size:1.1em;color:#E6EAF2"><code>$70 / 171,429 = $0.000408 per consumed credit</code></p>
+<p>This is theoretical maximum utilization. Credits that are not used before their rolling capacity becomes available again have no stored value.</p>
+
+<p>Anthropic currently publishes only "5× Pro" and "20× Pro," plus the existence of weekly limits. It explicitly retains discretion to apply additional model, feature, weekly, or monthly restrictions. <a href="https://support.claude.com/en/articles/11049741-what-is-the-max-plan">Source</a></p>
+
+<p>Older Anthropic documentation quoted approximately 50–200 Claude Code prompts per five hours for Max&nbsp;5× and 200–800 for Max&nbsp;20×. Those numbers should not be treated as current hard quotas: Anthropic subsequently doubled Claude Code five-hour limits in May&nbsp;2026, while its current documentation removed numeric prompt estimates. <a href="https://support.anthropic.com/en/articles/11145838-using-claude-code-with-your-pro-or-max-plan">Source</a></p>
+
+<h3>Effective Coding Plan capacity</h3>
+<p>At full monthly utilization:</p>
+<table>
+<thead><tr><th>Workload amplification</th><th>Effective top-level tasks/month</th><th>Average/day</th></tr></thead>
+<tbody>
+<tr><td>5 calls per task</td><td class="num">18,000</td><td class="num">600</td></tr>
+<tr><td>10 calls per task</td><td class="num">9,000</td><td class="num">300</td></tr>
+<tr><td>30 calls per task</td><td class="num">3,000</td><td class="num">100</td></tr>
+</tbody>
+</table>
+
+<p>For a 40-turn coding session, assuming each user turn causes 5–30 underlying model calls:</p>
+<table>
+<thead><tr><th>Calls per user turn</th><th>Calls per 40-turn session</th><th>Sessions/month</th><th>Sessions/day</th></tr></thead>
+<tbody>
+<tr><td class="num">5</td><td class="num">200</td><td class="num">450</td><td class="num">15</td></tr>
+<tr><td class="num">10</td><td class="num">400</td><td class="num">225</td><td class="num">7.5</td></tr>
+<tr><td class="num">30</td><td class="num">1,200</td><td class="num">75</td><td class="num">2.5</td></tr>
+</tbody>
+</table>
+<p>That call amplification, rather than token count, is the principal risk in the Coding Plan.</p>
+
+<!-- ───────────────────────────── Section 2 ───────────────────────────── -->
+<h2 id="s2">2. Billing mechanics</h2>
+
+<h3>Alibaba Coding Plan</h3>
+<p>The Coding Plan is effectively <strong>token-insensitive but call-sensitive</strong>.</p>
+<p>A 6,000-token response and a 500-token response cost the same when both are produced by one model call. A 100K-token cached prompt and a 2K prompt also consume one call each from the subscription quota.</p>
+<p>However, verbosity still has an indirect effect. Longer reasoning can cause more tool calls, retries, validation passes, file reads, and model continuations. Alibaba counts those underlying calls, not merely the visible message you submitted.</p>
+
+<h3>Alibaba Token Plan</h3>
+<p>The Token Plan is directly sensitive to:</p>
+<ul>
+<li>Uncached input tokens</li>
+<li>Cached input tokens</li>
+<li>Generated output and reasoning tokens</li>
+<li>Model selected</li>
+<li>Thinking mode</li>
+<li>Tool calls</li>
+</ul>
+<p>Alibaba does not publish a complete Personal Plan model-to-credit coefficient table. It says that the console bill is the source of truth. Its public Qwen&nbsp;3.6-Plus metering example reports:</p>
+<ul>
+<li>8,349 input tokens: 1.67 credits</li>
+<li>40,794 cached tokens: 0.82 credits</li>
+<li>573 output tokens: 0.69 credits</li>
+</ul>
+<p>That implies approximately:</p>
+<ul>
+<li><strong>200 credits</strong> per million normal input tokens</li>
+<li><strong>20 credits</strong> per million cached tokens</li>
+<li><strong>1,200 credits</strong> per million output tokens</li>
+</ul>
+<p>This example is from the Team Token Plan and Alibaba warns that coefficients vary by model, so it is an audit anchor rather than a guaranteed Personal Plan tariff. <a href="https://www.alibabacloud.com/help/en/model-studio/token-plan-overview">Source</a></p>
+
+<h3>Claude Max</h3>
+<p>Claude Max has a <strong>fixed invoice but not flat consumption</strong>.</p>
+<p>Anthropic states that usage depends on message length, conversation length, attached files, model, tools, and project complexity. Claude, Claude Code, and IDE sessions also draw from the same account allowance. When the allowance is exhausted, the user must wait, upgrade, or continue at standard API rates through separate usage credits. <a href="https://support.claude.com/en/articles/11145838-use-claude-code-with-your-pro-or-max-plan">Source</a></p>
+<div class="callout"><strong>The economically correct description:</strong> Claude Max hides the metering unit; it does not eliminate token or verbosity costs.</div>
+
+<!-- ───────────────────────────── Section 3 ───────────────────────────── -->
+<h2 id="s3">3. Prompt-cache economics</h2>
+
+<p>Both providers offer essentially the same explicit five-minute cache economics:</p>
+<table>
+<thead><tr><th>Cache operation</th><th>Alibaba</th><th>Anthropic</th></tr></thead>
+<tbody>
+<tr><td>Five-minute cache write</td><td>1.25× normal input</td><td>1.25× normal input</td></tr>
+<tr><td>Cache hit</td><td>0.10× normal input</td><td>0.10× normal input</td></tr>
+<tr><td>Effective hit discount</td><td>90%</td><td>90%</td></tr>
+</tbody>
+</table>
+
+<p>Alibaba's automatic implicit cache is less attractive: cache hits cost 20% of normal input and hit probability is not guaranteed. Explicit and implicit Alibaba caching cannot be combined. <a href="https://www.alibabacloud.com/help/en/model-studio/context-cache">Source</a></p>
+
+<p>For a long CLI session, cache discipline is therefore critical:</p>
+<ul>
+<li>Keep the repository/system prefix byte-for-byte stable.</li>
+<li>Put changing instructions after the cached prefix.</li>
+<li>Avoid changing tool definitions or system prompts unnecessarily.</li>
+<li>Keep successive turns inside the cache TTL.</li>
+<li>Warm the cache before releasing parallel sub-agents.</li>
+</ul>
+<div class="callout callout-warn"><strong>Reminder:</strong> A 90% discount on cached input does not apply to generated output, new context, reasoning tokens, or tool traces.</div>
+
+<!-- ───────────────────────────── Section 4 ───────────────────────────── -->
+<h2 id="s4">4. Long-context benchmark</h2>
+
+<h3>Benchmark definition</h3>
+<p>The benchmark models:</p>
+<ul>
+<li>100,000-token reusable repository prefix</li>
+<li>40 consecutive turns</li>
+<li>2,000 fresh input tokens per turn</li>
+<li>Explicit five-minute caching</li>
+<li>Concise output: 2,000 tokens per turn</li>
+<li>Verbose output: 6,000 tokens per turn</li>
+</ul>
+
+<table>
+<thead><tr><th>Token category</th><th>Quantity</th></tr></thead>
+<tbody>
+<tr><td>Initial cache write</td><td class="num">100,000</td></tr>
+<tr><td>Fresh input over 40 turns</td><td class="num">80,000</td></tr>
+<tr><td>Cached prefix reads</td><td class="num">3,900,000</td></tr>
+<tr><td>Concise output</td><td class="num">80,000</td></tr>
+<tr><td>Verbose output</td><td class="num">240,000</td></tr>
+</tbody>
+</table>
+
+<h3>Alibaba modeled credit burn</h3>
+<p>Because Alibaba does not publish exact Personal Plan credit coefficients, the following estimates normalize the public Qwen&nbsp;3.6 credit example using current Model Studio list-price ratios:</p>
+<ul>
+<li><strong>Qwen&nbsp;3.7-Plus:</strong> $0.40/M input and $1.60/M output versus Qwen&nbsp;3.6-Plus at $0.50/$3.00.</li>
+<li><strong>Qwen&nbsp;3.8-Max:</strong> $2.00/M input and $6.00/M output. <a href="https://www.alibabacloud.com/help/en/model-studio/model-pricing">Source</a></li>
+</ul>
+<p>These are planning estimates, not published Personal Plan deduction coefficients.</p>
+
+<table>
+<thead><tr><th>Model</th><th>Concise session</th><th>Verbose session</th><th>Verbosity increase</th><th>Sessions per 7-day quota (concise / verbose)</th></tr></thead>
+<tbody>
+<tr><td>Qwen 3.7-Plus</td><td class="num">146 credits</td><td class="num">249 credits</td><td class="num">+70%</td><td class="num">273 / 161</td></tr>
+<tr><td>Qwen 3.8-Max</td><td class="num">~668 credits</td><td class="num">~1,052 credits</td><td class="num">+57%</td><td class="num">~60 / ~38</td></tr>
+</tbody>
+</table>
+
+<h3>Sustainable daily averages under the 40,000-credit rolling seven-day limit</h3>
+<table>
+<thead><tr><th>Model</th><th>Standard-hours sessions/day</th><th>Off-peak sessions/day</th></tr></thead>
+<tbody>
+<tr><td>Qwen 3.7-Plus, concise</td><td class="num">39.0</td><td class="num">97.6</td></tr>
+<tr><td>Qwen 3.7-Plus, verbose</td><td class="num">23.0</td><td class="num">57.4</td></tr>
+<tr><td>Qwen 3.8-Max, concise</td><td class="num">8.6</td><td class="num">42.9</td></tr>
+<tr><td>Qwen 3.8-Max, verbose</td><td class="num">5.4</td><td class="num">27.1</td></tr>
+</tbody>
+</table>
+
+<p>Alibaba currently applies <strong>0.4× credit consumption</strong> to Qwen&nbsp;3.7-Plus and <strong>0.2×</strong> to Qwen&nbsp;3.8-Max between 22:00 and 08:00&nbsp;UTC+8. In Lisbon during August, that corresponds approximately to 15:00–01:00 local time. <a href="https://modelstudio.alibabacloud.com/intl/blog/model-studio-token-plan-individual/">Source</a></p>
+
+<div class="callout"><strong>Off-peak impact:</strong> This discount changes the recommendation materially — Qwen&nbsp;3.8-Max becomes economically viable for much more sustained use when the workload can be shifted into the discounted window.</div>
+
+<h3>Claude API-equivalent resource value</h3>
+<p>Claude Max does not disclose how these sessions translate into its included quota. Nevertheless, current API rates provide a useful shadow value:</p>
+<table>
+<thead><tr><th>Claude model</th><th>Concise API-equivalent cost</th><th>Verbose API-equivalent cost</th><th>Verbosity increase</th></tr></thead>
+<tbody>
+<tr><td>Sonnet 5</td><td class="num">$1.99</td><td class="num">$3.59</td><td class="num">+80%</td></tr>
+<tr><td>Opus 5</td><td class="num">$4.98</td><td class="num">$8.98</td><td class="num">+80%</td></tr>
+</tbody>
+</table>
+
+<p>These calculations use the current Sonnet&nbsp;5 introductory rates of $2/M input and $10/M output and Opus&nbsp;5 rates of $5/M input and $25/M output, including the 1.25× initial cache write and 0.1× cache reads. <strong>Sonnet pricing rises to $3/$15 after August&nbsp;31,&nbsp;2026.</strong> <a href="https://www.anthropic.com/pricing">Source</a></p>
+
+<p>At API-equivalent prices, $100 represents approximately:</p>
+<ul>
+<li><strong>50 concise</strong> or <strong>28 verbose</strong> Sonnet sessions</li>
+<li><strong>20 concise</strong> or <strong>11 verbose</strong> Opus sessions</li>
+</ul>
+<p>This does not mean Max&nbsp;5× contains those exact quantities. It shows the compute value that Anthropic would charge through its transparent API meter.</p>
+
+<p>Sonnet&nbsp;5 also uses a tokenizer that produces approximately 30% more tokens than Sonnet&nbsp;4.6 for identical text. Repository sizes estimated using an older Claude tokenizer should therefore be remeasured. <a href="https://docs.anthropic.com/en/docs/about-claude/models/migrating-to-claude-4">Source</a></p>
+
+<!-- ───────────────────────────── Section 5 ───────────────────────────── -->
+<h2 id="s5">5. The verbosity-tax audit</h2>
+
+<p>Moving from 2,000 to 6,000 output tokens across 40 turns adds 160,000 output tokens.</p>
+<table>
+<thead><tr><th>Meter</th><th>Incremental burn</th></tr></thead>
+<tbody>
+<tr><td>Alibaba Coding Plan</td><td>No direct additional quota, unless extra model calls occur</td></tr>
+<tr><td>Qwen 3.7-Plus Token Plan estimate</td><td class="num">+102 credits</td></tr>
+<tr><td>Qwen 3.8-Max Token Plan estimate</td><td class="num">+384 credits</td></tr>
+<tr><td>Claude Sonnet 5 API equivalent</td><td class="num">+$1.60</td></tr>
+<tr><td>Claude Opus 5 API equivalent</td><td class="num">+$4.00</td></tr>
+<tr><td>Claude Max subscription</td><td>Earlier exhaustion of undisclosed session/weekly quota</td></tr>
+</tbody>
+</table>
+
+<p>The Alibaba Coding Plan is therefore unusually attractive for models that generate long answers without spawning many additional calls.</p>
+
+<p>The Token Plan behaves differently. Output tokens are materially more expensive than cached input. Under the public Qwen credit anchor, one million output tokens consumes approximately as many credits as:</p>
+<ul>
+<li><strong>Six million</strong> normal input tokens, or</li>
+<li><strong>Sixty million</strong> cache-hit input tokens</li>
+</ul>
+
+<div class="callout"><strong>Practical implication:</strong> Controlling answer length often creates greater savings than further optimizing an already effective prompt cache.</div>
+
+<p>For Claude Max, conciseness has no immediate marginal cash cost while below the limit, but it extends the usable session and weekly allowance. Once the included limit is reached, continued usage is charged at API rates, making the hidden verbosity tax explicit. <a href="https://support.anthropic.com/en/articles/12429409-manage-usage-credits-for-paid-claude-plans">Source</a></p>
+
+<!-- ───────────────────────────── Section 6 ───────────────────────────── -->
+<h2 id="s6">6. Parallel multi-agent workflows</h2>
+
+<h3>Coding Plan call consumption</h3>
+<p>Assume one decomposition launches 4–8 agents, each making 10–30 calls:</p>
+<table>
+<thead><tr><th>Agents</th><th>Calls per decomposition</th></tr></thead>
+<tbody>
+<tr><td class="num">4</td><td class="num">40–120</td></tr>
+<tr><td class="num">6</td><td class="num">60–180</td></tr>
+<tr><td class="num">8</td><td class="num">80–240</td></tr>
+</tbody>
+</table>
+
+<p>This produces the following theoretical capacity before coordinator calls, retries, and validation:</p>
+<table>
+<thead><tr><th>Quota</th><th>Multi-agent decompositions</th></tr></thead>
+<tbody>
+<tr><td>6,000 calls/5 hours</td><td class="num">25–150</td></tr>
+<tr><td>90,000 calls/month</td><td class="num">375–2,250</td></tr>
+</tbody>
+</table>
+<p>The wide range shows why visible prompt count is a poor predictor of Coding Plan consumption.</p>
+
+<h3>Token Plan multi-agent benchmark</h3>
+<p>Assume every agent receives the 100K repository prefix, performs 15 turns, adds 2K fresh input per turn, and generates either 2K or 6K output per turn.</p>
+<table>
+<thead><tr><th>Model</th><th>4 agents</th><th>6 agents</th><th>8 agents</th></tr></thead>
+<tbody>
+<tr><td>Qwen 3.7-Plus</td><td class="num">266–419</td><td class="num">398–629</td><td class="num">531–838</td></tr>
+<tr><td>Qwen 3.8-Max</td><td class="num">1,232–1,810</td><td class="num">1,849–2,714</td><td class="num">2,465–3,619</td></tr>
+</tbody>
+</table>
+<p>The ranges represent concise-to-verbose output. During Alibaba's discounted window, multiply Plus figures by 0.4 and Max figures by 0.2.</p>
+
+<p>A single 4–8-agent batch therefore fits inside the Token Pro 12,000-credit five-hour ceiling. Repeated 3.8-Max-model batches can still consume the window quickly. Alibaba markets Pro as supporting approximately 6–8 concurrent agents, but this should be treated as a design target rather than guaranteed throughput or latency. <a href="https://modelstudio.alibabacloud.com/intl/blog/model-studio-token-plan-individual/">Source</a></p>
+
+<h3>Claude Max parallelism</h3>
+<p>All Claude, Claude Code, and supported IDE usage shares the same account-level allowance. Four to eight sub-agents do not receive separate Max quotas. Each agent creates its own generated history, reasoning, tools, and output, so consumption generally scales roughly with the number of active agents even when a common repository prefix is cached. <a href="https://support.claude.com/en/articles/11145838-use-claude-code-with-your-pro-or-max-plan">Source</a></p>
+
+<p>Therefore:</p>
+<ul>
+<li><strong>Max 5×:</strong> acceptable for occasional 4-agent bursts.</li>
+<li><strong>Max 20×:</strong> the defensible Claude choice for persistent 4–8-agent execution.</li>
+</ul>
+<p>Neither tier provides a throughput SLA or auditable agent-hour capacity.</p>
+
+<!-- ───────────────────────────── Section 7 ───────────────────────────── -->
+<h2 id="s7">7. Break-even volume analysis</h2>
+
+<h3>Hard cash-flow breakpoints</h3>
+<p>Subscription pricing creates a step function rather than a smooth token crossover.</p>
+
+<h3>Alibaba Coding versus Claude Max</h3>
+<p>Alibaba Coding remains cheaper than either Claude Max tier while the workload stays under:</p>
+<ul>
+<li>6,000 calls in any rolling five hours</li>
+<li>45,000 calls per week</li>
+<li>90,000 calls per month</li>
+<li>Approximately 3,000 calls per sustained calendar day</li>
+</ul>
+
+<p>Claude Max&nbsp;5× becomes cheaper in monthly cash terms only when:</p>
+<ol>
+<li>The Coding Plan no longer provides sufficient capacity;</li>
+<li>The equivalent workload still fits inside Max&nbsp;5×'s undisclosed limits; and</li>
+<li>The alternative is buying both Alibaba Coding and Token Pro for approximately $120/month.</li>
+</ol>
+<p>At that point, Max&nbsp;5× is $20 cheaper than the two Alibaba subscriptions combined. Before that point, the $50 Alibaba subscription has the lower invoice.</p>
+
+<h3>Alibaba Token Pro versus Claude Max</h3>
+<p>Token Pro remains cheaper while usage stays below:</p>
+<ul>
+<li>12,000 credits per rolling five hours</li>
+<li>40,000 credits per rolling seven days</li>
+<li>Approximately 5,714 sustained credits/day</li>
+</ul>
+
+<p>Under the benchmark, those limits correspond approximately to:</p>
+<table>
+<thead><tr><th>Workload</th><th>Standard-hours sustainable volume/day</th><th>Off-peak volume/day</th></tr></thead>
+<tbody>
+<tr><td>Qwen 3.7-Plus concise</td><td class="num">39 sessions</td><td class="num">98</td></tr>
+<tr><td>Qwen 3.7-Plus verbose</td><td class="num">23 sessions</td><td class="num">57</td></tr>
+<tr><td>Qwen 3.8-Max concise</td><td class="num">8.6 sessions</td><td class="num">43</td></tr>
+<tr><td>Qwen 3.8-Max verbose</td><td class="num">5.4 sessions</td><td class="num">27</td></tr>
+</tbody>
+</table>
+
+<h3>Capacity-normalized Claude break-even</h3>
+<p>Because Anthropic does not disclose Max capacity, the break-even must be expressed as the capacity Max would need to deliver.</p>
+
+<p>For Max to have a lower effective cost per completed benchmark session than Alibaba at full utilization:</p>
+
+<table>
+<thead><tr><th>Alibaba comparison</th><th>Max 5× must deliver more than</th><th>Max 20× must deliver more than</th></tr></thead>
+<tbody>
+<tr><td>Coding Plan, 5 calls/turn</td><td class="num">30 sessions/day</td><td class="num">60/day</td></tr>
+<tr><td>Coding Plan, 10 calls/turn</td><td class="num">15/day</td><td class="num">30/day</td></tr>
+<tr><td>Coding Plan, 30 calls/turn</td><td class="num">5/day</td><td class="num">10/day</td></tr>
+<tr><td>Token Pro, Plus concise</td><td class="num">55.8/day</td><td class="num">111.5/day</td></tr>
+<tr><td>Token Pro, Plus verbose</td><td class="num">32.8/day</td><td class="num">65.6/day</td></tr>
+<tr><td>Token Pro, 3.8-Max concise</td><td class="num">12.3/day</td><td class="num">24.6/day</td></tr>
+<tr><td>Token Pro, 3.8-Max verbose</td><td class="num">7.7/day</td><td class="num">15.4/day</td></tr>
+</tbody>
+</table>
+
+<p>The Alibaba Token figures above use standard-hour consumption. During discounted hours, the Claude requirement rises by:</p>
+<ul>
+<li><strong>2.5×</strong> against Qwen&nbsp;3.7-Plus</li>
+<li><strong>5×</strong> against Qwen&nbsp;3.8-Max</li>
+</ul>
+<p>Since Anthropic does not publish whether Max&nbsp;5× or 20× can deliver those benchmark-session quantities, a more precise public break-even claim would be fabricated. The current account's <code>/status</code> and Settings → Usage data must be measured against a repeatable trace.</p>
+
+<h3>Coding Plan versus Token Pro within Alibaba</h3>
+<p>For the common Qwen&nbsp;3.7-Plus model, the modeled crossover is particularly revealing.</p>
+<p>For a 40-turn cached session:</p>
+<ul>
+<li><strong>Token Pro concise crossover:</strong> approximately 1.9 model calls per user turn</li>
+<li><strong>Token Pro verbose crossover:</strong> approximately 3.3 calls per user turn</li>
+</ul>
+<p>Alibaba says actual tasks commonly require 5–30 underlying calls. Consequently, for long Qwen&nbsp;3.7-Plus agent sessions, <strong>Token Pro should provide more session capacity than the Coding Plan</strong> despite costing $20 more.</p>
+<p>The Coding Plan wins when interactions are simple and close to one direct completion per turn. Token Pro wins when tools, file exploration, testing, and retries amplify each visible turn into several model calls.</p>
+
+<!-- ───────────────────────────── Section 8 ───────────────────────────── -->
+<h2 id="s8">8. Final verdict</h2>
+
+<table class="verdict-table">
+<thead><tr><th>Workload</th><th>Recommendation</th><th>Rationale</th></tr></thead>
+<tbody>
+<tr><td>Short or medium coding tasks, limited tool use</td><td>Alibaba Coding Plan</td><td>Lowest price and predictable call meter; no direct output-token tax</td></tr>
+<tr><td>100K+ repository, 30–50 turns, frequent cache reuse</td><td>Alibaba Token Pro with Qwen&nbsp;3.7-Plus</td><td>Cached context becomes very cheap; higher effective session capacity than request billing</td></tr>
+<tr><td>Flagship Qwen reasoning, workload can run 15:00–01:00 Lisbon time</td><td>Token Pro with Qwen&nbsp;3.8-Max off-peak</td><td>The 0.2× credit multiplier offsets much of the flagship-model premium</td></tr>
+<tr><td>Quality-critical Claude Code use by one developer</td><td>Claude Max 5×</td><td>Pay for Claude-native capability and workflow integration, not transparent compute economics</td></tr>
+<tr><td>Persistent Opus use or 4–8 Claude sub-agents</td><td>Claude Max 20×</td><td>Greater headroom, although quota remains opaque</td></tr>
+<tr><td>Actual team sharing or production automation</td><td>None of these individual plans</td><td>Use Alibaba Team Token/API or Claude Team/Enterprise/API</td></tr>
+</tbody>
+</table>
+
+<p>Alibaba's Coding and Personal Token plans prohibit API-key sharing and non-interactive backend or batch automation. Claude Max is likewise explicitly an individual consumer plan. A team may run several agents under one developer's control, but sharing the subscription across developers or treating it as production infrastructure is a governance and contractual mismatch. <a href="https://www.alibabacloud.com/help/en/model-studio/token-plan-personal-overview">Source</a></p>
+
+<h3>Procurement decision</h3>
+<ul>
+<li><strong>Best raw unit economics:</strong> Alibaba Coding Plan.</li>
+<li><strong>Best long-context and multi-agent economics:</strong> Alibaba Token Pro using Qwen&nbsp;3.7-Plus, explicit caching, and off-peak scheduling.</li>
+<li><strong>Best Claude-specific developer experience:</strong> Claude Max&nbsp;5×.</li>
+<li><strong>Best Claude option for persistent parallel execution:</strong> Claude Max&nbsp;20×, but it should be purchased because Claude produces better completed engineering outcomes — not because its published quota economics are superior.</li>
+</ul>
+
+<div class="callout"><strong>From a strict infrastructure-audit perspective:</strong> Alibaba sells measurable capacity with some coefficient opacity; Anthropic sells an opaque fair-use capacity tier. That makes Alibaba easier to budget and optimize, while Claude Max must be evaluated through controlled workload traces and completed-task economics rather than advertised usage multiples.</div>
+
+<h2>Sources and references</h2>
+<ul>
+<li>Alibaba Coding Plan documentation: <a href="https://www.alibabacloud.com/help/en/model-studio/coding-plan">Alibaba Cloud</a></li>
+<li>Alibaba Token Plan Personal overview: <a href="https://www.alibabacloud.com/help/en/model-studio/token-plan-personal-overview">Alibaba Cloud</a></li>
+<li>Alibaba Token Plan overview (team, metering example): <a href="https://www.alibabacloud.com/help/en/model-studio/token-plan-overview">Alibaba Cloud</a></li>
+<li>Alibaba model pricing (Qwen 3.7-Plus, Qwen 3.8-Max): <a href="https://www.alibabacloud.com/help/en/model-studio/model-pricing">Alibaba Cloud</a></li>
+<li>Alibaba context cache documentation: <a href="https://www.alibabacloud.com/help/en/model-studio/context-cache">Alibaba Cloud</a></li>
+<li>Token Plan Individual off-peak discounts: <a href="https://modelstudio.alibabacloud.com/intl/blog/model-studio-token-plan-individual/">Model Studio</a></li>
+<li>Claude Max plan overview: <a href="https://support.claude.com/en/articles/11049741-what-is-the-max-plan">Claude Help Center</a></li>
+<li>Using Claude Code with Pro or Max plan: <a href="https://support.claude.com/en/articles/11145838-use-claude-code-with-your-pro-or-max-plan">Claude Help Center</a></li>
+<li>Managing usage credits for paid Claude plans: <a href="https://support.anthropic.com/en/articles/12429409-manage-usage-credits-for-paid-claude-plans">Claude Help Center</a></li>
+<li>Anthropic pricing (Sonnet 5, Opus 5): <a href="https://www.anthropic.com/pricing">Anthropic</a></li>
+<li>Migrating to Claude 4 (tokenizer changes): <a href="https://docs.anthropic.com/en/docs/about-claude/models/migrating-to-claude-4">Claude Platform Docs</a></li>
+</ul>
+
+<h2>Related</h2>
+<ul>
+<li><a href="/research/coding-plan-comparison">AI coding plan comparison</a> — the full sortable table of plans, limits, and model scores across 9 providers.</li>
+<li><a href="/research/ai-coding-economics-2026">AI coding economics 2026</a> — how a 32M-token daily workload exposes the real math behind pay-as-you-go and flat-rate plans.</li>
+<li><a href="/research/cheapest-ai-code-generation">Cheapest way to run AI code generation (2026)</a> — broader guide across subscription, API, self-hosted, and coding plan categories.</li>
+<li><a href="/research/prompt-caching-economics">Prompt caching economics</a> — when prompt caching pays off and when it doesn't.</li>
+<li><a href="/research/caching-strategies-compared">Caching strategies compared</a> — explicit vs implicit vs semantic caching.</li>
+<li><a href="/research/true-cost-coding-agents">The true cost of coding agents</a> — API bills, retries, review, and technical debt.</li>
+<li><a href="/research/llm-api-pricing-tracker">LLM API pricing tracker</a> — live view of provider unit prices.</li>
+</ul>
+<hr style="margin:48px 0 24px;border:none;border-top:1px solid #1E2A3F" /><p>Want this applied to your own LLM spend? FinOps LLM runs a free audit of your AI costs and shows where the savings are. <a href="/book">Book free audit &rarr;</a></p><p><a href="/research">Back to research</a></p>{% endblock %}
