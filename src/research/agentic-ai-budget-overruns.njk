@@ -1,0 +1,109 @@
+---json
+{
+  "permalink": "research/agentic-ai-budget-overruns.html",
+  "lang": "en",
+  "head": {
+    "title": "Why agentic AI blows the budget · FinOps LLM",
+    "description": "73% of 127 reviewed agentic AI implementations ran over budget, averaging $2.3M unmodelled. Where the spend actually goes and how to instrument against it.",
+    "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+    "canonical": "https://finopsllm.com/research/agentic-ai-budget-overruns",
+    "article": {
+      "datePublished": "2026-08-15",
+      "dateModified": "2026-08-15",
+      "breadcrumb": "Why agentic AI blows the budget"
+    },
+    "faq": [
+      {
+        "q": "How often do agentic AI projects go over budget?",
+        "a": "A review of 127 enterprise agentic AI implementations found 73% ran over budget, some by more than 2.4x, averaging $2.3M in costs that were never modelled. When almost every project in a category misses in the same direction, the estimating method is wrong rather than the execution."
+      },
+      {
+        "q": "Where does the unmodelled cost actually go?",
+        "a": "Almost none of it is the token price. It clusters in the orchestration multiplier - the model calls one user action generates - plus retries and tool loops, evaluation harnesses that often cost more than the feature they grade, and recurring integration and human review."
+      },
+      {
+        "q": "What is the orchestration multiplier?",
+        "a": "The ratio of model calls to completed user tasks, including retries. It is the single most important number in an agent forecast and the one almost nobody measures. Pilots typically assume single-digit multipliers; production agent loops routinely run 10 to 50 calls per user-visible action."
+      },
+      {
+        "q": "What happened at Uber?",
+        "a": "Uber rolled Claude Code out to roughly 5,000 engineers in December 2025 and had spent its entire annual AI budget by April 2026, at $500 to $2,000 per engineer per month. The deployment worked; the forecast failed, because a seat was priced as a licence when it behaved as a consumption profile."
+      },
+      {
+        "q": "Is an overrun the same as waste?",
+        "a": "No. Overrun means the forecast was wrong; waste means the spend produced nothing. Most 2026 overruns happened on projects that worked. Conflating them turns a forecasting problem into a cancellation decision, which destroys value to fix a spreadsheet."
+      },
+      {
+        "q": "What is the fastest control to put in place?",
+        "a": "A hard per-agent consumption ceiling enforced at the gateway, with a named approval path to raise it. Soft budgets are reporting, not control - an agent stuck in a retry loop can spend a quarter's allocation over a weekend, and no monthly review catches that in time."
+      }
+    ],
+    "openGraph": [
+      { "property": "og:type", "content": "article" },
+      { "property": "og:url", "content": "https://finopsllm.com/research/agentic-ai-budget-overruns" },
+      { "property": "og:title", "content": "Why agentic AI blows the budget" },
+      { "property": "og:description", "content": "73% of reviewed agentic implementations ran over budget. Where the spend goes and how to instrument against it." },
+      { "property": "og:image", "content": "https://finopsllm.com/og.svg" },
+      { "property": "og:site_name", "content": "FinOps LLM" },
+      { "property": "og:locale", "content": "en_US" }
+    ],
+    "twitter": [
+      { "name": "twitter:card", "content": "summary_large_image" },
+      { "name": "twitter:site", "content": "@finopsllm" },
+      { "name": "twitter:title", "content": "Why agentic AI blows the budget" },
+      { "name": "twitter:description", "content": "73% over budget, $2.3M unmodelled. Where it goes and how to catch it." },
+      { "name": "twitter:image", "content": "https://finopsllm.com/og.svg" }
+    ],
+    "style": "body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}.wrap{max-width:840px;margin:0 auto;padding:56px 24px}a{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}h3{margin-top:22px;color:#E6EAF2}table{border-collapse:collapse;width:100%;margin:18px 0;font-size:15px}th,td{text-align:left;padding:10px 12px;border-bottom:1px solid #1E2A3F;vertical-align:top}th{color:#E6EAF2}",
+    "scripts": [
+      { "src": "/assets/consent.js", "defer": true },
+      { "src": "/assets/attribution.js", "defer": true }
+    ]
+  }
+}
+---
+{% extends "shell.njk" %}{% block body %}<h1>Why agentic AI blows the budget</h1><p class="updated" style="color:#6B7689;font-size:14px;margin-top:-6px">Published 15 August 2026</p>
+<p>A review of 127 enterprise agentic AI implementations found 73% ran over budget, some by more than 2.4x, with an average of $2.3M in costs nobody had modelled. That is not a failure rate for agents. It is a failure rate for agent <em>forecasting</em> - most of those projects shipped and worked. What broke was the estimating method.</p>
+
+<h2>Why the estimate is structurally wrong</h2>
+<p>When three-quarters of a category miss in the same direction, that is not variance. A per-call price multiplied by expected requests is correct arithmetic for an API and wrong arithmetic for an agent, because the agent decides how many calls a request costs.</p>
+<p>The clearest public case is Uber: Claude Code to roughly 5,000 engineers in December 2025, entire annual AI budget gone by April 2026, at $500 to $2,000 per engineer per month. Nobody misused it. The forecast assumed a seat had a price; a seat turned out to have a consumption profile. The same pattern showed up industry-wide in H1 2026, with teams reporting they were 3x over their whole-year token budget by May.</p>
+
+<h2>Where the $2.3M actually goes</h2>
+<table>
+  <thead><tr><th scope="col">Cost</th><th scope="col">Why the pilot missed it</th><th scope="col">Shape at scale</th></tr></thead>
+  <tbody>
+    <tr><td>Orchestration multiplier</td><td>The pilot measured one call. Production runs a loop.</td><td>10-50 model calls per user-visible action.</td></tr>
+    <tr><td>Retries and tool loops</td><td>Failure paths were not in the demo.</td><td>An agent that cannot finish retries until it hits a cap, if one exists.</td></tr>
+    <tr><td>Evaluation</td><td>Quality was judged by hand at pilot size.</td><td>The eval harness routinely costs more than the feature it grades. See <a href="/research/eval-cost-allocation">eval cost allocation</a>.</td></tr>
+    <tr><td>Integration and human review</td><td>Scoped as engineering time, not run-rate.</td><td>Recurring monthly, indefinitely, on anything customer-facing.</td></tr>
+  </tbody>
+</table>
+<p>Almost none of it is the token price, which is why optimizing the model choice does not close the gap. See <a href="/research/hidden-llm-costs">hidden LLM costs</a> and <a href="/research/agent-total-cost-of-ownership">agent total cost of ownership</a>.</p>
+
+<h2>Instrument the multiplier before the rollout</h2>
+<p>The one measurement that changes the forecast: for each agent workflow, how many model calls does one <em>completed</em> user task generate, including retries? Instrument it in the pilot and the pilot becomes useful. Report only a monthly cost figure and it did not de-risk anything.</p>
+<ul>
+<li><strong>Emit call counts per task, not just per request.</strong> Tag a task ID at the gateway and count calls against it. See <a href="/research/agent-spend-attribution">agent spend attribution</a>.</li>
+<li><strong>Denominate the budget in tokens per completed task.</strong> Dollars per seat drifts with pricing and hides volume growth.</li>
+<li><strong>Model the eval and human review line explicitly.</strong> If it is not on the forecast it will be the biggest surprise on the invoice.</li>
+<li><strong>Forecast a range with a named driver.</strong> "$400k-$1.1M depending on whether adoption reaches 40% or 90%" is actionable. A single number is a hostage.</li>
+</ul>
+
+<h2>Overrun is not waste</h2>
+<p>Two different failures get merged when a freeze gets proposed. <strong>Overrun</strong> means the forecast was wrong and the spend may have been entirely worth it. <strong>Waste</strong> means the spend produced nothing. Uber's engineers presumably got real value; whether it was worth $500 to $2,000 a month is a separate question from whether anyone predicted it.</p>
+<p>Reporting these separately is what keeps a good programme alive through a bad quarter. It also requires a value metric, not just a cost one - see <a href="/research/ai-value-management">AI value management</a>.</p>
+
+<h2>The one control worth having first</h2>
+<p>A hard consumption ceiling per agent, enforced at the gateway, with a named approval path to raise it. Soft budgets are reporting; an agent in a retry loop can spend a quarter's allocation over a weekend and no monthly variance review catches that in time to matter. The ceiling has to live where the requests are. See <a href="/research/agent-spend-guardrails-production">agent spend guardrails in production</a> and <a href="/research/cap-inference-costs">capping inference costs</a>.</p>
+<p>For coding agents specifically - the category behind the most dramatic 2026 overruns - see <a href="/research/true-cost-coding-agents">the true cost of coding agents</a>.</p>
+
+<h2>Related</h2>
+<ul>
+<li><a href="/research/agent-total-cost-of-ownership">Agent total cost of ownership</a> - the full-cost model.</li>
+<li><a href="/research/agent-spend-guardrails-production">Agent spend guardrails in production</a> - the enforcement layer.</li>
+<li><a href="/research/agent-economics">Agent economics</a> - why the unit is the task, not the call.</li>
+<li><a href="/research/true-cost-coding-agents">The true cost of coding agents</a> - the worst-hit category.</li>
+<li><a href="/research/hidden-llm-costs">Hidden LLM costs</a> - what the token line never shows.</li>
+</ul>
+<hr style="margin:48px 0 24px;border:none;border-top:1px solid #1E2A3F" /><p>Want this applied to your own LLM spend? FinOps LLM runs a free audit of your AI costs and shows where the savings are. <a href="/book">Book free audit &rarr;</a></p><p><a href="/research">Back to research</a></p>{% endblock %}

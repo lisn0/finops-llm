@@ -1,0 +1,159 @@
+---json
+{
+  "permalink": "research/focus-1-5-ai-token-tracking.html",
+  "lang": "en",
+  "head": {
+    "title": "FOCUS 1.5 adds AI token tracking · FinOps LLM",
+    "description": "FOCUS 1.5 lands December 2026 with native AI token tracking and a new Price Sheet dataset. What it standardizes, what it does not, and how to be ready.",
+    "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+    "canonical": "https://finopsllm.com/research/focus-1-5-ai-token-tracking",
+    "article": {
+      "datePublished": "2026-08-15",
+      "dateModified": "2026-08-15",
+      "breadcrumb": "FOCUS 1.5 AI token tracking"
+    },
+    "faq": [
+      {
+        "q": "What is FOCUS 1.5?",
+        "a": "FOCUS 1.5 is the next version of the FinOps Open Cost and Usage Specification, confirmed for December 2026. It adds native AI token tracking to the Cost and Usage dataset - surfacing AI model identity and input and output token consumption - plus a new Price Sheet dataset for provider list pricing."
+      },
+      {
+        "q": "What does the Price Sheet dataset do?",
+        "a": "It gives list pricing its own standardized representation, separate from the consumption record. That separation is what lets you compute the gap between list price and what you actually paid, and compare provider pricing without reverse-engineering it out of an invoice."
+      },
+      {
+        "q": "Does FOCUS 1.5 solve AI cost attribution?",
+        "a": "No. FOCUS standardizes the shape of billing data coming out of providers. It cannot tell you which feature, team, or customer caused a given request, because that context never reaches the provider. Attribution still requires your own tagging at the gateway."
+      },
+      {
+        "q": "When does FOCUS 1.5 ship and when will providers support it?",
+        "a": "The specification is confirmed for December 2026. Provider adoption follows on its own schedule - FOCUS 1.0 took well over a year to reach broad coverage across major clouds. Plan for a spec date in 2026 and usable exports through 2027."
+      },
+      {
+        "q": "How do we prepare for FOCUS 1.5?",
+        "a": "Store token counts by type rather than a single total, keep model identity as a first-class field on every record, retain provider list prices at the time of use, and keep your internal cost records reconciled to the invoice. Each maps directly onto a 1.5 field."
+      },
+      {
+        "q": "Is FOCUS the same as the Tokenomics Foundation?",
+        "a": "No. FOCUS standardizes billing data - the schema of what providers export. The Tokenomics Foundation, launched 4 August 2026, targets the layer above: what that spend means in business terms and what a token is worth. They are complementary and land in that order."
+      }
+    ],
+    "openGraph": [
+      {
+        "property": "og:type",
+        "content": "article"
+      },
+      {
+        "property": "og:url",
+        "content": "https://finopsllm.com/research/focus-1-5-ai-token-tracking"
+      },
+      {
+        "property": "og:title",
+        "content": "FOCUS 1.5 adds AI token tracking"
+      },
+      {
+        "property": "og:description",
+        "content": "December 2026: native AI token tracking and a Price Sheet dataset. What it standardizes, what it does not, and how to be ready."
+      },
+      {
+        "property": "og:image",
+        "content": "https://finopsllm.com/og.svg"
+      },
+      {
+        "property": "og:site_name",
+        "content": "FinOps LLM"
+      },
+      {
+        "property": "og:locale",
+        "content": "en_US"
+      }
+    ],
+    "twitter": [
+      {
+        "name": "twitter:card",
+        "content": "summary_large_image"
+      },
+      {
+        "name": "twitter:site",
+        "content": "@finopsllm"
+      },
+      {
+        "name": "twitter:title",
+        "content": "FOCUS 1.5 adds AI token tracking"
+      },
+      {
+        "name": "twitter:description",
+        "content": "December 2026: native AI token tracking and a Price Sheet dataset. What to do now."
+      },
+      {
+        "name": "twitter:image",
+        "content": "https://finopsllm.com/og.svg"
+      }
+    ],
+    "style": "body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}.wrap{max-width:840px;margin:0 auto;padding:56px 24px}a{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}h3{margin-top:22px;color:#E6EAF2}table{border-collapse:collapse;width:100%;margin:18px 0;font-size:15px}th,td{text-align:left;padding:10px 12px;border-bottom:1px solid #1E2A3F;vertical-align:top}th{color:#E6EAF2}",
+    "scripts": [
+      {
+        "src": "/assets/consent.js",
+        "defer": true
+      },
+      {
+        "src": "/assets/attribution.js",
+        "defer": true
+      }
+    ]
+  }
+}
+---
+{% extends "shell.njk" %}{% block body %}<h1>FOCUS 1.5 adds AI token tracking</h1><p class="updated" style="color:#6B7689;font-size:14px;margin-top:-6px">Published 15 August 2026</p>
+<p>FOCUS 1.5 is confirmed for December 2026 and adds two things the specification has never carried: native AI token tracking inside the Cost and Usage dataset, and a separate Price Sheet dataset for provider list pricing. Together they make token-based AI spend comparable and portable across providers, the way FOCUS already made cloud billing comparable.</p>
+
+<h2>What is actually in it</h2>
+<p>Two additions, and the second matters more than its billing gets:</p>
+<h3>1. AI model identity and token consumption in Cost and Usage</h3>
+<p>The consumption record gains fields for which model served a charge and how many input and output tokens it consumed, with worked examples for token-based and generation-based billing. Today that information either does not survive the provider's export or arrives in a provider-specific shape you have to parse per vendor. After 1.5, the shape is the same everywhere.</p>
+<h3>2. A Price Sheet dataset</h3>
+<p>List pricing gets its own standardized representation, separate from the consumption record. This is the quieter but more useful half. Keeping price separate from usage means you can finally compute two things directly from the data:</p>
+<ul>
+<li><strong>List versus actual.</strong> The gap between the published rate and your effective rate - the number that tells you whether a commitment or a negotiated rate is earning its keep.</li>
+<li><strong>Provider comparison without archaeology.</strong> Comparing two vendors currently means reverse-engineering an effective rate out of an invoice that blends discounts, tiers, and cached-token pricing. A price sheet in a known schema removes that step. See <a href="/research/provider-arbitrage">provider arbitrage</a>.</li>
+</ul>
+
+<h2>Why this matters more than a normal point release</h2>
+<p>Token spend has been the one large technology cost with no standard billing shape. Every provider meters differently, cached and reasoning tokens price on their own scales, and the ratios move whenever a model changes underneath you. That is why the State of FinOps 2026 survey put granular AI spend monitoring - tokens, requests, GPU utilization - at the top of the most-requested capability list across all 1,192 respondents.</p>
+<p>FOCUS 1.5 does not deliver that capability, but it removes the excuse that the data is unobtainable. Once tokens are a first-class billing field, a tool that cannot report on them by model is choosing not to.</p>
+
+<h2>What FOCUS 1.5 will not do</h2>
+<p>Be clear about this before you plan around it, because the gap is where most teams get caught:</p>
+<ul>
+<li><strong>It does not give you attribution.</strong> FOCUS standardizes what providers emit. Providers do not know which feature, team, or customer caused a request, because that context never leaves your infrastructure. A request made without a tag is unattributable regardless of how good the billing schema is. See <a href="/research/what-is-llm-cost-attribution">cost attribution</a>.</li>
+<li><strong>It does not cover the unmetered layers.</strong> GPU reservations, vector stores, eval harnesses, and human review sit outside the token line. See <a href="/research/hidden-llm-costs">hidden LLM costs</a>.</li>
+<li><strong>It does not arrive on the spec date.</strong> A December 2026 specification is not a December 2026 export. FOCUS 1.0 took well over a year to reach broad provider coverage. Plan for usable AI exports through 2027, not in Q1.</li>
+<li><strong>It does not tell you whether the spend was worth it.</strong> That is the layer the <a href="/research/tokenomics-foundation">Tokenomics Foundation</a> was launched to define.</li>
+</ul>
+
+<h2>How to be ready, using work that pays for itself now</h2>
+<p>Every item below is useful before 1.5 ships and maps directly onto a 1.5 field afterwards:</p>
+<table>
+  <thead><tr><th scope="col">Do this now</th><th scope="col">Why it maps cleanly</th></tr></thead>
+  <tbody>
+    <tr><td>Store token counts by type, never as one total</td><td>Input and output are separate fields in 1.5. A single blended total cannot be split back apart.</td></tr>
+    <tr><td>Keep model identity on every record</td><td>Model identity is a first-class 1.5 field and the basis of every per-model comparison.</td></tr>
+    <tr><td>Retain provider list prices at time of use</td><td>The Price Sheet dataset is a point-in-time view. Historical list prices are not reliably recoverable later.</td></tr>
+    <tr><td>Reconcile internal records to the invoice monthly</td><td>1.5 will make the provider's version authoritative and comparable. An unreconciled internal figure becomes visibly wrong. See <a href="/research/invoice-reconciliation">invoice reconciliation</a>.</td></tr>
+    <tr><td>Tag at the gateway: feature, environment, team, customer</td><td>The one thing FOCUS will never supply. Emit it via <a href="/research/opentelemetry-genai-conventions">OpenTelemetry GenAI conventions</a>.</td></tr>
+  </tbody>
+</table>
+
+<h2>The wider signal</h2>
+<p>FOCUS 1.5 did not arrive alone. The same window produced the <a href="/research/tokenomics-foundation">Tokenomics Foundation</a> launch on 4 August 2026, and the announcement that from 2027 FinOps X becomes Tokenomicon, a Linux Foundation conference built around the economics of AI, with FinOps X continuing as a co-located practitioner track. The flagship runs in San Diego, 7-10 June 2027, with regional events in Amsterdam and London.</p>
+<p>A specification adding token fields, a new standards body, and a conference renamed around the unit is three independent bodies agreeing on the same thing: the token is now the unit of enterprise technology spend, and the accounting is being built after the fact. Being early to the schema is cheap. Retrofitting it is not.</p>
+
+<h2>Related</h2>
+<ul>
+<li><a href="/research/llm-finops-standards">LLM FinOps standards</a> - the wider standards picture.</li>
+<li><a href="/research/tokenomics-foundation">What is the Tokenomics Foundation?</a> - the value layer above the schema.</li>
+<li><a href="/research/state-of-finops-2026-ai-spend">State of FinOps 2026: 98% now manage AI spend</a> - the capability gap 1.5 partly addresses.</li>
+<li><a href="/research/opentelemetry-genai-conventions">OpenTelemetry GenAI conventions</a> - the telemetry side of the same problem.</li>
+<li><a href="/research/llm-token-types-explained">LLM token types explained</a> - why one blended total is not enough.</li>
+</ul>
+<hr style="margin:48px 0 24px;border:none;border-top:1px solid #1E2A3F" /><p>Want this applied to your own LLM spend? FinOps LLM runs a free audit of your AI costs and shows where the savings are. <a href="/book">Book free audit &rarr;</a></p><p><a href="/research">Back to research</a></p>{% endblock %}
