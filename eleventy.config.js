@@ -61,6 +61,18 @@ const localesForSlug = (() => {
       index.get(slug).push(lang);
     }
   }
+  // Translations that ship from _data/articles/*.json have no .njk on disk, so
+  // the filesystem scan alone would let the English page stop declaring
+  // alternates the moment a locale exists only in JSON.
+  const jsonDir = "src/_data/articles";
+  if (fs.existsSync(jsonDir)) {
+    for (const name of fs.readdirSync(jsonDir)) {
+      if (!name.endsWith(".json")) continue;
+      const data = JSON.parse(fs.readFileSync(`${jsonDir}/${name}`, "utf8"));
+      const slug = (data.slug || "").split("/").pop() || name.slice(0, -5);
+      index.set(slug, [...new Set([...(index.get(slug) || []), ...Object.keys(data.languages || {})])]);
+    }
+  }
   return index;
 })();
 

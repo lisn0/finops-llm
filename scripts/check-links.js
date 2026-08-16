@@ -138,7 +138,7 @@ for (const f of walk(site).filter((f) => f.endsWith(".html"))) {
       .replace(/&nbsp;/g, " ").replace(/&amp;/g, "&")
       .replace(/ · FinOps LLM$/, "");
     if (node.headline !== core) errors.push(`${rel}: JSON-LD headline does not match <title>`);
-    if (node.description !== desc) errors.push(`${rel}: JSON-LD description does not match meta description`);
+    if (node.description !== decodeEntities(desc)) errors.push(`${rel}: JSON-LD description does not match meta description`);
   }
 }
 
