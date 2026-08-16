@@ -1,0 +1,92 @@
+---json
+{
+  "permalink": "research/deepseek-harness-goals-ralph-loop.html",
+  "lang": "en",
+  "head": {
+    "title": "DeepSeek Harness Goals and the Ralph Loop · FinOps LLM",
+    "description": "DeepSeek Harness formalises open-ended agent work as goals, goal rounds, and Ralph loops. A guide to the vocabulary and where the spend risk sits.",
+    "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+    "canonical": "https://finopsllm.com/research/deepseek-harness-goals-ralph-loop",
+    "article": {
+      "datePublished": "2026-08-16"
+    },
+    "faq": [
+      {
+        "q": "What is a goal in DeepSeek Harness?",
+        "a": "A goal is a durable completion objective attached to a session, with an explicit phase: active, paused, blocked, or complete. It survives across turns, so the agent has a standing objective rather than only the current message."
+      },
+      {
+        "q": "What is a goal round?",
+        "a": "A goal round is one continuation cycle admitted for the current goal, materialised as a single goal-sourced turn. Whether another round can be admitted is controlled by a process-local goal activation that is either armed or disarmed."
+      },
+      {
+        "q": "What is the Ralph loop?",
+        "a": "The Ralph loop is a foreground workflow that repeatedly starts fresh agent sessions against an immutable objective. Each Ralph round is a fresh child session with no parent conversation seed, and a bounded structured handoff carries status, summary, evidence, and blockers from one round to the next."
+      },
+      {
+        "q": "Why do goal loops matter for AI cost control?",
+        "a": "Because a standing objective plus automatic continuation is an unbounded spend authorisation unless something disarms it. Goal creation and edits are documented as requiring direct human authorisation, which makes the human the budget owner for open-ended work."
+      }
+    ],
+    "style": "body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}.wrap{max-width:860px;margin:0 auto;padding:56px 24px}a{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}table{border-collapse:collapse;width:100%;margin:24px 0;font-size:.95em}th,td{border:1px solid #1E2A3F;padding:10px 12px;text-align:left;color:#B6C0D2}th{color:#E6EAF2;background:#101726}code{background:#101726;padding:2px 6px;border-radius:4px;color:#E6EAF2;font-size:.92em}.callout{border-left:4px solid #7AAFFF;padding-left:16px;margin:24px 0;font-style:italic;color:#B6C0D2}",
+    "scripts": [
+      {
+        "src": "/assets/consent.js",
+        "defer": true
+      },
+      {
+        "src": "/assets/attribution.js",
+        "defer": true
+      }
+    ]
+  }
+}
+---
+{% extends "shell.njk" %}{% block body %}<h1>DeepSeek Harness goals and the Ralph loop</h1>
+<p class="updated" style="color:#6B7689;font-size:14px;margin-top:-6px">Published 16 August 2026</p>
+<p>Most agent cost surprises are not about the price of a token. They are about how many times the agent decided to try again. <a href="https://github.com/deepseek-ai/deepseek-harness">DeepSeek Harness</a> gives that behaviour a vocabulary, which is the first step to putting a number on it.</p>
+
+<h2>Turn, step, round</h2>
+<p>Three units, precisely separated in the project glossary:</p>
+<table>
+<thead><tr><th>Unit</th><th>Definition</th><th>Cost meaning</th></tr></thead>
+<tbody>
+<tr><td>Step</td><td>One model request plus the tool executions it produces</td><td>The billing atom</td></tr>
+<tr><td>Turn</td><td>One drain of input, ending when the model stops or policy intervenes</td><td>The user-facing unit</td></tr>
+<tr><td>Round</td><td>An outer policy iteration, such as a goal round or a fresh-agent attempt</td><td>The multiplier above turns</td></tr>
+</tbody>
+</table>
+<p>Rounds are the layer that most homegrown cost models omit entirely. If your forecast counts requests, and your system runs rounds, your forecast is measuring the wrong thing.</p>
+
+<h2>Goals are durable objectives</h2>
+<p>A goal is a durable completion objective with an explicit phase — active, paused, blocked, or complete. Unlike a message, it persists across turns, so the agent carries a standing objective. Each continuation cycle admitted for that goal is a goal round, materialised as one goal-sourced turn.</p>
+<p>Admission is gated by a goal activation: a process-local permission to admit another round, which is either armed or disarmed. That single bit is the throttle on open-ended work.</p>
+
+<div class="callout">A standing objective plus automatic continuation is a spend authorisation with no upper bound. The documented requirement that goal creation and edits need direct human authorisation is precisely why: someone has to own the budget for open-ended work.</div>
+
+<h2>The Ralph loop is deliberate restart</h2>
+<p>The Ralph loop is a foreground workflow that iterates toward an immutable objective by starting fresh agent sessions, built on the harness's workflow and subagent primitives. A Ralph round is one fresh child session with no parent conversation seed. Continuity is carried by a Ralph handoff — described as a normalised, bounded, structured report containing status, summary, evidence, and blockers.</p>
+<p>The economics here are genuinely interesting, and they cut both ways. Restarting clean means each round pays a small input cost instead of dragging an ever-growing conversation forward, so per-round cost stays flat rather than climbing. But nothing about a fresh start guarantees progress, and a loop that restarts cheaply can afford to restart many more times.</p>
+<p>The bounded handoff is the control that makes the pattern viable: it is the only channel between rounds, so it caps context growth by construction. Watch two numbers — rounds per objective, and whether the handoff's blockers list is repeating. A blocker that appears in three consecutive handoffs is a loop that will not converge, and every further round is pure waste.</p>
+
+<h2>Commands are not tools</h2>
+<p>Worth separating, because it affects what you meter. A human command is a slash-prefixed instruction routed through the command plane for human-facing adapters — discovery, parsing, dispatch, cancellation, and rendering, owned by UI adapters. It is explicitly distinct from a model tool. The goal command is one of these.</p>
+<p>Practically: a human typing a slash command is not the model spending tokens. Attribute the two separately or your per-session cost will blame the wrong actor.</p>
+
+<h2>Four controls for open-ended work</h2>
+<ol>
+<li>A maximum round count per objective, enforced before admission rather than reviewed afterwards.</li>
+<li>A cumulative token budget spanning all rounds of one goal, not per round.</li>
+<li>Convergence detection on the handoff: repeated blockers stop the loop.</li>
+<li>Explicit human authorisation for goal creation, kept as the audit record of who authorised the spend.</li>
+</ol>
+
+<h2>Related</h2>
+<ul>
+<li><a href="/research/deepseek-harness-subagents">DeepSeek Harness subagents and delegation depth</a> — the other multiplier.</li>
+<li><a href="/research/deepseek-harness-guardrails">Where to put spend guardrails in DeepSeek Harness</a> — where to enforce a round cap.</li>
+<li><a href="/research/deepseek-harness-session-log">The DeepSeek Harness session log as a cost record</a> — where rounds become measurable.</li>
+<li><a href="/research/deepseek-harness-tool-scopes">DeepSeek Harness tool scopes and restrictions</a> — narrowing what a round can do.</li>
+</ul>
+
+<hr style="margin:48px 0 24px;border:none;border-top:1px solid #1E2A3F" /><p>Want this applied to your own LLM spend? FinOps LLM runs a free audit of your AI costs and shows where the savings are. <a href="/book">Book free audit &rarr;</a></p><p><a href="/research">Back to research</a></p>{% endblock %}

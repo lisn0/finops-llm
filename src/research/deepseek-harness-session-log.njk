@@ -1,0 +1,96 @@
+---json
+{
+  "permalink": "research/deepseek-harness-session-log.html",
+  "lang": "en",
+  "head": {
+    "title": "The DeepSeek Harness Session Log · FinOps LLM",
+    "description": "DeepSeek Harness records every agent turn as an append-only typed event log with per-step token usage. A guide to reading it as a cost record.",
+    "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+    "canonical": "https://finopsllm.com/research/deepseek-harness-session-log",
+    "article": {
+      "datePublished": "2026-08-16"
+    },
+    "faq": [
+      {
+        "q": "What is a session in DeepSeek Harness?",
+        "a": "A session is an append-only log of typed SessionEvents, described in the docs as the single source of truth for an agent's whole interaction history. Message history is derived from the log rather than stored separately."
+      },
+      {
+        "q": "Where is token usage recorded in DeepSeek Harness?",
+        "a": "Usage travels with model output. The system reads per-step assistant/chunk records of type 'usage', with assistant/message.usage as a fallback, so a step's token accounting and the text it produced stay attached to each other."
+      },
+      {
+        "q": "What does 'model-visible means logged' mean?",
+        "a": "It is the governing principle of the harness: anything the model could see must appear in the session log, so the log can reconstitute the run. For cost work this means the log is complete by construction rather than by instrumentation discipline."
+      }
+    ],
+    "style": "body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}.wrap{max-width:860px;margin:0 auto;padding:56px 24px}a{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}table{border-collapse:collapse;width:100%;margin:24px 0;font-size:.95em}th,td{border:1px solid #1E2A3F;padding:10px 12px;text-align:left;color:#B6C0D2}th{color:#E6EAF2;background:#101726}code{background:#101726;padding:2px 6px;border-radius:4px;color:#E6EAF2;font-size:.92em}.callout{border-left:4px solid #7AAFFF;padding-left:16px;margin:24px 0;font-style:italic;color:#B6C0D2}",
+    "scripts": [
+      {
+        "src": "/assets/consent.js",
+        "defer": true
+      },
+      {
+        "src": "/assets/attribution.js",
+        "defer": true
+      }
+    ]
+  }
+}
+---
+{% extends "shell.njk" %}{% block body %}<h1>The DeepSeek Harness session log as a cost record</h1>
+<p class="updated" style="color:#6B7689;font-size:14px;margin-top:-6px">Published 16 August 2026</p>
+<p>Most agent cost tracking is bolted on. You wrap the provider SDK, emit a span, hope nobody adds a second call path, and discover six weeks later that the subagent traffic never got instrumented. DeepSeek Harness takes a different route: the session log is the primary artefact, and token accounting rides inside it.</p>
+
+<h2>The session is an append-only event log</h2>
+<p>The docs put it directly: a <code>Session</code> is an append-only log of typed <code>SessionEvent</code>s, and it is the single source of truth for an agent's whole interaction history. Every event carries four fields:</p>
+<table>
+<thead><tr><th>Field</th><th>Meaning</th></tr></thead>
+<tbody>
+<tr><td><code>type</code></td><td>Event category, a key from the extensible <code>SessionEventMap</code></td></tr>
+<tr><td><code>seq</code></td><td>Monotonic sequence number, equal to the log length at append time</td></tr>
+<tr><td><code>time</code></td><td>Unix epoch milliseconds</td></tr>
+<tr><td><code>data</code></td><td>Type-specific, JSON-serialisable payload</td></tr>
+</tbody>
+</table>
+<p>Surface events carry two more: <code>sourceEventSeqs</code>, referencing the events they derive from, and <code>surfaceOp</code>, describing how the event enters the message surface.</p>
+
+<h2>The events a cost model cares about</h2>
+<ul>
+<li><strong><code>turn/start</code> and <code>turn/end</code></strong> — open and close a turn, the latter with a <code>TurnEndReason</code>. A turn is the user-facing unit of work.</li>
+<li><strong><code>step/start</code> and <code>step/end</code></strong> — a step is one model call plus its tool calls. This is the billing unit.</li>
+<li><strong><code>assistant/message</code></strong> — model output, with optional <code>TokenUsage</code> attached.</li>
+<li><strong><code>assistant/chunk</code></strong> — raw stream tokens, kept for replay fidelity. Usage arrives here as chunks of type <code>usage</code>.</li>
+<li><strong><code>tool/call</code> and <code>tool/result</code></strong> — the model's tool invocation and its outcome, the latter with an optional <code>meta</code> payload.</li>
+<li><strong><code>request/header</code></strong> — the full <code>EpochHeader</code>: config, system prompt, and tool set for the request.</li>
+<li><strong><code>request/context</code></strong> — route metadata: provider, model, context window.</li>
+</ul>
+<p>That last pair is the piece most homegrown telemetry misses. <code>request/context</code> tells you which provider and model actually served the step, and <code>request/header</code> tells you what was sent. Together they let you reconstruct the cost of a step from the log alone, without trusting a separately maintained pricing lookup keyed off an assumed model.</p>
+
+<h2>Usage travels with output</h2>
+<p>The docs are careful about this: an <code>assistant/message</code> carries the step's <code>usage</code> when the adapter reported token accounting, so the model output and its accounting travel together. The reader prefers per-step <code>assistant/chunk { type: 'usage' }</code> records and falls back to <code>assistant/message.usage</code>.</p>
+<p>The practical effect is that you cannot end up with orphaned usage numbers you can no longer attribute to a step, which is the single most common defect in retrofitted agent cost tracking.</p>
+
+<h2>Derived history, not duplicated history</h2>
+<p>Message history is derived from surface events and never stored separately. The projection rules are simple: <code>user/message</code> becomes a user message, <code>assistant/message</code> becomes an assistant message with raw chunks skipped, <code>tool/result</code> becomes a user message carrying a tool-result block. Everything else stays log-only.</p>
+<p>For a FinOps team this is the useful property. There is one place to read, and reading it does not risk disagreeing with what the model actually saw.</p>
+
+<div class="callout">The governing principle of the harness is "model-visible means logged" — the session log must be able to reconstitute the run. A log complete enough to replay a session is, by construction, complete enough to cost it.</div>
+
+<h2>What to build on top</h2>
+<ol>
+<li>Join <code>step/start</code> and <code>step/end</code> to get step duration and count per turn. Step count per turn is your orchestration multiplier, and it is the number that surprises finance.</li>
+<li>Attach <code>request/context</code> to each step for the provider and model, then price the usage from the same step's <code>assistant/chunk</code> usage record.</li>
+<li>Count <code>tool/call</code> events per step. High tool-call fan-out per step is where latency and retry cost concentrate.</li>
+<li>Watch <code>TurnEndReason</code> distributions. Turns ending for reasons other than completion are paid-for work that produced nothing.</li>
+</ol>
+
+<h2>Related</h2>
+<ul>
+<li><a href="/research/deepseek-harness-plugin-architecture">DeepSeek Harness: what "everything is a plugin" buys you</a> — the seam model underneath.</li>
+<li><a href="/research/deepseek-harness-guardrails">Where to put spend guardrails in DeepSeek Harness</a> — acting on what the log shows.</li>
+<li><a href="/research/opentelemetry-genai-conventions">OpenTelemetry GenAI conventions</a> — the standard-based alternative.</li>
+<li><a href="/research/what-is-llm-cost-attribution">What is LLM cost attribution</a> — the underlying discipline.</li>
+</ul>
+
+<hr style="margin:48px 0 24px;border:none;border-top:1px solid #1E2A3F" /><p>Want this applied to your own LLM spend? FinOps LLM runs a free audit of your AI costs and shows where the savings are. <a href="/book">Book free audit &rarr;</a></p><p><a href="/research">Back to research</a></p>{% endblock %}

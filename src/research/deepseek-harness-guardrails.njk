@@ -1,0 +1,93 @@
+---json
+{
+  "permalink": "research/deepseek-harness-guardrails.html",
+  "lang": "en",
+  "head": {
+    "title": "Spend Guardrails in DeepSeek Harness · FinOps LLM",
+    "description": "DeepSeek Harness exposes two waterfall hooks, agent/pre-step and tools/pre-execute. A guide to using them as budget and policy enforcement points.",
+    "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+    "canonical": "https://finopsllm.com/research/deepseek-harness-guardrails",
+    "article": {
+      "datePublished": "2026-08-16"
+    },
+    "faq": [
+      {
+        "q": "Where can you enforce spend policy in DeepSeek Harness?",
+        "a": "Two waterfall extension points. agent/pre-step runs before a model request is issued and its returned decision is authoritative. tools/pre-execute runs before any tool body executes, ahead of the monotonic permission guards."
+      },
+      {
+        "q": "What is a waterfall hook in DeepSeek Harness?",
+        "a": "A waterfall is an ordered chain of listeners where each must call next() to delegate downstream. Listeners that wrap next() preserve downstream messages unless replacement is intentional, so a guard can inspect, modify, or short-circuit a step."
+      },
+      {
+        "q": "What is a monotonic guard?",
+        "a": "A monotonic guard evaluates tool permissions without modifying them: it can deny or abstain but never grant. Guards run after the tools/pre-execute waterfall, and if a guard denies or approval is unanswerable the tool body is skipped."
+      }
+    ],
+    "style": "body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}.wrap{max-width:860px;margin:0 auto;padding:56px 24px}a{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}table{border-collapse:collapse;width:100%;margin:24px 0;font-size:.95em}th,td{border:1px solid #1E2A3F;padding:10px 12px;text-align:left;color:#B6C0D2}th{color:#E6EAF2;background:#101726}code{background:#101726;padding:2px 6px;border-radius:4px;color:#E6EAF2;font-size:.92em}.callout{border-left:4px solid #7AAFFF;padding-left:16px;margin:24px 0;font-style:italic;color:#B6C0D2}",
+    "scripts": [
+      {
+        "src": "/assets/consent.js",
+        "defer": true
+      },
+      {
+        "src": "/assets/attribution.js",
+        "defer": true
+      }
+    ]
+  }
+}
+---
+{% extends "shell.njk" %}{% block body %}<h1>Where to put spend guardrails in DeepSeek Harness</h1>
+<p class="updated" style="color:#6B7689;font-size:14px;margin-top:-6px">Published 16 August 2026</p>
+<p>An agent that discovers its budget from the monthly invoice does not have a budget. It has a postmortem. The useful question about any harness is where you can stand in the loop and say no, and DeepSeek Harness answers that with two named waterfall extension points.</p>
+
+<h2>First, the shape of the loop</h2>
+<p>The harness uses a turn and step model. A <strong>step</strong> is one model request plus the tool calls it produces. A <strong>turn</strong> contains zero or more steps. The flow for a turn runs roughly: input claim, prompt assembly, <code>agent/pre-step</code>, LLM stream, tool execution, step completion, then turn closure.</p>
+<p>Two event streams run alongside each other. <code>session/event</code> carries durable replay facts — chunks, messages, tool calls, results. <code>agent/*</code> carries live coordination signals — status, inbox, request interception. Guardrails belong in the second; accounting belongs in the first.</p>
+
+<h2>Interception point 1: <code>agent/pre-step</code></h2>
+<p>This is the checkpoint before the model request goes out. The docs state that the returned <code>agent/pre-step</code> decision is authoritative, and that listeners wrapping <code>next()</code> preserve downstream messages unless replacement is intentional. That is the property that makes it usable as a budget gate: a listener can reject a proposed step, or modify it, and the decision stands.</p>
+<p>What belongs here:</p>
+<ul>
+<li><strong>Per-turn step caps.</strong> The runaway-agent failure mode is a turn that never converges. A hard step ceiling turns an unbounded bill into a bounded one.</li>
+<li><strong>Cumulative token budgets.</strong> Sum usage from the session log so far; refuse the next step past the threshold.</li>
+<li><strong>Model downshifting.</strong> Rewrite the step to a cheaper route once a turn has burned past a soft threshold, rather than refusing outright.</li>
+<li><strong>Context-size limits.</strong> Prompt assembly happens before this hook, so the assembled request is visible and measurable at this point.</li>
+</ul>
+
+<h2>Interception point 2: <code>tools/pre-execute</code></h2>
+<p>Tool execution is a three-phase pipeline. The <code>tools/pre-execute</code> waterfall runs first, monotonic guards run next, and only then does the tool body execute — sandboxed, with filesystem gatekeeping. Afterwards a post-execute waterfall can accept, block, replace, or add context to the result, and <code>ToolDefinition.finalizeContent</code> enforces content invariants synchronously.</p>
+<p>The permission layer is deliberately asymmetric. Registered monotonic guards deny or abstain, with identity protected — they never grant. If a guard denies, or if <code>ctx.approval</code>'s one-shot prompt is absent or unanswerable, the result is denial and the tool body is skipped. Failure closed, not open.</p>
+<p>Filesystem mutations are separately gated: only <code>fs/write-intent</code> or <code>fs/edit-intent</code> tool-fs mutations pass. Writes are not an incidental side effect of a tool running.</p>
+
+<div class="callout">Two properties make this pipeline trustworthy as a control point: guards can only deny, and an unanswerable approval prompt denies. Most homegrown agent policy layers fail open when the approval channel is missing, which is exactly when you needed them.</div>
+
+<h2>What the pipeline records</h2>
+<p>Three session events give you the audit trail: <code>tool/call</code> before execution, <code>tool/code-dispatch</code> for sub-calls, and <code>tool/result</code> as the final authoritative outcome. Sub-calls being separately recorded matters — a single model-visible tool call that fans out internally does not hide its fan-out.</p>
+
+<h2>A practical guardrail set</h2>
+<table>
+<thead><tr><th>Control</th><th>Hook</th><th>Stops</th></tr></thead>
+<tbody>
+<tr><td>Max steps per turn</td><td><code>agent/pre-step</code></td><td>Non-converging loops</td></tr>
+<tr><td>Cumulative token ceiling</td><td><code>agent/pre-step</code></td><td>Slow-burn overspend</td></tr>
+<tr><td>Route downshift past threshold</td><td><code>agent/pre-step</code></td><td>Frontier pricing on cheap work</td></tr>
+<tr><td>Tool allow-list by cost class</td><td>Monotonic guard</td><td>Expensive tools in cheap contexts</td></tr>
+<tr><td>Subprocess and network denial</td><td><code>ctx.sandbox</code> policy</td><td>Unmetered egress</td></tr>
+<tr><td>Write-intent gating</td><td><code>ctx.fs</code> seam</td><td>Unreviewed mutations</td></tr>
+</tbody>
+</table>
+
+<h2>The caveat</h2>
+<p>DeepSeek Harness is in developer preview and its own README warns of compatibility-breaking changes. These hook names and semantics are the ones documented today; treat guardrail plugins built against them as code you will revisit, and pin the version you built against.</p>
+
+<h2>Related</h2>
+<ul>
+<li><a href="/research/deepseek-harness-session-log">The DeepSeek Harness session log as a cost record</a> — the data the guardrails read.</li>
+<li><a href="/research/deepseek-harness-plugin-architecture">DeepSeek Harness: what "everything is a plugin" buys you</a> — why guards are plugins too.</li>
+<li><a href="/research/agent-spend-guardrails">Agent spend guardrails</a> — the provider-agnostic version.</li>
+<li><a href="/research/true-cost-coding-agents">The true cost of coding agents</a> — what runaway loops actually cost.</li>
+</ul>
+
+<hr style="margin:48px 0 24px;border:none;border-top:1px solid #1E2A3F" /><p>Want this applied to your own LLM spend? FinOps LLM runs a free audit of your AI costs and shows where the savings are. <a href="/book">Book free audit &rarr;</a></p><p><a href="/research">Back to research</a></p>{% endblock %}

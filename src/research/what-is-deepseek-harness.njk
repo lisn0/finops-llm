@@ -1,0 +1,131 @@
+---json
+{
+  "permalink": "research/what-is-deepseek-harness.html",
+  "lang": "en",
+  "head": {
+    "title": "What Is DeepSeek Harness? A Complete Guide · FinOps LLM",
+    "description": "DeepSeek Harness (dsh) is an MIT-licensed open-source agent harness from DeepSeek AI. What it is, how to install it, how it works, and when to use it.",
+    "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+    "canonical": "https://finopsllm.com/research/what-is-deepseek-harness",
+    "article": {
+      "datePublished": "2026-08-16"
+    },
+    "faq": [
+      {
+        "q": "What is DeepSeek Harness?",
+        "a": "DeepSeek Harness, package name dsh, is an MIT-licensed open-source agent harness published by DeepSeek AI. It runs coding and automation agents that read and edit files, run commands, delegate to subagents, and plan work. Its design premise is that everything is a plugin, built on the Cordis plugin runtime."
+      },
+      {
+        "q": "How do you install DeepSeek Harness?",
+        "a": "The quickest path is npx @deepseek-ai/dsh web, which starts a local web UI on port 3080. From source, clone the repository, run pnpm install, pnpm run build, then pnpm dsh web. It needs Node 22.19 or newer and Git 2.26 or newer, with pnpm pinned through Corepack."
+      },
+      {
+        "q": "Is DeepSeek Harness free?",
+        "a": "The harness itself is MIT-licensed and free to run. Model inference is not: you supply a DeepSeek API key, or point it at a different provider through the model seam. The cost of running agents is inference cost, not licence cost."
+      },
+      {
+        "q": "Is DeepSeek Harness production ready?",
+        "a": "No. The project describes itself as a developer preview and states plainly that there will be compatibility-breaking changes. It is suitable for evaluation and prototyping, and as a benchmark against whatever agent stack you already run, but not for standardising on this quarter."
+      },
+      {
+        "q": "What is the difference between an agent harness and a model?",
+        "a": "The model generates text and tool calls. The harness is everything around it: assembling the prompt, executing tools, enforcing permissions, recording the session, managing turns and steps, and delegating to subagents. Most of what an agent does well or badly is harness behaviour, not model behaviour."
+      }
+    ],
+    "style": "body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}.wrap{max-width:860px;margin:0 auto;padding:56px 24px}a{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}h3{margin-top:26px;color:#E6EAF2}table{border-collapse:collapse;width:100%;margin:24px 0;font-size:.95em}th,td{border:1px solid #1E2A3F;padding:10px 12px;text-align:left;color:#B6C0D2}th{color:#E6EAF2;background:#101726}code{background:#101726;padding:2px 6px;border-radius:4px;color:#E6EAF2;font-size:.92em}pre{background:#101726;border:1px solid #1E2A3F;border-radius:6px;padding:14px 16px;overflow-x:auto;color:#E6EAF2;font-size:.9em}pre code{background:none;padding:0}.callout{border-left:4px solid #7AAFFF;padding-left:16px;margin:24px 0;font-style:italic;color:#B6C0D2}",
+    "scripts": [
+      {
+        "src": "/assets/consent.js",
+        "defer": true
+      },
+      {
+        "src": "/assets/attribution.js",
+        "defer": true
+      }
+    ]
+  }
+}
+---
+{% extends "shell.njk" %}{% block body %}<h1>What is DeepSeek Harness? A complete guide</h1>
+<p class="updated" style="color:#6B7689;font-size:14px;margin-top:-6px">Published 16 August 2026</p>
+<p><a href="https://github.com/deepseek-ai/deepseek-harness">DeepSeek Harness</a> — package name <code>dsh</code> — is an MIT-licensed open-source agent harness published by DeepSeek AI. This is the plain-language version: what it is, how to run it, how it is put together, and whether you should care.</p>
+
+<h2>What an agent harness actually is</h2>
+<p>A model generates text and tool calls. That is all it does. Everything else that makes an agent useful is the harness: assembling the prompt, executing the tools the model asked for, enforcing what it is allowed to do, recording what happened, managing the loop that decides whether to call the model again, and delegating work to child agents.</p>
+<p>This distinction is worth internalising before anything else, because most of what an agent does well or badly is harness behaviour rather than model behaviour. Two teams running the identical model can get very different results and very different bills, and the difference lives here.</p>
+
+<h2>What DeepSeek Harness does</h2>
+<p>It runs coding and automation agents. In practice the agent reads and edits files, runs shell commands, searches the codebase, delegates to subagents, plans work, and asks for confirmation according to whatever permission policy is active. There is a browser UI, a headless mode for one-shot runs, and an automation server that speaks JSON-RPC over standard input and output for scripting.</p>
+
+<h2>The one design idea: everything is a plugin</h2>
+<p>The harness runs on <a href="https://github.com/cordiverse/cordis">Cordis</a>, a plugin runtime where plugins contribute services, typed events, and reversible effects into a shared context. There is no privileged core. The model adapter is a plugin. The tool registry is a plugin. The session log is a plugin. The agent loop itself is a plugin.</p>
+<p>Most extensible systems give you a fixed core plus hooks — you can observe and decorate, but not replace, and replacing means forking. A plugin runtime inverts that: the pieces you would most want to replace are the units of composition.</p>
+
+<h2>Getting it running</h2>
+<h3>The fast path</h3>
+<pre><code>npx @deepseek-ai/dsh web</code></pre>
+<p>That starts a local web UI at <code>http://127.0.0.1:3080</code>.</p>
+
+<h3>From source</h3>
+<pre><code>git clone https://github.com/deepseek-ai/deepseek-harness
+cd deepseek-harness
+pnpm install
+pnpm run build
+pnpm dsh web</code></pre>
+<p>Requirements: Node 22.19 or newer (CI covers 22.19, 24, and 26), Git 2.26 or newer, and pnpm pinned through Corepack. A DeepSeek API key is optional at install time but needed to do anything useful; it can come from the environment or a gitignored <code>.env</code> at the repository root.</p>
+
+<h3>The two steps people miss</h3>
+<ol>
+<li><strong>Settings → Models.</strong> Enter your API key. The route enables immediately, no restart needed.</li>
+<li><strong>Choose workspace.</strong> Add and activate your project directory. The session composer stays unavailable until a workspace is active, which is the usual reason a fresh install appears broken.</li>
+</ol>
+
+<h3>Headless</h3>
+<pre><code>pnpm dsh --profile headless "summarize this workspace"</code></pre>
+<p>This is the mode that matters for automation, because a harness that only works interactively cannot be put in CI, and a harness that cannot be put in CI cannot be measured on a schedule.</p>
+
+<h2>The concepts you need to read the docs</h2>
+<table>
+<thead><tr><th>Term</th><th>Meaning</th></tr></thead>
+<tbody>
+<tr><td>Step</td><td>One model request plus the tool calls it produces</td></tr>
+<tr><td>Turn</td><td>One drain of input, ending when the model stops or policy intervenes</td></tr>
+<tr><td>Round</td><td>An outer policy iteration above turns, such as a fresh attempt at a goal</td></tr>
+<tr><td>Session</td><td>An append-only log of typed events — the single source of truth for the run</td></tr>
+<tr><td>Capability seam</td><td>A service interface with several interchangeable implementations</td></tr>
+<tr><td>Profile</td><td>A named composition: an ordered list of plugin bundles plus user patches</td></tr>
+<tr><td>Scope</td><td>The unit of per-agent registration for tools, prompts, and restrictions</td></tr>
+</tbody>
+</table>
+<p>Configuration resolves in four layers, later winning: profile bundles, then profile patches, then home-level patches, then command-line overlays. Knowing that order turns "why is it using that model" from an investigation into a lookup.</p>
+
+<h2>How to configure it</h2>
+<p>Composition runs through profiles. Three templates ship: a base runtime, a browser UI variant, and a headless one-shot runner. A profile stores an ordered list of bundles — packages that distribute configuration rows and code — plus your own patches on top.</p>
+<p>The registry keys you will see referenced across the documentation are the subsystems: sessions, system prompt, tools, agents, the agent loop, and the model service. Each is a plugin contributing into the shared context under one of those names.</p>
+
+<h2>What makes it worth looking at</h2>
+<ul>
+<li><strong>Model choice is swappable.</strong> The model service is an interface with several backends behind it, including one that replays a recorded session without paying for inference again. The agent loop consumes a provider-neutral stream and never learns which backend is live.</li>
+<li><strong>The record is complete by construction.</strong> The governing principle is that model-visible means logged: anything the model could see appears in the session log, because the log has to be able to reconstitute the run. Token usage travels attached to the output that incurred it.</li>
+<li><strong>Enforcement points are explicit.</strong> One before the model request goes out, whose decision is documented as authoritative, and one before any tool body executes. Permission guards can deny or abstain but never grant, and an unanswerable approval prompt denies.</li>
+<li><strong>It runs headless.</strong> Which means it can be scripted, scheduled, and measured.</li>
+</ul>
+
+<div class="callout">The plugin claim is not just positioning. One of the shipped demos is self-referential: it inspects and modifies its own live plugin runtime while running. That is difficult to fake.</div>
+
+<h2>When to use it, and when not to</h2>
+<p><strong>Use it</strong> to evaluate, to prototype, and as a concrete benchmark for whatever agent stack you already run. The five questions worth carrying to your own system are: is model choice swappable, is there a complete session record with usage attached, are there enforcement points before the model call and before tool execution, does it run headless, and is the configuration layering documented.</p>
+<p><strong>Do not</strong> standardise on it this quarter. The project describes itself as a developer preview and states plainly that there will be compatibility-breaking changes. Pin whatever version you build against, and do not schedule production migration work off a preview API.</p>
+
+<h2>What it costs to run</h2>
+<p>The harness is MIT-licensed and free. Inference is not. You supply a DeepSeek API key, or point the model seam at another provider. The practical implication is that your bill is a function of steps per turn, tools in the catalogue, delegation depth, and how many rounds an open-ended objective is allowed to run — all harness-level decisions, none of them the token price you negotiated.</p>
+
+<h2>Related</h2>
+<ul>
+<li><a href="/research/deepseek-harness-getting-started">DeepSeek Harness: install, profiles, and first run</a> — the longer setup walkthrough.</li>
+<li><a href="/research/deepseek-harness-plugin-architecture">What "everything is a plugin" actually buys you</a> — the architecture in depth.</li>
+<li><a href="/research/deepseek-harness-session-log">The DeepSeek Harness session log as a cost record</a> — reading the event log.</li>
+<li><a href="/research/deepseek-harness-guardrails">Where to put spend guardrails in DeepSeek Harness</a> — the enforcement points.</li>
+</ul>
+
+<hr style="margin:48px 0 24px;border:none;border-top:1px solid #1E2A3F" /><p>Want this applied to your own LLM spend? FinOps LLM runs a free audit of your AI costs and shows where the savings are. <a href="/book">Book free audit &rarr;</a></p><p><a href="/research">Back to research</a></p>{% endblock %}

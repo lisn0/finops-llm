@@ -1,0 +1,92 @@
+---json
+{
+  "permalink": "research/deepseek-harness-defensive-patterns.html",
+  "lang": "en",
+  "head": {
+    "title": "DeepSeek Harness Defensive Patterns · FinOps LLM",
+    "description": "Seven defensive patterns from the DeepSeek Harness docs: orthogonal outcomes, contract normalisation, real quiescence on dispose, and environment scrubbing.",
+    "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+    "canonical": "https://finopsllm.com/research/deepseek-harness-defensive-patterns",
+    "article": {
+      "datePublished": "2026-08-16"
+    },
+    "faq": [
+      {
+        "q": "Why must a process report timeout and exit code independently?",
+        "a": "Because a process can time out and still exit zero, if it trapped the termination signal and shut down cleanly. Nesting the timeout report inside an exit-code branch makes that outcome invisible. Orthogonal outcomes need independent fields."
+      },
+      {
+        "q": "What does it mean that dispose must reach quiescence?",
+        "a": "Requesting termination is not the same as achieving it. Dispose must await children's actual termination before returning, and close listener registries before sending kill signals so that late completions arrive silently rather than firing into a torn-down system."
+      },
+      {
+        "q": "How should an agent harness handle subprocess environments?",
+        "a": "By scrubbing them. The documented rule is to remove variables matching key, secret, token, and password patterns before spawning, and to use private directories, random file names, and exclusive owner-only file opens rather than predictable paths."
+      },
+      {
+        "q": "Why is awaiting agent idle an unreliable completion signal?",
+        "a": "Because status is a property of the whole agent, not of one message. Multiple queued operations share execution intervals, so idle can arrive before your message ran or after someone else's did. A caller must define its own interval explicitly and attribute outputs to that interval."
+      }
+    ],
+    "style": "body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}.wrap{max-width:860px;margin:0 auto;padding:56px 24px}a{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}table{border-collapse:collapse;width:100%;margin:24px 0;font-size:.95em}th,td{border:1px solid #1E2A3F;padding:10px 12px;text-align:left;color:#B6C0D2}th{color:#E6EAF2;background:#101726}code{background:#101726;padding:2px 6px;border-radius:4px;color:#E6EAF2;font-size:.92em}.callout{border-left:4px solid #7AAFFF;padding-left:16px;margin:24px 0;font-style:italic;color:#B6C0D2}",
+    "scripts": [
+      {
+        "src": "/assets/consent.js",
+        "defer": true
+      },
+      {
+        "src": "/assets/attribution.js",
+        "defer": true
+      }
+    ]
+  }
+}
+---
+{% extends "shell.njk" %}{% block body %}<h1>Seven defensive patterns from the DeepSeek Harness docs</h1>
+<p class="updated" style="color:#6B7689;font-size:14px;margin-top:-6px">Published 16 August 2026</p>
+<p><a href="https://github.com/deepseek-ai/deepseek-harness">DeepSeek Harness</a> ships a short document of defensive patterns, each written as a general rule with the specific bug that motivated it. It is the most transferable file in the repository: none of it depends on adopting the harness, and every item corresponds to a failure mode that shows up in homegrown agent runtimes.</p>
+
+<h2>1. Report orthogonal outcomes independently</h2>
+<p>Never nest one flag's report inside another flag's conditional. A process can time out <em>and</em> exit zero, because it trapped the signal and shut down cleanly. If the timeout is only reported inside a non-zero-exit branch, that outcome disappears. Timed-out, signal, and exit code are independent facts and need independent fields.</p>
+<p>Cost relevance: silently swallowed timeouts are how retry loops form. The caller sees success, gets nothing useful, and tries again.</p>
+
+<h2>2. Honour public contracts on both sides</h2>
+<p>Where an outcome has multiple valid representations, normalise them before exposing them. The worked example is model-request failures: implementations may throw or emit an error finish chunk, and the API boundary normalises everything to a terminal finish chunk. Without that, a caller catching an exception cannot tell whether it came from the provider, from middleware, from logging, or from its own code.</p>
+
+<h2>3. Async state is not synchronous state</h2>
+<p>Status queries are not causally tied to specific async operations. Awaiting an agent's idle state as a completion signal for one message is wrong, because multiple queued operations share execution intervals — idle may arrive before yours ran, or after someone else's did.</p>
+<p>The prescribed fix: an automation caller owning a run defines its interval explicitly, from inbox receipt through the next whole-agent idle, and attributes outputs to that interval rather than to individual messages. Handle the nothing-to-wait-for branch too, or the caller hangs indefinitely.</p>
+
+<div class="callout">An automation harness that hangs waiting for the wrong idle signal keeps a session and its children resident. The bill for that is not the hang; it is everything still alive behind it.</div>
+
+<h2>4. Dispose must reach quiescence, not just request it</h2>
+<p>Requesting termination is not achieving it. Dispose awaits children's actual termination before returning. And listener registries close <em>before</em> kill signals are sent, so late completions land silently instead of firing callbacks into a half-torn-down system.</p>
+<p>This is the pattern with the clearest financial edge. A dispose that returns early leaves orphaned subprocesses and unclosed sandboxes running, and metered compute does not stop because its parent forgot about it.</p>
+
+<h2>5. Contain callback exceptions in the dispatcher</h2>
+<p>Wrap dispatch loops in try/catch. One failing subscriber must not reject the dispatch promise or starve the listeners queued behind it. In an agent runtime the starved listener is frequently the one doing accounting, which is how usage records go missing without any error surfacing.</p>
+
+<h2>6. Never hand untrusted output the ambient environment or predictable paths</h2>
+<p>The strongest rule in the document, and the one to adopt first. Scrub spawned command environments: remove variables matching key, secret, token, and password patterns before the subprocess starts. Use private directories created with owner-only permissions, random file names, and exclusive owner-only opens rather than predictable paths.</p>
+<p>Two distinct threats. Environment scrubbing stops harness credentials leaking into subprocess output that the model then reads — and, once read, that output is in the session log and the context window. Random names and exclusive creation close symlink races on shared temporary directories.</p>
+
+<h2>7. Unlink link-shaped paths</h2>
+<p>Check whether a path is a symbolic link before unlinking, and delete the link rather than following it. Recursive removal is reserved for confirmed real directories, because it can traverse symlinks into their targets and throws on junctions. Cleanup code that deletes more than it created is a failure mode with no upper bound on the damage.</p>
+
+<h2>How to use this list</h2>
+<ol>
+<li>Take patterns 1 and 4 to your subprocess and sandbox teardown code today. Those two are where money leaks.</li>
+<li>Take pattern 6 to any place you spawn a process whose output the model will read.</li>
+<li>Take pattern 3 to your automation layer, especially anywhere a wait is expressed as "until the agent is idle".</li>
+<li>Take pattern 5 to your telemetry pipeline and check that a failing listener cannot starve the accounting one.</li>
+</ol>
+
+<h2>Related</h2>
+<ul>
+<li><a href="/research/deepseek-harness-guardrails">Where to put spend guardrails in DeepSeek Harness</a> — the enforcement points.</li>
+<li><a href="/research/deepseek-harness-subagents">DeepSeek Harness subagents and delegation depth</a> — where dispose actually matters.</li>
+<li><a href="/research/deepseek-harness-tool-scopes">DeepSeek Harness tool scopes and restrictions</a> — narrowing the blast radius.</li>
+<li><a href="/research/deepseek-harness-session-log">The DeepSeek Harness session log as a cost record</a> — what gets recorded.</li>
+</ul>
+
+<hr style="margin:48px 0 24px;border:none;border-top:1px solid #1E2A3F" /><p>Want this applied to your own LLM spend? FinOps LLM runs a free audit of your AI costs and shows where the savings are. <a href="/book">Book free audit &rarr;</a></p><p><a href="/research">Back to research</a></p>{% endblock %}

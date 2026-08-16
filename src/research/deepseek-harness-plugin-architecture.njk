@@ -1,0 +1,86 @@
+---json
+{
+  "permalink": "research/deepseek-harness-plugin-architecture.html",
+  "lang": "en",
+  "head": {
+    "title": "DeepSeek Harness: Everything Is a Plugin · FinOps LLM",
+    "description": "DeepSeek Harness makes every part of an agent a Cordis plugin. What that swappability means for model routing, sandboxing, and cost control.",
+    "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+    "canonical": "https://finopsllm.com/research/deepseek-harness-plugin-architecture",
+    "article": {
+      "datePublished": "2026-08-16"
+    },
+    "faq": [
+      {
+        "q": "What is DeepSeek Harness?",
+        "a": "DeepSeek Harness (dsh) is an MIT-licensed open-source agent harness from DeepSeek AI. It is built on the Cordis plugin runtime, where model adapters, tool registries, session logs, and the agent loop are all replaceable plugins rather than a privileged core."
+      },
+      {
+        "q": "What is a capability seam in DeepSeek Harness?",
+        "a": "A capability seam is a service interface with more than one implementation. The owner package declares the interface, provider packages implement it, and consumers call it without knowing which provider is active. ctx.llm, ctx.fs, ctx.sandbox, and ctx.subagents are all seams."
+      },
+      {
+        "q": "Why does a plugin architecture matter for AI cost?",
+        "a": "Cost levers in an agent are provider swaps: routing to a cheaper model, moving execution to a cheaper sandbox, or replacing a subagent transport. When those are seams rather than hardcoded calls, a routing change is a config edit instead of a fork of the harness."
+      }
+    ],
+    "style": "body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}.wrap{max-width:860px;margin:0 auto;padding:56px 24px}a{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}table{border-collapse:collapse;width:100%;margin:24px 0;font-size:.95em}th,td{border:1px solid #1E2A3F;padding:10px 12px;text-align:left;color:#B6C0D2}th{color:#E6EAF2;background:#101726}code{background:#101726;padding:2px 6px;border-radius:4px;color:#E6EAF2;font-size:.92em}.callout{border-left:4px solid #7AAFFF;padding-left:16px;margin:24px 0;font-style:italic;color:#B6C0D2}",
+    "scripts": [
+      {
+        "src": "/assets/consent.js",
+        "defer": true
+      },
+      {
+        "src": "/assets/attribution.js",
+        "defer": true
+      }
+    ]
+  }
+}
+---
+{% extends "shell.njk" %}{% block body %}<h1>DeepSeek Harness: what "everything is a plugin" actually buys you</h1>
+<p class="updated" style="color:#6B7689;font-size:14px;margin-top:-6px">Published 16 August 2026</p>
+<p>DeepSeek AI has published <a href="https://github.com/deepseek-ai/deepseek-harness">deepseek-harness</a> (<code>dsh</code>), an MIT-licensed agent harness whose design slogan is that everything is a plugin. That phrase gets used loosely across the agent tooling space, so it is worth being precise about what it means here and where it changes the economics of running agents.</p>
+
+<h2>Cordis, not a framework with hooks</h2>
+<p>The harness runs on <a href="https://github.com/cordiverse/cordis">Cordis</a>, a plugin runtime whose model is that plugins contribute services, typed events, and reversible effects to a shared context. The architecture doc is explicit that there is no privileged core: model adapters, tool registries, session logs, and the agent loop itself are all plugins. Nothing sits underneath them as an immovable engine.</p>
+<p>That matters because the usual shape of an "extensible" agent framework is a fixed core plus a hook surface. You can observe and decorate, but you cannot replace. Replacing means forking. Cordis inverts that: the pieces you would want to replace are the units of composition.</p>
+
+<h2>Capability seams: the part that matters operationally</h2>
+<p>The harness formalises this with what it calls a <strong>capability seam</strong>. A seam is a service interface with more than one implementation, and each service occupies one of three roles:</p>
+<table>
+<thead><tr><th>Role</th><th>What it does</th></tr></thead>
+<tbody>
+<tr><td>Owner</td><td>The package that declares the service interface</td></tr>
+<tr><td>Implementation</td><td>A package providing concrete behaviour (seams have several)</td></tr>
+<tr><td>Consumer</td><td>A package calling the service, blind to which provider is live</td></tr>
+</tbody>
+</table>
+<p>Not every service is a seam. The docs distinguish three kinds: swappable seams (<code>ctx.llm</code>, <code>ctx.subprocess</code>), single-owner core services (<code>ctx.sessions</code>, <code>ctx.agents</code>), and composition points that coordinate other services (<code>ctx.agentLoop</code>). Knowing which is which tells you where you are allowed to substitute behaviour and where you are not.</p>
+
+<h2>The four seams with cost consequences</h2>
+<ul>
+<li><strong><code>ctx.llm</code> — the model seam.</strong> Owned by the <code>llm</code> package; implementations include <code>llm-deepseek</code>, <code>llm-pi-ai</code>, and <code>llm-replay</code>. The agent loop consumes a provider-neutral stream service and does not know which backend is running. <code>llm-replay</code> is the interesting one for cost work: it lets you re-run a recorded session without paying for inference again.</li>
+<li><strong><code>ctx.fs</code> — the filesystem seam.</strong> Providers are <code>fs-local</code> (host filesystem), <code>fs-sandbox</code> (confined mutations), and <code>fs-e2b</code> (a remote sandboxed Linux box). The seam decouples the tools the model can see from where execution physically happens.</li>
+<li><strong><code>ctx.sandbox</code> — the execution seam.</strong> Consumers hand over argv; implementations wrap execution under policy. <code>sandbox-local</code> enforces on the host, <code>sandbox-policy</code> centralises deployment defaults.</li>
+<li><strong><code>ctx.subagents</code> — the delegation seam.</strong> Six implementations covering in-process spawning, forking, ACP bridges, Codex, Claude Code, and SDK-based agents. This is where a harness usually hardcodes an assumption; here it is a swap.</li>
+</ul>
+
+<div class="callout">Every meaningful cost lever in an agent system is a provider swap: route to a cheaper model, move execution to a cheaper sandbox, replace a subagent transport with a local one. When those are seams, the change is a config edit. When they are not, the change is a fork you now maintain.</div>
+
+<h2>Why this is a FinOps concern, not just an architecture one</h2>
+<p>The recurring failure in agent cost programmes is not that teams pick an expensive model. It is that the harness makes the expensive choice structural. Once model selection, tool execution location, and delegation transport are baked into application code, every optimisation becomes an engineering project with its own schedule and its own regression risk. Teams then defer the optimisation, and the spend compounds.</p>
+<p>A seam-based harness moves those decisions into composition. That does not make them free, but it changes them from refactors into configuration, which is the difference between a quarterly initiative and an afternoon.</p>
+
+<h2>The caveat worth stating plainly</h2>
+<p>DeepSeek Harness is in developer preview and its README says, without softening it, that there will be compatibility-breaking changes. Building production cost tooling directly against its internal interfaces right now means signing up to chase them. Evaluate it, prototype against it, but pin your versions and expect churn.</p>
+
+<h2>Related</h2>
+<ul>
+<li><a href="/research/deepseek-harness-session-log">The DeepSeek Harness session log as a cost record</a> — where token accounting actually lives.</li>
+<li><a href="/research/deepseek-harness-guardrails">Where to put spend guardrails in DeepSeek Harness</a> — the two waterfall interception points.</li>
+<li><a href="/research/deepseek-harness-getting-started">DeepSeek Harness: install, profiles, and first run</a> — the practical setup path.</li>
+<li><a href="/research/true-cost-coding-agents">The true cost of coding agents</a> — the costs that sit outside the API bill.</li>
+</ul>
+
+<hr style="margin:48px 0 24px;border:none;border-top:1px solid #1E2A3F" /><p>Want this applied to your own LLM spend? FinOps LLM runs a free audit of your AI costs and shows where the savings are. <a href="/book">Book free audit &rarr;</a></p><p><a href="/research">Back to research</a></p>{% endblock %}

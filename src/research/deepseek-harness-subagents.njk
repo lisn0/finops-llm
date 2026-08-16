@@ -1,0 +1,97 @@
+---json
+{
+  "permalink": "research/deepseek-harness-subagents.html",
+  "lang": "en",
+  "head": {
+    "title": "DeepSeek Harness Subagents and Delegation · FinOps LLM",
+    "description": "DeepSeek Harness treats subagents as a swappable seam with six transports, capability flags, and a depth cap. Why delegation depth drives agent cost.",
+    "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+    "canonical": "https://finopsllm.com/research/deepseek-harness-subagents",
+    "article": {
+      "datePublished": "2026-08-16"
+    },
+    "faq": [
+      {
+        "q": "How do subagents work in DeepSeek Harness?",
+        "a": "Subagents are a capability seam registered by name in ctx.subagents, with multiple providers coexisting. Two modes exist: one-shot delegations that create a child, deliver a prompt, await completion and dispose, and continuable children that persist as durable background sessions."
+      },
+      {
+        "q": "What subagent transports does DeepSeek Harness support?",
+        "a": "Providers include in-process spawn and fork backends that create ordinary agents through the parent context, an ACP bridge for remote deployment, and Codex, Claude Code, and SDK-based implementations."
+      },
+      {
+        "q": "How does DeepSeek Harness limit delegation depth?",
+        "a": "Delegation depth is persisted in the session header and tracked at runtime. Cold resume cannot lower depth, and a start is rejected if the derived depth exceeds the maxDepth cap or safe-integer bounds."
+      },
+      {
+        "q": "Why does delegation depth matter for AI cost?",
+        "a": "Each level of delegation multiplies the number of model calls made per user request. A parent that spawns three children, each of which spawns three more, has turned one request into a tree of billable work. Depth caps convert an unbounded fan-out into a bounded one."
+      }
+    ],
+    "style": "body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}.wrap{max-width:860px;margin:0 auto;padding:56px 24px}a{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}table{border-collapse:collapse;width:100%;margin:24px 0;font-size:.95em}th,td{border:1px solid #1E2A3F;padding:10px 12px;text-align:left;color:#B6C0D2}th{color:#E6EAF2;background:#101726}code{background:#101726;padding:2px 6px;border-radius:4px;color:#E6EAF2;font-size:.92em}.callout{border-left:4px solid #7AAFFF;padding-left:16px;margin:24px 0;font-style:italic;color:#B6C0D2}",
+    "scripts": [
+      {
+        "src": "/assets/consent.js",
+        "defer": true
+      },
+      {
+        "src": "/assets/attribution.js",
+        "defer": true
+      }
+    ]
+  }
+}
+---
+{% extends "shell.njk" %}{% block body %}<h1>DeepSeek Harness subagents: delegation as a cost multiplier</h1>
+<p class="updated" style="color:#6B7689;font-size:14px;margin-top:-6px">Published 16 August 2026</p>
+<p>The fastest way to multiply an agent bill is to let agents spawn agents. One user request becomes a tree, and the tree has no natural size. <a href="https://github.com/deepseek-ai/deepseek-harness">DeepSeek Harness</a> treats delegation as a first-class subsystem with an explicit depth cap, which makes it a good place to study how the multiplier actually works.</p>
+
+<h2>Subagents are a seam, not a built-in</h2>
+<p>Delegation lives behind <code>ctx.subagents</code>, a capability seam rather than core agent-loop machinery. Unlike the shell executor, which permits exactly one implementation, subagent providers are registered by name and multiple can coexist. Documented transports cover in-process spawning and forking (creating ordinary agents through the parent's context), an ACP bridge for remote deployment, and Codex, Claude Code, and SDK-based implementations.</p>
+<p>That plurality is the point. Where a child runs is a deployment decision with a price attached, and here it is chosen at composition time instead of compiled in.</p>
+
+<h2>Two delegation modes, two cost profiles</h2>
+<table>
+<thead><tr><th>Mode</th><th>Shape</th><th>Cost characteristic</th></tr></thead>
+<tbody>
+<tr><td>One-shot</td><td>Create child, send prompt, await result, dispose</td><td>Bounded, attributable to the parent turn</td></tr>
+<tr><td>Continuable</td><td>Durable background session with a resident activation</td><td>Open-ended; accrues across turns</td></tr>
+</tbody>
+</table>
+<p>One-shot delegations resolve into a run handle with a terminal result promise. Continuable children are heavier: the continuation manager reserves identity, composes the child, and orders every turn through the child's inbox, with the provider contributing only initial creation metadata. Their activation moves through three states — running, waiting (quiescent but owning uncompleted child activations), and settled — and a message arriving with no live activation triggers a cold resume from the persisted session.</p>
+<p>Cold resumes are the line item people forget. Reconstituting a child from its session log costs input tokens proportional to that log, and a chatty continuable child gets more expensive to wake the longer it lives.</p>
+
+<h2>Capabilities fail loud, not silent</h2>
+<p>Before delegating, the service validates the requested capabilities against the chosen provider. The specification is explicit that a request needing a capability the provider lacks is rejected with a typed error rather than accepted and then ignored. Start-time capabilities cover output schemas, depth limits, tool filters, and personas, each mapping one-to-one onto a request option.</p>
+<p>This is the correct default for cost work. Silent degradation is how a tool filter meant to keep an expensive tool out of a cheap child quietly stops applying, and nobody finds out until the invoice.</p>
+
+<h2>Depth is capped, and the cap cannot be laundered</h2>
+<p>Delegation depth is persisted in the session header, with a runtime field tracking the greater value. Two rules protect it: a cold resume cannot lower depth, and a start is rejected if the derived depth exceeds the <code>maxDepth</code> cap or safe-integer bounds. You cannot reset the counter by restarting a child.</p>
+
+<div class="callout">A parent that spawns three children, each spawning three more, has turned one user request into thirteen agents. Depth caps are the difference between a fan-out you sized and a fan-out you discovered.</div>
+
+<h2>Discovery is cheap, delivery is authoritative</h2>
+<p>Two enumeration operations exist. <code>listChildren()</code> returns direct children from a live-preferred corpus with three-tiered acceleration — a watermark cache, then a projection checkpoint, then persistence inspection. <code>listDescendants()</code> walks the whole tree in pre-order, adding parent and depth positions. Both deliberately consult no agent registries, activations, or providers; message delivery remains the authoritative operation.</p>
+<p>The practical read: you can audit the delegation tree without paying to instantiate it.</p>
+
+<h2>Results carry a stop reason</h2>
+<p>A subagent result carries the output (last non-empty assistant message, or the accumulated text stream), optional structured output validated against the requested schema, and a <code>stopReason</code> from a merge-extensible union: completed, aborted, error, max-tokens, refusal. Anything other than completed indicates partial output, and consumers map those to error tool results.</p>
+<p>Track that distribution. A rising share of <code>max-tokens</code> or <code>error</code> stop reasons is spend that produced nothing, and it is usually the cheapest waste in the system to eliminate.</p>
+
+<h2>What to measure</h2>
+<ol>
+<li>Children per parent turn, and descendants per user request.</li>
+<li>Maximum observed delegation depth against your configured cap.</li>
+<li>Share of continuable children resumed cold, and the log size at resume.</li>
+<li>Stop-reason distribution across all subagent runs.</li>
+</ol>
+
+<h2>Related</h2>
+<ul>
+<li><a href="/research/deepseek-harness-plugin-architecture">DeepSeek Harness: what "everything is a plugin" buys you</a> — the seam model.</li>
+<li><a href="/research/deepseek-harness-goals-ralph-loop">DeepSeek Harness goals and the Ralph loop</a> — the other unbounded-iteration risk.</li>
+<li><a href="/research/deepseek-harness-guardrails">Where to put spend guardrails in DeepSeek Harness</a> — the enforcement points.</li>
+<li><a href="/research/deepseek-harness-session-log">The DeepSeek Harness session log as a cost record</a> — where the numbers come from.</li>
+</ul>
+
+<hr style="margin:48px 0 24px;border:none;border-top:1px solid #1E2A3F" /><p>Want this applied to your own LLM spend? FinOps LLM runs a free audit of your AI costs and shows where the savings are. <a href="/book">Book free audit &rarr;</a></p><p><a href="/research">Back to research</a></p>{% endblock %}

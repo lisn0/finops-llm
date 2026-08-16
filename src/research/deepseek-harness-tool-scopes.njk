@@ -1,0 +1,93 @@
+---json
+{
+  "permalink": "research/deepseek-harness-tool-scopes.html",
+  "lang": "en",
+  "head": {
+    "title": "DeepSeek Harness Tool Scopes and Restrictions · FinOps LLM",
+    "description": "DeepSeek Harness scopes tools per agent with restrictions, shadowing, and a setup window. How a narrower tool surface reduces both risk and token spend.",
+    "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+    "canonical": "https://finopsllm.com/research/deepseek-harness-tool-scopes",
+    "article": {
+      "datePublished": "2026-08-16"
+    },
+    "faq": [
+      {
+        "q": "What is a scope in DeepSeek Harness?",
+        "a": "A scope is the unit of per-agent registration for contributions such as tools, prompts, variables, restrictions, and listeners. A contribution is either global or scoped to a single agent, and scoped registrations are lifetime-bound to that agent's context."
+      },
+      {
+        "q": "What is a restriction?",
+        "a": "A restriction filters the global tool set for one scope by intersection. Scope-local registrations then merge in after filtering, so an agent can be given a narrow slice of the global tools plus its own additions."
+      },
+      {
+        "q": "What is shadowing in an agent harness?",
+        "a": "Shadowing means a scoped item replaces a same-named global counterpart within that scope alone. Other agents continue to see the global version, so one agent can be given a different implementation of a named tool without affecting anyone else."
+      },
+      {
+        "q": "Why does the tool surface affect AI cost?",
+        "a": "Every tool definition sits in the system prompt and is re-sent on every model request in the session. A large tool catalogue is a fixed per-step token tax, and it also widens the model's choice space, which raises the chance of an expensive wrong call."
+      }
+    ],
+    "style": "body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}.wrap{max-width:860px;margin:0 auto;padding:56px 24px}a{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}table{border-collapse:collapse;width:100%;margin:24px 0;font-size:.95em}th,td{border:1px solid #1E2A3F;padding:10px 12px;text-align:left;color:#B6C0D2}th{color:#E6EAF2;background:#101726}code{background:#101726;padding:2px 6px;border-radius:4px;color:#E6EAF2;font-size:.92em}.callout{border-left:4px solid #7AAFFF;padding-left:16px;margin:24px 0;font-style:italic;color:#B6C0D2}",
+    "scripts": [
+      {
+        "src": "/assets/consent.js",
+        "defer": true
+      },
+      {
+        "src": "/assets/attribution.js",
+        "defer": true
+      }
+    ]
+  }
+}
+---
+{% extends "shell.njk" %}{% block body %}<h1>DeepSeek Harness tool scopes: a narrower surface is a cheaper one</h1>
+<p class="updated" style="color:#6B7689;font-size:14px;margin-top:-6px">Published 16 August 2026</p>
+<p>Tool catalogues grow. Someone adds a browser tool, someone adds a database tool, someone adds five terminal operations, and a year later every agent in the system is offered forty tools whether it needs them or not. That is usually discussed as a safety problem. It is also a line item. <a href="https://github.com/deepseek-ai/deepseek-harness">DeepSeek Harness</a> has a per-agent scoping model that addresses both at once.</p>
+
+<h2>Why the catalogue is a recurring cost</h2>
+<p>Tool definitions are part of the request. The harness records a request header event carrying the configuration, system prompt, and tool set exactly as sent, which makes the point concrete: the catalogue is re-transmitted on every model request in the session, so it is a fixed tax per step rather than a one-time cost.</p>
+<p>There is a second, larger effect. A wide catalogue widens the model's choice space. More plausible-but-wrong tool selections mean more steps that produce nothing useful, and steps are the billing unit. Trimming the surface reduces the token floor and the error rate together.</p>
+
+<h2>The vocabulary</h2>
+<table>
+<thead><tr><th>Term</th><th>Meaning</th></tr></thead>
+<tbody>
+<tr><td>Scope</td><td>The unit of per-agent registration for tools, prompts, variables, restrictions, and listeners</td></tr>
+<tr><td>Scope key</td><td>The opaque identity a scope is keyed by, compared by object identity — usually the live agent itself</td></tr>
+<tr><td>Agent context</td><td>The agent's own scoped context, where registrations are lifetime-bound and scope-visible</td></tr>
+<tr><td>Restriction</td><td>A filter over the global tool set for one scope, applied by intersection</td></tr>
+<tr><td>Shadowing</td><td>A scoped item replacing a same-named global counterpart, within that scope alone</td></tr>
+<tr><td>Setup window</td><td>The creation slot where a creator composes an agent's scoped world, before publication or first prompt assembly</td></tr>
+</tbody>
+</table>
+
+<h2>How composition resolves</h2>
+<p>Restrictions filter the global set first, then scope-local registrations merge in. That ordering is what makes least privilege practical: you start from an intersection with the global catalogue — never more than global — and then add exactly the agent-specific tools this agent needs.</p>
+<p>Shadowing gives you the substitution case without a fork. One agent can receive a different implementation behind a familiar tool name — a read-only variant, a metered variant, a cheaper backend — while every other agent continues to see the global one.</p>
+<p>Lifetime binding matters for the same reason dispose does. Scoped registrations end with the agent's context, so a short-lived child cannot leak contributions into the parent's world.</p>
+
+<div class="callout">The composition all happens in the setup window, before the agent is published or assembles its first prompt. Privilege decisions made after the first prompt are not privilege decisions; they are cleanup.</div>
+
+<h2>Scoped dispatch and lineage</h2>
+<p>Events about one agent dispatch with that agent's carrier, so a listener can tell whose activity it is observing; registry-level events remain unfiltered. Separately, lineage — parent session, delegation depth, subagent depth — is described explicitly as data that does not itself affect visibility.</p>
+<p>That separation is worth borrowing. A child does not inherit access because it is a child; access is composed deliberately in its setup window. Inherited-by-default privilege is how a cheap summarisation subagent ends up holding the same expensive tool set as its parent.</p>
+
+<h2>Four things to do with this</h2>
+<ol>
+<li>Count your tool definitions and multiply by steps per session. That is your fixed per-session tool tax in tokens.</li>
+<li>Define a minimum viable tool set per agent role, and apply it as a restriction rather than a convention.</li>
+<li>Shadow expensive tools with cheap or read-only variants in low-value contexts instead of removing them entirely.</li>
+<li>Never inherit the parent's tool set into subagents by default. Compose it.</li>
+</ol>
+
+<h2>Related</h2>
+<ul>
+<li><a href="/research/deepseek-harness-guardrails">Where to put spend guardrails in DeepSeek Harness</a> — enforcement at execution time.</li>
+<li><a href="/research/deepseek-harness-subagents">DeepSeek Harness subagents and delegation depth</a> — tool filters at delegation time.</li>
+<li><a href="/research/deepseek-harness-plugin-architecture">DeepSeek Harness: what "everything is a plugin" buys you</a> — where tools come from.</li>
+<li><a href="/research/deepseek-harness-goals-ralph-loop">DeepSeek Harness goals and the Ralph loop</a> — bounding open-ended work.</li>
+</ul>
+
+<hr style="margin:48px 0 24px;border:none;border-top:1px solid #1E2A3F" /><p>Want this applied to your own LLM spend? FinOps LLM runs a free audit of your AI costs and shows where the savings are. <a href="/book">Book free audit &rarr;</a></p><p><a href="/research">Back to research</a></p>{% endblock %}
