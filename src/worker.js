@@ -90,7 +90,6 @@ const TRANSLATED_PATHS = [
 	'/research/cheapest-ai-code-generation',
 	'/research/coding-plan-comparison',
 	'/research/finops-for-llm',
-	'/research/finops-for-llm-v2',
 	'/research/gpt-5-6-pricing-tier-guide',
 	'/research/how-much-does-gpt5-cost',
 	'/research/how-to-audit-llm-spend',
