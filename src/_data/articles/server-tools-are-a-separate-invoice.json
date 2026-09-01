@@ -1,0 +1,139 @@
+{
+  "slug": "research/server-tools-are-a-separate-invoice",
+  "tags": [
+    "finops",
+    "tools",
+    "agents",
+    "cost-attribution"
+  ],
+  "datePublished": "2026-09-01",
+  "dateModified": "2026-09-01",
+  "image": "https://finopsllm.com/og.png",
+  "agentMode": true,
+  "languages": {
+    "en": {
+      "title": "Server tools bill outside the token meter",
+      "titleCore": "Server tools are a separate invoice",
+      "description": "Web search, web fetch and code execution are charged per use, not per token. If your cost model only counts tokens, an agent can double the bill invisibly.",
+      "body": "<p>Most LLM cost models have one meter: tokens in, tokens out, price per million. That model was correct when the only thing a request did was generate text. It stopped being correct the moment server-side tools arrived.</p><p>Web search, web fetch and code execution run on the provider's infrastructure, and several of them carry their own per-use charge on top of the tokens they produce. A single agent turn can therefore bill you twice: once for the searches it ran, and again for the tokens those results added to the context.</p><h2>The compounding part</h2><p>The second charge is the one people miss. Every tool result gets appended to the conversation, and every subsequent turn re-sends the whole thing as input. Ten searches early in a long agent run are not ten charges &mdash; they are ten charges plus their result payloads re-read on every turn that follows.</p><p>This is why agent costs feel non-linear when the token math says they should be linear. The per-use fee is the visible part; the context growth it causes is the larger part, and it lands in your input-token line where nothing labels it as tool-driven.</p><h2>Attribute it or you cannot manage it</h2><p>Log tool invocations per request alongside the usage object: which tool, how many calls, and the token size of what each result added. That last field is the one that makes the compounding visible, and it is the one nobody records by default.</p><p>Then compute cost per agent run, not cost per API call. A run is what a user actually triggered; an API call is one of the twenty things that run happened to do. Any budget or unit-economics number attached to the call rather than the run will be wrong in the direction that flatters you.</p><h2>Three controls that actually work</h2><p><strong>Cap the tool calls per run.</strong> A hard limit on searches or fetches per user request bounds both charges at once. Most workloads that hit a limit of ten were looping, not researching.</p><p><strong>Truncate what enters the context.</strong> You rarely need a whole fetched page. Summarising or trimming a result before it is appended cuts every downstream turn, not just the current one.</p><p><strong>Cache the stable prefix.</strong> If the system prompt and tool definitions are constant across a run &mdash; and they usually are &mdash; prompt caching removes the largest repeated cost the tools created.</p><p>Check your provider's current rate card before modelling any of this: which tools charge per use, and at what rate, differs by tool and changes over time. The structural point holds regardless &mdash; the token meter is no longer the whole bill.</p><h2>Related</h2><ul><li><a href=&quot;/research/prompt-caching-economics&quot;>Prompt caching economics</a></li><li><a href=&quot;/research/cost-per-request-kpi&quot;>Cost per request as a KPI</a></li><li><a href=&quot;/research/llm-cost-attribution&quot;>LLM cost attribution</a></li></ul>",
+      "faq": [
+        {
+          "question": "Why do server-side tools cost more than the tokens suggest?",
+          "answer": "They bill twice. Several carry a per-use charge on the provider's infrastructure, and their results are appended to the conversation, so every following turn re-sends them as input tokens. The second cost is usually larger and is invisible in a token-only model."
+        },
+        {
+          "question": "How should we attribute agent tool costs?",
+          "answer": "Log which tool ran, how many times, and the token size each result added to the context — then compute cost per agent run rather than per API call. A run is what the user triggered; the call is one of many things that run did."
+        },
+        {
+          "question": "What is the most effective control?",
+          "answer": "A hard cap on tool calls per user request, because it bounds both the per-use fee and the context growth at once. Truncating results before they enter the context and caching the stable prompt prefix are the next two."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/prompt-caching-economics",
+          "label": "Prompt caching economics"
+        },
+        {
+          "slug": "/research/cost-per-request-kpi",
+          "label": "Cost per request as a KPI"
+        },
+        {
+          "slug": "/research/llm-cost-attribution",
+          "label": "LLM cost attribution"
+        }
+      ]
+    },
+    "es": {
+      "title": "Las herramientas de servidor no son tokens",
+      "titleCore": "Las herramientas de servidor son otra factura",
+      "description": "Búsqueda web, fetch y ejecución de código se cobran por uso, no por token. Si tu modelo de coste solo cuenta tokens, un agente duplica la factura sin verse.",
+      "body": "<p>La mayoría de los modelos de coste de LLM tienen un solo contador: tokens de entrada, tokens de salida, precio por millón. Eso era correcto cuando una petición solo generaba texto. Dejó de serlo cuando llegaron las herramientas del lado del servidor.</p><p>La búsqueda web, el fetch y la ejecución de código corren en la infraestructura del proveedor, y varias llevan su propio cargo por uso además de los tokens que producen. Un turno de agente puede cobrarte dos veces: por las búsquedas y por los tokens que sus resultados añadieron al contexto.</p><h2>La parte que se acumula</h2><p>El segundo cargo es el que se escapa. Cada resultado se añade a la conversación, y cada turno posterior reenvía todo como entrada. Diez búsquedas al principio de una ejecución larga no son diez cargos: son diez cargos más sus resultados releídos en cada turno siguiente.</p><p>Por eso los costes de agente parecen no lineales cuando la aritmética de tokens dice que deberían serlo. La tarifa por uso es la parte visible; el crecimiento del contexto es la mayor, y aterriza en tu línea de tokens de entrada sin ninguna etiqueta.</p><h2>Atribúyelo o no podrás gestionarlo</h2><p>Registra las invocaciones por petición junto al objeto de uso: qué herramienta, cuántas llamadas y el tamaño en tokens de lo que añadió cada resultado. Ese último campo es el que hace visible la acumulación.</p><p>Después calcula el coste por ejecución de agente, no por llamada a la API. La ejecución es lo que el usuario disparó de verdad.</p><h2>Tres controles que funcionan</h2><p><strong>Limita las llamadas por ejecución.</strong> Un tope duro acota los dos cargos a la vez.</p><p><strong>Recorta lo que entra en el contexto.</strong> Rara vez necesitas una página entera; resumir antes de añadir reduce todos los turnos siguientes.</p><p><strong>Cachea el prefijo estable.</strong> Si el prompt de sistema y las definiciones de herramientas no cambian, el caché elimina el mayor coste repetido.</p>",
+      "faq": [
+        {
+          "question": "¿Por qué cuestan más de lo que sugieren los tokens?",
+          "answer": "Cobran dos veces: varias tienen un cargo por uso en la infraestructura del proveedor, y sus resultados se añaden a la conversación, de modo que cada turno posterior los reenvía como tokens de entrada. El segundo coste suele ser mayor."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/prompt-caching-economics",
+          "label": "Economía del caché de prompts"
+        }
+      ]
+    },
+    "fr": {
+      "title": "Les outils serveur facturent hors compteur",
+      "titleCore": "Les outils serveur sont une facture à part",
+      "description": "Recherche web, fetch et exécution de code sont facturés à l’usage, pas au token. Un modèle de coût qui ne compte que les tokens rate la moitié de la facture.",
+      "body": "<p>La plupart des modèles de coût LLM n’ont qu’un compteur : tokens en entrée, tokens en sortie, prix au million. C’était exact tant qu’une requête ne faisait que générer du texte. Ça a cessé de l’être avec les outils côté serveur.</p><p>La recherche web, le fetch et l’exécution de code tournent sur l’infrastructure du fournisseur, et plusieurs portent leur propre frais à l’usage en plus des tokens qu’ils produisent. Un tour d’agent peut donc vous facturer deux fois.</p><h2>La partie qui se cumule</h2><p>C’est le second coût qu’on oublie. Chaque résultat d’outil est ajouté à la conversation, et chaque tour suivant renvoie l’ensemble en entrée. Dix recherches en début d’exécution, ce n’est pas dix frais : c’est dix frais plus leurs charges utiles relues à chaque tour suivant.</p><p>D’où des coûts d’agent qui semblent non linéaires alors que l’arithmétique des tokens les dit linéaires. Le frais à l’usage est la partie visible ; la croissance du contexte est la plus grosse, et elle atterrit dans votre ligne de tokens d’entrée sans étiquette.</p><h2>Attribuez, sinon vous ne pilotez rien</h2><p>Journalisez les appels d’outils par requête à côté de l’objet d’usage : quel outil, combien d’appels, et la taille en tokens de ce que chaque résultat a ajouté. Ce dernier champ rend le cumul visible.</p><p>Calculez ensuite le coût par exécution d’agent, pas par appel d’API.</p><h2>Trois contrôles efficaces</h2><p><strong>Plafonnez les appels d’outils par exécution</strong> : cela borne les deux coûts d’un coup.</p><p><strong>Tronquez ce qui entre dans le contexte</strong> : résumer un résultat avant de l’ajouter allège tous les tours suivants.</p><p><strong>Mettez en cache le préfixe stable</strong> : prompt système et définitions d’outils sont constants, le cache supprime le plus gros coût répété.</p>",
+      "faq": [
+        {
+          "question": "Pourquoi coûtent-ils plus que ce que les tokens laissent penser?",
+          "answer": "Ils facturent deux fois : plusieurs portent un frais à l’usage sur l’infrastructure du fournisseur, et leurs résultats sont ajoutés à la conversation, donc chaque tour suivant les renvoie en tokens d’entrée. Le second coût est généralement le plus lourd."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/prompt-caching-economics",
+          "label": "Économie du cache de prompts"
+        }
+      ]
+    },
+    "de": {
+      "title": "Server-Tools zählt Ihr Token-Zähler nicht",
+      "titleCore": "Server-Tools sind eine eigene Rechnung",
+      "description": "Websuche, Web-Fetch und Codeausführung kosten pro Nutzung, nicht pro Token. Wer nur Tokens zählt, übersieht, wie ein Agent die Rechnung verdoppelt.",
+      "body": "<p>Die meisten LLM-Kostenmodelle haben einen Zähler: Tokens rein, Tokens raus, Preis je Million. Das stimmte, solange eine Anfrage nur Text erzeugte. Mit serverseitigen Tools stimmt es nicht mehr.</p><p>Websuche, Web-Fetch und Codeausführung laufen auf der Infrastruktur des Anbieters, und mehrere davon tragen eine eigene Nutzungsgebühr zusätzlich zu den Tokens, die sie erzeugen. Ein Agentenzug kann Sie also doppelt belasten.</p><h2>Der kumulative Teil</h2><p>Die zweite Gebühr wird übersehen. Jedes Tool-Ergebnis wird an die Konversation angehängt, und jeder folgende Zug sendet alles erneut als Eingabe. Zehn Suchen früh in einem langen Lauf sind nicht zehn Gebühren, sondern zehn Gebühren plus ihre Nutzlast, in jedem weiteren Zug erneut gelesen.</p><p>Deshalb wirken Agentenkosten nichtlinear, obwohl die Token-Rechnung Linearität nahelegt. Die Nutzungsgebühr ist der sichtbare Teil; das Kontextwachstum ist der größere und landet unbeschriftet in Ihrer Eingabe-Token-Zeile.</p><h2>Ohne Zuordnung keine Steuerung</h2><p>Protokollieren Sie Tool-Aufrufe je Anfrage neben dem Usage-Objekt: welches Tool, wie viele Aufrufe, und wie groß in Tokens das jeweilige Ergebnis war. Letzteres macht die Kumulation sichtbar.</p><p>Berechnen Sie dann Kosten je Agentenlauf, nicht je API-Aufruf.</p><h2>Drei wirksame Kontrollen</h2><p><strong>Begrenzen Sie Tool-Aufrufe je Lauf</strong> &mdash; das deckelt beide Kosten zugleich.</p><p><strong>Kürzen Sie, was in den Kontext gelangt</strong> &mdash; zusammenfassen vor dem Anhängen entlastet jeden folgenden Zug.</p><p><strong>Cachen Sie das stabile Präfix</strong> &mdash; Systemprompt und Tool-Definitionen sind konstant; Caching entfernt den größten wiederholten Posten.</p>",
+      "faq": [
+        {
+          "question": "Warum kosten Server-Tools mehr als die Tokens vermuten lassen?",
+          "answer": "Sie rechnen doppelt ab: mehrere tragen eine Nutzungsgebühr auf der Infrastruktur des Anbieters, und ihre Ergebnisse werden an die Konversation angehängt, sodass jeder folgende Zug sie erneut als Eingabe-Tokens sendet. Der zweite Posten ist meist der größere."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/prompt-caching-economics",
+          "label": "Ökonomie des Prompt-Cachings"
+        }
+      ]
+    },
+    "pt": {
+      "title": "As ferramentas de servidor não são tokens",
+      "titleCore": "As ferramentas de servidor são outra fatura",
+      "description": "Pesquisa web, fetch e execução de código cobram por utilização, não por token. Um modelo de custo que só conta tokens perde metade da fatura de um agente.",
+      "body": "<p>A maioria dos modelos de custo de LLM tem um só contador: tokens de entrada, tokens de saída, preço por milhão. Era correto enquanto um pedido apenas gerava texto. Deixou de o ser com as ferramentas do lado do servidor.</p><p>A pesquisa web, o fetch e a execução de código correm na infraestrutura do fornecedor, e várias têm um custo por utilização além dos tokens que produzem. Um turno de agente pode assim cobrar-lhe duas vezes.</p><h2>A parte que se acumula</h2><p>É a segunda cobrança que escapa. Cada resultado é acrescentado à conversa e cada turno seguinte reenvia tudo como entrada. Dez pesquisas no início de uma execução longa não são dez cobranças: são dez cobranças mais o seu conteúdo relido em todos os turnos seguintes.</p><p>É por isso que os custos de agente parecem não lineares quando a aritmética dos tokens diz que deviam ser lineares. A taxa por utilização é a parte visível; o crescimento do contexto é a maior, e cai na linha dos tokens de entrada sem etiqueta.</p><h2>Sem atribuição não há gestão</h2><p>Registe as invocações por pedido junto ao objeto de utilização: que ferramenta, quantas chamadas e o tamanho em tokens do que cada resultado acrescentou.</p><p>Depois calcule o custo por execução de agente, não por chamada à API.</p><h2>Três controlos que funcionam</h2><p><strong>Limite as chamadas por execução</strong> &mdash; delimita as duas cobranças ao mesmo tempo.</p><p><strong>Corte o que entra no contexto</strong> &mdash; resumir antes de acrescentar alivia todos os turnos seguintes.</p><p><strong>Coloque o prefixo estável em cache</strong> &mdash; prompt de sistema e definições de ferramentas são constantes.</p>",
+      "faq": [
+        {
+          "question": "Porque custam mais do que os tokens sugerem?",
+          "answer": "Cobram duas vezes: várias têm um custo por utilização na infraestrutura do fornecedor, e os seus resultados são acrescentados à conversa, pelo que cada turno seguinte os reenvia como tokens de entrada. O segundo custo costuma ser o maior."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/prompt-caching-economics",
+          "label": "Economia da cache de prompts"
+        }
+      ]
+    },
+    "ja": {
+      "title": "サーバー側ツールはトークン計測の外で課金される",
+      "titleCore": "サーバー側ツールは別の請求書",
+      "description": "ウェブ検索・フェッチ・コード実行は利用回数で課金されます。トークンしか数えない原価計算では、エージェントが請求を倍にしても見えません。",
+      "body": "<p>多くの LLM 原価モデルには計測器がひとつしかありません。入力トークン、出力トークン、100 万あたりの単価。リクエストがテキストを生成するだけだった頃は正しい考え方でした。サーバー側ツールの登場で、それは成り立たなくなりました。</p><p>ウェブ検索、ウェブフェッチ、コード実行はプロバイダー側の基盤で動き、いくつかは生成するトークンとは別に利用ごとの料金が発生します。つまりエージェントの 1 ターンで二重に課金されうるのです。</p><h2>積み上がるほうの費用</h2><p>見落とされるのは二つ目の課金です。ツールの結果は会話に追加され、以降のターンはその全体を入力として再送します。長い実行の序盤での 10 回の検索は、10 回分の料金だけでなく、その結果本体を以降の全ターンで読み直す費用でもあります。</p><p>トークンの計算上は線形のはずのエージェント費用が非線形に感じられるのはこのためです。利用料は見える部分にすぎず、より大きいのは文脈の肥大で、それはラベルの無いまま入力トークンの行に着地します。</p><h2>按分しなければ管理できない</h2><p>リクエストごとに、どのツールを何回呼び、各結果が何トークン増やしたかを usage と並べて記録してください。最後の項目こそが積み上がりを可視化します。</p><p>そのうえで、API 呼び出し単位ではなくエージェント実行単位で原価を出します。利用者が起動したのは実行のほうです。</p><h2>効く対策は 3 つ</h2><p><strong>実行あたりのツール呼び出しに上限を設ける。</strong>両方の費用を同時に抑えられます。</p><p><strong>文脈に入れる内容を削る。</strong>取得したページ全体が必要になることはまれです。</p><p><strong>安定した接頭辞をキャッシュする。</strong>システムプロンプトとツール定義は実行中変わりません。</p>",
+      "faq": [
+        {
+          "question": "なぜトークンから想像するより高くつくのですか？",
+          "answer": "二重に課金されるからです。いくつかのツールはプロバイダー基盤での利用ごとに料金が発生し、さらにその結果が会話に追加されるため、以降のターンが毎回それを入力トークンとして再送します。通常は後者のほうが大きくなります。"
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/prompt-caching-economics",
+          "label": "プロンプトキャッシュの経済性"
+        }
+      ]
+    }
+  }
+}
