@@ -1,0 +1,139 @@
+{
+  "slug": "research/non-production-llm-spend",
+  "tags": [
+    "finops",
+    "cost-attribution",
+    "ci-cd",
+    "guardrails"
+  ],
+  "datePublished": "2026-09-01",
+  "dateModified": "2026-09-01",
+  "image": "https://finopsllm.com/og.png",
+  "agentMode": true,
+  "languages": {
+    "en": {
+      "title": "Your dev environment is a prod workload",
+      "titleCore": "Non-production LLM spend",
+      "description": "CI runs, local dev, staging and demo instances quietly become a real share of the LLM bill, and they are almost always the least attributed part of it.",
+      "body": "<p>Every FinOps review of LLM spend starts with production traffic, because that is what has a dashboard. Then someone runs the numbers by environment and finds that a meaningful slice of the bill &mdash; frequently double digits as a percentage &mdash; never touched a customer.</p><p>It comes from four places, and they compound.</p><h2>Where non-production spend comes from</h2><p><strong>CI.</strong> Every pull request that runs an evaluation suite calls the model. A suite of two hundred cases across a busy repository is thousands of calls a day, on the most capable model, because whoever wrote the suite quite reasonably wanted it to reflect production.</p><p><strong>Local development.</strong> Engineers iterating on a prompt call the API dozens of times an hour, usually on a shared key, usually with no tagging that says whose loop it was.</p><p><strong>Staging and demo instances.</strong> Long-lived, low-traffic, and configured identically to production &mdash; which means the expensive model and no caching, serving a handful of requests that nobody watches.</p><p><strong>Retries and runaway loops in test.</strong> An agent loop that fails safely in production still burns tokens when it misbehaves in a branch, and nothing in a test environment is set up to notice.</p><h2>Fix attribution before you fix cost</h2><p>The single change that pays for itself is a <strong>separate API key per environment</strong>. It costs an afternoon and turns an unexplained line item into four labelled ones. Tag every request with the environment, and for CI, the repository and workflow. Without that, every proposal below is guesswork.</p><p>Once you can see it, three things usually follow immediately. Non-prod is where a smaller model is almost always fine &mdash; evaluation suites need consistency, not frontier capability, and most of them can pin a cheaper model with no loss of signal. Non-prod is where caching earns the most, because CI replays near-identical prompts all day. And non-prod is where hard spend caps are actually safe to set: a capped test environment fails a build, while a capped production environment fails a customer.</p><h2>The rule</h2><p>Give every non-production environment its own key, its own budget, and its own cap. Then treat the gap between environments as a number you manage deliberately, rather than one you discover in a quarterly review.</p><h2>Related</h2><ul><li><a href=&quot;/research/evals-cost-control&quot;>Cost controls in your evaluation pipeline</a></li><li><a href=&quot;/research/llm-cost-attribution&quot;>LLM cost attribution</a></li><li><a href=&quot;/research/agent-spend-guardrails&quot;>Agent spend guardrails</a></li></ul>",
+      "faq": [
+        {
+          "question": "How much of an LLM bill is typically non-production?",
+          "answer": "It varies, but teams that measure it are routinely surprised to find a double-digit percentage never served a customer. CI evaluation suites are usually the largest single contributor, followed by long-lived staging instances."
+        },
+        {
+          "question": "What is the first thing to change?",
+          "answer": "A separate API key per environment, with the environment tagged on every request. It takes an afternoon and turns one unexplained line item into labelled ones, which is a precondition for every other fix."
+        },
+        {
+          "question": "Is it safe to put a hard spend cap on non-production?",
+          "answer": "Yes, and it is the one place a hard cap is genuinely safe. A capped test environment fails a build, which someone notices and fixes; a capped production environment fails a customer."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/evals-cost-control",
+          "label": "Cost controls in your evaluation pipeline"
+        },
+        {
+          "slug": "/research/llm-cost-attribution",
+          "label": "LLM cost attribution"
+        },
+        {
+          "slug": "/research/agent-spend-guardrails",
+          "label": "Agent spend guardrails"
+        }
+      ]
+    },
+    "es": {
+      "title": "Tu entorno de desarrollo también gasta",
+      "titleCore": "Gasto de LLM fuera de producción",
+      "description": "CI, desarrollo local, staging y demos acaban siendo una parte real de la factura de LLM, y casi siempre es la peor atribuida de todas.",
+      "body": "<p>Toda revisión FinOps empieza por el tráfico de producción, porque es lo que tiene panel. Luego alguien desglosa por entorno y descubre que una parte notable de la factura &mdash; a menudo de dos dígitos en porcentaje &mdash; nunca tocó a un cliente.</p><h2>De dónde sale</h2><p><strong>CI:</strong> cada pull request que ejecuta una suite de evaluación llama al modelo, miles de veces al día y en el modelo más caro. <strong>Desarrollo local:</strong> iterar un prompt son decenas de llamadas por hora, con clave compartida y sin etiquetar. <strong>Staging y demos:</strong> configurados igual que producción, con el modelo caro y sin caché. <strong>Reintentos y bucles descontrolados en pruebas</strong>, que nadie vigila.</p><h2>Primero la atribución</h2><p>El cambio que se paga solo es una <strong>clave de API por entorno</strong>. Cuesta una tarde y convierte una partida inexplicable en cuatro etiquetadas. Etiqueta el entorno en cada petición y, en CI, el repositorio y el workflow.</p><p>Después llegan tres cosas solas: fuera de producción casi siempre basta un modelo más barato; la caché rinde más que en ningún sitio, porque CI repite prompts casi idénticos; y los topes duros de gasto ahí sí son seguros &mdash; un entorno de pruebas con tope rompe un build, uno de producción rompe un cliente.</p>",
+      "faq": [
+        {
+          "question": "¿Qué hay que cambiar primero?",
+          "answer": "Una clave de API por entorno, con el entorno etiquetado en cada petición. Cuesta una tarde y convierte una partida sin explicar en varias etiquetadas, que es la condición previa para cualquier otro arreglo."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/llm-cost-attribution",
+          "label": "Atribución de costes de LLM"
+        }
+      ]
+    },
+    "fr": {
+      "title": "Votre environnement de dev coûte aussi",
+      "titleCore": "Dépense LLM hors production",
+      "description": "CI, développement local, staging et démos finissent par peser réellement sur la facture LLM, et c’est presque toujours la part la moins attribuée.",
+      "body": "<p>Toute revue FinOps commence par le trafic de production, parce que c’est ce qui a un tableau de bord. Puis quelqu’un ventile par environnement et découvre qu’une part notable de la facture &mdash; souvent à deux chiffres en pourcentage &mdash; n’a jamais touché un client.</p><h2>D’où elle vient</h2><p><strong>La CI :</strong> chaque pull request qui lance une suite d’évaluation appelle le modèle, des milliers de fois par jour, sur le modèle le plus capable. <strong>Le développement local :</strong> itérer sur un prompt, c’est des dizaines d’appels par heure, sur une clé partagée, sans étiquette. <strong>Staging et démos :</strong> configurés comme la production, donc modèle cher et pas de cache. <strong>Reprises et boucles emballées en test</strong>, que personne ne surveille.</p><h2>L’attribution d’abord</h2><p>Le changement qui se rembourse seul : une <strong>clé d’API par environnement</strong>. Une après-midi de travail, et une ligne inexpliquée devient quatre lignes étiquetées. Étiquetez l’environnement sur chaque requête et, pour la CI, le dépôt et le workflow.</p><p>Trois conséquences suivent : hors production un modèle plus petit suffit presque toujours ; le cache y rapporte le plus, la CI rejouant des prompts quasi identiques ; et un plafond de dépense y est réellement sûr &mdash; un test plafonné casse un build, une production plafonnée casse un client.</p>",
+      "faq": [
+        {
+          "question": "Que faut-il changer en premier?",
+          "answer": "Une clé d’API distincte par environnement, avec l’environnement étiqueté sur chaque requête. Cela prend une après-midi et transforme une ligne inexpliquée en lignes identifiées, condition préalable à tout autre correctif."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/llm-cost-attribution",
+          "label": "Attribution des coûts LLM"
+        }
+      ]
+    },
+    "de": {
+      "title": "Auch Ihre Dev-Umgebung kostet Tokens",
+      "titleCore": "LLM-Ausgaben außerhalb der Produktion",
+      "description": "CI, lokale Entwicklung, Staging und Demos werden zu einem echten Teil der LLM-Rechnung — und sind fast immer der am schlechtesten zugeordnete Teil.",
+      "body": "<p>Jede FinOps-Prüfung beginnt beim Produktionsverkehr, weil es dafür ein Dashboard gibt. Dann schlüsselt jemand nach Umgebung auf und findet, dass ein spürbarer Teil der Rechnung &mdash; oft ein zweistelliger Prozentsatz &mdash; nie einen Kunden erreicht hat.</p><h2>Woher es kommt</h2><p><strong>CI:</strong> jeder Pull Request mit Evaluierungs-Suite ruft das Modell auf, tausende Male am Tag, auf dem teuersten Modell. <strong>Lokale Entwicklung:</strong> Prompt-Iteration sind Dutzende Aufrufe pro Stunde, auf einem gemeinsamen Key, ohne Tagging. <strong>Staging und Demos:</strong> konfiguriert wie Produktion, also teures Modell ohne Caching. <strong>Retries und entlaufene Schleifen im Test</strong>, die niemand beobachtet.</p><h2>Zuerst die Zuordnung</h2><p>Die Änderung, die sich selbst bezahlt: ein <strong>eigener API-Key je Umgebung</strong>. Ein Nachmittag Arbeit, und aus einer unerklärten Position werden vier beschriftete. Taggen Sie die Umgebung an jeder Anfrage, in der CI auch Repository und Workflow.</p><p>Danach folgt dreierlei: außerhalb der Produktion genügt fast immer ein kleineres Modell; Caching zahlt sich nirgends mehr aus, weil CI nahezu identische Prompts wiederholt; und harte Ausgabengrenzen sind hier wirklich sicher &mdash; eine gedeckelte Testumgebung bricht einen Build, eine gedeckelte Produktion bricht einen Kunden.</p>",
+      "faq": [
+        {
+          "question": "Was sollte man zuerst ändern?",
+          "answer": "Einen eigenen API-Key je Umgebung, mit der Umgebung als Tag an jeder Anfrage. Das kostet einen Nachmittag und macht aus einer unerklärten Rechnungsposition beschriftete &mdash; die Voraussetzung für jede weitere Maßnahme."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/llm-cost-attribution",
+          "label": "LLM-Kostenzuordnung"
+        }
+      ]
+    },
+    "pt": {
+      "title": "O seu ambiente de dev também gasta",
+      "titleCore": "Gasto de LLM fora de produção",
+      "description": "CI, desenvolvimento local, staging e demos tornam-se uma fatia real da fatura de LLM, e é quase sempre a parte pior atribuída de todas.",
+      "body": "<p>Toda a revisão FinOps começa pelo tráfego de produção, porque é o que tem painel. Depois alguém reparte por ambiente e descobre que uma fatia relevante da fatura &mdash; muitas vezes de dois dígitos em percentagem &mdash; nunca tocou num cliente.</p><h2>De onde vem</h2><p><strong>CI:</strong> cada pull request que corre uma suite de avaliação chama o modelo, milhares de vezes por dia, no modelo mais caro. <strong>Desenvolvimento local:</strong> iterar um prompt são dezenas de chamadas por hora, em chave partilhada e sem etiquetas. <strong>Staging e demos:</strong> configurados como produção, com modelo caro e sem cache. <strong>Retentativas e ciclos descontrolados em teste</strong>, que ninguém vigia.</p><h2>Primeiro a atribuição</h2><p>A mudança que se paga sozinha é uma <strong>chave de API por ambiente</strong>. Custa uma tarde e transforma uma rubrica inexplicada em quatro identificadas. Etiquete o ambiente em cada pedido e, na CI, o repositório e o workflow.</p><p>Seguem-se três coisas: fora de produção quase sempre basta um modelo mais barato; a cache rende aí mais do que em qualquer lado, porque a CI repete prompts quase idênticos; e os tetos rígidos de gasto são ali seguros &mdash; um ambiente de teste com teto quebra um build, um de produção quebra um cliente.</p>",
+      "faq": [
+        {
+          "question": "O que mudar primeiro?",
+          "answer": "Uma chave de API por ambiente, com o ambiente etiquetado em cada pedido. Custa uma tarde e transforma uma rubrica sem explicação em rubricas identificadas, que é a condição para qualquer outra correção."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/llm-cost-attribution",
+          "label": "Atribuição de custos de LLM"
+        }
+      ]
+    },
+    "ja": {
+      "title": "開発環境も立派な本番ワークロード",
+      "titleCore": "本番外の LLM 支出",
+      "description": "CI、ローカル開発、ステージング、デモ環境は静かに請求額の相当部分を占め、しかも最も帰属が取れていない部分です。",
+      "body": "<p>LLM 支出のレビューはいつも本番トラフィックから始まります。ダッシュボードがあるのがそこだけだからです。ところが環境別に分解すると、請求額のうち無視できない割合 &mdash; しばしば二桁パーセント &mdash; が一度も顧客に届いていないと分かります。</p><h2>どこから来るのか</h2><p><strong>CI:</strong> 評価スイートを走らせるプルリクエストごとにモデルを呼び、最も高価なモデルで 1 日に数千回になります。<strong>ローカル開発:</strong> プロンプトの調整は 1 時間に数十回の呼び出しで、共有キー、タグなしが普通です。<strong>ステージングとデモ:</strong> 本番と同じ構成、つまり高価なモデルでキャッシュなし。<strong>テスト中のリトライや暴走ループ</strong>は誰も見ていません。</p><h2>コストより先に帰属を直す</h2><p>投資が確実に回収できる変更は<strong>環境ごとに別の API キー</strong>を持つことです。半日で終わり、説明のつかない 1 行が 4 つのラベル付きの行になります。各リクエストに環境を、CI ではリポジトリとワークフローもタグ付けします。</p><p>見えるようになれば結論は自然に出ます。本番外はより小さいモデルでほぼ問題ありません。CI はほぼ同一のプロンプトを繰り返すので、キャッシュの効果が最も大きい場所です。そして厳格な上限を安全に置けるのもここだけです &mdash; 上限に達したテスト環境はビルドを落としますが、本番環境は顧客を落とします。</p>",
+      "faq": [
+        {
+          "question": "最初に変えるべきことは何ですか？",
+          "answer": "環境ごとに API キーを分け、各リクエストに環境をタグ付けすることです。半日で終わり、説明のつかない請求項目がラベル付きの項目になります。他のあらゆる対策の前提条件です。"
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/llm-cost-attribution",
+          "label": "LLM コストの帰属"
+        }
+      ]
+    }
+  }
+}
