@@ -29,12 +29,16 @@
 {%- if not article.languages['en'] -%}{%- set _ = codes.push('en') -%}{%- endif -%}
 {%- for code in article.languages | keys -%}{%- set _ = codes.push(code) -%}{%- endfor -%}
 
+{#- hreflang must name canonical URLs. Built from urlSlug, a -v2 variant told
+    Google "the en/es version of me is /…-v2" while its own canonical pointed at
+    the control — an inconsistent cluster Google drops wholesale. controlSlug is
+    identical to urlSlug on every non-variant article. -#}
 {%- set hreflangs = [] -%}
 {%- for code in codes -%}
   {%- set prefix = '/' + code if code != 'en' else '' -%}
-  {%- set _ = hreflangs.push({ lang: code, href: siteUrl + prefix + '/' + urlSlug }) -%}
+  {%- set _ = hreflangs.push({ lang: code, href: siteUrl + prefix + '/' + controlSlug }) -%}
 {%- endfor -%}
-{%- set _ = hreflangs.push({ lang: 'x-default', href: siteUrl + '/' + urlSlug }) -%}
+{%- set _ = hreflangs.push({ lang: 'x-default', href: siteUrl + '/' + controlSlug }) -%}
 
 {%- set jsonLdArticle = {
   "@context": "https://schema.org",
@@ -73,6 +77,21 @@
 <meta name="content-signal" content="search=yes, ai-input=yes, ai-train=yes" />
 {%- endif -%}
 <link rel="canonical" href="{{ canonicalUrl }}" />
+<meta property="og:type" content="article" />
+<meta property="og:site_name" content="FinOps LLM" />
+<meta property="og:locale" content="{{ lang }}" />
+<meta property="og:url" content="{{ canonicalUrl }}" />
+<meta property="og:title" content="{{ locale.titleCore or locale.title }}" />
+<meta property="og:description" content="{{ locale.description }}" />
+<meta property="og:image" content="{{ article.image or (siteUrl + '/og.png') }}" />
+<meta property="og:image:type" content="image/png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="FinOps LLM" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="{{ locale.titleCore or locale.title }}" />
+<meta name="twitter:description" content="{{ locale.description }}" />
+<meta name="twitter:image" content="{{ article.image or (siteUrl + '/og.png') }}" />
 {%- for alt in hreflangs -%}
 <link rel="alternate" hreflang="{{ alt.lang }}" href="{{ alt.href }}" />
 {%- endfor -%}

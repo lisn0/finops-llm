@@ -15,8 +15,23 @@
 <link rel="icon" type="image/x-icon" href="/favicon.ico" />
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
 <link rel="manifest" href="/site.webmanifest" />
-{% if head.openGraph %}{% for tag in head.openGraph %}<meta property="{{ tag.property }}" content="{{ tag.content | safe }}" />{% endfor %}{% endif %}
-{% if head.twitter %}{% for tag in head.twitter %}<meta name="{{ tag.name }}" content="{{ tag.content | safe }}" />{% endfor %}{% endif %}
+{% if head.openGraph %}{% for tag in head.openGraph %}<meta property="{{ tag.property }}" content="{{ tag.content | safe }}" />{% endfor %}
+{% elif head.canonical %}<meta property="og:type" content="{% if '/research/' in head.canonical %}article{% else %}website{% endif %}" />
+<meta property="og:site_name" content="FinOps LLM" />
+<meta property="og:locale" content="{{ lang or 'en' }}" />
+<meta property="og:url" content="{{ head.canonical | safe }}" />
+<meta property="og:title" content="{{ head.title | safe }}" />
+{% if head.description %}<meta property="og:description" content="{{ head.description | safe }}" />{% endif %}
+<meta property="og:image" content="https://finopsllm.com/og.png" />
+<meta property="og:image:type" content="image/png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="FinOps LLM" />{% endif %}
+{% if head.twitter %}{% for tag in head.twitter %}<meta name="{{ tag.name }}" content="{{ tag.content | safe }}" />{% endfor %}
+{% elif head.canonical %}<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="{{ head.title | safe }}" />
+{% if head.description %}<meta name="twitter:description" content="{{ head.description | safe }}" />{% endif %}
+<meta name="twitter:image" content="https://finopsllm.com/og.png" />{% endif %}
 {% for link in head.links %}{% if link.rel == 'preconnect' %}<link rel="{{ link.rel }}" href="{{ link.href | safe }}"{% if link.crossorigin %} crossorigin{% endif %} />{% else %}<link rel="{{ link.rel }}"{% if link.type %} type="{{ link.type }}"{% endif %}{% if link.sizes %} sizes="{{ link.sizes }}"{% endif %}{% if link.title %} title="{{ link.title }}"{% endif %} href="{{ link.href | safe }}" />{% endif %}{% endfor %}
 {% if head.fontStylesheet %}<link href="{{ head.fontStylesheet | safe }}" rel="stylesheet" />{% endif %}
 {% if head.style %}<style>{{ head.style | safe }}</style>{% endif %}
