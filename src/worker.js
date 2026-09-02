@@ -207,9 +207,117 @@ function logAiCrawler(request, env, url) {
 	}
 }
 
+
+/* ------------------------------------------------------------------ */
+/* Live pricing (/api/pricing + nightly refresh)                       */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Baseline shipped with the build. It is the fallback served when KV is empty
+ * AND the yardstick every scraped refresh is measured against: a parse that
+ * loses a model or moves a price by more than PRICE_DRIFT_MAX is rejected
+ * outright rather than published. A wrong price on a pricing tracker is worse
+ * than an old one, so the failure mode here is "serve the baseline", never
+ * "serve a guess".
+ */
+const PRICING_BASELINE = {
+	updated: '2026-09-02',
+	source: 'https://platform.claude.com/docs/en/about-claude/pricing',
+	anthropic: [
+		{ id: 'fable-5-1', model: 'Claude Fable 5.1', input: 10, output: 50, cacheRead: 0.25, cacheWrite5m: 12.5, cacheWrite1h: 20, context: 1000000 },
+		{ id: 'fable-5', model: 'Claude Fable 5', input: 10, output: 50, cacheRead: 1, cacheWrite5m: 12.5, cacheWrite1h: 20, context: 1000000 },
+		{ id: 'opus-5', model: 'Claude Opus 5', input: 5, output: 25, cacheRead: 0.5, cacheWrite5m: 6.25, cacheWrite1h: 10, context: 1000000 },
+		{ id: 'sonnet-5', model: 'Claude Sonnet 5', input: 2, output: 10, cacheRead: 0.2, cacheWrite5m: 2.5, cacheWrite1h: 4, context: 1000000 },
+		{ id: 'sonnet-4-6', model: 'Claude Sonnet 4.6', input: 3, output: 15, cacheRead: 0.3, cacheWrite5m: 3.75, cacheWrite1h: 6, context: 1000000 },
+		{ id: 'haiku-4-5', model: 'Claude Haiku 4.5', input: 1, output: 5, cacheRead: 0.1, cacheWrite5m: 1.25, cacheWrite1h: 2, context: 200000 },
+	],
+};
+
+const PRICING_KV_KEY = 'anthropic:v1';
+const PRICING_DOC_URL = PRICING_BASELINE.source;
+// A real price change is a step, not a leap. Anything outside this band is a
+// parser fault far more often than it is Anthropic repricing 4x overnight.
+const PRICE_DRIFT_MAX = 3;
+
+async function servePricing(env) {
+	let payload = PRICING_BASELINE;
+	try {
+		const stored = env.PRICING && (await env.PRICING.get(PRICING_KV_KEY, 'json'));
+		if (validatePricing(stored)) payload = stored;
+	} catch {
+		// KV unavailable — the baseline is still a correct answer.
+	}
+	return new Response(JSON.stringify(payload), {
+		headers: {
+			'Content-Type': 'application/json; charset=utf-8',
+			'Cache-Control': 'public, max-age=3600',
+			'Access-Control-Allow-Origin': '*',
+		},
+	});
+}
+
+/** True only if every baseline model is present, priced, and plausibly close. */
+function validatePricing(data) {
+	if (!data || !Array.isArray(data.anthropic)) return false;
+	if (data.anthropic.length !== PRICING_BASELINE.anthropic.length) return false;
+	return PRICING_BASELINE.anthropic.every((base) => {
+		const found = data.anthropic.find((m) => m && m.id === base.id);
+		if (!found) return false;
+		return ['input', 'output', 'cacheRead', 'cacheWrite5m'].every((f) => {
+			const v = found[f];
+			if (typeof v !== 'number' || !isFinite(v) || v <= 0) return false;
+			return v <= base[f] * PRICE_DRIFT_MAX && v >= base[f] / PRICE_DRIFT_MAX;
+		});
+	});
+}
+
+/**
+ * Pull the published pricing table and read each model's row. Deliberately
+ * dumb: find the model name, take the dollar figures that follow it on the
+ * same row. If the page shape changes, this returns fewer models and
+ * validatePricing rejects the whole batch — which is the intended outcome.
+ */
+function parsePricingDoc(html) {
+	const text = html.replace(/<[^>]+>/g, '\n').replace(/&nbsp;/g, ' ');
+	const models = PRICING_BASELINE.anthropic.map((base) => {
+		const at = text.indexOf(base.model);
+		if (at === -1) return null;
+		const nums = (text.slice(at, at + 400).match(/\$\s*([0-9]+(?:\.[0-9]+)?)/g) || [])
+			.map((n) => parseFloat(n.replace(/[^0-9.]/g, '')));
+		if (nums.length < 4) return null;
+		const [input, cacheWrite5m, cacheRead, output] = nums;
+		return { ...base, input, cacheWrite5m, cacheRead, output };
+	});
+	if (models.some((m) => m === null)) return null;
+	return { ...PRICING_BASELINE, updated: new Date().toISOString().slice(0, 10), anthropic: models };
+}
+
+async function refreshPricing(env) {
+	if (!env.PRICING) return { ok: false, reason: 'no KV binding' };
+	let parsed = null;
+	try {
+		const res = await fetch(PRICING_DOC_URL, { headers: { 'User-Agent': 'finopsllm-pricing-bot' } });
+		if (!res.ok) return { ok: false, reason: 'HTTP ' + res.status };
+		parsed = parsePricingDoc(await res.text());
+	} catch (e) {
+		return { ok: false, reason: 'fetch failed: ' + e.message };
+	}
+	if (!validatePricing(parsed)) return { ok: false, reason: 'rejected by validation' };
+	await env.PRICING.put(PRICING_KV_KEY, JSON.stringify(parsed));
+	return { ok: true, updated: parsed.updated };
+}
+
 export default {
+	async scheduled(event, env, ctx) {
+		ctx.waitUntil(refreshPricing(env).then((r) => console.log('pricing refresh', JSON.stringify(r))));
+	},
+
 	async fetch(request, env) {
 		const url = new URL(request.url);
+
+		// Live pricing feed for the tracker pages. Served before anything else
+		// so no redirect or language rule can touch it.
+		if (url.pathname === '/api/pricing') return servePricing(env);
 
 		// 0. Record AI crawler hits before any redirect, so a bot that lands on
 		//    www or a translated path is still counted against the URL it asked

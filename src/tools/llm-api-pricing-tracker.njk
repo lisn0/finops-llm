@@ -256,6 +256,7 @@
 </style>
 
 <script>
+let UPDATED = "2026-09-02";
 const PROVIDERS = [
   { name: "OpenAI", color: "#00A67E", models: [
     { name: "GPT-4o", input: 2.50, output: 10.00, cacheRead: 1.25, cacheWrite: 2.50, context: "128K" },
@@ -265,9 +266,12 @@ const PROVIDERS = [
     { name: "GPT-4.5", input: 75.00, output: 150.00, cacheRead: 37.50, cacheWrite: 75.00, context: "128K" },
   ]},
   { name: "Anthropic", color: "#D97757", models: [
-    { name: "Claude Sonnet 4", input: 3.00, output: 15.00, cacheRead: 0.30, cacheWrite: 3.75, context: "200K" },
-    { name: "Claude Haiku 4", input: 0.80, output: 4.00, cacheRead: 0.08, cacheWrite: 1.00, context: "200K" },
-    { name: "Claude Opus 4", input: 15.00, output: 75.00, cacheRead: 1.50, cacheWrite: 18.75, context: "200K" },
+    { id: "fable-5-1", name: "Claude Fable 5.1", input: 10.00, output: 50.00, cacheRead: 0.25, cacheWrite: 12.50, context: "1M" },
+    { id: "fable-5", name: "Claude Fable 5", input: 10.00, output: 50.00, cacheRead: 1.00, cacheWrite: 12.50, context: "1M" },
+    { id: "opus-5", name: "Claude Opus 5", input: 5.00, output: 25.00, cacheRead: 0.50, cacheWrite: 6.25, context: "1M" },
+    { id: "sonnet-5", name: "Claude Sonnet 5", input: 2.00, output: 10.00, cacheRead: 0.20, cacheWrite: 2.50, context: "1M" },
+    { id: "sonnet-4-6", name: "Claude Sonnet 4.6", input: 3.00, output: 15.00, cacheRead: 0.30, cacheWrite: 3.75, context: "1M" },
+    { id: "haiku-4-5", name: "Claude Haiku 4.5", input: 1.00, output: 5.00, cacheRead: 0.10, cacheWrite: 1.25, context: "200K" },
   ]},
   { name: "Google", color: "#4285F4", models: [
     { name: "Gemini 2.5 Pro", input: 1.25, output: 10.00, cacheRead: 0.31, cacheWrite: 1.25, context: "1M" },
@@ -321,14 +325,29 @@ function renderPricing() {
       <td class="price">${m.cacheRead ? `$${m.cacheRead.toFixed(2)}` : '—'}</td>
       <td class="price">${m.cacheWrite ? `$${m.cacheWrite.toFixed(2)}` : '—'}</td>
       <td>${m.context}</td>
-      <td class="updated">2026-08-01</td>
+      <td class="updated">${UPDATED}</td>
     </tr>
   `).join('');
   
-  document.getElementById('lastUpdated').textContent = '1 August 2026, 00:00 UTC';
+  document.getElementById('lastUpdated').textContent = UPDATED;
 }
 
 renderPricing();
+
+// Live refresh: the worker keeps Anthropic pricing current in KV. Any failure
+// or malformed payload leaves the baked-in table exactly as rendered above.
+fetch('/api/pricing').then(r => r.ok ? r.json() : null).then(d => {
+  if (!d || !Array.isArray(d.anthropic) || !d.anthropic.length) return;
+  const a = PROVIDERS.find(p => p.name === 'Anthropic');
+  if (!a) return;
+  a.models = d.anthropic.map(m => ({
+    id: m.id, name: m.model, input: m.input, output: m.output,
+    cacheRead: m.cacheRead, cacheWrite: m.cacheWrite5m,
+    context: m.context >= 1e6 ? '1M' : (m.context / 1000) + 'K',
+  }));
+  if (d.updated) UPDATED = d.updated;
+  renderPricing();
+}).catch(() => {});
 </script>
 
 <h2>Related</h2>
