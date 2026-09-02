@@ -4,8 +4,8 @@
 
 ## What this site is
 
-- **Research & education hub**: 54+ articles on LLM cost attribution, budgeting, anomaly detection, and FinOps practice.
-- **Multi-language**: EN (primary), ES, JA (19–20 pages each); DE, FR (5–6 pages).
+- **Research & education hub**: 150+ articles on LLM cost attribution, budgeting, anomaly detection, and FinOps practice.
+- **Multi-language**: EN (primary, ~174 pages), plus ES, JA, DE, FR, PT at ~70 pages each. ~517 pages total.
 - **AI-crawler friendly**: Markdown export via `Accept: text/markdown`, FAQPage JSON-LD for Bing AI, robots.txt AI signals.
 - **Managed cost optimization service pitch**: Free audit booking at `/book`.
 
@@ -58,10 +58,14 @@ The script reads the live sitemap (from the deployed domain), verifies HTTP 200 
 ## Architecture
 
 - **`src/`** — Eleventy templates (`.njk`), data files, and assets.
-  - **`src/research/*.njk`** — English research pages (54 articles).
-  - **`src/{es,ja,de,fr}/research/*.njk`** — Translated pages.
+  - **`src/_data/articles/*.json`** — the current way to publish an article: one
+    JSON file carries every locale, and `src/_data/articlePages.js` paginates it
+    into pages. Dropping a file in here publishes it in every locale it declares
+    and it appears in the research A–Z and the sitemap automatically — no stub
+    `.njk`, no registration. See "Adding an article" below.
+  - **`src/research/*.njk`** — older hand-written English research pages (106).
+  - **`src/{es,ja,de,fr}/research/*.njk`** — older hand-written translated pages.
   - **`src/worker.js`** — Cloudflare Worker (www→apex redirect, language routing, markdown export for agents).
-  - **`src/sitemap.xml`** — Hand-maintained sitemap (critical: every public route must be listed here).
   - **`src/robots.txt`** — AI crawler allow-list and signals.
 - **`wrangler.jsonc`** — Cloudflare Workers config (git-triggered build, asset serving).
 - **`scripts/indexnow-submit.mjs`** — Post-deploy IndexNow client.
@@ -70,12 +74,44 @@ The script reads the live sitemap (from the deployed domain), verifies HTTP 200 
 
 | File | Purpose |
 |------|---------|
-| `.eleventy.js` | Eleventy config (passthrough copy, i18n, markdown) |
+| `eleventy.config.js` | Eleventy config (passthrough copy, i18n, sitemap + research collections) |
 | `wrangler.jsonc` | Cloudflare Workers build+deploy config |
-| `src/sitemap.xml` | All public URLs (hand-maintained, critical for crawlers) |
+| `scripts/content-gap-analyzer.js` | Checks target topics against `src/research` **and** `src/_data/articles` |
 | `src/robots.txt` | Bot allow-list + AI signals (Content-Signal, ai-train=no) |
 | `src/worker.js` | Edge logic: redirects, language routing, markdown export |
 | `scripts/indexnow-submit.mjs` | Post-deploy search-engine notification |
+
+## Adding an article
+
+Write one JSON file in `src/_data/articles/` — nothing else to register.
+
+```jsonc
+{
+  "slug": "research/my-article",       // NOTE: includes the research/ prefix on this site
+  "image": "https://finopsllm.com/og.png",
+  "agentMode": true,
+  "tags": ["…"],
+  "datePublished": "2026-09-02",
+  "dateModified": "2026-09-02",
+  "languages": {
+    "en": { "title": "…", "titleCore": "…", "description": "…", "body": "<h2>…", "faq": [], "related": [] }
+  }
+}
+```
+
+Gotchas, both of which the build catches:
+
+- **`title` is what goes in `<title>`** here (`article.njk` renders
+  `{{ locale.title }} · FinOps LLM`), and the linter caps it at **70 chars
+  including that suffix** and HTML entities. `description` caps at 165.
+  `titleCore` is the H1/og:title and may be longer.
+  *On the sibling llmcfo site this is inverted — there `titleCore` is the
+  `<title>`.*
+- `related[].slug` must be a full path (`/research/…`) even though the
+  top-level `slug` already carries the prefix.
+
+`npm run build` fails loudly on broken internal links and prints title/description
+length warnings at the end. Run it before committing — the pre-commit hook does too.
 
 ## Language routing
 
@@ -95,10 +131,10 @@ The Worker (`src/worker.js`) implements client-side language negotiation:
 ### SEO signals
 
 - Canonical: `https://finopsllm.com/<path>` per domain/per language.
-- hreflang: every translated page lists alternates in EN/ES/FR/DE/JA.
-- FAQPage JSON-LD: 54 research pages include structured Q&A for AI extraction.
+- hreflang: every translated page lists alternates in EN/ES/FR/DE/JA/PT, plus x-default.
+- FAQPage JSON-LD: research pages with a `faq` block emit structured Q&A for AI extraction.
 - Breadcrumb JSON-LD: every page includes hierarchical navigation.
-- Sitemap: `src/sitemap.xml` lists all 123 pages; hand-maintained (no auto-generation).
+- Sitemap: generated at build time from the `sitemap` collection in `eleventy.config.js` (~517 pages). It was seven hand-maintained XML files and drifted; do not reintroduce one.
 
 ## Getting help
 
