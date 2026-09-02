@@ -209,12 +209,12 @@ function logAiCrawler(request, env, url) {
 
 
 /* ------------------------------------------------------------------ */
-/* Live pricing (/api/pricing + nightly refresh)                       */
+/* Live pricing (/api/pricing)                                          */
 /* ------------------------------------------------------------------ */
 
 /**
- * Baseline shipped with the build. It is the fallback served when KV is empty
- * AND the yardstick every scraped refresh is measured against: a parse that
+ * Baseline shipped with the build. It is the fallback served when the live
+ * fetch fails AND the yardstick every scraped refresh is measured against: a parse that
  * loses a model or moves a price by more than PRICE_DRIFT_MAX is rejected
  * outright rather than published. A wrong price on a pricing tracker is worse
  * than an old one, so the failure mode here is "serve the baseline", never
@@ -233,19 +233,30 @@ const PRICING_BASELINE = {
 	],
 };
 
-const PRICING_KV_KEY = 'anthropic:v1';
 const PRICING_DOC_URL = PRICING_BASELINE.source;
 // A real price change is a step, not a leap. Anything outside this band is a
 // parser fault far more often than it is Anthropic repricing 4x overnight.
 const PRICE_DRIFT_MAX = 3;
 
-async function servePricing(env) {
+/**
+ * Read the live page, parse it, serve it. No storage: the upstream fetch is
+ * edge-cached for 6h by Cloudflare, so this costs one real request per colo
+ * per 6h and everything else is a cache hit. Anything that fails — network,
+ * page reshuffle, implausible number — falls back to the baseline.
+ */
+async function servePricing() {
 	let payload = PRICING_BASELINE;
 	try {
-		const stored = env.PRICING && (await env.PRICING.get(PRICING_KV_KEY, 'json'));
-		if (validatePricing(stored)) payload = stored;
+		const res = await fetch(PRICING_DOC_URL, {
+			headers: { 'User-Agent': 'finopsllm-pricing-bot' },
+			cf: { cacheTtl: 21600, cacheEverything: true },
+		});
+		if (res.ok) {
+			const parsed = parsePricingDoc(await res.text());
+			if (validatePricing(parsed)) payload = parsed;
+		}
 	} catch {
-		// KV unavailable — the baseline is still a correct answer.
+		// Upstream unreachable — the baseline is still a correct answer.
 	}
 	return new Response(JSON.stringify(payload), {
 		headers: {
@@ -273,51 +284,37 @@ function validatePricing(data) {
 
 /**
  * Pull the published pricing table and read each model's row. Deliberately
- * dumb: find the model name, take the dollar figures that follow it on the
- * same row. If the page shape changes, this returns fewer models and
- * validatePricing rejects the whole batch — which is the intended outcome.
+ * dumb: find the model name where it is followed by a full price row —
+ * "$input $cacheWrite5m $cacheWrite1h $cacheRead $output / MTok" — and take
+ * those five figures. Skips the sidebar nav and the shorter batch/legacy
+ * tables, which do not carry five prices. If the page shape changes this
+ * returns null and the baseline is served, which is the intended outcome.
  */
 function parsePricingDoc(html) {
 	const text = html.replace(/<[^>]+>/g, '\n').replace(/&nbsp;/g, ' ');
 	const models = PRICING_BASELINE.anthropic.map((base) => {
-		const at = text.indexOf(base.model);
-		if (at === -1) return null;
-		const nums = (text.slice(at, at + 400).match(/\$\s*([0-9]+(?:\.[0-9]+)?)/g) || [])
-			.map((n) => parseFloat(n.replace(/[^0-9.]/g, '')));
-		if (nums.length < 4) return null;
-		const [input, cacheWrite5m, cacheRead, output] = nums;
-		return { ...base, input, cacheWrite5m, cacheRead, output };
+		for (let at = text.indexOf(base.model); at !== -1; at = text.indexOf(base.model, at + 1)) {
+			// "Claude Fable 5" must not match inside "Claude Fable 5.1".
+			if (/[.0-9]/.test(text[at + base.model.length] || '')) continue;
+			const nums = (text.slice(at, at + 200).match(/\$\s*([0-9]+(?:\.[0-9]+)?)\s*\/\s*MTok/g) || [])
+				.map((n) => parseFloat(n.replace(/[^0-9.]/g, '')));
+			if (nums.length < 5) continue;
+			const [input, cacheWrite5m, cacheWrite1h, cacheRead, output] = nums;
+			return { ...base, input, cacheWrite5m, cacheWrite1h, cacheRead, output };
+		}
+		return null;
 	});
 	if (models.some((m) => m === null)) return null;
 	return { ...PRICING_BASELINE, updated: new Date().toISOString().slice(0, 10), anthropic: models };
 }
 
-async function refreshPricing(env) {
-	if (!env.PRICING) return { ok: false, reason: 'no KV binding' };
-	let parsed = null;
-	try {
-		const res = await fetch(PRICING_DOC_URL, { headers: { 'User-Agent': 'finopsllm-pricing-bot' } });
-		if (!res.ok) return { ok: false, reason: 'HTTP ' + res.status };
-		parsed = parsePricingDoc(await res.text());
-	} catch (e) {
-		return { ok: false, reason: 'fetch failed: ' + e.message };
-	}
-	if (!validatePricing(parsed)) return { ok: false, reason: 'rejected by validation' };
-	await env.PRICING.put(PRICING_KV_KEY, JSON.stringify(parsed));
-	return { ok: true, updated: parsed.updated };
-}
-
 export default {
-	async scheduled(event, env, ctx) {
-		ctx.waitUntil(refreshPricing(env).then((r) => console.log('pricing refresh', JSON.stringify(r))));
-	},
-
 	async fetch(request, env) {
 		const url = new URL(request.url);
 
 		// Live pricing feed for the tracker pages. Served before anything else
 		// so no redirect or language rule can touch it.
-		if (url.pathname === '/api/pricing') return servePricing(env);
+		if (url.pathname === '/api/pricing') return servePricing();
 
 		// 0. Record AI crawler hits before any redirect, so a bot that lands on
 		//    www or a translated path is still counted against the URL it asked
