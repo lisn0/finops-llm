@@ -259,11 +259,9 @@
 let UPDATED = "2026-09-02";
 const PROVIDERS = [
   { name: "OpenAI", color: "#00A67E", models: [
-    { name: "GPT-4o", input: 2.50, output: 10.00, cacheRead: 1.25, cacheWrite: 2.50, context: "128K" },
-    { name: "GPT-4o mini", input: 0.15, output: 0.60, cacheRead: 0.075, cacheWrite: 0.15, context: "128K" },
-    { name: "o3", input: 10.00, output: 40.00, cacheRead: 5.00, cacheWrite: 10.00, context: "200K" },
-    { name: "o3-mini", input: 1.10, output: 4.40, cacheRead: 0.55, cacheWrite: 1.10, context: "200K" },
-    { name: "GPT-4.5", input: 75.00, output: 150.00, cacheRead: 37.50, cacheWrite: 75.00, context: "128K" },
+    { id: "gpt-5-6-sol", name: "GPT-5.6-Sol", input: 4.00, output: 20.00, cacheRead: 0.40, cacheWrite: 5.00, context: "1.05M" },
+    { id: "gpt-5-6-terra", name: "GPT-5.6-Terra", input: 2.00, output: 12.00, cacheRead: 0.20, cacheWrite: 2.50, context: "1.05M" },
+    { id: "gpt-5-6-luna", name: "GPT-5.6-Luna", input: 0.20, output: 1.20, cacheRead: 0.02, cacheWrite: 0.25, context: "1.05M" },
   ]},
   { name: "Anthropic", color: "#D97757", models: [
     { id: "fable-5-1", name: "Claude Fable 5.1", input: 10.00, output: 50.00, cacheRead: 0.25, cacheWrite: 12.50, context: "1M" },
@@ -334,17 +332,23 @@ function renderPricing() {
 
 renderPricing();
 
-// Live refresh: the worker keeps Anthropic pricing current in KV. Any failure
-// or malformed payload leaves the baked-in table exactly as rendered above.
+// Live refresh: the worker re-reads each provider's published pricing page
+// behind the edge cache. Any failure or malformed payload leaves the baked-in
+// table exactly as rendered above.
 fetch('/api/pricing').then(r => r.ok ? r.json() : null).then(d => {
-  if (!d || !Array.isArray(d.anthropic) || !d.anthropic.length) return;
-  const a = PROVIDERS.find(p => p.name === 'Anthropic');
-  if (!a) return;
-  a.models = d.anthropic.map(m => ({
-    id: m.id, name: m.model, input: m.input, output: m.output,
-    cacheRead: m.cacheRead, cacheWrite: m.cacheWrite5m,
-    context: m.context >= 1e6 ? '1M' : (m.context / 1000) + 'K',
-  }));
+  if (!d) return;
+  let changed = false;
+  PROVIDERS.forEach(p => {
+    const live = d[p.name.toLowerCase()];
+    if (!Array.isArray(live) || live.length !== p.models.length) return;
+    p.models = live.map(m => ({
+      id: m.id, name: m.model, input: m.input, output: m.output,
+      cacheRead: m.cacheRead, cacheWrite: m.cacheWrite5m,
+      context: m.context >= 1e6 ? +(m.context / 1e6).toFixed(2) + 'M' : (m.context / 1000) + 'K',
+    }));
+    changed = true;
+  });
+  if (!changed) return;
   if (d.updated) UPDATED = d.updated;
   renderPricing();
 }).catch(() => {});

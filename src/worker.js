@@ -231,33 +231,64 @@ const PRICING_BASELINE = {
 		{ id: 'sonnet-4-6', model: 'Claude Sonnet 4.6', input: 3, output: 15, cacheRead: 0.3, cacheWrite5m: 3.75, cacheWrite1h: 6, context: 1000000 },
 		{ id: 'haiku-4-5', model: 'Claude Haiku 4.5', input: 1, output: 5, cacheRead: 0.1, cacheWrite5m: 1.25, cacheWrite1h: 2, context: 200000 },
 	],
+	openai: [
+		{ id: 'gpt-5-6-sol', model: 'gpt-5.6-sol', input: 4, output: 20, cacheRead: 0.4, cacheWrite5m: 5, context: 1050000 },
+		{ id: 'gpt-5-6-terra', model: 'gpt-5.6-terra', input: 2, output: 12, cacheRead: 0.2, cacheWrite5m: 2.5, context: 1050000 },
+		{ id: 'gpt-5-6-luna', model: 'gpt-5.6-luna', input: 0.2, output: 1.2, cacheRead: 0.02, cacheWrite5m: 0.25, context: 1050000 },
+	],
 };
 
-const PRICING_DOC_URL = PRICING_BASELINE.source;
+/**
+ * How to read each provider's published table. Adding a provider is one entry
+ * here plus its models in the baseline — no new parsing code. `order` names the
+ * fields the dollar figures appear in, left to right; extra trailing figures on
+ * the row (OpenAI repeats every price for long context) are ignored.
+ */
+const PRICING_SOURCES = [
+	{
+		key: 'anthropic',
+		url: 'https://platform.claude.com/docs/en/about-claude/pricing',
+		// "$3 / MTok" — the bare-dollar form would also match prose on this page.
+		price: /\$\s*([0-9]+(?:\.[0-9]+)?)\s*\/\s*MTok/g,
+		order: ['input', 'cacheWrite5m', 'cacheWrite1h', 'cacheRead', 'output'],
+	},
+	{
+		key: 'openai',
+		url: 'https://platform.openai.com/docs/pricing',
+		price: /\$\s*([0-9]+(?:\.[0-9]+)?)/g,
+		// The page ships every service tier; the Standard table comes first, and
+		// each row is short-context prices then the same four for long context.
+		order: ['input', 'cacheRead', 'cacheWrite5m', 'output'],
+	},
+];
+
 // A real price change is a step, not a leap. Anything outside this band is a
-// parser fault far more often than it is Anthropic repricing 4x overnight.
+// parser fault far more often than it is a provider repricing 4x overnight.
 const PRICE_DRIFT_MAX = 3;
 
 /**
- * Read the live page, parse it, serve it. No storage: the upstream fetch is
- * edge-cached for 6h by Cloudflare, so this costs one real request per colo
- * per 6h and everything else is a cache hit. Anything that fails — network,
- * page reshuffle, implausible number — falls back to the baseline.
+ * Read every provider's live page, parse it, serve the lot. No storage: each
+ * upstream fetch is edge-cached for 6h by Cloudflare, so this costs one real
+ * request per provider per colo per 6h. Providers are independent — one that
+ * fails or reshapes falls back to its baseline block and the rest still update.
  */
 async function servePricing() {
-	let payload = PRICING_BASELINE;
-	try {
-		const res = await fetch(PRICING_DOC_URL, {
-			headers: { 'User-Agent': 'finopsllm-pricing-bot' },
-			cf: { cacheTtl: 21600, cacheEverything: true },
-		});
-		if (res.ok) {
-			const parsed = parsePricingDoc(await res.text());
-			if (validatePricing(parsed)) payload = parsed;
-		}
-	} catch {
-		// Upstream unreachable — the baseline is still a correct answer.
-	}
+	const payload = { ...PRICING_BASELINE };
+	await Promise.all(
+		PRICING_SOURCES.map(async (src) => {
+			try {
+				const res = await fetch(src.url, {
+					headers: { 'User-Agent': 'finopsllm-pricing-bot' },
+					cf: { cacheTtl: 21600, cacheEverything: true },
+				});
+				if (!res.ok) return;
+				const parsed = parseProvider(await res.text(), src);
+				if (validateProvider(parsed, src.key)) payload[src.key] = parsed;
+			} catch {
+				// Upstream unreachable — the baseline block is still a correct answer.
+			}
+		})
+	);
 	return new Response(JSON.stringify(payload), {
 		headers: {
 			'Content-Type': 'application/json; charset=utf-8',
@@ -268,11 +299,11 @@ async function servePricing() {
 }
 
 /** True only if every baseline model is present, priced, and plausibly close. */
-function validatePricing(data) {
-	if (!data || !Array.isArray(data.anthropic)) return false;
-	if (data.anthropic.length !== PRICING_BASELINE.anthropic.length) return false;
-	return PRICING_BASELINE.anthropic.every((base) => {
-		const found = data.anthropic.find((m) => m && m.id === base.id);
+function validateProvider(models, key) {
+	const baseline = PRICING_BASELINE[key];
+	if (!Array.isArray(models) || models.length !== baseline.length) return false;
+	return baseline.every((base) => {
+		const found = models.find((m) => m && m.id === base.id);
 		if (!found) return false;
 		return ['input', 'output', 'cacheRead', 'cacheWrite5m'].every((f) => {
 			const v = found[f];
@@ -283,29 +314,27 @@ function validatePricing(data) {
 }
 
 /**
- * Pull the published pricing table and read each model's row. Deliberately
- * dumb: find the model name where it is followed by a full price row —
- * "$input $cacheWrite5m $cacheWrite1h $cacheRead $output / MTok" — and take
- * those five figures. Skips the sidebar nav and the shorter batch/legacy
- * tables, which do not carry five prices. If the page shape changes this
- * returns null and the baseline is served, which is the intended outcome.
+ * Deliberately dumb: find the model name where it is followed by a full price
+ * row, and read the figures in the order the source declares. Sidebar nav and
+ * the shorter batch/legacy tables carry too few prices and are skipped. If the
+ * page shape changes this returns null, validateProvider rejects it, and the
+ * baseline is served — which is the intended outcome.
  */
-function parsePricingDoc(html) {
+function parseProvider(html, src) {
 	const text = html.replace(/<[^>]+>/g, '\n').replace(/&nbsp;/g, ' ');
-	const models = PRICING_BASELINE.anthropic.map((base) => {
+	const models = PRICING_BASELINE[src.key].map((base) => {
 		for (let at = text.indexOf(base.model); at !== -1; at = text.indexOf(base.model, at + 1)) {
 			// "Claude Fable 5" must not match inside "Claude Fable 5.1".
 			if (/[.0-9]/.test(text[at + base.model.length] || '')) continue;
-			const nums = (text.slice(at, at + 200).match(/\$\s*([0-9]+(?:\.[0-9]+)?)\s*\/\s*MTok/g) || [])
-				.map((n) => parseFloat(n.replace(/[^0-9.]/g, '')));
-			if (nums.length < 5) continue;
-			const [input, cacheWrite5m, cacheWrite1h, cacheRead, output] = nums;
-			return { ...base, input, cacheWrite5m, cacheWrite1h, cacheRead, output };
+			const nums = (text.slice(at, at + 200).match(src.price) || []).map((n) => parseFloat(n.replace(/[^0-9.]/g, '')));
+			if (nums.length < src.order.length) continue;
+			const row = { ...base };
+			src.order.forEach((field, i) => { row[field] = nums[i]; });
+			return row;
 		}
 		return null;
 	});
-	if (models.some((m) => m === null)) return null;
-	return { ...PRICING_BASELINE, updated: new Date().toISOString().slice(0, 10), anthropic: models };
+	return models.some((m) => m === null) ? null : models;
 }
 
 export default {

@@ -14,9 +14,12 @@
   fetch('/api/pricing')
     .then(function (r) { return r.ok ? r.json() : null; })
     .then(function (data) {
-      if (!data || !Array.isArray(data.anthropic)) return;
+      if (!data) return;
       var byId = {};
-      data.anthropic.forEach(function (m) { if (m && m.id) byId[m.id] = m; });
+      Object.keys(data).forEach(function (k) {
+        if (!Array.isArray(data[k])) return;
+        data[k].forEach(function (m) { if (m && m.id) byId[m.id] = m; });
+      });
 
       rows.forEach(function (row) {
         var m = byId[row.getAttribute('data-model')];
