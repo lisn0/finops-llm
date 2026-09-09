@@ -1,0 +1,35 @@
+{
+  "slug": "research/streaming-abandoned-generations-cost",
+  "tags": ["finops", "cost-control", "streaming", "llm-usage"],
+  "datePublished": "2026-09-09",
+  "dateModified": "2026-09-09",
+  "image": "https://finopsllm.com/og.png",
+  "agentMode": true,
+  "languages": {
+    "en": {
+      "title": "Abandoned streaming responses still cost money",
+      "titleCore": "Streaming responses and abandoned generations",
+      "description": "A user can abandon a streaming response while the model keeps generating. Measure abandoned output, cancel upstream work, and report cost per completed response.",
+      "body": "<p>Streaming makes an AI product feel fast, but it also makes an unfinished response easy to mistake for a cancelled request. A user closes the tab, loses the connection, or presses stop; the provider may continue generating until the request is cancelled or the output reaches its limit. The visible response is shorter, but the bill is not necessarily shorter.</p><h2>The abandoned tail is a real cost</h2><p>Track three events separately: time to first token, tokens delivered to the client, and tokens generated upstream. The gap between delivered and generated output is the abandoned tail. It represents work the user never received, and it can be large in long-form answers, coding agents, and tool-using workflows.</p><p>Do not measure this only as a percentage of requests. A small number of abandoned, high-token generations can dominate the waste. Report abandoned output tokens and their cost by feature, model, device, connection type, and cancellation reason.</p><h2>Cancellation has to travel upstream</h2><p>Stopping the browser renderer is not the same as stopping the model request. Propagate the client disconnect or an explicit stop action through your gateway to the provider request. Set a short grace period for reconnects, then cancel. For agent workflows, cancel the active generation and any queued tool work that no longer has a live parent task.</p><p>Keep an idempotent request identifier so a cancellation race cannot produce duplicate accounting. Record whether the provider confirmed cancellation; otherwise classify the remaining tokens as uncertain spend instead of silently calling them savings.</p><h2>Use a better KPI</h2><p>Cost per request is misleading when many responses are abandoned. Use cost per delivered response and cost per successful task, then show the abandonment rate beside both. A product change that increases time to first token may increase abandonment even when total tokens per request stay flat.</p><h2>Practical controls</h2><ul><li>Emit a cancellation event with request, feature, model, and token counters.</li><li>Cancel upstream work on disconnect and explicit stop.</li><li>Cap maximum output for interactive workloads.</li><li>Compare generated, delivered, and billed tokens during invoice reconciliation.</li><li>Alert when abandoned-token cost rises faster than successful-task volume.</li></ul><h2>Related</h2><ul><li><a href=&quot;/research/llm-cost-attribution&quot;>LLM cost attribution</a></li><li><a href=&quot;/research/agent-spend-guardrails&quot;>Agent spend guardrails</a></li><li><a href=&quot;/research/retry-loop-hidden-spend&quot;>Retry loop hidden spend</a></li></ul>",
+      "faq": [
+        {
+          "question": "Does stopping a streaming response stop model billing?",
+          "answer": "Not necessarily. Closing a tab or stopping the renderer does not guarantee that the upstream model request was cancelled. Propagate disconnects and explicit stop actions through the gateway, then reconcile generated, delivered, and billed tokens."
+        },
+        {
+          "question": "How should abandoned streaming output be measured?",
+          "answer": "Track tokens generated upstream minus tokens delivered to the client, then report the difference by feature, model, device, and cancellation reason. Also measure its dollar cost because a few long generations can dominate the waste."
+        },
+        {
+          "question": "What is a better KPI than cost per request for streaming AI?",
+          "answer": "Use cost per delivered response and cost per successful task, with abandonment rate beside them. Cost per request hides whether the user received the output and whether the work produced business value."
+        }
+      ],
+      "related": [
+        { "slug": "/research/llm-cost-attribution", "label": "LLM cost attribution" },
+        { "slug": "/research/agent-spend-guardrails", "label": "Agent spend guardrails" },
+        { "slug": "/research/retry-loop-hidden-spend", "label": "Retry loop hidden spend" }
+      ]
+    }
+  }
+}
