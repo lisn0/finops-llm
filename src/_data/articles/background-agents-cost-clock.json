@@ -1,0 +1,35 @@
+{
+  "slug": "research/background-agents-cost-clock",
+  "tags": ["finops", "agents", "background-jobs", "budgeting"],
+  "datePublished": "2026-09-10",
+  "dateModified": "2026-09-10",
+  "image": "https://finopsllm.com/og.png",
+  "agentMode": true,
+  "languages": {
+    "en": {
+      "title": "Background agents change the FinOps clock",
+      "titleCore": "Background agents change the FinOps clock",
+      "description": "Background execution lets agents continue after the user leaves. Budget by task, enforce time and tool limits, and close the loop when work finishes.",
+      "body": "<p>Background execution is one of the most useful new patterns in agent products: a task can continue after the user closes the app, while the agent waits, calls tools, and returns later with a result. It is also a break from the old request-response cost model. Spend is no longer concentrated in a visible session; it can accumulate while nobody is watching.</p><p>Google's <a href=&quot;https://blog.google/innovation-and-ai/technology/developers-tools/expanding-managed-agents-gemini-api/&quot;>Managed Agents update</a> describes background execution together with remote MCP, custom functions, and credential refresh. Each capability expands what an agent can do, but also expands the number of billable steps and the time during which a task can remain active.</p><h2>Budget the task, not the chat turn</h2><p>A chat-turn budget is too small a boundary for a background agent. Create a task budget that follows the work across model calls, tool calls, retries, waiting periods, and resumptions. The budget should have both a dollar limit and a step limit. A task that has spent little money but made hundreds of low-value tool calls is still unhealthy.</p><p>Keep a ledger keyed by task ID. Record start time, end time, model calls, input and output tokens, tool calls, external service charges, retries, and final outcome. This lets you distinguish productive long-running work from an agent that is alive but making no progress.</p><h2>Use timeouts as financial controls</h2><p>Timeouts are not only reliability settings. A stale task consumes capacity and can wake up again after a deployment or credential refresh. Set separate limits for total wall-clock lifetime, idle time between steps, maximum model calls, and maximum tool calls. When a limit is reached, pause for human approval or terminate with a useful partial result.</p><p>Resumption needs idempotency. A task that is resumed without a durable checkpoint may repeat expensive searches, retrievals, or tool actions. Store the last completed step and the outputs needed to continue. Reconcile resumed work under the original task ID so the second run does not look like a new, unrelated feature.</p><h2>Charge for value, not runtime</h2><p>Longer execution is not automatically more valuable. Track completion rate, time to useful result, human interventions, and cost per completed task. A background agent that spends ten minutes and produces the same result as a two-minute workflow is a routing and prompt problem, even if the user experience hides the delay.</p><h2>A production control loop</h2><ul><li>Give every background task a dollar, step, wall-clock, and idle-time budget.</li><li>Persist checkpoints before expensive or irreversible tool calls.</li><li>Require approval before crossing a risk or spend threshold.</li><li>Terminate stalled tasks and report the reason to the owner.</li><li>Review cost per completed task by workflow version, not only by model.</li></ul><h2>Related</h2><ul><li><a href=&quot;/research/agent-spend-guardrails-production&quot;>Agent spend guardrails in production</a></li><li><a href=&quot;/research/agent-total-cost-of-ownership&quot;>Agent total cost of ownership</a></li><li><a href=&quot;/research/three-agent-budgets&quot;>Three budgets every agent needs</a></li></ul>",
+      "faq": [
+        {
+          "question": "Why do background agents need a different cost model?",
+          "answer": "They can continue after a user leaves and accumulate spend across model calls, tool calls, retries, waits, and resumptions. A single chat-turn budget cannot contain work that persists beyond the session."
+        },
+        {
+          "question": "What limits should a background agent have?",
+          "answer": "Set separate dollar, step, wall-clock, idle-time, model-call, and tool-call limits. Each catches a different failure mode, from an expensive loop to a task that remains alive without making progress."
+        },
+        {
+          "question": "How should resumed agent work be accounted for?",
+          "answer": "Use a durable checkpoint and keep the same task ID across resumptions. Record completed steps and resumed spend together so repeated work is visible instead of being misclassified as a new workload."
+        }
+      ],
+      "related": [
+        { "slug": "/research/agent-spend-guardrails-production", "label": "Agent spend guardrails in production" },
+        { "slug": "/research/agent-total-cost-of-ownership", "label": "Agent total cost of ownership" },
+        { "slug": "/research/three-agent-budgets", "label": "Three budgets every agent needs" }
+      ]
+    }
+  }
+}

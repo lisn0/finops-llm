@@ -1,0 +1,35 @@
+{
+  "slug": "research/agent-web-search-cost-center",
+  "tags": ["finops", "agents", "web-search", "mcp", "cost-control"],
+  "datePublished": "2026-09-10",
+  "dateModified": "2026-09-10",
+  "image": "https://finopsllm.com/og.png",
+  "agentMode": true,
+  "languages": {
+    "en": {
+      "title": "Web search is becoming an agent cost center",
+      "titleCore": "Web search is becoming an agent cost center",
+      "description": "Agent web search is useful, but each search adds a metered cost beside model tokens. Budget queries, cache results, and measure search cost per successful task.",
+      "body": "<p>Agents are moving from static knowledge to live web research, and that changes the cost model. A single user request can now trigger several searches, a model call to interpret each result, tool retries, and a final synthesis. The search layer is no longer invisible infrastructure; it is a separately metered part of the task.</p><p>Amazon Bedrock AgentCore, for example, documents Web Search as a usage-priced capability at $7 per 1,000 queries. The exact price will vary by provider and product, but the FinOps lesson is universal: count tool calls as billable work alongside input and output tokens. See the <a href=&quot;https://aws.amazon.com/blogs/aws/announcing-web-search-on-amazon-bedrock-agentcore-ground-your-ai-agents-in-current-accurate-web-knowledge/&quot;>AWS announcement</a> for the current example.</p><h2>One prompt can become many searches</h2><p>Search amplification comes from planning. An agent may rewrite a question, search several sources, follow a result, retry a timeout, and search again after finding conflicting evidence. If the application reports only the user's original prompt, finance sees a low-volume feature while the provider sees a high-volume tool workload.</p><p>Record the parent task ID, search provider, query count, result fetches, retry count, and whether the result changed the final answer. Then calculate search cost per successful task. A search that never contributes to a useful answer is a candidate for a policy change, not just a line item to accept.</p><h2>Control the search budget</h2><ul><li>Set a maximum search-query budget per task and per user tier.</li><li>Use a cheaper first pass for discovery, then reserve deep research for high-value tasks.</li><li>Cache stable queries and normalize harmless wording differences.</li><li>Stop after the evidence threshold is met instead of letting the planner keep exploring.</li><li>Make retries exponential and cap them independently from model retries.</li></ul><h2>Measure freshness against spend</h2><p>Freshness is valuable only when it changes the decision. Compare answer quality and task success across search depths: no search, one search, and bounded multi-search. Some workflows need current information; others are paying for repeated retrieval of facts that change slowly.</p><p>Report three numbers together: model cost, search cost, and cost per successful task. This prevents a cheaper model from looking efficient when it is compensating with a large number of paid searches. It also gives product teams a defensible way to decide when live web grounding is worth the premium.</p><h2>Related</h2><ul><li><a href=&quot;/research/mcp-server-cost-impact&quot;>MCP server cost impact</a></li><li><a href=&quot;/research/agent-total-cost-of-ownership&quot;>Agent total cost of ownership</a></li><li><a href=&quot;/research/cost-per-successful-task&quot;>Cost per successful task</a></li></ul>",
+      "faq": [
+        {
+          "question": "Why is web search a new agent cost center?",
+          "answer": "An agent can issue multiple searches, fetch results, retry failed calls, and then make additional model calls to interpret them. Search is separately metered in some platforms, so it must be counted beside token spend."
+        },
+        {
+          "question": "How should web-search agent costs be measured?",
+          "answer": "Attach each query to a parent task ID and record provider, query count, retries, and whether the result changed the answer. Report search cost and model cost together as cost per successful task."
+        },
+        {
+          "question": "How can teams reduce agent web-search spend?",
+          "answer": "Set query budgets, cache stable searches, use bounded search depth, stop when an evidence threshold is met, and apply retry caps independently from model-call retry policies."
+        }
+      ],
+      "related": [
+        { "slug": "/research/mcp-server-cost-impact", "label": "MCP server cost impact" },
+        { "slug": "/research/agent-total-cost-of-ownership", "label": "Agent total cost of ownership" },
+        { "slug": "/research/cost-per-successful-task", "label": "Cost per successful task" }
+      ]
+    }
+  }
+}

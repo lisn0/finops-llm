@@ -1,0 +1,35 @@
+{
+  "slug": "research/model-price-cuts-routing-budget",
+  "tags": ["finops", "model-routing", "pricing", "budgeting"],
+  "datePublished": "2026-09-10",
+  "dateModified": "2026-09-10",
+  "image": "https://finopsllm.com/og.png",
+  "agentMode": true,
+  "languages": {
+    "en": {
+      "title": "Model price cuts do not lower your AI bill automatically",
+      "titleCore": "Model price cuts and the routing budget",
+      "description": "Falling model prices create savings only when workloads move to the right tier. Rebaseline unit economics, quality, latency, and capacity after every pricing change.",
+      "body": "<p>Model prices are falling quickly, but a lower list price does not automatically produce a lower company bill. Teams often respond to a price cut by increasing usage, keeping premium routing in place, or expanding context and output limits until the savings disappear. The relevant question is not whether price per token fell; it is whether cost per successful task fell.</p><p>OpenAI's <a href=&quot;https://openai.com/index/advancing-the-price-performance-frontier-with-gpt-5-6/&quot;>GPT-5.6 pricing update</a> illustrates the pattern: lower-cost models are positioned for high-volume work, while faster or more capable tiers serve workloads where quality or latency justifies a premium. The same announcement highlights Batch, Flex processing, and prompt caching as ways to match capacity and workload shape to cost.</p><h2>Rebaseline by workload</h2><p>Do not apply a single percentage reduction to the whole invoice. Split spend by workload class: interactive support, extraction, coding, agent planning, evaluation, and batch enrichment. For each class record quality, latency, success rate, tokens, and provider price. Then calculate the current cost per successful task before deciding what to move.</p><p>A price cut can change the routing frontier. A model that was previously too expensive for classification may now be the cheapest option after accounting for retries and failure rates. Conversely, a cheap model that produces more invalid outputs can cost more after repair calls and human review.</p><h2>Use the right lane</h2><p>Interactive work needs predictable latency. Repeated context may benefit from caching. Non-urgent work may fit batch or flexible processing. High-volume production may justify committed capacity. The savings come from matching the workload to the commercial lane, not from choosing the lowest token price in isolation.</p><p>Keep routing behind a feature flag and run a quality-and-cost comparison long enough to cover normal traffic variation. Compare total task cost, including fallback calls, cache behavior, tool calls, and post-processing. If the new route fails its quality SLO, roll it back even when its token price looks attractive.</p><h2>Make price changes operational</h2><ul><li>Track provider price history with effective dates.</li><li>Recalculate budgets and forecasts when a price changes.</li><li>Notify workload owners when their routing frontier moves.</li><li>Measure realized savings against invoices, not a spreadsheet estimate.</li><li>Use the freed budget deliberately: more users, better quality, or lower spend.</li></ul><p>Price changes are opportunities to improve allocation, not reasons to stop measuring. A mature FinOps program treats every new model tier as a routing experiment with an owner, baseline, and success metric.</p><h2>Related</h2><ul><li><a href=&quot;/research/model-routing&quot;>Model routing</a></li><li><a href=&quot;/research/provider-prices-not-comparable&quot;>Why provider prices are not comparable</a></li><li><a href=&quot;/research/cost-per-successful-task&quot;>Cost per successful task</a></li></ul>",
+      "faq": [
+        {
+          "question": "Why do model price cuts not automatically reduce total AI spend?",
+          "answer": "Usage can expand, premium routing can remain unchanged, and teams can consume the savings with longer context or larger outputs. Total spend falls only when workloads are reallocated and unit economics are measured."
+        },
+        {
+          "question": "What should be measured after a model price change?",
+          "answer": "Recalculate cost per successful task by workload, including quality, latency, retries, fallbacks, cache behavior, tool calls, and post-processing. Compare realized savings with provider invoices after the change."
+        },
+        {
+          "question": "How should cheaper models be introduced safely?",
+          "answer": "Route them behind a feature flag, compare them against a locked quality and cost baseline across normal traffic, and roll back when the quality SLO fails even if the token price is lower."
+        }
+      ],
+      "related": [
+        { "slug": "/research/model-routing", "label": "Model routing" },
+        { "slug": "/research/provider-prices-not-comparable", "label": "Why provider prices are not comparable" },
+        { "slug": "/research/cost-per-successful-task", "label": "Cost per successful task" }
+      ]
+    }
+  }
+}
