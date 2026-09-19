@@ -253,6 +253,86 @@
           "label": "سجل الجلسة كمصدر وحيد للحقيقة"
         }
       ]
+    },
+    "zh": {
+      "title": "DeepSeek Harness 中的七大防御性架构模式",
+      "titleCore": "DeepSeek Harness 中的七大防御性架构模式",
+      "description": "DeepSeek Harness 源码中的七大工程防御模式：正交结果分离、契约双向校验、真实资源释放与运行环境沙盒化隔离。",
+      "body": "<p>在复杂的自主智能体系统中，微小的错误往往会导致死循环、资源泄漏与巨额 Token 账单。DeepSeek Harness 源码沉淀了七大防御性模式：</p>\n\n<h2>1. 正交结果独立上报</h2>\n<p>将业务任务成功与否同资源消耗统计彻底解耦。即使任务失败，Token 消耗与执行耗时也必须完整记录并上报财务网关。</p>\n\n<h2>2. 契约双向严格校验</h2>\n<p>调用前和输出后均对参数结构和类型进行严格断言，防止提示词注入攻击与畸形 JSON 破坏后续流程。</p>\n\n<h2>3. 异步状态严禁同步化假设</h2>\n<p>所有的智能体状态变更均持久化在事件流日志中，避免在多步骤并发中发生数据冲突或竞态丢失。</p>\n\n<h2>4. 彻底释放运行资源 (Dispose)</h2>\n<p>取消或结束任务时，必须实质性终止子进程、关闭网络连接并清理临时文件，而不仅仅发出取消信号。</p>\n\n<h2>5. 分发器全面捕获插件异常</h2>\n<p>任何工具或插件的报错均被隔离在本地调用栈中，不得引发核心智能体控制循环的奔溃。</p>\n\n<h2>6. 严禁向不可信输出暴露环境敏感信息</h2>\n<p>过滤系统环境变量与路径信息，防止大模型在生成代码或分析报告时泄漏企业凭证。</p>\n\n<h2>7. 符号链接穿透校验</h2>\n<p>严格解析真实文件路径，阻止智能体通过软链接越界访问项目工作区之外的敏感文件。</p>",
+      "faq": [
+        {
+          "question": "DeepSeek Harness 防御模式的核心作用是什么？",
+          "answer": "通过契约校验、异常隔离和资源清理，防止自主智能体陷入无限死循环并杜绝意外的 Token 浪费。"
+        },
+        {
+          "question": "为什么任务失败时仍需记录 Token 消耗？",
+          "answer": "正交结果原则要求无论业务成败，模型推理成本都必须精确核算并记账，以保障 FinOps 归因真实。"
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/what-is-deepseek-harness",
+          "label": "什么是 DeepSeek Harness？"
+        },
+        {
+          "slug": "/research/deepseek-harness-guardrails",
+          "label": "支出与安全护栏"
+        }
+      ]
+    },
+    "it": {
+      "title": "Sette pattern difensivi in DeepSeek Harness",
+      "titleCore": "Sette pattern difensivi in DeepSeek Harness",
+      "description": "I pattern difensivi nel codice di DeepSeek Harness: separazione ortogonale, contratti, rilascio reale delle risorse e isolamento ambientale.",
+      "body": "<p>Sette principi architetturali adottati da DeepSeek Harness per prevenire crash, leak di memoria e sprechi di token durante l'esecuzione autonoma degli agenti.</p>\n<h2>1. Risultati ortogonali e contratti</h2><p>Separare l'esito della task dal monitoraggio dei consumi: i token spesi vanno tracciati anche se la task fallisce.</p>\n<h2>2. Smaltimento reale delle risorse</h2><p>All'arresto di un agente, tutti i processi e le connessioni devono essere terminati esplicitamente.</p>",
+      "faq": [
+        {
+          "question": "Qual è lo scopo dei pattern difensivi?",
+          "answer": "Evitare loop infiniti, garantire la chiusura delle risorse e proteggere i budget di inferenza dai crash."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/what-is-deepseek-harness",
+          "label": "Guida a DeepSeek Harness"
+        }
+      ]
+    },
+    "ko": {
+      "title": "DeepSeek Harness의 7가지 방어적 설계 패턴",
+      "titleCore": "DeepSeek Harness의 7가지 방어적 설계 패턴",
+      "description": "DeepSeek Harness 소스코드 분석: 직교 결과 분리, 엄격한 계약 검증, 리소스 완전 해제 및 샌드박스 환경 격리.",
+      "body": "<p>자율 에이전트 실행 중 리소스 누수와 무한 루프를 방지하기 위해 DeepSeek Harness가 적용한 7가지 방어 패턴입니다.</p>\n<h2>1. 결과와 비용의 직교 분리</h2><p>작업 성공 여부와 관계없이 토큰 사용량과 실행 메트릭을 반드시 기록하여 비용 추적성을 유지합니다.</p>\n<h2>2. 완전한 리소스 정리 (Dispose)</h2><p>작업 중단 시 백그라운드 프로세스와 네트워크 소켓을 강제 종료하여 유휴 토큰 과금을 방지합니다.</p>",
+      "faq": [
+        {
+          "question": "방어적 패턴이 왜 필요한가요?",
+          "answer": "에이전트 장애와 무한 재시도 루프로 인한 토큰 비용 폭증을 방지하고 시스템 안정성을 유지하기 위함입니다."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/what-is-deepseek-harness",
+          "label": "DeepSeek Harness 개요"
+        }
+      ]
+    },
+    "nl": {
+      "title": "Zeven defensieve patronen in DeepSeek Harness",
+      "titleCore": "Zeven defensieve patronen in DeepSeek Harness",
+      "description": "Defensieve patronen in DeepSeek Harness: orthogonale resultaten, contractvalidatie, veilige opschoning en sandboxing.",
+      "body": "<p>Zeven essentiële ontwerppatronen uit DeepSeek Harness om oneindige lussen en onverwachte tokenkosten te voorkomen.</p>\n<h2>1. Orthogonale registratie</h2><p>Registreer tokenverbruik altijd, ongeacht of de taak slaagde of faalde.</p>\n<h2>2. Grondige afvoer van resources</h2><p>Zorg dat subprocessen en netwerkverbindingen direct sluiten bij beëindiging.</p>",
+      "faq": [
+        {
+          "question": "Wat is het voordeel van deze patronen?",
+          "answer": "Ze garanderen robuuste foutisolatie en voorkomen dat falende agents oneindig tokens blijven verbruiken."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/what-is-deepseek-harness",
+          "label": "Wat is DeepSeek Harness?"
+        }
+      ]
     }
   }
 }

@@ -233,6 +233,118 @@
           "label": "حواجز الإنفاق في DeepSeek Harness"
         }
       ]
+    },
+    "zh": {
+      "title": "安装 DeepSeek Harness：配置与首跑指南",
+      "titleCore": "安装 DeepSeek Harness：配置与首跑指南",
+      "description": "DeepSeek Harness 快速上手指南：通过 npx 运行 Web 界面、配置文件与插件包、四层配置覆盖顺序与核心演示示例。",
+      "body": "<p>这是 DeepSeek Harness 的实用操作指南：如何启动 <code>dsh</code>、组合模式的工作原理，以及最值得体验的官方演示。</p>\n\n<h2>最快速的上手方式</h2>\n<pre><code>npx @deepseek-ai/dsh web</code></pre>\n<p>在本地 <code>http://127.0.0.1:3080</code> 启动 Web 界面。开始前必须完成两项设置：</p>\n<ol>\n  <li><strong>设置 → 模型：</strong> 输入 DeepSeek API Key，无需重启即可生效。</li>\n  <li><strong>选择工作区：</strong> 添加并激活项目目录，否则会话编写器将保持禁用状态。</li>\n</ol>\n<p>启动后，智能体可以读写文件、执行终端命令、委托子智能体并进行规划，执行前会按权限策略请求确认。</p>\n\n<h2>源码安装与构建</h2>\n<pre><code>git clone https://github.com/deepseek-ai/deepseek-harness\npnpm install\npnpm run build\npnpm dsh web</code></pre>\n<p>环境要求：Node 22.19+、Git 2.26+，通过 Corepack 使用固定版本 <code>pnpm@11.7.0</code>。API Key 可配置于环境变量或根目录的 <code>.env</code> 文件中。</p>\n\n<h2>配置文件与插件包 (Profiles & Bundles)</h2>\n<p>在 Cordis 架构中，一切皆插件。<strong>Profile</strong> 是命名的插件组合，包含有序的 Bundle 列表及自定义补丁。官方内置三套模板：</p>\n<ul>\n  <li><code>dsh-base</code>: 模型适配器、基础工具与持久化。</li>\n  <li><code>dsh-web-app</code>: 浏览器交互界面。</li>\n  <li><code>dsh-headless</code>: 适合 CI/CD 和自动化的单次无头运行模式。</li>\n</ul>\n\n<h2>四层配置覆盖顺序</h2>\n<p>配置按固定顺序解析，后层覆盖前层：</p>\n<ol>\n  <li>Profile Bundles（预设插件包）</li>\n  <li>Profile Patches（配置补丁）</li>\n  <li>Home Patches（全局用户补丁）</li>\n  <li>CLI Overlays（命令行参数 —— 最高优先级）</li>\n</ol>",
+      "faq": [
+        {
+          "question": "如何快速安装和运行 DeepSeek Harness？",
+          "answer": "运行 npx @deepseek-ai/dsh web 即可在本地 3080 端口启动 Web 界面，或通过 git clone 源码编译运行。"
+        },
+        {
+          "question": "DeepSeek Harness 中的 Profile 是什么？",
+          "answer": "Profile 是命名的插件组合，定义了加载的插件包及补丁规则，如 dsh-base 和 dsh-headless。"
+        },
+        {
+          "question": "配置覆盖的四层解析顺序是什么？",
+          "answer": "顺序为：插件包、配置文件补丁、用户全局补丁、命令行参数。命令行参数具有最高优先级。"
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/what-is-deepseek-harness",
+          "label": "什么是 DeepSeek Harness？"
+        },
+        {
+          "slug": "/research/deepseek-harness-plugin-architecture",
+          "label": "插件化架构设计与优势"
+        },
+        {
+          "slug": "/research/deepseek-harness-guardrails",
+          "label": "智能体预算与开销护栏"
+        }
+      ]
+    },
+    "it": {
+      "title": "Installare DeepSeek Harness: profili e primo avvio",
+      "titleCore": "Installare DeepSeek Harness: profili e primo avvio",
+      "description": "Guida pratica a DeepSeek Harness: installazione npx, interfaccia web, profili, ordine di configurazione a quattro livelli e demo essenziali.",
+      "body": "<p>Guida pratica per iniziare con <code>dsh</code> (DeepSeek Harness): configurazione, modello compositivo a plugin e workflow iniziale.</p>\n\n<h2>Avvio rapido</h2>\n<pre><code>npx @deepseek-ai/dsh web</code></pre>\n<p>Avvia l'interfaccia web locale su <code>http://127.0.0.1:3080</code>. Prima dell'uso occorrono due passaggi:</p>\n<ol>\n  <li><strong>Impostazioni → Modelli:</strong> inserisci la chiave API DeepSeek.</li>\n  <li><strong>Scegli area di lavoro:</strong> aggiungi e attiva la cartella di progetto.</li>\n</ol>\n\n<h2>Compilazione da sorgente</h2>\n<pre><code>git clone https://github.com/deepseek-ai/deepseek-harness\npnpm install\npnpm run build\npnpm dsh web</code></pre>\n<p>Requisiti minimi: Node 22.19+, Git 2.26+, pnpm gestito via Corepack.</p>\n\n<h2>Profili e bundle</h2>\n<p>I componenti sono plugin Cordis raggruppati in profili (<code>dsh-base</code>, <code>dsh-web-app</code>, <code>dsh-headless</code>). L'ordine di override a 4 livelli garantisce che i flag da riga di comando abbiano sempre la precedenza assoluta.</p>",
+      "faq": [
+        {
+          "question": "Come si installa DeepSeek Harness?",
+          "answer": "Il metodo più rapido è npx @deepseek-ai/dsh web, oppure clonando il repository e compilando con pnpm."
+        },
+        {
+          "question": "Cos'è un profilo in DeepSeek Harness?",
+          "answer": "Una composizione con nome che definisce l'elenco ordinato di bundle di plugin e patch attive."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/what-is-deepseek-harness",
+          "label": "Cos'è DeepSeek Harness?"
+        },
+        {
+          "slug": "/research/deepseek-harness-guardrails",
+          "label": "Limiti di spesa in DeepSeek Harness"
+        }
+      ]
+    },
+    "ko": {
+      "title": "DeepSeek Harness 설치: 프로필과 첫 실행 가이드",
+      "titleCore": "DeepSeek Harness 설치: 프로필과 첫 실행 가이드",
+      "description": "DeepSeek Harness 실전 설치 가이드: npx 실행, 웹 인터페이스, 프로필 및 번들, 4단계 설정 우선순위와 핵심 데모 분석.",
+      "body": "<p>DeepSeek Harness(dsh)를 시작하기 위한 실전 가이드입니다. 환경 설정과 플러그인 아키텍처 및 첫 실행 방법을 안내합니다.</p>\n\n<h2>가장 빠른 실행 방법</h2>\n<pre><code>npx @deepseek-ai/dsh web</code></pre>\n<p>로컬 <code>http://127.0.0.1:3080</code>에서 웹 인터페이스가 시작됩니다. 다음 두 단계 설정이 필요합니다:</p>\n<ol>\n  <li><strong>설정 → 모델:</strong> DeepSeek API 키 입력(재시작 없이 즉시 활성화).</li>\n  <li><strong>워크스페이스 선택:</strong> 프로젝트 디렉터리를 추가하고 활성화.</li>\n</ol>\n\n<h2>소스 코드 빌드</h2>\n<pre><code>git clone https://github.com/deepseek-ai/deepseek-harness\npnpm install\npnpm run build\npnpm dsh web</code></pre>\n<p>요구사항: Node 22.19 이상, Git 2.26 이상, Corepack을 통한 <code>pnpm@11.7.0</code> 고정 버전.</p>\n\n<h2>프로필과 4단계 설정 계층</h2>\n<p>Cordis 런타임 위에서 동작하며 모든 것이 플러그인입니다. 번들 패키지, 프로필 패치, 홈 패치, CLI 오버레이 순으로 적용되어 CLI 명령어가 항상 최종 우선순위를 가집니다.</p>",
+      "faq": [
+        {
+          "question": "DeepSeek Harness 설치 방법은 무엇인가요?",
+          "answer": "npx @deepseek-ai/dsh web 명령어로 즉시 로컬 웹 UI를 실행하거나 소스를 클론하여 pnpm으로 빌드할 수 있습니다."
+        },
+        {
+          "question": "설정 우선순위는 어떻게 결정되나요?",
+          "answer": "프로필 번들, 프로필 패치, 사용자 홈 패치, CLI 오버레이 순서로 적용되며 CLI 파라미터가 최우선 적용됩니다."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/what-is-deepseek-harness",
+          "label": "DeepSeek Harness 가이드"
+        },
+        {
+          "slug": "/research/deepseek-harness-plugin-architecture",
+          "label": "플러그인 아키텍처 분석"
+        }
+      ]
+    },
+    "nl": {
+      "title": "DeepSeek Harness installeren: profielen & eerste run",
+      "titleCore": "DeepSeek Harness installeren: profielen & eerste run",
+      "description": "Praktische gids voor DeepSeek Harness: npx-installatie, webinterface, profielen, vierlagige configuratievolgorde en demo's.",
+      "body": "<p>Praktische gids voor het starten van <code>dsh</code> (DeepSeek Harness): installatie, configuratielagen en workflows.</p>\n\n<h2>Snelle start</h2>\n<pre><code>npx @deepseek-ai/dsh web</code></pre>\n<p>Start de lokale webinterface op <code>http://127.0.0.1:3080</code>. Voer twee stappen uit:</p>\n<ol>\n  <li><strong>Instellingen → Modellen:</strong> vul uw DeepSeek API-sleutel in.</li>\n  <li><strong>Kies werkruimte:</strong> activeer uw projectmap om de composer te ontgrendelen.</li>\n</ol>\n\n<h2>Bouwen vanuit broncode</h2>\n<pre><code>git clone https://github.com/deepseek-ai/deepseek-harness\npnpm install\npnpm run build\npnpm dsh web</code></pre>\n<p>Vereisten: Node 22.19+, Git 2.26+, pnpm via Corepack. De vierledige configuratiestructuur zorgt dat CLI-argumenten altijd voorrang hebben op profielen en bundels.</p>",
+      "faq": [
+        {
+          "question": "Hoe installeer je DeepSeek Harness?",
+          "answer": "Start direct met npx @deepseek-ai/dsh web of bouw de broncode lokaal via pnpm install en pnpm build."
+        },
+        {
+          "question": "Wat is een profiel in DeepSeek Harness?",
+          "answer": "Een benoemde samenstelling van Cordis-pluginbundels en aangepaste patches voor specifieke taken."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/what-is-deepseek-harness",
+          "label": "Wat is DeepSeek Harness?"
+        },
+        {
+          "slug": "/research/deepseek-harness-guardrails",
+          "label": "Budgetbewaking in DeepSeek Harness"
+        }
+      ]
     }
   }
 }

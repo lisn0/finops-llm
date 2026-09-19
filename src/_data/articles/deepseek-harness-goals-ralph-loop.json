@@ -253,6 +253,82 @@
           "label": "ميزانيات الوكلاء الثلاث"
         }
       ]
+    },
+    "zh": {
+      "title": "目标驱动与 Ralph 循环：控制智能体开销",
+      "titleCore": "目标驱动与 Ralph 循环：控制智能体开销",
+      "description": "DeepSeek Harness 如何将开放式任务形式化为目标、轮次与 Ralph 循环，以及控制长上下文重试成本的架构机制。",
+      "body": "<p>开放式任务（如大型代码重构）极易陷入成本失控。DeepSeek Harness 通过“步骤 (Step)、轮次 (Turn)、循环轮数 (Round)”以及 <strong>Ralph 循环</strong> 构建了严密的控制边界。</p>\n\n<h2>概念分层：Step、Turn 与 Round</h2>\n<ul>\n  <li><strong>Step:</strong> 一次模型推理调用及触发的工具执行，是计费的原子单位。</li>\n  <li><strong>Turn:</strong> 一次完整的用户交互与智能体响应周期。</li>\n  <li><strong>Round:</strong> 针对持久化目标（Goal）的一轮高级策略执行。</li>\n</ul>\n\n<h2>Ralph 循环：重置上下文以节约 Token</h2>\n<p>当智能体在长上下文中不断受挫时，上下文会充满历史错误。Ralph 循环通过优雅重置当前上下文、仅保留核心目标和进度快照，实现有意识的重新开始，大幅降低输入 Token 账单。</p>",
+      "faq": [
+        {
+          "question": "什么是 Ralph 循环？",
+          "answer": "它是一种上下文压缩与重置机制，在保留最终目标的同时清空过往冗余历史，有效遏制长上下文的 Token 浪费。"
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/what-is-deepseek-harness",
+          "label": "什么是 DeepSeek Harness？"
+        },
+        {
+          "slug": "/research/three-agent-budgets",
+          "label": "自主智能体的三层预算模型"
+        }
+      ]
+    },
+    "it": {
+      "title": "Obiettivi e Ralph Loop in DeepSeek Harness",
+      "titleCore": "Obiettivi e Ralph Loop in DeepSeek Harness",
+      "description": "Come DeepSeek Harness formalizza il lavoro autonomo in obiettivi, round e Ralph loop per limitare i costi di contesto lungo.",
+      "body": "<p>Formalizzazione del lavoro iterativo: distinzione tra step, turn e round, e utilizzo del Ralph Loop per resettare il contesto e contenere i token.</p>",
+      "faq": [
+        {
+          "question": "Cos'è il Ralph Loop?",
+          "answer": "Un meccanismo per riavviare consapevolmente il contesto di lavoro preservando gli obiettivi essenziali."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/what-is-deepseek-harness",
+          "label": "Guida a DeepSeek Harness"
+        }
+      ]
+    },
+    "ko": {
+      "title": "목표 관리와 Ralph 루프: 에이전트 비용 통제",
+      "titleCore": "목표 관리와 Ralph 루프: 에이전트 비용 통제",
+      "description": "DeepSeek Harness의 목표 지향 루프, 스텝/턴/라운드 분리 및 긴 컨텍스트 비용을 줄이는 Ralph 루프 분석.",
+      "body": "<p>장기 작업 시 컨텍스트 비대화를 방지하고 목표를 달성하기 위해 Ralph 루프를 통해 컨텍스트를 초기화하며 비용을 통제합니다.</p>",
+      "faq": [
+        {
+          "question": "Ralph 루프의 목적은 무엇인가요?",
+          "answer": "과거 실패 기록으로 비대해진 컨텍스트를 초기화하고 목표 요약만 유지하여 토큰 낭비를 차단합니다."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/what-is-deepseek-harness",
+          "label": "DeepSeek Harness 개요"
+        }
+      ]
+    },
+    "nl": {
+      "title": "Doelen en de Ralph-loop in DeepSeek Harness",
+      "titleCore": "Doelen en de Ralph-loop in DeepSeek Harness",
+      "description": "Hoe DeepSeek Harness langdurig agentwerk formaliseert met doelen, rondes en de Ralph-loop om contextkosten te beperken.",
+      "body": "<p>Structuur voor autonome taken met doelen en context-resets via de Ralph-loop om dure herhalingen te voorkomen.</p>",
+      "faq": [
+        {
+          "question": "Wat doet de Ralph-loop?",
+          "answer": "Het reset de context met behoud van de hoofddoelen om te voorkomen dat foutieve prompts de tokenrekening opdrijven."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/what-is-deepseek-harness",
+          "label": "Wat is DeepSeek Harness?"
+        }
+      ]
     }
   }
 }
