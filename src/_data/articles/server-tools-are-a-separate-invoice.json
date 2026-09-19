@@ -134,6 +134,110 @@
           "label": "プロンプトキャッシュの経済性"
         }
       ]
+    },
+    "it": {
+      "title": "Gli strumenti server fatturano fuori dai token",
+      "titleCore": "Gli strumenti server sono una fattura separata",
+      "description": "Web search ed esecuzione di codice si pagano a chiamata, non a token. Se si contano solo i token, i costi dell'agente raddoppiano invisibilmente.",
+      "body": "<p>La maggior parte dei modelli di costo per LLM misura una sola cosa: token di input, token di output e costo per milione. Questo modello era corretto quando le richieste generavano solo testo, ma è diventato obsoleto con l'arrivo degli strumenti lato server.</p><p>Web search, fetch e interpreti di codice girano sull'infrastruttura del provider e spesso addebitano una tariffa a chiamata oltre ai token generati. Un singolo turno di un agente può quindi fatturare due volte: una per la ricerca eseguita e una per i token che quel risultato aggiunge al contesto.</p><h2>L'effetto cumulativo del contesto</h2><p>Il secondo addebito è quello più insidioso. Ogni risultato di un tool viene aggiunto alla conversazione e ogni turno successivo lo reinvia per intero come input. Dieci ricerche all'inizio di una lunga sessione significano dieci tariffe di ricerca più i relativi payload di token riletti a ogni turno successivo.</p><h2>Tre controlli operativi</h2><p>Limitare il numero di chiamate ai tool per sessione, troncare e riassumere i contenuti prima di inserirli nel contesto, e memorizzare nella cache il prefisso stabile del prompt.</p>",
+      "faq": [
+        {
+          "question": "Perché gli strumenti server costano più del previsto?",
+          "answer": "Perché si paga una tariffa a chiamata per l'esecuzione del tool e successivamente si pagano i token generati dal risultato reinviati a ogni turno successivo."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/prompt-caching-economics",
+          "label": "Economia del prompt caching"
+        }
+      ]
+    },
+    "ko": {
+      "title": "서버 측 도구는 토큰 계량기 외부에서 청구된다",
+      "titleCore": "서버 측 도구는 별도의 청구서다",
+      "description": "웹 검색과 코드 실행은 토큰이 아닌 호출당 요금이 청구됩니다. 토큰만 계산하면 에이전트 비용이 두 배로 늘어나는 이유.",
+      "body": "<p>대부분의 LLM 비용 모델은 입력 토큰과 출력 토큰이라는 단일 계량기만을 전제합니다. 하지만 웹 검색, 웹 페치, 코드 실행과 같은 서버 측 도구는 제공업체 인프라에서 실행되며 호출당 별도 요금이 부과됩니다.</p><p>따라서 단일 에이전트 턴에서 도구 호출 비용과 그 결과가 컨텍스트에 추가되면서 발생하는 입력 토큰 비용이라는 이중 과금이 발생합니다.</p><h2>복리로 불어나는 컨텍스트 비용</h2><p>도구의 실행 결과는 대화 기록에 누적되며, 이후의 모든 턴에서 입력 토큰으로 계속해서 재전송됩니다. 작업 초반의 10회 웹 검색은 10번의 도구 사용료뿐만 아니라, 이후 모든 턴에서 수천 개의 토큰을 반복해서 읽는 비용을 발생시킵니다.</p><h2>3가지 실질적 통제 방안</h2><p>에이전트 실행당 도구 호출 횟수를 엄격히 제한하고, 컨텍스트에 추가하기 전에 결과 텍스트를 요약 및 축소하며, 변경되지 않는 시스템 프롬프트와 툴 정의에 프롬프트 캐싱을 적용해야 합니다.</p>",
+      "faq": [
+        {
+          "question": "서버 측 도구가 토큰 계산보다 비싼 이유는 무엇인가요?",
+          "answer": "도구 호출 자체에 건당 요금이 부과될 뿐만 아니라, 반환된 결과 텍스트가 이후 모든 턴의 입력 토큰으로 누적되어 재청구되기 때문입니다."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/prompt-caching-economics",
+          "label": "프롬프트 캐싱의 경제학"
+        }
+      ]
+    },
+    "zh": {
+      "title": "大模型服务端工具往往是另一张计费账单",
+      "titleCore": "大模型服务端工具往往是另一张计费账单",
+      "description": "网页检索、网页抓取与代码执行往往按次计费而非仅按Token计费。若成本模型只统计Token，账单将在无形中翻倍。",
+      "body": "<p>大多数LLM成本模型只设立了一个单一的计量维度：输入Token、输出Token、每百万Token单价。当API请求的全部工作仅仅是补全生成文本时，这一模型完全正确。但自从云供应商推出服务端原生工具（Server-side Tools）的那一刻起，该假设便彻底失效了。</p><p>网络实时搜索（Web Search）、网页抓取（Web Fetch）以及代码沙箱执行（Code Execution）均直接运行在云供应商的基础设施之上，其中许多工具在产出Token之外，还额外附带独立的按次调用费。因此，单次智能体交互往往会产生双重收费：一次是工具本身的单次调用费，另一次是工具返回结果作为上下文被后续各轮重复计费的Token费用。</p><h2>隐性的复利累积效应</h2><p>最容易被工程团队忽视的是第二笔费用。每一次工具调用的返回结果都会被完整追加到对话历史中，而后续的每一个交互回合都会将全部历史作为输入Token重新发送。在一段漫长的智能体执行链路初期执行十次网页搜索，产生的绝不仅是十次单项费用——而是十次调用费加上其庞大的网页数据载荷在后续每轮交互中被反复重新计费的累计成本。</p><h2>三大立竿见影的治理控制</h2><ul><li><strong>对单次任务的工具调用次数设定硬顶：</strong>为单次用户任务设定搜索或抓取次数的绝对上限。大多数触及10次上限的工作流都是在死循环，而非有效探索。</li><li><strong>截断并精简注入上下文的内容：</strong>极少有业务场景需要将抓取的整个HTML页面塞入Prompt。在将工具结果追加至历史前进行清洗或摘要，可以有效削减后续所有轮次的输入成本。</li><li><strong>缓存固定的前缀结构：</strong>如果系统提示词和工具定义在任务全生命周期内保持静态，利用提示词前缀缓存可消除工具带来的最大重复成本。</li></ul>",
+      "faq": [
+        {
+          "question": "为什么大模型服务端工具的实际成本远超Token消耗？",
+          "answer": "因为它们采取双重计费：云供应商针对工具执行按次收费，且其返回结果追加到上下文后会在后续每一轮中被作为输入Token反复计费。"
+        },
+        {
+          "question": "工程团队应如何精确归因智能体工具的消耗成本？",
+          "answer": "在记录Token的同时记录所用工具、调用次数及结果载荷大小，并计算单次智能体完整任务的总成本，而非孤立的单次API调用。"
+        },
+        {
+          "question": "治理服务端工具成本膨胀最有效的手段是什么？",
+          "answer": "为单次用户任务设定工具调用次数硬顶、在工具结果注入上下文前进行摘要截断，以及对不变的工具前缀启用提示词前缀缓存。"
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/prompt-caching-economics",
+          "label": "提示词缓存经济学"
+        },
+        {
+          "slug": "/research/cost-per-request-kpi",
+          "label": "单次请求成本KPI"
+        },
+        {
+          "slug": "/research/llm-cost-attribution",
+          "label": "LLM成本归因"
+        }
+      ]
+    },
+    "nl": {
+      "title": "Servertools vallen buiten de standaard tokenmeter",
+      "titleCore": "Servertools vallen buiten de standaard tokenmeter",
+      "description": "Web search, web fetch en code-executie worden per aanroep gefactureerd. Zonder tool-attributie verdubbelen agents ongemerkt de factuur.",
+      "body": "<p>De meeste LLM-kostenmodellen hanteren één meter: tokens in, tokens uit, prijs per miljoen. Dat model volstond toen een verzoek uitsluitend tekst genereerde. Het werd ontoereikend op het moment dat server-side tools hun intrede deden.</p><p>Web search, web fetch en code-executie draaien op de infrastructuur van de provider, en verschillende tools brengen een vaste toeslag per aanroep in rekening bovenop de geproduceerde tokens. Eén enkele interactieronde kan daardoor dubbel factureren: eenmaal voor de zoekopdrachten zelf, en nogmaals voor de tokens die de zoekresultaten aan de context toevoegen.</p><h2>Het compounding-effect</h2><p>De tweede kostenpost wordt stelselmatig over het hoofd gezien. Elk toolresultaat wordt toegevoegd aan de conversatiehistorie, en elke volgende turn verstuurt die complete payload opnieuw als input-tokens. Tien zoekopdrachten vroeg in een agent-run zijn niet slechts tien tariefposten &mdash; het zijn tien toeslagen plus de payloads die bij elke volgende stap opnieuw worden belast.</p><h2>Drie bewezen beheersmaatregelen</h2><ul><li><strong>Begrens het aantal toolcalls per run:</strong> Een hard plafond op zoekopdrachten per gebruikersverzoek begrenst beide kostenposten gelijktijdig. Workflows die de limiet van tien overschrijden zitten vrijwel altijd in een oneindige lus.</li><li><strong>Kort payloads in vóór contextinjectie:</strong> U heeft zelden een volledige webpagina nodig. Door resultaten samen te vatten voordat ze worden toegevoegd, verlaagt u de kosten van elke opeenvolgende turn.</li><li><strong>Cache het stabiele prompt-voorvoegsel:</strong> Als de systeemprompt en gereedschapsdefinities constant blijven, elimineert prompt caching de grootste herhalende kostenpost.</li></ul>",
+      "faq": [
+        {
+          "question": "Waarom kosten server-side tools meer dan de tokens suggereren?",
+          "answer": "Omdat providers een toeslag per aanroep heffen én de resultaten toevoegen aan de conversatie, waardoor ze bij elke volgende beurt opnieuw als input-tokens worden gefactureerd."
+        },
+        {
+          "question": "Hoe moeten teams toolkosten bij agents toewijzen?",
+          "answer": "Log welke tool werd uitgevoerd, hoe vaak en de tokenomvang van elk resultaat. Bereken vervolgens de kosten per complete agent-run in plaats van per individuele API-aanroep."
+        },
+        {
+          "question": "Wat is de meest effectieve beheersmaatregel voor toolkosten?",
+          "answer": "Een hard plafond op toolcalls per taak, het samenvatten van resultaten vóór injectie in de context en het cachen van het statische prompt-voorvoegsel."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/prompt-caching-economics",
+          "label": "Economie van prompt caching"
+        },
+        {
+          "slug": "/research/cost-per-request-kpi",
+          "label": "Kosten per verzoek als product-KPI"
+        },
+        {
+          "slug": "/research/llm-cost-attribution",
+          "label": "LLM-kostentoewijzing"
+        }
+      ]
     }
   }
 }

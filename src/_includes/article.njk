@@ -53,19 +53,33 @@
   "publisher": { "@type": "Organization", "name": "FinOps LLM", "url": siteUrl + '/' }
 } -%}
 
+{%- set breadcrumbLabels = {
+  en: ["Home", "Research"],
+  de: ["Startseite", "Forschung"],
+  es: ["Inicio", "Investigación"],
+  fr: ["Accueil", "Recherche"],
+  ja: ["ホーム", "リサーチ"],
+  pt: ["Início", "Pesquisa"],
+  it: ["Home", "Ricerca"],
+  ko: ["홈", "리서치"],
+  zh: ["首页", "研究"],
+  nl: ["Home", "Onderzoek"],
+  ar: ["الرئيسية", "أبحاث"]
+} -%}
+{%- set bl = breadcrumbLabels[lang] or breadcrumbLabels['en'] -%}
 {%- set breadcrumb = {
   "@context": "https://schema.org",
   "@type": "BreadcrumbList",
   "itemListElement": [
-    { "@type": "ListItem", "position": 1, "name": "Home", "item": siteUrl + '/' },
-    { "@type": "ListItem", "position": 2, "name": "Research", "item": siteUrl + '/research' },
+    { "@type": "ListItem", "position": 1, "name": bl[0], "item": siteUrl + '/' },
+    { "@type": "ListItem", "position": 2, "name": bl[1], "item": siteUrl + '/research' },
     { "@type": "ListItem", "position": 3, "name": locale.titleCore or locale.title, "item": canonicalUrl }
   ]
 } -%}
 
 
 <!DOCTYPE html>
-<html lang="{{ lang }}">
+<html lang="{{ lang }}"{% if lang == 'ar' %} dir="rtl"{% endif %}>
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -107,16 +121,16 @@ p,li{color:#B6C0D2}
 h1{line-height:1.08}
 h2{margin-top:34px}
 h3{margin-top:26px;color:#E6EAF2}
-code{background:#101726;padding:2px 6px;border-radius:4px;color:#E6EAF2;font-size:.92em}
-pre{background:#101726;border:1px solid #1E2A3F;border-radius:6px;padding:14px 16px;overflow-x:auto;color:#E6EAF2;font-size:.9em}
+code{background:#101726;padding:2px 6px;border-radius:4px;color:#E6EAF2;font-size:.92em;direction:ltr;unicode-bidi:embed}
+pre{background:#101726;border:1px solid #1E2A3F;border-radius:6px;padding:14px 16px;overflow-x:auto;color:#E6EAF2;font-size:.9em;direction:ltr;text-align:left;unicode-bidi:embed}
 pre code{background:none;padding:0}
 table{border-collapse:collapse;width:100%;margin:24px 0;font-size:.95em}
-th,td{border:1px solid #1E2A3F;padding:10px 12px;text-align:left;color:#B6C0D2}
+th,td{border:1px solid #1E2A3F;padding:10px 12px;text-align:{% if lang == 'ar' %}right{% else %}left{% endif %};color:#B6C0D2}
 th{color:#E6EAF2;background:#101726}
-.langsw{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;color:#647289;margin:0 0 26px}
+.langsw{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;color:#647289;margin:0 0 26px;direction:ltr}
 .langsw a{text-decoration:none}
 .langsw a[aria-current]{color:#E6EAF2;font-weight:600}
-.agent-summary{border-left:3px solid #7AAFFF;background:rgba(122,175,255,.10);padding:16px 20px;margin:0 0 28px;color:#E6EAF2}
+.agent-summary{border-{% if lang == 'ar' %}right{% else %}left{% endif %}:3px solid #7AAFFF;background:rgba(122,175,255,.10);padding:16px 20px;margin:0 0 28px;color:#E6EAF2}
 </style>
 <script type="application/ld+json">{{ jsonLdArticle | dump | safe }}</script>
 <script type="application/ld+json">{{ breadcrumb | dump | safe }}</script>

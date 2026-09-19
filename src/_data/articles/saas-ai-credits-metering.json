@@ -133,6 +133,136 @@
           "label": "IA sombra em cartões corporativos"
         }
       ]
+    },
+    "it": {
+      "title": "Crediti IA SaaS: misurare un'unità non controllata",
+      "titleCore": "Crediti IA SaaS: misurare un'unità non controllata",
+      "description": "I crediti IA dei fornitori sono un costo a consumo privo dei controlli FinOps standard. Come monitorarli, ripartirli e impostare tetti di spesa.",
+      "body": "<p>Il FinOps sul cloud presuppone un'unità di misura trasparente: un'ora di istanza, una richiesta, un gigabyte. Un credito IA di un fornitore SaaS è l'opposto: è un'unità definita, tariffata e modificabile unilateralmente dal vendor nel corso del contratto. Il costo si comporta come un consumo ma non fornisce gli strumenti di governance necessari.</p><h2>Tre criticità del modello a crediti</h2><ul><li><strong>Opacità dell'unità:</strong> Due funzionalità possono bruciare quantità di crediti drasticamente diverse per un'azione percepita come identica dall'utente.</li><li><strong>Tariffa imposta:</strong> L'overage (consumo eccedente) è tariffato dal vendor, eliminando la leva di spostare il carico su percorsi più economici.</li><li><strong>Scadenza senza cumulo:</strong> Le quote per utente che non si sommano tra team né si trasferiscono al mese successivo portano a pagare overage su un team mentre i crediti di un altro scadono inutilizzati.</li></ul><h2>Monitorare tramite telemetria autonoma</h2><p>Estraete i dati di utilizzo tramite l'API di amministrazione del fornitore su base pianificata e archiviate la serie temporale indicizzata per utente, team e funzionalità. La dashboard del fornitore mostra il periodo corrente, mentre le vostre analisi riguardano il trend storico.</p><h2>Allocare prima della fattura</h2><p>Mappate i crediti sugli stessi centri di costo usati per il cloud e pubblicate report mensili di showback. I costi non allocati finiscono per default sul budget IT o di piattaforma, l'unico team che non ha influenza sul volume consumato.</p><h2>Tetti amministrativi e rinnovo</h2><p>Impostate un tetto rigido (hard cap) nella console del vendor prima che la spesa venga sostenuta. Dodici mesi di misurazioni proprietarie rappresentano la leva negoziale più forte per richiedere pooling e rollover al momento del rinnovo.</p>",
+      "faq": [
+        {
+          "question": "Perché i crediti IA SaaS sono più difficili da gestire?",
+          "answer": "Perché l'unità è definita dal fornitore, le quote per licenza raramente consentono il pooling e la spesa eccedente è tariffata senza concorrenza."
+        },
+        {
+          "question": "Come si monitora il consumo di crediti IA SaaS?",
+          "answer": "Estraendo l'utilizzo tramite API amministrativa e memorizzandolo come serie temporale proprietaria associata a utenti, team e centri di costo."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/shadow-ai-corporate-cards",
+          "label": "Shadow AI sulle carte aziendali"
+        },
+        {
+          "slug": "/research/committed-spend-discounts",
+          "label": "Sconti su spesa impegnata"
+        }
+      ]
+    },
+    "ko": {
+      "title": "SaaS AI 크레딧: 통제 불가능한 단위 측정하기",
+      "titleCore": "SaaS AI 크레딧: 통제 불가능한 단위 측정하기",
+      "description": "공급업체 AI 크레딧은 표준 FinOps 통제 장치가 없는 종량제 비용입니다. 통제권을 잃기 전에 크레딧을 측정, 배부 및 상한 설정하는 방법.",
+      "body": "<p>클라우드 FinOps는 소비 단위가 명확하다는 전제에서 출발합니다. 인스턴스 시간, 요청 수, 기가바이트 등이 대표적입니다. 하지만 SaaS 공급업체의 AI 크레딧은 다릅니다. 공급업체가 임의로 정의하고 가격을 매기며 계약 기간 중간에도 규칙을 변경할 수 있습니다. 지출은 사용량처럼 발생하지만 관리 도구는 전무합니다.</p><h2>전통적 관리 방식을 무너뜨리는 3가지 특성</h2><ul><li><strong>불투명한 소비 단위:</strong> 사용자가 체감하는 동일한 작업이라도 기능에 따라 소모되는 크레딧 수가 극단적으로 다릅니다.</li><li><strong>공급업체가 통제하는 초과 요율:</strong> 초과 사용료는 공급업체가 독점 책정하므로 저렴한 경로로 전환할 여지가 없습니다.</li><li><strong>이월되지 않는 라이선스별 할당량:</strong> 팀 간 풀링이나 익월 이월이 불가능하여 한 부서는 초과 요금을 내고 다른 부서는 할당량을 날리는 비효율이 발생합니다.</li></ul><h2>자체 시계열 데이터 수집</h2><p>공급업체 관리자 API를 정기적으로 호출하여 사용자, 팀, 기능별로 원시 소비 데이터를 자체 데이터베이스에 저장하십시오. 공급업체 대시보드는 당월 현황만 보여주지만 재무 관리는 추세 분석이 핵심입니다.</p><h2>청구서 수령 전 사전 배부</h2><p>클라우드 쇼백(Showback)에 사용하는 동일한 원가 중심점에 크레딧을 매핑하고 매월 내부 보고서를 발행하십시오. 미배부된 비용은 소비를 전혀 통제할 수 없는 IT 플랫폼 팀 예산으로 전가됩니다.</p>",
+      "faq": [
+        {
+          "question": "SaaS AI 크레딧 관리가 클라우드 지출보다 어려운 이유는?",
+          "answer": "공급업체가 소비 단위를 자의적으로 정의하고, 시트별 할당량이 이월되거나 풀링되지 않으며 초과 단가를 독점 책정하기 때문입니다."
+        },
+        {
+          "question": "SaaS AI 크레딧 소비를 어떻게 측정해야 하나요?",
+          "answer": "관리자 API를 통해 정기적으로 사용량을 추출하고 사용자, 부서, 기능별 시계열 데이터로 저장하여 자체 분석합니다."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/shadow-ai-corporate-cards",
+          "label": "법인카드 섀도우 AI 관리"
+        },
+        {
+          "slug": "/research/rate-limits-are-cost-control",
+          "label": "속도 제한을 통한 비용 통제"
+        }
+      ]
+    },
+    "zh": {
+      "title": "SaaS AI积分：度量无法掌控的计费单元",
+      "titleCore": "SaaS AI积分：度量无法掌控的计费单元",
+      "description": "SaaS软件捆绑的AI积分是一种缺乏标准FinOps治理工具的计量支出。企业如何在超额失控前完成用量计量、成本分摊与上限封顶。",
+      "body": "<p>云原生FinOps的前提是计量单元清晰可辨：实例小时、请求数或流量。而SaaS供应商的AI积分（Credits）完全不同：它由厂商自定义、自行定价，甚至在合同期内动态调整扣费规则。这种支出兼具用量消耗的不确定性，却缺乏云账单配套的成本管控工具。</p><h2>打破传统管理框架的三大特性</h2><ul><li><strong>计量规则极度不透明：</strong> 最终用户感知相似的操作，在不同功能模块中消耗的积分可能相差数十倍，且厂商极少公布折算算法。</li><li><strong>超额单价无法被市场竞价：</strong> 超额用量（Overage）完全由单一厂商定价，企业无法通过切换低成本模型来平抑开销。</li><li><strong>席位额度无法跨团队共享或结转：</strong> 按席位配发的额度通常当月作废，导致A团队额度浪费的同时，B团队却在产生昂贵的超额账单。</li></ul><h2>构建企业自有的时序计量</h2><p>通过厂商的管理API定期抓取原始消耗日志，按员工、部门与业务功能打标沉淀。厂商后台通常只展示当期汇总，而财务分析需要完整的历史趋势图谱。</p><h2>账单到达前完成成本分摊</h2><p>将AI积分映射到与云资源相同的成本中心，每月出具内部Showback账单。未分摊的AI支出最终都会沉淀到IT平台基础部门，而该部门恰恰是对业务消耗最无发言权的团队。</p>",
+      "faq": [
+        {
+          "question": "为什么SaaS AI积分比云账单更难管控？",
+          "answer": "因为积分计量单位由厂商独家定义且可能动态变更，席位额度无法跨团队打通结转，超额单价缺乏市场调节机制。"
+        },
+        {
+          "question": "企业应如何度量SaaS AI积分的实际消耗？",
+          "answer": "通过管理API定时拉取明细，按用户、团队和功能维度构建自有时序数据库，并与财务成本中心精准对齐。"
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/shadow-ai-corporate-cards",
+          "label": "企业信用卡上的影子AI治理"
+        },
+        {
+          "slug": "/research/committed-spend-discounts",
+          "label": "承诺支出折扣优化指南"
+        }
+      ]
+    },
+    "nl": {
+      "title": "SaaS AI-credits: een ongrijpbare eenheid meten",
+      "titleCore": "SaaS AI-credits: een ongrijpbare eenheid meten",
+      "description": "AI-credits van softwareleveranciers zijn variabele kosten zonder standaard FinOps-controles. Zo meet, alloceert en limiteert u ze effectief.",
+      "body": "<p>Cloud FinOps leunt op transparante eenheden: een serveruur, een API-aanroep of een gigabyte. Een AI-credit van een SaaS-leverancier is dat niet. Het is een eenheid die door de leverancier wordt gedefinieerd, geprijsd en tussentijds kan worden gewijzigd. De kosten gedragen zich als consumptie, maar zonder de dashboards en tooling die consumptie beheersbaar maken.</p><h2>Drie eigenschappen die traditioneel beheer breken</h2><ul><li><strong>Ondoorzichtige eenheden:</strong> Twee functies kunnen enorm verschillende credits verbruiken voor wat de gebruiker ervaart als dezelfde taak.</li><li><strong>Gedwongen overschrijdingstarieven:</strong> Meerverbruik wordt eenzijdig door de vendor geprijsd; werklast verplaatsen naar een goedkoper alternatief is onmogelijk.</li><li><strong>Verlopende tegoeden:</strong> Licentiegebonden tegoeden kunnen niet worden samengevoegd of meegenomen, waardoor u overage betaalt voor het ene team terwijl tegoed bij een ander verdampt.</li></ul><h2>Meet het in eigen beheer</h2><p>Haal gebruiksdata periodiek op via de admin-API van de leverancier en sla deze op per gebruiker, team en functionaliteit. Het vendor-dashboard toont alleen de lopende periode; uw FinOps-vragen gaan over historische trends.</p><h2>Alloceer vóór de factuur</h2><p>Wijs credits toe aan dezelfde kostenplaatsen die u gebruikt voor cloud showback. Niet-gealloceerde uitgaven belanden automatisch bij IT of platform teams — precies de afdelingen die het verbruik niet bepalen.</p>",
+      "faq": [
+        {
+          "question": "Waarom zijn SaaS AI-credits lastiger dan cloudkosten?",
+          "answer": "Omdat de eenheid en overschrijdingstarieven eenzijdig door de vendor worden bepaald en tegoeden zelden meegenomen of gedeeld kunnen worden."
+        },
+        {
+          "question": "Hoe richt u monitoring in voor SaaS AI-credits?",
+          "answer": "Door verbruiksdata via de API op te slaan in een eigen tijdreeks per gebruiker, team en kostenplaats gekoppeld aan de financiële administratie."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/shadow-ai-corporate-cards",
+          "label": "Shadow AI op zakelijke creditcards"
+        },
+        {
+          "slug": "/research/rate-limits-are-cost-control",
+          "label": "Rate limits als kostenbeheersing"
+        }
+      ]
+    },
+    "ar": {
+      "title": "أرصدة الذكاء الاصطناعي في SaaS: قياس وحدة لا تملكها",
+      "titleCore": "أرصدة الذكاء الاصطناعي في SaaS: قياس وحدة لا تملكها",
+      "description": "أرصدة الذكاء الاصطناعي من مزودي البرمجيات تمثل تكلفة استهلاك تفتقر لضوابط FinOps السحابية. كيفية تتبعها وتوزيعها ووضع سقوف مالية لها.",
+      "body": "<p>تفترض ممارسات FinOps السحابية أن وحدة الاستهلاك واضحة ومقروءة: ساعة تشغيل خادم، أو طلب، أو غيغابايت. أما رصيد الذكاء الاصطناعي لدى مزودي برمجيات SaaS فليس كذلك. إنه وحدة يحددها المزود، ويسعرها، ويمكنه تعديل قيمتها في منتصف مدة العقد. يتصرف الإنفاق كاستهلاك متغير دون أن يمنحك أدوات الحوكمة التي تجعل الاستهلاك قابلاً للإدارة.</p><h2>ثلاث خصائص تعطل آليات الإدارة التقليدية</h2><ul><li><strong>وحدة غامضة:</strong> يمكن لميزتين برمجيتين استهلاك كميات متفاوتة تماماً من الأرصدة لنفس الإجراء من وجهة نظر المستخدم، ونادراً ما تُنشر معادلة التحويل.</li><li><strong>تسعير احتكاري للاستهلاك الفائض:</strong> يحدد المزود سعر التجاوز (overage) منفرداً دون وجود بديل سوقي أرخص لنقل عبء العمل.</li><li><strong>انتهاء صلاحية الحصص دون تدوير:</strong> الحصص المخصصة لكل مقعد لا تجمع بين الفرق ولا ترحل للشهر التالي، مما يجعلك تدفع رسوم تجاوز لفريق بينما تضيع أرصدة فريق آخر غير مستخدمة.</li></ul><h2>تتبع الاستهلاك ببياناتك المستقلة</h2><p>اسحب بيانات الاستهلاك من واجهة برمجة تطبيقات إدارة المزود بجدول زمني منتظم، وخزنها في سلسلة زمنية مملوكة لك مصنفة حسب المستخدم والفريق والميزة البرمجية. لوحة تحكم المزود تعرض الشهر الحالي فقط، بينما أسئلتك المالية تتمحور حول الاتجاه العام.</p><h2>توزيع التكلفة قبل وصول الفاتورة</h2><p>اربط الأرصدة بمراكز التكلفة ذاتها المستخدمة في السحابة، وأصدر تقارير الاستعراض المالي (showback) شهرياً. الإنفاق غير الموزع يستقر تلقائياً في ميزانية تقنية المعلومات، وهو الفريق الوحيد الذي لا يملك أي تأثير على حجم استهلاك الأقسام الأخرى.</p><h2>وضع سقوف صارمة واستثمارها في التجديد</h2><p>فعل السقف الإداري الصارم في لوحة تحكم المزود لوقف الإنفاق قبل حدوثه. واستخدم 12 شهراً من بيانات التتبع المستقلة كأقوى ورقة تفاوض للمطالبة بتجميع الأرصدة وترحيلها وتثبيت أسعار التجاوز عند تجديد العقد.</p>",
+      "faq": [
+        {
+          "question": "لماذا تعد أرصدة الذكاء الاصطناعي في SaaS أصعب في الإدارة؟",
+          "answer": "لأن المزود يحدد ويسعر الوحدة منفرداً، وحصص المقاعد نادراً ما ترحل أو تجمع بين الفرق، وأسعار التجاوز محددة دون منافسة."
+        },
+        {
+          "question": "كيف تقيس المؤسسات استهلاك أرصدة الذكاء الاصطناعي في SaaS؟",
+          "answer": "بسحب بيانات الاستخدام عبر واجهة API الإدارية بانتظام وتخزينها كسلسلة زمنية خاصة مربوطة بالمستخدمين والفرق ومراكز التكلفة."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/shadow-ai-corporate-cards",
+          "label": "الذكاء الاصطناعي الخفي على بطاقات الشركات"
+        },
+        {
+          "slug": "/research/committed-spend-discounts",
+          "label": "خصومات الإنفاق الملتزم به"
+        }
+      ]
     }
   }
 }

@@ -118,11 +118,12 @@ for (const f of walk(site).filter((f) => f.endsWith(".html"))) {
     try { node = JSON.parse(m[1]); } catch (e) { errors.push(`${rel}: invalid JSON-LD (${e.message})`); continue; }
     // A FAQPage entry has to read as a question and has to be on the page, or
     // it is ineligible for rich results and nothing would cite it. 81 of these
-    // were section headings copied verbatim. ？ is the Japanese question mark.
+    // were section headings copied verbatim.
+    // Japanese ends questions with \uFF1F (？); Arabic ends with \u061F (؟).
     if (node["@type"] === "FAQPage") {
       for (const q of node.mainEntity || []) {
         const name = (q.name || "").trim();
-        if (!/[?？]$/.test(name)) errors.push(`${rel}: FAQ entry is not a question — "${name}"`);
+        if (!/[?\u061F\uFF1F]$/.test(name)) errors.push(`${rel}: FAQ entry is not a question — "${name}"`);
         if (!decodeEntities(html).includes(name)) errors.push(`${rel}: FAQ question is not visible on the page — "${name}"`);
         if (((q.acceptedAnswer || {}).text || "").length < 40) errors.push(`${rel}: FAQ answer is too thin for "${name}"`);
       }

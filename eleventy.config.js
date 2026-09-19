@@ -44,7 +44,13 @@ const BREADCRUMB_LABELS = {
   fr: ["Accueil", "Recherche"],
   ja: ["ホーム", "リサーチ"],
   pt: ["Início", "Pesquisa"],
+  it: ["Home", "Ricerca"],
+  ko: ["홈", "리서치"],
+  zh: ["首页", "研究"],
+  nl: ["Home", "Onderzoek"],
+  ar: ["الرئيسية", "أبحاث"],
 };
+
 
 // Which locales actually have a file for a given research slug. Hand-listed
 // hreflang was present on only 143 of 203 pages and had no way to stay honest
