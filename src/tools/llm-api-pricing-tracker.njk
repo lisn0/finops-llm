@@ -3,8 +3,8 @@
   "permalink": "tools/llm-api-pricing-tracker.html",
   "lang": "en",
   "head": {
-    "title": "LLM API Pricing Tracker · Current Model Prices · FinOps LLM",
-    "description": "Current per-token pricing for the major LLM APIs in one table: OpenAI, Anthropic, Google, and open-weight hosts. Input, output, and cache-read rates.",
+    "title": "LLM API Pricing: OpenAI, GPT-6 & Claude Prices · FinOps LLM",
+    "description": "Live OpenAI API pricing (GPT-6, GPT-5.6) and Claude API pricing (Opus 5.5, Sonnet 5) per 1M tokens, read from the providers' own pricing pages. Plus Gemini.",
     "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
     "canonical": "https://finopsllm.com/tools/llm-api-pricing-tracker",
     "openGraph": [
@@ -18,11 +18,11 @@
       },
       {
         "property": "og:title",
-        "content": "LLM API Pricing Tracker · Current Model Prices · FinOps LLM"
+        "content": "LLM API Pricing: OpenAI, GPT-6 & Claude Prices · FinOps LLM"
       },
       {
         "property": "og:description",
-        "content": "Current per-token pricing for the major LLM APIs in one table: OpenAI, Anthropic, Google, and open-weight hosts. Input, output, and cache-read rates."
+        "content": "Live OpenAI API pricing (GPT-6, GPT-5.6) and Claude API pricing (Opus 5.5, Sonnet 5) per 1M tokens, read from the providers' own pricing pages. Plus Gemini."
       },
       {
         "property": "og:image",
@@ -48,11 +48,11 @@
       },
       {
         "name": "twitter:title",
-        "content": "LLM API Pricing Tracker · Current Model Prices · FinOps LLM"
+        "content": "LLM API Pricing: OpenAI, GPT-6 & Claude Prices · FinOps LLM"
       },
       {
         "name": "twitter:description",
-        "content": "Current per-token pricing for the major LLM APIs in one table: OpenAI, Anthropic, Google, and open-weight hosts. Input, output, and cache-read rates."
+        "content": "Live OpenAI API pricing (GPT-6, GPT-5.6) and Claude API pricing (Opus 5.5, Sonnet 5) per 1M tokens, read from the providers' own pricing pages. Plus Gemini."
       },
       {
         "name": "twitter:image",
@@ -70,15 +70,15 @@
       }
     ],
     "jsonLd": [
-      "{\"@context\": \"https://schema.org\", \"@type\": \"WebApplication\", \"name\": \"LLM API Pricing Tracker\", \"applicationCategory\": \"FinanceApplication\", \"operatingSystem\": \"Any\", \"url\": \"https://finopsllm.com/tools/llm-api-pricing-tracker\", \"description\": \"Current per-token pricing for the major LLM APIs in one table: OpenAI, Anthropic, Google, and open-weight hosts. Input, output, and cache-read rates.\", \"offers\": {\"@type\": \"Offer\", \"price\": \"0\", \"priceCurrency\": \"USD\"}, \"publisher\": {\"@type\": \"Organization\", \"name\": \"FinOps LLM\", \"url\": \"https://finopsllm.com/\"}}",
+      "{\"@context\": \"https://schema.org\", \"@type\": \"WebApplication\", \"name\": \"LLM API Pricing Tracker\", \"applicationCategory\": \"FinanceApplication\", \"operatingSystem\": \"Any\", \"url\": \"https://finopsllm.com/tools/llm-api-pricing-tracker\", \"description\": \"Live OpenAI API pricing (GPT-6, GPT-5.6) and Claude API pricing (Opus 5.5, Sonnet 5) per 1M tokens, read from the providers' own pricing pages. Plus Gemini.\", \"offers\": {\"@type\": \"Offer\", \"price\": \"0\", \"priceCurrency\": \"USD\"}, \"publisher\": {\"@type\": \"Organization\", \"name\": \"FinOps LLM\", \"url\": \"https://finopsllm.com/\"}}",
       "{\"@context\": \"https://schema.org\", \"@type\": \"BreadcrumbList\", \"itemListElement\": [{\"@type\": \"ListItem\", \"position\": 1, \"name\": \"Home\", \"item\": \"https://finopsllm.com/\"}, {\"@type\": \"ListItem\", \"position\": 2, \"name\": \"LLM API Pricing Tracker\", \"item\": \"https://finopsllm.com/tools/llm-api-pricing-tracker\"}]}"
     ]
   }
 }
 ---
-{% extends "shell.njk" %}{% block body %}<div class="eye">FREE TOOL · UPDATED DAILY</div>
+{% extends "shell.njk" %}{% block body %}<div class="eye">FREE TOOL · LIVE PRICES</div>
 <h1 class="page-title">LLM API Pricing <em>Tracker.</em></h1>
-<p class="lede">Live prices for every major model. Input, output, cache-read, and cache-write costs across all providers. Updated daily at 00:00 UTC.</p>
+<p class="lede">OpenAI API pricing and Claude API pricing, per million tokens, pulled live from each provider's own pricing page. Input, output, cache-read, and cache-write rates for GPT-6 Astra, Sol and Luna, GPT-5.6, Claude Opus 5.5, Fable 5.1, Sonnet 5 and Haiku 4.5. New OpenAI and Anthropic models appear here as soon as they are listed.</p>
 
 <div class="pricing-grid" id="pricingGrid">
   <!-- Populated by JS -->
@@ -119,7 +119,7 @@
 <h2>Context windows are a ceiling, not a target</h2>
 <p>The context column shows the maximum a model accepts. It is not a budget to fill. Cost scales with what you actually send, and retrieval that grows context faster than it improves answers is one of the most common causes of a bill that rises without the product getting better. Measure the p95 context length you send in production; that number, not the ceiling, is what your invoice reflects.</p>
 <h2>How we track prices</h2>
-  <p>Prices are scraped daily from provider pricing pages and verified against API responses. Cache prices apply only where providers support prompt caching. Context windows are maximum supported; effective context may be lower for reasoning models.</p>
+  <p>OpenAI and Anthropic prices are read from the providers' published pricing pages at most six hours old; any model either provider lists is picked up automatically, and a parse that fails sanity checks falls back to the last verified table. Google, Meta, Mistral and DeepSeek rows are maintained by hand. Cache prices apply only where providers support prompt caching. Context windows are maximum supported; effective context may be lower for reasoning models.</p>
   <p>Last updated: <span id="lastUpdated">—</span></p>
 </div>
 
@@ -256,15 +256,17 @@
 </style>
 
 <script>
-let UPDATED = "2026-09-02";
+let UPDATED = "2026-09-22";
 const PROVIDERS = [
   { name: "OpenAI", color: "#00A67E", models: [
+    { id: "gpt-6-astra", name: "GPT-6-Astra", input: 10.00, output: 50.00, cacheRead: 1.00, cacheWrite: 12.50, context: "—" },
+    { id: "gpt-6-sol", name: "GPT-6-Sol", input: 2.00, output: 10.00, cacheRead: 0.20, cacheWrite: 2.50, context: "—" },
+    { id: "gpt-6-luna", name: "GPT-6-Luna", input: 0.10, output: 0.50, cacheRead: 0.01, cacheWrite: 0.125, context: "—" },
     { id: "gpt-5-6-sol", name: "GPT-5.6-Sol", input: 4.00, output: 20.00, cacheRead: 0.40, cacheWrite: 5.00, context: "1.05M" },
-    { id: "gpt-5-6-terra", name: "GPT-5.6-Terra", input: 2.00, output: 12.00, cacheRead: 0.20, cacheWrite: 2.50, context: "1.05M" },
-    { id: "gpt-5-6-luna", name: "GPT-5.6-Luna", input: 0.20, output: 1.20, cacheRead: 0.02, cacheWrite: 0.25, context: "1.05M" },
   ]},
   { name: "Anthropic", color: "#D97757", models: [
     { id: "fable-5-1", name: "Claude Fable 5.1", input: 10.00, output: 50.00, cacheRead: 0.25, cacheWrite: 12.50, context: "1M" },
+    { id: "opus-5-5", name: "Claude Opus 5.5", input: 4.00, output: 20.00, cacheRead: 0.20, cacheWrite: 5.00, context: "1M" },
     { id: "fable-5", name: "Claude Fable 5", input: 10.00, output: 50.00, cacheRead: 1.00, cacheWrite: 12.50, context: "1M" },
     { id: "opus-5", name: "Claude Opus 5", input: 5.00, output: 25.00, cacheRead: 0.50, cacheWrite: 6.25, context: "1M" },
     { id: "sonnet-5", name: "Claude Sonnet 5", input: 2.00, output: 10.00, cacheRead: 0.20, cacheWrite: 2.50, context: "1M" },
@@ -289,6 +291,9 @@ const PROVIDERS = [
     { name: "DeepSeek R1", input: 0.55, output: 2.19, cacheRead: 0.14, cacheWrite: 0.55, context: "64K" },
   ]},
 ];
+
+// Keep sub-cent prices exact: $0.125, not $0.13.
+const usd = v => '$' + (Math.round(v * 100) === v * 100 ? v.toFixed(2) : v);
 
 function renderPricing() {
   // Render provider cards
@@ -318,10 +323,10 @@ function renderPricing() {
     <tr>
       <td><strong>${m.name}</strong></td>
       <td>${m.provider}</td>
-      <td class="price">$${m.input.toFixed(2)}</td>
-      <td class="price">$${m.output.toFixed(2)}</td>
-      <td class="price">${m.cacheRead ? `$${m.cacheRead.toFixed(2)}` : '—'}</td>
-      <td class="price">${m.cacheWrite ? `$${m.cacheWrite.toFixed(2)}` : '—'}</td>
+      <td class="price">${usd(m.input)}</td>
+      <td class="price">${usd(m.output)}</td>
+      <td class="price">${m.cacheRead ? usd(m.cacheRead) : '—'}</td>
+      <td class="price">${m.cacheWrite ? usd(m.cacheWrite) : '—'}</td>
       <td>${m.context}</td>
       <td class="updated">${UPDATED}</td>
     </tr>
@@ -340,11 +345,11 @@ fetch('/api/pricing').then(r => r.ok ? r.json() : null).then(d => {
   let changed = false;
   PROVIDERS.forEach(p => {
     const live = d[p.name.toLowerCase()];
-    if (!Array.isArray(live) || live.length !== p.models.length) return;
+    if (!Array.isArray(live) || !live.length) return;
     p.models = live.map(m => ({
       id: m.id, name: m.model, input: m.input, output: m.output,
       cacheRead: m.cacheRead, cacheWrite: m.cacheWrite5m,
-      context: m.context >= 1e6 ? +(m.context / 1e6).toFixed(2) + 'M' : (m.context / 1000) + 'K',
+      context: !m.context ? '—' : m.context >= 1e6 ? +(m.context / 1e6).toFixed(2) + 'M' : (m.context / 1000) + 'K',
     }));
     changed = true;
   });

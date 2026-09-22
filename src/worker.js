@@ -221,20 +221,22 @@ function logAiCrawler(request, env, url) {
  * "serve a guess".
  */
 const PRICING_BASELINE = {
-	updated: '2026-09-02',
+	updated: '2026-09-22',
 	source: 'https://platform.claude.com/docs/en/about-claude/pricing',
 	anthropic: [
 		{ id: 'fable-5-1', model: 'Claude Fable 5.1', input: 10, output: 50, cacheRead: 0.25, cacheWrite5m: 12.5, cacheWrite1h: 20, context: 1000000 },
-		{ id: 'fable-5', model: 'Claude Fable 5', input: 10, output: 50, cacheRead: 1, cacheWrite5m: 12.5, cacheWrite1h: 20, context: 1000000 },
+		{ id: 'opus-5-5', model: 'Claude Opus 5.5', input: 4, output: 20, cacheRead: 0.2, cacheWrite5m: 5, cacheWrite1h: 8, context: 1000000 },
 		{ id: 'opus-5', model: 'Claude Opus 5', input: 5, output: 25, cacheRead: 0.5, cacheWrite5m: 6.25, cacheWrite1h: 10, context: 1000000 },
 		{ id: 'sonnet-5', model: 'Claude Sonnet 5', input: 2, output: 10, cacheRead: 0.2, cacheWrite5m: 2.5, cacheWrite1h: 4, context: 1000000 },
-		{ id: 'sonnet-4-6', model: 'Claude Sonnet 4.6', input: 3, output: 15, cacheRead: 0.3, cacheWrite5m: 3.75, cacheWrite1h: 6, context: 1000000 },
 		{ id: 'haiku-4-5', model: 'Claude Haiku 4.5', input: 1, output: 5, cacheRead: 0.1, cacheWrite5m: 1.25, cacheWrite1h: 2, context: 200000 },
+		{ id: 'fable-5', model: 'Claude Fable 5', input: 10, output: 50, cacheRead: 1, cacheWrite5m: 12.5, cacheWrite1h: 20, context: 1000000 },
+		{ id: 'sonnet-4-6', model: 'Claude Sonnet 4.6', input: 3, output: 15, cacheRead: 0.3, cacheWrite5m: 3.75, cacheWrite1h: 6, context: 1000000 },
 	],
 	openai: [
+		{ id: 'gpt-6-astra', model: 'gpt-6-astra', input: 10, output: 50, cacheRead: 1, cacheWrite5m: 12.5 },
+		{ id: 'gpt-6-sol', model: 'gpt-6-sol', input: 2, output: 10, cacheRead: 0.2, cacheWrite5m: 2.5 },
+		{ id: 'gpt-6-luna', model: 'gpt-6-luna', input: 0.1, output: 0.5, cacheRead: 0.01, cacheWrite5m: 0.125 },
 		{ id: 'gpt-5-6-sol', model: 'gpt-5.6-sol', input: 4, output: 20, cacheRead: 0.4, cacheWrite5m: 5, context: 1050000 },
-		{ id: 'gpt-5-6-terra', model: 'gpt-5.6-terra', input: 2, output: 12, cacheRead: 0.2, cacheWrite5m: 2.5, context: 1050000 },
-		{ id: 'gpt-5-6-luna', model: 'gpt-5.6-luna', input: 0.2, output: 1.2, cacheRead: 0.02, cacheWrite5m: 0.25, context: 1050000 },
 	],
 };
 
@@ -248,14 +250,19 @@ const PRICING_SOURCES = [
 	{
 		key: 'anthropic',
 		url: 'https://platform.claude.com/docs/en/about-claude/pricing',
-		// "$3 / MTok" — the bare-dollar form would also match prose on this page.
-		price: /\$\s*([0-9]+(?:\.[0-9]+)?)\s*\/\s*MTok/g,
+		// Any "Claude <Family> <version>" — a new family or version is picked up
+		// without a code change.
+		name: /Claude [A-Z][a-z]+ [0-9]+(?:\.[0-9]+)?(?![.0-9])/g,
+		// One table cell: "$3 / MTok".
+		cell: /^\$\s*([0-9]+(?:\.[0-9]+)?)\s*\/\s*MTok$/,
 		order: ['input', 'cacheWrite5m', 'cacheWrite1h', 'cacheRead', 'output'],
 	},
 	{
 		key: 'openai',
-		url: 'https://platform.openai.com/docs/pricing',
-		price: /\$\s*([0-9]+(?:\.[0-9]+)?)/g,
+		url: 'https://developers.openai.com/api/docs/pricing',
+		// "gpt-6-sol", "gpt-5.6-cyber"; bare "gpt-5" and "gpt-4o-*" are tool/audio rows.
+		name: /gpt-[0-9]+(?:\.[0-9]+)?-[a-z]+(?![-.0-9a-z])/g,
+		cell: /^\$\s*([0-9]+(?:\.[0-9]+)?)$/,
 		// The page ships every service tier; the Standard table comes first, and
 		// each row is short-context prices then the same four for long context.
 		order: ['input', 'cacheRead', 'cacheWrite5m', 'output'],
@@ -298,43 +305,60 @@ async function servePricing() {
 	});
 }
 
-/** True only if every baseline model is present, priced, and plausibly close. */
+/**
+ * True if the parse looks like the real table: enough models to not be a
+ * half-broken page, every row internally sane (cache read <= input <= output),
+ * and every model we already know priced within PRICE_DRIFT_MAX of baseline.
+ * New models are accepted on sanity alone; models the provider delisted drop out.
+ */
 function validateProvider(models, key) {
 	const baseline = PRICING_BASELINE[key];
-	if (!Array.isArray(models) || models.length !== baseline.length) return false;
-	return baseline.every((base) => {
-		const found = models.find((m) => m && m.id === base.id);
-		if (!found) return false;
-		return ['input', 'output', 'cacheRead', 'cacheWrite5m'].every((f) => {
-			const v = found[f];
-			if (typeof v !== 'number' || !isFinite(v) || v <= 0) return false;
-			return v <= base[f] * PRICE_DRIFT_MAX && v >= base[f] / PRICE_DRIFT_MAX;
-		});
+	if (!Array.isArray(models) || models.length < Math.ceil(baseline.length / 2)) return false;
+	return models.every((m) => {
+		const fields = ['input', 'output', 'cacheRead', 'cacheWrite5m'];
+		if (!fields.every((f) => typeof m[f] === 'number' && isFinite(m[f]) && m[f] > 0)) return false;
+		if (!(m.cacheRead <= m.input && m.input <= m.output)) return false;
+		const base = baseline.find((b) => b.id === m.id);
+		return !base || fields.every((f) => m[f] <= base[f] * PRICE_DRIFT_MAX && m[f] >= base[f] / PRICE_DRIFT_MAX);
 	});
 }
 
 /**
- * Deliberately dumb: find the model name where it is followed by a full price
- * row, and read the figures in the order the source declares. Sidebar nav and
- * the shorter batch/legacy tables carry too few prices and are skipped. If the
- * page shape changes this returns null, validateProvider rejects it, and the
- * baseline is served — which is the intended outcome.
+ * Discover every model the page prices, not just the ones we already know.
+ * A model counts only where its name is immediately followed by a full price
+ * row — sidebar nav, prose mentions and short tables are skipped. A name
+ * immediately followed by "(" is an annotated row ("retired", "limited
+ * availability") and the model is left out. Only the first priced row per name
+ * is read; both providers list the standard tier before batch/priority. If the
+ * page shape changes this returns too little, validateProvider rejects it, and
+ * the baseline is served — which is the intended outcome.
  */
 function parseProvider(html, src) {
 	const text = html.replace(/<[^>]+>/g, '\n').replace(/&nbsp;/g, ' ');
-	const models = PRICING_BASELINE[src.key].map((base) => {
-		for (let at = text.indexOf(base.model); at !== -1; at = text.indexOf(base.model, at + 1)) {
-			// "Claude Fable 5" must not match inside "Claude Fable 5.1".
-			if (/[.0-9]/.test(text[at + base.model.length] || '')) continue;
-			const nums = (text.slice(at, at + 200).match(src.price) || []).map((n) => parseFloat(n.replace(/[^0-9.]/g, '')));
-			if (nums.length < src.order.length) continue;
-			const row = { ...base };
-			src.order.forEach((field, i) => { row[field] = nums[i]; });
-			return row;
+	const seen = new Set();
+	const models = [];
+	for (const m of text.matchAll(src.name)) {
+		const name = m[0];
+		if (seen.has(name)) continue;
+		const cells = text.slice(m.index + name.length, m.index + name.length + 300).split('\n').map((c) => c.trim()).filter(Boolean);
+		if (!cells.length) continue;
+		if (cells[0].startsWith('(')) { seen.add(name); continue; }
+		const row = [];
+		for (const c of cells) {
+			if (/^[0-9]$/.test(c)) continue; // footnote marker inside a price cell
+			const p = c.match(src.cell);
+			if (!p) break;
+			row.push(parseFloat(p[1]));
 		}
-		return null;
-	});
-	return models.some((m) => m === null) ? null : models;
+		if (row.length < src.order.length) continue;
+		seen.add(name);
+		const id = name.toLowerCase().replace(/^claude /, '').replace(/[ .]/g, '-');
+		const base = PRICING_BASELINE[src.key].find((b) => b.id === id);
+		const model = { id, model: name, ...(base && base.context ? { context: base.context } : {}) };
+		src.order.forEach((field, i) => { model[field] = row[i]; });
+		models.push(model);
+	}
+	return models;
 }
 
 export default {
