@@ -221,7 +221,7 @@ function logAiCrawler(request, env, url) {
  * "serve a guess".
  */
 const PRICING_BASELINE = {
-	updated: '2026-09-22',
+	updated: '2026-09-23',
 	source: 'https://platform.claude.com/docs/en/about-claude/pricing',
 	anthropic: [
 		{ id: 'fable-5-1', model: 'Claude Fable 5.1', input: 10, output: 50, cacheRead: 0.25, cacheWrite5m: 12.5, cacheWrite1h: 20, context: 1000000 },
@@ -237,6 +237,35 @@ const PRICING_BASELINE = {
 		{ id: 'gpt-6-sol', model: 'gpt-6-sol', input: 2, output: 10, cacheRead: 0.2, cacheWrite5m: 2.5 },
 		{ id: 'gpt-6-luna', model: 'gpt-6-luna', input: 0.1, output: 0.5, cacheRead: 0.01, cacheWrite5m: 0.125 },
 		{ id: 'gpt-5-6-sol', model: 'gpt-5.6-sol', input: 4, output: 20, cacheRead: 0.4, cacheWrite5m: 5, context: 1050000 },
+	],
+	// Standard tier; Flash prices are Google's promo rates through 2026-12-31.
+	google: [
+		{ id: 'gemini-3-8-flash', model: 'Gemini 3.8 Flash', input: 0.75, output: 3.75, cacheRead: 0.075 },
+		{ id: 'gemini-3-7-flash', model: 'Gemini 3.7 Flash', input: 0.75, output: 3.75, cacheRead: 0.075 },
+		{ id: 'gemini-3-6-flash', model: 'Gemini 3.6 Flash', input: 0.75, output: 3.75, cacheRead: 0.075 },
+		{ id: 'gemini-3-5-flash', model: 'Gemini 3.5 Flash', input: 1.5, output: 9, cacheRead: 0.15 },
+		{ id: 'gemini-3-5-flash-lite', model: 'Gemini 3.5 Flash-Lite', input: 0.3, output: 2.5, cacheRead: 0.03 },
+		{ id: 'gemini-3-1-flash-lite', model: 'Gemini 3.1 Flash-Lite', input: 0.25, output: 1.5, cacheRead: 0.025 },
+		{ id: 'gemini-3-1-pro-preview', model: 'Gemini 3.1 Pro Preview', input: 2, output: 12, cacheRead: 0.2 },
+		{ id: 'gemini-3-flash-preview', model: 'Gemini 3 Flash Preview', input: 0.5, output: 3, cacheRead: 0.05 },
+		{ id: 'gemini-2-5-pro', model: 'Gemini 2.5 Pro', input: 1.25, output: 10, cacheRead: 0.125 },
+		{ id: 'gemini-2-5-flash', model: 'Gemini 2.5 Flash', input: 0.3, output: 2.5, cacheRead: 0.03 },
+		{ id: 'gemini-2-5-flash-lite', model: 'Gemini 2.5 Flash-Lite', input: 0.1, output: 0.4, cacheRead: 0.01 },
+	],
+	xai: [
+		{ id: 'grok-4-7', model: 'grok-4.7', input: 2, output: 6, cacheRead: 0.5, context: 500000 },
+		{ id: 'grok-build-0-1', model: 'grok-build-0.1', input: 1, output: 2, cacheRead: 0.2, context: 256000 },
+		{ id: 'grok-4-6', model: 'grok-4.6', input: 2, output: 6, cacheRead: 0.5, context: 500000 },
+		{ id: 'grok-4-5', model: 'grok-4.5', input: 2, output: 6, cacheRead: 0.3, context: 500000 },
+		{ id: 'grok-4-3', model: 'grok-4.3', input: 1.25, output: 2.5, cacheRead: 0.2, context: 1000000 },
+		{ id: 'grok-4-20-multi-agent-0309', model: 'grok-4.20-multi-agent-0309', input: 1.25, output: 2.5, cacheRead: 0.2, context: 1000000 },
+		{ id: 'grok-4-20-0309-reasoning', model: 'grok-4.20-0309-reasoning', input: 1.25, output: 2.5, cacheRead: 0.2, context: 1000000 },
+		{ id: 'grok-4-20-0309-non-reasoning', model: 'grok-4.20-0309-non-reasoning', input: 1.25, output: 2.5, cacheRead: 0.2, context: 1000000 },
+	],
+	// Peak (list) prices; DeepSeek's off-peak window is half.
+	deepseek: [
+		{ id: 'deepseek-flash', model: 'deepseek-flash', input: 0.3, output: 1.2, cacheRead: 0.006, context: 1000000 },
+		{ id: 'deepseek-v4-pro', model: 'deepseek-v4-pro', input: 1.32, output: 3.96, cacheRead: 0.044, context: 1000000 },
 	],
 };
 
@@ -267,7 +296,82 @@ const PRICING_SOURCES = [
 		// each row is short-context prices then the same four for long context.
 		order: ['input', 'cacheRead', 'cacheWrite5m', 'output'],
 	},
+	// The three below don't lay prices out as "name, then a row of dollar cells",
+	// so each gets a `parse(cells)` over the page's text cells. `order` is then
+	// just the fields every model must carry to pass validation.
+	{
+		key: 'google',
+		url: 'https://ai.google.dev/gemini-api/docs/pricing',
+		order: ['input', 'cacheRead', 'output'],
+		// One card per model: "Gemini 3.8 Flash", "gemini-3.8-flash", then the
+		// Standard tier ("Input price", "Free of charge", "$0.75 through …") up to
+		// the "Batch" heading. Live/TTS/Image/Embedding cards don't match the name.
+		parse(cells) {
+			const out = [];
+			cells.forEach((c, i) => {
+				if (!/^Gemini [0-9.]+ (Pro|Flash|Flash-Lite)( Preview)?$/.test(c) || !/^gemini-[0-9a-z.-]+$/.test(cells[i + 1])) return;
+				const end = cells.indexOf('Batch', i);
+				const card = cells.slice(i, end < 0 ? i + 60 : end);
+				// First dollar figure right after the label: a promo's current price, or Pro's <=200k price.
+				const price = (label) => {
+					const j = card.findIndex((x) => x.startsWith(label));
+					return j < 0 ? NaN : dollars(card.slice(j + 1, j + 5).find((x) => x.startsWith('$')));
+				};
+				out.push({ id: cells[i + 1].replace(/\./g, '-'), model: c, input: price('Input price'), output: price('Output price'), cacheRead: price('Context caching price') });
+			});
+			return out;
+		},
+	},
+	{
+		key: 'xai',
+		url: 'https://docs.x.ai/developers/pricing',
+		order: ['input', 'cacheRead', 'output'],
+		// "grok-4.7 | Long context ≥ | 200k | tokens | 500k | $2.00 | $0.50 | $6.00 | …long-context repeats".
+		parse(cells) {
+			const out = [];
+			cells.forEach((c, i) => {
+				if (!/^grok-[0-9a-z][0-9a-z.-]*$/.test(c) || !String(cells[i + 1]).startsWith('Long context')) return;
+				const [input, cacheRead, output] = cells.slice(i + 5, i + 8).map(dollars);
+				out.push({ id: c.replace(/\./g, '-'), model: c, input, cacheRead, output, context: tokens(cells[i + 4]) });
+			});
+			return out;
+		},
+	},
+	{
+		key: 'deepseek',
+		url: 'https://api-docs.deepseek.com/quick_start/pricing',
+		order: ['input', 'cacheRead', 'output'],
+		// Column table: "MODEL | deepseek-flash | (1) | deepseek-v4-pro", then under
+		// PRICING each line has OFF-PEAK and PEAK pairs, one figure per model.
+		// Peak is the list price; off-peak is a discount window.
+		parse(cells) {
+			const m = cells.indexOf('MODEL'), p = cells.indexOf('PRICING');
+			if (m < 0 || p < 0) return [];
+			const ids = [];
+			for (let i = m + 1; /^(deepseek-[0-9a-z.-]+|\([0-9]\))$/.test(cells[i] || ''); i++) if (cells[i][0] !== '(') ids.push(cells[i]);
+			const peak = (label) => {
+				const j = cells.findIndex((c, k) => k > p && c.includes(label));
+				const k = j < 0 ? -1 : cells.indexOf('PEAK', j);
+				return k < 0 ? [] : cells.slice(k + 1, k + 1 + ids.length).map(dollars);
+			};
+			const [cacheRead, input, output] = ['CACHE HIT', 'CACHE MISS', 'OUTPUT'].map(peak);
+			const context = tokens(cells[cells.indexOf('CONTEXT LENGTH') + 1]);
+			return ids.map((id, i) => ({ id, model: id, input: input[i], cacheRead: cacheRead[i], output: output[i], context }));
+		},
+	},
 ];
+
+// "$0.75 through December 31, 2026." -> 0.75; anything else -> NaN (fails validation).
+function dollars(s) {
+	const m = String(s).match(/^\$\s*([0-9]+(?:\.[0-9]+)?)/);
+	return m ? parseFloat(m[1]) : NaN;
+}
+
+// "500k" -> 500000, "1M" -> 1000000; anything else -> undefined.
+function tokens(s) {
+	const m = String(s).match(/^([0-9]+(?:\.[0-9]+)?)\s*([kKM])$/);
+	return m ? Math.round(parseFloat(m[1]) * (m[2] === 'M' ? 1e6 : 1e3)) : undefined;
+}
 
 // A real price change is a step, not a leap. Anything outside this band is a
 // parser fault far more often than it is a provider repricing 4x overnight.
@@ -290,7 +394,7 @@ async function servePricing() {
 				});
 				if (!res.ok) return;
 				const parsed = parseProvider(await res.text(), src);
-				if (validateProvider(parsed, src.key)) payload[src.key] = parsed;
+				if (validateProvider(parsed, src)) payload[src.key] = parsed;
 			} catch {
 				// Upstream unreachable — the baseline block is still a correct answer.
 			}
@@ -311,11 +415,11 @@ async function servePricing() {
  * and every model we already know priced within PRICE_DRIFT_MAX of baseline.
  * New models are accepted on sanity alone; models the provider delisted drop out.
  */
-function validateProvider(models, key) {
-	const baseline = PRICING_BASELINE[key];
+function validateProvider(models, src) {
+	const baseline = PRICING_BASELINE[src.key];
 	if (!Array.isArray(models) || models.length < Math.ceil(baseline.length / 2)) return false;
 	return models.every((m) => {
-		const fields = ['input', 'output', 'cacheRead', 'cacheWrite5m'];
+		const fields = src.order;
 		if (!fields.every((f) => typeof m[f] === 'number' && isFinite(m[f]) && m[f] > 0)) return false;
 		if (!(m.cacheRead <= m.input && m.input <= m.output)) return false;
 		const base = baseline.find((b) => b.id === m.id);
@@ -335,6 +439,15 @@ function validateProvider(models, key) {
  */
 function parseProvider(html, src) {
 	const text = html.replace(/<[^>]+>/g, '\n').replace(/&nbsp;/g, ' ');
+	if (src.parse) {
+		const seen = new Set();
+		return src.parse(text.split('\n').map((c) => c.trim()).filter(Boolean))
+			.filter((m) => !seen.has(m.id) && seen.add(m.id))
+			.map((m) => {
+				const base = PRICING_BASELINE[src.key].find((b) => b.id === m.id);
+				return m.context || !(base && base.context) ? m : { ...m, context: base.context };
+			});
+	}
 	const seen = new Set();
 	const models = [];
 	for (const m of text.matchAll(src.name)) {

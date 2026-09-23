@@ -226,68 +226,25 @@
   <td class="limit-cell official" data-val="200000" data-f="context">200K</td>
   <td>50%</td>
 </tr>
-<!-- Google -->
-<tr>
-  <td class="provider-cell"><strong>Google</strong></td>
-  <td>Gemini 3.5 Flash</td>
-  <td class="price-cell official" data-val="1.50">$1.50</td>
-  <td class="price-cell official" data-val="9.00">$9.00</td>
-  <td class="price-cell official" data-val="0.15">$0.15</td>
-  <td class="price-cell official" data-val="1.88">$1.88</td>
-  <td class="limit-cell official" data-val="1000000">1M</td>
-  <td>50%</td>
+{#- Rows from src/_data/pricing.json; pricing-live.js patches them from /api/pricing. #}
+{%- macro liveRows(key, name, batch) -%}
+{%- for m in pricing[key] %}
+<tr data-model="{{ m.id }}">
+  <td class="provider-cell"><strong>{{ name }}</strong></td>
+  <td>{{ m.model }}</td>
+  {%- for f in ['input', 'output', 'cacheRead', 'cacheWrite5m'] %}
+  {%- set v = m[f] %}
+  <td class="price-cell official" data-f="{{ f }}"{% if v is number %} data-val="{{ v }}">${{ v.toFixed(2) if (v * 100) | round == v * 100 else v }}{% else %}>—{% endif %}</td>
+  {%- endfor %}
+  <td class="limit-cell official" data-f="context"{% if m.context %} data-val="{{ m.context }}">{{ (m.context / 1000000) ~ 'M' if m.context >= 1000000 else (m.context / 1000) ~ 'K' }}{% else %}>—{% endif %}</td>
+  <td>{{ batch }}</td>
 </tr>
-<tr>
-  <td class="provider-cell"><strong>Google</strong></td>
-  <td>Gemini 3.1 Pro Preview</td>
-  <td class="price-cell official" data-val="2.00">$2.00</td>
-  <td class="price-cell official" data-val="12.00">$12.00</td>
-  <td class="price-cell official" data-val="0.20">$0.20</td>
-  <td class="price-cell official" data-val="2.50">$2.50</td>
-  <td class="limit-cell official" data-val="1000000">1M</td>
-  <td>50%</td>
-</tr>
-<tr>
-  <td class="provider-cell"><strong>Google</strong></td>
-  <td>Gemini 2.5 Pro</td>
-  <td class="price-cell official" data-val="1.25">$1.25</td>
-  <td class="price-cell official" data-val="5.00">$5.00</td>
-  <td class="price-cell official" data-val="0.31">$0.31</td>
-  <td class="price-cell official" data-val="4.50">$4.50</td>
-  <td class="limit-cell official" data-val="1000000">1M</td>
-  <td>50%</td>
-</tr>
-<tr>
-  <td class="provider-cell"><strong>Google</strong></td>
-  <td>Gemini 2.5 Flash</td>
-  <td class="price-cell official" data-val="0.15">$0.15</td>
-  <td class="price-cell official" data-val="0.60">$0.60</td>
-  <td class="price-cell official" data-val="0.04">$0.04</td>
-  <td class="price-cell official" data-val="0.15">$0.15</td>
-  <td class="limit-cell official" data-val="1000000">1M</td>
-  <td>50%</td>
-</tr>
+{%- endfor %}
+{%- endmacro %}
+<!-- Google (Flash prices are promo rates through 2026-12-31) -->
+{{ liveRows('google', 'Google', '50%') }}
 <!-- xAI -->
-<tr>
-  <td class="provider-cell"><strong>xAI</strong></td>
-  <td>Grok 4.5</td>
-  <td class="price-cell official" data-val="2.00">$2.00</td>
-  <td class="price-cell official" data-val="6.00">$6.00</td>
-  <td class="price-cell official" data-val="0.50">$0.50</td>
-  <td class="price-cell official" data-val="1.50">$1.50</td>
-  <td class="limit-cell official" data-val="1000000">1M</td>
-  <td>50%</td>
-</tr>
-<tr>
-  <td class="provider-cell"><strong>xAI</strong></td>
-  <td>Grok 4.3</td>
-  <td class="price-cell official" data-val="1.25">$1.25</td>
-  <td class="price-cell official" data-val="2.50">$2.50</td>
-  <td class="price-cell official" data-val="">-</td>
-  <td class="price-cell official" data-val="">-</td>
-  <td class="limit-cell official" data-val="1000000">1M</td>
-  <td>50%</td>
-</tr>
+{{ liveRows('xai', 'xAI', '—') }}
 
 <!-- Meta -->
 <tr>
@@ -361,27 +318,8 @@
   <td class="limit-cell est" data-val="128000">128K</td>
   <td class="est">-</td>
 </tr>
-<!-- DeepSeek -->
-<tr>
-  <td class="provider-cell"><strong>DeepSeek</strong></td>
-  <td>DeepSeek V4 Flash</td>
-  <td class="price-cell official" data-val="0.14">$0.14</td>
-  <td class="price-cell official" data-val="0.28">$0.28</td>
-  <td class="price-cell official" data-val="0.0028">$0.0028</td>
-  <td class="price-cell est">-</td>
-  <td class="limit-cell official" data-val="128000">128K</td>
-  <td>-</td>
-</tr>
-<tr>
-  <td class="provider-cell"><strong>DeepSeek</strong></td>
-  <td>DeepSeek V4 Pro</td>
-  <td class="price-cell official" data-val="0.435">$0.435</td>
-  <td class="price-cell official" data-val="0.87">$0.87</td>
-  <td class="price-cell official" data-val="0.0036">$0.0036</td>
-  <td class="price-cell est">-</td>
-  <td class="limit-cell official" data-val="128000">128K</td>
-  <td>-</td>
-</tr>
+<!-- DeepSeek (peak-hour list prices) -->
+{{ liveRows('deepseek', 'DeepSeek', '—') }}
 <!-- Qwen -->
 <tr>
   <td class="provider-cell"><strong>Alibaba Qwen</strong></td>

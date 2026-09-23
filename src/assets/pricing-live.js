@@ -13,7 +13,8 @@
   var rows = document.querySelectorAll('tr[data-model]');
   if (!rows.length) return;
 
-  var PROVIDER_NAMES = { anthropic: 'Anthropic', openai: 'OpenAI' };
+  var PROVIDER_NAMES = { anthropic: 'Anthropic', openai: 'OpenAI', google: 'Google', xai: 'xAI', deepseek: 'DeepSeek' };
+  var BATCH = { anthropic: '50%', openai: '50%', google: '50%' };
   var FIELDS = ['input', 'output', 'cacheRead', 'cacheWrite5m', 'context'];
 
   function ok(v) { return typeof v === 'number' && isFinite(v) && v >= 0; }
@@ -34,7 +35,7 @@
           if (!m || !m.id || !/^[a-z0-9-]+$/.test(m.id)) return;
           var tr = row(m.id);
           if (!tr) {
-            if (!FIELDS.slice(0, 4).every(function (f) { return ok(m[f]); })) return;
+            if (!FIELDS.slice(0, 2).every(function (f) { return ok(m[f]); })) return;
             // Insert after the previous model of this provider, or its last baked row.
             var anchor = last || Array.prototype.filter.call(document.querySelectorAll('tr[data-model]'), function (r) {
               var p = r.querySelector('.provider-cell');
@@ -54,7 +55,7 @@
               td.textContent = '—';
               tr.appendChild(td);
             });
-            tr.insertAdjacentHTML('beforeend', '<td>50%</td>');
+            tr.insertAdjacentHTML('beforeend', '<td>' + (BATCH[key] || '—') + '</td>');
             anchor.parentNode.insertBefore(tr, anchor.nextSibling);
           }
           last = tr;
