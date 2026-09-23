@@ -4,7 +4,7 @@
   "lang": "en",
   "head": {
     "title": "LLM Cost Calculator · Compare Provider Pricing · FinOps LLM",
-    "description": "Compare LLM costs across providers for your exact workload. Input token usage and volume, get real-time cost estimates for 20+ models.",
+    "description": "Compare LLM costs across providers for your exact workload. Input token usage and volume, get live cost estimates for GPT-6, Claude Opus 5.5 and more.",
     "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
     "canonical": "https://finopsllm.com/tools/llm-cost-calculator",
     "openGraph": [
@@ -22,7 +22,7 @@
       },
       {
         "property": "og:description",
-        "content": "Compare LLM costs across providers for your exact workload. Input token usage and volume, get real-time cost estimates for 20+ models."
+        "content": "Compare LLM costs across providers for your exact workload. Input token usage and volume, get live cost estimates for GPT-6, Claude Opus 5.5 and more."
       },
       {
         "property": "og:image",
@@ -52,7 +52,7 @@
       },
       {
         "name": "twitter:description",
-        "content": "Compare LLM costs across providers for your exact workload. Input token usage and volume, get real-time cost estimates for 20+ models."
+        "content": "Compare LLM costs across providers for your exact workload. Input token usage and volume, get live cost estimates for GPT-6, Claude Opus 5.5 and more."
       },
       {
         "name": "twitter:image",
@@ -70,7 +70,7 @@
       }
     ],
     "jsonLd": [
-      "{\"@context\": \"https://schema.org\", \"@type\": \"WebApplication\", \"name\": \"LLM Cost Calculator\", \"applicationCategory\": \"FinanceApplication\", \"operatingSystem\": \"Any\", \"url\": \"https://finopsllm.com/tools/llm-cost-calculator\", \"description\": \"Compare LLM costs across providers for your exact workload. Input token usage and volume, get real-time cost estimates for 20+ models.\", \"offers\": {\"@type\": \"Offer\", \"price\": \"0\", \"priceCurrency\": \"USD\"}, \"publisher\": {\"@type\": \"Organization\", \"name\": \"FinOps LLM\", \"url\": \"https://finopsllm.com/\"}}",
+      "{\"@context\": \"https://schema.org\", \"@type\": \"WebApplication\", \"name\": \"LLM Cost Calculator\", \"applicationCategory\": \"FinanceApplication\", \"operatingSystem\": \"Any\", \"url\": \"https://finopsllm.com/tools/llm-cost-calculator\", \"description\": \"Compare LLM costs across providers for your exact workload. Input token usage and volume, get live cost estimates for GPT-6, Claude Opus 5.5 and more.\", \"offers\": {\"@type\": \"Offer\", \"price\": \"0\", \"priceCurrency\": \"USD\"}, \"publisher\": {\"@type\": \"Organization\", \"name\": \"FinOps LLM\", \"url\": \"https://finopsllm.com/\"}}",
       "{\"@context\": \"https://schema.org\", \"@type\": \"BreadcrumbList\", \"itemListElement\": [{\"@type\": \"ListItem\", \"position\": 1, \"name\": \"Home\", \"item\": \"https://finopsllm.com/\"}, {\"@type\": \"ListItem\", \"position\": 2, \"name\": \"LLM Cost Calculator\", \"item\": \"https://finopsllm.com/tools/llm-cost-calculator\"}]}"
     ]
   }
@@ -78,7 +78,7 @@
 ---
 {% extends "shell.njk" %}{% block body %}<div class="eye">FREE TOOL</div>
 <h1 class="page-title">LLM Cost <em>Calculator.</em></h1>
-<p class="lede">Compare costs across providers for your exact workload. Input your token usage, see real-time estimates for 20+ models.</p>
+<p class="lede">Compare costs across providers for your exact workload. Input your token usage, see live estimates for every current OpenAI and Anthropic model, GPT-6 and Claude Opus 5.5 included.</p>
 
 <div class="tool-container">
   <div class="input-section">
@@ -150,7 +150,7 @@
 <h2>Using this to make a routing decision</h2>
 <p>Cost alone cannot pick a model. Set the quality floor first — the eval your task has to pass — then compare cost only among the models that clear it. A model that halves the cost and fails one request in twenty has not saved anything once the retry, the latency, and the support ticket are counted. Run the comparison, pick the two or three candidates that are plausible, and A/B them on real traffic before changing the routing rule.</p>
 <h2>Methodology</h2>
-  <p>Prices are per-model list prices as of August 2026. Cache-read tokens are discounted where applicable. Actual costs vary based on retries, latency requirements, and volume discounts.</p>
+  <p>Prices are standard-tier list prices from the same live feed as the <a href="/research/llm-api-pricing-tracker">LLM API pricing tracker</a>, last updated <span data-live-updated>{{ pricing.updated }}</span>. New models appear automatically. Cache-read tokens are discounted where applicable. Actual costs vary based on retries, latency requirements, and volume discounts.</p>
   <p>This calculator is for estimation only. For a precise audit of your actual spend, <a href="/book">book a free audit</a>.</p>
 </div>
 
@@ -305,22 +305,38 @@
 </style>
 
 <script>
-const MODELS = [
-  { name: "GPT-4o", provider: "OpenAI", inputPrice: 2.50, outputPrice: 10.00, cacheReadPrice: 1.25 },
-  { name: "GPT-4o mini", provider: "OpenAI", inputPrice: 0.15, outputPrice: 0.60, cacheReadPrice: 0.075 },
-  { name: "o3", provider: "OpenAI", inputPrice: 10.00, outputPrice: 40.00, cacheReadPrice: 5.00 },
-  { name: "o3-mini", provider: "OpenAI", inputPrice: 1.10, outputPrice: 4.40, cacheReadPrice: 0.55 },
-  { name: "Claude Sonnet 4", provider: "Anthropic", inputPrice: 3.00, outputPrice: 15.00, cacheReadPrice: 0.30 },
-  { name: "Claude Haiku 4", provider: "Anthropic", inputPrice: 0.80, outputPrice: 4.00, cacheReadPrice: 0.08 },
-  { name: "Claude Opus 4", provider: "Anthropic", inputPrice: 15.00, outputPrice: 75.00, cacheReadPrice: 1.50 },
-  { name: "Gemini 2.5 Pro", provider: "Google", inputPrice: 1.25, outputPrice: 10.00, cacheReadPrice: 0.31 },
-  { name: "Gemini 2.5 Flash", provider: "Google", inputPrice: 0.30, outputPrice: 2.50, cacheReadPrice: 0.075 },
-  { name: "Gemini 2.0 Flash", provider: "Google", inputPrice: 0.10, outputPrice: 0.40, cacheReadPrice: 0.025 },
-  { name: "Llama 3.3 70B", provider: "Meta", inputPrice: 0.60, outputPrice: 0.60, cacheReadPrice: 0.60 },
-  { name: "Mistral Large 2", provider: "Mistral", inputPrice: 2.00, outputPrice: 6.00, cacheReadPrice: 1.00 },
-  { name: "DeepSeek V3", provider: "DeepSeek", inputPrice: 0.27, outputPrice: 1.10, cacheReadPrice: 0.07 },
-  { name: "Command R+", provider: "Cohere", inputPrice: 2.50, outputPrice: 10.00, cacheReadPrice: 1.25 },
-];
+// Same source as the pricing tracker: src/_data/pricing.json baked in at build
+// time, then replaced by /api/pricing if the Worker has a valid fresher copy.
+const PROVIDER_NAMES = { anthropic: "Anthropic", openai: "OpenAI" };
+let MODELS = [];
+
+function loadPricing(data) {
+  const ok = v => typeof v === "number" && isFinite(v) && v >= 0;
+  const models = [];
+  Object.keys(PROVIDER_NAMES).forEach(key => {
+    (Array.isArray(data[key]) ? data[key] : []).forEach(m => {
+      if (!m || !ok(m.input) || !ok(m.output)) return;
+      models.push({
+        // OpenAI entries carry raw ids ("gpt-6-sol"); render them as "GPT-6 Sol".
+        name: String(m.model).replace(/^gpt-([\d.]+)-?(.*)$/, (_, v, rest) =>
+          "GPT-" + v + rest.split("-").map(w => w ? " " + w[0].toUpperCase() + w.slice(1) : "").join("")),
+        provider: PROVIDER_NAMES[key],
+        inputPrice: m.input,
+        outputPrice: m.output,
+        cacheReadPrice: ok(m.cacheRead) ? m.cacheRead : m.input,
+      });
+    });
+  });
+  if (!models.length) return false;
+  MODELS = models;
+  if (data.updated) document.querySelectorAll("[data-live-updated]").forEach(el => { el.textContent = data.updated; });
+  return true;
+}
+
+function costOf(model, inputTokens, outputTokens, cacheHitRate) {
+  const cacheHitTokens = Math.round(inputTokens * (cacheHitRate / 100));
+  return ((inputTokens - cacheHitTokens) * model.inputPrice + cacheHitTokens * model.cacheReadPrice + outputTokens * model.outputPrice) / 1000000;
+}
 
 function calculateCosts() {
   const inputTokens = parseInt(document.getElementById('inputTokens').value) || 0;
@@ -329,16 +345,7 @@ function calculateCosts() {
   const cacheHitRate = parseInt(document.getElementById('cacheHitRate').value) || 0;
   
   const results = MODELS.map(model => {
-    // Calculate cache splits
-    const cacheHitTokens = Math.round(inputTokens * (cacheHitRate / 100));
-    const cacheMissTokens = inputTokens - cacheHitTokens;
-    
-    // Cost per request
-    const inputCost = (cacheMissTokens * model.inputPrice / 1000000) + 
-                      (cacheHitTokens * model.cacheReadPrice / 1000000);
-    const outputCost = outputTokens * model.outputPrice / 1000000;
-    const costPerRequest = inputCost + outputCost;
-    
+    const costPerRequest = costOf(model, inputTokens, outputTokens, cacheHitRate);
     const costPer1K = costPerRequest * 1000;
     const dailyCost = costPerRequest * requestsPerDay;
     const monthlyCost = dailyCost * 30;
@@ -382,12 +389,13 @@ function calculateCosts() {
   const best = results[0];
   const worst = results[results.length - 1];
   const savings = worst.monthlyCost - best.monthlyCost;
-  
+  const cacheSaving = costOf(best, inputTokens, outputTokens, 0) * requestsPerDay * 30 - best.monthlyCost;
+
   summary.innerHTML = `
     <strong>Best option:</strong> ${best.name} (${best.provider}) at $${best.monthlyCost.toFixed(0)}/month.<br>
     <strong>Worst option:</strong> ${worst.name} (${worst.provider}) at $${worst.monthlyCost.toFixed(0)}/month.<br>
     <strong>Spread:</strong> $${savings.toFixed(0)}/month (${((worst.monthlyCost / best.monthlyCost - 1) * 100).toFixed(0)}% more expensive).<br><br>
-    <strong>With ${cacheHitRate}% caching:</strong> You save approximately $${(best.monthlyCost * (1 - cacheHitRate / 200)).toFixed(0)}/month vs no caching on the best model.
+    <strong>With ${cacheHitRate}% caching:</strong> You save $${cacheSaving.toFixed(0)}/month vs no caching on the best model.
   `;
 }
 
@@ -396,8 +404,12 @@ document.querySelectorAll('input').forEach(input => {
   input.addEventListener('input', calculateCosts);
 });
 
-// Initial calculation
+loadPricing({{ pricing | dump | safe }});
 calculateCosts();
+fetch('/api/pricing')
+  .then(r => r.ok ? r.json() : null)
+  .then(data => { if (data && loadPricing(data)) calculateCosts(); })
+  .catch(() => { /* keep the build-time prices */ });
 </script>
 
 <h2>Related</h2>
