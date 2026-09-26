@@ -5,7 +5,7 @@
 // no assistant has ever crawled. That is the one failure mode we cannot see.
 
 import assert from 'node:assert/strict';
-import { detectAiCrawler } from '../src/worker.js';
+import { detectAiCrawler, isTrackedPath } from '../src/worker.js';
 
 // Real user-agent strings, with the classification each must receive.
 const CASES = [
@@ -57,3 +57,24 @@ assert.equal(detectAiCrawler('GPTBOT/1.0').name, 'GPTBot');
 assert.equal(detectAiCrawler('gptbot/1.0').name, 'GPTBot');
 
 console.log(`✅ AI crawler detection: ${CASES.length} crawlers classified, negatives rejected, ordering held`);
+
+// Page-only guard. Assets and robots.txt were the most-recorded "pages" in this
+// dataset, because every crawler fetches them on nearly every visit. The same
+// silence applies if the guard ever breaks, so pin the behaviour here.
+// /api/pricing is a real HTML page on this site, so it stays tracked — the
+// extension guard is about file extensions, not about what a path looks like.
+const TRACKED = ['/', '/about', '/research/llm-cost-tracking', '/pricing', '/research/sitemap-overview', '/research/v1.2-guide', '/.well-known/api-catalog', '/api/pricing'];
+const NOT_TRACKED = [
+	'/robots.txt', '/sitemap-index.xml', '/sitemap.xml', '/.env', '/favicon.ico',
+	'/assets/site.css', '/main.js', '/img/hero.avif', '/fonts/inter.woff2',
+	'/llms.txt', '/llms-full.txt', '/manifest.webmanifest',
+	'/.git/config', '/.htaccess', '/research/.env',
+	// A query on an asset path must not sneak past the extension match.
+	'/assets/site.css?v=2', '/main.js#hash',
+];
+TRACKED.forEach((p) => assert.equal(isTrackedPath(p), true, `${p} must be tracked as a page`));
+NOT_TRACKED.forEach((p) => assert.equal(isTrackedPath(p), false, `${p} must NOT be tracked as a page`));
+// Falsy input must not throw — the guard runs before the try/catch.
+assert.equal(isTrackedPath(undefined), true, 'undefined path is tracked rather than throwing');
+
+console.log(`✅ page-only guard: ${TRACKED.length} pages tracked, ${NOT_TRACKED.length} asset/sitemap paths rejected`);

@@ -186,6 +186,24 @@ export function detectAiCrawler(userAgent) {
 	return AI_CRAWLERS.find((c) => ua.includes(c.token)) || null;
 }
 
+// Only page views are worth counting. Crawlers fetch robots.txt, sitemaps and
+// assets on nearly every visit, and logging those as "pages" buried the real
+// pages: /robots.txt was the single most-recorded path in this dataset, ahead
+// of the homepage. Matched on extension, so /research/sitemap-style slugs that
+// happen to contain a dot are unaffected.
+const ASSET_PATH_RE =
+	/\.(?:css|js|mjs|map|json|xml|txt|ico|png|jpe?g|gif|svg|webp|avif|woff2?|ttf|otf|eot|mp4|webm|webmanifest)$/i;
+// Dotfile segments are scanner probes, not pages: /.env logged 32 hits and
+// /.git/config style paths would too. Anchored to a segment start so an
+// ordinary slug like /research/v1.2-guide is unaffected. /.well-known is exempt
+// because we serve a real API catalog there worth counting.
+const DOTFILE_PATH_RE = /(?:^|\/)\.(?!well-known(?:\/|$))/i;
+
+export function isTrackedPath(pathname) {
+	const p = (pathname || '').split(/[?#]/)[0];
+	return !ASSET_PATH_RE.test(p) && !DOTFILE_PATH_RE.test(p);
+}
+
 // Fire-and-forget write to Workers Analytics Engine. Deliberately never throws:
 // a logging fault must not take down page serving. Note AE itself also fails
 // SILENTLY on malformed data — `npx wrangler tail` is the only way to see that,
@@ -194,6 +212,7 @@ function logAiCrawler(request, env, url) {
 	if (!env || !env.AI_HITS) return; // binding absent in local dev — fine.
 	const hit = detectAiCrawler(request.headers.get('User-Agent'));
 	if (!hit) return;
+	if (!isTrackedPath(url.pathname)) return;
 	try {
 		env.AI_HITS.writeDataPoint({
 			// Path is attacker-controlled and unbounded; AE drops the whole data
