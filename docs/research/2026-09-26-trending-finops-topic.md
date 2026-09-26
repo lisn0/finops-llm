@@ -1,0 +1,20 @@
+# Research brief — diagnose the prompt-cache misses behind an LLM bill
+
+**Researched:** 2026-09-26. **Suggested article angle:** “Your prompt cache is missing: how to find the costly change.” Show a small, repeatable FinOps investigation: compare two consecutive Responses API calls, classify the cache miss, fix an unintended prompt or configuration change, then verify *billed* input-token mix and cost over representative traffic.
+
+## Why now, and why this angle
+
+- On **2026-09-08**, OpenAI announced general availability of Prompt Cache Diagnostics for the Responses API on GPT-5.6 and later supported models. Its [dated API changelog](https://developers.openai.com/api/docs/changelog) explicitly says the feature compares reuse against an earlier response and identifies cache-miss reasons. OpenAI had launched its aggregate Prompt Caching Dashboard on **2026-08-20**; the September feature adds request-level investigation to that broader view. [Source: OpenAI changelog](https://developers.openai.com/api/docs/changelog).
+- Read-only slug inspection found existing `/research/prompt-caching-explained`, `/research/prompt-caching-economics`, and `/research/prompt-cache-attribution` articles. A diagnostic workflow tied to the **September 8 launch** is a distinct update, not another general caching or ROI explainer.
+
+## Verified facts to build around
+
+- For a current request, set `prompt_cache_options.comparison_response_id` to a recent completed baseline response ID from the same organization; inspect `prompt_cache_diagnostics` and `usage.input_tokens_details.cached_tokens` in the new response. The comparison option requests diagnostics; it neither loads the old conversation nor changes caching behavior. [Source: OpenAI diagnostic guide](https://developers.openai.com/api/docs/guides/prompt-caching/diagnostics) (live documentation, publication date not stated).
+- OpenAI documents miss reasons including `model_changed`, `service_tier_changed`, `tools_changed`, and `prompt_cache_key_changed`. A changed or reordered tool definition can break expected prefix reuse. For GPT-5.6 and later, the minimum cacheable prefix is **1,024 tokens**. [Source: OpenAI diagnostic guide](https://developers.openai.com/api/docs/guides/prompt-caching/diagnostics) (undated).
+- `cache_missed_tokens` is an estimate for the comparison, **not a billed-token count**. Validate realized savings with `cached_tokens`, `cache_write_tokens`, total input tokens, and the model’s current rates across several requests. OpenAI says cached-input rates can be lower, while cache writes on GPT-5.6 and later cost **1.25×** standard input and reads **0.1×**; cache-write pricing is a token category, not an extra charge added to the same tokens. [Sources: diagnostic guide](https://developers.openai.com/api/docs/guides/prompt-caching/diagnostics), [prompt-caching guide](https://developers.openai.com/api/docs/guides/prompt-caching) (both undated live documentation).
+
+## Caveats for the article
+
+- Scope the walkthrough to **supported Responses API models**; do not imply Chat Completions or every model supports diagnostics. A `cache_hit` diagnostic means no miss was detected relative to the baseline; check actual `cached_tokens` before claiming savings. [Source: diagnostic guide](https://developers.openai.com/api/docs/guides/prompt-caching/diagnostics).
+- The diagnostic record may expire; `comparison_response_not_found` and `unavailable` are inconclusive. Diagnostics classify the first reason they find, so a second comparison may be needed after a fix. The feature itself has no extra fee or separate rate-limit cost, but additional test calls are billed normally. [Source: diagnostic guide](https://developers.openai.com/api/docs/guides/prompt-caching/diagnostics).
+- Treat savings as a hypothesis until measured against representative traffic and current price tables. Some misses are intentional, such as model switches or conversation compaction; do not recommend changing them solely to improve hit rate. [Source: diagnostic guide](https://developers.openai.com/api/docs/guides/prompt-caching/diagnostics).
