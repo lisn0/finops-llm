@@ -1,0 +1,30 @@
+---json
+{
+  "permalink": "contact.html",
+  "lang": "en",
+  "head": {
+    "title": "Contact FinOps LLM",
+    "description": "Ask about an AI spend audit, Tidal Telemetry, partnerships, or support. People and agents can send the same contact request.",
+    "canonical": "https://finopsllm.com/contact",
+    "style": "body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.65}.wrap{max-width:760px;margin:0 auto;padding:56px 24px}a{color:#7AAFFF}p{color:#B6C0D2}form{display:grid;gap:16px}label{display:grid;gap:5px}input,select,textarea{box-sizing:border-box;width:100%;padding:11px;background:#121B2C;color:#E6EAF2;border:1px solid #58657A;border-radius:5px;font:inherit}button{padding:12px 20px;background:#7AAFFF;border:0;border-radius:5px;color:#0A0F1A;font:inherit;font-weight:700;cursor:pointer}.trap{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}#contact-status{min-height:1.5em}",
+    "scripts": [{ "src": "/assets/contact.js", "defer": true }]
+  }
+}
+---
+{% extends "shell.njk" %}{% block body %}
+<h1>Contact FinOps LLM</h1>
+<p>Ask us about an AI spend audit, Tidal Telemetry, or a partnership. Do not include passwords, API keys, or customer data in this form.</p>
+<form id="contact-form" action="/api/contact" method="post">
+  <label>Name <input name="name" autocomplete="name" maxlength="120" required></label>
+  <label>Work email <input name="email" type="email" autocomplete="email" maxlength="254" required></label>
+  <label>Company <input name="company" autocomplete="organization" maxlength="160" required></label>
+  <label>Topic <select name="topic" required><option value="">Choose a topic</option><option value="audit">AI spend audit</option><option value="telemetry">Tidal Telemetry</option><option value="partnership">Partnership</option><option value="support">Support</option><option value="other">Other</option></select></label>
+  <label>Message <textarea name="message" rows="7" maxlength="4000" required></textarea></label>
+  <div class="trap" aria-hidden="true"><label>Website <input name="website" tabindex="-1" autocomplete="off"></label></div>
+  <button type="submit">Send message</button>
+  <p id="contact-status" role="status" aria-live="polite"></p>
+</form>
+<p>Prefer a call? <a href="/book/schedule">Pick a time</a>. You can also try <a href="mailto:hello@finopsllm.com">hello@finopsllm.com</a>.</p>
+<p>Agents can use <a href="/openapi.json">the documented JSON endpoint</a> with the user's permission.</p>
+<p><a href="/">Back to FinOps LLM</a></p>
+{% endblock %}

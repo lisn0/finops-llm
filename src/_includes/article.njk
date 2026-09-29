@@ -17,7 +17,8 @@
     competed with its own control on an identical title and description. It
     canonicals to the control instead — in every locale, since the controls all
     exist here. -#}
-{%- set controlSlug = urlSlug | replace('-v2', '') -%}
+{%- set controlSlug = urlSlug -%}
+{%- if urlSlug.slice(-3) == '-v2' -%}{%- set controlSlug = urlSlug.slice(0, -3) -%}{%- endif -%}
 {%- set canonicalPath = ('/' + lang + '/' + controlSlug) if lang != 'en' else ('/' + controlSlug) -%}
 {%- set canonicalUrl = siteUrl + canonicalPath -%}
 

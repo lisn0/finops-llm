@@ -23,6 +23,113 @@
 const APEX = 'finopsllm.com';
 const DEFAULT_TITLE = 'FinOps LLM';
 const CONTENT_SIGNAL = 'search=yes, ai-input=yes, ai-train=no';
+const CONTACT_TO = 'hello@finopsllm.com';
+const CONTACT_FROM = 'contact@finopsllm.com';
+const CONTACT_MAX_BYTES = 8192;
+const CONTACT_TOPICS = new Set(['audit', 'telemetry', 'partnership', 'support', 'other']);
+
+function contactJson(body, status = 200) {
+	return new Response(JSON.stringify(body), {
+		status,
+		headers: { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' },
+	});
+}
+
+function contactResult(request, body, status = 200) {
+	const isForm = (request.headers.get('Content-Type') || '').startsWith('application/x-www-form-urlencoded');
+	if (isForm && (request.headers.get('Accept') || '').includes('text/html')) {
+		if (body.ok) return new Response(null, { status: 303, headers: { Location: '/contact/sent', 'Cache-Control': 'no-store' } });
+		const html = '<!doctype html><html lang="en"><meta charset="utf-8"><title>Contact unavailable</title><main><h1>We could not send your message</h1><p>Please try again later or book a call.</p><a href="/contact">Return to contact</a></main></html>';
+		return new Response(html, { status, headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' } });
+	}
+	return contactJson(body, status);
+}
+
+function logContactFailure(request, stage, error) {
+	const rawCode = typeof error?.code === 'string' ? error.code : '';
+	const code = /^E_[A-Z_]{1,60}$/.test(rawCode) ? rawCode : 'unknown';
+	const rawRay = request.headers.get('CF-Ray') || '';
+	const ray = /^[a-zA-Z0-9-]{1,80}$/.test(rawRay) ? rawRay : 'unavailable';
+	console.error('contact_delivery_failure', { stage, code, ray });
+}
+
+function contactField(value, max, multiline = false) {
+	return typeof value === 'string' && value.trim().length > 0 && value.trim().length <= max &&
+		!/[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]/.test(value) && (multiline || !/[\r\n]/.test(value));
+}
+
+function validClientIp(ip) {
+	if (!ip || ip.length > 45) return false;
+	if (/^\d+\.\d+\.\d+\.\d+$/.test(ip)) return ip.split('.').every((part) => Number(part) <= 255);
+	if (!ip.includes(':') || !/^[0-9a-fA-F:.]+$/.test(ip)) return false;
+	try { return Boolean(new URL(`http://[${ip}]/`).hostname); }
+	catch { return false; }
+}
+
+async function readContactBody(request) {
+	if (!request.body) return '';
+	const reader = request.body.getReader();
+	const chunks = [];
+	let size = 0;
+	try {
+		while (true) {
+			const { done, value } = await reader.read();
+			if (done) break;
+			size += value.byteLength;
+			if (size > CONTACT_MAX_BYTES) throw new RangeError('too_large');
+			chunks.push(value);
+		}
+	} finally { reader.releaseLock(); }
+	const bytes = new Uint8Array(size);
+	let offset = 0;
+	for (const chunk of chunks) { bytes.set(chunk, offset); offset += chunk.byteLength; }
+	return new TextDecoder('utf-8', { fatal: true }).decode(bytes);
+}
+
+async function serveContact(request, env) {
+	if (request.method === 'GET') {
+		return contactJson({ endpoint: '/api/contact', methods: ['POST'], formats: ['application/json', 'application/x-www-form-urlencoded'], fields: ['name', 'email', 'company', 'topic', 'message'], topics: [...CONTACT_TOPICS], maximumBytes: CONTACT_MAX_BYTES });
+	}
+	if (request.method !== 'POST') return contactJson({ error: 'method_not_allowed' }, 405);
+	const origin = request.headers.get('Origin');
+	if (origin !== null && origin !== `https://${APEX}`) return contactResult(request, { error: 'forbidden_origin' }, 403);
+	if (!env.EMAIL?.send || !env.CONTACT_LIMIT?.limit) return contactResult(request, { error: 'contact_unavailable' }, 503);
+	const ip = request.headers.get('CF-Connecting-IP');
+	if (!validClientIp(ip)) return contactResult(request, { error: 'contact_unavailable' }, 503);
+	let allowed;
+	try { ({ success: allowed } = await env.CONTACT_LIMIT.limit({ key: ip })); }
+	catch (error) { logContactFailure(request, 'rate_limit', error); return contactResult(request, { error: 'contact_unavailable' }, 503); }
+	if (!allowed) return contactResult(request, { error: 'rate_limited' }, 429);
+	const length = Number(request.headers.get('Content-Length'));
+	if (Number.isFinite(length) && length > CONTACT_MAX_BYTES) return contactResult(request, { error: 'too_large' }, 413);
+	const type = (request.headers.get('Content-Type') || '').split(';', 1)[0].toLowerCase();
+	if (type !== 'application/json' && type !== 'application/x-www-form-urlencoded') return contactResult(request, { error: 'unsupported_media_type' }, 415);
+	let data;
+	try {
+		const body = await readContactBody(request);
+		data = type === 'application/json' ? JSON.parse(body) : Object.fromEntries(new URLSearchParams(body));
+	} catch (error) { return contactResult(request, { error: error instanceof RangeError ? 'too_large' : 'invalid_body' }, error instanceof RangeError ? 413 : 400); }
+	if (!data || typeof data !== 'object' || Array.isArray(data)) return contactResult(request, { error: 'invalid_body' }, 400);
+	// Honeypot field is intentionally absent from the public schema.
+	if (data.website) return contactResult(request, { ok: true });
+	if (!contactField(data.name, 120) || !contactField(data.company, 160) || !contactField(data.message, 4000, true) ||
+		!contactField(data.email, 254) || !/^[A-Za-z0-9.!#$%&'*+/=?^_`{|}~-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(data.email.trim()) ||
+		!CONTACT_TOPICS.has(data.topic)) return contactResult(request, { error: 'invalid_fields' }, 400);
+	const name = data.name.trim();
+	const email = data.email.trim();
+	const company = data.company.trim();
+	const message = data.message.trim();
+	try {
+		await env.EMAIL.send({
+			to: CONTACT_TO,
+			from: CONTACT_FROM,
+			replyTo: email,
+			subject: `FinOps LLM contact: ${data.topic}`,
+			text: `Name: ${name}\nEmail: ${email}\nCompany: ${company}\nTopic: ${data.topic}\n\n${message}`,
+		});
+	} catch (error) { logContactFailure(request, 'email', error); return contactResult(request, { error: 'contact_unavailable' }, 503); }
+	return contactResult(request, { ok: true });
+}
 
 /* ------------------------------------------------------------------ */
 /* A/B test: English homepage variant (control vs v2 mockup)          */
@@ -493,13 +600,201 @@ function parseProvider(html, src) {
 	return models;
 }
 
+/* ------------------------------------------------------------------ */
+/* Model releases and retirements (/api/releases)                      */
+/* ------------------------------------------------------------------ */
+
+/**
+ * OpenRouter is the release feed: one public JSON call returns every model it
+ * serves with the timestamp it first appeared and, where the lab has announced
+ * one, the date the model is switched off. That covers "what shipped" and
+ * "what is going away" without scraping anyone's newsroom or their timeline.
+ *
+ * What it cannot know is the lab's own announcement wording or date, so `date`
+ * is the day the model became purchasable, not the day the lab posted about it.
+ * The payload says so in `note`, and the page repeats it.
+ */
+const RELEASE_SOURCE = 'https://openrouter.ai/api/v1/models';
+
+/**
+ * First-party lab prefixes, keyed as they appear on OpenRouter. Anything absent
+ * is dropped: third-party routers, `~` quant mirrors and `stealth` drops all
+ * carry a `created` timestamp but are not a lab shipping anything. A first-party
+ * shape change (OpenRouter renames a prefix) yields an empty list, which
+ * RELEASES_MIN_ROWS rejects, and the page keeps its dated snapshot.
+ */
+const RELEASE_LABS = {
+	openai: 'OpenAI',
+	anthropic: 'Anthropic',
+	google: 'Google',
+	'meta-llama': 'Meta',
+	meta: 'Meta',
+	mistralai: 'Mistral',
+	deepseek: 'DeepSeek',
+	qwen: 'Alibaba',
+	alibaba: 'Alibaba',
+	'z-ai': 'Z.ai',
+	moonshotai: 'Moonshot',
+	'x-ai': 'xAI',
+	cohere: 'Cohere',
+	microsoft: 'Microsoft',
+	nvidia: 'NVIDIA',
+	amazon: 'Amazon',
+	minimax: 'MiniMax',
+	upstage: 'Upstage',
+	baidu: 'Baidu',
+	'01-ai': '01.AI',
+	tencent: 'Tencent',
+	'bytedance-seed': 'ByteDance',
+	inclusionai: 'InclusionAI',
+	sakana: 'Sakana',
+	xiaomi: 'Xiaomi',
+	'aion-labs': 'Aion Labs',
+	thales: 'Thales',
+};
+
+const RELEASES_WINDOW_DAYS = 45;
+const RELEASES_MIN_ROWS = 100;
+
+/**
+ * Which lab ships this model, or null when it is not a first-party listing.
+ * `:batch`, `:free` and `:extended` are the same weights behind a different
+ * endpoint, so they are excluded as duplicates of a row already in the feed.
+ */
+function releaseLab(id) {
+	if (!id.includes('/')) return null;
+	const prefix = id.split('/')[0];
+	if (prefix.startsWith('~')) return null;
+	return RELEASE_LABS[prefix] || null;
+}
+
+const isEndpointVariant = (id) => id.includes(':');
+
+/**
+ * OpenRouter quotes dollars per token and uses a negative number for "not
+ * published". The site quotes per 1M tokens, and an unpublished price renders
+ * as a dash: printing a number we do not have is how a tracker loses trust.
+ */
+function releasePrice(model) {
+	const p = model.pricing || {};
+	const one = (key) => {
+		const n = Number(p[key]);
+		return Number.isFinite(n) && n >= 0 ? Math.round(n * 1e6 * 1e4) / 1e4 : null;
+	};
+	return { in: one('prompt'), out: one('completion') };
+}
+
+const isoDay = (ts) => new Date(ts * 1000).toISOString().slice(0, 10);
+
+/**
+ * Read the feed, keep the recent first-party movements, serve them split into
+ * what shipped and what is switching off. No storage: one edge-cached upstream
+ * call per colo per 6h. On any upstream or shape fault this returns null and
+ * the caller answers 503, which the page treats as "keep the snapshot you have".
+ *
+ * The transform is exported so scripts/fetch-releases.mjs writes the page's
+ * snapshot with the identical filter, rather than a second copy of the lab list
+ * that can quietly disagree with the live endpoint.
+ */
+export async function serveReleases() {
+	let data;
+	try {
+		const res = await fetch(RELEASE_SOURCE, {
+			headers: { 'User-Agent': 'finopsllm-release-bot' },
+			cf: { cacheTtl: 21600, cacheEverything: true },
+		});
+		if (!res.ok) return null;
+		data = (await res.json()).data;
+	} catch {
+		return null;
+	}
+	if (!Array.isArray(data) || data.length < RELEASES_MIN_ROWS) return null;
+
+	const body = buildReleases(data);
+	return new Response(
+		JSON.stringify({
+			updated: isoDay(Date.now() / 1000),
+			source: RELEASE_SOURCE,
+			windowDays: RELEASES_WINDOW_DAYS,
+			note:
+				'Dates are the day a model first became purchasable via OpenRouter, not the lab announcement date. in/out are USD per 1M tokens; null means the lab has not published a price.',
+			...body,
+		}),
+		{
+			headers: {
+				'Content-Type': 'application/json; charset=utf-8',
+				'Cache-Control': 'public, max-age=3600',
+				'Access-Control-Allow-Origin': '*',
+			},
+		}
+	);
+}
+
+/**
+ * The whole filter, as a pure function of the upstream array. `now` is a
+ * parameter rather than a read of the clock so the build script can stamp a
+ * reproducible snapshot and the tests can pin a day.
+ */
+export function buildReleases(data, now = Date.now()) {
+	const cutoff = now - RELEASES_WINDOW_DAYS * 864e5;
+	const today = isoDay(now / 1000);
+	const releases = [];
+	const retirements = [];
+
+	for (const m of data) {
+		const lab = releaseLab(m.id || '');
+		if (!lab || isEndpointVariant(m.id)) continue;
+		const price = releasePrice(m);
+
+		if (m.created && m.created * 1000 >= cutoff && m.created * 1000 <= now) {
+			releases.push({
+				id: m.id,
+				provider: lab,
+				date: isoDay(m.created),
+				in: price.in,
+				out: price.out,
+				ctx: m.context_length || 0,
+			});
+		}
+
+		// Only retirements still ahead of us. A lapsed date is history, and this
+		// page is about what is about to cost a migration, not a graveyard.
+		if (m.expiration_date && m.expiration_date >= today) {
+			retirements.push({ id: m.id, provider: lab, expires: m.expiration_date, in: price.in, out: price.out });
+		}
+	}
+
+	releases.sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : a.id < b.id ? 1 : -1));
+	retirements.sort((a, b) => (a.expires < b.expires ? -1 : a.expires > b.expires ? 1 : 0));
+
+	return { releases, retirements };
+}
+
 export default {
 	async fetch(request, env) {
 		const url = new URL(request.url);
+		if (url.pathname === '/api/contact') return serveContact(request, env);
 
 		// Live pricing feed for the tracker pages. Served before anything else
 		// so no redirect or language rule can touch it.
 		if (url.pathname === '/api/pricing') return servePricing();
+
+		// Release and retirement feed for the release tracker. Same rule: raw
+		// JSON, ahead of every redirect and language negotiation.
+		if (url.pathname === '/api/releases') {
+			const releases = await serveReleases();
+			return (
+				releases ||
+				new Response(JSON.stringify({ error: 'release feed unavailable', releases: [], retirements: [] }), {
+					status: 503,
+					headers: {
+						'Content-Type': 'application/json; charset=utf-8',
+						'Cache-Control': 'public, max-age=600',
+						'Access-Control-Allow-Origin': '*',
+					},
+				})
+			);
+		}
 
 		// 0. Record AI crawler hits before any redirect, so a bot that lands on
 		//    www or a translated path is still counted against the URL it asked

@@ -1,0 +1,56 @@
+{
+  "slug": "research/openai-ultra-fast-api-pricing",
+  "tags": [
+    "pricing",
+    "llm-costs",
+    "cost-optimization",
+    "api-performance"
+  ],
+  "datePublished": "2026-09-27",
+  "dateModified": "2026-09-27",
+  "image": "https://finopsllm.com/og.png",
+  "languages": {
+    "en": {
+      "title": "OpenAI Ultra Fast API: Three Speed Tiers",
+      "titleCore": "OpenAI Ultra Fast API pricing and speed tiers",
+      "description": "OpenAI Ultra Fast API pricing across three speed tiers, with the per-turn cost math and the latency cases that justify the premium.",
+      "body": "<p>OpenAI's response API playground now shows a speed selector with three options: standard, fast, and ultra fast. This isn't just a UI tweak — it's a new pricing dimension. Ultra fast mode, powered by Cerebras inference, was previewed last month for select customers where GPT-5 Soul hit 750 tokens per second — up to 14x faster than standard. The Dev Day leak suggests OpenAI is preparing to expand ultra fast access to a much larger developer group.</p><h2>The three tiers</h2><table><thead><tr><th>Tier</th><th>Relative speed</th><th>Use case</th><th>Pricing signal</th></tr></thead><tbody><tr><td>Standard</td><td>1x (baseline)</td><td>Batch, async, non-urgent</td><td>Base rate</td></tr><tr><td>Fast</td><td>~3-5x</td><td>Interactive, user-facing</td><td>Likely 2-3x base</td></tr><tr><td>Ultra fast</td><td>~10-14x</td><td>Real-time agents, trading, live assist</td><td>Likely 5-10x base</td></tr></tbody></table><p>Exact multipliers aren't public yet. The leaked documentation shows ultra fast as an \"access controlled service tier\" — meaning you'll need approval or a specific plan (the rumored $500 ChatGPT Pro Max) to unlock it.</p><h2>What this does to your cost model</h2><p>Speed tiers turn latency into a first-class cost lever. Today you optimize by model selection (GPT-5 mini vs GPT-5 vs GPT-5 Soul). Tomorrow you'll optimize by <em>speed tier within the same model</em>.</p><p>For a 10K token request/response pair at standard GPT-5 Soul pricing (~$5/$15 per million):</p><ul><li>Standard: ~$0.20 per call</li><li>Fast (est. 3x): ~$0.60 per call</li><li>Ultra fast (est. 8x): ~$1.60 per call</li></ul><p>The breakeven depends entirely on what latency buys you. A support agent that resolves in one turn instead of three because ultra fast kept the user engaged? That's a win. A batch enrichment job? Standard every time.</p><h2>How to prepare</h2><ol><li><strong>Instrument latency per feature.</strong> You can't decide if fast is worth it without knowing your current p50/p95 and the business value of each millisecond.</li><li><strong>Tag requests by urgency.</strong> Build a router that sends batch work to standard, chat to fast, and real-time agents to ultra fast — automatically.</li><li><strong>Model the Pro Max unlock.</strong> If the $500/mo plan includes ultra fast quota, calculate your break-even volume vs pay-per-call at the ultra fast multiplier.</li></ol><h2>Related reading</h2><p>See <a href=\"/research/model-routing\">model routing</a> for the pattern this extends, and <a href=\"/research/llm-cost-per-user-benchmarks\">LLM cost per user benchmarks</a> to benchmark your own latency-to-value ratio.</p>",
+      "faq": [
+        {
+          "question": "What are the three OpenAI API speed tiers?",
+          "answer": "Standard (baseline), Fast (~3-5x faster), and Ultra Fast (~10-14x faster, powered by Cerebras). Ultra fast is currently an access-controlled tier."
+        },
+        {
+          "question": "How much more does ultra fast cost?",
+          "answer": "Not officially published. Leaks suggest 5-10x the base token rate. The $500/mo ChatGPT Pro Max plan may include ultra fast quota."
+        },
+        {
+          "question": "Should I use ultra fast for my agent?",
+          "answer": "Only if latency directly drives revenue or retention — real-time coding assistants, trading bots, live customer support. Batch and async workloads should stay on standard."
+        },
+        {
+          "question": "When does ultra fast roll out broadly?",
+          "answer": "Leaks point to OpenAI Dev Day (September 29, 2026) as the expansion trigger. Access may be gated behind the Pro Max plan initially."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/model-routing",
+          "label": "Model routing"
+        },
+        {
+          "slug": "/research/llm-cost-per-user-benchmarks",
+          "label": "LLM cost per user benchmarks"
+        },
+        {
+          "slug": "/research/chatgpt-pro-max-economics",
+          "label": "ChatGPT Pro Max: $500 plan economics"
+        },
+        {
+          "slug": "/research/cap-inference-costs",
+          "label": "How to cap inference costs"
+        }
+      ]
+    }
+  }
+}

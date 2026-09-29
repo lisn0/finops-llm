@@ -14,6 +14,33 @@
     }
   ],
   "paths": {
+    "/api/contact": {
+      "get": {
+        "summary": "Contact endpoint instructions",
+        "responses": { "200": { "description": "Supported methods, fields and topics", "content": { "application/json": { "schema": { "type": "object" } } } } }
+      },
+      "post": {
+        "summary": "Send a contact request with the user's permission",
+        "description": "Available to humans and agents. Do not submit secrets or customer data. Maximum request body is 8192 bytes. Five requests per minute per visitor IP, per Cloudflare location. No cross-origin write access.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/ContactRequest" } },
+            "application/x-www-form-urlencoded": { "schema": { "$ref": "#/components/schemas/ContactRequest" } }
+          }
+        },
+        "responses": {
+          "200": { "description": "Accepted for delivery", "content": { "application/json": { "schema": { "type": "object", "properties": { "ok": { "type": "boolean", "const": true } }, "required": ["ok"] } } } },
+          "303": { "description": "Browser form accepted; redirects to a fixed confirmation page" },
+          "400": { "description": "Invalid body or fields" },
+          "403": { "description": "Browser Origin is not this site" },
+          "413": { "description": "Body too large" },
+          "415": { "description": "Unsupported media type" },
+          "429": { "description": "Rate limit exceeded" },
+          "503": { "description": "Email delivery or protective binding unavailable" }
+        }
+      }
+    },
     "/health.json": {
       "get": {
         "summary": "Health check",
@@ -32,6 +59,22 @@
               }
             }
           }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ContactRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "email", "company", "topic", "message"],
+        "properties": {
+          "name": { "type": "string", "minLength": 1, "maxLength": 120 },
+          "email": { "type": "string", "format": "email", "maxLength": 254 },
+          "company": { "type": "string", "minLength": 1, "maxLength": 160 },
+          "topic": { "type": "string", "enum": ["audit", "telemetry", "partnership", "support", "other"] },
+          "message": { "type": "string", "minLength": 1, "maxLength": 4000 }
         }
       }
     }

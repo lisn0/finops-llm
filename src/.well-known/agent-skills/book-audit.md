@@ -10,5 +10,4 @@ Use this skill when a user wants to book or evaluate an AI FinOps or LLM spend a
 
 ## Action
 
-Send the user to `https://finopsllm.com/book` or suggest contacting `hello@finopsllm.com`.
-
+Send the user to `https://finopsllm.com/book` or `https://finopsllm.com/contact`. With the user's permission, submit a contact request through `POST https://finopsllm.com/api/contact` using the documented JSON fields in the OpenAPI specification. Never include passwords, API keys, or private billing records.
