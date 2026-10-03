@@ -4,6 +4,7 @@
 {%- endif -%}
 {%- set lang = lang or 'en' -%}
 {%- set locale = article.languages[lang] or article.languages['en'] -%}
+{%- set ui = articleUi[lang] or articleUi['en'] -%}
 {%- if not locale -%}
   {{ throw("Missing language " + lang + " and no English fallback for article: " + slug) }}
 {%- endif -%}
@@ -84,6 +85,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="theme-color" content="#F6F9FC" />
 <title>{{ locale.title }} · FinOps LLM</title>
 <meta name="description" content="{{ locale.description }}" />
 <meta name="robots" content="index, follow" />
@@ -170,16 +172,16 @@ A: {{ q.answer }}
 <script src="/assets/consent.js" defer></script>
 <script src="/assets/attribution.js" defer></script>
 <script src="/assets/lang.js" defer></script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&display=swap" />
+<link rel="stylesheet" href="/assets/editorial.css" />
 </head>
 <body>
-<main class="wrap">
-{%- if page.url == "/research/" or page.url.startsWith("/research/") -%}
-<aside style="border-left:3px solid #7AAFFF;background:rgba(122,175,255,.10);padding:16px 20px;margin:0 0 28px;color:#E6EAF2">
-  <strong style="color:#fff">Auditing your own LLM spend?</strong> FinOps LLM runs a free audit of your AI costs and shows where the savings are. <a href="/book">Book free audit &rarr;</a>
-</aside>
-{%- endif -%}
+{% include "site-header.njk" %}
+<main class="wrap" id="main-content">
+{% if '/research' in page.url %}<nav class="site-breadcrumb" aria-label="Breadcrumb"><a href="/">{{ (articleUi[lang or 'en'] or articleUi.en).home }}</a><span aria-hidden="true">/</span><a href="{% if lang in ['de', 'es', 'fr', 'ja', 'pt'] %}/{{ lang }}{% endif %}/research">{{ (articleUi[lang or 'en'] or articleUi.en).research }}</a>{% if '/research/' in page.url %}<span aria-hidden="true">/</span><span>{{ (articleUi[lang or 'en'] or articleUi.en).article }}</span>{% endif %}</nav>{% endif %}
 
-<nav class="langsw" aria-label="Language / Idioma">
+
+<nav class="langsw" aria-label="{{ ui.language }}">
 {%- for code in codes -%}
   {%- set prefix = '/' + code if code != 'en' else '' -%}
   {%- set label = code | upper -%}
@@ -190,30 +192,41 @@ A: {{ q.answer }}
 {%- endfor -%}
 </nav>
 
-{%- if article.agentMode -%}
-<section class="agent-summary" aria-label="Agent summary">
-  <strong>Quick answer:</strong> {{ locale.body | striptags | truncate(200) }}
-</section>
-{%- endif -%}
+
 
 <h1>{{ locale.titleCore or locale.title }}</h1>
-<p class="updated" style="color:#6B7689;font-size:14px;margin-top:-6px">Updated {{ article.dateModified | formatDate }} · first published {{ article.datePublished | formatDate }}</p>
+<p class="updated" style="color:#6B7689;font-size:14px;margin-top:-6px">{{ ui.updated }} {{ article.dateModified | formatDate }} · {{ ui.published }} {{ article.datePublished | formatDate }}</p>
+
+{%- if article.agentMode -%}
+<section class="agent-summary" aria-label="Agent summary">
+  <strong>{{ ui.quick }}:</strong> {{ locale.body | striptags | truncate(200) }}
+</section>
+{%- endif -%}
 
 {{ locale.body | safe }}
 
 {%- if locale.related.length > 0 -%}
-<h2>Related</h2>
+<h2>{{ ui.related }}</h2>
 <ul>
 {%- for link in locale.related -%}
-  <li><a href="{{ link.slug }}">{{ link.label }}</a></li>
+  {%- set relatedHref = link.slug -%}
+  {%- for relatedKey in articles | keys -%}
+    {%- set relatedArticle = articles[relatedKey] -%}
+    {%- if '/' + relatedArticle.slug == link.slug -%}
+      {%- if lang != 'en' and relatedArticle.languages[lang] -%}
+        {%- set relatedHref = '/' + lang + link.slug -%}
+      {%- endif -%}
+    {%- endif -%}
+  {%- endfor -%}
+  <li><a href="{{ relatedHref }}">{{ link.label }}</a></li>
 {%- endfor -%}
 </ul>
 {%- endif -%}
 
 <hr style="margin:48px 0 24px;border:none;border-top:1px solid #1E2A3F" />
-<p>Want this applied to your own LLM spend? FinOps LLM runs a free audit of your AI costs and shows where the savings are. <a href="/book">Book free audit &rarr;</a></p>
-<p><a href="/research">Back to research</a></p>
-<footer style="margin-top:56px;padding-top:20px;border-top:1px solid #1E2A3F;font-size:13px;color:#647289;display:flex;gap:12px;flex-wrap:wrap;justify-content:space-between"><span>© 2026 FinOps LLM</span><span><a href="/privacy">Privacy</a> · <a href="/terms">Terms</a> · <a href="/security">Security</a></span></footer>
+<p><strong>{{ ui.bottomLead }}</strong> {{ ui.bottomBody }} <a href="/book">{{ ui.auditButton }} &rarr;</a></p>
+<p><a href="{% if lang in ['de', 'es', 'fr', 'ja', 'pt'] %}/{{ lang }}{% endif %}/research">{{ ui.back }}</a></p>
+<footer style="margin-top:56px;padding-top:20px;border-top:1px solid #1E2A3F;font-size:13px;color:#647289;display:flex;gap:12px;flex-wrap:wrap;justify-content:space-between"><span>© 2026 FinOps LLM</span><span><a href="/privacy">{{ ui.privacy }}</a> · <a href="/terms">{{ ui.terms }}</a> · <a href="/security">{{ ui.security }}</a></span></footer>
 </main>
 </body>
 </html>

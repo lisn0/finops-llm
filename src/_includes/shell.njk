@@ -7,7 +7,7 @@
 {% if head.description %}<meta name="description" content="{{ head.description | safe }}" />{% endif %}
 {% if head.keywords %}<meta name="keywords" content="{{ head.keywords | safe }}" />{% endif %}
 {% if head.robots %}<meta name="robots" content="{{ head.robots | safe }}" />{% endif %}
-{% if head.themeColor %}<meta name="theme-color" content="{{ head.themeColor | safe }}" />{% endif %}
+<meta name="theme-color" content="#F6F9FC" />
 {% if head.verification %}<meta name="msvalidate.01" content="{{ head.verification | safe }}" />{% endif %}
 {% if head.canonical %}<link rel="canonical" href="{{ head.canonical | safe }}" />{% endif %}
 {% for alt in head.hreflang or (page.url | hreflangsFor) %}<link rel="alternate" hreflang="{{ alt.lang }}" href="{{ alt.href | safe }}" />{% endfor %}
@@ -42,10 +42,15 @@
 {% for ld in head | generatedLd(page.url) %}<script type="application/ld+json">
 {{ ld | safe }}
 </script>{% endfor %}
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&display=swap" />
+<link rel="stylesheet" href="/assets/editorial.css" />
 </head>
-<body><main class="wrap">{%- if page.url == "/research/" or page.url.startsWith("/research/") -%}<aside style="border-left:3px solid #7AAFFF;background:rgba(122,175,255,.10);padding:16px 20px;margin:0 0 28px;color:#E6EAF2"><strong style="color:#fff">Auditing your own LLM spend?</strong> FinOps LLM runs a free audit of your AI costs and shows where the savings are. <a href="/book">Book free audit &rarr;</a></aside>{%- endif -%}{%- block body -%}{%- endblock -%}
+<body>
+{% include "site-header.njk" %}<main class="wrap" id="main-content">
+{% if '/research' in page.url %}<nav class="site-breadcrumb" aria-label="Breadcrumb"><a href="/">{{ (articleUi[lang or 'en'] or articleUi.en).home }}</a><span aria-hidden="true">/</span><a href="{% if lang in ['de', 'es', 'fr', 'ja', 'pt'] %}/{{ lang }}{% endif %}/research">{{ (articleUi[lang or 'en'] or articleUi.en).research }}</a>{% if '/research/' in page.url %}<span aria-hidden="true">/</span><span>{{ (articleUi[lang or 'en'] or articleUi.en).article }}</span>{% endif %}</nav>{% endif %}{%- block body -%}{%- endblock -%}
 {#- FAQPage schema used to be the only place these lived. Google requires the
     Q&A be visible on the page, and a question nobody can see is also a question
     nobody can cite. Rendering from head.faq means schema and page cannot drift. -#}
 {%- if head.faq and head.faq.length -%}<section class="faq" aria-labelledby="faq-heading" style="margin-top:48px;border-top:1px solid #1E2A3F;padding-top:28px"><h2 id="faq-heading">FAQ</h2>{%- for f in head.faq -%}<h3 style="margin:24px 0 6px;font-size:17px">{{ f.q }}</h3><p>{{ f.a }}</p>{%- endfor -%}</section>{%- endif -%}
+{%- if page.url == "/research/" or page.url.startsWith("/research/") -%}<aside style="border-left:3px solid #7AAFFF;background:rgba(122,175,255,.10);padding:16px 20px;margin:0 0 28px;color:#E6EAF2"><strong style="color:#fff">Auditing your own LLM spend?</strong> FinOps LLM runs a free audit of your AI costs and shows where the savings are. <a href="/book">Book free audit &rarr;</a></aside>{%- endif -%}
 <footer style="margin-top:56px;padding-top:20px;border-top:1px solid #1E2A3F;font-size:13px;color:#647289;display:flex;gap:12px;flex-wrap:wrap;justify-content:space-between"><span>© 2026 FinOps LLM</span><span><a href="/privacy">Privacy</a> · <a href="/terms">Terms</a> · <a href="/security">Security</a></span></footer></main></body></html>
