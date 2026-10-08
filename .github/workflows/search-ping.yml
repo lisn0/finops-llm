@@ -3,19 +3,18 @@ name: search-ping
 # Submits the sitemaps to IndexNow (Bing/Yandex/Naver/Seznam) and re-submits
 # them to Google Search Console.
 #
-# Deliberately NOT on `push`. Two reasons:
-#   1. This is a periodic concern, not a per-commit one. Google discovers pages
-#      from the sitemaps already declared in robots.txt, so a push adds nothing
-#      Google cares about, and IndexNow only reaches the other engines.
-#   2. As a per-push check it was a guaranteed red X: a GitHub billing lock
-#      kills the job before a runner picks it up, so every content push since
-#      2026-08-15 failed without a single step running. Noise that trains you to
-#      ignore red is worse than no check.
-#
-# Manual dispatch is the "I just deployed" path. The sleep below is only load-
-# bearing for that case - a scheduled run is long past deploy - but it is one
-# line, so it stays rather than growing a conditional.
+# Run after article/research content is published to main. Cloudflare builds
+# from the same push; the delay gives the live site time to publish its sitemap.
+# GitHub's account billing lock can prevent the runner from starting until the
+# repository owner resolves it (Frontier #3753).
 on:
+  push:
+    branches:
+      - main
+    paths:
+      - "src/_data/articles/**"
+      - "src/research/**"
+      - "src/*/research/**"
   workflow_dispatch:
   schedule:
     # Mondays 06:00 UTC.
@@ -42,12 +41,5 @@ jobs:
         env:
           GSC_SA_KEY: ${{ secrets.GSC_SA_KEY }}
           GSC_SITE: sc-domain:finopsllm.com
-          GSC_SITEMAPS: >-
-            https://finopsllm.com/sitemap-index.xml,
-            https://finopsllm.com/sitemap.xml,
-            https://finopsllm.com/sitemap-es.xml,
-            https://finopsllm.com/sitemap-ja.xml,
-            https://finopsllm.com/sitemap-fr.xml,
-            https://finopsllm.com/sitemap-de.xml,
-            https://finopsllm.com/sitemap-pt.xml
+          GSC_SITEMAPS: https://finopsllm.com/sitemap-index.xml
         run: node scripts/gsc-sitemap-submit.mjs
