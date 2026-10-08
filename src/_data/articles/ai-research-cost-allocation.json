@@ -1,0 +1,50 @@
+{
+  "slug": "research/ai-research-cost-allocation",
+  "tags": [
+    "ai-research",
+    "cost-allocation",
+    "finops",
+    "llm-costs",
+    "chargeback"
+  ],
+  "datePublished": "2026-10-08",
+  "dateModified": "2026-10-08",
+  "image": "https://finopsllm.com/og.png",
+  "agentMode": true,
+  "languages": {
+    "en": {
+      "title": "AI Research Cost Allocation by Project and Result",
+      "titleCore": "AI Research Cost Allocation by Project and Result",
+      "description": "Allocate AI research spend across projects, experiments, review, and verified results with a ledger that separates measured cost from estimates.",
+      "body": "<p>Allocate AI research costs first to the project that authorized the work, then to its experiment or problem set, and finally to reviewed outcomes when that detail is available. This three-level ledger lets finance answer both who funded a research program and what a verified result cost, without pretending every model output has the same value.</p><p>The method matters as research workloads move from small experiments to large batches. OpenAI's October 2026 math release, for example, describes 722 manuscripts, 372 result families, and an average result using roughly three hours of ChatGPT Pro thinking compute equivalent. The disclosure does not publish a per-result API price, so the compute equivalent must remain a separate unit from dollars. See the <a href=\"https://openai.com/index/sharing-ai-progress-in-mathematics/\">OpenAI release</a> and its <a href=\"https://github.com/openai/math\">repository</a>.</p><h2>Use three allocation levels</h2><ol><li><strong>Project:</strong> the approved research program, such as materials discovery, theorem exploration, or literature review.</li><li><strong>Experiment:</strong> a bounded question, benchmark, or run batch with a named owner and review criteria.</li><li><strong>Outcome:</strong> an attempted, accepted, verified, or reusable result, with its validation state recorded.</li></ol><p>Every model request, tool call, sandbox, and reviewer entry should carry the project and experiment identifiers. Add an outcome identifier after the work is reviewed. This preserves the original spend even when a candidate is rejected or revised.</p><h2>What belongs in the ledger</h2><p>At minimum, store the timestamp, provider or internal system, model and configuration, project ID, experiment ID, request or run ID, measured usage, rate-card version, direct charge, currency, and status. For research workflows, also capture retry count, tool and compute charges, reviewer minutes, and the final disposition. Keep sensitive prompts and research data out of the finance export unless governance rules permit them.</p><p>Where internal models do not expose a billable rate, log the native work unit separately: accelerator-hours, job-hours, or a disclosed equivalent. If the organization assigns a transfer price, include its owner, method, effective date, and confidence level. Do not silently convert the proxy to cash or combine it with provider invoices.</p><h2>Allocate shared infrastructure transparently</h2><p>Some costs cannot be traced to one request: reserved accelerators, shared storage, evaluation infrastructure, and platform operations. Publish an allocation rule before charging teams. Directly attributable usage should go to its experiment; shared fixed costs can be allocated by reserved capacity, measured utilization, or a stable workload driver. Show the fixed-cost allocation separately from marginal inference spend.</p><p>Choose a rule that follows the decision the report is meant to support. Use marginal usage for model-routing choices, capacity reservations for infrastructure planning, and fully loaded cost for program funding. Changing the denominator between teams or reporting periods makes the comparison unreliable.</p><h2>Use a status-aware denominator</h2><p>Do not divide total research spend by every generated document and call the result cost per discovery. Count outputs by stage: attempted, candidate, reviewed, verified, and reused. Then report, for example, cost per verified result alongside candidate-to-verified rate and reviewer hours. This makes review quality and failed work visible rather than hiding them in a blended average.</p><p>For a simple project report, show four rows: direct model and tool costs, shared platform allocation, human review effort, and total fully loaded spend. Add the number of attempts and verified outcomes next to each. The resulting unit cost is meaningful only when the validation rule and time window are stated.</p><h2>Reconcile and govern the numbers</h2><p>Reconcile the request ledger to provider invoices or platform metering on a regular schedule. Explain any gap caused by delayed usage exports, minimum charges, credits, retries, or shared resources. Mark estimates and internal transfer prices so they cannot be mistaken for amounts payable to a provider.</p><p>Set a project budget owner, a run-level ceiling, and an exception path for work that exceeds its allowance. Review the budget when the project changes from exploratory work to a repeatable pipeline; an experiment's uncertainty is not a reason for an unbounded production budget. For operational guardrails inside the agent loop, see <a href=\"/research/three-agent-budgets\">the three budgets every autonomous agent needs</a>. For the outcome metric, see <a href=\"/research/cost-per-successful-task\">cost per successful task</a>.</p><h2>FAQ</h2><h3>How should AI research costs be allocated?</h3><p>Charge direct usage to the project and experiment that caused it. Allocate shared infrastructure with a published driver, and show that amount separately from marginal model spend.</p><h3>Should failed AI research runs be excluded from cost per result?</h3><p>No. Keep failed and revised attempts in total spend, then report the verified-result rate. Excluding unsuccessful work understates the cost of producing a usable result.</p><h3>How do you cost an internal model without a price?</h3><p>Report its native compute unit separately. If an internal transfer price is needed, disclose its formula, owner, effective date, and assumptions, and keep it distinct from provider invoice cost.</p><h2>Related</h2><ul><li><a href=\"/research/openai-math-release-research-cost-controls\">OpenAI's math release and research cost controls</a></li><li><a href=\"/research/cost-per-successful-task\">Cost per successful task</a></li><li><a href=\"/research/three-agent-budgets\">Budgets for autonomous agents</a></li></ul>",
+      "faq": [
+        {
+          "question": "How should AI research costs be allocated?",
+          "answer": "Charge direct usage to the project and experiment that caused it. Allocate shared infrastructure with a published driver, and show that amount separately from marginal model spend."
+        },
+        {
+          "question": "Should failed AI research runs be excluded from cost per result?",
+          "answer": "No. Keep failed and revised attempts in total spend, then report the verified-result rate. Excluding unsuccessful work understates the cost of producing a usable result."
+        },
+        {
+          "question": "How do you cost an internal model without a price?",
+          "answer": "Report its native compute unit separately. If an internal transfer price is needed, disclose its formula, owner, effective date, and assumptions, and keep it distinct from provider invoice cost."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/openai-math-release-research-cost-controls",
+          "label": "OpenAI's math release and research cost controls"
+        },
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "Cost per successful task"
+        },
+        {
+          "slug": "/research/three-agent-budgets",
+          "label": "Budgets for autonomous agents"
+        }
+      ]
+    }
+  }
+}
