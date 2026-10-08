@@ -58,7 +58,9 @@ function pushIfRequested(push, urls) {
     .stdout.trim();
   if (upstream !== "origin/main") fail(`Expected origin/main upstream, found ${upstream}.`);
   const status = git(["status", "--porcelain"]).stdout.trim();
-  if (status) fail("Refusing to push with staged or working-tree changes. Commit and review the release first.");
+  if (status) {
+    log(`Uncommitted/staged changes are not included in the push:\n${status}`);
+  }
   const outgoing = git(["log", "--format=%h %s", "origin/main..HEAD"]).stdout.trim();
   if (!outgoing) fail("There are no commits to push to origin/main.");
   log(`Push destination: ${pushUrl} (${branch})`);
@@ -291,7 +293,7 @@ async function main() {
   const args = process.argv.slice(2);
   if (args.includes("--help") || args.includes("-h")) {
     log("Usage: npm run post-publish-search -- [--push] https://finopsllm.com/research/slug [more-urls...]");
-    log("--push verifies a clean main checkout and the GitHub production remote, pushes committed article/research files, then waits for Cloudflare.");
+    log("--push verifies main and the GitHub production remote, pushes only committed article/research files, then waits for Cloudflare. Other working-tree changes stay local.");
     log("Without --push, URLs must already be pushed. Google sitemap submission and URL inspection use GSC_SA_KEY or the local GSC_SA_KEY_FILE setting.");
     log("Bing discovery uses robots.txt plus IndexNow. HTTP submission receipts do not guarantee indexing.");
     return;
