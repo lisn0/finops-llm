@@ -1,24 +1,220 @@
 {
   "slug": "research/benchmark-jev-against-llm-routing",
-  "tags": ["finops", "agents", "evaluation", "jev", "model-routing"],
+  "tags": [
+    "finops",
+    "agents",
+    "evaluation",
+    "jev",
+    "model-routing"
+  ],
   "datePublished": "2026-09-21",
   "dateModified": "2026-09-21",
   "image": "https://finopsllm.com/og.png",
   "agentMode": true,
-  "languages": {"en": {
-    "title": "What independent Jev tests say about cost",
-    "titleCore": "What independent Jev tests say about cost",
-    "description": "Early independent Jev tests support a cheap, fast decision layer—but the size of the saving depends on the LLM path it replaces.",
-    "body": "<p>Early independent testing supports the basic Jev story: it is a fast, inexpensive way to make typed decisions. It also adds a needed qualification: the saving depends on what it replaces. Comparing Jev with a slow reasoning call produces a dramatic result. Comparing it with a small structured-output model produces a smaller, but still useful, difference.</p><p>The most detailed reproducible test we found is <a href=&quot;https://github.com/WallerChen/jev-measured&quot;>jev-measured</a>, which called Jev through OpenRouter across eight cases including routing, tool selection, moderation, reranking, lead scoring, and guardrails. Its reported decision costs fell between $0.0000153 and $0.0000254. In its head-to-head runs, Jev's median latency was 352 ms and its mean cost was $0.0000188.</p><h2>Where the savings are real</h2><p>Against GPT-5 Nano in that test, Jev cost about 18 times less per fixture and returned much faster. That is meaningful when the old workflow asks a generation model to read state, reason, produce a formatted response, then have code pull a single decision from the text.</p><p>Against Gemini Flash Lite and Mistral Small, the measured cost gap was only 1.7 times and 1.4 times respectively. On one single-question case, a small model was cheaper. That is not a failure for Jev. It defines the actual opportunity: Jev is strongest when one call can replace a repeated decision step or several decision questions can be evaluated together—not when it is forced into every trivial classification.</p><h2>Typed output removes a real cost</h2><p>The same benchmark initially found schema errors in the chat-model baselines: booleans where probabilities were requested, probability strings instead of numbers, and missing fields. Strict JSON schema mode removed those errors. That correction is important. Good FinOps writing does not hide the baseline's best configuration. It does show that output validation, repair, retries, and parsing are costs in their own right—and Jev removes that whole category for its own output contract.</p><h2>Accuracy and calibration still decide the rollout</h2><p>Cost and latency do not answer whether a decision is good enough to automate. An independent physical-AI test reported 91.3% agreement with its own 300 incident templates, while a small support-ticket test found no evidence to support a blanket claim that Jev is more accurate than all chat models. Both are early, narrow experiments. They point to the correct production test: evaluate Jev on your own labelled cases and inspect accuracy at each confidence level.</p><p>A practical scorecard has five lines: decision accuracy, confidence calibration, median and P95 latency, cost per correct decision, and escalation rate. That produces an actionable result: route these cases to Jev above this threshold; send the rest to a larger model or review. It is more useful than either launch hype or a generic warning to distrust the model.</p>",
-    "faq": [
-      {"question": "How much does a Jev decision cost in independent tests?", "answer": "One reproducible live-API project reported roughly $0.000015–$0.000025 per decision across eight representative use cases. Results vary with input size and provider."},
-      {"question": "Is Jev always much cheaper than an LLM?", "answer": "No. The largest savings appear when Jev replaces a reasoning or generation-heavy path. The gap against a fast, small structured-output LLM can be much smaller."},
-      {"question": "What should teams measure before routing production traffic to Jev?", "answer": "Measure accuracy, calibration by confidence band, tail latency, cost per correct decision, and the rate at which cases escalate to a model or person."}
-    ],
-    "related": [
-      {"slug": "/research/evals-cost-control", "label": "Evals are a cost control"},
-      {"slug": "/research/cost-per-successful-task", "label": "Cost per successful task"},
-      {"slug": "/research/provider-prices-not-comparable", "label": "Why provider prices are not comparable"}
-    ]
-  }}
+  "languages": {
+    "en": {
+      "title": "What independent Jev tests say about cost",
+      "titleCore": "What independent Jev tests say about cost",
+      "description": "Early independent Jev tests support a cheap, fast decision layer—but the size of the saving depends on the LLM path it replaces.",
+      "body": "<p>Early independent testing supports the basic Jev story: it is a fast, inexpensive way to make typed decisions. It also adds a needed qualification: the saving depends on what it replaces. Comparing Jev with a slow reasoning call produces a dramatic result. Comparing it with a small structured-output model produces a smaller, but still useful, difference.</p><p>The most detailed reproducible test we found is <a href=&quot;https://github.com/WallerChen/jev-measured&quot;>jev-measured</a>, which called Jev through OpenRouter across eight cases including routing, tool selection, moderation, reranking, lead scoring, and guardrails. Its reported decision costs fell between $0.0000153 and $0.0000254. In its head-to-head runs, Jev's median latency was 352 ms and its mean cost was $0.0000188.</p><h2>Where the savings are real</h2><p>Against GPT-5 Nano in that test, Jev cost about 18 times less per fixture and returned much faster. That is meaningful when the old workflow asks a generation model to read state, reason, produce a formatted response, then have code pull a single decision from the text.</p><p>Against Gemini Flash Lite and Mistral Small, the measured cost gap was only 1.7 times and 1.4 times respectively. On one single-question case, a small model was cheaper. That is not a failure for Jev. It defines the actual opportunity: Jev is strongest when one call can replace a repeated decision step or several decision questions can be evaluated together—not when it is forced into every trivial classification.</p><h2>Typed output removes a real cost</h2><p>The same benchmark initially found schema errors in the chat-model baselines: booleans where probabilities were requested, probability strings instead of numbers, and missing fields. Strict JSON schema mode removed those errors. That correction is important. Good FinOps writing does not hide the baseline's best configuration. It does show that output validation, repair, retries, and parsing are costs in their own right—and Jev removes that whole category for its own output contract.</p><h2>Accuracy and calibration still decide the rollout</h2><p>Cost and latency do not answer whether a decision is good enough to automate. An independent physical-AI test reported 91.3% agreement with its own 300 incident templates, while a small support-ticket test found no evidence to support a blanket claim that Jev is more accurate than all chat models. Both are early, narrow experiments. They point to the correct production test: evaluate Jev on your own labelled cases and inspect accuracy at each confidence level.</p><p>A practical scorecard has five lines: decision accuracy, confidence calibration, median and P95 latency, cost per correct decision, and escalation rate. That produces an actionable result: route these cases to Jev above this threshold; send the rest to a larger model or review. It is more useful than either launch hype or a generic warning to distrust the model.</p>",
+      "faq": [
+        {
+          "question": "How much does a Jev decision cost in independent tests?",
+          "answer": "One reproducible live-API project reported roughly $0.000015–$0.000025 per decision across eight representative use cases. Results vary with input size and provider."
+        },
+        {
+          "question": "Is Jev always much cheaper than an LLM?",
+          "answer": "No. The largest savings appear when Jev replaces a reasoning or generation-heavy path. The gap against a fast, small structured-output LLM can be much smaller."
+        },
+        {
+          "question": "What should teams measure before routing production traffic to Jev?",
+          "answer": "Measure accuracy, calibration by confidence band, tail latency, cost per correct decision, and the rate at which cases escalate to a model or person."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/evals-cost-control",
+          "label": "Evals are a cost control"
+        },
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "Cost per successful task"
+        },
+        {
+          "slug": "/research/provider-prices-not-comparable",
+          "label": "Why provider prices are not comparable"
+        }
+      ]
+    },
+    "de": {
+      "title": "Was unabhängige Jev-Tests über die Kosten aussagen",
+      "titleCore": "Was unabhängige Jev-Tests über die Kosten aussagen",
+      "description": "Frühe unabhängige Jev-Tests stützen eine günstige, schnelle Entscheidungsschicht – die Höhe der Ersparnis hängt aber vom ersetzten LLM-Pfad ab.",
+      "body": "<p>Frühe unabhängige Tests stützen die Grundthese zu Jev: Es ist ein schneller, günstiger Weg, typisierte Entscheidungen zu treffen. Sie liefern zudem eine nötige Einschränkung: Die Ersparnis hängt davon ab, was Jev ersetzt. Der Vergleich mit einem langsamen Reasoning-Aufruf ergibt ein dramatisches Ergebnis. Der Vergleich mit einem kleinen Modell mit strukturierter Ausgabe ergibt einen kleineren, aber immer noch nützlichen Unterschied.</p><p>Der detaillierteste reproduzierbare Test, den wir gefunden haben, ist <a href=&quot;https://github.com/WallerChen/jev-measured&quot;>jev-measured</a>. Er rief Jev über OpenRouter in acht Fällen auf, darunter Routing, Tool-Auswahl, Moderation, Reranking, Lead-Scoring und Guardrails. Die berichteten Entscheidungskosten lagen zwischen $0.0000153 und $0.0000254. In den direkten Vergleichsläufen betrug Jevs mediane Latenz 352 ms und die mittleren Kosten $0.0000188.</p><h2>Wo die Einsparungen echt sind</h2><p>Gegenüber GPT-5 Nano war Jev in diesem Test pro Testfall etwa 18-mal günstiger und antwortete deutlich schneller. Das ist relevant, wenn der bisherige Workflow ein Generierungsmodell bittet, den Zustand zu lesen, zu schlussfolgern, eine formatierte Antwort zu erzeugen, und der Code dann eine einzelne Entscheidung aus dem Text herauszieht.</p><p>Gegenüber Gemini Flash Lite und Mistral Small betrug der gemessene Kostenunterschied nur das 1.7-Fache bzw. das 1.4-Fache. In einem Fall mit nur einer Frage war ein kleines Modell günstiger. Das ist kein Versagen von Jev. Es definiert die tatsächliche Chance: Jev ist am stärksten, wenn ein Aufruf einen wiederkehrenden Entscheidungsschritt ersetzen kann oder mehrere Entscheidungsfragen gemeinsam ausgewertet werden – nicht, wenn man es in jede triviale Klassifizierung zwängt.</p><h2>Typisierte Ausgabe beseitigt echte Kosten</h2><p>Derselbe Benchmark fand zunächst Schemafehler in den Chat-Modell-Baselines: Booleans, wo Wahrscheinlichkeiten verlangt waren, Wahrscheinlichkeits-Strings statt Zahlen und fehlende Felder. Der strikte JSON-Schema-Modus beseitigte diese Fehler. Diese Korrektur ist wichtig. Gutes FinOps-Schreiben verschweigt nicht die beste Konfiguration der Baseline. Es zeigt aber, dass Ausgabevalidierung, Reparatur, Wiederholungen und Parsing eigene Kostenpunkte sind – und dass Jev diese gesamte Kategorie für seinen eigenen Ausgabevertrag beseitigt.</p><h2>Genauigkeit und Kalibrierung entscheiden weiterhin über den Rollout</h2><p>Kosten und Latenz beantworten nicht, ob eine Entscheidung gut genug für die Automatisierung ist. Ein unabhängiger Test zu physischer KI meldete 91.3 % Übereinstimmung mit den eigenen 300 Vorfallvorlagen, während ein kleiner Test mit Support-Tickets keinen Beleg für die pauschale Behauptung fand, Jev sei genauer als alle Chat-Modelle. Beides sind frühe, enge Experimente. Sie weisen auf den richtigen Produktionstest hin: Jev auf Ihren eigenen gelabelten Fällen auswerten und die Genauigkeit in jedem Konfidenzbereich prüfen.</p><p>Eine praxistaugliche Scorecard hat fünf Zeilen: Entscheidungsgenauigkeit, Konfidenzkalibrierung, mediane und P95-Latenz, Kosten pro korrekter Entscheidung und Eskalationsrate. Daraus ergibt sich ein umsetzbares Ergebnis: Diese Fälle oberhalb dieses Schwellenwerts an Jev routen; den Rest an ein größeres Modell oder zur Prüfung schicken. Das ist nützlicher als Launch-Hype oder eine pauschale Warnung, dem Modell zu misstrauen.</p>",
+      "faq": [
+        {
+          "question": "Wie viel kostet eine Jev-Entscheidung in unabhängigen Tests?",
+          "answer": "Ein reproduzierbares Projekt mit Live-API meldete grob $0.000015–$0.000025 pro Entscheidung über acht repräsentative Anwendungsfälle. Die Ergebnisse variieren mit Eingabegröße und Anbieter."
+        },
+        {
+          "question": "Ist Jev immer deutlich günstiger als ein LLM?",
+          "answer": "Nein. Die größten Einsparungen entstehen, wenn Jev einen Reasoning- oder generierungslastigen Pfad ersetzt. Der Abstand zu einem schnellen, kleinen LLM mit strukturierter Ausgabe kann viel kleiner sein."
+        },
+        {
+          "question": "Was sollten Teams messen, bevor sie Produktionsverkehr an Jev routen?",
+          "answer": "Messen Sie Genauigkeit, Kalibrierung je Konfidenzband, Tail-Latenz, Kosten pro korrekter Entscheidung und die Rate, mit der Fälle an ein Modell oder eine Person eskalieren."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/evals-cost-control",
+          "label": "Evals sind eine Kostenkontrolle"
+        },
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "Kosten pro erfolgreicher Aufgabe"
+        },
+        {
+          "slug": "/research/provider-prices-not-comparable",
+          "label": "Warum Anbieterpreise nicht vergleichbar sind"
+        }
+      ]
+    },
+    "es": {
+      "title": "Pruebas independientes de Jev: qué dicen del coste",
+      "titleCore": "Pruebas independientes de Jev: qué dicen del coste",
+      "description": "Las primeras pruebas independientes respaldan una capa de decisión barata y rápida, pero el tamaño del ahorro depende de la ruta LLM que reemplaza.",
+      "body": "<p>Las primeras pruebas independientes respaldan la idea básica de Jev: es una forma rápida y barata de tomar decisiones tipadas. También añaden una matización necesaria: el ahorro depende de lo que reemplaza. Comparar Jev con una llamada de razonamiento lenta produce un resultado espectacular. Compararlo con un modelo pequeño de salida estructurada produce una diferencia menor, pero igualmente útil.</p><p>La prueba reproducible más detallada que encontramos es <a href=&quot;https://github.com/WallerChen/jev-measured&quot;>jev-measured</a>, que llamó a Jev a través de OpenRouter en ocho casos que incluyen enrutamiento, selección de herramientas, moderación, reordenación, puntuación de leads y guardarraíles. Los costes de decisión que reporta oscilaron entre $0.0000153 y $0.0000254. En sus ejecuciones cara a cara, la latencia mediana de Jev fue de 352 ms y su coste medio fue de $0.0000188.</p><h2>Dónde el ahorro es real</h2><p>Frente a GPT-5 Nano en esa prueba, Jev costó unas 18 veces menos por caso de prueba y respondió mucho más rápido. Esto es significativo cuando el flujo anterior pide a un modelo de generación que lea el estado, razone, produzca una respuesta con formato y luego el código extraiga una única decisión del texto.</p><p>Frente a Gemini Flash Lite y Mistral Small, la diferencia de coste medida fue de solo 1.7 veces y 1.4 veces, respectivamente. En un caso de una sola pregunta, un modelo pequeño resultó más barato. Eso no es un fracaso de Jev. Define la oportunidad real: Jev es más fuerte cuando una llamada puede reemplazar un paso de decisión repetido o cuando varias preguntas de decisión pueden evaluarse juntas, no cuando se lo fuerza a intervenir en cada clasificación trivial.</p><h2>La salida tipada elimina un coste real</h2><p>El mismo benchmark encontró inicialmente errores de esquema en las líneas base de modelos de chat: booleanos donde se pedían probabilidades, cadenas de probabilidad en lugar de números y campos ausentes. El modo estricto de esquema JSON eliminó esos errores. Esa corrección es importante. Un buen texto de FinOps no oculta la mejor configuración de la línea base. Sí muestra que la validación de la salida, la reparación, los reintentos y el análisis sintáctico son costes por derecho propio, y que Jev elimina toda esa categoría para su propio contrato de salida.</p><h2>La precisión y la calibración siguen decidiendo el despliegue</h2><p>El coste y la latencia no responden si una decisión es lo bastante buena para automatizarla. Una prueba independiente de IA física reportó un 91.3% de acuerdo con sus propias 300 plantillas de incidentes, mientras que una pequeña prueba de tickets de soporte no encontró evidencia que respalde una afirmación general de que Jev sea más preciso que todos los modelos de chat. Ambas son pruebas tempranas y acotadas. Apuntan a la prueba de producción correcta: evaluar Jev con sus propios casos etiquetados e inspeccionar la precisión en cada nivel de confianza.</p><p>Un cuadro de mando práctico tiene cinco líneas: precisión de decisión, calibración de la confianza, latencia mediana y P95, coste por decisión correcta y tasa de escalado. Eso produce un resultado accionable: enrutar estos casos a Jev por encima de este umbral y enviar el resto a un modelo mayor o a revisión. Es más útil que el entusiasmo del lanzamiento o que una advertencia genérica de desconfiar del modelo.</p>",
+      "faq": [
+        {
+          "question": "¿Cuánto cuesta una decisión de Jev en pruebas independientes?",
+          "answer": "Un proyecto reproducible con API real reportó aproximadamente $0.000015–$0.000025 por decisión en ocho casos de uso representativos. Los resultados varían con el tamaño de la entrada y el proveedor."
+        },
+        {
+          "question": "¿Es Jev siempre mucho más barato que un LLM?",
+          "answer": "No. Los mayores ahorros aparecen cuando Jev reemplaza una ruta de razonamiento o de generación intensiva. La diferencia frente a un LLM pequeño y rápido de salida estructurada puede ser mucho menor."
+        },
+        {
+          "question": "¿Qué deben medir los equipos antes de enrutar tráfico de producción a Jev?",
+          "answer": "Midan la precisión, la calibración por banda de confianza, la latencia de cola, el coste por decisión correcta y la tasa de casos que escalan a un modelo o a una persona."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/evals-cost-control",
+          "label": "Las evaluaciones son un control de costes"
+        },
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "Coste por tarea exitosa"
+        },
+        {
+          "slug": "/research/provider-prices-not-comparable",
+          "label": "Por qué los precios de los proveedores no son comparables"
+        }
+      ]
+    },
+    "fr": {
+      "title": "Ce que disent les tests indépendants de Jev sur le coût",
+      "titleCore": "Ce que disent les tests indépendants de Jev sur le coût",
+      "description": "Les premiers tests indépendants soutiennent une couche de décision rapide et peu chère, mais l'ampleur de l'économie dépend du chemin LLM qu'elle remplace.",
+      "body": "<p>Les premiers tests indépendants confirment l'idée de base de Jev : c'est un moyen rapide et peu coûteux de prendre des décisions typées. Ils ajoutent aussi une nuance nécessaire : l'économie dépend de ce que Jev remplace. Comparer Jev à un appel de raisonnement lent donne un résultat spectaculaire. Le comparer à un petit modèle à sortie structurée donne un écart plus faible, mais toujours utile.</p><p>Le test reproductible le plus détaillé que nous ayons trouvé est <a href=&quot;https://github.com/WallerChen/jev-measured&quot;>jev-measured</a>, qui a appelé Jev via OpenRouter sur huit cas couvrant le routage, la sélection d'outils, la modération, le reclassement, la notation de leads et les garde-fous. Les coûts de décision qu'il rapporte se situent entre $0.0000153 et $0.0000254. Dans ses exécutions en face-à-face, la latence médiane de Jev était de 352 ms et son coût moyen de $0.0000188.</p><h2>Là où les économies sont réelles</h2><p>Face à GPT-5 Nano dans ce test, Jev a coûté environ 18 fois moins par cas de test et a répondu beaucoup plus vite. C'est significatif lorsque l'ancien flux demande à un modèle de génération de lire l'état, de raisonner, de produire une réponse mise en forme, puis que le code en extrait une seule décision.</p><p>Face à Gemini Flash Lite et Mistral Small, l'écart de coût mesuré n'était que de 1.7 fois et 1.4 fois respectivement. Sur un cas à question unique, un petit modèle était moins cher. Ce n'est pas un échec pour Jev. Cela définit l'opportunité réelle : Jev est le plus fort lorsqu'un appel peut remplacer une étape de décision répétée, ou lorsque plusieurs questions de décision peuvent être évaluées ensemble — pas lorsqu'on le force dans chaque classification triviale.</p><h2>La sortie typée supprime un vrai coût</h2><p>Le même benchmark a d'abord relevé des erreurs de schéma dans les références de modèles de chat : des booléens là où des probabilités étaient demandées, des chaînes de probabilité au lieu de nombres, et des champs manquants. Le mode strict de schéma JSON a supprimé ces erreurs. Cette correction est importante. Un bon texte FinOps ne cache pas la meilleure configuration de la référence. Il montre en revanche que la validation de sortie, la réparation, les nouvelles tentatives et l'analyse syntaxique sont des coûts à part entière — et que Jev supprime toute cette catégorie pour son propre contrat de sortie.</p><h2>La précision et la calibration décident encore du déploiement</h2><p>Le coût et la latence ne disent pas si une décision est assez bonne pour être automatisée. Un test indépendant d'IA physique a rapporté 91.3 % de concordance avec ses propres 300 modèles d'incidents, tandis qu'un petit test sur des tickets de support n'a trouvé aucun élément permettant d'affirmer globalement que Jev est plus précis que tous les modèles de chat. Ce sont deux expériences précoces et étroites. Elles indiquent le bon test de production : évaluer Jev sur vos propres cas étiquetés et examiner la précision à chaque niveau de confiance.</p><p>Un tableau de bord pratique tient en cinq lignes : précision des décisions, calibration de la confiance, latence médiane et P95, coût par décision correcte et taux d'escalade. On obtient ainsi un résultat exploitable : router ces cas vers Jev au-dessus de ce seuil, envoyer le reste vers un modèle plus grand ou en revue. C'est plus utile que l'enthousiasme du lancement ou qu'une mise en garde générique de se méfier du modèle.</p>",
+      "faq": [
+        {
+          "question": "Combien coûte une décision Jev dans les tests indépendants ?",
+          "answer": "Un projet reproductible sur API réelle a rapporté environ $0.000015–$0.000025 par décision sur huit cas d'usage représentatifs. Les résultats varient selon la taille de l'entrée et le fournisseur."
+        },
+        {
+          "question": "Jev est-il toujours bien moins cher qu'un LLM ?",
+          "answer": "Non. Les plus grosses économies apparaissent lorsque Jev remplace un chemin de raisonnement ou de génération lourd. L'écart avec un petit LLM rapide à sortie structurée peut être beaucoup plus faible."
+        },
+        {
+          "question": "Que doivent mesurer les équipes avant de router du trafic de production vers Jev ?",
+          "answer": "Mesurez la précision, la calibration par tranche de confiance, la latence de queue, le coût par décision correcte et le taux de cas escaladés vers un modèle ou une personne."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/evals-cost-control",
+          "label": "Les évaluations sont un contrôle des coûts"
+        },
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "Coût par tâche réussie"
+        },
+        {
+          "slug": "/research/provider-prices-not-comparable",
+          "label": "Pourquoi les prix des fournisseurs ne sont pas comparables"
+        }
+      ]
+    },
+    "ja": {
+      "title": "独立したJevテストがコストについて示すこと",
+      "titleCore": "独立したJevテストがコストについて示すこと",
+      "description": "初期の独立テストは、安価で高速な判断レイヤーとしてのJevを裏付けますが、節約額の大きさは置き換えるLLMの経路によって変わります。",
+      "body": "<p>初期の独立テストは、Jevの基本的な見方を裏付けています。Jevは、型付きの判断を行うための高速で低コストな手段です。同時に、必要な但し書きも加わります。節約額は、何を置き換えるかによって決まります。Jevを低速な推論呼び出しと比較すると、劇的な結果になります。小さな構造化出力モデルと比較すると、差は小さくなりますが、それでも有用です。</p><p>私たちが見つけた中で最も詳細な再現可能テストは <a href=&quot;https://github.com/WallerChen/jev-measured&quot;>jev-measured</a> です。このテストでは、OpenRouter 経由でJevを呼び出し、ルーティング、ツール選択、モデレーション、リランキング、リードスコアリング、ガードレールを含む8つのケースを実行しました。報告されている判断1件あたりのコストは $0.0000153 から $0.0000254 の範囲でした。直接比較の実行では、Jevの中央値レイテンシは 352 ms、平均コストは $0.0000188 でした。</p><h2>節約が実際に生じる場面</h2><p>このテストでは、GPT-5 Nano と比べて、Jevはフィクスチャあたり約18分の1のコストで、応答もはるかに高速でした。従来のワークフローが、生成モデルに状態を読み取らせ、推論させ、整形された応答を出力させたうえで、コードがそのテキストから1つの判断を取り出している場合、この差は大きな意味を持ちます。</p><p>Gemini Flash Lite や Mistral Small と比べると、測定されたコスト差はそれぞれ1.7倍と1.4倍にとどまりました。質問が1つだけのケースでは、小さなモデルのほうが安価でした。これはJevの失敗ではありません。むしろ実際の機会を示しています。Jevが最も力を発揮するのは、1回の呼び出しで繰り返される判断ステップを置き換えられる場合や、複数の判断の質問をまとめて評価できる場合です。些細な分類のすべてに無理に使う場合ではありません。</p><h2>型付き出力は実際のコストを取り除く</h2><p>同じベンチマークでは、当初、チャットモデルのベースラインでスキーマエラーが見つかりました。確率を求めているのにブール値が返る、数値ではなく確率の文字列が返る、フィールドが欠落する、といったものです。厳格なJSONスキーマモードにより、これらのエラーは解消されました。この修正は重要です。優れたFinOpsの記事は、ベースラインの最良の構成を隠しません。一方で、出力の検証、修復、リトライ、パースがそれ自体コストであること、そしてJevは自身の出力契約についてはそのカテゴリ全体を取り除くことを示しています。</p><h2>導入を左右するのは今も精度とキャリブレーション</h2><p>コストとレイテンシだけでは、判断が自動化に十分な品質かどうかはわかりません。物理AIに関する独立テストでは、独自の300件のインシデントテンプレートとの一致率が91.3%と報告されました。一方、小規模なサポートチケットのテストでは、Jevがすべてのチャットモデルより正確だという包括的な主張を裏付ける証拠は見つかりませんでした。どちらも初期の限定的な実験です。これらは正しい本番テストを示しています。自社のラベル付きケースでJevを評価し、信頼度の各水準で精度を確認することです。</p><p>実用的なスコアカードは5項目です。判断の精度、信頼度のキャリブレーション、中央値とP95のレイテンシ、正しい判断1件あたりのコスト、エスカレーション率です。これにより、実行可能な結論が得られます。このしきい値を超えるケースはJevにルーティングし、残りはより大きなモデルまたはレビューに回す、というものです。これは、ローンチ時の熱狂や、モデルを疑えという一般的な警告よりも有用です。</p>",
+      "faq": [
+        {
+          "question": "独立テストでは、Jevの判断1件あたりのコストはいくらですか？",
+          "answer": "再現可能な実APIのプロジェクトでは、8つの代表的なユースケースで判断1件あたり約 $0.000015〜$0.000025 と報告されました。結果は入力サイズとプロバイダーによって異なります。"
+        },
+        {
+          "question": "JevはLLMより常に大幅に安いのですか？",
+          "answer": "いいえ。最大の節約が見られるのは、Jevが推論や生成の負荷が高い経路を置き換える場合です。高速で小さな構造化出力LLMとの差は、はるかに小さくなることがあります。"
+        },
+        {
+          "question": "本番トラフィックをJevにルーティングする前に、チームは何を測定すべきですか？",
+          "answer": "精度、信頼度の区間ごとのキャリブレーション、テールレイテンシ、正しい判断1件あたりのコスト、モデルまたは人にエスカレーションされるケースの割合を測定してください。"
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/evals-cost-control",
+          "label": "評価はコスト管理の手段である"
+        },
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "成功タスクあたりのコスト"
+        },
+        {
+          "slug": "/research/provider-prices-not-comparable",
+          "label": "プロバイダーの価格が比較できない理由"
+        }
+      ]
+    },
+    "pt": {
+      "title": "O que testes independentes do Jev dizem sobre custo",
+      "titleCore": "O que testes independentes do Jev dizem sobre custo",
+      "description": "Os primeiros testes independentes sustentam uma camada de decisão barata e rápida, mas o tamanho da economia depende do caminho de LLM que ela substitui.",
+      "body": "<p>Os primeiros testes independentes sustentam a ideia básica do Jev: é uma forma rápida e barata de tomar decisões tipadas. Eles também acrescentam uma ressalva necessária: a economia depende do que ele substitui. Comparar o Jev com uma chamada lenta de raciocínio produz um resultado dramático. Compará-lo com um modelo pequeno de saída estruturada produz uma diferença menor, mas ainda útil.</p><p>O teste reproduzível mais detalhado que encontramos é o <a href=&quot;https://github.com/WallerChen/jev-measured&quot;>jev-measured</a>, que chamou o Jev pelo OpenRouter em oito casos, incluindo roteamento, seleção de ferramentas, moderação, reranking, pontuação de leads e guardrails. Os custos de decisão relatados ficaram entre $0.0000153 e $0.0000254. Nas execuções comparativas diretas, a latência mediana do Jev foi de 352 ms e o custo médio foi de $0.0000188.</p><h2>Onde a economia é real</h2><p>Contra o GPT-5 Nano nesse teste, o Jev custou cerca de 18 vezes menos por fixture e respondeu muito mais rápido. Isso é significativo quando o fluxo antigo pede a um modelo de geração que leia o estado, raciocine, produza uma resposta formatada e depois o código extraia uma única decisão do texto.</p><p>Contra o Gemini Flash Lite e o Mistral Small, a diferença de custo medida foi de apenas 1.7 vez e 1.4 vez, respectivamente. Em um caso de pergunta única, um modelo pequeno foi mais barato. Isso não é uma falha do Jev. Define a oportunidade real: o Jev é mais forte quando uma chamada pode substituir uma etapa de decisão repetida ou quando várias perguntas de decisão podem ser avaliadas juntas — e não quando é forçado em toda classificação trivial.</p><h2>A saída tipada elimina um custo real</h2><p>O mesmo benchmark encontrou inicialmente erros de esquema nas linhas de base de modelos de chat: booleanos onde se pediam probabilidades, strings de probabilidade em vez de números e campos ausentes. O modo estrito de esquema JSON eliminou esses erros. Essa correção é importante. Um bom texto de FinOps não esconde a melhor configuração da linha de base. Ele mostra, sim, que validação de saída, reparo, novas tentativas e parsing são custos por si só — e que o Jev elimina toda essa categoria para o seu próprio contrato de saída.</p><h2>Precisão e calibração ainda decidem a implantação</h2><p>Custo e latência não respondem se uma decisão é boa o bastante para ser automatizada. Um teste independente de IA física relatou 91.3% de concordância com os seus próprios 300 modelos de incidentes, enquanto um pequeno teste de tickets de suporte não encontrou evidência que sustente uma afirmação geral de que o Jev é mais preciso do que todos os modelos de chat. Ambos são experimentos iniciais e restritos. Eles apontam para o teste de produção correto: avaliar o Jev nos seus próprios casos rotulados e inspecionar a precisão em cada faixa de confiança.</p><p>Um scorecard prático tem cinco linhas: precisão da decisão, calibração da confiança, latência mediana e P95, custo por decisão correta e taxa de escalonamento. Isso produz um resultado acionável: encaminhar estes casos ao Jev acima deste limiar e enviar o restante a um modelo maior ou à revisão. É mais útil do que o hype de lançamento ou um aviso genérico para desconfiar do modelo.</p>",
+      "faq": [
+        {
+          "question": "Quanto custa uma decisão do Jev em testes independentes?",
+          "answer": "Um projeto reproduzível com API real relatou aproximadamente $0.000015–$0.000025 por decisão em oito casos de uso representativos. Os resultados variam conforme o tamanho da entrada e o provedor."
+        },
+        {
+          "question": "O Jev é sempre muito mais barato do que um LLM?",
+          "answer": "Não. As maiores economias aparecem quando o Jev substitui um caminho de raciocínio ou de geração pesada. A diferença em relação a um LLM pequeno e rápido de saída estruturada pode ser bem menor."
+        },
+        {
+          "question": "O que as equipes devem medir antes de encaminhar tráfego de produção ao Jev?",
+          "answer": "Meça a precisão, a calibração por faixa de confiança, a latência de cauda, o custo por decisão correta e a taxa de casos escalados para um modelo ou uma pessoa."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/evals-cost-control",
+          "label": "Avaliações são um controle de custos"
+        },
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "Custo por tarefa bem-sucedida"
+        },
+        {
+          "slug": "/research/provider-prices-not-comparable",
+          "label": "Por que os preços dos provedores não são comparáveis"
+        }
+      ]
+    }
+  }
 }

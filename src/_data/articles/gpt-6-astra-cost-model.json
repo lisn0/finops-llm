@@ -55,6 +55,236 @@
           "label": "Opus 5.5 cost by effort level"
         }
       ]
+    },
+    "de": {
+      "title": "GPT-6 Astra: Preise und Kostenmodell, $10/$50",
+      "titleCore": "GPT-6 Astra Kostenmodell",
+      "description": "GPT-6 Astra kostet $10 Input und $50 Output pro 1M Tokens. Kosten pro Aufgabe nach Effort, wo Opus 5.5 bei gleichem Wert günstiger ist, und Fast-Mode-Preise.",
+      "body": "<p>GPT-6 Astra ist das Topmodell der GPT-6-Familie von OpenAI. Es erschien am 3. September 2026, drei Wochen vor GPT-6 Sol und Luna. Es kostet pro Token 5&times; so viel wie GPT-6 Sol, und in öffentlichen Benchmarks kosten die meisten seiner Effort-Stufen mehr als ein Konkurrent, der besser abschneidet.</p><h2>Preise von GPT-6 Astra</h2><table><thead><tr><th>Stufe</th><th>Input</th><th>Gecachter Input</th><th>Output</th></tr></thead><tbody><tr><td>Standard</td><td>$10.00</td><td>$1.00</td><td>$50.00</td></tr><tr><td>Batch oder Flex</td><td>$5.00</td><td>$0.50</td><td>$25.00</td></tr><tr><td>Fast-Modus</td><td>$20.00</td><td>$2.00</td><td>$100.00</td></tr><tr><td>Langer Kontext (über 272K Input)</td><td>$20.00</td><td>$2.00</td><td>$75.00</td></tr></tbody></table><p>Pro 1M Tokens, laut <a href=\"https://developers.openai.com/api/docs/pricing\">Preisseite von OpenAI</a>. Ein Cache-Schreibvorgang kostet $12.50. Astra hat ein Kontextfenster von 1,050,000 Tokens, maximal 128,000 Output-Tokens und einen Wissensstand von April 2026.</p><p>Astra denkt immer nach. Anders als Sol und Luna gibt es keine Effort-Stufe <code>none</code>; zur Wahl stehen low, medium, high, xhigh und max.</p><h2>Im Vergleich zu anderen Premium-Modellen</h2><table><thead><tr><th>Modell</th><th>Input</th><th>Gecacht</th><th>Output</th></tr></thead><tbody><tr><td>GPT-6 Astra</td><td>$10.00</td><td>$1.00</td><td>$50.00</td></tr><tr><td>Claude Fable 5.1</td><td>$10.00</td><td>$0.25</td><td>$50.00</td></tr><tr><td>Claude Opus 5.5</td><td>$4.00</td><td>$0.20</td><td>$20.00</td></tr><tr><td>GPT-6 Sol</td><td>$2.00</td><td>$0.20</td><td>$10.00</td></tr></tbody></table><p>Astra und Claude Fable 5.1 haben denselben Listenpreis, aber Fable 5.1 berechnet für gecachten Input nur ein Viertel. Bei einem cachelastigen Agenten macht dieser Unterschied den Großteil der Input-Rechnung aus.</p><h2>Kosten pro Aufgabe bei jeder Effort-Stufe</h2><p>Artificial Analysis Intelligence Index (v4.3.2):</p><table><thead><tr><th>Effort</th><th>Index-Wert</th><th>Kosten pro Aufgabe</th></tr></thead><tbody><tr><td>low</td><td>45.8</td><td>$0.82</td></tr><tr><td>medium</td><td>49.6</td><td>$1.54</td></tr><tr><td>high</td><td>50.9</td><td>$1.73</td></tr><tr><td>xhigh</td><td>52.4</td><td>$2.31</td></tr><tr><td>max</td><td>52.7</td><td>$3.26</td></tr></tbody></table><p>Nur Astra auf low liegt auf der Preis-Leistungs-Grenze. Mit 45.8 für $0.82 füllt es die Lücke zwischen Sol auf xhigh (44.1, $0.53) und Sol auf max (47.5, $1.06). Es ist außerdem sparsam: etwa 4,400 Output-Tokens pro Aufgabe auf low, gegenüber 27,200 auf max.</p><p>Ab medium schlägt Claude Opus 5.5 es auf beiden Achsen. Opus 5.5 auf medium erreicht 51.2 für $1.34, mehr als Astra auf medium oder high und günstiger als beide. Opus 5.5 auf high erreicht 53.6 für $1.82, mehr als Astra auf max bei 44 % weniger pro Aufgabe. Die vollständigen modellübergreifenden Zahlen stehen unter <a href=\"/research/real-cost-per-task-frontier-models\">reale Kosten pro Aufgabe</a>.</p><p>Das ist ein Benchmark-Ergebnis, kein Urteil über Ihre Workload. Es heißt aber, dass sich Astra oberhalb von low erst an Ihren eigenen Aufgaben bewähren muss, bevor Sie dafür zahlen.</p><h2>Was ein Agent-Schritt kostet</h2><p>Ein Schritt mit 200K Input-Tokens, davon 90 % gecacht, und 20K Output-Tokens kostet bei Astra $1.38: 5&times; GPT-6 Sol ($0.276) und 2.7&times; Claude Opus 5.5 ($0.516). Beim Tarif für langen Kontext steigen die Zahlen schnell: Derselbe Schritt mit 270K Input kostet $1.51, mit 300K sind es $2.64.</p><h2>Der Fast-Modus verdoppelt alles</h2><p>Der Fast-Modus (früher Priority Processing, am 30. Juli 2026 umbenannt) kostet $20 Input und $100 Output pro 1M Tokens. Erfassen Sie <code>service_tier</code> bei jeder Anfrage. Sowohl <code>\"priority\"</code> als auch <code>\"fast\"</code> wählen ihn aus, ein Dashboard, das nur nach einem Wert filtert, übersieht daher die Ausgaben unter dem anderen.</p><h2>Wann sich Astra lohnt</h2><ul><li>Beginnen Sie mit Effort low. Das ist die einzige Einstellung, die in öffentlichen Benchmarks kosteneffizient ist.</li><li>Bevor Sie den Effort erhöhen, spielen Sie dieselben Aufgaben mit Opus 5.5 und Sol auf max erneut ab. Zahlen Sie nur dort für Astra, wo es bei Ihren Aufgaben gewinnt.</li><li>Schicken Sie Offline-Evaluierungen und Bulk-Jobs über Batch zu $5/$25.</li><li>Halten Sie den Fast-Modus hinter einer expliziten Allowlist.</li></ul><p>Quellen: <a href=\"https://developers.openai.com/api/docs/models/gpt-6-astra\">OpenAI-Modellseite zu GPT-6 Astra</a>, <a href=\"https://developers.openai.com/api/docs/pricing\">OpenAI-Preise</a>, <a href=\"https://artificialanalysis.ai/\">Artificial Analysis</a>. Preise abgerufen am 23. September 2026.</p>",
+      "faq": [
+        {
+          "question": "Was kostet GPT-6 Astra?",
+          "answer": "$10 pro 1M Input-Tokens, $1 pro 1M gecachte Input-Tokens und $50 pro 1M Output-Tokens in der Standardstufe. Batch kostet $5/$25, der Fast-Modus $20/$100."
+        },
+        {
+          "question": "Lohnt sich GPT-6 Astra im Vergleich zu Claude Opus 5.5?",
+          "answer": "Im Index von Artificial Analysis erreicht Opus 5.5 bei Effort medium 51.2 für $1.34 pro Aufgabe und schlägt damit Astra auf medium (49.6, $1.54) und high (50.9, $1.73). Nur Astra auf Effort low liegt auf der Preis-Leistungs-Grenze."
+        },
+        {
+          "question": "Kann ich das Reasoning bei GPT-6 Astra abschalten?",
+          "answer": "Nein. Astra unterstützt die Effort-Stufen low, medium, high, xhigh und max, ohne Einstellung none. GPT-6 Sol und Luna bieten none an."
+        },
+        {
+          "question": "Wann erschien GPT-6 Astra?",
+          "answer": "Am 3. September 2026. GPT-6 Sol und Luna folgten am 22. September 2026."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/gpt-6-pricing",
+          "label": "GPT-6-Preise: Astra, Sol und Luna"
+        },
+        {
+          "slug": "/research/gpt-6-sol-cost-model",
+          "label": "GPT-6 Sol Kostenmodell"
+        },
+        {
+          "slug": "/research/gpt-6-luna-cost-model",
+          "label": "GPT-6 Luna Kostenmodell"
+        },
+        {
+          "slug": "/research/claude-fable-5-1-cost-model",
+          "label": "Claude Fable 5.1 Kostenmodell"
+        },
+        {
+          "slug": "/research/opus-5-5-effort-level-cost",
+          "label": "Opus 5.5 Kosten nach Effort-Stufe"
+        }
+      ]
+    },
+    "es": {
+      "title": "Precio y costes de GPT-6 Astra: $10/$50",
+      "titleCore": "Modelo de costes de GPT-6 Astra",
+      "description": "GPT-6 Astra cuesta $10 de entrada y $50 de salida por 1M de tokens. Coste por tarea según el esfuerzo, Opus 5.5 como alternativa más barata y modo rápido.",
+      "body": "<p>GPT-6 Astra es el modelo de gama alta de la familia GPT-6 de OpenAI. Se lanzó el 3 de septiembre de 2026, tres semanas antes que GPT-6 Sol y Luna. Cuesta 5&times; lo que GPT-6 Sol por token y, en los benchmarks públicos, la mayoría de sus ajustes de esfuerzo cuestan más que un competidor que puntúa más alto.</p><h2>Precios de GPT-6 Astra</h2><table><thead><tr><th>Nivel</th><th>Entrada</th><th>Entrada en caché</th><th>Salida</th></tr></thead><tbody><tr><td>Estándar</td><td>$10.00</td><td>$1.00</td><td>$50.00</td></tr><tr><td>Batch o flex</td><td>$5.00</td><td>$0.50</td><td>$25.00</td></tr><tr><td>Modo rápido</td><td>$20.00</td><td>$2.00</td><td>$100.00</td></tr><tr><td>Contexto largo (más de 272K de entrada)</td><td>$20.00</td><td>$2.00</td><td>$75.00</td></tr></tbody></table><p>Por 1M de tokens, según la <a href=\"https://developers.openai.com/api/docs/pricing\">página de precios de OpenAI</a>. Una escritura en caché cuesta $12.50. Astra tiene una ventana de contexto de 1,050,000 tokens, 128,000 tokens de salida máximos y una fecha de corte de conocimiento de abril de 2026.</p><p>Astra siempre razona. A diferencia de Sol y Luna, no tiene el ajuste de esfuerzo <code>none</code>; las opciones son low, medium, high, xhigh y max.</p><h2>Frente a otros modelos premium</h2><table><thead><tr><th>Modelo</th><th>Entrada</th><th>En caché</th><th>Salida</th></tr></thead><tbody><tr><td>GPT-6 Astra</td><td>$10.00</td><td>$1.00</td><td>$50.00</td></tr><tr><td>Claude Fable 5.1</td><td>$10.00</td><td>$0.25</td><td>$50.00</td></tr><tr><td>Claude Opus 5.5</td><td>$4.00</td><td>$0.20</td><td>$20.00</td></tr><tr><td>GPT-6 Sol</td><td>$2.00</td><td>$0.20</td><td>$10.00</td></tr></tbody></table><p>Astra y Claude Fable 5.1 tienen el mismo precio de lista, pero Fable 5.1 cobra una cuarta parte por la entrada en caché. En un agente con mucha caché, esa diferencia es la mayor parte de la factura de entrada.</p><h2>Coste por tarea en cada nivel de esfuerzo</h2><p>Artificial Analysis Intelligence Index (v4.3.2):</p><table><thead><tr><th>Esfuerzo</th><th>Puntuación del índice</th><th>Coste por tarea</th></tr></thead><tbody><tr><td>low</td><td>45.8</td><td>$0.82</td></tr><tr><td>medium</td><td>49.6</td><td>$1.54</td></tr><tr><td>high</td><td>50.9</td><td>$1.73</td></tr><tr><td>xhigh</td><td>52.4</td><td>$2.31</td></tr><tr><td>max</td><td>52.7</td><td>$3.26</td></tr></tbody></table><p>Solo Astra en esfuerzo low está en la frontera de precio-rendimiento. Con 45.8 por $0.82, cubre el hueco entre Sol en xhigh (44.1, $0.53) y Sol en max (47.5, $1.06). Además es frugal: unos 4,400 tokens de salida por tarea en low, frente a 27,200 en max.</p><p>Desde medium hacia arriba, Claude Opus 5.5 lo supera en ambos ejes. Opus 5.5 en medium puntúa 51.2 por $1.34, más que Astra en medium o high y más barato que cualquiera de los dos. Opus 5.5 en high puntúa 53.6 por $1.82, más que Astra en max con un 44% menos por tarea. Las cifras completas entre modelos están en <a href=\"/research/real-cost-per-task-frontier-models\">coste real por tarea</a>.</p><p>Es un resultado de benchmark, no un veredicto sobre tu carga de trabajo. Sí significa que Astra por encima de low tiene que ganarse su sitio en tus propias tareas antes de que lo pagues.</p><h2>Cuánto cuesta un paso de agente</h2><p>Un paso con 200K tokens de entrada, el 90% en caché, y 20K tokens de salida cuesta $1.38 en Astra: 5&times; GPT-6 Sol ($0.276) y 2.7&times; Claude Opus 5.5 ($0.516). Con la tarifa de contexto largo las cifras suben rápido: el mismo paso con 270K de entrada cuesta $1.51, y con 300K cuesta $2.64.</p><h2>El modo rápido lo duplica todo</h2><p>El modo rápido (antes procesamiento prioritario, renombrado el 30 de julio de 2026) cuesta $20 de entrada y $100 de salida por 1M de tokens. Registra <code>service_tier</code> en cada solicitud. Tanto <code>\"priority\"</code> como <code>\"fast\"</code> lo seleccionan, así que un panel que filtre por un solo valor pasará por alto el gasto del otro.</p><h2>Cuándo compensa Astra</h2><ul><li>Empieza en esfuerzo low. Es el único ajuste eficiente en costes según los benchmarks públicos.</li><li>Antes de subir el esfuerzo, repite las mismas tareas en Opus 5.5 y en Sol en max. Paga por Astra solo donde gane en tus tareas.</li><li>Envía la evaluación offline y los trabajos masivos por batch a $5/$25.</li><li>Mantén el modo rápido detrás de una lista de permitidos explícita.</li></ul><p>Fuentes: <a href=\"https://developers.openai.com/api/docs/models/gpt-6-astra\">página del modelo GPT-6 Astra de OpenAI</a>, <a href=\"https://developers.openai.com/api/docs/pricing\">precios de OpenAI</a>, <a href=\"https://artificialanalysis.ai/\">Artificial Analysis</a>. Precios consultados el 23 de septiembre de 2026.</p>",
+      "faq": [
+        {
+          "question": "¿Cuánto cuesta GPT-6 Astra?",
+          "answer": "$10 por 1M de tokens de entrada, $1 por 1M de tokens de entrada en caché y $50 por 1M de tokens de salida en el nivel estándar. Batch cuesta $5/$25 y el modo rápido $20/$100."
+        },
+        {
+          "question": "¿Merece la pena GPT-6 Astra frente a Claude Opus 5.5?",
+          "answer": "En el índice de Artificial Analysis, Opus 5.5 en esfuerzo medium puntúa 51.2 por $1.34 por tarea, por encima de Astra en medium (49.6, $1.54) y high (50.9, $1.73). Solo Astra en esfuerzo low está en la frontera de precio-rendimiento."
+        },
+        {
+          "question": "¿Puedo desactivar el razonamiento en GPT-6 Astra?",
+          "answer": "No. Astra admite esfuerzo low, medium, high, xhigh y max, sin ajuste none. GPT-6 Sol y Luna sí ofrecen none."
+        },
+        {
+          "question": "¿Cuándo se lanzó GPT-6 Astra?",
+          "answer": "El 3 de septiembre de 2026. GPT-6 Sol y Luna llegaron el 22 de septiembre de 2026."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/gpt-6-pricing",
+          "label": "Precios de GPT-6: Astra, Sol y Luna"
+        },
+        {
+          "slug": "/research/gpt-6-sol-cost-model",
+          "label": "Modelo de costes de GPT-6 Sol"
+        },
+        {
+          "slug": "/research/gpt-6-luna-cost-model",
+          "label": "Modelo de costes de GPT-6 Luna"
+        },
+        {
+          "slug": "/research/claude-fable-5-1-cost-model",
+          "label": "Modelo de costes de Claude Fable 5.1"
+        },
+        {
+          "slug": "/research/opus-5-5-effort-level-cost",
+          "label": "Coste de Opus 5.5 por nivel de esfuerzo"
+        }
+      ]
+    },
+    "fr": {
+      "title": "Prix et coûts de GPT-6 Astra : 10 $/50 $",
+      "titleCore": "Modèle de coûts de GPT-6 Astra",
+      "description": "GPT-6 Astra coûte 10 $ en entrée et 50 $ en sortie par 1M de tokens. Coût par tâche selon l'effort, où Opus 5.5 est moins cher à score égal, et tarif du mode rapide.",
+      "body": "<p>GPT-6 Astra est le modèle haut de gamme de la famille GPT-6 d'OpenAI. Il a été lancé le 3 septembre 2026, trois semaines avant GPT-6 Sol et Luna. Il coûte 5&times; le prix de GPT-6 Sol par token et, sur les benchmarks publics, la plupart de ses réglages d'effort coûtent plus cher qu'un concurrent qui score mieux.</p><h2>Tarifs de GPT-6 Astra</h2><table><thead><tr><th>Niveau</th><th>Entrée</th><th>Entrée en cache</th><th>Sortie</th></tr></thead><tbody><tr><td>Standard</td><td>$10.00</td><td>$1.00</td><td>$50.00</td></tr><tr><td>Batch ou flex</td><td>$5.00</td><td>$0.50</td><td>$25.00</td></tr><tr><td>Mode rapide</td><td>$20.00</td><td>$2.00</td><td>$100.00</td></tr><tr><td>Contexte long (plus de 272K en entrée)</td><td>$20.00</td><td>$2.00</td><td>$75.00</td></tr></tbody></table><p>Par 1M de tokens, d'après la <a href=\"https://developers.openai.com/api/docs/pricing\">page de tarifs d'OpenAI</a>. Une écriture en cache coûte $12.50. Astra offre une fenêtre de contexte de 1,050,000 tokens, 128,000 tokens de sortie maximum et une date limite de connaissances d'avril 2026.</p><p>Astra raisonne toujours. Contrairement à Sol et Luna, il n'a pas de réglage d'effort <code>none</code> ; les choix sont low, medium, high, xhigh et max.</p><h2>Face aux autres modèles premium</h2><table><thead><tr><th>Modèle</th><th>Entrée</th><th>En cache</th><th>Sortie</th></tr></thead><tbody><tr><td>GPT-6 Astra</td><td>$10.00</td><td>$1.00</td><td>$50.00</td></tr><tr><td>Claude Fable 5.1</td><td>$10.00</td><td>$0.25</td><td>$50.00</td></tr><tr><td>Claude Opus 5.5</td><td>$4.00</td><td>$0.20</td><td>$20.00</td></tr><tr><td>GPT-6 Sol</td><td>$2.00</td><td>$0.20</td><td>$10.00</td></tr></tbody></table><p>Astra et Claude Fable 5.1 ont le même prix catalogue, mais Fable 5.1 facture l'entrée en cache quatre fois moins cher. Sur un agent qui exploite beaucoup le cache, cet écart représente l'essentiel de la facture d'entrée.</p><h2>Coût par tâche à chaque niveau d'effort</h2><p>Artificial Analysis Intelligence Index (v4.3.2) :</p><table><thead><tr><th>Effort</th><th>Score de l'indice</th><th>Coût par tâche</th></tr></thead><tbody><tr><td>low</td><td>45.8</td><td>$0.82</td></tr><tr><td>medium</td><td>49.6</td><td>$1.54</td></tr><tr><td>high</td><td>50.9</td><td>$1.73</td></tr><tr><td>xhigh</td><td>52.4</td><td>$2.31</td></tr><tr><td>max</td><td>52.7</td><td>$3.26</td></tr></tbody></table><p>Seul Astra à effort low se situe sur la frontière prix-performance. Avec 45.8 pour $0.82, il comble l'écart entre Sol en xhigh (44.1, $0.53) et Sol en max (47.5, $1.06). Il est aussi sobre : environ 4,400 tokens de sortie par tâche en low, contre 27,200 en max.</p><p>À partir de medium, Claude Opus 5.5 le bat sur les deux axes. Opus 5.5 en medium obtient 51.2 pour $1.34, plus qu'Astra en medium ou en high, et pour moins cher que l'un comme l'autre. Opus 5.5 en high obtient 53.6 pour $1.82, plus qu'Astra en max, pour 44 % de moins par tâche. Les chiffres complets entre modèles figurent dans <a href=\"/research/real-cost-per-task-frontier-models\">coût réel par tâche</a>.</p><p>C'est un résultat de benchmark, pas un verdict sur votre charge de travail. Cela signifie en revanche qu'Astra au-dessus de low doit faire ses preuves sur vos propres tâches avant que vous le payiez.</p><h2>Ce que coûte une étape d'agent</h2><p>Une étape avec 200K tokens d'entrée, dont 90 % en cache, et 20K tokens de sortie coûte $1.38 sur Astra : 5&times; GPT-6 Sol ($0.276) et 2.7&times; Claude Opus 5.5 ($0.516). Au tarif contexte long, les chiffres grimpent vite : la même étape à 270K en entrée coûte $1.51, et à 300K elle coûte $2.64.</p><h2>Le mode rapide double tout</h2><p>Le mode rapide (anciennement traitement prioritaire, renommé le 30 juillet 2026) coûte $20 en entrée et $100 en sortie par 1M de tokens. Suivez <code>service_tier</code> sur chaque requête. <code>\"priority\"</code> comme <code>\"fast\"</code> le sélectionnent, donc un tableau de bord filtrant sur une seule valeur manquera les dépenses de l'autre.</p><h2>Quand Astra vaut le coup</h2><ul><li>Commencez à l'effort low. C'est le seul réglage rentable sur les benchmarks publics.</li><li>Avant d'augmenter l'effort, rejouez les mêmes tâches sur Opus 5.5 et sur Sol en max. Ne payez pour Astra que là où il gagne sur vos tâches.</li><li>Envoyez l'évaluation hors ligne et les traitements en masse via batch à $5/$25.</li><li>Gardez le mode rapide derrière une liste d'autorisation explicite.</li></ul><p>Sources : <a href=\"https://developers.openai.com/api/docs/models/gpt-6-astra\">page du modèle GPT-6 Astra d'OpenAI</a>, <a href=\"https://developers.openai.com/api/docs/pricing\">tarifs OpenAI</a>, <a href=\"https://artificialanalysis.ai/\">Artificial Analysis</a>. Prix relevés le 23 septembre 2026.</p>",
+      "faq": [
+        {
+          "question": "Combien coûte GPT-6 Astra ?",
+          "answer": "$10 par 1M de tokens d'entrée, $1 par 1M de tokens d'entrée en cache et $50 par 1M de tokens de sortie au niveau standard. Le batch est à $5/$25, le mode rapide à $20/$100."
+        },
+        {
+          "question": "GPT-6 Astra vaut-il le coup face à Claude Opus 5.5 ?",
+          "answer": "Sur l'indice d'Artificial Analysis, Opus 5.5 à effort medium obtient 51.2 pour $1.34 par tâche, devant Astra en medium (49.6, $1.54) et en high (50.9, $1.73). Seul Astra à effort low se situe sur la frontière prix-performance."
+        },
+        {
+          "question": "Peut-on désactiver le raisonnement sur GPT-6 Astra ?",
+          "answer": "Non. Astra prend en charge les efforts low, medium, high, xhigh et max, sans réglage none. GPT-6 Sol et Luna proposent none."
+        },
+        {
+          "question": "Quand GPT-6 Astra est-il sorti ?",
+          "answer": "Le 3 septembre 2026. GPT-6 Sol et Luna ont suivi le 22 septembre 2026."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/gpt-6-pricing",
+          "label": "Tarifs GPT-6 : Astra, Sol et Luna"
+        },
+        {
+          "slug": "/research/gpt-6-sol-cost-model",
+          "label": "Modèle de coûts de GPT-6 Sol"
+        },
+        {
+          "slug": "/research/gpt-6-luna-cost-model",
+          "label": "Modèle de coûts de GPT-6 Luna"
+        },
+        {
+          "slug": "/research/claude-fable-5-1-cost-model",
+          "label": "Modèle de coûts de Claude Fable 5.1"
+        },
+        {
+          "slug": "/research/opus-5-5-effort-level-cost",
+          "label": "Coût d'Opus 5.5 par niveau d'effort"
+        }
+      ]
+    },
+    "ja": {
+      "title": "GPT-6 Astraの料金とコストモデル:$10/$50",
+      "titleCore": "GPT-6 Astraのコストモデル",
+      "description": "GPT-6 Astraは1Mトークンあたり入力$10、出力$50。エフォート別のタスク単価、同スコアでOpus 5.5のほうが安いケース、高速モードの料金を解説します。",
+      "body": "<p>GPT-6 Astraは、OpenAIのGPT-6ファミリーの最上位モデルです。2026年9月3日に、GPT-6 SolおよびLunaの3週間前にリリースされました。トークン単価はGPT-6 Solの5&times;で、公開ベンチマークでは、ほとんどのエフォート設定が、より高いスコアを出す競合モデルよりも高コストになっています。</p><h2>GPT-6 Astraの料金</h2><table><thead><tr><th>ティア</th><th>入力</th><th>キャッシュ入力</th><th>出力</th></tr></thead><tbody><tr><td>標準</td><td>$10.00</td><td>$1.00</td><td>$50.00</td></tr><tr><td>バッチまたはフレックス</td><td>$5.00</td><td>$0.50</td><td>$25.00</td></tr><tr><td>高速モード</td><td>$20.00</td><td>$2.00</td><td>$100.00</td></tr><tr><td>ロングコンテキスト(入力272K超)</td><td>$20.00</td><td>$2.00</td><td>$75.00</td></tr></tbody></table><p>料金は1Mトークンあたりで、<a href=\"https://developers.openai.com/api/docs/pricing\">OpenAIの料金ページ</a>に基づきます。キャッシュ書き込みは$12.50です。Astraは、1,050,000トークンのコンテキストウィンドウ、最大出力128,000トークン、2026年4月のナレッジカットオフを備えています。</p><p>Astraは常に推論を行います。SolやLunaと異なり、<code>none</code>エフォート設定はなく、選択肢はlow、medium、high、xhigh、maxです。</p><h2>他のプレミアムモデルとの比較</h2><table><thead><tr><th>モデル</th><th>入力</th><th>キャッシュ</th><th>出力</th></tr></thead><tbody><tr><td>GPT-6 Astra</td><td>$10.00</td><td>$1.00</td><td>$50.00</td></tr><tr><td>Claude Fable 5.1</td><td>$10.00</td><td>$0.25</td><td>$50.00</td></tr><tr><td>Claude Opus 5.5</td><td>$4.00</td><td>$0.20</td><td>$20.00</td></tr><tr><td>GPT-6 Sol</td><td>$2.00</td><td>$0.20</td><td>$10.00</td></tr></tbody></table><p>AstraとClaude Fable 5.1は定価が同じですが、Fable 5.1のキャッシュ入力は4分の1の料金です。キャッシュを多用するエージェントでは、この差が入力コストの大半を占めます。</p><h2>エフォート別のタスク単価</h2><p>Artificial Analysis Intelligence Index(v4.3.2):</p><table><thead><tr><th>エフォート</th><th>インデックススコア</th><th>タスク単価</th></tr></thead><tbody><tr><td>low</td><td>45.8</td><td>$0.82</td></tr><tr><td>medium</td><td>49.6</td><td>$1.54</td></tr><tr><td>high</td><td>50.9</td><td>$1.73</td></tr><tr><td>xhigh</td><td>52.4</td><td>$2.31</td></tr><tr><td>max</td><td>52.7</td><td>$3.26</td></tr></tbody></table><p>価格性能フロンティア上にあるのは、lowエフォートのAstraだけです。$0.82で45.8というスコアは、xhighのSol(44.1、$0.53)とmaxのSol(47.5、$1.06)の間を埋めます。出力も控えめで、lowではタスクあたり約4,400出力トークン、maxでは27,200です。</p><p>mediumより上では、Claude Opus 5.5が両方の軸でAstraを上回ります。mediumのOpus 5.5は$1.34で51.2を記録し、mediumやhighのAstraより高スコアで、どちらよりも安価です。highのOpus 5.5は$1.82で53.6を記録し、maxのAstraより高スコアでありながら、タスクあたり44%安くなっています。モデル間の詳細な数値は、<a href=\"/research/real-cost-per-task-frontier-models\">実際のタスク単価</a>をご覧ください。</p><p>これはベンチマークの結果であり、お客様のワークロードに対する評価ではありません。ただし、low以上のAstraは、費用を払う前に自社のタスクで価値を示す必要があるということです。</p><h2>エージェントの1ステップのコスト</h2><p>入力200Kトークン(うち90%がキャッシュ)、出力20Kトークンのステップは、Astraで$1.38かかります。これはGPT-6 Sol($0.276)の5&times;、Claude Opus 5.5($0.516)の2.7&times;です。ロングコンテキスト料金では数字が急速に上がり、入力270Kの同じステップは$1.51、300Kでは$2.64になります。</p><h2>高速モードはすべてが2倍</h2><p>高速モード(旧プライオリティ処理、2026年7月30日に名称変更)は、1Mトークンあたり入力$20、出力$100です。すべてのリクエストで<code>service_tier</code>を記録してください。<code>\"priority\"</code>と<code>\"fast\"</code>のどちらでも選択されるため、片方の値だけでフィルタするダッシュボードでは、もう一方の支出を見逃します。</p><h2>Astraが価値を持つ場面</h2><ul><li>lowエフォートから始めます。公開ベンチマークでコスト効率が良い唯一の設定です。</li><li>エフォートを上げる前に、同じタスクをOpus 5.5とmaxのSolで再実行します。自社のタスクでAstraが勝つ場合にのみ、Astraに費用を払います。</li><li>オフライン評価と大量処理は、$5/$25のバッチで送ります。</li><li>高速モードは、明示的な許可リストの背後に置きます。</li></ul><p>出典:<a href=\"https://developers.openai.com/api/docs/models/gpt-6-astra\">OpenAI GPT-6 Astraモデルページ</a>、<a href=\"https://developers.openai.com/api/docs/pricing\">OpenAI料金</a>、<a href=\"https://artificialanalysis.ai/\">Artificial Analysis</a>。料金は2026年9月23日時点です。</p>",
+      "faq": [
+        {
+          "question": "GPT-6 Astraの料金はいくらですか?",
+          "answer": "標準ティアでは、入力1Mトークンあたり$10、キャッシュ入力1Mトークンあたり$1、出力1Mトークンあたり$50です。バッチは$5/$25、高速モードは$20/$100です。"
+        },
+        {
+          "question": "GPT-6 AstraはClaude Opus 5.5と比べて価値がありますか?",
+          "answer": "Artificial Analysisのインデックスでは、mediumエフォートのOpus 5.5がタスクあたり$1.34で51.2を記録し、medium(49.6、$1.54)とhigh(50.9、$1.73)のAstraを上回っています。価格性能フロンティア上にあるのは、lowエフォートのAstraだけです。"
+        },
+        {
+          "question": "GPT-6 Astraで推論をオフにできますか?",
+          "answer": "できません。Astraはlow、medium、high、xhigh、maxのエフォートに対応しており、noneはありません。GPT-6 SolとLunaにはnoneがあります。"
+        },
+        {
+          "question": "GPT-6 Astraはいつリリースされましたか?",
+          "answer": "2026年9月3日です。GPT-6 SolとLunaは2026年9月22日に続きました。"
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/gpt-6-pricing",
+          "label": "GPT-6の料金:Astra、Sol、Luna"
+        },
+        {
+          "slug": "/research/gpt-6-sol-cost-model",
+          "label": "GPT-6 Solのコストモデル"
+        },
+        {
+          "slug": "/research/gpt-6-luna-cost-model",
+          "label": "GPT-6 Lunaのコストモデル"
+        },
+        {
+          "slug": "/research/claude-fable-5-1-cost-model",
+          "label": "Claude Fable 5.1のコストモデル"
+        },
+        {
+          "slug": "/research/opus-5-5-effort-level-cost",
+          "label": "Opus 5.5のエフォートレベル別コスト"
+        }
+      ]
+    },
+    "pt": {
+      "title": "Preço e custos do GPT-6 Astra: $10/$50",
+      "titleCore": "Modelo de custos do GPT-6 Astra",
+      "description": "GPT-6 Astra custa $10 de entrada e $50 de saída por 1M de tokens. Custo por tarefa por esforço, Opus 5.5 como opção mais barata e modo rápido.",
+      "body": "<p>O GPT-6 Astra é o modelo de topo da família GPT-6 da OpenAI. Foi lançado em 3 de setembro de 2026, três semanas antes do GPT-6 Sol e do Luna. Custa 5&times; o GPT-6 Sol por token e, nos benchmarks públicos, a maioria das suas configurações de esforço custa mais do que um concorrente que pontua mais alto.</p><h2>Preços do GPT-6 Astra</h2><table><thead><tr><th>Nível</th><th>Entrada</th><th>Entrada em cache</th><th>Saída</th></tr></thead><tbody><tr><td>Padrão</td><td>$10.00</td><td>$1.00</td><td>$50.00</td></tr><tr><td>Batch ou flex</td><td>$5.00</td><td>$0.50</td><td>$25.00</td></tr><tr><td>Modo rápido</td><td>$20.00</td><td>$2.00</td><td>$100.00</td></tr><tr><td>Contexto longo (acima de 272K de entrada)</td><td>$20.00</td><td>$2.00</td><td>$75.00</td></tr></tbody></table><p>Por 1M de tokens, conforme a <a href=\"https://developers.openai.com/api/docs/pricing\">página de preços da OpenAI</a>. Uma gravação em cache custa $12.50. O Astra tem janela de contexto de 1,050,000 tokens, 128,000 tokens de saída no máximo e data de corte de conhecimento em abril de 2026.</p><p>O Astra sempre raciocina. Diferente do Sol e do Luna, ele não tem a configuração de esforço <code>none</code>; as opções são low, medium, high, xhigh e max.</p><h2>Frente a outros modelos premium</h2><table><thead><tr><th>Modelo</th><th>Entrada</th><th>Em cache</th><th>Saída</th></tr></thead><tbody><tr><td>GPT-6 Astra</td><td>$10.00</td><td>$1.00</td><td>$50.00</td></tr><tr><td>Claude Fable 5.1</td><td>$10.00</td><td>$0.25</td><td>$50.00</td></tr><tr><td>Claude Opus 5.5</td><td>$4.00</td><td>$0.20</td><td>$20.00</td></tr><tr><td>GPT-6 Sol</td><td>$2.00</td><td>$0.20</td><td>$10.00</td></tr></tbody></table><p>O Astra e o Claude Fable 5.1 têm o mesmo preço de tabela, mas o Fable 5.1 cobra um quarto por entrada em cache. Em um agente que usa muito cache, essa diferença é a maior parte da conta de entrada.</p><h2>Custo por tarefa em cada nível de esforço</h2><p>Artificial Analysis Intelligence Index (v4.3.2):</p><table><thead><tr><th>Esforço</th><th>Pontuação do índice</th><th>Custo por tarefa</th></tr></thead><tbody><tr><td>low</td><td>45.8</td><td>$0.82</td></tr><tr><td>medium</td><td>49.6</td><td>$1.54</td></tr><tr><td>high</td><td>50.9</td><td>$1.73</td></tr><tr><td>xhigh</td><td>52.4</td><td>$2.31</td></tr><tr><td>max</td><td>52.7</td><td>$3.26</td></tr></tbody></table><p>Apenas o Astra em esforço low está na fronteira de preço-desempenho. Com 45.8 por $0.82, ele preenche a lacuna entre o Sol em xhigh (44.1, $0.53) e o Sol em max (47.5, $1.06). Também é econômico: cerca de 4,400 tokens de saída por tarefa em low, contra 27,200 em max.</p><p>De medium para cima, o Claude Opus 5.5 o supera nos dois eixos. O Opus 5.5 em medium marca 51.2 por $1.34, mais que o Astra em medium ou high e mais barato que ambos. O Opus 5.5 em high marca 53.6 por $1.82, mais que o Astra em max, com 44% menos por tarefa. Os números completos entre modelos estão em <a href=\"/research/real-cost-per-task-frontier-models\">custo real por tarefa</a>.</p><p>Isso é um resultado de benchmark, não um veredito sobre a sua carga de trabalho. Mas significa que o Astra acima de low precisa merecer seu lugar nas suas próprias tarefas antes de você pagar por ele.</p><h2>Quanto custa um passo de agente</h2><p>Um passo com 200K tokens de entrada, 90% em cache, e 20K tokens de saída custa $1.38 no Astra: 5&times; o GPT-6 Sol ($0.276) e 2.7&times; o Claude Opus 5.5 ($0.516). Na tarifa de contexto longo os números sobem rápido: o mesmo passo com 270K de entrada custa $1.51, e com 300K custa $2.64.</p><h2>O modo rápido dobra tudo</h2><p>O modo rápido (antes processamento prioritário, renomeado em 30 de julho de 2026) custa $20 de entrada e $100 de saída por 1M de tokens. Registre <code>service_tier</code> em cada requisição. Tanto <code>\"priority\"</code> quanto <code>\"fast\"</code> o selecionam, então um painel que filtre por um único valor deixará passar o gasto do outro.</p><h2>Quando o Astra vale a pena</h2><ul><li>Comece em esforço low. É a única configuração eficiente em custo nos benchmarks públicos.</li><li>Antes de aumentar o esforço, repita as mesmas tarefas no Opus 5.5 e no Sol em max. Pague pelo Astra só onde ele vencer nas suas tarefas.</li><li>Envie avaliação offline e jobs em massa por batch a $5/$25.</li><li>Mantenha o modo rápido atrás de uma lista de permissões explícita.</li></ul><p>Fontes: <a href=\"https://developers.openai.com/api/docs/models/gpt-6-astra\">página do modelo GPT-6 Astra da OpenAI</a>, <a href=\"https://developers.openai.com/api/docs/pricing\">preços da OpenAI</a>, <a href=\"https://artificialanalysis.ai/\">Artificial Analysis</a>. Preços consultados em 23 de setembro de 2026.</p>",
+      "faq": [
+        {
+          "question": "Quanto custa o GPT-6 Astra?",
+          "answer": "$10 por 1M de tokens de entrada, $1 por 1M de tokens de entrada em cache e $50 por 1M de tokens de saída no nível padrão. O batch custa $5/$25 e o modo rápido $20/$100."
+        },
+        {
+          "question": "O GPT-6 Astra vale a pena em comparação com o Claude Opus 5.5?",
+          "answer": "No índice da Artificial Analysis, o Opus 5.5 em esforço medium marca 51.2 por $1.34 por tarefa, superando o Astra em medium (49.6, $1.54) e high (50.9, $1.73). Apenas o Astra em esforço low está na fronteira de preço-desempenho."
+        },
+        {
+          "question": "Posso desligar o raciocínio no GPT-6 Astra?",
+          "answer": "Não. O Astra aceita esforço low, medium, high, xhigh e max, sem a configuração none. O GPT-6 Sol e o Luna oferecem none."
+        },
+        {
+          "question": "Quando o GPT-6 Astra foi lançado?",
+          "answer": "Em 3 de setembro de 2026. O GPT-6 Sol e o Luna vieram em 22 de setembro de 2026."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/gpt-6-pricing",
+          "label": "Preços do GPT-6: Astra, Sol e Luna"
+        },
+        {
+          "slug": "/research/gpt-6-sol-cost-model",
+          "label": "Modelo de custos do GPT-6 Sol"
+        },
+        {
+          "slug": "/research/gpt-6-luna-cost-model",
+          "label": "Modelo de custos do GPT-6 Luna"
+        },
+        {
+          "slug": "/research/claude-fable-5-1-cost-model",
+          "label": "Modelo de custos do Claude Fable 5.1"
+        },
+        {
+          "slug": "/research/opus-5-5-effort-level-cost",
+          "label": "Custo do Opus 5.5 por nível de esforço"
+        }
+      ]
     }
   }
 }

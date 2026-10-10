@@ -55,6 +55,236 @@
           "label": "Shadow AI on corporate cards"
         }
       ]
+    },
+    "de": {
+      "title": "KI-Beschaffung im Unternehmen und Committed Spend",
+      "titleCore": "KI-Beschaffung im Unternehmen und Committed Spend",
+      "description": "Bei Milliardenausgaben für KI schlagen verhandelte Preise die Modellwahl. Preislisten, Committed-Use-Rabatte, Egress-Konditionen und die wichtigste Klausel.",
+      "body": "<p>Am 25. September 2026 bezifferte ein Bericht auf Basis eingestufter Schätzungen die Ausgaben einer US-Behörde für KI-Modelltests im Milliardenbereich; auf Hacker News brachte er es auf 176 Punkte und 106 Kommentare. Wie hoch die Zahl genau ist, spielt kaum eine Rolle, entscheidend ist die Richtung: KI-Modellausgaben sind von einer Kostenposition zu einer Beschaffungskategorie geworden, und die Mechanismen, die eine monatliche Rechnung von $50K bestimmen, gelten bei einer neunstelligen nicht mehr.</p><h2>Was sich im Beschaffungsmaßstab ändert</h2><ul><li><strong>Veröffentlichte Preislisten werden verhandelbar.</strong> Bei geringem Volumen zahlt man den Listenpreis. Bei hohem Volumen hat der Anbieter Bereitstellungskosten und eine Beziehung zu schützen.</li><li><strong>Committed-Use-Rabatte ersetzen Spot-Preise.</strong> Ein Committed-Spend-Vertrag tauscht Flexibilität gegen einen niedrigeren Preis. Nur sinnvoll, wenn Sie Ihre Untergrenze kennen.</li><li><strong>Rate-Limits und Durchsatzgarantien werden vertraglich.</strong> Best-Effort-Priorität wird zur Vertragsklausel. Für Agenten-Workloads ist das wichtiger als der Preis.</li><li><strong>Support-Stufe und Eskalationswege werden gekauft, nicht vorausgesetzt.</strong> Ein Sev-1 mit einem Bereitschaftsingenieur ist eine betriebliche Abhängigkeit, keine Ausgabe.</li><li><strong>Datenbedingungen prüft die Rechtsabteilung.</strong> Aufbewahrung, Opt-out vom Training und Unterauftragsverarbeiter-Listen werden auditiert. Diese Prüfung liegt auf dem kritischen Pfad.</li></ul><h2>Der Committed-Spend-Tausch</h2><p>Ein Committed-Use-Vertrag ist eine Wette auf die eigene Prognose. Rabatte liegen typischerweise bei 10&ndash;35 % unter Liste für eine Untergrenze über 12 Monate. Der typische Fehlerfall: Ein Team verpflichtet sich auf eine Untergrenze, nutzt dann während der Laufzeit ein günstigeres Modell zu stark und zahlt am Ende Committed-Preise für Tokens, die es gar nicht brauchte. Drei Kontrollen machen die Wette sicher:</p><ol><li><strong>Legen Sie die Untergrenze an der wirklich stabilen Last fest.</strong> Batch-, Eval- und interner Traffic lässt sich weit besser prognostizieren als kundennaher Agenten-Traffic.</li><li><strong>Halten Sie die Modellwahl innerhalb der Laufzeit austauschbar.</strong> Eine Zusage, $X bei einem Anbieter auszugeben, ist über dessen Modelle hinweg übertragbar. Eine Zusage auf ein bestimmtes Modell ist es nicht.</li><li><strong>Prüfen Sie in Monat 6, nicht in Monat 12.</strong> Liegt die tatsächliche Run-Rate weit unter der Untergrenze, verhandeln Sie vor der Schlussabrechnung neu.</li></ol><h2>Preislisten und Egress bestimmen weiterhin die Rechnung</h2><p>Zwei Posten überraschen Beschaffungsteams regelmäßig, die einen Eckpreis ausgehandelt haben:</p><ul><li><strong>Gecachte Eingabe.</strong> Opus 5.5 berechnet $0.20 pro Million für Cache-Lesezugriffe gegenüber $4.00 für frische Eingabe. Bei cache-lastigen Agenten-Workloads macht der Cache-Preis, nicht der Eckpreis, den Großteil der Eingabekosten aus. Verhandeln Sie den Cache-Preis ausdrücklich.</li><li><strong>Serverseitige Tools sind eine eigene Rechnungsposition.</strong> Websuche, Codeausführung und ähnliche Server-Tools werden unabhängig von Tokens abgerechnet. Ein Unternehmens-Agent auf Basis von Websuche kann einen großen Nicht-Token-Posten haben, den keine Preislisten-Verhandlung berührt hat.</li></ul><h2>Die Modellwahl ist ein Hebel zweiter Ordnung</h2><p>Im Beschaffungsmaßstab ist der Abstand zwischen einem Premium- und einem Mittelklasse-Modell oft kleiner als der zwischen verhandeltem und Listenpreis. Und wenn ein großes Labor die Preise an einem Nachmittag um 40 % senkt, wird eine vor sechs Monaten festgeschriebene Preisliste plötzlich zur teuren Option. Gestalten Sie Verträge so, dass Preisänderungen weitergegeben werden oder ein Prüffenster auslösen. Diese eine Klausel hat wiederholt mehr bewirkt als das Modell im Vertrag.</p><h2>Fazit</h2><p>Committed Spend, Cache-Preise, Egress und Weitergabeklauseln sind die Mechanismen, die über eine große KI-Rechnung entscheiden. Die Modellwahl entscheidet über die Qualität. Halten Sie diese beiden Gespräche getrennt und tragen Sie das Verlängerungsdatum in den Kalender ein, bevor die Laufzeit beginnt.</p>",
+      "faq": [
+        {
+          "question": "Wann lohnt sich ein Committed-Use-Rabatt bei LLM-Ausgaben?",
+          "answer": "Wenn Sie eine Untergrenze aus stabilen Workloads &mdash; Batch, Evals, interner Traffic &mdash; ableiten können und die Modellwahl innerhalb der Laufzeit austauschbar bleibt. Eine Zusage zu den Ausgaben bei einem Anbieter ist über dessen Modelle hinweg übertragbar; eine Zusage auf ein einzelnes Modell nicht."
+        },
+        {
+          "question": "Warum ist der Preis für gecachte Eingabe bei Unternehmensvolumen so wichtig?",
+          "answer": "Bei cache-lastigen Agenten-Workloads können Cache-Lesezugriffe den Großteil der Eingabekosten ausmachen. Opus 5.5 berechnet $0.20 pro Million für Cache-Lesezugriffe gegenüber $4.00 für frische Eingabe, sodass der Cache-Preis und nicht der Eckpreis die Rechnung bestimmt. Verhandeln Sie ihn ausdrücklich."
+        },
+        {
+          "question": "Welche Posten gehen bei Verhandlungen über den Eckpreis unter?",
+          "answer": "Serverseitige Tools werden getrennt von Tokens abgerechnet. Ein Agent auf Basis serverseitiger Websuche oder Codeausführung kann einen großen Nicht-Token-Posten erzeugen, den keine Preislisten-Verhandlung abgedeckt hat."
+        },
+        {
+          "question": "Wie sollte ein langfristiger Vertrag mit einer Preissenkung umgehen?",
+          "answer": "Gestalten Sie ihn so, dass Preisänderungen des Anbieters weitergegeben werden oder ein Prüffenster auslösen. Wenn zwei Labore am selben Nachmittag die Preise senken, wird eine vor sechs Monaten festgeschriebene Preisliste zur teuren Option."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/committed-spend-discounts",
+          "label": "Rabatte für Committed Spend"
+        },
+        {
+          "slug": "/research/server-tools-are-a-separate-invoice",
+          "label": "Server-Tools sind eine eigene Rechnung"
+        },
+        {
+          "slug": "/research/azure-openai-vs-direct-cost",
+          "label": "Azure OpenAI vs. Direktkosten"
+        },
+        {
+          "slug": "/research/regional-pricing-premium",
+          "label": "Regionaler Preisaufschlag"
+        },
+        {
+          "slug": "/research/shadow-ai-corporate-cards",
+          "label": "Schatten-KI auf Firmenkarten"
+        }
+      ]
+    },
+    "es": {
+      "title": "Compras de IA empresarial y gasto comprometido",
+      "titleCore": "Compras de IA empresarial y gasto comprometido",
+      "description": "Con miles de millones en gasto de IA, las tarifas negociadas pesan más que el modelo. Tarifas de lista, descuentos por compromiso, egreso y la cláusula clave.",
+      "body": "<p>El 25 de septiembre de 2026, un informe basado en estimaciones clasificadas situó en miles de millones el gasto de una agencia estadounidense en pruebas de modelos de IA, y obtuvo 176 puntos y 106 comentarios en Hacker News. Sea cual sea la cifra exacta, lo importante es la dirección: el gasto en modelos de IA ha pasado de ser una partida a ser una categoría de compras, y los mecanismos que rigen una factura mensual de $50K no rigen una de nueve cifras.</p><h2>Qué cambia a escala de compras</h2><ul><li><strong>Las tarifas de lista publicadas pasan a ser negociables.</strong> Con poco volumen se acepta el precio de lista. Con mucho volumen, el proveedor tiene un coste de servicio y una relación que proteger.</li><li><strong>Los descuentos por uso comprometido sustituyen al precio spot.</strong> Un acuerdo de gasto comprometido cambia flexibilidad por una tarifa menor. Solo sirve si conoce su mínimo.</li><li><strong>Los límites de tasa y las garantías de rendimiento se vuelven contractuales.</strong> La prioridad «best-effort» pasa a ser una cláusula. Esto importa más que el precio en las cargas de trabajo de agentes.</li><li><strong>El nivel de soporte y las vías de escalado se compran, no se dan por supuestos.</strong> Un Sev-1 con un ingeniero de guardia es una dependencia operativa, no un gasto.</li><li><strong>Legal revisa las condiciones de datos.</strong> Se auditan la retención, la exclusión del entrenamiento y las listas de subencargados. Esa revisión está en la ruta crítica.</li></ul><h2>El intercambio del gasto comprometido</h2><p>Un acuerdo de uso comprometido es una apuesta sobre su propia previsión. Los descuentos suelen ser del 10&ndash;35 % sobre la lista por un mínimo de 12 meses. El modo de fallo es un equipo que se compromete a un mínimo, luego usa en exceso un modelo más barato durante el plazo y acaba pagando tarifas comprometidas por tokens que no necesitaba. Tres controles hacen segura la apuesta:</p><ol><li><strong>Dimensione el mínimo según la carga realmente estable.</strong> El tráfico por lotes, de evaluación e interno se pronostica mucho mejor que el de agentes de cara al cliente.</li><li><strong>Mantenga la selección de modelo intercambiable dentro del plazo.</strong> Un compromiso de gastar $X con un proveedor es portable entre los modelos de ese proveedor. Un compromiso con un modelo concreto no lo es.</li><li><strong>Revise en el mes 6, no en el mes 12.</strong> Si el ritmo real está muy por debajo del mínimo, renegocie antes del ajuste final.</li></ol><h2>Las tarifas de lista y el egreso siguen decidiendo la factura</h2><p>Dos partidas sorprenden con frecuencia a los equipos de compras que negociaron una tarifa principal:</p><ul><li><strong>Entrada en caché.</strong> Opus 5.5 cobra $0.20 por millón por lecturas de caché frente a $4.00 por entrada nueva. En cargas de agentes con mucha caché, la tarifa de caché, no la principal, es la mayor parte del coste de entrada. Negocie la tarifa de caché de forma explícita.</li><li><strong>Las herramientas del lado del servidor son una línea de factura aparte.</strong> La búsqueda web, la ejecución de código y herramientas de servidor similares se facturan con independencia de los tokens. Un agente empresarial basado en búsqueda web puede tener una partida grande ajena a los tokens que ninguna negociación de tarifas tocó.</li></ul><h2>La elección de modelo es una palanca de segundo orden</h2><p>A escala de compras, la diferencia entre un modelo premium y uno de gama media suele ser menor que la diferencia entre una tarifa negociada y una de lista. Y cuando un gran laboratorio recorta precios un 40 % en una tarde, una tarifa fijada hace seis meses pasa de golpe a ser la opción cara. Estructure los acuerdos para que las revisiones de precio se trasladen o activen una ventana de revisión. Esa sola cláusula ha importado una y otra vez más que el modelo incluido en el contrato.</p><h2>Conclusión</h2><p>El gasto comprometido, las tarifas de caché, el egreso y las cláusulas de traslado son los mecanismos que deciden una factura grande de IA. La selección de modelo decide la calidad. Mantenga separadas esas dos conversaciones y ponga la fecha de renovación en el calendario antes de que empiece el plazo.</p>",
+      "faq": [
+        {
+          "question": "¿Cuándo tiene sentido un descuento por uso comprometido en el gasto en LLM?",
+          "answer": "Cuando puede dimensionar un mínimo a partir de cargas estables &mdash; lotes, evaluaciones, tráfico interno &mdash; y mantener intercambiable la selección de modelo dentro del plazo. Un compromiso de gasto con un proveedor es portable entre sus modelos; un compromiso con un solo modelo no lo es."
+        },
+        {
+          "question": "¿Por qué importa tanto la tarifa de entrada en caché a volumen empresarial?",
+          "answer": "En cargas de agentes con mucha caché, las lecturas de caché pueden ser la mayor parte del coste de entrada. Opus 5.5 cobra $0.20 por millón por lecturas de caché frente a $4.00 por entrada nueva, así que la tarifa de caché, y no la principal, determina la factura. Negóciela de forma explícita."
+        },
+        {
+          "question": "¿Qué partidas se escapan en las negociaciones de la tarifa principal?",
+          "answer": "Las herramientas del lado del servidor se facturan aparte de los tokens. Un agente basado en búsqueda web o ejecución de código del lado del servidor puede generar una partida grande ajena a los tokens que ninguna negociación de tarifas cubrió."
+        },
+        {
+          "question": "¿Cómo debe un acuerdo a largo plazo tratar una bajada de precios?",
+          "answer": "Estructúrelo para que las revisiones de precio del proveedor se trasladen o activen una ventana de revisión. Cuando dos laboratorios bajan precios en la misma tarde, una tarifa fijada hace seis meses pasa a ser la opción cara."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/committed-spend-discounts",
+          "label": "Descuentos por gasto comprometido"
+        },
+        {
+          "slug": "/research/server-tools-are-a-separate-invoice",
+          "label": "Las herramientas de servidor son una factura aparte"
+        },
+        {
+          "slug": "/research/azure-openai-vs-direct-cost",
+          "label": "Azure OpenAI frente al coste directo"
+        },
+        {
+          "slug": "/research/regional-pricing-premium",
+          "label": "Sobreprecio regional"
+        },
+        {
+          "slug": "/research/shadow-ai-corporate-cards",
+          "label": "IA en la sombra con tarjetas corporativas"
+        }
+      ]
+    },
+    "fr": {
+      "title": "Achats d’IA en entreprise et dépenses engagées",
+      "titleCore": "Achats d’IA en entreprise et dépenses engagées",
+      "description": "À des milliards de dépenses en IA, les tarifs négociés pèsent plus que le choix du modèle. Grilles tarifaires, remises d’engagement, egress et la clause clé.",
+      "body": "<p>Le 25 septembre 2026, un rapport fondé sur des estimations classifiées a chiffré en milliards les dépenses d’une agence américaine pour tester des modèles d’IA, récoltant 176 points et 106 commentaires sur Hacker News. Quel que soit le chiffre exact, c’est la tendance qui compte : les dépenses de modèles d’IA sont passées d’une ligne budgétaire à une catégorie d’achats, et les mécanismes qui régissent une facture mensuelle de $50K ne régissent pas une facture à neuf chiffres.</p><h2>Ce qui change à l’échelle des achats</h2><ul><li><strong>Les grilles tarifaires publiées deviennent négociables.</strong> À faible volume, vous prenez le prix catalogue. À fort volume, le fournisseur a un coût de service et une relation à préserver.</li><li><strong>Les remises d’usage engagé remplacent le prix à la demande.</strong> Un accord de dépenses engagées échange de la flexibilité contre un tarif plus bas. Utile seulement si vous connaissez votre plancher.</li><li><strong>Les limites de débit et les garanties de capacité deviennent contractuelles.</strong> La priorité « best-effort » devient une clause. C’est plus important que le prix pour les charges de travail d’agents.</li><li><strong>Le niveau de support et les chemins d’escalade s’achètent, ils ne se présument pas.</strong> Un Sev-1 avec un ingénieur d’astreinte est une dépendance opérationnelle, pas une dépense.</li><li><strong>Les conditions sur les données sont examinées par le juridique.</strong> Conservation, refus de l’entraînement et listes de sous-traitants sont audités. Cet examen est sur le chemin critique.</li></ul><h2>Le compromis des dépenses engagées</h2><p>Un accord d’usage engagé est un pari sur votre propre prévision. Les remises sont généralement de 10&ndash;35 % sous le prix catalogue pour un plancher de 12 mois. Le mode d’échec : une équipe s’engage sur un plancher, puis surconsomme un modèle moins cher pendant la durée du contrat et finit par payer des tarifs engagés pour des tokens dont elle n’avait pas besoin. Trois contrôles sécurisent le pari :</p><ol><li><strong>Dimensionnez le plancher sur la charge réellement stable.</strong> Le trafic batch, d’évaluation et interne se prévoit bien mieux que le trafic d’agents orientés client.</li><li><strong>Gardez la sélection du modèle interchangeable pendant la durée du contrat.</strong> Un engagement de dépenser $X chez un fournisseur est transférable entre ses modèles. Un engagement sur un modèle précis ne l’est pas.</li><li><strong>Faites une revue au mois 6, pas au mois 12.</strong> Si le rythme réel est très inférieur au plancher, renégociez avant la régularisation.</li></ol><h2>Les grilles tarifaires et l’egress décident encore de la facture</h2><p>Deux lignes surprennent régulièrement les équipes achats qui ont négocié un tarif d’appel :</p><ul><li><strong>L’entrée en cache.</strong> Opus 5.5 facture $0.20 par million pour les lectures de cache contre $4.00 pour l’entrée neuve. Sur les charges d’agents riches en cache, c’est le tarif du cache, et non le tarif d’appel, qui représente l’essentiel du coût d’entrée. Négociez explicitement le tarif du cache.</li><li><strong>Les outils côté serveur sont une ligne de facture distincte.</strong> La recherche web, l’exécution de code et les outils serveur similaires sont facturés indépendamment des tokens. Un agent d’entreprise bâti sur la recherche web peut avoir une grosse ligne hors tokens que aucune négociation de grille tarifaire n’a touchée.</li></ul><h2>Le choix du modèle est un levier de second ordre</h2><p>À l’échelle des achats, l’écart entre un modèle premium et un modèle d’entrée de gamme est souvent plus petit que l’écart entre un tarif négocié et un tarif catalogue. Et quand un grand laboratoire baisse ses prix de 40 % en un après-midi, une grille figée il y a six mois devient soudain l’option chère. Structurez les accords pour que les révisions de prix soient répercutées ou déclenchent une fenêtre de revue. Cette seule clause a plus souvent compté que le modèle inclus dans le contrat.</p><h2>En résumé</h2><p>Les dépenses engagées, les tarifs de cache, l’egress et les clauses de répercussion sont les mécanismes qui décident d’une grosse facture d’IA. Le choix du modèle décide de la qualité. Gardez ces deux discussions séparées et mettez la date de renouvellement au calendrier avant le début du contrat.</p>",
+      "faq": [
+        {
+          "question": "Quand une remise d’usage engagé a-t-elle du sens pour les dépenses de LLM ?",
+          "answer": "Quand vous pouvez dimensionner un plancher à partir de charges stables &mdash; batch, évaluations, trafic interne &mdash; et garder la sélection du modèle interchangeable pendant la durée du contrat. Un engagement de dépenses chez un fournisseur est transférable entre ses modèles ; un engagement sur un seul modèle ne l’est pas."
+        },
+        {
+          "question": "Pourquoi le tarif de l’entrée en cache compte-t-il autant à volume d’entreprise ?",
+          "answer": "Sur les charges d’agents riches en cache, les lectures de cache peuvent représenter l’essentiel du coût d’entrée. Opus 5.5 facture $0.20 par million pour les lectures de cache contre $4.00 pour l’entrée neuve : c’est donc le tarif du cache, et non le tarif d’appel, qui fait la facture. Négociez-le explicitement."
+        },
+        {
+          "question": "Quelles lignes échappent aux négociations de tarif d’appel ?",
+          "answer": "Les outils côté serveur sont facturés séparément des tokens. Un agent bâti sur la recherche web ou l’exécution de code côté serveur peut générer une grosse ligne hors tokens qu’aucune négociation de grille tarifaire n’a couverte."
+        },
+        {
+          "question": "Comment un accord de long terme doit-il traiter une baisse de prix ?",
+          "answer": "Structurez-le pour que les révisions de prix du fournisseur soient répercutées ou déclenchent une fenêtre de revue. Quand deux laboratoires baissent leurs prix le même après-midi, une grille figée il y a six mois devient l’option chère."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/committed-spend-discounts",
+          "label": "Remises sur dépenses engagées"
+        },
+        {
+          "slug": "/research/server-tools-are-a-separate-invoice",
+          "label": "Les outils serveur sont une facture à part"
+        },
+        {
+          "slug": "/research/azure-openai-vs-direct-cost",
+          "label": "Azure OpenAI vs coût direct"
+        },
+        {
+          "slug": "/research/regional-pricing-premium",
+          "label": "Surcoût tarifaire régional"
+        },
+        {
+          "slug": "/research/shadow-ai-corporate-cards",
+          "label": "L’IA fantôme sur les cartes d’entreprise"
+        }
+      ]
+    },
+    "ja": {
+      "title": "企業のAI調達とコミット型支出",
+      "titleCore": "企業のAI調達とコミット型支出",
+      "description": "AI支出が数十億規模になると、モデル選びより交渉済みレートが効きます。レートカード、コミット利用割引、エグレス条件、そして最も重要な条項を解説します。",
+      "body": "<p>2026年9月25日、機密扱いの推計に基づく報道で、米国のある政府機関のAIモデル試験への支出が数十億規模とされ、Hacker Newsで176ポイント、106件のコメントを集めました。正確な金額がいくらであれ、重要なのは方向性です。AIモデルへの支出は費目の1つから調達カテゴリへと変わり、月額$50Kの請求を左右する仕組みは、9桁の請求には通用しません。</p><h2>調達規模で何が変わるか</h2><ul><li><strong>公表されたレートカードが交渉対象になります。</strong>少量ならリスト価格を受け入れるしかありません。大量になると、提供側にも提供コストと守るべき関係があります。</li><li><strong>コミット利用割引がスポット価格に取って代わります。</strong>コミット型支出契約は、柔軟性と引き換えに低いレートを得るものです。下限を把握している場合にのみ有効です。</li><li><strong>レート制限とスループット保証が契約事項になります。</strong>ベストエフォートの優先度が契約条件になります。エージェントのワークロードでは価格より重要です。</li><li><strong>サポート階層とエスカレーション経路は、前提とせず購入するものです。</strong>オンコールのエンジニアが対応するSev-1は、費用ではなく運用上の依存関係です。</li><li><strong>データ条件は法務が審査します。</strong>保持期間、学習へのオプトアウト、サブプロセッサー一覧が監査されます。この審査はクリティカルパス上にあります。</li></ul><h2>コミット型支出のトレードオフ</h2><p>コミット利用契約は、自社の需要予測に賭けるものです。割引は12か月の下限に対して、通常リスト価格の10&ndash;35%引きです。失敗のパターンは、チームが下限にコミットしたあと、契約期間中に安価なモデルを使い過ぎて、不要だったトークンにコミット価格を払うことです。次の3つの管理でこの賭けを安全にできます。</p><ol><li><strong>下限は、本当に安定しているワークロードに合わせて決めます。</strong>バッチ、評価、社内トラフィックは、顧客向けエージェントのトラフィックよりはるかに予測しやすいです。</li><li><strong>契約期間中もモデル選択を入れ替え可能にしておきます。</strong>プロバイダーに$Xを支出するというコミットは、そのプロバイダーのモデル間で持ち運べます。特定モデルへのコミットはそうではありません。</li><li><strong>見直しは12か月目ではなく6か月目に行います。</strong>実際のランレートが下限を大きく下回っている場合は、精算の前に再交渉します。</li></ol><h2>請求を決めるのは今もレートカードとエグレス</h2><p>ヘッドラインのレートを交渉した調達チームが、よく驚く項目が2つあります。</p><ul><li><strong>キャッシュ入力。</strong>Opus 5.5のキャッシュ読み取りは100万あたり$0.20で、新規入力の$4.00と比べて安価です。キャッシュ比率の高いエージェントのワークロードでは、入力コストの大半を占めるのはヘッドラインのレートではなくキャッシュのレートです。キャッシュのレートを明示的に交渉してください。</li><li><strong>サーバー側ツールは別の請求項目です。</strong>ウェブ検索、コード実行などのサーバーツールは、トークンとは別に課金されます。ウェブ検索を軸にした企業向けエージェントには、レートカードの交渉が及ばない大きな非トークン項目が生じ得ます。</li></ul><h2>モデル選択は二次的なレバーです</h2><p>調達規模では、プレミアムモデルと中位モデルの差は、交渉済みレートとリスト価格の差より小さいことが少なくありません。さらに、大手ラボが1日の午後に40%値下げすれば、6か月前に固定したレートカードは突然割高な選択肢になります。価格改定が反映される、または見直し期間のトリガーとなるよう契約を構成してください。この1つの条項は、契約に含まれるモデルよりも重要になることが繰り返しありました。</p><h2>まとめ</h2><p>コミット型支出、キャッシュレート、エグレス、価格改定の反映条項が、大規模なAI請求を左右する仕組みです。モデル選択が決めるのは品質です。この2つの議論は分けて進め、契約期間が始まる前に更新日をカレンダーに入れてください。</p>",
+      "faq": [
+        {
+          "question": "LLM支出でコミット利用割引が有効なのはどんなときですか?",
+          "answer": "バッチ、評価、社内トラフィックといった安定したワークロードから下限を見積もれ、契約期間中もモデル選択を入れ替え可能にできる場合です。プロバイダーへの支出コミットはそのモデル間で持ち運べますが、1つのモデルへのコミットはそうではありません。"
+        },
+        {
+          "question": "企業規模でキャッシュ入力レートがそれほど重要なのはなぜですか?",
+          "answer": "キャッシュ比率の高いエージェントのワークロードでは、キャッシュ読み取りが入力コストの大半を占めることがあります。Opus 5.5のキャッシュ読み取りは100万あたり$0.20で、新規入力の$4.00に対する料金です。請求を左右するのはヘッドラインのレートではなくキャッシュのレートなので、明示的に交渉してください。"
+        },
+        {
+          "question": "ヘッドラインのレート交渉で見落とされる項目は何ですか?",
+          "answer": "サーバー側ツールはトークンとは別に課金されます。サーバー側のウェブ検索やコード実行を軸にしたエージェントでは、レートカードの交渉が及ばない大きな非トークン項目が生じ得ます。"
+        },
+        {
+          "question": "長期契約では価格引き下げをどう扱うべきですか?",
+          "answer": "プロバイダーの価格改定が反映される、または見直し期間のトリガーとなるよう構成してください。2つのラボが同じ日の午後に値下げすれば、6か月前に固定したレートカードは割高な選択肢になります。"
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/committed-spend-discounts",
+          "label": "コミット型支出の割引"
+        },
+        {
+          "slug": "/research/server-tools-are-a-separate-invoice",
+          "label": "サーバーツールは別請求"
+        },
+        {
+          "slug": "/research/azure-openai-vs-direct-cost",
+          "label": "Azure OpenAIと直接契約のコスト比較"
+        },
+        {
+          "slug": "/research/regional-pricing-premium",
+          "label": "リージョン別価格のプレミアム"
+        },
+        {
+          "slug": "/research/shadow-ai-corporate-cards",
+          "label": "法人カードで広がるシャドーAI"
+        }
+      ]
+    },
+    "pt": {
+      "title": "Compras de IA corporativa e gasto comprometido",
+      "titleCore": "Compras de IA corporativa e gasto comprometido",
+      "description": "Com bilhões em gastos de IA, tarifas negociadas pesam mais que a escolha do modelo. Tabelas de preços, descontos por compromisso, egress e a cláusula-chave.",
+      "body": "<p>Em 25 de setembro de 2026, um relatório baseado em estimativas sigilosas colocou na casa dos bilhões o gasto de uma agência dos EUA com testes de modelos de IA, e somou 176 pontos e 106 comentários no Hacker News. Seja qual for o valor exato, o que importa é a direção: o gasto com modelos de IA deixou de ser uma linha do orçamento e virou uma categoria de compras, e os mecanismos que regem uma fatura mensal de $50K não regem uma de nove dígitos.</p><h2>O que muda na escala de compras</h2><ul><li><strong>As tabelas de preços publicadas passam a ser negociáveis.</strong> Com volume baixo, você aceita o preço de lista. Com volume alto, o fornecedor tem um custo de atendimento e uma relação a proteger.</li><li><strong>Descontos por uso comprometido substituem o preço spot.</strong> Um acordo de gasto comprometido troca flexibilidade por uma tarifa menor. Só vale a pena se você conhece o seu piso.</li><li><strong>Limites de taxa e garantias de vazão viram cláusulas contratuais.</strong> A prioridade «best-effort» passa a ser um termo. Isso importa mais que o preço para cargas de trabalho de agentes.</li><li><strong>O nível de suporte e os caminhos de escalonamento são comprados, não presumidos.</strong> Um Sev-1 com um engenheiro de plantão é uma dependência operacional, não uma despesa.</li><li><strong>Os termos de dados são revisados pelo jurídico.</strong> Retenção, exclusão do treinamento e listas de subprocessadores são auditadas. Essa revisão está no caminho crítico.</li></ul><h2>A troca do gasto comprometido</h2><p>Um acordo de uso comprometido é uma aposta na sua própria previsão. Os descontos costumam ser de 10&ndash;35% abaixo da lista para um piso de 12 meses. O modo de falha é uma equipe que se compromete com um piso, depois usa em excesso um modelo mais barato durante o prazo e acaba pagando tarifas comprometidas por tokens de que não precisava. Três controles tornam a aposta segura:</p><ol><li><strong>Dimensione o piso pela carga realmente estável.</strong> Tráfego em lote, de avaliação e interno é previsto muito melhor que o tráfego de agentes voltados ao cliente.</li><li><strong>Mantenha a escolha do modelo fungível dentro do prazo.</strong> Um compromisso de gastar $X com um fornecedor é portável entre os modelos desse fornecedor. Um compromisso com um modelo específico não é.</li><li><strong>Revise no mês 6, não no mês 12.</strong> Se o ritmo real estiver muito abaixo do piso, renegocie antes do acerto final.</li></ol><h2>Tabelas de preços e egress ainda decidem a fatura</h2><p>Dois itens surpreendem com frequência as equipes de compras que negociaram uma tarifa de destaque:</p><ul><li><strong>Entrada em cache.</strong> O Opus 5.5 cobra $0.20 por milhão por leituras de cache contra $4.00 por entrada nova. Em cargas de agentes com muito cache, a tarifa de cache, e não a tarifa de destaque, é a maior parte do custo de entrada. Negocie a tarifa de cache explicitamente.</li><li><strong>Ferramentas do lado do servidor são uma linha de fatura separada.</strong> Busca na web, execução de código e ferramentas de servidor semelhantes são cobradas independentemente dos tokens. Um agente corporativo construído sobre busca na web pode ter um grande item fora dos tokens que nenhuma negociação de tabela de preços alcançou.</li></ul><h2>A escolha do modelo é uma alavanca de segunda ordem</h2><p>Na escala de compras, a diferença entre um modelo premium e um de nível intermediário costuma ser menor que a diferença entre uma tarifa negociada e uma de lista. E quando um grande laboratório corta os preços em 40% numa tarde, uma tabela de preços fixada seis meses antes vira de repente a opção cara. Estruture os acordos para que as revisões de preço sejam repassadas ou acionem uma janela de revisão. Essa única cláusula já importou repetidamente mais que o modelo dentro do contrato.</p><h2>Conclusão</h2><p>Gasto comprometido, tarifas de cache, egress e cláusulas de repasse são os mecanismos que decidem uma grande fatura de IA. A escolha do modelo decide a qualidade. Mantenha essas duas conversas separadas e coloque a data de renovação no calendário antes de o prazo começar.</p>",
+      "faq": [
+        {
+          "question": "Quando um desconto por uso comprometido faz sentido para o gasto com LLMs?",
+          "answer": "Quando você consegue dimensionar um piso a partir de cargas estáveis &mdash; lote, avaliações, tráfego interno &mdash; e manter a escolha do modelo fungível dentro do prazo. Um compromisso de gasto com um fornecedor é portável entre os modelos dele; um compromisso com um único modelo não é."
+        },
+        {
+          "question": "Por que a tarifa de entrada em cache importa tanto em volume corporativo?",
+          "answer": "Em cargas de agentes com muito cache, as leituras de cache podem ser a maior parte do custo de entrada. O Opus 5.5 cobra $0.20 por milhão por leituras de cache contra $4.00 por entrada nova, então a tarifa de cache, e não a tarifa de destaque, determina a fatura. Negocie-a explicitamente."
+        },
+        {
+          "question": "Quais itens escapam das negociações da tarifa de destaque?",
+          "answer": "As ferramentas do lado do servidor são cobradas separadamente dos tokens. Um agente construído sobre busca na web ou execução de código do lado do servidor pode gerar um grande item fora dos tokens que nenhuma negociação de tabela de preços cobriu."
+        },
+        {
+          "question": "Como um acordo de longo prazo deve tratar uma redução de preços?",
+          "answer": "Estruture-o para que as revisões de preço do fornecedor sejam repassadas ou acionem uma janela de revisão. Quando dois laboratórios cortam preços na mesma tarde, uma tabela de preços fixada seis meses antes vira a opção cara."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/committed-spend-discounts",
+          "label": "Descontos por gasto comprometido"
+        },
+        {
+          "slug": "/research/server-tools-are-a-separate-invoice",
+          "label": "Ferramentas de servidor são uma fatura separada"
+        },
+        {
+          "slug": "/research/azure-openai-vs-direct-cost",
+          "label": "Azure OpenAI vs custo direto"
+        },
+        {
+          "slug": "/research/regional-pricing-premium",
+          "label": "Prêmio de preço regional"
+        },
+        {
+          "slug": "/research/shadow-ai-corporate-cards",
+          "label": "IA paralela em cartões corporativos"
+        }
+      ]
     }
   }
 }

@@ -55,6 +55,236 @@
           "label": "LLM API pricing tracker"
         }
       ]
+    },
+    "de": {
+      "title": "GPT-6 Luna: Preise und Kostenmodell, $0,10/$0,50",
+      "titleCore": "GPT-6 Luna Kostenmodell",
+      "description": "GPT-6 Luna kostet $0,10 Input und $0,50 Output pro 1M Tokens. Gleicher Benchmark-Wert wie GPT-5.6 Luna bei 61 % weniger pro Aufgabe, mit Volumenrechnung und Latenz.",
+      "body": "<p>GPT-6 Luna ist das günstige Modell der GPT-6-Familie von OpenAI und erschien am 22. September 2026 zusammen mit GPT-6 Sol. OpenAI richtet es mit einem klaren Ziel an Hochvolumen-Aufgaben: Zusammenfassen, Extrahieren und schnelle Fragen. Mit $0.10 pro 1M Input-Tokens ist es das Modell, auf das man zuerst routet und das man erst verlässt, wenn die Aufgabe beweist, dass sie mehr braucht.</p><h2>Preise von GPT-6 Luna</h2><table><thead><tr><th>Stufe</th><th>Input</th><th>Gecachter Input</th><th>Output</th></tr></thead><tbody><tr><td>Standard</td><td>$0.10</td><td>$0.01</td><td>$0.50</td></tr><tr><td>Batch oder Flex</td><td>$0.05</td><td>$0.005</td><td>$0.25</td></tr><tr><td>Fast-Modus</td><td>$0.20</td><td>$0.02</td><td>$1.00</td></tr><tr><td>Langer Kontext (über 272K Input)</td><td>$0.20</td><td>$0.02</td><td>$0.75</td></tr></tbody></table><p>Pro 1M Tokens, laut <a href=\"https://developers.openai.com/api/docs/pricing\">Preisseite von OpenAI</a>. Ein Cache-Schreibvorgang kostet $0.125. Luna hat dasselbe Kontextfenster von 1,050,000 Tokens wie der Rest von GPT-6, einen Wissensstand von Mai 2026 (den aktuellsten der drei) und den vollen Effort-Bereich von <code>none</code> bis <code>max</code>.</p><h2>Gleicher Wert wie GPT-5.6 Luna, 61 % günstiger pro Aufgabe</h2><p>Artificial Analysis hat beide Luna-Generationen mit seinem Intelligence Index (v4.3.2) bei maximalem Effort getestet.</p><table><thead><tr><th>Modell</th><th>Index-Wert</th><th>Kosten pro Aufgabe</th><th>Ausgabegeschwindigkeit</th></tr></thead><tbody><tr><td>GPT-6 Luna (max)</td><td>37</td><td>$0.07</td><td>132.2 Tokens/s</td></tr><tr><td>GPT-5.6 Luna (max)</td><td>37</td><td>$0.18</td><td>142.3 Tokens/s</td></tr><tr><td>GPT-6 Sol (low)</td><td>33.9</td><td>$0.13</td><td>&mdash;</td></tr></tbody></table><p>Der Wert hat sich nicht bewegt. Die Kosten pro Aufgabe sanken um 61 %, vor allem durch den niedrigeren Preis pro Token. GPT-6 Luna auf max schlägt außerdem GPT-6 Sol auf low sowohl beim Wert als auch bei den Kosten. Wenn Sie Sol auf low betrieben haben, um zu sparen, ist Luna auf max bei diesem Index das bessere Angebot.</p><h2>Was hohes Volumen kostet</h2><p>Eine Million Klassifizierungsanfragen pro Monat, jede mit 600 Input-Tokens und 100 Output-Tokens, ohne Caching:</p><table><thead><tr><th>Modell</th><th>Monatliche Kosten</th></tr></thead><tbody><tr><td>GPT-6 Luna, Batch</td><td>$55</td></tr><tr><td>GPT-6 Luna</td><td>$110</td></tr><tr><td>GPT-5.6 Luna</td><td>$240</td></tr><tr><td>Claude Haiku 4.5</td><td>$1,100</td></tr><tr><td>GPT-6 Sol</td><td>$2,200</td></tr><tr><td>GPT-6 Astra</td><td>$11,000</td></tr></tbody></table><p>Claude Haiku 4.5 kostet pro Token 10&times; mehr und erreichte als Modell ohne Reasoning nur 15 im selben Index. Dieselbe Arbeit von Sol auf Luna zu verlagern senkt die Rechnung um 95 %. Deshalb lohnt sich ein Router, der nur die schwierigen Fälle an Sol schickt.</p><h2>Der Haken: Latenz und Ausführlichkeit</h2><p>Die obigen Indexwerte gelten für maximalen Effort, und bei maximalem Effort startet Luna langsam. Artificial Analysis maß 104 Sekunden bis zum ersten Token. Außerdem verbrauchte das Modell über den gesamten Index 150M Output-Tokens, bei einem Median von 84M; Artificial Analysis beschreibt es als eher wortreich. Diese Ausführlichkeit steckt bereits in den $0.07 pro Aufgabe, die Kostenzahl stimmt also, aber die Wartezeit eignet sich nicht für einen nutzernahen Chat.</p><p>Für interaktiven Traffic betreiben Sie Luna mit <code>none</code>, <code>low</code> oder dem Standard <code>medium</code> und messen die Genauigkeit an Ihren eigenen Prompts. Die Werte auf dieser Seite gelten nur für maximalen Effort; die Genauigkeit bei niedrigeren Einstellungen müssen Sie testen, nicht nachschlagen. Heben Sie sich maximalen Effort für Batch-Jobs auf, bei denen Latenz keine Rolle spielt und der Batch-Preis die Rechnung nochmals halbiert.</p><h2>Rate Limits skalieren weiter als bei Sol</h2><p>Luna beginnt in Tier 1 mit 500K Tokens pro Minute, genau wie Sol, erreicht aber in Tier 5 180M Tokens pro Minute (Sol endet bei 40M), mit bis zu 30,000 Anfragen pro Minute. Für Bulk-Pipelines zählt dieser Spielraum so viel wie der Preis.</p><h2>So setzen Sie Luna ein</h2><ul><li>Routen Sie nach Aufgabentyp: Extraktion, Klassifizierung, Tagging und kurze Zusammenfassungen gehen standardmäßig an Luna.</li><li>Schicken Sie nicht eilige Mengen über die Batch API zu $0.05/$0.25.</li><li>Wählen Sie den Effort pro Route: low für Interaktives, max für Offline-Jobs.</li><li>Eskalieren Sie auf <a href=\"/research/gpt-6-sol-cost-model\">GPT-6 Sol</a>, wenn ein Validator die Ausgabe von Luna ablehnt, nicht von vornherein.</li></ul><p>Quellen: <a href=\"https://developers.openai.com/api/docs/models/gpt-6-luna\">OpenAI-Modellseite zu GPT-6 Luna</a>, <a href=\"https://artificialanalysis.ai/models/gpt-6-luna\">Artificial Analysis: GPT-6 Luna</a>, <a href=\"https://artificialanalysis.ai/models/gpt-5-6-luna\">Artificial Analysis: GPT-5.6 Luna</a>, <a href=\"https://techcrunch.com/2026/09/22/openai-launches-gpt-6-sol-and-luna/\">TechCrunch</a>. Preise abgerufen am 23. September 2026.</p>",
+      "faq": [
+        {
+          "question": "Was kostet GPT-6 Luna?",
+          "answer": "$0.10 pro 1M Input-Tokens, $0.01 pro 1M gecachte Input-Tokens und $0.50 pro 1M Output-Tokens. Batch und Flex kosten die Hälfte: $0.05 und $0.25."
+        },
+        {
+          "question": "Ist GPT-6 Luna besser als GPT-5.6 Luna?",
+          "answer": "Im Intelligence Index von Artificial Analysis erreichen beide bei maximalem Effort 37, aber GPT-6 Luna kostet $0.07 pro Aufgabe statt $0.18, also 61 % weniger."
+        },
+        {
+          "question": "Ist GPT-6 Luna günstiger als Claude Haiku 4.5?",
+          "answer": "Ja. Haiku 4.5 kostet $1/$5 pro 1M Tokens, das Zehnfache der $0.10/$0.50 von Luna. Eine Million Anfragen mit 600 Input- und 100 Output-Tokens kosten bei Luna $110 und bei Haiku 4.5 $1,100."
+        },
+        {
+          "question": "Warum ist GPT-6 Luna langsam?",
+          "answer": "Bei maximalem Reasoning-Effort maß Artificial Analysis etwa 104 Sekunden bis zum ersten Token. Niedrigere Effort-Einstellungen antworten schneller; nutzen Sie diese für interaktiven Traffic."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/gpt-6-pricing",
+          "label": "GPT-6-Preise: Astra, Sol und Luna"
+        },
+        {
+          "slug": "/research/gpt-6-sol-cost-model",
+          "label": "GPT-6 Sol Kostenmodell"
+        },
+        {
+          "slug": "/research/gpt-6-astra-cost-model",
+          "label": "GPT-6 Astra Kostenmodell"
+        },
+        {
+          "slug": "/research/reasoning-model-cost-guide",
+          "label": "Kostenleitfaden für Reasoning-Modelle"
+        },
+        {
+          "slug": "/research/llm-api-pricing-tracker",
+          "label": "LLM-API-Preis-Tracker"
+        }
+      ]
+    },
+    "es": {
+      "title": "Precio y costes de GPT-6 Luna: $0,10/$0,50",
+      "titleCore": "Modelo de costes de GPT-6 Luna",
+      "description": "GPT-6 Luna cuesta $0,10 de entrada y $0,50 de salida por 1M de tokens. Misma puntuación que GPT-5.6 Luna con un 61% menos por tarea; incluye volumen y latencia.",
+      "body": "<p>GPT-6 Luna es el modelo económico de la familia GPT-6 de OpenAI, lanzado el 22 de septiembre de 2026 junto con GPT-6 Sol. OpenAI lo orienta al trabajo de alto volumen con un objetivo claro: resumir, extraer datos y responder preguntas rápidas. Con $0.10 por 1M de tokens de entrada, es el modelo al que conviene enrutar primero y del que solo hay que salir cuando la tarea demuestre que necesita más.</p><h2>Precios de GPT-6 Luna</h2><table><thead><tr><th>Nivel</th><th>Entrada</th><th>Entrada en caché</th><th>Salida</th></tr></thead><tbody><tr><td>Estándar</td><td>$0.10</td><td>$0.01</td><td>$0.50</td></tr><tr><td>Batch o flex</td><td>$0.05</td><td>$0.005</td><td>$0.25</td></tr><tr><td>Modo rápido</td><td>$0.20</td><td>$0.02</td><td>$1.00</td></tr><tr><td>Contexto largo (más de 272K de entrada)</td><td>$0.20</td><td>$0.02</td><td>$0.75</td></tr></tbody></table><p>Por 1M de tokens, según la <a href=\"https://developers.openai.com/api/docs/pricing\">página de precios de OpenAI</a>. Una escritura en caché cuesta $0.125. Luna tiene la misma ventana de contexto de 1,050,000 tokens que el resto de GPT-6, una fecha de corte de conocimiento de mayo de 2026 (la más reciente de los tres) y todo el rango de esfuerzo, de <code>none</code> a <code>max</code>.</p><h2>Misma puntuación que GPT-5.6 Luna, 61% más barato por tarea</h2><p>Artificial Analysis evaluó las dos generaciones de Luna con su Intelligence Index (v4.3.2) en esfuerzo máximo.</p><table><thead><tr><th>Modelo</th><th>Puntuación del índice</th><th>Coste por tarea</th><th>Velocidad de salida</th></tr></thead><tbody><tr><td>GPT-6 Luna (max)</td><td>37</td><td>$0.07</td><td>132.2 tokens/s</td></tr><tr><td>GPT-5.6 Luna (max)</td><td>37</td><td>$0.18</td><td>142.3 tokens/s</td></tr><tr><td>GPT-6 Sol (low)</td><td>33.9</td><td>$0.13</td><td>&mdash;</td></tr></tbody></table><p>La puntuación no cambió. El coste por tarea bajó un 61%, sobre todo por el menor precio por token. GPT-6 Luna en max también supera a GPT-6 Sol en esfuerzo low tanto en puntuación como en coste. Si usabas Sol en low para ahorrar, Luna en max es mejor negocio según este índice.</p><h2>Cuánto cuesta el alto volumen</h2><p>Un millón de solicitudes de clasificación al mes, cada una con 600 tokens de entrada y 100 de salida, sin caché:</p><table><thead><tr><th>Modelo</th><th>Coste mensual</th></tr></thead><tbody><tr><td>GPT-6 Luna, batch</td><td>$55</td></tr><tr><td>GPT-6 Luna</td><td>$110</td></tr><tr><td>GPT-5.6 Luna</td><td>$240</td></tr><tr><td>Claude Haiku 4.5</td><td>$1,100</td></tr><tr><td>GPT-6 Sol</td><td>$2,200</td></tr><tr><td>GPT-6 Astra</td><td>$11,000</td></tr></tbody></table><p>Claude Haiku 4.5 cuesta 10&times; más por token y obtuvo 15 en el mismo índice, al ser un modelo sin razonamiento. Pasar el mismo trabajo de Sol a Luna reduce la factura un 95%, y por eso merece la pena construir un router que envíe a Sol solo los casos difíciles.</p><h2>La trampa: latencia y verbosidad</h2><p>Las cifras del índice anteriores son en esfuerzo máximo, y en ese nivel Luna tarda en arrancar. Artificial Analysis midió 104 segundos hasta el primer token. Además, usó 150M de tokens de salida en todo el índice, frente a una mediana de 84M, algo que Artificial Analysis describe como cierta verbosidad. Esa verbosidad ya está incluida en los $0.07 por tarea, así que la cifra de coste se mantiene, pero la espera no sirve para un chat de cara al usuario.</p><p>Para el tráfico interactivo, ejecuta Luna en <code>none</code>, <code>low</code> o el valor por defecto <code>medium</code> y mide la precisión con tus propios prompts. Las puntuaciones de esta página son solo para esfuerzo máximo, así que la precisión con ajustes más bajos hay que probarla, no consultarla. Reserva el esfuerzo máximo para los trabajos batch, donde la latencia no importa y el precio batch reduce la factura a la mitad otra vez.</p><h2>Los límites de tasa escalan más que en Sol</h2><p>Luna empieza en 500K tokens por minuto en el Tier 1, igual que Sol, pero llega a 180M de tokens por minuto en el Tier 5 (Sol se queda en 40M), con hasta 30,000 solicitudes por minuto. Para pipelines masivos, ese margen importa tanto como el precio.</p><h2>Cómo usar Luna</h2><ul><li>Enruta por tipo de tarea: la extracción, la clasificación, el etiquetado y los resúmenes cortos van a Luna por defecto.</li><li>Envía el volumen no urgente por la Batch API a $0.05/$0.25.</li><li>Elige el esfuerzo por ruta: low para lo interactivo, max para los trabajos offline.</li><li>Escala a <a href=\"/research/gpt-6-sol-cost-model\">GPT-6 Sol</a> cuando un validador rechace la salida de Luna, no de entrada.</li></ul><p>Fuentes: <a href=\"https://developers.openai.com/api/docs/models/gpt-6-luna\">página del modelo GPT-6 Luna de OpenAI</a>, <a href=\"https://artificialanalysis.ai/models/gpt-6-luna\">Artificial Analysis: GPT-6 Luna</a>, <a href=\"https://artificialanalysis.ai/models/gpt-5-6-luna\">Artificial Analysis: GPT-5.6 Luna</a>, <a href=\"https://techcrunch.com/2026/09/22/openai-launches-gpt-6-sol-and-luna/\">TechCrunch</a>. Precios consultados el 23 de septiembre de 2026.</p>",
+      "faq": [
+        {
+          "question": "¿Cuánto cuesta GPT-6 Luna?",
+          "answer": "$0.10 por 1M de tokens de entrada, $0.01 por 1M de tokens de entrada en caché y $0.50 por 1M de tokens de salida. Batch y flex cuestan la mitad: $0.05 y $0.25."
+        },
+        {
+          "question": "¿Es GPT-6 Luna mejor que GPT-5.6 Luna?",
+          "answer": "En el Intelligence Index de Artificial Analysis ambos obtienen 37 en esfuerzo máximo, pero GPT-6 Luna cuesta $0.07 por tarea frente a $0.18, es decir, un 61% menos."
+        },
+        {
+          "question": "¿Es GPT-6 Luna más barato que Claude Haiku 4.5?",
+          "answer": "Sí. Haiku 4.5 cuesta $1/$5 por 1M de tokens, diez veces los $0.10/$0.50 de Luna. Un millón de solicitudes de 600 tokens de entrada y 100 de salida cuestan $110 con Luna y $1,100 con Haiku 4.5."
+        },
+        {
+          "question": "¿Por qué GPT-6 Luna es lento?",
+          "answer": "En esfuerzo de razonamiento máximo, Artificial Analysis midió unos 104 segundos hasta el primer token. Los ajustes de esfuerzo más bajos responden más rápido; úsalos para el tráfico interactivo."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/gpt-6-pricing",
+          "label": "Precios de GPT-6: Astra, Sol y Luna"
+        },
+        {
+          "slug": "/research/gpt-6-sol-cost-model",
+          "label": "Modelo de costes de GPT-6 Sol"
+        },
+        {
+          "slug": "/research/gpt-6-astra-cost-model",
+          "label": "Modelo de costes de GPT-6 Astra"
+        },
+        {
+          "slug": "/research/reasoning-model-cost-guide",
+          "label": "Guía de costes de modelos de razonamiento"
+        },
+        {
+          "slug": "/research/llm-api-pricing-tracker",
+          "label": "Seguimiento de precios de APIs de LLM"
+        }
+      ]
+    },
+    "fr": {
+      "title": "Prix et coûts de GPT-6 Luna : 0,10 $/0,50 $",
+      "titleCore": "Modèle de coûts de GPT-6 Luna",
+      "description": "GPT-6 Luna coûte 0,10 $ en entrée et 0,50 $ en sortie par 1M de tokens. Même score que GPT-5.6 Luna pour 61 % de moins par tâche, avec calcul de volume et latence.",
+      "body": "<p>GPT-6 Luna est le modèle économique de la famille GPT-6 d'OpenAI, lancé le 22 septembre 2026 en même temps que GPT-6 Sol. OpenAI le destine aux charges à fort volume avec un objectif clair : résumer, extraire et répondre à des questions rapides. À $0.10 par 1M de tokens d'entrée, c'est le modèle vers lequel router en premier, et que l'on ne quitte que lorsque la tâche prouve qu'elle exige davantage.</p><h2>Tarifs de GPT-6 Luna</h2><table><thead><tr><th>Niveau</th><th>Entrée</th><th>Entrée en cache</th><th>Sortie</th></tr></thead><tbody><tr><td>Standard</td><td>$0.10</td><td>$0.01</td><td>$0.50</td></tr><tr><td>Batch ou flex</td><td>$0.05</td><td>$0.005</td><td>$0.25</td></tr><tr><td>Mode rapide</td><td>$0.20</td><td>$0.02</td><td>$1.00</td></tr><tr><td>Contexte long (plus de 272K en entrée)</td><td>$0.20</td><td>$0.02</td><td>$0.75</td></tr></tbody></table><p>Par 1M de tokens, d'après la <a href=\"https://developers.openai.com/api/docs/pricing\">page de tarifs d'OpenAI</a>. Une écriture en cache coûte $0.125. Luna dispose de la même fenêtre de contexte de 1,050,000 tokens que le reste de GPT-6, d'une date limite de connaissances de mai 2026 (la plus récente des trois) et de toute la plage d'effort, de <code>none</code> à <code>max</code>.</p><h2>Même score que GPT-5.6 Luna, 61 % moins cher par tâche</h2><p>Artificial Analysis a évalué les deux générations de Luna avec son Intelligence Index (v4.3.2) à effort maximal.</p><table><thead><tr><th>Modèle</th><th>Score de l'indice</th><th>Coût par tâche</th><th>Vitesse de sortie</th></tr></thead><tbody><tr><td>GPT-6 Luna (max)</td><td>37</td><td>$0.07</td><td>132.2 tokens/s</td></tr><tr><td>GPT-5.6 Luna (max)</td><td>37</td><td>$0.18</td><td>142.3 tokens/s</td></tr><tr><td>GPT-6 Sol (low)</td><td>33.9</td><td>$0.13</td><td>&mdash;</td></tr></tbody></table><p>Le score n'a pas bougé. Le coût par tâche a chuté de 61 %, surtout grâce au prix par token plus bas. GPT-6 Luna à max dépasse aussi GPT-6 Sol à effort low, à la fois en score et en coût. Si vous faisiez tourner Sol en low pour économiser, Luna en max est un meilleur choix sur cet indice.</p><h2>Ce que coûte un fort volume</h2><p>Un million de requêtes de classification par mois, chacune avec 600 tokens d'entrée et 100 tokens de sortie, sans cache :</p><table><thead><tr><th>Modèle</th><th>Coût mensuel</th></tr></thead><tbody><tr><td>GPT-6 Luna, batch</td><td>$55</td></tr><tr><td>GPT-6 Luna</td><td>$110</td></tr><tr><td>GPT-5.6 Luna</td><td>$240</td></tr><tr><td>Claude Haiku 4.5</td><td>$1,100</td></tr><tr><td>GPT-6 Sol</td><td>$2,200</td></tr><tr><td>GPT-6 Astra</td><td>$11,000</td></tr></tbody></table><p>Claude Haiku 4.5 coûte 10&times; plus cher par token et a obtenu 15 sur le même indice, étant un modèle sans raisonnement. Passer le même travail de Sol à Luna réduit la facture de 95 %, ce qui justifie de construire un routeur qui n'envoie que les cas difficiles à Sol.</p><h2>Le piège : latence et verbosité</h2><p>Les chiffres de l'indice ci-dessus sont à effort maximal, et à ce niveau Luna démarre lentement. Artificial Analysis a mesuré 104 secondes avant le premier token. Il a aussi consommé 150M de tokens de sortie sur l'ensemble de l'indice, contre une médiane de 84M, ce qu'Artificial Analysis qualifie de relativement verbeux. Cette verbosité est déjà comprise dans les $0.07 par tâche, donc le chiffre de coût tient, mais l'attente ne convient pas à un chat destiné aux utilisateurs.</p><p>Pour le trafic interactif, faites tourner Luna en <code>none</code>, <code>low</code> ou en <code>medium</code> par défaut, et mesurez la précision sur vos propres prompts. Les scores de cette page ne valent que pour l'effort maximal : la précision avec des réglages plus bas est à tester, pas à chercher dans un tableau. Gardez l'effort max pour les traitements batch, où la latence importe peu et où le tarif batch divise encore la facture par deux.</p><h2>Des limites de débit plus larges que sur Sol</h2><p>Luna démarre à 500K tokens par minute au Tier 1, comme Sol, mais atteint 180M de tokens par minute au Tier 5 (Sol plafonne à 40M), avec jusqu'à 30,000 requêtes par minute. Pour les pipelines en masse, cette marge compte autant que le prix.</p><h2>Comment utiliser Luna</h2><ul><li>Routez par type de tâche : extraction, classification, étiquetage et résumés courts vont à Luna par défaut.</li><li>Envoyez le volume non urgent via la Batch API à $0.05/$0.25.</li><li>Choisissez l'effort par route : low pour l'interactif, max pour les traitements hors ligne.</li><li>Passez à <a href=\"/research/gpt-6-sol-cost-model\">GPT-6 Sol</a> lorsqu'un validateur rejette la sortie de Luna, pas d'emblée.</li></ul><p>Sources : <a href=\"https://developers.openai.com/api/docs/models/gpt-6-luna\">page du modèle GPT-6 Luna d'OpenAI</a>, <a href=\"https://artificialanalysis.ai/models/gpt-6-luna\">Artificial Analysis : GPT-6 Luna</a>, <a href=\"https://artificialanalysis.ai/models/gpt-5-6-luna\">Artificial Analysis : GPT-5.6 Luna</a>, <a href=\"https://techcrunch.com/2026/09/22/openai-launches-gpt-6-sol-and-luna/\">TechCrunch</a>. Prix relevés le 23 septembre 2026.</p>",
+      "faq": [
+        {
+          "question": "Combien coûte GPT-6 Luna ?",
+          "answer": "$0.10 par 1M de tokens d'entrée, $0.01 par 1M de tokens d'entrée en cache et $0.50 par 1M de tokens de sortie. Batch et flex coûtent moitié moins : $0.05 et $0.25."
+        },
+        {
+          "question": "GPT-6 Luna est-il meilleur que GPT-5.6 Luna ?",
+          "answer": "Sur l'Intelligence Index d'Artificial Analysis, les deux obtiennent 37 à effort maximal, mais GPT-6 Luna coûte $0.07 par tâche contre $0.18, soit 61 % de moins."
+        },
+        {
+          "question": "GPT-6 Luna est-il moins cher que Claude Haiku 4.5 ?",
+          "answer": "Oui. Haiku 4.5 coûte $1/$5 par 1M de tokens, dix fois les $0.10/$0.50 de Luna. Un million de requêtes de 600 tokens d'entrée et 100 de sortie coûtent $110 sur Luna et $1,100 sur Haiku 4.5."
+        },
+        {
+          "question": "Pourquoi GPT-6 Luna est-il lent ?",
+          "answer": "À effort de raisonnement maximal, Artificial Analysis a mesuré environ 104 secondes avant le premier token. Les réglages d'effort plus bas répondent plus vite ; utilisez-les pour le trafic interactif."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/gpt-6-pricing",
+          "label": "Tarifs GPT-6 : Astra, Sol et Luna"
+        },
+        {
+          "slug": "/research/gpt-6-sol-cost-model",
+          "label": "Modèle de coûts de GPT-6 Sol"
+        },
+        {
+          "slug": "/research/gpt-6-astra-cost-model",
+          "label": "Modèle de coûts de GPT-6 Astra"
+        },
+        {
+          "slug": "/research/reasoning-model-cost-guide",
+          "label": "Guide des coûts des modèles de raisonnement"
+        },
+        {
+          "slug": "/research/llm-api-pricing-tracker",
+          "label": "Suivi des tarifs des API de LLM"
+        }
+      ]
+    },
+    "ja": {
+      "title": "GPT-6 Lunaの料金とコストモデル:$0.10/$0.50",
+      "titleCore": "GPT-6 Lunaのコストモデル",
+      "description": "GPT-6 Lunaは100万トークンあたり入力$0.10、出力$0.50。ベンチマークスコアはGPT-5.6 Lunaと同じで、タスク単価は61%減。大量処理の試算とレイテンシの注意点も解説。",
+      "body": "<p>GPT-6 Lunaは、OpenAIのGPT-6ファミリーにおける低価格モデルで、2026年9月22日にGPT-6 Solと同時にリリースされました。OpenAIは、要約、抽出、簡単な質問といった大量処理向けと明確に位置づけています。入力1Mトークンあたり$0.10のため、最初にルーティングすべきモデルであり、タスクがそれ以上を必要とすると分かった場合にのみ別のモデルへ移すべきです。</p><h2>GPT-6 Lunaの料金</h2><table><thead><tr><th>ティア</th><th>入力</th><th>キャッシュ入力</th><th>出力</th></tr></thead><tbody><tr><td>標準</td><td>$0.10</td><td>$0.01</td><td>$0.50</td></tr><tr><td>バッチまたはフレックス</td><td>$0.05</td><td>$0.005</td><td>$0.25</td></tr><tr><td>高速モード</td><td>$0.20</td><td>$0.02</td><td>$1.00</td></tr><tr><td>ロングコンテキスト(入力272K超)</td><td>$0.20</td><td>$0.02</td><td>$0.75</td></tr></tbody></table><p>料金は1Mトークンあたりで、<a href=\"https://developers.openai.com/api/docs/pricing\">OpenAIの料金ページ</a>に基づきます。キャッシュ書き込みは$0.125です。Lunaは、GPT-6の他モデルと同じ1,050,000トークンのコンテキストウィンドウ、2026年5月のナレッジカットオフ(3モデルの中で最新)、<code>none</code>から<code>max</code>までの全エフォート範囲を備えています。</p><h2>GPT-5.6 Lunaと同じスコアで、タスク単価は61%減</h2><p>Artificial Analysisは、Intelligence Index(v4.3.2)で両世代のLunaを最大エフォートで評価しました。</p><table><thead><tr><th>モデル</th><th>インデックススコア</th><th>タスク単価</th><th>出力速度</th></tr></thead><tbody><tr><td>GPT-6 Luna (max)</td><td>37</td><td>$0.07</td><td>132.2トークン/秒</td></tr><tr><td>GPT-5.6 Luna (max)</td><td>37</td><td>$0.18</td><td>142.3トークン/秒</td></tr><tr><td>GPT-6 Sol (low)</td><td>33.9</td><td>$0.13</td><td>&mdash;</td></tr></tbody></table><p>スコアは変わりませんでした。タスク単価は61%下がり、主な要因はトークン単価の低下です。maxのGPT-6 Lunaは、lowエフォートのGPT-6 Solをスコアとコストの両面で上回ります。コストを抑えるためにSolをlowで使っていたのであれば、この指標ではmaxのLunaのほうが有利です。</p><h2>大量処理のコスト</h2><p>月100万件の分類リクエスト(各リクエストは入力600トークン、出力100トークン、キャッシュなし)の場合:</p><table><thead><tr><th>モデル</th><th>月額コスト</th></tr></thead><tbody><tr><td>GPT-6 Luna(バッチ)</td><td>$55</td></tr><tr><td>GPT-6 Luna</td><td>$110</td></tr><tr><td>GPT-5.6 Luna</td><td>$240</td></tr><tr><td>Claude Haiku 4.5</td><td>$1,100</td></tr><tr><td>GPT-6 Sol</td><td>$2,200</td></tr><tr><td>GPT-6 Astra</td><td>$11,000</td></tr></tbody></table><p>Claude Haiku 4.5はトークン単価が10&times;高く、推論なしのモデルとして同じ指標で15点でした。同じ処理をSolからLunaへ移すと請求額は95%減るため、難しいケースだけをSolに送るルーターを構築する価値があります。</p><h2>注意点:レイテンシと冗長性</h2><p>上記のインデックス値は最大エフォートのものであり、最大エフォートではLunaの応答開始が遅くなります。Artificial Analysisは最初のトークンまで104秒を計測しました。また、インデックス全体で出力トークンを150M使用しており、中央値の84Mを上回ります。Artificial Analysisはこれをやや冗長と評しています。この冗長性はすでにタスクあたり$0.07に含まれているためコスト値は変わりませんが、ユーザー向けチャットには待ち時間が適しません。</p><p>インタラクティブなトラフィックには、Lunaを<code>none</code>、<code>low</code>、またはデフォルトの<code>medium</code>で実行し、自社のプロンプトで精度を測定してください。このページのスコアは最大エフォートのみのものなので、低いエフォートでの精度は調べるのではなく、実際にテストする必要があります。最大エフォートは、レイテンシが問題にならず、バッチ料金でさらに半額になるバッチジョブに取っておきましょう。</p><h2>レート制限はSolより大きく拡張</h2><p>LunaはTier 1でSolと同じ毎分500Kトークンから始まりますが、Tier 5では毎分180Mトークンに達し(Solは40Mで頭打ち)、毎分最大30,000リクエストまで対応します。大規模なバルク処理パイプラインでは、この余裕は価格と同じくらい重要です。</p><h2>Lunaの使い方</h2><ul><li>タスクの種類でルーティングします。抽出、分類、タグ付け、短い要約はデフォルトでLunaに送ります。</li><li>急がない大量処理は、Batch APIを$0.05/$0.25で利用します。</li><li>ルートごとにエフォートを選びます。インタラクティブはlow、オフラインジョブはmaxです。</li><li>最初からではなく、バリデーターがLunaの出力を却下したときに<a href=\"/research/gpt-6-sol-cost-model\">GPT-6 Sol</a>へエスカレーションします。</li></ul><p>出典:<a href=\"https://developers.openai.com/api/docs/models/gpt-6-luna\">OpenAI GPT-6 Lunaモデルページ</a>、<a href=\"https://artificialanalysis.ai/models/gpt-6-luna\">Artificial Analysis: GPT-6 Luna</a>、<a href=\"https://artificialanalysis.ai/models/gpt-5-6-luna\">Artificial Analysis: GPT-5.6 Luna</a>、<a href=\"https://techcrunch.com/2026/09/22/openai-launches-gpt-6-sol-and-luna/\">TechCrunch</a>。料金は2026年9月23日時点です。</p>",
+      "faq": [
+        {
+          "question": "GPT-6 Lunaの料金はいくらですか?",
+          "answer": "入力100万トークンあたり$0.10、キャッシュ入力100万トークンあたり$0.01、出力100万トークンあたり$0.50です。バッチとフレックスはその半額で、$0.05と$0.25です。"
+        },
+        {
+          "question": "GPT-6 LunaはGPT-5.6 Lunaより優れていますか?",
+          "answer": "Artificial AnalysisのIntelligence Indexでは、最大エフォートで両方とも37点ですが、GPT-6 Lunaはタスクあたり$0.07で、$0.18のGPT-5.6 Lunaより61%安くなっています。"
+        },
+        {
+          "question": "GPT-6 LunaはClaude Haiku 4.5より安いですか?",
+          "answer": "はい。Haiku 4.5は100万トークンあたり$1/$5で、Lunaの$0.10/$0.50の10倍です。入力600トークン・出力100トークンのリクエスト100万件は、Lunaで$110、Haiku 4.5で$1,100かかります。"
+        },
+        {
+          "question": "なぜGPT-6 Lunaは遅いのですか?",
+          "answer": "最大の推論エフォートでは、Artificial Analysisは最初のトークンまで約104秒を計測しました。低いエフォート設定のほうが応答は速いため、インタラクティブなトラフィックにはそちらを使ってください。"
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/gpt-6-pricing",
+          "label": "GPT-6の料金:Astra、Sol、Luna"
+        },
+        {
+          "slug": "/research/gpt-6-sol-cost-model",
+          "label": "GPT-6 Solのコストモデル"
+        },
+        {
+          "slug": "/research/gpt-6-astra-cost-model",
+          "label": "GPT-6 Astraのコストモデル"
+        },
+        {
+          "slug": "/research/reasoning-model-cost-guide",
+          "label": "推論モデルのコストガイド"
+        },
+        {
+          "slug": "/research/llm-api-pricing-tracker",
+          "label": "LLM API料金トラッカー"
+        }
+      ]
+    },
+    "pt": {
+      "title": "Preço e custos do GPT-6 Luna: $0,10/$0,50",
+      "titleCore": "Modelo de custos do GPT-6 Luna",
+      "description": "O GPT-6 Luna custa $0,10 de entrada e $0,50 de saída por 1M de tokens. Mesma pontuação do GPT-5.6 Luna com 61% menos por tarefa, com conta de volume e latência.",
+      "body": "<p>O GPT-6 Luna é o modelo econômico da família GPT-6 da OpenAI, lançado em 22 de setembro de 2026 junto com o GPT-6 Sol. A OpenAI o direciona a trabalhos de alto volume com um objetivo claro: resumir, extrair dados e responder perguntas rápidas. Com $0.10 por 1M de tokens de entrada, é o modelo para o qual se deve rotear primeiro, e do qual só se sai quando a tarefa provar que precisa de mais.</p><h2>Preços do GPT-6 Luna</h2><table><thead><tr><th>Nível</th><th>Entrada</th><th>Entrada em cache</th><th>Saída</th></tr></thead><tbody><tr><td>Padrão</td><td>$0.10</td><td>$0.01</td><td>$0.50</td></tr><tr><td>Batch ou flex</td><td>$0.05</td><td>$0.005</td><td>$0.25</td></tr><tr><td>Modo rápido</td><td>$0.20</td><td>$0.02</td><td>$1.00</td></tr><tr><td>Contexto longo (acima de 272K de entrada)</td><td>$0.20</td><td>$0.02</td><td>$0.75</td></tr></tbody></table><p>Por 1M de tokens, conforme a <a href=\"https://developers.openai.com/api/docs/pricing\">página de preços da OpenAI</a>. Uma gravação em cache custa $0.125. O Luna tem a mesma janela de contexto de 1,050,000 tokens do restante do GPT-6, data de corte de conhecimento em maio de 2026 (a mais recente dos três) e toda a faixa de esforço, de <code>none</code> a <code>max</code>.</p><h2>Mesma pontuação do GPT-5.6 Luna, 61% mais barato por tarefa</h2><p>A Artificial Analysis avaliou as duas gerações do Luna no seu Intelligence Index (v4.3.2) com esforço máximo.</p><table><thead><tr><th>Modelo</th><th>Pontuação do índice</th><th>Custo por tarefa</th><th>Velocidade de saída</th></tr></thead><tbody><tr><td>GPT-6 Luna (max)</td><td>37</td><td>$0.07</td><td>132.2 tokens/s</td></tr><tr><td>GPT-5.6 Luna (max)</td><td>37</td><td>$0.18</td><td>142.3 tokens/s</td></tr><tr><td>GPT-6 Sol (low)</td><td>33.9</td><td>$0.13</td><td>&mdash;</td></tr></tbody></table><p>A pontuação não mudou. O custo por tarefa caiu 61%, principalmente pelo menor preço por token. O GPT-6 Luna em max também supera o GPT-6 Sol em esforço low tanto em pontuação quanto em custo. Se você usava o Sol em low para economizar, o Luna em max é um negócio melhor neste índice.</p><h2>Quanto custa o alto volume</h2><p>Um milhão de requisições de classificação por mês, cada uma com 600 tokens de entrada e 100 de saída, sem cache:</p><table><thead><tr><th>Modelo</th><th>Custo mensal</th></tr></thead><tbody><tr><td>GPT-6 Luna, batch</td><td>$55</td></tr><tr><td>GPT-6 Luna</td><td>$110</td></tr><tr><td>GPT-5.6 Luna</td><td>$240</td></tr><tr><td>Claude Haiku 4.5</td><td>$1,100</td></tr><tr><td>GPT-6 Sol</td><td>$2,200</td></tr><tr><td>GPT-6 Astra</td><td>$11,000</td></tr></tbody></table><p>O Claude Haiku 4.5 custa 10&times; mais por token e marcou 15 no mesmo índice, por ser um modelo sem raciocínio. Mover o mesmo trabalho do Sol para o Luna reduz a conta em 95%, e é por isso que vale a pena construir um roteador que envie apenas os casos difíceis ao Sol.</p><h2>O porém: latência e verbosidade</h2><p>Os números do índice acima são em esforço máximo, e nesse nível o Luna demora a começar. A Artificial Analysis mediu 104 segundos até o primeiro token. Ele também usou 150M de tokens de saída no índice inteiro, contra uma mediana de 84M, o que a Artificial Analysis descreve como um tanto verboso. Essa verbosidade já está dentro dos $0.07 por tarefa, então o número de custo se mantém, mas a espera não serve para um chat voltado ao usuário.</p><p>Para tráfego interativo, execute o Luna em <code>none</code>, <code>low</code> ou no padrão <code>medium</code> e meça a precisão com os seus próprios prompts. As pontuações desta página são só para esforço máximo, então a precisão em configurações mais baixas é algo a testar, não a consultar. Reserve o esforço máximo para jobs em batch, onde a latência não importa e o preço batch reduz a conta pela metade de novo.</p><h2>Os limites de taxa escalam mais que no Sol</h2><p>O Luna começa em 500K tokens por minuto no Tier 1, igual ao Sol, mas chega a 180M de tokens por minuto no Tier 5 (o Sol para em 40M), com até 30,000 requisições por minuto. Para pipelines em massa, essa folga importa tanto quanto o preço.</p><h2>Como usar o Luna</h2><ul><li>Roteie por tipo de tarefa: extração, classificação, etiquetagem e resumos curtos vão para o Luna por padrão.</li><li>Envie o volume não urgente pela Batch API a $0.05/$0.25.</li><li>Escolha o esforço por rota: low para o interativo, max para jobs offline.</li><li>Escale para o <a href=\"/research/gpt-6-sol-cost-model\">GPT-6 Sol</a> quando um validador rejeitar a saída do Luna, não logo de início.</li></ul><p>Fontes: <a href=\"https://developers.openai.com/api/docs/models/gpt-6-luna\">página do modelo GPT-6 Luna da OpenAI</a>, <a href=\"https://artificialanalysis.ai/models/gpt-6-luna\">Artificial Analysis: GPT-6 Luna</a>, <a href=\"https://artificialanalysis.ai/models/gpt-5-6-luna\">Artificial Analysis: GPT-5.6 Luna</a>, <a href=\"https://techcrunch.com/2026/09/22/openai-launches-gpt-6-sol-and-luna/\">TechCrunch</a>. Preços consultados em 23 de setembro de 2026.</p>",
+      "faq": [
+        {
+          "question": "Quanto custa o GPT-6 Luna?",
+          "answer": "$0.10 por 1M de tokens de entrada, $0.01 por 1M de tokens de entrada em cache e $0.50 por 1M de tokens de saída. Batch e flex custam metade: $0.05 e $0.25."
+        },
+        {
+          "question": "O GPT-6 Luna é melhor que o GPT-5.6 Luna?",
+          "answer": "No Intelligence Index da Artificial Analysis os dois marcam 37 em esforço máximo, mas o GPT-6 Luna custa $0.07 por tarefa contra $0.18, ou seja, 61% menos."
+        },
+        {
+          "question": "O GPT-6 Luna é mais barato que o Claude Haiku 4.5?",
+          "answer": "Sim. O Haiku 4.5 custa $1/$5 por 1M de tokens, dez vezes os $0.10/$0.50 do Luna. Um milhão de requisições de 600 tokens de entrada e 100 de saída custam $110 no Luna e $1,100 no Haiku 4.5."
+        },
+        {
+          "question": "Por que o GPT-6 Luna é lento?",
+          "answer": "Em esforço máximo de raciocínio, a Artificial Analysis mediu cerca de 104 segundos até o primeiro token. Configurações de esforço menores respondem mais rápido; use-as para tráfego interativo."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/gpt-6-pricing",
+          "label": "Preços do GPT-6: Astra, Sol e Luna"
+        },
+        {
+          "slug": "/research/gpt-6-sol-cost-model",
+          "label": "Modelo de custos do GPT-6 Sol"
+        },
+        {
+          "slug": "/research/gpt-6-astra-cost-model",
+          "label": "Modelo de custos do GPT-6 Astra"
+        },
+        {
+          "slug": "/research/reasoning-model-cost-guide",
+          "label": "Guia de custos de modelos de raciocínio"
+        },
+        {
+          "slug": "/research/llm-api-pricing-tracker",
+          "label": "Monitor de preços de APIs de LLM"
+        }
+      ]
     }
   }
 }
