@@ -1,6 +1,10 @@
 {
   "slug": "research/finops-for-llm-v2",
-  "tags": ["finops", "framework", "llm"],
+  "tags": [
+    "finops",
+    "framework",
+    "llm"
+  ],
   "datePublished": "2026-05-05",
   "dateModified": "2026-08-01",
   "image": "https://finopsllm.com/og.png",
@@ -12,18 +16,48 @@
       "description": "A practical framework for applying FinOps principles to LLM and GenAI spend: visibility, attribution, optimization, and accountability across teams.",
       "body": "<p>FinOps for LLMs is the practice of making AI spend visible, attributable, optimizable, and accountable. It borrows from cloud FinOps, but the cost drivers are different. A cloud bill is shaped by instances, storage, transfer, and commitments. An LLM bill is shaped by input tokens, output tokens, cache writes, cache reads, retries, model mix, context length, batch eligibility, and quality requirements.</p><p>The first mistake teams make is treating LLM spend as one provider-level number. That hides the real levers. A support summarization endpoint, an agent workflow, a nightly enrichment job, and an eval suite may all use the same model, but they have different latency needs, quality thresholds, cacheability, and ownership. FinOps starts when those workloads are separated.</p><table><thead><tr><th>Pillar</th><th>Core question</th><th>What it produces</th></tr></thead><tbody><tr><td>1. Visibility</td><td>What are we actually paying for, request by request?</td><td>Normalized usage records split by input, output, cache-write, cache-read, batch, and retry spend</td></tr><tr><td>2. Attribution</td><td>Which team, feature, customer, or workload caused it?</td><td>Spend mapped to owners: environment, endpoint, team, tenant, model, workload class</td></tr><tr><td>3. Optimization</td><td>Which lever lowers cost per successful task without breaking quality?</td><td>Routing, caching, batching, compaction, and arbitrage changes shipped behind flags</td></tr><tr><td>4. Accountability</td><td>Who reviews the numbers and acts on them each month?</td><td>Showback (then chargeback) reports and an operating rhythm reconciled against invoices</td></tr></tbody></table><h2>1. Visibility</h2><p>Visibility means normalizing provider invoices and gateway logs into a common record. Each request should carry enough metadata to answer: who owns it, which feature generated it, which model handled it, how many token classes were billed, whether the call retried, and whether the output produced user value.</p><p>Good visibility separates input, output, cache-write, cache-read, batch, and retry spend. Without this split, teams accidentally count cache-read discounts as savings, miss retry loops, and compare providers on list price rather than cost per successful task.</p><h2>2. Attribution</h2><p>Attribution maps spend to teams, products, customers, and workloads. The point is not blame; the point is decision quality. A finance team cannot govern spend if every line item says “OpenAI.” An engineering leader cannot optimize a product surface if spend is grouped only by provider account.</p><p>Minimum useful attribution usually includes environment, endpoint, team owner, customer or tenant where allowed, model, provider, and workload class. Mature programs add business metrics such as resolved ticket, completed analysis, generated report, or successful agent task.</p><h2>3. Optimization</h2><p>Optimization should follow attribution. The common levers are model routing, semantic caching, prompt caching, context compaction, batch routing, provider arbitrage, and fallback policy tuning. Each lever changes the bill differently. Routing changes model mix. Caching changes input-token and latency economics. Batch moves work into discounted asynchronous lanes. Compaction reduces repeated context.</p><p>The test is not “did token count go down?” The test is “did cost per successful task go down without breaking quality, latency, or reliability?”</p><h2>4. Accountability</h2><p>Showback should come before chargeback. First give teams a credible monthly view of their spend and drivers. Once the numbers are trusted, chargeback can make sense for mature organizations. The goal is a repeatable operating rhythm: review the largest drivers, agree on optimization candidates, ship changes behind flags, and reconcile against the next invoice.</p>",
       "faq": [
-        { "question": "What are the four pillars of FinOps for LLMs?", "answer": "The four pillars are: (1) Visibility - what are we actually paying for, request by request? (2) Attribution - which team, feature, customer, or workload caused it? (3) Optimization - which lever lowers cost per successful task without breaking quality? (4) Accountability - who reviews the numbers and acts on them each month?" },
-        { "question": "What does visibility mean in LLM FinOps?", "answer": "Visibility means normalizing provider invoices and gateway logs into a common record. Each request should carry metadata to answer who owns it, which feature generated it, which model handled it, how many token classes were billed, whether the call retried, and whether the output produced user value." },
-        { "question": "What is the purpose of attribution in LLM FinOps?", "answer": "Attribution maps spend to teams, products, customers, and workloads. The point is not blame but decision quality. Minimum useful attribution usually includes environment, endpoint, team owner, customer or tenant where allowed, model, provider, and workload class." },
-        { "question": "What are the common optimization levers in LLM FinOps?", "answer": "The common levers are model routing, semantic caching, prompt caching, context compaction, batch routing, provider arbitrage, and fallback policy tuning. Each lever changes the bill differently. The test is not 'did token count go down?' but 'did cost per successful task go down without breaking quality, latency, or reliability?'" }
+        {
+          "question": "What are the four pillars of FinOps for LLMs?",
+          "answer": "The four pillars are: (1) Visibility - what are we actually paying for, request by request? (2) Attribution - which team, feature, customer, or workload caused it? (3) Optimization - which lever lowers cost per successful task without breaking quality? (4) Accountability - who reviews the numbers and acts on them each month?"
+        },
+        {
+          "question": "What does visibility mean in LLM FinOps?",
+          "answer": "Visibility means normalizing provider invoices and gateway logs into a common record. Each request should carry metadata to answer who owns it, which feature generated it, which model handled it, how many token classes were billed, whether the call retried, and whether the output produced user value."
+        },
+        {
+          "question": "What is the purpose of attribution in LLM FinOps?",
+          "answer": "Attribution maps spend to teams, products, customers, and workloads. The point is not blame but decision quality. Minimum useful attribution usually includes environment, endpoint, team owner, customer or tenant where allowed, model, provider, and workload class."
+        },
+        {
+          "question": "What are the common optimization levers in LLM FinOps?",
+          "answer": "The common levers are model routing, semantic caching, prompt caching, context compaction, batch routing, provider arbitrage, and fallback policy tuning. Each lever changes the bill differently. The test is not 'did token count go down?' but 'did cost per successful task go down without breaking quality, latency, or reliability?'"
+        }
       ],
       "related": [
-        { "slug": "/research/what-is-llm-finops", "label": "What is LLM FinOps?" },
-        { "slug": "/research/ai-finops", "label": "AI FinOps" },
-        { "slug": "/research/llm-cost-attribution", "label": "LLM cost attribution" },
-        { "slug": "/research/llm-chargeback-showback", "label": "LLM chargeback and showback" },
-        { "slug": "/research/chargeback-vs-showback", "label": "Chargeback vs showback" },
-        { "slug": "/research/ai-cost-optimization-six-levers", "label": "Six levers for AI cost optimization" }
+        {
+          "slug": "/research/what-is-llm-finops",
+          "label": "What is LLM FinOps?"
+        },
+        {
+          "slug": "/research/ai-finops",
+          "label": "AI FinOps"
+        },
+        {
+          "slug": "/research/llm-cost-attribution",
+          "label": "LLM cost attribution"
+        },
+        {
+          "slug": "/research/llm-chargeback-showback",
+          "label": "LLM chargeback and showback"
+        },
+        {
+          "slug": "/research/chargeback-vs-showback",
+          "label": "Chargeback vs showback"
+        },
+        {
+          "slug": "/research/ai-cost-optimization-six-levers",
+          "label": "Six levers for AI cost optimization"
+        }
       ]
     },
     "es": {
@@ -32,14 +66,232 @@
       "description": "Un marco práctico para aplicar principios de FinOps al gasto en LLM y GenAI: visibilidad, atribución, optimización y responsabilidad entre equipos.",
       "body": "<p>FinOps para LLM es la práctica de hacer que el gasto en IA sea visible, atribuible, optimizable y responsable. Toma prestado del FinOps en la nube, pero los drivers de costo son diferentes. Una factura de nube depende de instancias, almacenamiento, transferencia y compromisos. Una factura de LLM depende de tokens de entrada, tokens de salida, escrituras en caché, lecturas en caché, reintentos, mix de modelos, longitud de contexto, elegibilidad por lotes y requisitos de calidad.</p><p>El primer error que cometen los equipos es tratar el gasto en LLM como un número a nivel de proveedor. Eso oculta las palancas reales. Un endpoint de resumen de soporte, un flujo de agente, un trabajo nocturno de enriquecimiento y un conjunto de evaluación pueden usar el mismo modelo, pero tienen diferentes necesidades de latencia, umbrales de calidad, capacidad de caché y propiedad. FinOps comienza cuando esas cargas de trabajo se separan.</p><table><thead><tr><th>Pilar</th><th>Pregunta clave</th><th>Qué produce</th></tr></thead><tbody><tr><td>1. Visibilidad</td><td>¿Qué estamos pagando realmente, solicitud por solicitud?</td><td>Registros de uso normalizados divididos por gasto de entrada, salida, escritura en caché, lectura en caché, lotes y reintentos</td></tr><tr><td>2. Atribución</td><td>¿Qué equipo, funcionalidad, cliente o carga de trabajo lo causó?</td><td>Gasto asignado a propietarios: entorno, endpoint, equipo, inquilino, modelo, clase de carga de trabajo</td></tr><tr><td>3. Optimización</td><td>¿Qué palanca reduce el costo por tarea exitosa sin degradar calidad?</td><td>Cambios de enrutamiento, caché, lotes, compactación y arbitraje lanzados detrás de banderas</td></tr><tr><td>4. Responsabilidad</td><td>¿Quién revisa los números y actúa cada mes?</td><td>Informes de showback (y luego chargeback) y un ritmo operativo reconciliado contra facturas</td></tr></tbody></table><h2>1. Visibilidad</h2><p>La visibilidad significa normalizar las facturas de los proveedores y los logs de gateway en un registro común. Cada solicitud debe llevar suficientes metadatos para responder: quién la posee, qué funcionalidad la generó, qué modelo la atendió, cuántas clases de tokens se facturaron, si la llamada reintentó y si la salida produjo valor para el usuario.</p><h2>2. Atribución</h2><p>La atribución asigna el gasto a equipos, productos, clientes y cargas de trabajo. El punto no es culpar; el punto es la calidad de las decisiones. El equipo de finanzas no puede gobernar el gasto si cada línea dice “OpenAI”. El líder de ingeniería no puede optimizar una superficie de producto si el gasto se agrupa solo por cuenta de proveedor.</p><h2>3. Optimización</h2><p>La optimización debe seguir a la atribución. Las palancas comunes son enrutamiento de modelos, caché semántica, caché de prompts, compactación de contexto, enrutamiento por lotes, arbitraje de proveedores y ajuste de políticas de respaldo. Cada palanca cambia la factura de manera diferente.</p><h2>4. Responsabilidad</h2><p>El showback debe venir antes que el chargeback. Primero se da a los equipos una vista mensual creíble de su gasto y drivers. Una vez que los números son confiables, el chargeback puede tener sentido para organizaciones maduras.</p>",
       "faq": [
-        { "question": "¿Cuáles son los cuatro pilares de FinOps para LLM?", "answer": "Los cuatro pilares son: (1) Visibilidad, (2) Atribución, (3) Optimización y (4) Responsabilidad." },
-        { "question": "¿Qué significa visibilidad en FinOps para LLM?", "answer": "Significa normalizar facturas de proveedores y logs de gateway en un registro común, separando gasto por entrada, salida, escritura en caché, lectura en caché, lotes y reintentos." },
-        { "question": "¿Cuáles son las palancas de optimización comunes?", "answer": "Enrutamiento de modelos, caché semántica, caché de prompts, compactación de contexto, lotes, arbitraje de proveedores y ajuste de políticas de respaldo." }
+        {
+          "question": "¿Cuáles son los cuatro pilares de FinOps para LLM?",
+          "answer": "Los cuatro pilares son: (1) Visibilidad, (2) Atribución, (3) Optimización y (4) Responsabilidad."
+        },
+        {
+          "question": "¿Qué significa visibilidad en FinOps para LLM?",
+          "answer": "Significa normalizar facturas de proveedores y logs de gateway en un registro común, separando gasto por entrada, salida, escritura en caché, lectura en caché, lotes y reintentos."
+        },
+        {
+          "question": "¿Cuáles son las palancas de optimización comunes?",
+          "answer": "Enrutamiento de modelos, caché semántica, caché de prompts, compactación de contexto, lotes, arbitraje de proveedores y ajuste de políticas de respaldo."
+        }
       ],
       "related": [
-        { "slug": "/research/what-is-llm-finops", "label": "¿Qué es LLM FinOps?" },
-        { "slug": "/es/research/ai-finops", "label": "AI FinOps" },
-        { "slug": "/es/research/llm-cost-attribution", "label": "Atribución de costos LLM" }
+        {
+          "slug": "/research/what-is-llm-finops",
+          "label": "¿Qué es LLM FinOps?"
+        },
+        {
+          "slug": "/es/research/ai-finops",
+          "label": "AI FinOps"
+        },
+        {
+          "slug": "/es/research/llm-cost-attribution",
+          "label": "Atribución de costos LLM"
+        }
+      ]
+    },
+    "de": {
+      "title": "FinOps für LLM und GenAI: Ein praxisnaher Rahmen",
+      "titleCore": "FinOps für LLM",
+      "description": "Ein praxisnaher Rahmen, um FinOps-Prinzipien auf LLM- und GenAI-Ausgaben anzuwenden: Transparenz, Zuordnung, Optimierung und Verantwortung über Teams hinweg.",
+      "body": "<p>FinOps für LLMs bedeutet, KI-Ausgaben sichtbar, zuordenbar, optimierbar und verantwortbar zu machen. Es übernimmt Ansätze aus dem Cloud-FinOps, doch die Kostentreiber sind andere. Eine Cloud-Rechnung wird durch Instanzen, Speicher, Datenübertragung und Verpflichtungen bestimmt. Eine LLM-Rechnung wird durch Eingabe-Token, Ausgabe-Token, Cache-Schreibvorgänge, Cache-Lesevorgänge, Wiederholungen, Modellmix, Kontextlänge, Eignung für Batch-Verarbeitung und Qualitätsanforderungen bestimmt.</p><p>Der erste Fehler vieler Teams besteht darin, LLM-Ausgaben als eine einzige Zahl auf Anbieterebene zu behandeln. Dadurch bleiben die eigentlichen Hebel verborgen. Ein Endpunkt für die Zusammenfassung von Support-Anfragen, ein Agenten-Workflow, ein nächtlicher Anreicherungsjob und eine Evaluationssuite können dasselbe Modell nutzen, haben aber unterschiedliche Latenzanforderungen, Qualitätsschwellen, Cachefähigkeit und Verantwortliche. FinOps beginnt, wenn diese Workloads getrennt werden.</p><table><thead><tr><th>Baustein</th><th>Kernfrage</th><th>Ergebnis</th></tr></thead><tbody><tr><td>1. Transparenz</td><td>Was zahlen wir tatsächlich, Anfrage für Anfrage?</td><td>Normalisierte Nutzungsdatensätze, aufgeteilt nach Eingabe-, Ausgabe-, Cache-Schreib-, Cache-Lese-, Batch- und Wiederholungskosten</td></tr><tr><td>2. Zuordnung</td><td>Welches Team, Feature, welcher Kunde oder Workload hat die Kosten verursacht?</td><td>Ausgaben, zugeordnet zu Verantwortlichen: Umgebung, Endpunkt, Team, Mandant, Modell, Workload-Klasse</td></tr><tr><td>3. Optimierung</td><td>Welcher Hebel senkt die Kosten pro erfolgreicher Aufgabe, ohne die Qualität zu beeinträchtigen?</td><td>Änderungen an Routing, Cache, Batch-Verarbeitung, Kompaktierung und Arbitrage, hinter Feature-Flags ausgeliefert</td></tr><tr><td>4. Verantwortung</td><td>Wer prüft die Zahlen und handelt jeden Monat danach?</td><td>Showback- (dann Chargeback-)Berichte und ein Betriebsrhythmus, abgeglichen mit den Rechnungen</td></tr></tbody></table><h2>1. Transparenz</h2><p>Transparenz bedeutet, Rechnungen der Anbieter und Gateway-Logs in einen gemeinsamen Datensatz zu überführen. Jede Anfrage sollte genügend Metadaten tragen, um zu beantworten: Wem gehört sie, welches Feature hat sie erzeugt, welches Modell hat sie bearbeitet, wie viele Token-Klassen wurden berechnet, wurde der Aufruf wiederholt und hat die Ausgabe einen Nutzen für Anwender gebracht?</p><p>Gute Transparenz trennt Eingabe-, Ausgabe-, Cache-Schreib-, Cache-Lese-, Batch- und Wiederholungskosten. Ohne diese Trennung zählen Teams versehentlich Cache-Lese-Rabatte als Einsparungen, übersehen Wiederholungsschleifen und vergleichen Anbieter anhand des Listenpreises statt anhand der Kosten pro erfolgreicher Aufgabe.</p><h2>2. Zuordnung</h2><p>Zuordnung verknüpft Ausgaben mit Teams, Produkten, Kunden und Workloads. Es geht nicht um Schuldzuweisung, sondern um die Qualität von Entscheidungen. Eine Finanzabteilung kann Ausgaben nicht steuern, wenn jede Position „OpenAI“ lautet. Eine Engineering-Leitung kann eine Produktoberfläche nicht optimieren, wenn Ausgaben nur nach Anbieterkonto gruppiert werden.</p><p>Eine sinnvolle Mindestzuordnung umfasst meist Umgebung, Endpunkt, Verantwortliche im Team, Kunde oder Mandant (sofern zulässig), Modell, Anbieter und Workload-Klasse. Reife Programme ergänzen Geschäftskennzahlen wie gelöste Tickets, abgeschlossene Analysen, erzeugte Berichte oder erfolgreich ausgeführte Agentenaufgaben.</p><h2>3. Optimierung</h2><p>Optimierung sollte der Zuordnung folgen. Übliche Hebel sind Modell-Routing, semantisches Caching, Prompt-Caching, Kompaktierung des Kontexts, Batch-Routing, Anbieter-Arbitrage und die Anpassung der Fallback-Richtlinien. Jeder Hebel wirkt anders auf die Rechnung. Routing verändert den Modellmix. Caching verändert die Wirtschaftlichkeit von Eingabe-Token und Latenz. Batch verlagert Arbeit in günstigere asynchrone Spuren. Kompaktierung reduziert wiederholten Kontext.</p><p>Der Maßstab lautet nicht: „Ist die Token-Zahl gesunken?“ Der Maßstab lautet: „Sind die Kosten pro erfolgreicher Aufgabe gesunken, ohne Qualität, Latenz oder Zuverlässigkeit zu verschlechtern?“</p><h2>4. Verantwortung</h2><p>Showback sollte vor Chargeback kommen. Geben Sie den Teams zuerst eine verlässliche monatliche Sicht auf ihre Ausgaben und deren Treiber. Sobald den Zahlen vertraut wird, kann Chargeback für reife Organisationen sinnvoll werden. Ziel ist ein wiederholbarer Betriebsrhythmus: die größten Treiber prüfen, Optimierungskandidaten festlegen, Änderungen hinter Feature-Flags ausrollen und mit der nächsten Rechnung abgleichen.</p>",
+      "faq": [
+        {
+          "question": "Welches sind die vier Säulen von FinOps für LLMs?",
+          "answer": "Die vier Säulen sind: (1) Transparenz – was zahlen wir tatsächlich, Anfrage für Anfrage? (2) Zuordnung – welches Team, Feature, welcher Kunde oder Workload hat die Kosten verursacht? (3) Optimierung – welcher Hebel senkt die Kosten pro erfolgreicher Aufgabe, ohne die Qualität zu beeinträchtigen? (4) Verantwortung – wer prüft die Zahlen und handelt jeden Monat danach?"
+        },
+        {
+          "question": "Was bedeutet Transparenz im LLM-FinOps?",
+          "answer": "Transparenz bedeutet, Anbieterrechnungen und Gateway-Logs in einen gemeinsamen Datensatz zu überführen. Jede Anfrage sollte Metadaten tragen, die zeigen, wem sie gehört, welches Feature sie erzeugt hat, welches Modell sie bearbeitet hat, wie viele Token-Klassen berechnet wurden, ob der Aufruf wiederholt wurde und ob die Ausgabe Nutzen gebracht hat."
+        },
+        {
+          "question": "Welchen Zweck hat die Zuordnung im LLM-FinOps?",
+          "answer": "Zuordnung verknüpft Ausgaben mit Teams, Produkten, Kunden und Workloads. Der Zweck ist nicht Schuldzuweisung, sondern bessere Entscheidungen. Eine sinnvolle Mindestzuordnung umfasst Umgebung, Endpunkt, Verantwortliche im Team, Kunde oder Mandant (sofern zulässig), Modell, Anbieter und Workload-Klasse."
+        },
+        {
+          "question": "Welche gängigen Optimierungshebel gibt es im LLM-FinOps?",
+          "answer": "Modell-Routing, semantisches Caching, Prompt-Caching, Kontextkompaktierung, Batch-Routing, Anbieter-Arbitrage und die Anpassung der Fallback-Richtlinien. Jeder Hebel wirkt anders auf die Rechnung. Der Maßstab lautet nicht „Ist die Token-Zahl gesunken?“, sondern „Sind die Kosten pro erfolgreicher Aufgabe gesunken, ohne Qualität, Latenz oder Zuverlässigkeit zu verschlechtern?“"
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/what-is-llm-finops",
+          "label": "Was ist LLM-FinOps?"
+        },
+        {
+          "slug": "/research/ai-finops",
+          "label": "AI FinOps"
+        },
+        {
+          "slug": "/research/llm-cost-attribution",
+          "label": "Kostenzuordnung bei LLMs"
+        },
+        {
+          "slug": "/research/llm-chargeback-showback",
+          "label": "LLM-Chargeback und Showback"
+        },
+        {
+          "slug": "/research/chargeback-vs-showback",
+          "label": "Chargeback vs. Showback"
+        },
+        {
+          "slug": "/research/ai-cost-optimization-six-levers",
+          "label": "Sechs Hebel zur KI-Kostenoptimierung"
+        }
+      ]
+    },
+    "fr": {
+      "title": "FinOps pour les LLM et la GenAI : un cadre pratique",
+      "titleCore": "FinOps pour les LLM",
+      "description": "Un cadre pratique pour appliquer le FinOps aux dépenses LLM et GenAI : visibilité, attribution, optimisation et responsabilité entre équipes.",
+      "body": "<p>Le FinOps pour les LLM consiste à rendre les dépenses liées à l’IA visibles, attribuables, optimisables et assumées. Il reprend les principes du FinOps cloud, mais les facteurs de coût diffèrent. Une facture cloud dépend des instances, du stockage, des transferts et des engagements. Une facture LLM dépend des tokens d’entrée, des tokens de sortie, des écritures et lectures de cache, des nouvelles tentatives, du mix de modèles, de la longueur du contexte, de l’éligibilité au traitement par lots et des exigences de qualité.</p><p>La première erreur des équipes consiste à traiter les dépenses LLM comme un chiffre unique au niveau du fournisseur. Cela masque les vrais leviers. Un point d’accès de synthèse du support, un workflow d’agent, un job nocturne d’enrichissement et une suite d’évaluation peuvent utiliser le même modèle, mais ils ont des besoins de latence, des seuils de qualité, une cacheabilité et des responsables différents. Le FinOps commence lorsque ces charges de travail sont séparées.</p><table><thead><tr><th>Pilier</th><th>Question clé</th><th>Ce qu’il produit</th></tr></thead><tbody><tr><td>1. Visibilité</td><td>Que payons-nous réellement, requête par requête ?</td><td>Enregistrements d’usage normalisés, ventilés en dépenses d’entrée, de sortie, d’écriture de cache, de lecture de cache, de lot et de nouvelle tentative</td></tr><tr><td>2. Attribution</td><td>Quelle équipe, fonctionnalité, quel client ou quel workload en est à l’origine ?</td><td>Dépenses rattachées à des responsables : environnement, point d’accès, équipe, locataire, modèle, classe de workload</td></tr><tr><td>3. Optimisation</td><td>Quel levier réduit le coût par tâche réussie sans dégrader la qualité ?</td><td>Routage, cache, traitement par lots, compaction et arbitrage, déployés derrière des indicateurs</td></tr><tr><td>4. Responsabilité</td><td>Qui examine les chiffres et agit chaque mois ?</td><td>Rapports de showback (puis de chargeback) et un rythme opérationnel rapproché des factures</td></tr></tbody></table><h2>1. Visibilité</h2><p>La visibilité consiste à normaliser les factures des fournisseurs et les journaux de la passerelle dans un enregistrement commun. Chaque requête doit porter suffisamment de métadonnées pour répondre à ces questions : qui en est responsable, quelle fonctionnalité l’a générée, quel modèle l’a traitée, combien de classes de tokens ont été facturées, si l’appel a été relancé et si la sortie a apporté une valeur à l’utilisateur.</p><p>Une bonne visibilité sépare les dépenses d’entrée, de sortie, d’écriture de cache, de lecture de cache, de lot et de nouvelle tentative. Sans cette séparation, les équipes comptent par erreur la remise sur lecture de cache comme une économie, passent à côté des boucles de nouvelles tentatives et comparent les fournisseurs sur leur prix catalogue plutôt que sur le coût par tâche réussie.</p><h2>2. Attribution</h2><p>L’attribution associe les dépenses aux équipes, produits, clients et workloads. Il ne s’agit pas de désigner des coupables, mais d’améliorer la qualité des décisions. Une direction financière ne peut pas piloter les dépenses si chaque ligne indique « OpenAI ». Un responsable d’ingénierie ne peut pas optimiser une surface produit si les dépenses ne sont regroupées que par compte fournisseur.</p><p>Une attribution minimale utile inclut en général l’environnement, le point d’accès, le responsable d’équipe, le client ou le locataire lorsque c’est autorisé, le modèle, le fournisseur et la classe de workload. Les programmes plus matures ajoutent des indicateurs métier comme un ticket résolu, une analyse terminée, un rapport généré ou une tâche d’agent réussie.</p><h2>3. Optimisation</h2><p>L’optimisation doit suivre l’attribution. Les leviers courants sont le routage de modèles, le cache sémantique, le cache de prompts, la compaction du contexte, le routage par lots, l’arbitrage entre fournisseurs et l’ajustement de la politique de repli. Chaque levier modifie la facture différemment. Le routage change le mix de modèles. Le cache modifie l’économie des tokens d’entrée et de la latence. Le traitement par lots déplace le travail vers des voies asynchrones à tarif réduit. La compaction réduit le contexte répété.</p><p>Le critère n’est pas « le nombre de tokens a-t-il baissé ? ». Le critère est « le coût par tâche réussie a-t-il baissé sans dégrader la qualité, la latence ou la fiabilité ? ».</p><h2>4. Responsabilité</h2><p>Le showback doit précéder le chargeback. Donnez d’abord aux équipes une vue mensuelle crédible de leurs dépenses et de leurs facteurs. Une fois les chiffres jugés fiables, le chargeback peut avoir du sens pour les organisations matures. L’objectif est un rythme opérationnel reproductible : examiner les principaux facteurs, convenir des candidats à l’optimisation, déployer les changements derrière des indicateurs et rapprocher le tout de la facture suivante.</p>",
+      "faq": [
+        {
+          "question": "Quels sont les quatre piliers du FinOps pour les LLM ?",
+          "answer": "Les quatre piliers sont : (1) Visibilité – que payons-nous réellement, requête par requête ? (2) Attribution – quelle équipe, fonctionnalité, quel client ou quel workload en est à l’origine ? (3) Optimisation – quel levier réduit le coût par tâche réussie sans dégrader la qualité ? (4) Responsabilité – qui examine les chiffres et agit chaque mois ?"
+        },
+        {
+          "question": "Que signifie la visibilité dans le FinOps des LLM ?",
+          "answer": "La visibilité consiste à normaliser les factures des fournisseurs et les journaux de la passerelle dans un enregistrement commun. Chaque requête doit porter des métadonnées indiquant qui en est responsable, quelle fonctionnalité l’a générée, quel modèle l’a traitée, combien de classes de tokens ont été facturées, si l’appel a été relancé et si la sortie a apporté une valeur à l’utilisateur."
+        },
+        {
+          "question": "À quoi sert l’attribution dans le FinOps des LLM ?",
+          "answer": "L’attribution associe les dépenses aux équipes, produits, clients et workloads. Il ne s’agit pas de désigner des coupables mais d’améliorer la qualité des décisions. L’attribution minimale utile comprend en général l’environnement, le point d’accès, le responsable d’équipe, le client ou le locataire lorsque c’est autorisé, le modèle, le fournisseur et la classe de workload."
+        },
+        {
+          "question": "Quels sont les principaux leviers d’optimisation du FinOps des LLM ?",
+          "answer": "Les leviers courants sont le routage de modèles, le cache sémantique, le cache de prompts, la compaction du contexte, le routage par lots, l’arbitrage entre fournisseurs et l’ajustement de la politique de repli. Chaque levier modifie la facture différemment. Le critère n’est pas « le nombre de tokens a-t-il baissé ? » mais « le coût par tâche réussie a-t-il baissé sans dégrader la qualité, la latence ou la fiabilité ? »"
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/what-is-llm-finops",
+          "label": "Qu’est-ce que le FinOps LLM ?"
+        },
+        {
+          "slug": "/research/ai-finops",
+          "label": "FinOps de l’IA"
+        },
+        {
+          "slug": "/research/llm-cost-attribution",
+          "label": "Attribution des coûts LLM"
+        },
+        {
+          "slug": "/research/llm-chargeback-showback",
+          "label": "Chargeback et showback LLM"
+        },
+        {
+          "slug": "/research/chargeback-vs-showback",
+          "label": "Chargeback ou showback : quelle différence ?"
+        },
+        {
+          "slug": "/research/ai-cost-optimization-six-levers",
+          "label": "Six leviers d’optimisation des coûts de l’IA"
+        }
+      ]
+    },
+    "ja": {
+      "title": "LLMとGenAIのFinOps：実践フレームワーク",
+      "titleCore": "LLMのFinOps",
+      "description": "LLMとGenAIの支出にFinOpsの原則を適用するための実践フレームワーク。可視化、コスト配分、最適化、チーム横断の説明責任を解説します。",
+      "body": "<p>LLMのFinOpsとは、AIの支出を可視化し、配分し、最適化し、説明責任を持たせる取り組みです。クラウドのFinOpsから考え方を借りていますが、コストの要因は異なります。クラウドの請求額はインスタンス、ストレージ、転送量、コミットメントによって決まります。一方、LLMの請求額は、入力トークン、出力トークン、キャッシュ書き込み、キャッシュ読み取り、リトライ、モデルの組み合わせ、コンテキスト長、バッチ処理の対象性、品質要件によって決まります。</p><p>多くのチームが最初に犯す間違いは、LLMの支出を提供元単位の1つの数字として扱うことです。それでは実際に効くレバーが見えなくなります。サポート要約のエンドポイント、エージェントのワークフロー、夜間のデータ補完ジョブ、評価スイートは同じモデルを使っていても、レイテンシの要件、品質基準、キャッシュの可否、担当者がそれぞれ異なります。これらのワークロードを切り分けたところから、FinOpsは始まります。</p><table><thead><tr><th>柱</th><th>核心的な問い</th><th>成果物</th></tr></thead><tbody><tr><td>1. 可視化</td><td>実際に何にいくら払っているのか、リクエストごとに把握できているか？</td><td>入力、出力、キャッシュ書き込み、キャッシュ読み取り、バッチ、リトライの支出に分けて正規化された利用記録</td></tr><tr><td>2. 配分</td><td>どのチーム、機能、顧客、ワークロードがこの支出を発生させたのか？</td><td>環境、エンドポイント、チーム、テナント、モデル、ワークロード区分など、責任者ごとに割り当てられた支出</td></tr><tr><td>3. 最適化</td><td>品質を損なわずに、成功したタスク1件あたりのコストを下げるレバーはどれか？</td><td>フラグの裏で出荷される、ルーティング、キャッシュ、バッチ処理、コンパクション、アービトラージの変更</td></tr><tr><td>4. 説明責任</td><td>誰が毎月数字を確認し、それに基づいて行動するのか？</td><td>請求書と照合された、ショーバック（その後チャージバック）レポートと運用サイクル</td></tr></tbody></table><h2>1. 可視化</h2><p>可視化とは、プロバイダーの請求書とゲートウェイのログを共通の記録に正規化することです。各リクエストには、誰の所有か、どの機能が生成したか、どのモデルが処理したか、いくつのトークン区分が請求されたか、呼び出しがリトライされたか、出力がユーザーに価値をもたらしたかを答えられるだけのメタデータを持たせるべきです。</p><p>適切な可視化では、入力、出力、キャッシュ書き込み、キャッシュ読み取り、バッチ、リトライの支出を分けます。この分割がないと、チームはキャッシュ読み取りの割引を節約額と誤認したり、リトライのループを見逃したり、成功したタスク単位ではなく定価でプロバイダーを比較したりしてしまいます。</p><h2>2. 配分</h2><p>配分とは、支出をチーム、プロダクト、顧客、ワークロードに対応づけることです。目的は責任追及ではなく、意思決定の質を高めることです。すべての明細に「OpenAI」としか書かれていなければ、財務チームはガバナンスを効かせられません。プロバイダーのアカウント単位でしか支出を集計できなければ、エンジニアリングの責任者はプロダクトの機能を最適化できません。</p><p>実用的な最低限の配分には通常、環境、エンドポイント、チームの責任者、許可されている場合は顧客またはテナント、モデル、プロバイダー、ワークロード区分が含まれます。成熟した取り組みでは、解決したチケット数、完了した分析、生成されたレポート、成功したエージェントのタスクといった事業指標を加えます。</p><h2>3. 最適化</h2><p>最適化は配分の後に続くべきです。代表的なレバーは、モデルのルーティング、セマンティックキャッシュ、プロンプトキャッシュ、コンテキストのコンパクション、バッチルーティング、プロバイダー間のアービトラージ、フォールバックポリシーの調整です。それぞれのレバーは請求額への効き方が異なります。ルーティングはモデルの組み合わせを変え、キャッシュは入力トークンとレイテンシの経済性を変えます。バッチは作業を割引の効く非同期の経路へ移し、コンパクションは繰り返されるコンテキストを減らします。</p><p>判断基準は「トークン数が減ったか」ではありません。「品質、レイテンシ、信頼性を損なわずに、成功したタスク1件あたりのコストが下がったか」です。</p><h2>4. 説明責任</h2><p>ショーバックはチャージバックより先に行うべきです。まず各チームに、支出とその要因について信頼できる月次の視点を提供します。数字が信頼されたら、成熟した組織ではチャージバックも意味を持つようになります。目指すのは、繰り返し可能な運用サイクルです。主要な要因を確認し、最適化の候補を決め、フラグの裏で変更を出荷し、次の請求書と照合します。</p>",
+      "faq": [
+        {
+          "question": "LLM FinOpsの4つの柱とは何ですか？",
+          "answer": "4つの柱は次のとおりです。（1）可視化：実際に何にいくら払っているのか、リクエストごとに把握できているか。（2）配分：どのチーム、機能、顧客、ワークロードがこの支出を発生させたのか。（3）最適化：品質を損なわずに、成功したタスク1件あたりのコストを下げるレバーはどれか。（4）説明責任：誰が毎月数字を確認し、それに基づいて行動するのか。"
+        },
+        {
+          "question": "LLM FinOpsにおける可視化とは何ですか？",
+          "answer": "可視化とは、プロバイダーの請求書とゲートウェイのログを共通の記録に正規化することです。各リクエストについて、誰の所有か、どの機能が生成したか、どのモデルが処理したか、いくつのトークン区分が請求されたか、リトライされたか、出力がユーザーに価値をもたらしたかが分かるようにします。"
+        },
+        {
+          "question": "LLM FinOpsで配分を行う目的は何ですか？",
+          "answer": "配分は支出をチーム、プロダクト、顧客、ワークロードに対応づけます。目的は責任追及ではなく、意思決定の質を高めることです。最低限、環境、エンドポイント、チームの責任者、モデル、プロバイダー、ワークロード区分を含めるのが一般的です。"
+        },
+        {
+          "question": "LLM FinOpsの代表的な最適化レバーは何ですか？",
+          "answer": "モデルのルーティング、セマンティックキャッシュ、プロンプトキャッシュ、コンテキストのコンパクション、バッチルーティング、プロバイダー間のアービトラージ、フォールバックポリシーの調整です。判断基準は「トークン数が減ったか」ではなく、「成功したタスク1件あたりのコストが品質を損なわずに下がったか」です。"
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/what-is-llm-finops",
+          "label": "LLM FinOpsとは？"
+        },
+        {
+          "slug": "/research/ai-finops",
+          "label": "AI FinOps"
+        },
+        {
+          "slug": "/research/llm-cost-attribution",
+          "label": "LLMのコスト配分"
+        },
+        {
+          "slug": "/research/llm-chargeback-showback",
+          "label": "LLMのチャージバックとショーバック"
+        },
+        {
+          "slug": "/research/chargeback-vs-showback",
+          "label": "チャージバックとショーバックの違い"
+        },
+        {
+          "slug": "/research/ai-cost-optimization-six-levers",
+          "label": "AIコスト最適化の6つのレバー"
+        }
+      ]
+    },
+    "pt": {
+      "title": "FinOps para LLM e GenAI: uma estrutura prática",
+      "titleCore": "FinOps para LLM",
+      "description": "Uma estrutura prática para aplicar princípios de FinOps aos gastos com LLM e GenAI: visibilidade, atribuição, otimização e responsabilidade entre equipes.",
+      "body": "<p>FinOps para LLMs é a prática de tornar os gastos com IA visíveis, atribuíveis, otimizáveis e responsáveis. Ele toma emprestado o FinOps de nuvem, mas os fatores de custo são diferentes. A fatura de nuvem é moldada por instâncias, armazenamento, transferência e compromissos. A fatura de um LLM é moldada por tokens de entrada, tokens de saída, escritas e leituras de cache, novas tentativas, mix de modelos, tamanho do contexto, elegibilidade para lote e requisitos de qualidade.</p><p>O primeiro erro das equipes é tratar o gasto com LLM como um único número no nível do provedor. Isso esconde as alavancas reais. Um endpoint de resumo de suporte, um fluxo de agente, um job noturno de enriquecimento e uma suíte de avaliação podem usar o mesmo modelo, mas têm necessidades de latência, limites de qualidade, capacidade de cache e donos diferentes. O FinOps começa quando essas cargas de trabalho são separadas.</p><table><thead><tr><th>Pilar</th><th>Pergunta central</th><th>O que produz</th></tr></thead><tbody><tr><td>1. Visibilidade</td><td>Quanto estamos pagando de fato, requisição por requisição?</td><td>Registros de uso normalizados, divididos em gasto de entrada, saída, escrita de cache, leitura de cache, lote e novas tentativas</td></tr><tr><td>2. Atribuição</td><td>Qual equipe, funcionalidade, cliente ou carga de trabalho gerou o gasto?</td><td>Gasto associado a donos: ambiente, endpoint, equipe, tenant, modelo, classe de carga de trabalho</td></tr><tr><td>3. Otimização</td><td>Qual alavanca reduz o custo por tarefa bem-sucedida sem prejudicar a qualidade?</td><td>Mudanças de roteamento, cache, lote, compactação e arbitragem entregues atrás de flags</td></tr><tr><td>4. Responsabilidade</td><td>Quem revisa os números e age sobre eles todo mês?</td><td>Relatórios de showback (e depois chargeback) e um ritmo operacional conciliado com as faturas</td></tr></tbody></table><h2>1. Visibilidade</h2><p>Visibilidade significa normalizar as faturas dos provedores e os logs do gateway em um registro comum. Cada requisição deve carregar metadados suficientes para responder: quem é o dono, qual funcionalidade a gerou, qual modelo a atendeu, quantas classes de token foram cobradas, se a chamada foi repetida e se a saída gerou valor para o usuário.</p><p>Uma boa visibilidade separa o gasto de entrada, saída, escrita de cache, leitura de cache, lote e novas tentativas. Sem essa divisão, as equipes contam por engano o desconto de leitura de cache como economia, deixam passar loops de novas tentativas e comparam provedores pelo preço de tabela em vez do custo por tarefa bem-sucedida.</p><h2>2. Atribuição</h2><p>A atribuição associa o gasto a equipes, produtos, clientes e cargas de trabalho. O objetivo não é culpar ninguém; é melhorar a qualidade das decisões. Uma área financeira não consegue governar o gasto se cada linha diz “OpenAI”. Um líder de engenharia não consegue otimizar uma superfície de produto se o gasto é agrupado apenas pela conta do provedor.</p><p>Uma atribuição mínima útil costuma incluir ambiente, endpoint, dono da equipe, cliente ou tenant quando permitido, modelo, provedor e classe de carga de trabalho. Programas maduros acrescentam métricas de negócio, como chamado resolvido, análise concluída, relatório gerado ou tarefa de agente bem-sucedida.</p><h2>3. Otimização</h2><p>A otimização deve seguir a atribuição. As alavancas comuns são roteamento de modelos, cache semântico, cache de prompts, compactação de contexto, roteamento em lote, arbitragem entre provedores e ajuste da política de fallback. Cada alavanca altera a fatura de um jeito diferente. O roteamento muda o mix de modelos. O cache muda a economia de tokens de entrada e de latência. O lote move o trabalho para faixas assíncronas com desconto. A compactação reduz o contexto repetido.</p><p>O teste não é “o número de tokens caiu?”. O teste é “o custo por tarefa bem-sucedida caiu sem prejudicar qualidade, latência ou confiabilidade?”.</p><h2>4. Responsabilidade</h2><p>O showback deve vir antes do chargeback. Primeiro, dê às equipes uma visão mensal confiável dos seus gastos e fatores de custo. Depois que os números forem confiáveis, o chargeback pode fazer sentido para organizações maduras. O objetivo é um ritmo operacional repetível: revisar os maiores fatores, combinar candidatos a otimização, entregar as mudanças atrás de flags e conciliar com a fatura seguinte.</p>",
+      "faq": [
+        {
+          "question": "Quais são os quatro pilares do FinOps para LLMs?",
+          "answer": "Os quatro pilares são: (1) Visibilidade – quanto estamos pagando de fato, requisição por requisição? (2) Atribuição – qual equipe, funcionalidade, cliente ou carga de trabalho gerou o gasto? (3) Otimização – qual alavanca reduz o custo por tarefa bem-sucedida sem prejudicar a qualidade? (4) Responsabilidade – quem revisa os números e age sobre eles todo mês?"
+        },
+        {
+          "question": "O que significa visibilidade no FinOps de LLMs?",
+          "answer": "Significa normalizar as faturas dos provedores e os logs do gateway em um registro comum. Cada requisição deve carregar metadados que mostrem quem é o dono, qual funcionalidade a gerou, qual modelo a atendeu, quantas classes de token foram cobradas, se a chamada foi repetida e se a saída gerou valor para o usuário."
+        },
+        {
+          "question": "Qual é a finalidade da atribuição no FinOps de LLMs?",
+          "answer": "A atribuição associa o gasto a equipes, produtos, clientes e cargas de trabalho. O objetivo não é culpar, e sim melhorar a qualidade das decisões. O mínimo útil geralmente inclui ambiente, endpoint, dono da equipe, cliente ou tenant quando permitido, modelo, provedor e classe de carga de trabalho."
+        },
+        {
+          "question": "Quais são as alavancas de otimização mais comuns no FinOps de LLMs?",
+          "answer": "São roteamento de modelos, cache semântico, cache de prompts, compactação de contexto, roteamento em lote, arbitragem entre provedores e ajuste da política de fallback. Cada alavanca altera a fatura de forma diferente. O teste não é “o número de tokens caiu?”, e sim “o custo por tarefa bem-sucedida caiu sem prejudicar qualidade, latência ou confiabilidade?”."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/what-is-llm-finops",
+          "label": "O que é LLM FinOps?"
+        },
+        {
+          "slug": "/research/ai-finops",
+          "label": "AI FinOps"
+        },
+        {
+          "slug": "/research/llm-cost-attribution",
+          "label": "Atribuição de custos de LLM"
+        },
+        {
+          "slug": "/research/llm-chargeback-showback",
+          "label": "Chargeback e showback de LLM"
+        },
+        {
+          "slug": "/research/chargeback-vs-showback",
+          "label": "Chargeback vs. showback"
+        },
+        {
+          "slug": "/research/ai-cost-optimization-six-levers",
+          "label": "Seis alavancas para otimizar custos de IA"
+        }
       ]
     }
   }
