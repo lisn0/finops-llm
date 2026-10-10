@@ -55,6 +55,236 @@
           "label": "Evals cost control"
         }
       ]
+    },
+    "de": {
+      "title": "Stille Modell-Downgrades sprengen Ihr Kostenmodell",
+      "titleCore": "Stille Modell-Downgrades und Kostenmodelle",
+      "description": "Ein Opus-5.5-Aufruf kann von Opus 4.8 bedient werden. Modell-Aliase garantieren keine Version, und Ihr Kostenmodell bemerkt den Wechsel nicht.",
+      "body": "<p>Am 23. September 2026 wies ein Thread auf r/GroundTruthAINews auf eine Fußnote in den Opus-5.5-Launch-Notes von Anthropic hin: <strong>Eine Opus-5.5-Anfrage kann von Opus 4.8 bedient werden</strong>. Anthropic und OpenAI haben am selben Nachmittag Preissenkungen veröffentlicht. Beide Labs verkauften dieselbe Idee: Leistung behalten, deutlich weniger ausgeben. Die Fußnote ist der Teil, der für FinOps zählt.</p><h2>Was tatsächlich passiert ist</h2><p>Claude Opus 5.5 startete mit $4/$20 pro Million Tokens, rund 20 % unter Opus 5, wobei Cache-Lesezugriffe um 60 % auf $0.20 gesenkt wurden. Anthropic sagt, weniger Tokens pro Task und 30 % schnellere Ausgabe machten typische Workloads etwa 40 % günstiger. Rund 90 Minuten später brachte OpenAI GPT-6 Sol mit $2/$10 und Luna mit $0.10/$0.50, beide zum halben Preis von GPT-5.6.</p><p>Jeder Launch-Beitrag aus dieser Zeit trägt dieselbe Art von Fußnote: Der Endpoint, den Sie aufrufen, ist ein <em>Alias</em>, und der Alias wird während eines Übergangsfensters auf mehrere Modellversionen verteilt. Das ist übliche Kapazitätspraxis. Es ist auch ein Problem für die Kostenmodellierung.</p><h2>Warum es die Zahlen sprengt</h2><ul><li><strong>Die Kosten pro Task driften.</strong> Ihre Prognose ging vom Output-Preis von Opus 5.5 aus. Landet ein Teil der Aufrufe bei 4.8, verschieben sich Stückpreis und Token-Anzahl, und zwar in entgegengesetzte Richtungen.</li><li><strong>Evals messen eine Mischung.</strong> Eine Eval-Suite, die in einem Übergangsfenster läuft, bewertet einen Mix aus Versionen. Der Wert ist später nicht reproduzierbar.</li><li><strong>Preissenkungen werden falsch zugeordnet.</strong> Zeigt sich eine Ersparnis von 40 % nur als 15 %, liegt die Lücke meist an der Versionsmischung, nicht an einer defekten Optimierung.</li><li><strong>Latenz-Baselines veralten.</strong> 4.8 ist nicht so schnell wie 5.5. Jedes p50, das Sie mitten im Übergang erfasst haben, ist nicht Ihr p50 im Normalbetrieb.</li></ul><h2>So erkennen Sie den Wechsel</h2><p>Jeder große Anbieter liefert das aufgelöste Modell im Response-Body zurück. Loggen Sie es. Ein Feld, vier Zeilen Code:</p><pre><code>resolved = response.model  # e.g. \"claude-opus-4-8-20260115\"\nassert resolved.startswith(EXPECTED_PREFIX) or resolved in ALLOWED_FALLBACKS</code></pre><p>Schlüsseln Sie dann jede Kostenmetrik nach aufgelöstem Modell auf, nicht nach dem angefragten. Sobald ein Bucket zu driften beginnt, haben Sie Ihre Antwort: Der Alias mischt Versionen, und Ihre Kosten pro Task sind ein gewichteter Durchschnitt zweier verschiedener Produkte.</p><h2>Die Folgen für das Budget</h2><p>Planen Sie während eines Übergangs mit den <em>gemischten</em> Kosten, nicht mit der Schlagzeile. Fallen 20 % der Aufrufe auf ein älteres Modell zurück, liegt Ihr effektiver Input-Preis nicht bei $4.00 pro Million &mdash; sondern bei dem, was die Mischung ergibt. Dieselbe Logik gilt für die beworbene Ersparnis: Die Aussage „40 % günstiger“ ist ein Durchschnitt für typische Workloads, der bereits eine Verringerung der Token-Anzahl voraussetzt, die nicht eintritt, wenn das günstigere, ältere Modell die längeren Antworten erzeugt.</p><h2>Regeln, an die Sie sich halten sollten</h2><ol><li><strong>Modellieren Sie nie auf einem Alias.</strong> Pinnen Sie eine datierte Modell-ID für alles, was Sie budgetieren oder bewerten.</li><li><strong>Loggen Sie bei jeder Anfrage das aufgelöste Modell.</strong> Nicht verhandelbar, falls Sie je eine Eval wiederholen.</li><li><strong>Setzen Sie die Baseline nach dem Übergangsfenster neu.</strong> Üblich sind Wochen, nicht Quartale, aber prüfen Sie es.</li><li><strong>Bewerten Sie einen Übergang als Mischung.</strong> Fragen Sie Ihren Anbieter nach der erwarteten Aufteilung oder messen Sie sie.</li></ol><h2>Fazit</h2><p>Eine Preissenkung und ein stilles Downgrade können am selben Nachmittag landen. Die Senkung ist die Schlagzeile; das Downgrade ist die Fußnote, die die Prognose des Vormonats leise ungültig macht. Loggen Sie das aufgelöste Modell, pinnen Sie datierte IDs und bewerten Sie die Mischung.</p>",
+      "faq": [
+        {
+          "question": "Kann eine Opus-5.5-Anfrage von Opus 4.8 bedient werden?",
+          "answer": "Ja. Die Launch-Notes von Anthropic enthielten eine Fußnote, wonach einige Opus-5.5-Anfragen während des Übergangsfensters an Opus 4.8 geleitet werden können. Modell-Endpoints sind Aliase, keine Versionsgarantien."
+        },
+        {
+          "question": "Wie erkenne ich, welches Modell eine Anfrage tatsächlich bedient hat?",
+          "answer": "Lesen Sie das Feld model im Response-Body der API. Loggen Sie es bei jedem Aufruf und schlüsseln Sie alle Kostenmetriken nach dem aufgelösten statt nach dem angefragten Modell auf."
+        },
+        {
+          "question": "Betrifft das auch OpenAI-Modelle?",
+          "answer": "Ja. Dieselbe Alias-und-Übergangs-Praxis gilt anbieterübergreifend, auch für die Launches von GPT-6 Sol und Luna am 22. September 2026. Pinnen Sie datierte Modell-IDs für alles, was Sie budgetieren oder bewerten."
+        },
+        {
+          "question": "Warum fiel meine Ersparnis pro Task geringer aus als die angekündigten 40 %?",
+          "answer": "Höchstwahrscheinlich wegen Versionsmischung. Die Aussage „40 % günstiger“ ist ein Durchschnitt für typische Workloads, der eine Verringerung der Token-Anzahl voraussetzt. Erzeugen günstigere, ältere Modelle längere Antworten, schrumpft die gemischte Ersparnis."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/claude-opus-5-5-cost-model",
+          "label": "Kostenmodell für Claude Opus 5.5"
+        },
+        {
+          "slug": "/research/gpt-6-pricing",
+          "label": "GPT-6-Preise: Sol, Luna, Astra"
+        },
+        {
+          "slug": "/research/model-price-cuts-routing-budget",
+          "label": "Modell-Preissenkungen und Routing-Budgets"
+        },
+        {
+          "slug": "/research/provider-prices-not-comparable",
+          "label": "Anbieterpreise sind nicht vergleichbar"
+        },
+        {
+          "slug": "/research/evals-cost-control",
+          "label": "Kostenkontrolle bei Evals"
+        }
+      ]
+    },
+    "es": {
+      "title": "Los downgrades silenciosos rompen tu modelo de costes",
+      "titleCore": "Downgrades silenciosos de modelo y modelos de costes",
+      "description": "Una llamada a Opus 5.5 puede responderla Opus 4.8. Los alias de modelo no garantizan versión, y tu modelo de costes no notará el cambio.",
+      "body": "<p>El 23 de septiembre de 2026, un hilo de r/GroundTruthAINews señaló una nota al pie enterrada en las notas de lanzamiento de Opus 5.5 de Anthropic: <strong>una solicitud a Opus 5.5 puede ser atendida por Opus 4.8</strong>. Anthropic y OpenAI publicaron recortes de precio la misma tarde. Ambos laboratorios vendieron la misma idea: mantener la capacidad y gastar mucho menos. La nota al pie es lo que importa a FinOps.</p><h2>Qué pasó en realidad</h2><p>Claude Opus 5.5 se lanzó a $4/$20 por millón de tokens, aproximadamente un 20% por debajo de Opus 5, con las lecturas de caché reducidas un 60% hasta $0.20. Anthropic dice que menos tokens por tarea y una salida un 30% más rápida hacen que las cargas típicas cuesten alrededor de un 40% menos. Unos 90 minutos después, OpenAI lanzó GPT-6 Sol a $2/$10 y Luna a $0.10/$0.50, ambos a la mitad de los precios de GPT-5.6.</p><p>Todas las entradas de lanzamiento de este periodo llevan el mismo tipo de nota al pie: el endpoint que llamas es un <em>alias</em>, y el alias se reparte la carga entre versiones del modelo durante una ventana de transición. Es una práctica normal de capacidad. También es un problema para el modelado de costes.</p><h2>Por qué rompe los números</h2><ul><li><strong>El coste por tarea se desvía.</strong> Tu previsión asumía el precio de salida de Opus 5.5. Si una parte de las llamadas cae en 4.8, cambian tanto el precio unitario como el número de tokens, en sentidos opuestos.</li><li><strong>Las evaluaciones miden una mezcla.</strong> Una suite de evaluación ejecutada durante una ventana de transición puntúa una combinación de versiones. La puntuación no se puede reproducir más adelante.</li><li><strong>Los recortes de precio se atribuyen mal.</strong> Si un ahorro del 40% aparece como un 15%, la diferencia suele deberse a la mezcla de versiones, no a una optimización rota.</li><li><strong>Las referencias de latencia quedan obsoletas.</strong> 4.8 no es tan rápido como 5.5. Cualquier p50 que midieras a mitad de transición no es tu p50 en régimen estable.</li></ul><h2>Cómo detectar el cambio</h2><p>Todos los grandes proveedores devuelven el modelo resuelto en el cuerpo de la respuesta. Regístralo. Un campo, cuatro líneas de código:</p><pre><code>resolved = response.model  # e.g. \"claude-opus-4-8-20260115\"\nassert resolved.startswith(EXPECTED_PREFIX) or resolved in ALLOWED_FALLBACKS</code></pre><p>Después divide cada métrica de coste por modelo resuelto, no por el modelo que pediste. En cuanto un grupo empiece a desviarse, tendrás la respuesta: el alias está mezclando versiones y tu coste por tarea es un promedio ponderado de dos productos distintos.</p><h2>La implicación presupuestaria</h2><p>Durante una transición, planifica con el coste <em>combinado</em>, no con el titular. Si el 20% de las llamadas pasa a un modelo anterior, tu tarifa efectiva de entrada no es $4.00 por millón &mdash; es la que resulte de la mezcla. La misma lógica vale para el ahorro anunciado: lo de «un 40% más barato» es un promedio de carga típica que ya asume una reducción del número de tokens, algo que puede no cumplirse si el modelo más barato pero más antiguo es el que genera las respuestas más largas.</p><h2>Reglas a mantener</h2><ol><li><strong>Nunca modeles sobre un alias.</strong> Fija un ID de modelo con fecha para todo lo que presupuestes o evalúes.</li><li><strong>Registra el modelo resuelto en cada solicitud.</strong> Es innegociable si alguna vez vuelves a ejecutar una evaluación.</li><li><strong>Vuelve a fijar la línea base tras la ventana de transición.</strong> Lo habitual son semanas, no trimestres, pero compruébalo.</li><li><strong>Valora una transición como una mezcla.</strong> Pide a tu proveedor el reparto esperado, o mídelo.</li></ol><h2>Conclusión</h2><p>Un recorte de precio y un downgrade silencioso pueden llegar la misma tarde. El recorte es el titular; el downgrade es la nota al pie que invalida en silencio la previsión del mes pasado. Registra el modelo resuelto, fija IDs con fecha y valora la mezcla.</p>",
+      "faq": [
+        {
+          "question": "¿Puede una solicitud a Opus 5.5 ser atendida por Opus 4.8?",
+          "answer": "Sí. Las notas de lanzamiento de Anthropic incluían una nota al pie que indicaba que algunas solicitudes a Opus 5.5 pueden dirigirse a Opus 4.8 durante la ventana de transición. Los endpoints de modelo son alias, no garantías de versión."
+        },
+        {
+          "question": "¿Cómo detecto qué modelo atendió realmente una solicitud?",
+          "answer": "Lee el campo model del cuerpo de la respuesta de la API. Regístralo en cada llamada y divide todas las métricas de coste por el modelo resuelto en lugar del solicitado."
+        },
+        {
+          "question": "¿Afecta esto también a los modelos de OpenAI?",
+          "answer": "Sí. La misma práctica de alias y transición se aplica en todos los proveedores, incluidos los lanzamientos de GPT-6 Sol y Luna del 22 de septiembre de 2026. Fija IDs de modelo con fecha para todo lo que presupuestes o evalúes."
+        },
+        {
+          "question": "¿Por qué el ahorro por tarea me salió menor que el 40% anunciado?",
+          "answer": "Lo más probable es la mezcla de versiones. Lo de «un 40% más barato» es un promedio de carga típica que asume una reducción del número de tokens. Si los modelos más baratos pero más antiguos producen respuestas más largas, el ahorro combinado se reduce."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/claude-opus-5-5-cost-model",
+          "label": "Modelo de costes de Claude Opus 5.5"
+        },
+        {
+          "slug": "/research/gpt-6-pricing",
+          "label": "Precios de GPT-6: Sol, Luna, Astra"
+        },
+        {
+          "slug": "/research/model-price-cuts-routing-budget",
+          "label": "Recortes de precio de modelos y presupuestos de enrutamiento"
+        },
+        {
+          "slug": "/research/provider-prices-not-comparable",
+          "label": "Los precios de los proveedores no son comparables"
+        },
+        {
+          "slug": "/research/evals-cost-control",
+          "label": "Control de costes de las evaluaciones"
+        }
+      ]
+    },
+    "fr": {
+      "title": "Les downgrades silencieux cassent votre modèle de coûts",
+      "titleCore": "Downgrades silencieux de modèle et modèles de coûts",
+      "description": "Un appel à Opus 5.5 peut être servi par Opus 4.8. Un alias de modèle ne garantit pas la version, et votre modèle de coûts ne verra pas le changement.",
+      "body": "<p>Le 23 septembre 2026, un fil de r/GroundTruthAINews a signalé une note de bas de page enfouie dans les notes de lancement d'Opus 5.5 d'Anthropic : <strong>une requête Opus 5.5 peut être servie par Opus 4.8</strong>. Anthropic et OpenAI ont annoncé des baisses de prix le même après-midi. Les deux laboratoires vendaient la même idée : garder la capacité et dépenser bien moins. La note de bas de page est ce qui compte pour le FinOps.</p><h2>Ce qui s'est réellement passé</h2><p>Claude Opus 5.5 a été lancé à $4/$20 par million de tokens, soit environ 20 % de moins qu'Opus 5, avec des lectures de cache réduites de 60 % à $0.20. Anthropic affirme que la baisse du nombre de tokens par tâche et une sortie 30 % plus rapide rendent les charges typiques environ 40 % moins chères. Environ 90 minutes plus tard, OpenAI a lancé GPT-6 Sol à $2/$10 et Luna à $0.10/$0.50, tous deux à la moitié des prix de GPT-5.6.</p><p>Chaque annonce de lancement de cette période comporte le même type de note : le endpoint que vous appelez est un <em>alias</em>, et cet alias est réparti entre plusieurs versions du modèle pendant une fenêtre de transition. C'est une pratique normale de gestion de capacité. C'est aussi un problème de modélisation des coûts.</p><h2>Pourquoi cela fausse les chiffres</h2><ul><li><strong>Le coût par tâche dérive.</strong> Votre prévision supposait le prix de sortie d'Opus 5.5. Si une part des appels tombe sur 4.8, le prix unitaire et le nombre de tokens bougent tous deux, en sens opposés.</li><li><strong>Les évaluations mesurent un mélange.</strong> Une suite d'évaluation exécutée pendant une fenêtre de transition note un mélange de versions. Le score n'est pas reproductible plus tard.</li><li><strong>Les baisses de prix sont mal attribuées.</strong> Si une économie de 40 % apparaît à 15 %, l'écart vient généralement du mélange de versions, pas d'une optimisation défaillante.</li><li><strong>Les références de latence deviennent obsolètes.</strong> 4.8 n'est pas aussi rapide que 5.5. Tout p50 relevé en pleine transition n'est pas votre p50 en régime établi.</li></ul><h2>Comment détecter le changement</h2><p>Tous les grands fournisseurs renvoient le modèle résolu dans le corps de la réponse. Journalisez-le. Un champ, quatre lignes de code :</p><pre><code>resolved = response.model  # e.g. \"claude-opus-4-8-20260115\"\nassert resolved.startswith(EXPECTED_PREFIX) or resolved in ALLOWED_FALLBACKS</code></pre><p>Ensuite, ventilez chaque métrique de coût par modèle résolu, et non par le modèle demandé. Dès qu'un groupe commence à dériver, vous avez votre réponse : l'alias mélange les versions et votre coût par tâche est une moyenne pondérée de deux produits différents.</p><h2>L'implication budgétaire</h2><p>Pendant une transition, planifiez sur le coût <em>mixte</em>, pas sur le chiffre d'affichage. Si 20 % des appels basculent vers un modèle plus ancien, votre tarif d'entrée effectif n'est pas $4.00 par million &mdash; c'est celui que produit le mélange. La même logique vaut pour l'économie annoncée : la promesse de « 40 % moins cher » est une moyenne de charge typique qui suppose déjà une baisse du nombre de tokens, laquelle peut ne pas se vérifier si le modèle moins cher mais plus ancien est celui qui produit les réponses les plus longues.</p><h2>Règles à tenir</h2><ol><li><strong>Ne modélisez jamais sur un alias.</strong> Épinglez un ID de modèle daté pour tout ce que vous budgétez ou évaluez.</li><li><strong>Journalisez le modèle résolu à chaque requête.</strong> C'est non négociable si vous relancez un jour une évaluation.</li><li><strong>Refaites la référence après la fenêtre de transition.</strong> La durée habituelle se compte en semaines, pas en trimestres, mais vérifiez.</li><li><strong>Valorisez une transition comme un mélange.</strong> Demandez à votre fournisseur la répartition attendue, ou mesurez-la.</li></ol><h2>En résumé</h2><p>Une baisse de prix et un downgrade silencieux peuvent arriver le même après-midi. La baisse fait la une ; le downgrade est la note de bas de page qui invalide discrètement la prévision du mois dernier. Journalisez le modèle résolu, épinglez des IDs datés et valorisez le mélange.</p>",
+      "faq": [
+        {
+          "question": "Une requête Opus 5.5 peut-elle être servie par Opus 4.8 ?",
+          "answer": "Oui. Les notes de lancement d'Anthropic comportaient une note de bas de page indiquant que certaines requêtes Opus 5.5 peuvent être routées vers Opus 4.8 pendant la fenêtre de transition. Les endpoints de modèle sont des alias, pas des garanties de version."
+        },
+        {
+          "question": "Comment détecter quel modèle a réellement servi une requête ?",
+          "answer": "Lisez le champ model dans le corps de la réponse de l'API. Journalisez-le à chaque appel et ventilez toutes les métriques de coût par modèle résolu plutôt que par modèle demandé."
+        },
+        {
+          "question": "Cela concerne-t-il aussi les modèles d'OpenAI ?",
+          "answer": "Oui. La même pratique d'alias et de transition s'applique chez tous les fournisseurs, y compris pour les lancements de GPT-6 Sol et Luna du 22 septembre 2026. Épinglez des IDs de modèle datés pour tout ce que vous budgétez ou évaluez."
+        },
+        {
+          "question": "Pourquoi mon économie par tâche est-elle inférieure aux 40 % annoncés ?",
+          "answer": "Très probablement à cause du mélange de versions. Une promesse de « 40 % moins cher » est une moyenne de charge typique qui suppose une baisse du nombre de tokens. Si des modèles moins chers mais plus anciens produisent des réponses plus longues, l'économie mixte diminue."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/claude-opus-5-5-cost-model",
+          "label": "Modèle de coûts de Claude Opus 5.5"
+        },
+        {
+          "slug": "/research/gpt-6-pricing",
+          "label": "Tarifs de GPT-6 : Sol, Luna, Astra"
+        },
+        {
+          "slug": "/research/model-price-cuts-routing-budget",
+          "label": "Baisses de prix des modèles et budgets de routage"
+        },
+        {
+          "slug": "/research/provider-prices-not-comparable",
+          "label": "Les prix des fournisseurs ne sont pas comparables"
+        },
+        {
+          "slug": "/research/evals-cost-control",
+          "label": "Maîtrise des coûts des évaluations"
+        }
+      ]
+    },
+    "ja": {
+      "title": "サイレントなモデル格下げがコストモデルを壊す",
+      "titleCore": "サイレントなモデル格下げとコストモデル",
+      "description": "Opus 5.5への呼び出しをOpus 4.8が処理することがあります。モデルのエイリアスはバージョンを保証せず、コストモデルは切り替わりに気づきません。",
+      "body": "<p>2026年9月23日、r/GroundTruthAINewsのスレッドが、AnthropicのOpus 5.5ローンチノートに埋もれた脚注を指摘しました。<strong>Opus 5.5へのリクエストをOpus 4.8が処理することがある</strong>というものです。同じ日の午後、AnthropicとOpenAIはともに値下げを発表しました。両社が売り込んだのは同じ考え方、つまり性能は維持したまま支出を大幅に減らすというものです。FinOpsにとって重要なのは、その脚注のほうです。</p><h2>実際に何が起きたか</h2><p>Claude Opus 5.5は100万トークンあたり$4/$20でローンチされ、Opus 5より約20%安く、キャッシュ読み取りは60%引き下げられて$0.20になりました。Anthropicは、タスクあたりのトークン減少と30%の出力高速化により、典型的なワークロードは約40%安くなると述べています。その約90分後、OpenAIはGPT-6 Solを$2/$10、Lunaを$0.10/$0.50で発表しました。どちらもGPT-5.6の半額です。</p><p>この時期のローンチ記事には、いずれも同種の脚注が付いています。呼び出しているエンドポイントは<em>エイリアス</em>であり、移行期間中はそのエイリアスが複数のモデルバージョンに負荷分散される、というものです。これは通常のキャパシティ運用ですが、コストモデリングの観点では問題になります。</p><h2>なぜ数字が狂うのか</h2><ul><li><strong>タスクあたりコストがずれる。</strong>予測はOpus 5.5の出力価格を前提にしていました。呼び出しの一部が4.8に回ると、単価とトークン数の両方が、逆方向に動きます。</li><li><strong>評価は混合を測っている。</strong>移行期間中に実行した評価スイートは、複数バージョンの混合をスコアリングします。そのスコアは後から再現できません。</li><li><strong>値下げの効果が誤って帰属される。</strong>40%の節約が15%にしか見えない場合、その差は最適化の失敗ではなく、たいていバージョンの混在です。</li><li><strong>レイテンシの基準値が古くなる。</strong>4.8は5.5ほど速くありません。移行の最中に取得したp50は、定常状態のp50ではありません。</li></ul><h2>切り替わりを検出する方法</h2><p>主要なプロバイダーはすべて、レスポンスボディに解決後のモデルを返します。それをログに残してください。フィールドは1つ、コードは4行です。</p><pre><code>resolved = response.model  # e.g. \"claude-opus-4-8-20260115\"\nassert resolved.startswith(EXPECTED_PREFIX) or resolved in ALLOWED_FALLBACKS</code></pre><p>そのうえで、すべてのコスト指標を、リクエストしたモデルではなく解決後のモデルで分割します。あるバケットがずれ始めた時点で答えが出ます。エイリアスがバージョンを混ぜており、タスクあたりコストは2つの異なる製品の加重平均になっているのです。</p><h2>予算への影響</h2><p>移行期間中は、見出しの数字ではなく<em>混合後の</em>コストで計画してください。呼び出しの20%が旧モデルに回るなら、実効的な入力単価は100万トークンあたり$4.00ではなく、混合の結果として決まる値になります。&mdash; 宣伝される節約額にも同じ理屈が当てはまります。「40%安い」は典型的なワークロードの平均値で、すでにトークン数の削減を前提にしています。安価だが旧型のモデルのほうが長い回答を生成する場合、その前提は成り立たないかもしれません。</p><h2>守るべきルール</h2><ol><li><strong>エイリアスでモデル化しない。</strong>予算化や評価の対象には、日付付きのモデルIDを固定してください。</li><li><strong>すべてのリクエストで解決後のモデルをログに残す。</strong>評価を再実行する可能性があるなら、これは必須です。</li><li><strong>移行期間の終了後にベースラインを取り直す。</strong>通常は四半期ではなく数週間ですが、確認してください。</li><li><strong>移行は混合として価格設定する。</strong>プロバイダーに想定される配分を尋ねるか、自分で測定してください。</li></ol><h2>まとめ</h2><p>値下げとサイレントな格下げは、同じ日の午後に同時に起こり得ます。値下げは見出しで、格下げは先月の予測を静かに無効にする脚注です。解決後のモデルをログに残し、日付付きIDを固定し、混合を踏まえて価格を見積もってください。</p>",
+      "faq": [
+        {
+          "question": "Opus 5.5へのリクエストをOpus 4.8が処理することはありますか？",
+          "answer": "はい。Anthropicのローンチノートには、移行期間中は一部のOpus 5.5リクエストがOpus 4.8にルーティングされることがあるという脚注がありました。モデルのエンドポイントはエイリアスであり、バージョンの保証ではありません。"
+        },
+        {
+          "question": "実際にどのモデルがリクエストを処理したかを確認するには？",
+          "answer": "APIレスポンスボディのmodelフィールドを読み取ります。すべての呼び出しで記録し、コスト指標はすべて、リクエストしたモデルではなく解決後のモデルで分割してください。"
+        },
+        {
+          "question": "OpenAIのモデルにも影響しますか？",
+          "answer": "はい。同じエイリアスと移行期間の運用は、2026年9月22日のGPT-6 SolとLunaのローンチを含め、プロバイダーを問わず当てはまります。予算化や評価の対象には、日付付きのモデルIDを固定してください。"
+        },
+        {
+          "question": "タスクあたりの節約が、宣伝されている40%より小さくなったのはなぜですか？",
+          "answer": "最も可能性が高いのはバージョンの混在です。「40%安い」は典型的なワークロードの平均値で、トークン数の削減を前提にしています。安価だが旧型のモデルが長い回答を生成していると、混合後の節約は小さくなります。"
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/claude-opus-5-5-cost-model",
+          "label": "Claude Opus 5.5のコストモデル"
+        },
+        {
+          "slug": "/research/gpt-6-pricing",
+          "label": "GPT-6の料金：Sol、Luna、Astra"
+        },
+        {
+          "slug": "/research/model-price-cuts-routing-budget",
+          "label": "モデルの値下げとルーティング予算"
+        },
+        {
+          "slug": "/research/provider-prices-not-comparable",
+          "label": "プロバイダー価格は比較できない"
+        },
+        {
+          "slug": "/research/evals-cost-control",
+          "label": "評価のコスト管理"
+        }
+      ]
+    },
+    "pt": {
+      "title": "Downgrades silenciosos quebram seu modelo de custos",
+      "titleCore": "Downgrades silenciosos de modelo e modelos de custos",
+      "description": "Uma chamada ao Opus 5.5 pode ser atendida pelo Opus 4.8. Aliases de modelo não garantem versão, e seu modelo de custos não percebe a troca.",
+      "body": "<p>Em 23 de setembro de 2026, um tópico no r/GroundTruthAINews apontou uma nota de rodapé escondida nas notas de lançamento do Opus 5.5 da Anthropic: <strong>uma requisição ao Opus 5.5 pode ser atendida pelo Opus 4.8</strong>. Anthropic e OpenAI anunciaram cortes de preço na mesma tarde. Os dois laboratórios venderam a mesma ideia: manter a capacidade e gastar bem menos. A nota de rodapé é a parte que importa para FinOps.</p><h2>O que realmente aconteceu</h2><p>O Claude Opus 5.5 foi lançado a $4/$20 por milhão de tokens, cerca de 20% abaixo do Opus 5, com as leituras de cache cortadas em 60%, para $0.20. A Anthropic diz que menos tokens por tarefa e uma saída 30% mais rápida tornam as cargas típicas cerca de 40% mais baratas. Cerca de 90 minutos depois, a OpenAI lançou o GPT-6 Sol a $2/$10 e o Luna a $0.10/$0.50, ambos pela metade dos preços do GPT-5.6.</p><p>Toda publicação de lançamento desse período traz o mesmo tipo de nota: o endpoint que você chama é um <em>alias</em>, e o alias é balanceado entre versões do modelo durante uma janela de transição. É uma prática normal de capacidade. Também é um problema de modelagem de custos.</p><h2>Por que isso quebra os números</h2><ul><li><strong>O custo por tarefa se desloca.</strong> Sua previsão assumia o preço de saída do Opus 5.5. Se uma parte das chamadas cair no 4.8, tanto o preço unitário quanto a contagem de tokens mudam, em sentidos opostos.</li><li><strong>As avaliações medem uma mistura.</strong> Uma suíte de avaliação executada durante uma janela de transição pontua uma combinação de versões. A pontuação não é reproduzível depois.</li><li><strong>Cortes de preço são atribuídos errado.</strong> Se uma economia de 40% aparece como 15%, a diferença geralmente é mistura de versões, não uma otimização quebrada.</li><li><strong>As linhas de base de latência ficam obsoletas.</strong> O 4.8 não é tão rápido quanto o 5.5. Qualquer p50 que você tenha capturado no meio da transição não é o seu p50 em regime estável.</li></ul><h2>Como detectar a troca</h2><p>Todo grande provedor devolve o modelo resolvido no corpo da resposta. Registre-o em log. Um campo, quatro linhas de código:</p><pre><code>resolved = response.model  # e.g. \"claude-opus-4-8-20260115\"\nassert resolved.startswith(EXPECTED_PREFIX) or resolved in ALLOWED_FALLBACKS</code></pre><p>Depois, divida cada métrica de custo pelo modelo resolvido, não pelo modelo que você pediu. Quando um grupo começar a se deslocar, você tem a resposta: o alias está misturando versões e o seu custo por tarefa é uma média ponderada de dois produtos diferentes.</p><h2>A implicação para o orçamento</h2><p>Durante uma transição, planeje com o custo <em>combinado</em>, não com a manchete. Se 20% das chamadas caírem para um modelo mais antigo, a sua tarifa efetiva de entrada não é $4.00 por milhão &mdash; é o que a mistura produzir. A mesma lógica vale para a economia anunciada: a promessa de «40% mais barato» é uma média de carga típica que já assume uma redução na contagem de tokens, o que pode não se sustentar se o modelo mais barato e mais antigo for o que gera as respostas mais longas.</p><h2>Regras a seguir</h2><ol><li><strong>Nunca modele sobre um alias.</strong> Fixe um ID de modelo datado para tudo que você orça ou avalia.</li><li><strong>Registre o modelo resolvido em toda requisição.</strong> É inegociável se você algum dia reexecutar uma avaliação.</li><li><strong>Refaça a linha de base depois da janela de transição.</strong> A duração usual é de semanas, não de trimestres, mas confirme.</li><li><strong>Precifique uma transição como uma mistura.</strong> Peça ao seu provedor a divisão esperada, ou meça.</li></ol><h2>Conclusão</h2><p>Um corte de preço e um downgrade silencioso podem chegar na mesma tarde. O corte é a manchete; o downgrade é a nota de rodapé que, em silêncio, invalida a previsão do mês passado. Registre o modelo resolvido, fixe IDs datados e precifique a mistura.</p>",
+      "faq": [
+        {
+          "question": "Uma requisição ao Opus 5.5 pode ser atendida pelo Opus 4.8?",
+          "answer": "Sim. As notas de lançamento da Anthropic traziam uma nota de rodapé informando que algumas requisições ao Opus 5.5 podem ser roteadas para o Opus 4.8 durante a janela de transição. Endpoints de modelo são aliases, não garantias de versão."
+        },
+        {
+          "question": "Como detecto qual modelo realmente atendeu uma requisição?",
+          "answer": "Leia o campo model no corpo da resposta da API. Registre-o em toda chamada e divida todas as métricas de custo pelo modelo resolvido, não pelo solicitado."
+        },
+        {
+          "question": "Isso afeta os modelos da OpenAI também?",
+          "answer": "Sim. A mesma prática de alias e transição vale entre provedores, incluindo os lançamentos do GPT-6 Sol e do Luna em 22 de setembro de 2026. Fixe IDs de modelo datados para tudo que você orça ou avalia."
+        },
+        {
+          "question": "Por que minha economia por tarefa saiu menor que os 40% anunciados?",
+          "answer": "Muito provavelmente por mistura de versões. A promessa de «40% mais barato» é uma média de carga típica que assume uma redução na contagem de tokens. Se modelos mais baratos e mais antigos produzem respostas mais longas, a economia combinada diminui."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/claude-opus-5-5-cost-model",
+          "label": "Modelo de custos do Claude Opus 5.5"
+        },
+        {
+          "slug": "/research/gpt-6-pricing",
+          "label": "Preços do GPT-6: Sol, Luna, Astra"
+        },
+        {
+          "slug": "/research/model-price-cuts-routing-budget",
+          "label": "Cortes de preço de modelos e orçamentos de roteamento"
+        },
+        {
+          "slug": "/research/provider-prices-not-comparable",
+          "label": "Preços de provedores não são comparáveis"
+        },
+        {
+          "slug": "/research/evals-cost-control",
+          "label": "Controle de custos de avaliações"
+        }
+      ]
     }
   }
 }

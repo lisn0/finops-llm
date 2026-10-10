@@ -1,6 +1,12 @@
 {
   "slug": "research/haiku-5-5-100k-prompt-price-threshold",
-  "tags": ["anthropic", "pricing", "prompt-budgets", "model-routing", "finops"],
+  "tags": [
+    "anthropic",
+    "pricing",
+    "prompt-budgets",
+    "model-routing",
+    "finops"
+  ],
   "datePublished": "2026-10-08",
   "dateModified": "2026-10-08",
   "image": "https://finopsllm.com/og.png",
@@ -26,9 +32,188 @@
         }
       ],
       "related": [
-        { "slug": "/research/context-window-paid-twice", "label": "The context window you pay for twice" },
-        { "slug": "/research/cost-per-successful-task", "label": "Cost per successful task" },
-        { "slug": "/research/three-agent-budgets", "label": "Three budgets for autonomous agents" }
+        {
+          "slug": "/research/context-window-paid-twice",
+          "label": "The context window you pay for twice"
+        },
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "Cost per successful task"
+        },
+        {
+          "slug": "/research/three-agent-budgets",
+          "label": "Three budgets for autonomous agents"
+        }
+      ]
+    },
+    "de": {
+      "title": "Claude Haiku 5.5: die Preisschwelle bei 100k Tokens",
+      "titleCore": "Claude Haiku 5.5 und die Preisschwelle bei 100k Tokens",
+      "description": "Haiku 5.5 ist bei kurzen Prompts günstig, längere nutzen eine teurere Stufe. Tokens neu zählen, Schwelle modellieren, Subagenten je Aufgabe budgetieren.",
+      "body": "<p><strong>Der Listenpreis von Claude Haiku 5.5 hängt von der Prompt-Länge ab.</strong> Anthropic hat das Modell <a href=\"https://www.anthropic.com/claude-haiku-5-5\">am 7. Oktober 2026 veröffentlicht</a>, für Aufgaben mit hohem Volumen wie Klassifizierung, Zusammenfassungen und Subagenten-Aufgaben. Das Kontextfenster von 1 Million Tokens ist kein Versprechen, dass alle diese Tokens den Preis für kurze Prompts kosten: Ein Prompt mit mehr als 100,000 Tokens nutzt eine höhere Preisstufe. Damit wird die Größe der Anfrage zu einer Budgetentscheidung, besonders bei Agenten, die Dokumente und Tool-Ergebnisse ansammeln.</p><h2>Die Preisliste hat zwei Seiten</h2><p>Die folgenden Angaben sind die von Anthropic veröffentlichten Standardpreise der Claude API in US-Dollar pro Million Tokens, Stand 8. Oktober. Die Grenze verläuft zwischen <em>bis zu</em> 100,000 Prompt-Tokens und <em>mehr als</em> 100,000; der höhere Preis wird nicht nur auf die Tokens oberhalb der Schwelle berechnet. Prüfen Sie die <a href=\"https://platform.claude.com/docs/en/about-claude/pricing\">aktuelle Preisdokumentation</a>, bevor Sie die Zahlen in einer Prognose verwenden.</p><table><thead><tr><th>Token-Kategorie</th><th>Prompt bis 100k</th><th>Prompt über 100k</th></tr></thead><tbody><tr><td>Eingabe ohne Cache</td><td>$0.10</td><td>$0.50</td></tr><tr><td>Ausgabe</td><td>$0.50</td><td>$2.50</td></tr><tr><td>Cache-Schreiben (5 Minuten)</td><td>$0.125</td><td>$0.625</td></tr><tr><td>Cache-Schreiben (1 Stunde)</td><td>$0.20</td><td>$1.00</td></tr><tr><td>Cache-Lesen</td><td>$0.01</td><td>$0.05</td></tr></tbody></table><p>Jeder aufgeführte Token-Preis ist oberhalb der Grenze fünfmal so hoch. Das bedeutet <em>nicht</em>, dass jede Anwendungsrechnung auf das Fünffache steigt: Viele Aufrufe bleiben womöglich kurz, und Ausgabevolumen, Caching, Tools, Batch-Verarbeitung, Wiederholungen und Aufgabenerfolg beeinflussen die Gesamtausgaben. <a href=\"https://platform.claude.com/docs/en/build-with-claude/context-windows\">Gecachter Kontext belegt weiterhin den Prompt</a>; ein Cache-Treffer macht aus einer Anfrage mit 120k Tokens keinen kurzen Prompt.</p><h2>Wie die Grenze bei einer einzelnen Anfrage aussieht</h2><p>Betrachten Sie zwei Beispielaufrufe ohne Caching und ohne separat abgerechnete Tools, die jeweils 1,000 Ausgabe-Tokens erzeugen. Ein Prompt mit 99,000 Tokens kostet für Eingabe plus Ausgabe zu den Preisen für kurze Prompts etwa <strong>$0.0104</strong>. Ein Prompt mit 101,000 Tokens kostet zu den Preisen für lange Prompts etwa <strong>$0.0530</strong>. Das ist ungefähr das Fünffache für eine Anfrage, die nur 2,000 Eingabe-Tokens länger ist. Das Beispiel hält die Ausgabe konstant, um die Preisgrenze zu isolieren; es ist keine gemessene Einsparung im Produktivbetrieb. Echte Prompts enthalten außerdem Systemanweisungen, Gesprächsverlauf, Tool-Schemas und Tool-Ergebnisse.</p><h2>Vor der Migration neu zählen</h2><p>Die <a href=\"https://platform.claude.com/docs/en/models/haiku-5-5/whats-new-haiku-5-5\">Migrationshinweise</a> von Anthropic besagen, dass derselbe Text bei Haiku 5.5 ungefähr 30 % mehr Tokens erzeugt als bei Haiku 4.5, abhängig vom Inhalt. Ein Prompt, der nach den alten Token-Zahlen deutlich unter 100k lag, kann die neue Grenze überschreiten. Multiplizieren Sie nicht alle alten Zahlen mit 1.3 und behandeln das Ergebnis als Rechnungsprognose; zählen Sie repräsentative Anfragen mit <code>claude-haiku-5-5</code> neu.</p><p>Der <a href=\"https://platform.claude.com/docs/en/build-with-claude/token-counting\">Token-Counting-Endpoint</a> von Anthropic akzeptiert die strukturierte Nachricht, den System-Prompt und unterstützte Client-Tools, bevor die Generierungsanfrage gesendet wird. Zählen Sie mit dem Zielmodell und protokollieren Sie nach der Antwort die tatsächliche Nutzung. Die Zählung vorab ist eine Schätzung und kann geringfügig von der abgerechneten Eingabe abweichen; einige Server-Tools sowie URL- und Datei-Blöcke unterstützt der Zähler nicht. Verlassen Sie sich bei diesen Pfaden auf die beobachtete Nutzung der Anfragen und halten Sie nahe der Schwelle einen Sicherheitsabstand ein.</p><h2>Eine Prompt-Budget-Regel für Subagenten</h2><ol><li><strong>Verteilung messen.</strong> Erfassen Sie die Prompt-Token-Zahlen von Haiku 5.5 nach Workload, Modell-ID und Aufgabenergebnis. Beobachten Sie, wie viele Aufrufe nahe an 100k liegen oder darüber, statt nur den Durchschnitt zu betrachten.</li><li><strong>Vor der Grenze warnen.</strong> Markieren Sie Anfragen nahe der Schwelle im Agenten-Orchestrator. Betrachten Sie die Warnstufe als Ihren eigenen betrieblichen Puffer, nicht als Preisregel von Anthropic.</li><li><strong>Die Ursache kürzen.</strong> Entfernen Sie doppelte Retrieval-Abschnitte, begrenzen Sie die Größe von Tool-Ergebnissen oder verdichten Sie veralteten Verlauf, wo Qualitätstests es zulassen. Verwerfen Sie keine Belege, die ein Agent braucht, nur um Tokens zu sparen.</li><li><strong>Den langen Schwanz vergleichen.</strong> Testen Sie bei unvermeidbar langen Prompts Haiku auf der höheren Stufe gegen eine andere Route mit denselben Aufgaben. Vergleichen Sie Kosten pro akzeptiertem Ergebnis, Latenz und Fallback-Häufigkeit, nicht nur Listenpreise.</li><li><strong>Mit der Rechnung abstimmen.</strong> Bewerten Sie tatsächliche Eingabe, Ausgabe sowie Cache-Lese- und Schreibvorgänge zur jeweils gültigen Stufe und addieren Sie dann Tools und Wiederholungen. Prüfen Sie Anbieter- oder Cloud-Plattform-Preise und etwaige Vertragsrabatte erneut.</li></ol><p>Haiku 5.5 kann oberhalb von 100k weiterhin die beste Wahl sein, aber das sollte eine gemessene Routing-Entscheidung sein. Entscheidend ist zu wissen, welche Anfragen die Grenze überschreiten und warum.</p><h2>Fragen, die Teams stellen</h2><h3>Gilt der höhere Preis nur für Tokens oberhalb von 100k?</h3><p>Nein. Anthropic beschreibt Haiku 5.5 als nach Prompt-Länge bepreist: Ein Prompt mit mehr als 100,000 Tokens zahlt für diese Anfrage die höheren veröffentlichten Preise.</p><h3>Kann Prompt Caching eine lange Anfrage in der günstigeren Stufe halten?</h3><p>Nein. Wiederverwendete Tokens können einen Cache-Lesepreis erhalten, aber gecachter Kontext belegt weiterhin die Prompt-Länge. Zählen Sie bei der Prüfung der Schwelle den vollständigen Prompt.</p><h3>Ist ein Tokenizer-Anstieg von 30 % garantiert?</h3><p>Nein. Anthropic nennt ungefähr 30 % mehr Tokens für denselben Text als bei Haiku 4.5, abhängig vom Inhalt. Zählen Sie Ihre eigenen Prompts mit dem Zielmodell.</p>",
+      "faq": [
+        {
+          "question": "Gilt der höhere Preis nur für Tokens oberhalb von 100k?",
+          "answer": "Nein. Anthropic bepreist Haiku 5.5 nach Prompt-Länge: Eine Anfrage mit mehr als 100,000 Prompt-Tokens nutzt die höheren veröffentlichten Preise."
+        },
+        {
+          "question": "Kann Prompt Caching eine lange Anfrage in der günstigeren Stufe halten?",
+          "answer": "Nein. Gecachte Tokens können einen niedrigeren Cache-Lesepreis erhalten, belegen aber weiterhin den Prompt-Kontext und zählen bei der Beurteilung der Anfragelänge mit."
+        },
+        {
+          "question": "Ist ein Tokenizer-Anstieg von 30 % garantiert?",
+          "answer": "Nein. Anthropic beschreibt einen ungefähren Anstieg der Token-Zahl um 30 % für denselben Text gegenüber Haiku 4.5, das genaue Ergebnis hängt vom Inhalt ab."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/context-window-paid-twice",
+          "label": "Das Kontextfenster, das Sie doppelt bezahlen"
+        },
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "Kosten pro erfolgreicher Aufgabe"
+        },
+        {
+          "slug": "/research/three-agent-budgets",
+          "label": "Drei Budgets für autonome Agenten"
+        }
+      ]
+    },
+    "es": {
+      "title": "Claude Haiku 5.5: el umbral de precio de 100k tokens",
+      "titleCore": "Claude Haiku 5.5 y el umbral de precio de 100k tokens",
+      "description": "Haiku 5.5 cobra poco por prompts cortos, pero los largos pasan a un nivel más caro. Recuente tokens, modele el umbral y presupueste subagentes por tarea.",
+      "body": "<p><strong>El precio de referencia de Claude Haiku 5.5 depende de la longitud del prompt.</strong> Anthropic <a href=\"https://www.anthropic.com/claude-haiku-5-5\">lanzó el modelo el 7 de octubre de 2026</a> para trabajo de alto volumen, como clasificación, resúmenes y tareas de subagentes. Su ventana de contexto de 1 millón de tokens no garantiza que todos esos tokens cuesten la tarifa de los prompts cortos: un prompt de más de 100,000 tokens usa un nivel de precio más alto. Por eso el tamaño de cada solicitud es una decisión presupuestaria, sobre todo en agentes que acumulan documentos y resultados de herramientas.</p><h2>La tarifa tiene dos caras</h2><p>Los siguientes son los precios estándar publicados por Anthropic para la API de Claude, en dólares estadounidenses por millón de tokens, consultados el 8 de octubre. El límite es <em>hasta</em> 100,000 tokens de prompt frente a <em>más de</em> 100,000; no es un precio que se aplique solo a los tokens que exceden el umbral. Consulte la <a href=\"https://platform.claude.com/docs/en/about-claude/pricing\">documentación de precios vigente</a> antes de usar las cifras en una previsión.</p><table><thead><tr><th>Categoría de token</th><th>Prompt de hasta 100k</th><th>Prompt de más de 100k</th></tr></thead><tbody><tr><td>Entrada sin caché</td><td>$0.10</td><td>$0.50</td></tr><tr><td>Salida</td><td>$0.50</td><td>$2.50</td></tr><tr><td>Escritura en caché de 5 minutos</td><td>$0.125</td><td>$0.625</td></tr><tr><td>Escritura en caché de 1 hora</td><td>$0.20</td><td>$1.00</td></tr><tr><td>Lectura de caché</td><td>$0.01</td><td>$0.05</td></tr></tbody></table><p>Cada tarifa por token indicada es cinco veces mayor por encima del límite. Eso <em>no</em> significa que toda la factura de una aplicación se multiplique por cinco: muchas llamadas pueden seguir siendo cortas, y el volumen de salida, el uso de caché, las herramientas, el procesamiento por lotes, los reintentos y el éxito de las tareas afectan al gasto total. <a href=\"https://platform.claude.com/docs/en/build-with-claude/context-windows\">El contexto en caché sigue ocupando el prompt</a>; un acierto de caché no convierte una solicitud de 120k tokens en un prompt corto.</p><h2>Cómo se ve el límite en una sola solicitud</h2><p>Considere dos llamadas ilustrativas sin caché ni herramientas facturadas por separado, cada una con 1,000 tokens de salida. Un prompt de 99,000 tokens cuesta aproximadamente <strong>$0.0104</strong> en entrada más salida con las tarifas de prompt corto. Un prompt de 101,000 tokens cuesta aproximadamente <strong>$0.0530</strong> con las tarifas de prompt largo. Es casi cinco veces más por una solicitud que solo tiene 2,000 tokens de entrada adicionales. El ejemplo mantiene fija la salida para aislar el límite de precios; no es un ahorro medido en producción. Los prompts reales también incluyen instrucciones de sistema, historial de conversación, esquemas de herramientas y resultados de herramientas.</p><h2>Recuente antes de migrar</h2><p>Las <a href=\"https://platform.claude.com/docs/en/models/haiku-5-5/whats-new-haiku-5-5\">notas de migración</a> de Anthropic indican que el mismo texto produce aproximadamente un 30% más de tokens en Haiku 5.5 que en Haiku 4.5, con variaciones según el contenido. Un prompt que parecía holgadamente por debajo de 100k con los recuentos antiguos puede cruzar el nuevo límite. No multiplique todos los recuentos antiguos por 1.3 para usarlo como previsión de factura; recuente solicitudes representativas con <code>claude-haiku-5-5</code>.</p><p>El <a href=\"https://platform.claude.com/docs/en/build-with-claude/token-counting\">endpoint de conteo de tokens</a> de Anthropic acepta el mensaje estructurado, el prompt de sistema y las herramientas de cliente compatibles antes de enviar la solicitud de generación. Cuente con el modelo de destino y luego registre el uso real tras la respuesta. El recuento previo es una estimación y puede diferir ligeramente de la entrada facturada; el contador no admite algunas herramientas de servidor ni bloques de URL o archivo. En esos casos, apóyese en el uso observado de las solicitudes y deje un margen de seguridad cerca del umbral.</p><h2>Una regla de presupuesto de prompts para subagentes</h2><ol><li><strong>Mida la distribución.</strong> Registre los recuentos de tokens de prompt de Haiku 5.5 por carga de trabajo, ID de modelo y resultado de la tarea. Observe cuántas llamadas se agrupan cerca de 100k o lo superan, en lugar de mirar solo el promedio.</li><li><strong>Avise antes del límite.</strong> Marque las solicitudes cercanas al umbral en el orquestador de agentes. Trate el nivel de aviso como su propio margen operativo, no como una regla de precios de Anthropic.</li><li><strong>Recorte la causa.</strong> Elimine fragmentos de recuperación duplicados, limite el tamaño de los resultados de herramientas o compacte el historial obsoleto donde las pruebas de calidad lo permitan. No descarte evidencia que un agente necesite solo para ahorrar tokens.</li><li><strong>Compare la cola larga.</strong> Para los prompts largos inevitables, pruebe Haiku en su nivel más alto frente a otra ruta con las mismas tareas. Compare el coste por resultado aceptado, la latencia y la frecuencia de respaldo, no solo los precios de lista.</li><li><strong>Concilie con la factura.</strong> Calcule el precio de la entrada, la salida y las lecturas y escrituras de caché reales en el nivel que corresponda, e incluya después las herramientas y los reintentos. Revise las tarifas del proveedor o de la plataforma en la nube y los descuentos contractuales.</li></ol><p>Haiku 5.5 puede seguir siendo la mejor opción por encima de 100k, pero debe ser una decisión de enrutamiento medida. El control importante es saber qué solicitudes cruzan la línea y por qué.</p><h2>Preguntas que se hacen los equipos</h2><h3>¿El precio más alto se aplica solo a los tokens por encima de 100k?</h3><p>No. Anthropic describe Haiku 5.5 como un modelo con precio según la longitud del prompt: un prompt de más de 100,000 tokens paga las tarifas publicadas más altas por esa solicitud.</p><h3>¿Puede el almacenamiento en caché mantener una solicitud larga en el nivel más barato?</h3><p>No. Los tokens reutilizados pueden recibir una tarifa de lectura de caché, pero el contexto en caché sigue ocupando la longitud del prompt. Cuente el prompt completo al comprobar el umbral.</p><h3>¿Está garantizado un aumento del 30% por el tokenizador?</h3><p>No. Anthropic indica aproximadamente un 30% más de tokens para el mismo texto que en Haiku 4.5, según el contenido. Cuente sus propios prompts en el modelo de destino.</p>",
+      "faq": [
+        {
+          "question": "¿El precio más alto se aplica solo a los tokens por encima de 100k?",
+          "answer": "No. Anthropic fija el precio de Haiku 5.5 según la longitud del prompt: una solicitud con más de 100,000 tokens de prompt usa las tarifas publicadas más altas."
+        },
+        {
+          "question": "¿Puede el almacenamiento en caché mantener una solicitud larga en el nivel más barato?",
+          "answer": "No. Los tokens en caché pueden recibir una tarifa de lectura más baja, pero siguen ocupando el contexto del prompt y cuentan al evaluar la longitud de la solicitud."
+        },
+        {
+          "question": "¿Está garantizado un aumento del 30% por el tokenizador?",
+          "answer": "No. Anthropic describe un aumento aproximado del 30% en el recuento de tokens para el mismo texto frente a Haiku 4.5, y el resultado exacto depende del contenido."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/context-window-paid-twice",
+          "label": "La ventana de contexto que se paga dos veces"
+        },
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "Coste por tarea exitosa"
+        },
+        {
+          "slug": "/research/three-agent-budgets",
+          "label": "Tres presupuestos para agentes autónomos"
+        }
+      ]
+    },
+    "fr": {
+      "title": "Claude Haiku 5.5 : le seuil tarifaire de 100k tokens",
+      "titleCore": "Claude Haiku 5.5 et le seuil tarifaire de 100k tokens",
+      "description": "Haiku 5.5 a un tarif bas pour les prompts courts, mais les longs passent à un palier plus cher. Recomptez les tokens, modélisez le seuil, budgétez les sous-agents.",
+      "body": "<p><strong>Le prix affiché de Claude Haiku 5.5 dépend de la longueur du prompt.</strong> Anthropic a <a href=\"https://www.anthropic.com/claude-haiku-5-5\">lancé le modèle le 7 octobre 2026</a> pour des usages à fort volume comme la classification, les résumés et les tâches de sous-agents. Sa fenêtre de contexte de 1 million de tokens ne garantit pas que tous ces tokens coûtent le tarif des prompts courts : un prompt de plus de 100,000 tokens relève d'un palier de prix plus élevé. La taille des requêtes devient donc une décision budgétaire, surtout pour les agents qui accumulent des documents et des résultats d'outils.</p><h2>La grille tarifaire a deux faces</h2><p>Voici les prix standard publiés par Anthropic pour l'API Claude, en dollars américains par million de tokens, relevés le 8 octobre. Le seuil sépare les prompts <em>jusqu'à</em> 100,000 tokens de ceux de <em>plus de</em> 100,000 ; ce n'est pas un prix appliqué uniquement aux tokens au-delà du seuil. Consultez la <a href=\"https://platform.claude.com/docs/en/about-claude/pricing\">documentation tarifaire en vigueur</a> avant d'utiliser ces chiffres dans une prévision.</p><table><thead><tr><th>Catégorie de token</th><th>Prompt jusqu'à 100k</th><th>Prompt au-delà de 100k</th></tr></thead><tbody><tr><td>Entrée sans cache</td><td>$0.10</td><td>$0.50</td></tr><tr><td>Sortie</td><td>$0.50</td><td>$2.50</td></tr><tr><td>Écriture en cache de 5 minutes</td><td>$0.125</td><td>$0.625</td></tr><tr><td>Écriture en cache d'1 heure</td><td>$0.20</td><td>$1.00</td></tr><tr><td>Lecture du cache</td><td>$0.01</td><td>$0.05</td></tr></tbody></table><p>Chaque tarif par token indiqué est cinq fois plus élevé au-dessus du seuil. Cela ne signifie <em>pas</em> que toute la facture d'une application est multipliée par cinq : beaucoup d'appels peuvent rester courts, et le volume de sortie, la mise en cache, les outils, le traitement par lots, les relances et le taux de réussite des tâches influencent tous la dépense totale. <a href=\"https://platform.claude.com/docs/en/build-with-claude/context-windows\">Le contexte mis en cache occupe toujours le prompt</a> ; un succès de cache ne transforme pas une requête de 120k tokens en prompt court.</p><h2>À quoi ressemble le seuil sur une seule requête</h2><p>Prenons deux appels illustratifs, sans cache ni outils facturés séparément, produisant chacun 1,000 tokens de sortie. Un prompt de 99,000 tokens coûte environ <strong>$0.0104</strong> en entrée et sortie aux tarifs des prompts courts. Un prompt de 101,000 tokens coûte environ <strong>$0.0530</strong> aux tarifs des prompts longs. C'est à peu près cinq fois plus pour une requête qui ne compte que 2,000 tokens d'entrée de plus. L'exemple garde la sortie fixe pour isoler le seuil tarifaire ; ce n'est pas une économie mesurée en production. Les vrais prompts contiennent aussi des instructions système, l'historique de conversation, des schémas d'outils et des résultats d'outils.</p><h2>Recomptez avant de migrer</h2><p>Les <a href=\"https://platform.claude.com/docs/en/models/haiku-5-5/whats-new-haiku-5-5\">notes de migration</a> d'Anthropic indiquent que le même texte produit environ 30 % de tokens en plus sur Haiku 5.5 que sur Haiku 4.5, avec des variations selon le contenu. Un prompt qui semblait nettement sous 100k avec les anciens décomptes peut franchir le nouveau seuil. Ne multipliez pas tous les anciens décomptes par 1.3 pour en faire une prévision de facture ; recomptez des requêtes représentatives avec <code>claude-haiku-5-5</code>.</p><p>Le <a href=\"https://platform.claude.com/docs/en/build-with-claude/token-counting\">endpoint de comptage de tokens</a> d'Anthropic accepte le message structuré, le prompt système et les outils client pris en charge avant l'envoi de la requête de génération. Comptez sur le modèle cible, puis consignez l'usage réel après la réponse. Le comptage préalable est une estimation et peut différer légèrement de l'entrée facturée ; certains outils serveur et blocs d'URL ou de fichiers ne sont pas pris en charge par le compteur. Pour ces cas, appuyez-vous sur l'usage observé des requêtes et gardez une marge de sécurité près du seuil.</p><h2>Une règle de budget de prompt pour les sous-agents</h2><ol><li><strong>Mesurez la distribution.</strong> Consignez les décomptes de tokens de prompt de Haiku 5.5 par charge de travail, identifiant de modèle et résultat de tâche. Observez combien d'appels se concentrent près de 100k ou le dépassent, plutôt que de regarder seulement la moyenne.</li><li><strong>Alertez avant le seuil.</strong> Signalez les requêtes proches du seuil dans l'orchestrateur d'agents. Considérez le niveau d'alerte comme votre propre marge opérationnelle, et non comme une règle tarifaire d'Anthropic.</li><li><strong>Réduisez la cause.</strong> Supprimez les fragments de récupération dupliqués, plafonnez la taille des résultats d'outils ou compactez l'historique périmé lorsque les tests de qualité le permettent. Ne supprimez pas les éléments dont un agent a besoin simplement pour économiser des tokens.</li><li><strong>Comparez la longue traîne.</strong> Pour les prompts longs inévitables, testez Haiku à son palier supérieur face à une autre route sur les mêmes tâches. Comparez le coût par résultat accepté, la latence et la fréquence de repli, pas seulement les prix catalogue.</li><li><strong>Rapprochez de la facture.</strong> Valorisez l'entrée, la sortie et les lectures et écritures de cache réelles au palier applicable, puis ajoutez les outils et les relances. Revérifiez les tarifs du fournisseur ou de la plateforme cloud ainsi que les remises contractuelles.</li></ol><p>Haiku 5.5 peut rester le meilleur choix au-delà de 100k, mais ce doit être une décision de routage mesurée. Le contrôle essentiel consiste à savoir quelles requêtes franchissent le seuil et pourquoi.</p><h2>Questions fréquentes des équipes</h2><h3>Le prix plus élevé ne s'applique-t-il qu'aux tokens au-dessus de 100k ?</h3><p>Non. Anthropic décrit Haiku 5.5 comme tarifé selon la longueur du prompt : un prompt de plus de 100,000 tokens paie les tarifs publiés plus élevés pour cette requête.</p><h3>Le cache de prompt peut-il maintenir une requête longue dans le palier moins cher ?</h3><p>Non. Les tokens réutilisés peuvent bénéficier d'un tarif de lecture du cache, mais le contexte mis en cache occupe toujours la longueur du prompt. Comptez le prompt complet lorsque vous vérifiez le seuil.</p><h3>Une hausse de 30 % due au tokenizer est-elle garantie ?</h3><p>Non. Anthropic indique environ 30 % de tokens en plus pour le même texte par rapport à Haiku 4.5, selon le contenu. Comptez vos propres prompts sur le modèle cible.</p>",
+      "faq": [
+        {
+          "question": "Le prix plus élevé ne s'applique-t-il qu'aux tokens au-dessus de 100k ?",
+          "answer": "Non. Anthropic tarife Haiku 5.5 selon la longueur du prompt : une requête de plus de 100,000 tokens de prompt utilise les tarifs publiés plus élevés."
+        },
+        {
+          "question": "Le cache de prompt peut-il maintenir une requête longue dans le palier moins cher ?",
+          "answer": "Non. Les tokens en cache peuvent bénéficier d'un tarif de lecture plus bas, mais ils occupent toujours le contexte du prompt et comptent dans l'évaluation de la longueur de la requête."
+        },
+        {
+          "question": "Une hausse de 30 % due au tokenizer est-elle garantie ?",
+          "answer": "Non. Anthropic décrit une hausse approximative de 30 % du nombre de tokens pour le même texte par rapport à Haiku 4.5, le résultat exact dépendant du contenu."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/context-window-paid-twice",
+          "label": "La fenêtre de contexte que vous payez deux fois"
+        },
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "Coût par tâche réussie"
+        },
+        {
+          "slug": "/research/three-agent-budgets",
+          "label": "Trois budgets pour les agents autonomes"
+        }
+      ]
+    },
+    "ja": {
+      "title": "Claude Haiku 5.5：100kトークンの価格しきい値",
+      "titleCore": "Claude Haiku 5.5と100kトークンの価格しきい値",
+      "description": "Haiku 5.5は短いプロンプトでは低料金ですが、長いプロンプトは高い料金帯になります。トークンを再計測し、境界をモデル化し、サブエージェントをタスク単位で予算化しましょう。",
+      "body": "<p><strong>Claude Haiku 5.5の表示価格は、プロンプトの長さによって変わります。</strong>Anthropicは分類、要約、サブエージェントのタスクといった大量処理向けに、<a href=\"https://www.anthropic.com/claude-haiku-5-5\">2026年10月7日にこのモデルをリリースしました</a>。100万トークンのコンテキストウィンドウは、そのすべてのトークンが短いプロンプトの料金になることを意味しません。100,000トークンを超えるプロンプトは、より高い料金帯が適用されます。そのためリクエストのサイズは予算上の判断となり、文書やツール結果を蓄積するエージェントでは特に重要です。</p><h2>料金表には2つの側面がある</h2><p>以下は、10月8日に確認したAnthropicのClaude API標準価格で、100万トークンあたりの米ドル建てです。境界は、プロンプトが100,000トークン<em>以下</em>か100,000トークン<em>超</em>かで決まり、しきい値を超えた分のトークンにだけ高い料金がかかるわけではありません。予測に使う前に、<a href=\"https://platform.claude.com/docs/en/about-claude/pricing\">最新の料金ドキュメント</a>をご確認ください。</p><table><thead><tr><th>トークン区分</th><th>プロンプト100k以下</th><th>プロンプト100k超</th></tr></thead><tbody><tr><td>キャッシュなしの入力</td><td>$0.10</td><td>$0.50</td></tr><tr><td>出力</td><td>$0.50</td><td>$2.50</td></tr><tr><td>5分間のキャッシュ書き込み</td><td>$0.125</td><td>$0.625</td></tr><tr><td>1時間のキャッシュ書き込み</td><td>$0.20</td><td>$1.00</td></tr><tr><td>キャッシュ読み取り</td><td>$0.01</td><td>$0.05</td></tr></tbody></table><p>記載されたトークン料金は、境界を超えるといずれも5倍になります。ただし、これはアプリケーションの請求額がすべて5倍になるという意味では<em>ありません</em>。多くの呼び出しは短いままかもしれず、出力量、キャッシュ、ツール、バッチ処理、再試行、タスクの成功率のすべてが総支出に影響します。<a href=\"https://platform.claude.com/docs/en/build-with-claude/context-windows\">キャッシュされたコンテキストもプロンプトを占有します</a>。キャッシュヒットがあっても、120kトークンのリクエストが短いプロンプトになるわけではありません。</p><h2>1回のリクエストで見る境界</h2><p>キャッシュも別課金のツールも使わず、どちらも出力が1,000トークンになる、2つの例示的な呼び出しを考えます。99,000トークンのプロンプトは、短いプロンプトの料金で入力と出力を合わせて約<strong>$0.0104</strong>です。101,000トークンのプロンプトは、長いプロンプトの料金で約<strong>$0.0530</strong>です。入力がわずか2,000トークン長いだけのリクエストで、およそ5倍になります。この例は価格の境界だけを切り出すために出力を固定しており、本番で計測した節約額ではありません。実際のプロンプトには、システム指示、会話履歴、ツールのスキーマ、ツールの結果も含まれます。</p><h2>移行前に再計測する</h2><p>Anthropicの<a href=\"https://platform.claude.com/docs/en/models/haiku-5-5/whats-new-haiku-5-5\">移行ノート</a>によると、同じテキストでもHaiku 5.5ではHaiku 4.5よりトークン数がおよそ30%多くなり、内容によって差があります。旧来のトークン数では100kを十分下回って見えたプロンプトが、新しい境界を超えることがあります。過去の数値をすべて1.3倍して請求額の予測とするのではなく、代表的なリクエストを<code>claude-haiku-5-5</code>で再計測してください。</p><p>Anthropicの<a href=\"https://platform.claude.com/docs/en/build-with-claude/token-counting\">トークンカウントのエンドポイント</a>は、生成リクエストを送る前に、構造化されたメッセージ、システムプロンプト、対応するクライアントツールを受け付けます。対象モデルでカウントし、レスポンス後に実際の使用量を記録してください。事前カウントは推定値であり、課金される入力とわずかに異なる場合があります。一部のサーバーツールやURL・ファイルのブロックは、このカウンターでは非対応です。そうした経路では、観測したリクエストの使用量に基づき、しきい値の近くには安全マージンを持たせてください。</p><h2>サブエージェント向けのプロンプト予算ルール</h2><ol><li><strong>分布を測る。</strong>Haiku 5.5のプロンプトトークン数を、ワークロード、モデルID、タスク結果ごとに記録します。平均だけでなく、100k付近や100k超に集中する呼び出しがどれだけあるかを見てください。</li><li><strong>境界の手前で警告する。</strong>エージェントのオーケストレーターで、しきい値に近いリクエストにフラグを立てます。警告レベルはAnthropicの価格ルールではなく、自社の運用上のマージンとして扱ってください。</li><li><strong>原因を削る。</strong>重複した検索チャンクの削除、ツール結果のサイズ上限、品質テストが許す範囲での古い履歴の圧縮を行います。トークンを節約するためだけに、エージェントが必要とする根拠を捨ててはいけません。</li><li><strong>ロングテールを比較する。</strong>避けられない長いプロンプトについては、より高い料金帯のHaikuを、同じタスクで別のルートと比較します。比較するのは定価だけでなく、受け入れられた結果あたりのコスト、レイテンシ、フォールバックの頻度です。</li><li><strong>請求書と照合する。</strong>実際の入力、出力、キャッシュの読み書きを該当する料金帯で計算し、そのうえでツールと再試行を加えます。プロバイダーまたはクラウドプラットフォームの料金と、契約上の割引も再確認してください。</li></ol><p>100kを超えてもHaiku 5.5が最良の選択である場合はありますが、それは計測に基づくルーティングの判断であるべきです。重要な統制は、どのリクエストが境界を越えるのか、そしてその理由を把握することです。</p><h2>チームからよくある質問</h2><h3>高い料金は100kを超えたトークンにだけ適用されますか？</h3><p>いいえ。AnthropicはHaiku 5.5をプロンプトの長さで価格設定していると説明しており、100,000トークンを超えるプロンプトは、そのリクエスト全体に高い公表料金が適用されます。</p><h3>プロンプトキャッシュで長いリクエストを安い料金帯に留められますか？</h3><p>いいえ。再利用されたトークンにはキャッシュ読み取り料金が適用されることがありますが、キャッシュされたコンテキストもプロンプトの長さを占有します。しきい値を確認する際は、プロンプト全体をカウントしてください。</p><h3>トークナイザーによる30%の増加は保証されていますか？</h3><p>いいえ。AnthropicはHaiku 4.5と比べて同じテキストでおよそ30%多くなると述べていますが、内容によって異なります。対象モデルで自社のプロンプトをカウントしてください。</p>",
+      "faq": [
+        {
+          "question": "高い料金は100kを超えたトークンにだけ適用されますか？",
+          "answer": "いいえ。AnthropicはHaiku 5.5をプロンプトの長さで価格設定しており、100,000トークンを超えるリクエストには、より高い公表料金が適用されます。"
+        },
+        {
+          "question": "プロンプトキャッシュで長いリクエストを安い料金帯に留められますか？",
+          "answer": "いいえ。キャッシュされたトークンには低いキャッシュ読み取り料金が適用されることがありますが、プロンプトのコンテキストを占有し、リクエストの長さの判定にも含まれます。"
+        },
+        {
+          "question": "トークナイザーによる30%の増加は保証されていますか？",
+          "answer": "いいえ。AnthropicはHaiku 4.5と比べて同じテキストでトークン数がおよそ30%増えると説明していますが、正確な結果は内容によって異なります。"
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/context-window-paid-twice",
+          "label": "二重に支払うコンテキストウィンドウ"
+        },
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "成功タスクあたりのコスト"
+        },
+        {
+          "slug": "/research/three-agent-budgets",
+          "label": "自律エージェントのための3つの予算"
+        }
+      ]
+    },
+    "pt": {
+      "title": "Claude Haiku 5.5: o limite de preço de 100k tokens",
+      "titleCore": "Claude Haiku 5.5 e o limite de preço de 100k tokens",
+      "description": "O Haiku 5.5 é barato em prompts curtos, mas os longos usam uma faixa mais cara. Reconte tokens, modele o limite e orce os subagentes por tarefa.",
+      "body": "<p><strong>O preço de vitrine do Claude Haiku 5.5 depende do tamanho do prompt.</strong> A Anthropic <a href=\"https://www.anthropic.com/claude-haiku-5-5\">lançou o modelo em 7 de outubro de 2026</a> para trabalho de alto volume, como classificação, resumos e tarefas de subagentes. Sua janela de contexto de 1 milhão de tokens não garante que todos esses tokens custem a tarifa de prompts curtos: um prompt com mais de 100,000 tokens usa uma faixa de preço mais alta. Isso faz do tamanho da requisição uma decisão orçamentária, principalmente para agentes que acumulam documentos e resultados de ferramentas.</p><h2>A tabela de preços tem dois lados</h2><p>Os valores a seguir são os preços padrão publicados pela Anthropic para a API do Claude, em dólares americanos por milhão de tokens, conferidos em 8 de outubro. O limite é <em>até</em> 100,000 tokens de prompt versus <em>mais de</em> 100,000; não é um preço cobrado apenas sobre os tokens que excedem o limite. Consulte a <a href=\"https://platform.claude.com/docs/en/about-claude/pricing\">documentação de preços atual</a> antes de usar os números em uma previsão.</p><table><thead><tr><th>Categoria de token</th><th>Prompt até 100k</th><th>Prompt acima de 100k</th></tr></thead><tbody><tr><td>Entrada sem cache</td><td>$0.10</td><td>$0.50</td></tr><tr><td>Saída</td><td>$0.50</td><td>$2.50</td></tr><tr><td>Escrita em cache de 5 minutos</td><td>$0.125</td><td>$0.625</td></tr><tr><td>Escrita em cache de 1 hora</td><td>$0.20</td><td>$1.00</td></tr><tr><td>Leitura de cache</td><td>$0.01</td><td>$0.05</td></tr></tbody></table><p>Cada tarifa de token listada é cinco vezes maior acima do limite. Isso <em>não</em> significa que toda a fatura de uma aplicação aumenta cinco vezes: muitas chamadas podem continuar curtas, e o volume de saída, o cache, as ferramentas, o processamento em lote, as novas tentativas e o sucesso das tarefas afetam o gasto total. <a href=\"https://platform.claude.com/docs/en/build-with-claude/context-windows\">O contexto em cache continua ocupando o prompt</a>; um acerto de cache não transforma uma requisição de 120k tokens em um prompt curto.</p><h2>Como o limite aparece em uma única requisição</h2><p>Considere duas chamadas ilustrativas, sem cache nem ferramentas cobradas separadamente, cada uma produzindo 1,000 tokens de saída. Um prompt de 99,000 tokens custa cerca de <strong>$0.0104</strong> em entrada mais saída nas tarifas de prompt curto. Um prompt de 101,000 tokens custa cerca de <strong>$0.0530</strong> nas tarifas de prompt longo. É aproximadamente cinco vezes mais por uma requisição com apenas 2,000 tokens de entrada a mais. O exemplo mantém a saída fixa para isolar o limite de preço; não é uma economia medida em produção. Prompts reais também incluem instruções de sistema, histórico de conversa, esquemas de ferramentas e resultados de ferramentas.</p><h2>Reconte antes de migrar</h2><p>As <a href=\"https://platform.claude.com/docs/en/models/haiku-5-5/whats-new-haiku-5-5\">notas de migração</a> da Anthropic dizem que o mesmo texto gera aproximadamente 30% mais tokens no Haiku 5.5 do que no Haiku 4.5, com variação conforme o conteúdo. Um prompt que parecia confortavelmente abaixo de 100k com as contagens antigas pode cruzar o novo limite. Não multiplique todas as contagens antigas por 1.3 e trate o resultado como previsão de fatura; reconte requisições representativas com <code>claude-haiku-5-5</code>.</p><p>O <a href=\"https://platform.claude.com/docs/en/build-with-claude/token-counting\">endpoint de contagem de tokens</a> da Anthropic aceita a mensagem estruturada, o prompt de sistema e as ferramentas de cliente compatíveis antes do envio da requisição de geração. Conte com o modelo de destino e registre o uso real depois da resposta. A contagem prévia é uma estimativa e pode diferir um pouco da entrada faturada; algumas ferramentas de servidor e blocos de URL ou arquivo não são compatíveis com o contador. Nesses caminhos, baseie-se no uso observado das requisições e mantenha uma margem de segurança perto do limite.</p><h2>Uma regra de orçamento de prompt para subagentes</h2><ol><li><strong>Meça a distribuição.</strong> Registre as contagens de tokens de prompt do Haiku 5.5 por carga de trabalho, ID do modelo e resultado da tarefa. Observe quantas chamadas se concentram perto de 100k ou o ultrapassam, em vez de olhar apenas a média.</li><li><strong>Avise antes do limite.</strong> Sinalize requisições próximas do limite no orquestrador de agentes. Trate o nível de aviso como sua própria margem operacional, não como uma regra de preço da Anthropic.</li><li><strong>Reduza a causa.</strong> Remova trechos de recuperação duplicados, limite o tamanho dos resultados de ferramentas ou compacte históricos antigos onde os testes de qualidade permitirem. Não descarte evidências de que um agente precisa só para economizar tokens.</li><li><strong>Compare a cauda longa.</strong> Para prompts longos inevitáveis, teste o Haiku na faixa mais alta contra outra rota nas mesmas tarefas. Compare custo por resultado aceito, latência e frequência de fallback, e não apenas os preços de tabela.</li><li><strong>Concilie com a fatura.</strong> Precifique a entrada, a saída e as leituras e escritas de cache reais na faixa aplicável e depois inclua ferramentas e novas tentativas. Reverifique as tarifas do provedor ou da plataforma de nuvem e quaisquer descontos contratuais.</li></ol><p>O Haiku 5.5 ainda pode ser a melhor escolha acima de 100k, mas isso deve ser uma decisão de roteamento medida. O controle importante é saber quais requisições cruzam a linha e por quê.</p><h2>Perguntas que as equipes fazem</h2><h3>O preço mais alto se aplica apenas aos tokens acima de 100k?</h3><p>Não. A Anthropic descreve o Haiku 5.5 como precificado pelo tamanho do prompt: um prompt com mais de 100,000 tokens paga as tarifas publicadas mais altas por aquela requisição.</p><h3>O cache de prompt pode manter uma requisição longa na faixa mais barata?</h3><p>Não. Tokens reutilizados podem receber a tarifa de leitura de cache, mas o contexto em cache continua ocupando o tamanho do prompt. Conte o prompt inteiro ao verificar o limite.</p><h3>Um aumento de 30% do tokenizador é garantido?</h3><p>Não. A Anthropic diz aproximadamente 30% mais tokens para o mesmo texto do que no Haiku 4.5, dependendo do conteúdo. Conte seus próprios prompts no modelo de destino.</p>",
+      "faq": [
+        {
+          "question": "O preço mais alto se aplica apenas aos tokens acima de 100k?",
+          "answer": "Não. A Anthropic precifica o Haiku 5.5 pelo tamanho do prompt: uma requisição com mais de 100,000 tokens de prompt usa as tarifas publicadas mais altas."
+        },
+        {
+          "question": "O cache de prompt pode manter uma requisição longa na faixa mais barata?",
+          "answer": "Não. Tokens em cache podem receber uma tarifa de leitura menor, mas ainda ocupam o contexto do prompt e contam na avaliação do tamanho da requisição."
+        },
+        {
+          "question": "Um aumento de 30% do tokenizador é garantido?",
+          "answer": "Não. A Anthropic descreve um aumento aproximado de 30% na contagem de tokens para o mesmo texto em relação ao Haiku 4.5, e o resultado exato depende do conteúdo."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/context-window-paid-twice",
+          "label": "A janela de contexto que você paga duas vezes"
+        },
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "Custo por tarefa bem-sucedida"
+        },
+        {
+          "slug": "/research/three-agent-budgets",
+          "label": "Três orçamentos para agentes autônomos"
+        }
       ]
     }
   }

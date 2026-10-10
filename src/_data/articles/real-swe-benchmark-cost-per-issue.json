@@ -55,6 +55,236 @@
           "label": "Pricing an open-weight model"
         }
       ]
+    },
+    "de": {
+      "title": "Real-SWE: Was ein gelöstes Issue wirklich kostet",
+      "titleCore": "Real-SWE: Kosten pro gelöstem Issue",
+      "description": "Real-SWE testet Modelle an privaten Unternehmens-Codebasen. Nützlich ist nicht die Erfolgsquote &mdash; sondern die Mischkosten pro gelöstem Issue.",
+      "body": "<p>Real-SWE erschien am 12. September 2026 und sammelte auf Hacker News 275 Punkte und 158 Kommentare. Die Prämisse ist genau das, was die meisten Kostenmodelle falsch machen: Benchmark-Suiten sind öffentlich, auswendig gelernt und nicht repräsentativ für den Code, den Ihre Agenten tatsächlich anfassen. Real-SWE lässt Modelle gegen private, reale Unternehmens-Repositories laufen.</p><h2>Warum die Kostenzahl wichtiger ist als der Score</h2><p>Ein öffentlicher Benchmark liefert Ihnen eine Erfolgsquote. Er liefert keine Kosten. Die Kosten pro gelöstem Issue brauchen drei Dinge gleichzeitig:</p><ul><li><strong>Erfolgsquote</strong> bei den schweren, privaten Aufgaben.</li><li><strong>Verbrauchte Tokens pro Versuch</strong>, einschließlich der Fehlschläge.</li><li><strong>Anzahl der Versuche</strong> &mdash; brauchte das Modell einen Retry, eine Planrevision, eine Schleife aus Diff-Vergleich und Neudenken?</li></ul><p>Multiplizieren Sie diese drei, erhalten Sie die einzige Zahl, die sich einer Budgetposition zuordnen lässt. Ein Modell, das 4 Punkte unter dem Spitzenreiter liegt, Issues aber in einem Versuch mit einem Drittel der Tokens löst, ist pro gelöstem Issue günstiger, und in einem echten Backlog summiert sich dieser Unterschied schneller, als es die Score-Lücke vermuten lässt.</p><h2>Warum öffentliche Benchmarks die Qualität überschätzen</h2><p>Unternehmens-Codebasen haben genau die Eigenschaften, die die Annahmen öffentlicher Benchmarks sprengen: lange interne Konventionen, undokumentierte Invarianten, Tests, die historische Zufälle festschreiben, und Build-Systeme, die niemand vollständig versteht. Ein Modell, das Muster in einem öffentlichen Repo erkennt, kann das nicht in einem Monorepo mit 400 Dateien und drei Jahren angesammelter Entscheidungen. Deshalb war ein viel diskutiertes Ergebnis in diesem Monat ein Open-Weights-Modell für kreatives Schreiben mit 27B, das auf Fable-5-Niveau arbeitet, zu einem gemeldeten 40x niedrigeren Preis &mdash; offene Gewichte starten mit einem Prior für das lokale Repository, den API-Modellen nicht haben.</p><h2>Die Rechnung</h2><p>Nehmen Sie ein reales Backend-Repo mit 40 Issues im Umfang. Angenommen, das günstigere Modell löst 22 in einem Versuch bei 60K Input / 8K Output, und das Premium-Modell löst 26 mit einem Retry-Multiplikator von 1.4x bei 90K Input / 14K Output. Zu Opus-5.5-Preisen ($4/$20, Cache-Lesezugriffe $0.20):</p><table><thead><tr><th>Modell</th><th>Gelöst</th><th>Kosten pro Issue</th><th>Gesamt</th></tr></thead><tbody><tr><td>Günstige Stufe</td><td>22</td><td>$0.32</td><td>$7.04</td></tr><td>Premium-Stufe</td><td>26</td><td>$0.61</td><td>$15.86</td></tr></tbody></table><p>Premium kostet 2.3x so viel insgesamt für 18 % mehr gelöste Issues. Bei einem Backlog von 40 Issues sind das $9 mehr. Derselbe Tausch bei 4,000 Issues pro Monat sind $880 &mdash; und er erkauft weiterhin nur 18 % mehr Durchsatz. Die günstige Stufe ist nicht offensichtlich falsch; Sie tauschen Lösungsquote gegen Volumen, und die richtige Antwort hängt davon ab, ob ein verpasstes Issue mehr als einen Dollar kostet.</p><h2>Was Sie messen sollten</h2><ol><li><strong>Kosten pro gelöstem Issue</strong>, nicht pro Versuch. Der Nenner sind gemergte PRs, nicht Requests.</li><li><strong>Retry-Multiplikator</strong> pro Modell. Ein Modell bei 1.4x liegt bei einem Drittel seines Listenpreises, bevor Sie irgendetwas anderes mitzählen.</li><li><strong>Tokens pro akzeptiertem Diff</strong>, einschließlich der Plan- und Selbstreview-Tokens, die der Diff nie zeigt.</li><li><strong>Minuten menschlichen Reviews</strong>. Ein um 12 % günstigeres Modell, dessen Review 20 % länger dauert, ist teurer.</li></ol><h2>Fazit</h2><p>Öffentliche Benchmarks ranken Fähigkeiten bei Aufgaben, die Ihrem Backlog nicht ähneln. Real-SWE ist ein früher Versuch der ehrlichen Version. Bis Sie ihn auf Ihren eigenen Repos laufen lassen, behandeln Sie jeden Modellvergleich als Hypothese über die Kosten pro gelöstem Issue und bepreisen Sie diese Hypothese mit Ihren eigenen Token-Zahlen.</p>",
+      "faq": [
+        {
+          "question": "Was ist Real-SWE?",
+          "answer": "Ein am 12. September 2026 veröffentlichter Benchmark, der Modelle an privaten, realen Unternehmens-Codebasen statt an öffentlichen Repositories bewertet. Er erhielt auf Hacker News 275 Punkte und 158 Kommentare."
+        },
+        {
+          "question": "Warum sind die Kosten pro gelöstem Issue besser als die Erfolgsquote?",
+          "answer": "Die Erfolgsquote ignoriert Token-Verbrauch und Versuchszahl. Zwei Modelle, die nur wenige Punkte auseinanderliegen, können sich bei den Kosten pro gelöstem Issue um 3x unterscheiden, sobald Retries, Planrevisionen und abgelehnte Diffs mitgezählt werden."
+        },
+        {
+          "question": "Wie berechne ich die Kosten pro gelöstem Issue intern?",
+          "answer": "Gesamtausgaben, die der agentischen Arbeit zuzurechnen sind, geteilt durch die gemergten PRs, zu denen der Agent wesentlich beigetragen hat. Erfassen Sie Retry-Multiplikator und Minuten menschlichen Reviews getrennt, denn beides sind echte Kosten."
+        },
+        {
+          "question": "Haben Open-Weights-Modelle bei privaten Codebasen einen Vorteil?",
+          "answer": "Sie starten mit einem Prior für das lokale Repository, den gehostete API-Modelle nicht haben. In diesem Monat wurde ein Open-Weights-Modell mit 27B auf Fable-5-Niveau zu einem etwa 40x niedrigeren Preis gemeldet, und das ist das Muster, das man beobachten sollte."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/real-cost-per-task-frontier-models",
+          "label": "Reale Kosten pro Task: Frontier-Modelle"
+        },
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "Kosten pro erfolgreichem Task"
+        },
+        {
+          "slug": "/research/heavy-agentic-coding-cost-claude-vs-qwen",
+          "label": "Kosten intensiven agentischen Codings: Claude vs. Qwen"
+        },
+        {
+          "slug": "/research/evals-cost-control",
+          "label": "Kostenkontrolle bei Evals"
+        },
+        {
+          "slug": "/research/pricing-an-open-weight-model",
+          "label": "Ein Open-Weights-Modell bepreisen"
+        }
+      ]
+    },
+    "es": {
+      "title": "Real-SWE: lo que cuesta de verdad resolver un issue",
+      "titleCore": "Coste de Real-SWE por issue resuelto",
+      "description": "Real-SWE evalúa modelos en bases de código empresariales privadas. La cifra útil no es la tasa de aciertos &mdash; es el coste mixto por issue resuelto.",
+      "body": "<p>Real-SWE se publicó el 12 de septiembre de 2026 y reunió 275 puntos y 158 comentarios en Hacker News. Su premisa es lo que la mayoría de los modelos de costes hace mal: las suites de benchmarks son públicas, están memorizadas y no representan el código que tus agentes tocan de verdad. Real-SWE ejecuta los modelos contra repositorios empresariales reales y privados.</p><h2>Por qué el coste importa más que la puntuación</h2><p>Un benchmark público te da una tasa de aciertos. No te da un coste. El coste por issue resuelto necesita tres cosas a la vez:</p><ul><li><strong>Tasa de aciertos</strong> en las tareas difíciles y privadas.</li><li><strong>Tokens consumidos por intento</strong>, incluidos los fallos.</li><li><strong>Número de intentos</strong> &mdash; ¿necesitó el modelo un reintento, una revisión del plan, un bucle de comparar el diff y replantear?</li></ul><p>Si los multiplicas, obtienes la única cifra que se corresponde con una partida contable. Un modelo que puntúa 4 puntos por debajo del líder, pero resuelve los issues en un intento y con un tercio de los tokens, sale más barato por issue resuelto, y en un backlog real esa diferencia se acumula más rápido de lo que sugiere la brecha de puntuación.</p><h2>Por qué los benchmarks públicos exageran la calidad</h2><p>Las bases de código empresariales tienen las propiedades que rompen los supuestos de los benchmarks públicos: convenciones internas largas, invariantes sin documentar, tests que codifican accidentes históricos y sistemas de build que nadie entiende del todo. Un modelo que reconoce patrones en un repositorio público no puede hacerlo en un monorepo de 400 archivos con tres años de decisiones acumuladas. Por eso un resultado muy comentado este mes fue el de un modelo de escritura creativa de 27B con pesos abiertos que rinde al nivel de Fable 5 con un precio, según se informa, 40x más barato &mdash; los pesos abiertos parten de un prior de repositorio local del que carecen los modelos de API.</p><h2>Hacer el cálculo</h2><p>Toma un repositorio backend real con 40 issues dentro del alcance. Supongamos que el modelo más barato resuelve 22 en un intento con 60K de entrada / 8K de salida, y el modelo premium resuelve 26 con un multiplicador de reintentos de 1.4x y 90K de entrada / 14K de salida. Con las tarifas de Opus 5.5 ($4/$20, lecturas de caché $0.20):</p><table><thead><tr><th>Modelo</th><th>Resueltos</th><th>Coste por issue</th><th>Total</th></tr></thead><tbody><tr><td>Nivel económico</td><td>22</td><td>$0.32</td><td>$7.04</td></tr><td>Nivel premium</td><td>26</td><td>$0.61</td><td>$15.86</td></tr></tbody></table><p>El premium cuesta 2.3x el total por un 18% más de issues resueltos. En un backlog de 40 issues son $9 más. El mismo intercambio con 4,000 issues al mes son $880 &mdash; y solo compra un 18% más de rendimiento. El nivel económico no es claramente un error; estás cambiando tasa de resolución por volumen, y la respuesta correcta depende de si un issue sin resolver cuesta más de un dólar.</p><h2>Qué instrumentar</h2><ol><li><strong>Coste por issue resuelto</strong>, no por intento. El denominador son los PR fusionados, no las solicitudes.</li><li><strong>Multiplicador de reintentos</strong> por modelo. Un modelo a 1.4x es un tercio de su precio de lista antes de contar nada más.</li><li><strong>Tokens por diff aceptado</strong>, incluidos los tokens de plan y autorrevisión que el diff nunca muestra.</li><li><strong>Minutos de revisión humana</strong>. Un modelo un 12% más barato que tarda un 20% más en revisarse resulta más caro.</li></ol><h2>Conclusión</h2><p>Los benchmarks públicos clasifican la capacidad en tareas que no se parecen a tu backlog. Real-SWE es un primer intento de la versión honesta. Hasta que lo ejecutes en tus propios repositorios, trata cada comparación de modelos como una hipótesis de coste por issue resuelto y valora esa hipótesis con tus propios recuentos de tokens.</p>",
+      "faq": [
+        {
+          "question": "¿Qué es Real-SWE?",
+          "answer": "Un benchmark publicado el 12 de septiembre de 2026 que evalúa modelos en bases de código empresariales reales y privadas en lugar de repositorios públicos. Reunió 275 puntos y 158 comentarios en Hacker News."
+        },
+        {
+          "question": "¿Por qué el coste por issue resuelto es mejor que la tasa de aciertos?",
+          "answer": "La tasa de aciertos ignora el consumo de tokens y el número de intentos. Dos modelos separados por unos pocos puntos pueden diferir 3x en coste por issue resuelto una vez que se cuentan los reintentos, las revisiones del plan y los diffs rechazados."
+        },
+        {
+          "question": "¿Cómo calculo internamente el coste por issue resuelto?",
+          "answer": "Gasto total atribuible al trabajo agéntico, dividido entre los PR fusionados a los que el agente contribuyó de forma material. Registra por separado el multiplicador de reintentos y los minutos de revisión humana, ya que ambos son costes reales."
+        },
+        {
+          "question": "¿Tienen los modelos de pesos abiertos ventaja en bases de código privadas?",
+          "answer": "Parten de un prior de repositorio local del que carecen los modelos de API alojados. Este mes se informó de un modelo de 27B con pesos abiertos al nivel de Fable 5 con un precio aproximadamente 40x más barato, que es el patrón a vigilar."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/real-cost-per-task-frontier-models",
+          "label": "Coste real por tarea: modelos de frontera"
+        },
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "Coste por tarea exitosa"
+        },
+        {
+          "slug": "/research/heavy-agentic-coding-cost-claude-vs-qwen",
+          "label": "Coste de programación agéntica intensiva: Claude frente a Qwen"
+        },
+        {
+          "slug": "/research/evals-cost-control",
+          "label": "Control de costes de las evaluaciones"
+        },
+        {
+          "slug": "/research/pricing-an-open-weight-model",
+          "label": "Cómo valorar un modelo de pesos abiertos"
+        }
+      ]
+    },
+    "fr": {
+      "title": "Real-SWE : ce que coûte vraiment une issue résolue",
+      "titleCore": "Coût Real-SWE par issue résolue",
+      "description": "Real-SWE teste les modèles sur des bases de code privées. Le chiffre utile n'est pas le taux de réussite &mdash; c'est le coût mixte par issue résolue.",
+      "body": "<p>Real-SWE est sorti le 12 septembre 2026 et a récolté 275 points et 158 commentaires sur Hacker News. Sa prémisse est ce que la plupart des modèles de coûts négligent : les suites de benchmarks sont publiques, mémorisées et peu représentatives du code que vos agents manipulent réellement. Real-SWE exécute les modèles sur des dépôts d'entreprise réels et privés.</p><h2>Pourquoi le coût compte plus que le score</h2><p>Un benchmark public vous donne un taux de réussite. Il ne vous donne pas un coût. Le coût par issue résolue exige trois éléments à la fois :</p><ul><li><strong>Le taux de réussite</strong> sur les tâches difficiles et privées.</li><li><strong>Les tokens consommés par tentative</strong>, échecs compris.</li><li><strong>Le nombre de tentatives</strong> &mdash; le modèle a-t-il eu besoin d'un nouvel essai, d'une révision du plan, d'une boucle de comparaison du diff et de reformulation ?</li></ul><p>Multipliez ces trois éléments et vous obtenez le seul chiffre qui correspond à une ligne budgétaire. Un modèle qui score 4 points sous le leader mais résout les issues en une tentative avec un tiers des tokens est moins cher par issue résolue, et sur un vrai backlog cet écart se cumule plus vite que ne le suggère l'écart de score.</p><h2>Pourquoi les benchmarks publics surestiment la qualité</h2><p>Les bases de code d'entreprise possèdent les propriétés qui font voler en éclats les hypothèses des benchmarks publics : de longues conventions internes, des invariants non documentés, des tests qui encodent des accidents historiques et des systèmes de build que personne ne comprend entièrement. Un modèle qui reconnaît des motifs dans un dépôt public ne peut pas le faire dans un monorepo de 400 fichiers et trois ans de décisions accumulées. C'est pourquoi un résultat très commenté ce mois-ci était celui d'un modèle d'écriture créative de 27B à poids ouverts, au niveau de Fable 5 pour un prix annoncé 40x moins élevé &mdash; les poids ouverts partent d'un a priori de dépôt local que les modèles d'API n'ont pas.</p><h2>Faire le calcul</h2><p>Prenez un vrai dépôt backend avec 40 issues dans le périmètre. Supposons que le modèle le moins cher en résolve 22 en une tentative avec 60K en entrée / 8K en sortie, et que le modèle premium en résolve 26 avec un multiplicateur de nouvelles tentatives de 1.4x et 90K en entrée / 14K en sortie. Aux tarifs d'Opus 5.5 ($4/$20, lectures de cache $0.20) :</p><table><thead><tr><th>Modèle</th><th>Résolues</th><th>Coût par issue</th><th>Total</th></tr></thead><tbody><tr><td>Palier économique</td><td>22</td><td>$0.32</td><td>$7.04</td></tr><td>Palier premium</td><td>26</td><td>$0.61</td><td>$15.86</td></tr></tbody></table><p>Le premium coûte 2.3x le total pour 18 % d'issues résolues en plus. Sur un backlog de 40 issues, cela fait $9 de plus. Le même arbitrage à 4,000 issues par mois représente $880 &mdash; et n'achète toujours que 18 % de débit supplémentaire. Le palier économique n'a rien d'évidemment mauvais ; vous échangez du taux de résolution contre du volume, et la bonne réponse dépend de la question de savoir si une issue manquée coûte plus d'un dollar.</p><h2>Ce qu'il faut instrumenter</h2><ol><li><strong>Le coût par issue résolue</strong>, pas par tentative. Le dénominateur, ce sont les PR fusionnées, pas les requêtes.</li><li><strong>Le multiplicateur de nouvelles tentatives</strong> par modèle. Un modèle à 1.4x pèse un tiers de son prix catalogue avant de compter quoi que ce soit d'autre.</li><li><strong>Les tokens par diff accepté</strong>, y compris les tokens de plan et d'auto-relecture que le diff ne montre jamais.</li><li><strong>Les minutes de relecture humaine</strong>. Un modèle 12 % moins cher qui demande 20 % de relecture en plus coûte plus cher.</li></ol><h2>En résumé</h2><p>Les benchmarks publics classent la capacité sur des tâches qui ne ressemblent pas à votre backlog. Real-SWE est une première tentative de version honnête. Tant que vous ne l'avez pas exécuté sur vos propres dépôts, traitez chaque comparaison de modèles comme une hypothèse de coût par issue résolue et chiffrez cette hypothèse avec vos propres volumes de tokens.</p>",
+      "faq": [
+        {
+          "question": "Qu'est-ce que Real-SWE ?",
+          "answer": "Un benchmark publié le 12 septembre 2026 qui évalue les modèles sur des bases de code d'entreprise réelles et privées plutôt que sur des dépôts publics. Il a récolté 275 points et 158 commentaires sur Hacker News."
+        },
+        {
+          "question": "Pourquoi le coût par issue résolue vaut-il mieux que le taux de réussite ?",
+          "answer": "Le taux de réussite ignore la consommation de tokens et le nombre de tentatives. Deux modèles séparés de quelques points peuvent différer de 3x en coût par issue résolue une fois comptés les nouveaux essais, les révisions du plan et les diffs rejetés."
+        },
+        {
+          "question": "Comment calculer en interne le coût par issue résolue ?",
+          "answer": "Dépense totale imputable au travail agentique, divisée par les PR fusionnées auxquelles l'agent a contribué de façon substantielle. Suivez séparément le multiplicateur de nouvelles tentatives et les minutes de relecture humaine, car ce sont deux coûts réels."
+        },
+        {
+          "question": "Les modèles à poids ouverts ont-ils un avantage sur les bases de code privées ?",
+          "answer": "Ils partent d'un a priori de dépôt local que les modèles d'API hébergés n'ont pas. Ce mois-ci, un modèle de 27B à poids ouverts a été signalé au niveau de Fable 5 pour un prix environ 40x moins élevé, ce qui est la tendance à surveiller."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/real-cost-per-task-frontier-models",
+          "label": "Coût réel par tâche : modèles de pointe"
+        },
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "Coût par tâche réussie"
+        },
+        {
+          "slug": "/research/heavy-agentic-coding-cost-claude-vs-qwen",
+          "label": "Coût du codage agentique intensif : Claude contre Qwen"
+        },
+        {
+          "slug": "/research/evals-cost-control",
+          "label": "Maîtrise des coûts des évaluations"
+        },
+        {
+          "slug": "/research/pricing-an-open-weight-model",
+          "label": "Tarifer un modèle à poids ouverts"
+        }
+      ]
+    },
+    "ja": {
+      "title": "Real-SWE：解決済みissueの本当のコスト",
+      "titleCore": "Real-SWEの解決済みissueあたりコスト",
+      "description": "Real-SWEは非公開のエンタープライズコードベースでモデルを評価します。重要なのは合格率ではなく、解決済みissueあたりの混合コストです。",
+      "body": "<p>Real-SWEは2026年9月12日に公開され、Hacker Newsで275ポイント、158コメントを集めました。その前提は、多くのコストモデルが見誤る部分です。ベンチマークスイートは公開されており、記憶されていて、エージェントが実際に触れるコードを代表していません。Real-SWEは、非公開の実在するエンタープライズリポジトリに対してモデルを実行します。</p><h2>スコアよりコストの数字が重要な理由</h2><p>公開ベンチマークから得られるのは合格率です。コストは得られません。解決済みissueあたりのコストには、次の3つが同時に必要です。</p><ul><li>難しい非公開タスクでの<strong>合格率</strong>。</li><li>失敗を含む、<strong>1回の試行あたりの消費トークン数</strong>。</li><li><strong>試行回数</strong>&mdash;モデルは再試行、計画の修正、差分を見直して考え直すループを必要としましたか。</li></ul><p>これらを掛け合わせると、費用項目に対応する唯一の数字が得られます。スコアがトップより4ポイント低くても、1回の試行で、3分の1のトークンでissueを解決するモデルは、解決済みissueあたりでは安くなります。実際のバックログでは、その差はスコア差が示唆するより速く積み上がります。</p><h2>公開ベンチマークが品質を過大評価する理由</h2><p>エンタープライズのコードベースには、公開ベンチマークの前提を崩す性質があります。長い社内規約、文書化されていない不変条件、過去の偶然を符号化したテスト、誰も完全には理解していないビルドシステムです。公開リポジトリでパターンを当てられるモデルでも、3年分の意思決定が積み重なった400ファイルのモノレポでは当てられません。だから今月広く議論された結果は、27Bのオープンウェイトの創作文章モデルがFable 5水準で動作し、価格は報告によれば40x安い、というものでした&mdash;オープンウェイトは、APIモデルにはないローカルリポジトリの事前知識から出発します。</p><h2>計算してみる</h2><p>対象のissueが40件ある実際のバックエンドリポジトリを考えます。安いモデルは入力60K / 出力8Kで、1回の試行で22件を解決し、プレミアムモデルは再試行倍率1.4x、入力90K / 出力14Kで26件を解決するとします。Opus 5.5の料金($4/$20、キャッシュ読み取り$0.20)では次のようになります。</p><table><thead><tr><th>モデル</th><th>解決数</th><th>issueあたりコスト</th><th>合計</th></tr></thead><tbody><tr><td>低価格帯</td><td>22</td><td>$0.32</td><td>$7.04</td></tr><td>プレミアム帯</td><td>26</td><td>$0.61</td><td>$15.86</td></tr></tbody></table><p>プレミアムは、解決数が18%増えるのに対し、合計コストは2.3xです。40件のバックログなら、差額は$9です。同じトレードオフを月4,000件で行うと$880になり&mdash;それでも得られるスループットは18%増えるだけです。低価格帯が明らかに間違いとは言えません。解決率とボリュームを交換しているのであり、正しい答えは、解決できなかったissue1件のコストが1ドルを超えるかどうかで決まります。</p><h2>計測すべきこと</h2><ol><li>試行あたりではなく、<strong>解決済みissueあたりのコスト</strong>。分母はリクエストではなく、マージされたPRです。</li><li>モデルごとの<strong>再試行倍率</strong>。1.4xのモデルは、他に何も数える前の時点で、定価の3分の1に相当します。</li><li>差分に現れない計画やセルフレビューのトークンを含む、<strong>承認された差分あたりのトークン数</strong>。</li><li><strong>人間のレビュー時間(分)</strong>。12%安くてもレビューに20%長くかかるモデルは、かえって高くつきます。</li></ol><h2>まとめ</h2><p>公開ベンチマークは、あなたのバックログとは似ていないタスクで能力を順位付けします。Real-SWEは、その誠実な版を目指す初期の試みです。自社のリポジトリで実行するまでは、あらゆるモデル比較を解決済みissueあたりコストの仮説として扱い、自社のトークン数でその仮説の価格を見積もってください。</p>",
+      "faq": [
+        {
+          "question": "Real-SWEとは何ですか？",
+          "answer": "2026年9月12日に公開されたベンチマークで、公開リポジトリではなく、非公開で実在するエンタープライズのコードベースでモデルを評価します。Hacker Newsで275ポイント、158コメントを集めました。"
+        },
+        {
+          "question": "合格率より解決済みissueあたりのコストのほうが優れているのはなぜですか？",
+          "answer": "合格率はトークン消費量と試行回数を無視します。数ポイントしか差がない2つのモデルでも、再試行、計画の修正、却下された差分を数えると、解決済みissueあたりのコストが3x違うことがあります。"
+        },
+        {
+          "question": "解決済みissueあたりのコストを社内でどう計算しますか？",
+          "answer": "エージェント作業に帰属する総支出を、エージェントが実質的に貢献したマージ済みPRの数で割ります。再試行倍率と人間のレビュー時間は、どちらも実際のコストなので、別々に追跡してください。"
+        },
+        {
+          "question": "非公開コードベースではオープンウェイトモデルが有利ですか？",
+          "answer": "ホスト型のAPIモデルにはない、ローカルリポジトリの事前知識から出発します。今月は、27BのオープンウェイトモデルがFable 5水準で、価格は約40x安いと報告されました。これが注目すべきパターンです。"
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/real-cost-per-task-frontier-models",
+          "label": "タスクあたりの実コスト：フロンティアモデル"
+        },
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "成功タスクあたりのコスト"
+        },
+        {
+          "slug": "/research/heavy-agentic-coding-cost-claude-vs-qwen",
+          "label": "ヘビーなエージェント型コーディングのコスト：ClaudeとQwen"
+        },
+        {
+          "slug": "/research/evals-cost-control",
+          "label": "評価のコスト管理"
+        },
+        {
+          "slug": "/research/pricing-an-open-weight-model",
+          "label": "オープンウェイトモデルの価格設定"
+        }
+      ]
+    },
+    "pt": {
+      "title": "Real-SWE: quanto custa de verdade resolver uma issue",
+      "titleCore": "Custo do Real-SWE por issue resolvida",
+      "description": "O Real-SWE avalia modelos em bases de código privadas. O número útil não é a taxa de acerto &mdash; é o custo combinado por issue resolvida.",
+      "body": "<p>O Real-SWE foi lançado em 12 de setembro de 2026 e somou 275 pontos e 158 comentários no Hacker News. A premissa é justamente o que a maioria dos modelos de custos erra: as suítes de benchmark são públicas, memorizadas e pouco representativas do código que seus agentes realmente tocam. O Real-SWE executa os modelos contra repositórios corporativos reais e privados.</p><h2>Por que o número de custo importa mais que a pontuação</h2><p>Um benchmark público dá uma taxa de acerto. Não dá um custo. O custo por issue resolvida exige três coisas ao mesmo tempo:</p><ul><li><strong>Taxa de acerto</strong> nas tarefas difíceis e privadas.</li><li><strong>Tokens consumidos por tentativa</strong>, incluindo as falhas.</li><li><strong>Número de tentativas</strong> &mdash; o modelo precisou de uma nova tentativa, de uma revisão do plano, de um ciclo de comparar o diff e repensar?</li></ul><p>Multiplique os três e você obtém o único número que corresponde a uma linha do orçamento. Um modelo que pontua 4 pontos abaixo do líder, mas resolve as issues em uma tentativa e com um terço dos tokens, sai mais barato por issue resolvida, e num backlog real essa diferença se acumula mais rápido do que a lacuna de pontuação sugere.</p><h2>Por que os benchmarks públicos superestimam a qualidade</h2><p>Bases de código corporativas têm as propriedades que quebram as premissas dos benchmarks públicos: longas convenções internas, invariantes sem documentação, testes que registram acidentes históricos e sistemas de build que ninguém entende por completo. Um modelo que reconhece padrões em um repositório público não consegue fazer isso num monorepo de 400 arquivos com três anos de decisões acumuladas. Por isso, um resultado muito comentado neste mês foi o de um modelo de escrita criativa de 27B com pesos abertos que opera no nível do Fable 5 por um preço, segundo relatos, 40x menor &mdash; pesos abertos partem de um prior de repositório local que os modelos de API não têm.</p><h2>Fazendo a conta</h2><p>Pegue um repositório de backend real com 40 issues no escopo. Digamos que o modelo mais barato resolva 22 em uma tentativa com 60K de entrada / 8K de saída, e o modelo premium resolva 26 com um multiplicador de novas tentativas de 1.4x e 90K de entrada / 14K de saída. Com as tarifas do Opus 5.5 ($4/$20, leituras de cache $0.20):</p><table><thead><tr><th>Modelo</th><th>Resolvidas</th><th>Custo por issue</th><th>Total</th></tr></thead><tbody><tr><td>Faixa econômica</td><td>22</td><td>$0.32</td><td>$7.04</td></tr><td>Faixa premium</td><td>26</td><td>$0.61</td><td>$15.86</td></tr></tbody></table><p>O premium custa 2.3x o total para 18% mais issues resolvidas. Num backlog de 40 issues, são $9 a mais. A mesma troca com 4,000 issues por mês dá $880 &mdash; e continua comprando apenas 18% a mais de vazão. A faixa econômica não está obviamente errada; você troca taxa de resolução por volume, e a resposta certa depende de uma issue não resolvida custar mais de um dólar.</p><h2>O que instrumentar</h2><ol><li><strong>Custo por issue resolvida</strong>, não por tentativa. O denominador são os PRs mesclados, não as requisições.</li><li><strong>Multiplicador de novas tentativas</strong> por modelo. Um modelo a 1.4x equivale a um terço do seu preço de tabela antes de você contar qualquer outra coisa.</li><li><strong>Tokens por diff aceito</strong>, incluindo os tokens de plano e de autorrevisão que o diff nunca mostra.</li><li><strong>Minutos de revisão humana</strong>. Um modelo 12% mais barato que leva 20% mais tempo para revisar sai mais caro.</li></ol><h2>Conclusão</h2><p>Os benchmarks públicos ranqueiam capacidade em tarefas que não se parecem com o seu backlog. O Real-SWE é uma tentativa inicial da versão honesta. Até você executá-lo nos seus próprios repositórios, trate toda comparação de modelos como uma hipótese de custo por issue resolvida e precifique essa hipótese com as suas próprias contagens de tokens.</p>",
+      "faq": [
+        {
+          "question": "O que é o Real-SWE?",
+          "answer": "Um benchmark lançado em 12 de setembro de 2026 que avalia modelos em bases de código corporativas reais e privadas, em vez de repositórios públicos. Ele somou 275 pontos e 158 comentários no Hacker News."
+        },
+        {
+          "question": "Por que o custo por issue resolvida é melhor que a taxa de acerto?",
+          "answer": "A taxa de acerto ignora o consumo de tokens e o número de tentativas. Dois modelos separados por poucos pontos podem diferir em 3x no custo por issue resolvida quando se contam novas tentativas, revisões do plano e diffs rejeitados."
+        },
+        {
+          "question": "Como calculo internamente o custo por issue resolvida?",
+          "answer": "Gasto total atribuível ao trabalho agêntico, dividido pelos PRs mesclados para os quais o agente contribuiu de forma material. Acompanhe separadamente o multiplicador de novas tentativas e os minutos de revisão humana, pois ambos são custos reais."
+        },
+        {
+          "question": "Modelos de pesos abertos têm vantagem em bases de código privadas?",
+          "answer": "Eles partem de um prior de repositório local que os modelos de API hospedados não têm. Neste mês, um modelo de 27B com pesos abertos foi relatado no nível do Fable 5 por um preço cerca de 40x menor, que é o padrão a observar."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/real-cost-per-task-frontier-models",
+          "label": "Custo real por tarefa: modelos de fronteira"
+        },
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "Custo por tarefa bem-sucedida"
+        },
+        {
+          "slug": "/research/heavy-agentic-coding-cost-claude-vs-qwen",
+          "label": "Custo de programação agêntica intensiva: Claude vs. Qwen"
+        },
+        {
+          "slug": "/research/evals-cost-control",
+          "label": "Controle de custos de avaliações"
+        },
+        {
+          "slug": "/research/pricing-an-open-weight-model",
+          "label": "Precificando um modelo de pesos abertos"
+        }
+      ]
     }
   }
 }

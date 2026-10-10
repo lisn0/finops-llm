@@ -52,6 +52,216 @@
           "label": "Cost per successful task"
         }
       ]
+    },
+    "de": {
+      "title": "Opus 5.5, 25 Stunden Agentenlauf: Kosten im Detail",
+      "titleCore": "Kostenanalyse eines lang laufenden Opus-5.5-Agenten",
+      "description": "Kostenaufschlüsselung eines 25-stündigen Agentenlaufs mit Opus 5.5 und 100K Zeilen: Token-Rechnung, Cache-Ersparnis und die günstige Modellalternative.",
+      "body": "<p>Eine Demo zeigte Opus 5.5, wie es ~25 Stunden lang autonom arbeitete, um einen vollständigen Minecraft-Klon zu bauen: ~100K Zeilen Spielcode, 26K Zeilen Tests, 1,000 automatisierte Tests, 775 Dateien, 783 generierte Bilder, 184 generierte Sounds und eine Anleitung im Spiel. Das ist der erste öffentliche Einblick in einen <strong>Coding-Agenten mit langem Horizont</strong> im großen Maßstab. Modellieren wir die Kosten.</p><h2>Schätzung des Token-Volumens</h2><p>Es gibt keine offiziellen Token-Zahlen. Wir modellieren sie anhand der erzeugten Artefakte:</p><table><thead><tr><th>Artefakt</th><th>Geschätzte Tokens</th><th>Hinweise</th></tr></thead><tbody><tr><td>100K Zeilen Spielcode</td><td>~3M Output</td><td>~30 Tokens/Zeile im Schnitt</td></tr><tr><td>26K Zeilen Tests</td><td>~0.8M Output</td><td>~30 Tokens/Zeile</td></tr><tr><td>775 Dateien (Struktur, Konfiguration)</td><td>~0.5M Output</td><td>Boilerplate + Imports</td></tr><tr><td>783 Bilder (Prompts + Metadaten)</td><td>~1.5M Input</td><td>~2K Tokens/Bild-Prompt</td></tr><tr><td>184 Sounds (Prompts + Metadaten)</td><td>~0.4M Input</td><td>~2K Tokens/Sound-Prompt</td></tr><tr><td>Anleitung im Spiel / Doku</td><td>~0.3M Output</td><td>Markdown + Code-Snippets</td></tr><tr><td>Kontext / Reasoning (25 Std.)</td><td>~10M Input</td><td>Tool-Aufrufe, Beobachtungen, Planung</td></tr><tr><td><strong>Gesamtschätzung</strong></td><td><strong>~12.4M Input / ~4.6M Output</strong></td><td></td></tr></tbody></table><h2>Kosten zu Opus-5.5-Preisen</h2><table><thead><tr><th>Token-Typ</th><th>Volumen</th><th>Preis</th><th>Kosten</th></tr></thead><tbody><tr><td>Input (ohne Cache, geschätzt 30 %)</td><td>3.7M</td><td>$4.00/MTok</td><td>$14.80</td></tr><tr><td>Input (aus dem Cache, geschätzt 70 %)</td><td>8.7M</td><td>$0.20/MTok</td><td>$1.74</td></tr><tr><td>Output</td><td>4.6M</td><td>$20.00/MTok</td><td>$92.00</td></tr><tr><td><strong>Gesamt</strong></td><td></td><td></td><td><strong>~$108.54</strong></td></tr></tbody></table><p><strong>~$109 für einen autonomen Agentenlauf von 25 Stunden, der ein auslieferbares Spiel erzeugt.</strong> Das sind ~$4.36/Stunde Agenten-Rechenzeit.</p><h2>Sensitivität: Die Cache-Trefferquote zählt am meisten</h2><table><thead><tr><th>Cache-Trefferquote</th><th>Input-Kosten</th><th>Gesamtkosten</th><th>Kosten/Stunde</th></tr></thead><tbody><tr><td>50 %</td><td>$24.80</td><td>$131.60</td><td>$5.26</td></tr><tr><td>70 % (Basis)</td><td>$16.54</td><td>$108.54</td><td>$4.34</td></tr><tr><td>90 %</td><td>$8.88</td><td>$92.88</td><td>$3.72</td></tr></tbody></table><p>Bei 90 % Cache-Treffern (mit gutem Kontextmanagement erreichbar) sinkt der Lauf auf <strong>$93 gesamt / $3.72/Std.</strong>.</p><h2>Vergleich: menschlicher Entwickler</h2><p>Ein Senior-Entwickler, der das allein baut: 3-6 Wochen (~120-240 Stunden) zu $100-200/Std. = $12K-$48K. Der Agentenlauf für $109 ist <strong>100-400x günstiger</strong> &mdash; aber nur, wenn die Qualität des Ergebnisses Ihr Release-Gate besteht.</p><h2>Was das für Ihr Agenten-Budget bedeutet</h2><ol><li><strong>Agenten mit langem Horizont sind bezahlbar.</strong> Unter $150 für einen komplexen 25-Stunden-Build verändert die ROI-Rechnung für Agent-first-Workflows.</li><li><strong>Der Cache ist der Hebel.</strong> Investieren Sie in Prompt-Caching-Infrastruktur &mdash; jede Verbesserung der Cache-Trefferquote um 10 % spart bei einem Lauf wie diesem ~$1.60.</li><li><strong>Output-Tokens dominieren.</strong> Bei $20/MTok macht der Output 85 % der Rechnung aus. Knappere Modelle (Anthropic behauptet 40 % weniger Wortreichtum) senken die Kosten direkt.</li><li><strong>Überwachen Sie pro Lauf, nicht pro Monat.</strong> Agenten-Workloads kommen in Schüben. Verfolgen Sie die Kosten pro abgeschlossener Aufgabe, nicht die aggregierten Monatsausgaben.</li></ol><h2>Weiterführende Lektüre</h2><p>Siehe <a href=\"/research/claude-opus-5-5-cost-model\">Kostenmodell für Claude Opus 5.5</a>, <a href=\"/research/agent-economics\">Agenten-Ökonomie</a>, <a href=\"/research/prompt-caching-economics\">Ökonomie des Prompt-Cachings</a> und <a href=\"/research/cost-per-successful-task\">Kosten pro erfolgreichem Task</a>.</p>",
+      "faq": [
+        {
+          "question": "Ist die Zahl von $109 exakt?",
+          "answer": "Nein &mdash; sie stammt aus einem Modell auf Basis der erzeugten Artefakte und der Opus-5.5-Listenpreise. Die tatsächlichen Token-Zahlen hängen von den konkreten Prompts, der Tool-Nutzung und dem Management des Kontextfensters ab. Betrachten Sie sie als Größenordnung."
+        },
+        {
+          "question": "Sind die Kosten für Bild- und Sound-Generierungs-APIs enthalten?",
+          "answer": "Nein. Die 783 Bilder und 184 Sounds wurden „per Code“ erzeugt &mdash; vermutlich über Diffusions-/TTS-APIs, die der Agent aufruft. Das sind separate Kosten (typischerweise $0.01-0.05/Bild, $0.01-0.10/Sekunde Audio)."
+        },
+        {
+          "question": "Wie schneidet das im Vergleich zu GPT-5 Soul für dieselbe Aufgabe ab?",
+          "answer": "Zu den Preisen von GPT-5 Soul ($5/$15) bei gleichen Token-Volumina: ~$69 Input + $69 Output = ~$138 (bei ähnlicher Cache-Quote). Opus 5.5 gewinnt beim Cache-Lesen ($0.20 gegenüber ~$0.50); beim Output ($20 gegenüber $15) ist es teurer, aber Anthropic behauptet, der Output sei 40 % weniger wortreich."
+        },
+        {
+          "question": "Kann ich das heute ausführen?",
+          "answer": "Opus 5.5 ist in der Claude API verfügbar. Der autonome 25-Stunden-Lauf erfordert eine eigene Agenten-Schleife (nicht einen einzelnen API-Aufruf). Architekturmuster finden Sie unter <a href=\"/research/agent-economics\">Agenten-Ökonomie</a>."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/claude-opus-5-5-cost-model",
+          "label": "Kostenmodell für Claude Opus 5.5"
+        },
+        {
+          "slug": "/research/agent-economics",
+          "label": "Agenten-Ökonomie"
+        },
+        {
+          "slug": "/research/prompt-caching-economics",
+          "label": "Ökonomie des Prompt-Cachings"
+        },
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "Kosten pro erfolgreichem Task"
+        }
+      ]
+    },
+    "es": {
+      "title": "Ejecución de 25 h de Opus 5.5: desglose de costes",
+      "titleCore": "Análisis de costes de un agente de larga duración con Opus 5.5",
+      "description": "Desglose del coste de una ejecución de agente Opus 5.5 de 25 horas con 100K líneas: cálculo de tokens, ahorro de caché y alternativa con un modelo barato.",
+      "body": "<p>Una demo mostró a Opus 5.5 trabajando de forma autónoma durante ~25 horas para construir un clon completo de Minecraft: ~100K líneas de código del juego, 26K líneas de tests, 1,000 tests automatizados, 775 archivos, 783 imágenes generadas, 184 sonidos generados y una guía dentro del juego. Es el primer vistazo público a un <strong>agente de programación de largo horizonte</strong> a escala. Vamos a modelar el coste.</p><h2>Estimación del volumen de tokens</h2><p>No hay recuentos oficiales de tokens. Lo modelaremos a partir de los artefactos de salida:</p><table><thead><tr><th>Artefacto</th><th>Tokens est.</th><th>Notas</th></tr></thead><tbody><tr><td>100K líneas de código del juego</td><td>~3M de salida</td><td>~30 tokens/línea de media</td></tr><tr><td>26K líneas de tests</td><td>~0.8M de salida</td><td>~30 tokens/línea</td></tr><tr><td>775 archivos (estructura, configuración)</td><td>~0.5M de salida</td><td>Código repetitivo + imports</td></tr><tr><td>783 imágenes (prompts + metadatos)</td><td>~1.5M de entrada</td><td>~2K tokens/prompt de imagen</td></tr><tr><td>184 sonidos (prompts + metadatos)</td><td>~0.4M de entrada</td><td>~2K tokens/prompt de sonido</td></tr><tr><td>Guía dentro del juego / documentación</td><td>~0.3M de salida</td><td>Markdown + fragmentos de código</td></tr><tr><td>Contexto / razonamiento (25 h)</td><td>~10M de entrada</td><td>Llamadas a herramientas, observaciones, planificación</td></tr><tr><td><strong>Estimación total</strong></td><td><strong>~12.4M de entrada / ~4.6M de salida</strong></td><td></td></tr></tbody></table><h2>Coste con los precios de Opus 5.5</h2><table><thead><tr><th>Tipo de token</th><th>Volumen</th><th>Tarifa</th><th>Coste</th></tr></thead><tbody><tr><td>Entrada (sin caché, est. 30%)</td><td>3.7M</td><td>$4.00/MTok</td><td>$14.80</td></tr><tr><td>Entrada (en caché, est. 70%)</td><td>8.7M</td><td>$0.20/MTok</td><td>$1.74</td></tr><tr><td>Salida</td><td>4.6M</td><td>$20.00/MTok</td><td>$92.00</td></tr><tr><td><strong>Total</strong></td><td></td><td></td><td><strong>~$108.54</strong></td></tr></tbody></table><p><strong>~$109 por una ejecución autónoma de agente de 25 horas que produce un juego listo para publicar.</strong> Son ~$4.36/hora de cómputo del agente.</p><h2>Sensibilidad: la tasa de aciertos de caché es lo que más pesa</h2><table><thead><tr><th>Tasa de aciertos de caché</th><th>Coste de entrada</th><th>Coste total</th><th>Coste/hora</th></tr></thead><tbody><tr><td>50%</td><td>$24.80</td><td>$131.60</td><td>$5.26</td></tr><tr><td>70% (base)</td><td>$16.54</td><td>$108.54</td><td>$4.34</td></tr><tr><td>90%</td><td>$8.88</td><td>$92.88</td><td>$3.72</td></tr></tbody></table><p>Con un 90% de aciertos de caché (alcanzable con una buena gestión del contexto), la ejecución baja a <strong>$93 en total / $3.72/h</strong>.</p><h2>Comparación: un desarrollador humano</h2><p>Un desarrollador sénior construyendo esto en solitario: 3-6 semanas (~120-240 horas) a $100-200/h = $12K-$48K. La ejecución del agente, a $109, es <strong>100-400x más barata</strong>, pero solo si la calidad del resultado supera tu barrera de lanzamiento.</p><h2>Qué significa esto para el presupuesto de tus agentes</h2><ol><li><strong>Los agentes de largo horizonte son asequibles.</strong> Menos de $150 por una construcción compleja de 25 horas cambia el cálculo del ROI de los flujos de trabajo centrados en agentes.</li><li><strong>La caché es la palanca.</strong> Invierte en infraestructura de prompt caching: cada mejora de 10% en la tasa de aciertos de caché ahorra ~$1.60 en una ejecución como esta.</li><li><strong>Los tokens de salida dominan.</strong> A $20/MTok, la salida es el 85% de la factura. Los modelos más concisos (Anthropic afirma que un 40% menos verbosos) recortan el coste directamente.</li><li><strong>Monitoriza por ejecución, no por mes.</strong> Las cargas de trabajo de agentes son irregulares. Sigue el coste por tarea completada, no el gasto mensual agregado.</li></ol><h2>Lecturas relacionadas</h2><p>Consulta <a href=\"/research/claude-opus-5-5-cost-model\">el modelo de costes de Claude Opus 5.5</a>, <a href=\"/research/agent-economics\">la economía de los agentes</a>, <a href=\"/research/prompt-caching-economics\">la economía del prompt caching</a> y <a href=\"/research/cost-per-successful-task\">el coste por tarea exitosa</a>.</p>",
+      "faq": [
+        {
+          "question": "¿Es exacta la cifra de $109?",
+          "answer": "No: es un modelo basado en los artefactos de salida y en los precios de lista de Opus 5.5. Los recuentos reales de tokens dependen de los prompts concretos, del uso de herramientas y de la gestión de la ventana de contexto. Tómala como orden de magnitud."
+        },
+        {
+          "question": "¿Incluye los costes de las API de generación de imágenes y sonido?",
+          "answer": "No. Las 783 imágenes y los 184 sonidos se generaron \"mediante código\", probablemente a través de API de difusión/TTS invocadas por el agente. Son costes aparte (normalmente $0.01-0.05/imagen, $0.01-0.10/segundo de audio)."
+        },
+        {
+          "question": "¿Cómo se compara con GPT-5 Soul para la misma tarea?",
+          "answer": "Con los precios de GPT-5 Soul ($5/$15) y los mismos volúmenes de tokens: ~$69 de entrada + $69 de salida = ~$138 (suponiendo una tasa de caché similar). Opus 5.5 gana en lectura de caché ($0.20 frente a ~$0.50); en salida ($20 frente a $15) es más caro, pero Anthropic afirma que su salida es un 40% menos verbosa."
+        },
+        {
+          "question": "¿Puedo ejecutarlo hoy?",
+          "answer": "Opus 5.5 está disponible en la API de Claude. La ejecución autónoma de 25 horas requiere un bucle de agente a medida (no una sola llamada a la API). Consulta <a href=\"/research/agent-economics\">la economía de los agentes</a> para ver patrones de arquitectura."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/claude-opus-5-5-cost-model",
+          "label": "Modelo de costes de Claude Opus 5.5"
+        },
+        {
+          "slug": "/research/agent-economics",
+          "label": "Economía de los agentes"
+        },
+        {
+          "slug": "/research/prompt-caching-economics",
+          "label": "Economía del prompt caching"
+        },
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "Coste por tarea exitosa"
+        }
+      ]
+    },
+    "fr": {
+      "title": "Agent Opus 5.5 sur 25 h : détail complet des coûts",
+      "titleCore": "Analyse du coût d'un agent Opus 5.5 de longue durée",
+      "description": "Détail des coûts d'une exécution d'agent Opus 5.5 de 25 heures produisant 100K lignes : calcul des tokens, économies de cache et alternative bon marché.",
+      "body": "<p>Une démo a montré Opus 5.5 travaillant de façon autonome pendant ~25 heures pour construire un clone complet de Minecraft : ~100K lignes de code de jeu, 26K lignes de tests, 1,000 tests automatisés, 775 fichiers, 783 images générées, 184 sons générés et un guide intégré au jeu. C'est le premier aperçu public d'un <strong>agent de codage à long horizon</strong> à grande échelle. Modélisons le coût.</p><h2>Estimer le volume de tokens</h2><p>Aucun décompte officiel de tokens n'a été publié. Nous le modélisons à partir des artefacts produits :</p><table><thead><tr><th>Artefact</th><th>Tokens est.</th><th>Notes</th></tr></thead><tbody><tr><td>100K lignes de code de jeu</td><td>~3M en sortie</td><td>~30 tokens/ligne en moyenne</td></tr><tr><td>26K lignes de tests</td><td>~0.8M en sortie</td><td>~30 tokens/ligne</td></tr><tr><td>775 fichiers (structure, configuration)</td><td>~0.5M en sortie</td><td>Code répétitif + imports</td></tr><tr><td>783 images (prompts + métadonnées)</td><td>~1.5M en entrée</td><td>~2K tokens/prompt d'image</td></tr><tr><td>184 sons (prompts + métadonnées)</td><td>~0.4M en entrée</td><td>~2K tokens/prompt de son</td></tr><tr><td>Guide intégré au jeu / docs</td><td>~0.3M en sortie</td><td>Markdown + extraits de code</td></tr><tr><td>Contexte / raisonnement (25 h)</td><td>~10M en entrée</td><td>Appels d'outils, observations, planification</td></tr><tr><td><strong>Estimation totale</strong></td><td><strong>~12.4M en entrée / ~4.6M en sortie</strong></td><td></td></tr></tbody></table><h2>Coût aux tarifs d'Opus 5.5</h2><table><thead><tr><th>Type de token</th><th>Volume</th><th>Tarif</th><th>Coût</th></tr></thead><tbody><tr><td>Entrée (hors cache, est. 30 %)</td><td>3.7M</td><td>$4.00/MTok</td><td>$14.80</td></tr><tr><td>Entrée (en cache, est. 70 %)</td><td>8.7M</td><td>$0.20/MTok</td><td>$1.74</td></tr><tr><td>Sortie</td><td>4.6M</td><td>$20.00/MTok</td><td>$92.00</td></tr><tr><td><strong>Total</strong></td><td></td><td></td><td><strong>~$108.54</strong></td></tr></tbody></table><p><strong>~$109 pour une exécution d'agent autonome de 25 heures qui produit un jeu prêt à être livré.</strong> Soit ~$4.36/heure de calcul d'agent.</p><h2>Sensibilité : le taux de succès du cache compte le plus</h2><table><thead><tr><th>Taux de succès du cache</th><th>Coût d'entrée</th><th>Coût total</th><th>Coût/heure</th></tr></thead><tbody><tr><td>50 %</td><td>$24.80</td><td>$131.60</td><td>$5.26</td></tr><tr><td>70 % (référence)</td><td>$16.54</td><td>$108.54</td><td>$4.34</td></tr><tr><td>90 %</td><td>$8.88</td><td>$92.88</td><td>$3.72</td></tr></tbody></table><p>Avec 90 % de succès du cache (atteignable avec une bonne gestion du contexte), l'exécution tombe à <strong>$93 au total / $3.72/h</strong>.</p><h2>Comparaison : un développeur humain</h2><p>Un développeur senior qui construit cela seul : 3-6 semaines (~120-240 heures) à $100-200/h = $12K-$48K. L'exécution de l'agent à $109 est <strong>100-400x moins chère</strong>, mais seulement si la qualité du résultat passe votre barrière de mise en production.</p><h2>Ce que cela implique pour le budget de vos agents</h2><ol><li><strong>Les agents à long horizon sont abordables.</strong> Moins de $150 pour une construction complexe de 25 heures change le calcul du ROI des workflows centrés sur les agents.</li><li><strong>Le cache est le levier.</strong> Investissez dans l'infrastructure de prompt caching : chaque amélioration de 10 % du taux de succès du cache économise ~$1.60 sur une exécution comme celle-ci.</li><li><strong>Les tokens de sortie dominent.</strong> À $20/MTok, la sortie représente 85 % de la facture. Les modèles plus concis (Anthropic affirme 40 % de verbosité en moins) réduisent directement le coût.</li><li><strong>Surveillez par exécution, pas par mois.</strong> Les charges de travail d'agents sont irrégulières. Suivez le coût par tâche accomplie, pas la dépense mensuelle agrégée.</li></ol><h2>Lectures associées</h2><p>Voir <a href=\"/research/claude-opus-5-5-cost-model\">le modèle de coûts de Claude Opus 5.5</a>, <a href=\"/research/agent-economics\">l'économie des agents</a>, <a href=\"/research/prompt-caching-economics\">l'économie du prompt caching</a> et <a href=\"/research/cost-per-successful-task\">le coût par tâche réussie</a>.</p>",
+      "faq": [
+        {
+          "question": "Le chiffre de $109 est-il exact ?",
+          "answer": "Non : c'est un modèle fondé sur les artefacts produits et sur les tarifs catalogue d'Opus 5.5. Les décomptes réels de tokens dépendent des prompts précis, de l'usage des outils et de la gestion de la fenêtre de contexte. À prendre comme un ordre de grandeur."
+        },
+        {
+          "question": "Cela inclut-il les coûts des API de génération d'images et de sons ?",
+          "answer": "Non. Les 783 images et les 184 sons ont été générés « par le code », probablement via des API de diffusion/TTS appelées par l'agent. Ce sont des coûts distincts (généralement $0.01-0.05/image, $0.01-0.10/seconde d'audio)."
+        },
+        {
+          "question": "Comment cela se compare-t-il à GPT-5 Soul pour la même tâche ?",
+          "answer": "Aux tarifs de GPT-5 Soul ($5/$15), avec les mêmes volumes de tokens : ~$69 en entrée + $69 en sortie = ~$138 (en supposant un taux de cache similaire). Opus 5.5 l'emporte sur la lecture du cache ($0.20 contre ~$0.50) ; en sortie ($20 contre $15) il est plus cher, mais Anthropic affirme que sa sortie est 40 % moins verbeuse."
+        },
+        {
+          "question": "Puis-je l'exécuter dès aujourd'hui ?",
+          "answer": "Opus 5.5 est disponible sur l'API Claude. L'exécution autonome de 25 heures nécessite une boucle d'agent sur mesure (et non un simple appel d'API). Voir <a href=\"/research/agent-economics\">l'économie des agents</a> pour des modèles d'architecture."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/claude-opus-5-5-cost-model",
+          "label": "Modèle de coûts de Claude Opus 5.5"
+        },
+        {
+          "slug": "/research/agent-economics",
+          "label": "Économie des agents"
+        },
+        {
+          "slug": "/research/prompt-caching-economics",
+          "label": "Économie du prompt caching"
+        },
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "Coût par tâche réussie"
+        }
+      ]
+    },
+    "ja": {
+      "title": "Opus 5.5の25時間エージェント実行：コスト全内訳",
+      "titleCore": "Opus 5.5の長時間エージェントのコスト分析",
+      "description": "100K行を生成したOpus 5.5の25時間エージェント実行のコスト内訳。トークン計算、キャッシュによる節約、安価なモデルという代替案を示します。",
+      "body": "<p>あるデモで、Opus 5.5が約25時間自律的に動作し、Minecraftの完全なクローンを構築する様子が公開されました。内訳は、約100K行のゲームコード、26K行のテスト、1,000件の自動テスト、775ファイル、783枚の生成画像、184個の生成サウンド、そしてゲーム内ガイドです。これは、<strong>長期ホライズンのコーディングエージェント</strong>を大規模に動かした初めての公開事例です。コストをモデル化してみましょう。</p><h2>トークン量の見積もり</h2><p>公式のトークン数は公開されていません。出力された成果物から推定します。</p><table><thead><tr><th>成果物</th><th>推定トークン数</th><th>備考</th></tr></thead><tbody><tr><td>100K行のゲームコード</td><td>出力 ~3M</td><td>平均 ~30トークン/行</td></tr><tr><td>26K行のテスト</td><td>出力 ~0.8M</td><td>~30トークン/行</td></tr><tr><td>775ファイル(構成、設定)</td><td>出力 ~0.5M</td><td>定型コード + import</td></tr><tr><td>783枚の画像(プロンプト + メタデータ)</td><td>入力 ~1.5M</td><td>画像プロンプトあたり ~2Kトークン</td></tr><tr><td>184個のサウンド(プロンプト + メタデータ)</td><td>入力 ~0.4M</td><td>サウンドプロンプトあたり ~2Kトークン</td></tr><tr><td>ゲーム内ガイド / ドキュメント</td><td>出力 ~0.3M</td><td>Markdown + コードスニペット</td></tr><tr><td>コンテキスト / 推論(25時間)</td><td>入力 ~10M</td><td>ツール呼び出し、観測、計画</td></tr><tr><td><strong>合計の推定</strong></td><td><strong>入力 ~12.4M / 出力 ~4.6M</strong></td><td></td></tr></tbody></table><h2>Opus 5.5の料金でのコスト</h2><table><thead><tr><th>トークン種別</th><th>量</th><th>単価</th><th>コスト</th></tr></thead><tbody><tr><td>入力(キャッシュなし、推定30%)</td><td>3.7M</td><td>$4.00/MTok</td><td>$14.80</td></tr><tr><td>入力(キャッシュ済み、推定70%)</td><td>8.7M</td><td>$0.20/MTok</td><td>$1.74</td></tr><tr><td>出力</td><td>4.6M</td><td>$20.00/MTok</td><td>$92.00</td></tr><tr><td><strong>合計</strong></td><td></td><td></td><td><strong>~$108.54</strong></td></tr></tbody></table><p><strong>出荷可能なゲームを生み出す25時間の自律エージェント実行で、約$109です。</strong>エージェントの計算コストにすると、1時間あたり約$4.36です。</p><h2>感度分析：最も効くのはキャッシュヒット率</h2><table><thead><tr><th>キャッシュヒット率</th><th>入力コスト</th><th>合計コスト</th><th>コスト/時間</th></tr></thead><tbody><tr><td>50%</td><td>$24.80</td><td>$131.60</td><td>$5.26</td></tr><tr><td>70%(基準)</td><td>$16.54</td><td>$108.54</td><td>$4.34</td></tr><tr><td>90%</td><td>$8.88</td><td>$92.88</td><td>$3.72</td></tr></tbody></table><p>キャッシュヒット率が90%(適切なコンテキスト管理で達成可能)なら、実行コストは<strong>合計$93 / 1時間あたり$3.72</strong>まで下がります。</p><h2>比較：人間の開発者</h2><p>シニア開発者が単独でこれを作る場合、3〜6週間(約120〜240時間)、時給$100〜200で、$12K〜$48Kになります。$109のエージェント実行は<strong>100〜400x安い</strong>ことになりますが、それは成果物の品質がリリース基準を満たす場合に限ります。</p><h2>エージェント予算にとっての意味</h2><ol><li><strong>長期ホライズンのエージェントは手が届く価格です。</strong>複雑な25時間のビルドが$150未満で済むことは、エージェントファーストのワークフローのROI計算を変えます。</li><li><strong>キャッシュが最大のレバーです。</strong>プロンプトキャッシュの基盤に投資してください。キャッシュヒット率が10%改善するごとに、このような実行で約$1.60節約できます。</li><li><strong>出力トークンが支配的です。</strong>$20/MTokでは、請求額の85%が出力です。より簡潔なモデル(Anthropicは冗長さが40%少ないと主張)は、コストを直接削減します。</li><li><strong>月ごとではなく、実行ごとに監視します。</strong>エージェントのワークロードは波があります。月次の合計支出ではなく、タスク完了あたりのコストを追跡してください。</li></ol><h2>関連記事</h2><p><a href=\"/research/claude-opus-5-5-cost-model\">Claude Opus 5.5のコストモデル</a>、<a href=\"/research/agent-economics\">エージェントの経済性</a>、<a href=\"/research/prompt-caching-economics\">プロンプトキャッシュの経済性</a>、<a href=\"/research/cost-per-successful-task\">成功タスクあたりのコスト</a>をご覧ください。</p>",
+      "faq": [
+        {
+          "question": "$109という数字は正確ですか？",
+          "answer": "いいえ。出力された成果物とOpus 5.5の定価に基づくモデルです。実際のトークン数は、具体的なプロンプト、ツールの使い方、コンテキストウィンドウの管理によって変わります。桁を把握するための目安として扱ってください。"
+        },
+        {
+          "question": "画像・サウンド生成APIのコストは含まれていますか？",
+          "answer": "含まれていません。783枚の画像と184個のサウンドは「コード経由」で生成されており、おそらくエージェントが呼び出す拡散モデル/TTSのAPIが使われています。これらは別のコストです(一般に画像1枚あたり$0.01-0.05、音声1秒あたり$0.01-0.10)。"
+        },
+        {
+          "question": "同じタスクをGPT-5 Soulで行うとどう比較できますか？",
+          "answer": "GPT-5 Soulの料金($5/$15)で同じトークン量なら、入力約$69 + 出力$69 = 約$138です(キャッシュ率は同程度と仮定)。Opus 5.5はキャッシュ読み取り($0.20対~$0.50)で優位です。出力($20対$15)は高いものの、Anthropicは出力の冗長さが40%少ないと主張しています。"
+        },
+        {
+          "question": "今日すぐに実行できますか？",
+          "answer": "Opus 5.5はClaude APIで利用できます。25時間の自律実行には、単一のAPI呼び出しではなく、独自のエージェントループが必要です。アーキテクチャのパターンは<a href=\"/research/agent-economics\">エージェントの経済性</a>をご覧ください。"
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/claude-opus-5-5-cost-model",
+          "label": "Claude Opus 5.5のコストモデル"
+        },
+        {
+          "slug": "/research/agent-economics",
+          "label": "エージェントの経済性"
+        },
+        {
+          "slug": "/research/prompt-caching-economics",
+          "label": "プロンプトキャッシュの経済性"
+        },
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "成功タスクあたりのコスト"
+        }
+      ]
+    },
+    "pt": {
+      "title": "Execução de 25 h do Opus 5.5: custo completo",
+      "titleCore": "Análise de custo de um agente de longa duração com Opus 5.5",
+      "description": "Detalhamento de custo de uma execução de agente de 25 horas com o Opus 5.5 gerando 100K linhas: conta de tokens, economia de cache e alternativa barata.",
+      "body": "<p>Uma demo mostrou o Opus 5.5 trabalhando de forma autônoma por ~25 horas para construir um clone completo de Minecraft: ~100K linhas de código do jogo, 26K linhas de testes, 1,000 testes automatizados, 775 arquivos, 783 imagens geradas, 184 sons gerados e um guia dentro do jogo. É o primeiro vislumbre público de um <strong>agente de programação de longo horizonte</strong> em escala. Vamos modelar o custo.</p><h2>Estimando o volume de tokens</h2><p>Não há contagens oficiais de tokens. Vamos modelar a partir dos artefatos produzidos:</p><table><thead><tr><th>Artefato</th><th>Tokens est.</th><th>Observações</th></tr></thead><tbody><tr><td>100K linhas de código do jogo</td><td>~3M de saída</td><td>~30 tokens/linha em média</td></tr><tr><td>26K linhas de testes</td><td>~0.8M de saída</td><td>~30 tokens/linha</td></tr><tr><td>775 arquivos (estrutura, configuração)</td><td>~0.5M de saída</td><td>Código repetitivo + imports</td></tr><tr><td>783 imagens (prompts + metadados)</td><td>~1.5M de entrada</td><td>~2K tokens/prompt de imagem</td></tr><tr><td>184 sons (prompts + metadados)</td><td>~0.4M de entrada</td><td>~2K tokens/prompt de som</td></tr><tr><td>Guia dentro do jogo / documentação</td><td>~0.3M de saída</td><td>Markdown + trechos de código</td></tr><tr><td>Contexto / raciocínio (25 h)</td><td>~10M de entrada</td><td>Chamadas de ferramentas, observações, planejamento</td></tr><tr><td><strong>Estimativa total</strong></td><td><strong>~12.4M de entrada / ~4.6M de saída</strong></td><td></td></tr></tbody></table><h2>Custo com os preços do Opus 5.5</h2><table><thead><tr><th>Tipo de token</th><th>Volume</th><th>Tarifa</th><th>Custo</th></tr></thead><tbody><tr><td>Entrada (sem cache, est. 30%)</td><td>3.7M</td><td>$4.00/MTok</td><td>$14.80</td></tr><tr><td>Entrada (em cache, est. 70%)</td><td>8.7M</td><td>$0.20/MTok</td><td>$1.74</td></tr><tr><td>Saída</td><td>4.6M</td><td>$20.00/MTok</td><td>$92.00</td></tr><tr><td><strong>Total</strong></td><td></td><td></td><td><strong>~$108.54</strong></td></tr></tbody></table><p><strong>~$109 por uma execução autônoma de agente de 25 horas que produz um jogo pronto para lançar.</strong> São ~$4.36/hora de computação do agente.</p><h2>Sensibilidade: a taxa de acerto do cache é o que mais pesa</h2><table><thead><tr><th>Taxa de acerto do cache</th><th>Custo de entrada</th><th>Custo total</th><th>Custo/hora</th></tr></thead><tbody><tr><td>50%</td><td>$24.80</td><td>$131.60</td><td>$5.26</td></tr><tr><td>70% (base)</td><td>$16.54</td><td>$108.54</td><td>$4.34</td></tr><tr><td>90%</td><td>$8.88</td><td>$92.88</td><td>$3.72</td></tr></tbody></table><p>Com 90% de acerto de cache (alcançável com boa gestão de contexto), a execução cai para <strong>$93 no total / $3.72/h</strong>.</p><h2>Comparação: um desenvolvedor humano</h2><p>Um desenvolvedor sênior construindo isso sozinho: 3-6 semanas (~120-240 horas) a $100-200/h = $12K-$48K. A execução do agente, a $109, é <strong>100-400x mais barata</strong> &mdash; mas só se a qualidade do resultado passar pelo seu critério de lançamento.</p><h2>O que isso significa para o orçamento dos seus agentes</h2><ol><li><strong>Agentes de longo horizonte são acessíveis.</strong> Menos de $150 por uma construção complexa de 25 horas muda a conta do ROI dos fluxos de trabalho centrados em agentes.</li><li><strong>O cache é a alavanca.</strong> Invista em infraestrutura de prompt caching &mdash; cada melhora de 10% na taxa de acerto do cache economiza ~$1.60 numa execução como esta.</li><li><strong>Os tokens de saída dominam.</strong> A $20/MTok, a saída é 85% da fatura. Modelos mais concisos (a Anthropic afirma 40% menos verbosidade) reduzem o custo diretamente.</li><li><strong>Monitore por execução, não por mês.</strong> As cargas de trabalho de agentes são irregulares. Acompanhe o custo por tarefa concluída, não o gasto mensal agregado.</li></ol><h2>Leituras relacionadas</h2><p>Veja <a href=\"/research/claude-opus-5-5-cost-model\">o modelo de custos do Claude Opus 5.5</a>, <a href=\"/research/agent-economics\">a economia dos agentes</a>, <a href=\"/research/prompt-caching-economics\">a economia do prompt caching</a> e <a href=\"/research/cost-per-successful-task\">o custo por tarefa bem-sucedida</a>.</p>",
+      "faq": [
+        {
+          "question": "O valor de $109 é exato?",
+          "answer": "Não &mdash; é um modelo baseado nos artefatos produzidos e nos preços de tabela do Opus 5.5. As contagens reais de tokens dependem dos prompts específicos, do uso de ferramentas e da gestão da janela de contexto. Trate como ordem de grandeza."
+        },
+        {
+          "question": "Isso inclui os custos das APIs de geração de imagens e sons?",
+          "answer": "Não. As 783 imagens e os 184 sons foram gerados \"por meio de código\" &mdash; provavelmente via APIs de difusão/TTS chamadas pelo agente. São custos à parte (tipicamente $0.01-0.05/imagem, $0.01-0.10/segundo de áudio)."
+        },
+        {
+          "question": "Como isso se compara ao GPT-5 Soul para a mesma tarefa?",
+          "answer": "Com os preços do GPT-5 Soul ($5/$15) e os mesmos volumes de tokens: ~$69 de entrada + $69 de saída = ~$138 (supondo taxa de cache semelhante). O Opus 5.5 ganha na leitura de cache ($0.20 contra ~$0.50); na saída ($20 contra $15) é mais caro, mas a Anthropic afirma que a saída é 40% menos verbosa."
+        },
+        {
+          "question": "Posso executar isso hoje?",
+          "answer": "O Opus 5.5 está disponível na API do Claude. A execução autônoma de 25 horas exige um loop de agente personalizado (não uma única chamada de API). Veja <a href=\"/research/agent-economics\">a economia dos agentes</a> para padrões de arquitetura."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/claude-opus-5-5-cost-model",
+          "label": "Modelo de custos do Claude Opus 5.5"
+        },
+        {
+          "slug": "/research/agent-economics",
+          "label": "Economia dos agentes"
+        },
+        {
+          "slug": "/research/prompt-caching-economics",
+          "label": "Economia do prompt caching"
+        },
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "Custo por tarefa bem-sucedida"
+        }
+      ]
     }
   }
 }

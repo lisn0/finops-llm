@@ -1,6 +1,11 @@
 {
   "slug": "research/openai-prompt-cache-diagnostics-cost",
-  "tags": ["finops", "prompt-caching", "cost-attribution", "openai"],
+  "tags": [
+    "finops",
+    "prompt-caching",
+    "cost-attribution",
+    "openai"
+  ],
   "datePublished": "2026-09-26",
   "dateModified": "2026-09-26",
   "image": "https://finopsllm.com/og.png",
@@ -26,9 +31,188 @@
         }
       ],
       "related": [
-        { "slug": "/research/prompt-caching-economics", "label": "Prompt caching economics" },
-        { "slug": "/research/prompt-cache-attribution", "label": "Prompt-cache attribution" },
-        { "slug": "/research/cost-per-successful-task", "label": "Cost per successful task" }
+        {
+          "slug": "/research/prompt-caching-economics",
+          "label": "Prompt caching economics"
+        },
+        {
+          "slug": "/research/prompt-cache-attribution",
+          "label": "Prompt-cache attribution"
+        },
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "Cost per successful task"
+        }
+      ]
+    },
+    "de": {
+      "title": "Den Cache-Miss hinter Ihrer OpenAI-Rechnung finden",
+      "titleCore": "Den Cache-Miss hinter Ihrer OpenAI-Rechnung finden",
+      "description": "Mit OpenAI Prompt Cache Diagnostics unerwartete Cache-Misses aufspüren, versehentliche Präfixänderungen beheben und Einsparungen anhand abgerechneter Tokens prüfen.",
+      "body": "<p>Ein Prompt-Cache-Dashboard kann Ihnen sagen, dass die Wiederverwendung gesunken ist. Es kann Ihnen von sich aus nicht sagen, welche Änderung an der Anfrage den Rückgang verursacht hat oder wie viel er gekostet hat. Mit dem <a href=\"https://developers.openai.com/api/docs/changelog\">Release vom 8. September 2026</a> hat OpenAI Prompt Cache Diagnostics in der Responses API für GPT-5.6 und später unterstützte Modelle allgemein verfügbar gemacht. Der nützliche FinOps-Schritt besteht darin, einen Rückgang der gecachten Tokens in eine kurze, wiederholbare Untersuchung zu verwandeln.</p><h2>Die Anfrage mit dem Miss vergleichen</h2><p>Speichern Sie die ID einer aktuellen, abgeschlossenen Antwort, deren Präfix Sie wiederverwendet erwartet hatten. Setzen Sie bei der nächsten vergleichbaren Anfrage an die Responses API derselben Organisation <code>prompt_cache_options.comparison_response_id</code> auf diese ID. Lesen Sie dann <code>prompt_cache_diagnostics</code> in der neuen Antwort, zusammen mit <code>usage.input_tokens_details.cached_tokens</code>. Die Vergleichsoption fordert eine Diagnose an; sie lädt die frühere Konversation nicht und ändert das Cache-Verhalten nicht. Der <a href=\"https://developers.openai.com/api/docs/guides/prompt-caching/diagnostics\">Diagnostics-Leitfaden</a> von OpenAI enthält funktionierende Anfragebeispiele.</p><pre><code>const next = await client.responses.create({\n  model: model,\n  instructions: stableInstructions,\n  input: nextInput,\n  tools: stableTools,\n  prompt_cache_options: { comparison_response_id: baseline.id }\n});\nconsole.log(next.prompt_cache_diagnostics);\nconsole.log(next.usage.input_tokens_details.cached_tokens);</code></pre><p>Das Snippet setzt voraus, dass <code>baseline</code> eine aktuelle, abgeschlossene Antwort ist und die übrigen Variablen Ihre eigenen Anfragedaten sind. Halten Sie ein stabiles Präfix, das lang genug zum Cachen ist: OpenAI dokumentiert für GPT-5.6 und später ein Minimum von 1,024 Tokens. Ein kleiner oder grundlegend anderer Prompt ist kein aussagekräftiger Cache-Miss-Test.</p><h2>Die Ursache beheben, nicht die Kennzahl</h2><p>Ein <code>cache_miss</code>-Ergebnis kann auf ein geändertes Modell, einen anderen Service-Tier, geänderte Tool-Definitionen oder deren Reihenfolge, den Cache-Schlüssel, das Antwortformat, den Reasoning-Aufwand, die Ausführlichkeit oder komprimierten Kontext hindeuten. Zum Beispiel kann die harmlos wirkende Umbenennung eines Tool-Schemas das wiederverwendbare Präfix ungültig machen. Vergleichen Sie die Anfragekonfiguration und die frühesten Prompt-Bytes, stellen Sie die Stabilität dort wieder her, wo die Änderung versehentlich war, und führen Sie den Vergleich erneut gegen dieselbe Baseline aus. OpenAI meldet die erste gefundene Ursache, daher kann nach der ersten Korrektur eine weitere auftauchen.</p><p>Erzwingen Sie keinen Treffer, wenn die Änderung bewusst erfolgte. Ein anderes Modell kann die Gesamtkosten der Aufgabe senken, auch wenn die Cache-Wiederverwendung verloren geht; Komprimierung kann den künftigen Kontext verkleinern. Bewerten Sie die gesamte Anfrage und Aufgabe, nicht die Cache-Trefferquote isoliert. Eine abgelaufene Baseline oder ein <code>unavailable</code>-Ergebnis ist nicht aussagekräftig und kein Beweis dafür, dass das Caching versagt hat.</p><h2>Den Befund in Geld übersetzen</h2><p><code>cache_missed_tokens</code> schätzt die verlorenen wiederverwendbaren Tokens relativ zur Vergleichsantwort. Das ist <em>keine</em> Zahl abgerechneter Tokens. Ein <code>cache_hit</code>-Ergebnis belegt ebenfalls keine Dollar-Einsparung. Für die realisierten Input-Kosten erfassen Sie pro Antwort die Summen von <code>input_tokens</code>, <code>cached_tokens</code> und <code>cache_write_tokens</code> und wenden dann den aktuellen Tarif für dieses Modell und diese Verarbeitungsstufe an. Für GPT-5.6 und später gibt der <a href=\"https://developers.openai.com/api/docs/guides/prompt-caching\">Prompt-Caching-Leitfaden</a> von OpenAI an, dass Cache-Lesezugriffe das 0.1-Fache des ungecachten Input-Tarifs und Cache-Schreibzugriffe das 1.25-Fache dieses Tarifs kosten.</p><pre><code>ordinary = input_tokens - cached_tokens - cache_write_tokens\nweighted_input = ordinary + 0.1 * cached_tokens + 1.25 * cache_write_tokens\ninput_cost = weighted_input * input_price_per_million / 1_000_000</code></pre><p>Das sind sich ausschließende Token-Kategorien: Addieren Sie keinen Cache-Write-Aufschlag auf Tokens, die bereits zum Schreibtarif gezählt wurden. Diese Formel deckt nur den Input ab; beziehen Sie bei der Berechnung der Kosten pro erfolgreicher Aufgabe Output, Tools, Wiederholungen und weitere Gebühren ein. Verwenden Sie die aktuelle Preisliste des Anbieters statt eines fest eingetragenen Preises aus diesem Artikel.</p><h2>Ein nützlicher wöchentlicher Check</h2><ol><li>Gruppieren Sie vergleichbaren Traffic nach Workload, Modell und Service-Tier; stellen Sie den Anteil gecachter Tokens und die Input-Kosten pro abgeschlossener Aufgabe dar.</li><li>Ziehen Sie eine Stichprobe einer plötzlichen Regression, vergleichen Sie sie mit einer aktuellen Baseline und dokumentieren Sie den Diagnosegrund und die verantwortliche Code-Änderung.</li><li>Beheben Sie versehentliche Drift bei Präfix oder Konfiguration; behalten Sie beabsichtigte Änderungen bei Qualität oder Routing bei, wenn sich die Gesamtwirtschaftlichkeit der Aufgabe verbessert.</li><li>Validieren Sie das Ergebnis mit repräsentativem Produktions-Traffic und gleichen Sie die beobachteten Einsparungen mit der Abrechnung ab.</li></ol><p>Die Diagnostics selbst verursachen keine zusätzliche Funktionsgebühr, aber zusätzliche Testanfragen werden normal abgerechnet. Der Gewinn ist nicht ein schöneres Trefferquoten-Diagramm. Es ist eine belastbare Erklärung dafür, warum sich die Input-Kosten eines bestimmten Workloads verändert haben, und ob die vorgeschlagene Korrektur die Rechnung tatsächlich gesenkt hat.</p><h2>Fragen, die Teams stellen</h2><h3>Beweist eine Cache-Hit-Diagnose, dass eine Anfrage günstiger war?</h3><p>Nein. Sie besagt, dass gegenüber der gewählten Baseline kein Miss erkannt wurde. Prüfen Sie die tatsächlichen <code>cached_tokens</code> und die bepreisten Token-Kategorien der Anfrage, bevor Sie Einsparungen behaupten.</p><h3>Können Diagnostics zwei beliebige OpenAI-Anfragen vergleichen?</h3><p>Nein. Verwenden Sie eine aktuelle, abgeschlossene Baseline derselben Organisation und erwarten Sie diesen Ablauf nur bei unterstützten Responses-API-Modellen ab GPT-5.6. Ein Vergleichsdatensatz kann ablaufen.</p><h3>Sollte jeder Cache-Miss beseitigt werden?</h3><p>Nein. Ein Modellwechsel, ein anderer Service-Tier oder komprimierter Kontext können beabsichtigt sein. Vergleichen Sie Qualität, Latenz und Kosten pro erfolgreicher Aufgabe, bevor Sie die Änderung rückgängig machen.</p>",
+      "faq": [
+        {
+          "question": "Beweist eine Cache-Hit-Diagnose, dass eine Anfrage günstiger war?",
+          "answer": "Nein. Sie bedeutet, dass gegenüber der gewählten Baseline kein Cache-Miss erkannt wurde. Prüfen Sie die tatsächlichen gecachten Tokens und die bepreisten Token-Kategorien, bevor Sie Einsparungen behaupten."
+        },
+        {
+          "question": "Können Diagnostics zwei beliebige OpenAI-Anfragen vergleichen?",
+          "answer": "Nein. Verwenden Sie eine aktuelle, abgeschlossene Baseline derselben Organisation bei einem unterstützten Responses-API-Modell ab GPT-5.6. Der Vergleichsdatensatz kann ablaufen."
+        },
+        {
+          "question": "Sollte jeder Cache-Miss beseitigt werden?",
+          "answer": "Nein. Modellwechsel, Änderungen des Service-Tiers und Kontextkomprimierung können beabsichtigt sein. Vergleichen Sie Qualität, Latenz und Kosten pro erfolgreicher Aufgabe, bevor Sie sie rückgängig machen."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/prompt-caching-economics",
+          "label": "Wirtschaftlichkeit von Prompt Caching"
+        },
+        {
+          "slug": "/research/prompt-cache-attribution",
+          "label": "Prompt-Cache-Zuordnung"
+        },
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "Kosten pro erfolgreicher Aufgabe"
+        }
+      ]
+    },
+    "es": {
+      "title": "El fallo de caché detrás de tu factura de OpenAI",
+      "titleCore": "El fallo de caché detrás de tu factura de OpenAI",
+      "description": "Usa OpenAI Prompt Cache Diagnostics para rastrear fallos de caché inesperados, corregir cambios accidentales de prefijo y verificar el ahorro en tokens facturados.",
+      "body": "<p>Un panel de caché de prompts puede decirte que la reutilización cayó. Por sí solo no puede decirte qué cambio en la solicitud provocó la caída ni cuánto costó. El <a href=\"https://developers.openai.com/api/docs/changelog\">lanzamiento del 8 de septiembre de 2026</a> de OpenAI hizo que Prompt Cache Diagnostics estuviera disponible de forma general en la Responses API para GPT-5.6 y los modelos compatibles posteriores. La jugada útil para FinOps es convertir una caída de tokens en caché en una investigación breve y repetible.</p><h2>Compara la solicitud que falló</h2><p>Guarda el ID de una respuesta reciente y completada cuyo prefijo esperabas reutilizar. En la siguiente solicitud comparable a la Responses API desde la misma organización, define <code>prompt_cache_options.comparison_response_id</code> con ese ID. Después lee <code>prompt_cache_diagnostics</code> en la nueva respuesta, junto con <code>usage.input_tokens_details.cached_tokens</code>. La opción de comparación solicita un diagnóstico; no carga la conversación anterior ni cambia el comportamiento de la caché. La <a href=\"https://developers.openai.com/api/docs/guides/prompt-caching/diagnostics\">guía de diagnósticos</a> de OpenAI incluye ejemplos de solicitudes que funcionan.</p><pre><code>const next = await client.responses.create({\n  model: model,\n  instructions: stableInstructions,\n  input: nextInput,\n  tools: stableTools,\n  prompt_cache_options: { comparison_response_id: baseline.id }\n});\nconsole.log(next.prompt_cache_diagnostics);\nconsole.log(next.usage.input_tokens_details.cached_tokens);</code></pre><p>El fragmento supone que <code>baseline</code> es una respuesta reciente y completada, y que las demás variables son los datos de tu propia solicitud. Mantén un prefijo estable lo bastante largo para almacenarse en caché: OpenAI documenta un mínimo de 1,024 tokens para GPT-5.6 y posteriores. Un prompt pequeño o radicalmente distinto no es una prueba significativa de fallo de caché.</p><h2>Corrige la causa, no la métrica</h2><p>Un resultado <code>cache_miss</code> puede apuntar a un cambio de modelo, nivel de servicio, definiciones u orden de herramientas, clave de caché, formato de respuesta, esfuerzo de razonamiento, verbosidad o contexto compactado. Por ejemplo, renombrar un esquema de herramienta, algo aparentemente inofensivo, puede invalidar el prefijo reutilizable. Compara la configuración de la solicitud y los primeros bytes del prompt, restablece la estabilidad donde el cambio fue accidental y vuelve a ejecutar la comparación contra la misma referencia. OpenAI informa de la primera causa que encuentra, así que puede aparecer otra tras la primera corrección.</p><p>No fuerces un acierto si el cambio fue deliberado. Un modelo distinto puede reducir el costo total de la tarea aunque pierda reutilización de caché; la compactación puede reducir el contexto futuro. Evalúa la solicitud y la tarea completas, no el porcentaje de aciertos de caché de forma aislada. Una referencia caducada o un resultado <code>unavailable</code> es no concluyente, no una prueba de que la caché falló.</p><h2>Traduce el hallazgo a dinero</h2><p><code>cache_missed_tokens</code> estima los tokens reutilizables perdidos respecto a la respuesta de comparación. <em>No</em> es un recuento de tokens facturados. Un resultado <code>cache_hit</code> tampoco establece un ahorro en dólares. Para el costo de entrada realizado, recopila el total de <code>input_tokens</code>, <code>cached_tokens</code> y <code>cache_write_tokens</code> de cada respuesta y aplica la tarifa vigente para ese modelo y nivel de procesamiento. Para GPT-5.6 y posteriores, la <a href=\"https://developers.openai.com/api/docs/guides/prompt-caching\">guía de prompt caching</a> de OpenAI indica que las lecturas de caché cuestan 0.1 veces la tarifa de entrada sin caché y las escrituras de caché cuestan 1.25 veces esa tarifa.</p><pre><code>ordinary = input_tokens - cached_tokens - cache_write_tokens\nweighted_input = ordinary + 0.1 * cached_tokens + 1.25 * cache_write_tokens\ninput_cost = weighted_input * input_price_per_million / 1_000_000</code></pre><p>Son categorías de tokens excluyentes: no sumes un recargo de escritura de caché a tokens que ya se contaron a la tarifa de escritura. Esta fórmula cubre solo la entrada; incluye la salida, las herramientas, los reintentos y otros cargos al calcular el costo por tarea exitosa. Usa la tabla de precios vigente del proveedor en lugar de un precio fijo copiado de este artículo.</p><h2>Una revisión semanal útil</h2><ol><li>Agrupa el tráfico comparable por carga de trabajo, modelo y nivel de servicio; grafica la proporción de tokens en caché y el costo de entrada por tarea completada.</li><li>Toma una muestra de una regresión repentina, compárala con una referencia reciente y registra el motivo del diagnóstico y el cambio de código responsable.</li><li>Corrige la deriva accidental de prefijo o configuración; conserva los cambios intencionales de calidad o enrutamiento si la economía total de la tarea mejora.</li><li>Valida el resultado con tráfico de producción representativo y concilia el ahorro observado con la facturación.</li></ol><p>Los diagnósticos en sí no tienen un cargo adicional por la función, pero las solicitudes de prueba extra se facturan normalmente. El beneficio no es un gráfico de tasa de aciertos más bonito. Es una explicación defendible de por qué cambió el costo de entrada de una carga de trabajo concreta, y de si la corrección propuesta realmente redujo su factura.</p><h2>Preguntas que se hacen los equipos</h2><h3>¿Un diagnóstico de cache hit demuestra que una solicitud fue más barata?</h3><p>No. Indica que no se detectó ningún fallo frente a la referencia seleccionada. Comprueba los <code>cached_tokens</code> reales y las categorías de tokens con precio de la solicitud antes de afirmar que hubo ahorro.</p><h3>¿Pueden los diagnósticos comparar dos solicitudes cualesquiera de OpenAI?</h3><p>No. Usa una referencia reciente y completada de la misma organización, y espera este flujo solo en modelos compatibles de la Responses API de GPT-5.6 y posteriores. Un registro de comparación puede caducar.</p><h3>¿Hay que eliminar todos los fallos de caché?</h3><p>No. Un cambio de modelo, un nivel de servicio distinto o un contexto compactado pueden ser intencionales. Compara calidad, latencia y costo por tarea exitosa antes de revertir el cambio.</p>",
+      "faq": [
+        {
+          "question": "¿Un diagnóstico de cache hit demuestra que una solicitud fue más barata?",
+          "answer": "No. Significa que no se detectó ningún fallo de caché frente a la referencia seleccionada. Comprueba los tokens en caché reales y las categorías de tokens con precio antes de afirmar que hubo ahorro."
+        },
+        {
+          "question": "¿Pueden los diagnósticos comparar dos solicitudes cualesquiera de OpenAI?",
+          "answer": "No. Usa una referencia reciente y completada de la misma organización en un modelo compatible de la Responses API de GPT-5.6 o posterior. El registro de comparación puede caducar."
+        },
+        {
+          "question": "¿Hay que eliminar todos los fallos de caché?",
+          "answer": "No. Los cambios de modelo, de nivel de servicio y la compactación de contexto pueden ser intencionales. Compara calidad, latencia y costo por tarea exitosa antes de revertirlos."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/prompt-caching-economics",
+          "label": "Economía del prompt caching"
+        },
+        {
+          "slug": "/research/prompt-cache-attribution",
+          "label": "Atribución de la caché de prompts"
+        },
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "Costo por tarea exitosa"
+        }
+      ]
+    },
+    "fr": {
+      "title": "Trouver le défaut de cache derrière votre facture OpenAI",
+      "titleCore": "Trouver le défaut de cache derrière votre facture OpenAI",
+      "description": "Avec OpenAI Prompt Cache Diagnostics, tracez les défauts de cache, corrigez les changements de préfixe accidentels et vérifiez les économies sur les tokens facturés.",
+      "body": "<p>Un tableau de bord du cache de prompts peut vous dire que la réutilisation a chuté. Il ne peut pas, à lui seul, vous dire quel changement de requête a provoqué la chute ni combien elle a coûté. La <a href=\"https://developers.openai.com/api/docs/changelog\">version du 8 septembre 2026</a> d'OpenAI a rendu Prompt Cache Diagnostics généralement disponible dans la Responses API pour GPT-5.6 et les modèles compatibles ultérieurs. Le bon réflexe FinOps consiste à transformer une baisse de tokens en cache en une enquête courte et reproductible.</p><h2>Comparez la requête qui a échoué</h2><p>Enregistrez l'ID d'une réponse récente et terminée dont vous attendiez que le préfixe soit réutilisé. Sur la requête comparable suivante à la Responses API, depuis la même organisation, définissez <code>prompt_cache_options.comparison_response_id</code> avec cet ID. Lisez ensuite <code>prompt_cache_diagnostics</code> dans la nouvelle réponse, avec <code>usage.input_tokens_details.cached_tokens</code>. L'option de comparaison demande un diagnostic ; elle ne charge pas la conversation précédente et ne modifie pas le comportement du cache. Le <a href=\"https://developers.openai.com/api/docs/guides/prompt-caching/diagnostics\">guide des diagnostics</a> d'OpenAI contient des exemples de requêtes fonctionnels.</p><pre><code>const next = await client.responses.create({\n  model: model,\n  instructions: stableInstructions,\n  input: nextInput,\n  tools: stableTools,\n  prompt_cache_options: { comparison_response_id: baseline.id }\n});\nconsole.log(next.prompt_cache_diagnostics);\nconsole.log(next.usage.input_tokens_details.cached_tokens);</code></pre><p>L'extrait suppose que <code>baseline</code> est une réponse récente et terminée, et que les autres variables sont les données de votre propre requête. Conservez un préfixe stable assez long pour être mis en cache : OpenAI documente un minimum de 1,024 tokens pour GPT-5.6 et les versions ultérieures. Un prompt court ou radicalement différent n'est pas un test de défaut de cache pertinent.</p><h2>Corrigez la cause, pas la métrique</h2><p>Un résultat <code>cache_miss</code> peut pointer vers un changement de modèle, de niveau de service, de définitions ou d'ordre des outils, de clé de cache, de format de réponse, d'effort de raisonnement, de verbosité ou de contexte compacté. Par exemple, le renommage d'un schéma d'outil, d'apparence anodine, peut invalider le préfixe réutilisable. Comparez la configuration de la requête et les premiers octets du prompt, rétablissez la stabilité là où le changement était accidentel, puis relancez la comparaison avec la même référence. OpenAI signale la première cause qu'il trouve : une autre peut donc apparaître après la première correction.</p><p>Ne forcez pas un succès si le changement était délibéré. Un autre modèle peut réduire le coût total de la tâche même en perdant la réutilisation du cache ; la compaction peut réduire le contexte futur. Jugez l'ensemble de la requête et de la tâche, pas le pourcentage de succès du cache isolément. Une référence expirée ou un résultat <code>unavailable</code> est non concluant, et ne prouve pas que le cache a échoué.</p><h2>Traduisez le constat en argent</h2><p><code>cache_missed_tokens</code> estime les tokens réutilisables perdus par rapport à la réponse de comparaison. Ce n'est <em>pas</em> un nombre de tokens facturés. De même, un résultat <code>cache_hit</code> n'établit pas d'économie en dollars. Pour le coût d'entrée réalisé, collectez le total de <code>input_tokens</code>, <code>cached_tokens</code> et <code>cache_write_tokens</code> de chaque réponse, puis appliquez le tarif en vigueur pour ce modèle et ce niveau de traitement. Pour GPT-5.6 et les versions ultérieures, le <a href=\"https://developers.openai.com/api/docs/guides/prompt-caching\">guide du prompt caching</a> d'OpenAI indique que les lectures de cache coûtent 0.1 fois le tarif d'entrée hors cache et les écritures de cache 1.25 fois ce tarif.</p><pre><code>ordinary = input_tokens - cached_tokens - cache_write_tokens\nweighted_input = ordinary + 0.1 * cached_tokens + 1.25 * cache_write_tokens\ninput_cost = weighted_input * input_price_per_million / 1_000_000</code></pre><p>Ces catégories de tokens sont exclusives : n'ajoutez pas de surcoût d'écriture de cache à des tokens déjà comptés au tarif d'écriture. Cette formule ne couvre que l'entrée ; incluez la sortie, les outils, les nouvelles tentatives et les autres frais pour calculer le coût par tâche réussie. Utilisez la grille tarifaire actuelle du fournisseur plutôt qu'un prix figé repris de cet article.</p><h2>Un contrôle hebdomadaire utile</h2><ol><li>Regroupez le trafic comparable par charge de travail, modèle et niveau de service ; tracez la part de tokens en cache et le coût d'entrée par tâche terminée.</li><li>Échantillonnez une régression soudaine, comparez-la à une référence récente et consignez la raison du diagnostic ainsi que le changement de code responsable.</li><li>Corrigez la dérive accidentelle du préfixe ou de la configuration ; conservez les changements volontaires de qualité ou de routage si l'économie globale de la tâche s'améliore.</li><li>Validez le résultat sur un trafic de production représentatif et rapprochez les économies observées de la facturation.</li></ol><p>Les diagnostics eux-mêmes n'entraînent aucun frais supplémentaire de fonctionnalité, mais les requêtes de test additionnelles sont facturées normalement. L'enjeu n'est pas un joli graphique de taux de succès. C'est une explication défendable de la raison pour laquelle le coût d'entrée d'une charge de travail donnée a changé, et de la capacité de la correction proposée à réduire réellement sa facture.</p><h2>Questions que se posent les équipes</h2><h3>Un diagnostic cache-hit prouve-t-il qu'une requête a coûté moins cher ?</h3><p>Non. Il indique qu'aucun défaut n'a été détecté par rapport à la référence choisie. Vérifiez les <code>cached_tokens</code> réels et les catégories de tokens tarifées de la requête avant d'annoncer des économies.</p><h3>Les diagnostics peuvent-ils comparer deux requêtes OpenAI quelconques ?</h3><p>Non. Utilisez une référence récente et terminée de la même organisation, et n'attendez ce flux que sur les modèles compatibles de la Responses API à partir de GPT-5.6. Un enregistrement de comparaison peut expirer.</p><h3>Faut-il supprimer chaque défaut de cache ?</h3><p>Non. Un changement de modèle, un autre niveau de service ou un contexte compacté peuvent être volontaires. Comparez qualité, latence et coût par tâche réussie avant d'annuler le changement.</p>",
+      "faq": [
+        {
+          "question": "Un diagnostic cache-hit prouve-t-il qu'une requête a coûté moins cher ?",
+          "answer": "Non. Il signifie qu'aucun défaut de cache n'a été détecté par rapport à la référence choisie. Vérifiez les tokens en cache réels et les catégories de tokens tarifées avant d'annoncer des économies."
+        },
+        {
+          "question": "Les diagnostics peuvent-ils comparer deux requêtes OpenAI quelconques ?",
+          "answer": "Non. Utilisez une référence récente et terminée de la même organisation sur un modèle compatible de la Responses API à partir de GPT-5.6. L'enregistrement de comparaison peut expirer."
+        },
+        {
+          "question": "Faut-il supprimer chaque défaut de cache ?",
+          "answer": "Non. Les changements de modèle, de niveau de service et la compaction du contexte peuvent être volontaires. Comparez qualité, latence et coût par tâche réussie avant de les annuler."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/prompt-caching-economics",
+          "label": "Économie du prompt caching"
+        },
+        {
+          "slug": "/research/prompt-cache-attribution",
+          "label": "Attribution du cache de prompts"
+        },
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "Coût par tâche réussie"
+        }
+      ]
+    },
+    "ja": {
+      "title": "OpenAI請求の裏にあるキャッシュミスを見つける",
+      "titleCore": "OpenAI請求の裏にあるキャッシュミスを見つける",
+      "description": "OpenAI Prompt Cache Diagnosticsで想定外のキャッシュミスを追跡し、意図しないプレフィックス変更を修正して、課金トークン使用量で削減効果を検証します。",
+      "body": "<p>プロンプトキャッシュのダッシュボードは、再利用率が下がったことを教えてくれます。しかし、それだけでは、どのリクエストの変更が低下を招いたのか、またそれにいくらかかったのかは分かりません。OpenAIの<a href=\"https://developers.openai.com/api/docs/changelog\">2026年9月8日のリリース</a>により、Prompt Cache DiagnosticsがGPT-5.6以降の対応モデル向けにResponses APIで一般提供となりました。FinOpsとして有効なのは、キャッシュ済みトークンの低下を、短く繰り返し実行できる調査に落とし込むことです。</p><h2>ミスしたリクエストを比較する</h2><p>プレフィックスが再利用されると見込んでいた、直近の完了済みレスポンスのIDを保存します。同じ組織からの次の比較可能なResponses APIリクエストで、<code>prompt_cache_options.comparison_response_id</code>にそのIDを設定します。その後、新しいレスポンスの<code>prompt_cache_diagnostics</code>を、<code>usage.input_tokens_details.cached_tokens</code>と合わせて確認します。比較オプションは診断を要求するだけで、以前の会話を読み込むことも、キャッシュの挙動を変えることもありません。OpenAIの<a href=\"https://developers.openai.com/api/docs/guides/prompt-caching/diagnostics\">診断ガイド</a>には、動作するリクエスト例が掲載されています。</p><pre><code>const next = await client.responses.create({\n  model: model,\n  instructions: stableInstructions,\n  input: nextInput,\n  tools: stableTools,\n  prompt_cache_options: { comparison_response_id: baseline.id }\n});\nconsole.log(next.prompt_cache_diagnostics);\nconsole.log(next.usage.input_tokens_details.cached_tokens);</code></pre><p>このスニペットは、<code>baseline</code>が直近の完了済みレスポンスであり、その他の変数が自社のリクエストデータであることを前提としています。キャッシュできるだけの長さの安定したプレフィックスを維持してください。OpenAIは、GPT-5.6以降の最小値を1,024トークンと定めています。小さいプロンプトや大きく異なるプロンプトは、意味のあるキャッシュミスのテストにはなりません。</p><h2>指標ではなく原因を直す</h2><p><code>cache_miss</code>の結果は、モデル、サービスティア、ツール定義またはその順序、キャッシュキー、レスポンス形式、推論の工数、冗長度、圧縮されたコンテキストのいずれかの変更を示している可能性があります。たとえば、一見無害なツールスキーマの名前変更でも、再利用可能なプレフィックスが無効になることがあります。リクエスト設定とプロンプトの先頭バイトを比較し、変更が意図しないものだった箇所は安定性を戻して、同じベースラインとの比較をやり直してください。OpenAIは最初に見つかった原因を報告するため、最初の修正後に別の原因が現れることがあります。</p><p>変更が意図的なものであれば、ヒットを無理に作る必要はありません。別のモデルは、キャッシュの再利用を失ってもタスク全体のコストを下げることがあります。圧縮は今後のコンテキストを減らせます。キャッシュヒット率だけを単独で見るのではなく、リクエストとタスク全体で判断してください。期限切れのベースラインや<code>unavailable</code>の結果は結論が出せないという意味であり、キャッシュが失敗した証拠ではありません。</p><h2>発見を金額に換算する</h2><p><code>cache_missed_tokens</code>は、比較レスポンスと比べて失われた再利用可能トークンの推定値です。課金トークン数では<em>ありません</em>。同様に、<code>cache_hit</code>の結果もドル単位の削減を裏付けるものではありません。実際の入力コストを求めるには、各レスポンスの<code>input_tokens</code>、<code>cached_tokens</code>、<code>cache_write_tokens</code>の合計を集め、そのモデルと処理ティアの現行レートを適用します。GPT-5.6以降について、OpenAIの<a href=\"https://developers.openai.com/api/docs/guides/prompt-caching\">プロンプトキャッシュのガイド</a>は、キャッシュ読み取りがキャッシュなしの入力レートの0.1倍、キャッシュ書き込みがそのレートの1.25倍のコストだと示しています。</p><pre><code>ordinary = input_tokens - cached_tokens - cache_write_tokens\nweighted_input = ordinary + 0.1 * cached_tokens + 1.25 * cache_write_tokens\ninput_cost = weighted_input * input_price_per_million / 1_000_000</code></pre><p>これらは互いに排他的なトークン区分です。すでに書き込みレートで数えたトークンに、キャッシュ書き込みの割増を重ねて加算しないでください。この式は入力のみが対象です。成功したタスクあたりのコストを計算する際は、出力、ツール、リトライ、その他の料金も含めてください。この記事の固定価格ではなく、プロバイダーの最新の料金表を使用してください。</p><h2>有効な週次チェック</h2><ol><li>比較可能なトラフィックをワークロード、モデル、サービスティアごとにグループ化し、キャッシュ済みトークンの割合と、完了タスクあたりの入力コストをグラフ化します。</li><li>急な悪化をサンプリングして直近のベースラインと比較し、診断の理由と原因となったコード変更を記録します。</li><li>意図しないプレフィックスや設定のドリフトを修正します。品質やルーティングの意図的な変更は、タスク全体の経済性が改善するなら維持します。</li><li>代表的な本番トラフィックで結果を検証し、観測された削減額を請求と突き合わせます。</li></ol><p>診断機能そのものに追加の機能料金はありませんが、追加のテストリクエストは通常どおり課金されます。見返りは、見栄えのよいヒット率のグラフではありません。特定のワークロードの入力コストがなぜ変わったのか、そして提案した修正が実際に請求額を下げたのかについて、説明責任を果たせる根拠を得られることです。</p><h2>チームからよくある質問</h2><h3>キャッシュヒットの診断は、リクエストが安かった証拠になりますか?</h3><p>いいえ。選択したベースラインと比べてミスが検出されなかったことを示すだけです。節約を主張する前に、実際の<code>cached_tokens</code>とリクエストの課金対象トークン区分を確認してください。</p><h3>診断は任意の2つのOpenAIリクエストを比較できますか?</h3><p>いいえ。同じ組織の直近の完了済みベースラインを使用してください。このワークフローは、GPT-5.6以降の対応するResponses APIモデルでのみ利用できます。比較レコードは期限切れになることがあります。</p><h3>すべてのキャッシュミスをなくすべきですか?</h3><p>いいえ。モデルの切り替え、別のサービスティア、圧縮されたコンテキストは意図的な場合があります。変更を元に戻す前に、品質、レイテンシ、成功したタスクあたりのコストを比較してください。</p>",
+      "faq": [
+        {
+          "question": "キャッシュヒットの診断は、リクエストが安かった証拠になりますか?",
+          "answer": "いいえ。選択したベースラインと比べてキャッシュミスが検出されなかったという意味です。節約を主張する前に、実際のキャッシュ済みトークンと課金対象のトークン区分を確認してください。"
+        },
+        {
+          "question": "診断は任意の2つのOpenAIリクエストを比較できますか?",
+          "answer": "いいえ。GPT-5.6以降の対応するResponses APIモデルで、同じ組織の直近の完了済みベースラインを使用してください。比較レコードは期限切れになることがあります。"
+        },
+        {
+          "question": "すべてのキャッシュミスをなくすべきですか?",
+          "answer": "いいえ。モデルの切り替え、サービスティアの変更、コンテキストの圧縮は意図的な場合があります。元に戻す前に、品質、レイテンシ、成功したタスクあたりのコストを比較してください。"
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/prompt-caching-economics",
+          "label": "プロンプトキャッシュの経済性"
+        },
+        {
+          "slug": "/research/prompt-cache-attribution",
+          "label": "プロンプトキャッシュの帰属"
+        },
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "成功したタスクあたりのコスト"
+        }
+      ]
+    },
+    "pt": {
+      "title": "O cache miss por trás da sua fatura da OpenAI",
+      "titleCore": "O cache miss por trás da sua fatura da OpenAI",
+      "description": "Use o OpenAI Prompt Cache Diagnostics para rastrear cache misses inesperados, corrigir mudanças acidentais de prefixo e verificar a economia pelos tokens faturados.",
+      "body": "<p>Um painel de cache de prompts pode dizer que a reutilização caiu. Sozinho, ele não consegue dizer qual mudança na requisição causou a queda nem quanto ela custou. O <a href=\"https://developers.openai.com/api/docs/changelog\">lançamento de 8 de setembro de 2026</a> da OpenAI tornou o Prompt Cache Diagnostics disponível de forma geral na Responses API para o GPT-5.6 e modelos compatíveis posteriores. A jogada útil de FinOps é transformar uma queda nos tokens em cache em uma investigação curta e repetível.</p><h2>Compare a requisição que falhou</h2><p>Salve o ID de uma resposta recente e concluída cujo prefixo você esperava que fosse reutilizado. Na próxima requisição comparável à Responses API, feita pela mesma organização, defina <code>prompt_cache_options.comparison_response_id</code> com esse ID. Depois leia <code>prompt_cache_diagnostics</code> na nova resposta, junto com <code>usage.input_tokens_details.cached_tokens</code>. A opção de comparação solicita um diagnóstico; ela não carrega a conversa anterior nem altera o comportamento do cache. O <a href=\"https://developers.openai.com/api/docs/guides/prompt-caching/diagnostics\">guia de diagnósticos</a> da OpenAI inclui exemplos de requisição que funcionam.</p><pre><code>const next = await client.responses.create({\n  model: model,\n  instructions: stableInstructions,\n  input: nextInput,\n  tools: stableTools,\n  prompt_cache_options: { comparison_response_id: baseline.id }\n});\nconsole.log(next.prompt_cache_diagnostics);\nconsole.log(next.usage.input_tokens_details.cached_tokens);</code></pre><p>O trecho pressupõe que <code>baseline</code> seja uma resposta recente e concluída, e que as demais variáveis sejam os dados da sua própria requisição. Mantenha um prefixo estável e longo o bastante para ser armazenado em cache: a OpenAI documenta um mínimo de 1.024 tokens para o GPT-5.6 e posteriores. Um prompt pequeno ou radicalmente diferente não é um teste significativo de cache miss.</p><h2>Corrija a causa, não a métrica</h2><p>Um resultado <code>cache_miss</code> pode apontar para mudança de modelo, nível de serviço, definições ou ordem das ferramentas, chave de cache, formato de resposta, esforço de raciocínio, verbosidade ou contexto compactado. Por exemplo, renomear o esquema de uma ferramenta, algo aparentemente inofensivo, pode invalidar o prefixo reutilizável. Compare a configuração da requisição e os primeiros bytes do prompt, restabeleça a estabilidade onde a mudança foi acidental e execute a comparação de novo contra a mesma linha de base. A OpenAI informa a primeira causa que encontra, então outra pode aparecer depois da primeira correção.</p><p>Não force um acerto se a mudança foi deliberada. Um modelo diferente pode reduzir o custo total da tarefa mesmo perdendo a reutilização de cache; a compactação pode reduzir o contexto futuro. Avalie a requisição e a tarefa inteiras, não o percentual de acertos de cache isoladamente. Uma linha de base expirada ou um resultado <code>unavailable</code> é inconclusivo, não prova de que o cache falhou.</p><h2>Traduza o achado em dinheiro</h2><p><code>cache_missed_tokens</code> estima os tokens reutilizáveis perdidos em relação à resposta de comparação. Isso <em>não</em> é uma contagem de tokens faturados. Um resultado <code>cache_hit</code> também não estabelece economia em dólares. Para o custo de entrada realizado, colete o total de <code>input_tokens</code>, <code>cached_tokens</code> e <code>cache_write_tokens</code> de cada resposta e aplique a tarifa atual desse modelo e nível de processamento. Para o GPT-5.6 e posteriores, o <a href=\"https://developers.openai.com/api/docs/guides/prompt-caching\">guia de prompt caching</a> da OpenAI informa que leituras de cache custam 0,1 vez a tarifa de entrada sem cache e escritas de cache custam 1,25 vez essa tarifa.</p><pre><code>ordinary = input_tokens - cached_tokens - cache_write_tokens\nweighted_input = ordinary + 0.1 * cached_tokens + 1.25 * cache_write_tokens\ninput_cost = weighted_input * input_price_per_million / 1_000_000</code></pre><p>Essas categorias de tokens são mutuamente exclusivas: não some um acréscimo de escrita em cache a tokens que já foram contados na tarifa de escrita. Esta fórmula cobre apenas a entrada; inclua saída, ferramentas, novas tentativas e outras cobranças ao calcular o custo por tarefa bem-sucedida. Use a tabela de preços atual do provedor em vez de um preço fixo copiado deste artigo.</p><h2>Uma verificação semanal útil</h2><ol><li>Agrupe o tráfego comparável por carga de trabalho, modelo e nível de serviço; represente em gráfico a proporção de tokens em cache e o custo de entrada por tarefa concluída.</li><li>Amostre uma regressão repentina, compare-a com uma linha de base recente e registre o motivo do diagnóstico e a mudança de código responsável.</li><li>Corrija o desvio acidental de prefixo ou configuração; mantenha as mudanças intencionais de qualidade ou roteamento se a economia total da tarefa melhorar.</li><li>Valide o resultado com tráfego de produção representativo e concilie a economia observada com o faturamento.</li></ol><p>Os diagnósticos em si não têm taxa extra pelo recurso, mas as requisições de teste adicionais são faturadas normalmente. O ganho não é um gráfico de taxa de acerto mais bonito. É uma explicação defensável de por que o custo de entrada de uma carga de trabalho específica mudou, e se a correção proposta realmente reduziu a fatura dela.</p><h2>Perguntas que as equipes fazem</h2><h3>Um diagnóstico de cache hit prova que uma requisição foi mais barata?</h3><p>Não. Ele indica que nenhum miss foi detectado em relação à linha de base selecionada. Confira os <code>cached_tokens</code> reais e as categorias de tokens precificadas da requisição antes de afirmar que houve economia.</p><h3>Os diagnósticos podem comparar duas requisições quaisquer da OpenAI?</h3><p>Não. Use uma linha de base recente e concluída da mesma organização e espere esse fluxo apenas em modelos compatíveis da Responses API a partir do GPT-5.6. Um registro de comparação pode expirar.</p><h3>Todo cache miss deve ser eliminado?</h3><p>Não. Uma troca de modelo, um nível de serviço diferente ou um contexto compactado podem ser intencionais. Compare qualidade, latência e custo por tarefa bem-sucedida antes de reverter a mudança.</p>",
+      "faq": [
+        {
+          "question": "Um diagnóstico de cache hit prova que uma requisição foi mais barata?",
+          "answer": "Não. Ele significa que nenhum cache miss foi detectado em relação à linha de base selecionada. Confira os tokens em cache reais e as categorias de tokens precificadas antes de afirmar que houve economia."
+        },
+        {
+          "question": "Os diagnósticos podem comparar duas requisições quaisquer da OpenAI?",
+          "answer": "Não. Use uma linha de base recente e concluída da mesma organização em um modelo compatível da Responses API a partir do GPT-5.6. O registro de comparação pode expirar."
+        },
+        {
+          "question": "Todo cache miss deve ser eliminado?",
+          "answer": "Não. Trocas de modelo, mudanças de nível de serviço e compactação de contexto podem ser intencionais. Compare qualidade, latência e custo por tarefa bem-sucedida antes de revertê-las."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/prompt-caching-economics",
+          "label": "Economia do prompt caching"
+        },
+        {
+          "slug": "/research/prompt-cache-attribution",
+          "label": "Atribuição do cache de prompts"
+        },
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "Custo por tarefa bem-sucedida"
+        }
       ]
     }
   }
