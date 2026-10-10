@@ -15,7 +15,7 @@
       "title": "Background agents change the FinOps clock",
       "titleCore": "Background agents change the FinOps clock",
       "description": "Background execution lets agents continue after the user leaves. Budget by task, enforce time and tool limits, and close the loop when work finishes.",
-      "body": "<p>Background execution is one of the most useful new patterns in agent products: a task can continue after the user closes the app, while the agent waits, calls tools, and returns later with a result. It is also a break from the old request-response cost model. Spend is no longer concentrated in a visible session; it can accumulate while nobody is watching.</p><p>Google's <a href=&quot;https://blog.google/innovation-and-ai/technology/developers-tools/expanding-managed-agents-gemini-api/&quot;>Managed Agents update</a> describes background execution together with remote MCP, custom functions, and credential refresh. Each capability expands what an agent can do, but also expands the number of billable steps and the time during which a task can remain active.</p><h2>Budget the task, not the chat turn</h2><p>A chat-turn budget is too small a boundary for a background agent. Create a task budget that follows the work across model calls, tool calls, retries, waiting periods, and resumptions. The budget should have both a dollar limit and a step limit. A task that has spent little money but made hundreds of low-value tool calls is still unhealthy.</p><p>Keep a ledger keyed by task ID. Record start time, end time, model calls, input and output tokens, tool calls, external service charges, retries, and final outcome. This lets you distinguish productive long-running work from an agent that is alive but making no progress.</p><h2>Use timeouts as financial controls</h2><p>Timeouts are not only reliability settings. A stale task consumes capacity and can wake up again after a deployment or credential refresh. Set separate limits for total wall-clock lifetime, idle time between steps, maximum model calls, and maximum tool calls. When a limit is reached, pause for human approval or terminate with a useful partial result.</p><p>Resumption needs idempotency. A task that is resumed without a durable checkpoint may repeat expensive searches, retrievals, or tool actions. Store the last completed step and the outputs needed to continue. Reconcile resumed work under the original task ID so the second run does not look like a new, unrelated feature.</p><h2>Charge for value, not runtime</h2><p>Longer execution is not automatically more valuable. Track completion rate, time to useful result, human interventions, and cost per completed task. A background agent that spends ten minutes and produces the same result as a two-minute workflow is a routing and prompt problem, even if the user experience hides the delay.</p><h2>A production control loop</h2><ul><li>Give every background task a dollar, step, wall-clock, and idle-time budget.</li><li>Persist checkpoints before expensive or irreversible tool calls.</li><li>Require approval before crossing a risk or spend threshold.</li><li>Terminate stalled tasks and report the reason to the owner.</li><li>Review cost per completed task by workflow version, not only by model.</li></ul><h2>Related</h2><ul><li><a href=&quot;/research/agent-spend-guardrails-production&quot;>Agent spend guardrails in production</a></li><li><a href=&quot;/research/agent-total-cost-of-ownership&quot;>Agent total cost of ownership</a></li><li><a href=&quot;/research/three-agent-budgets&quot;>Three budgets every agent needs</a></li></ul>",
+      "body": "<p>Background execution is one of the most useful new patterns in agent products: a task can continue after the user closes the app, while the agent waits, calls tools, and returns later with a result. It is also a break from the old request-response cost model. Spend is no longer concentrated in a visible session; it can accumulate while nobody is watching.</p><p>Google's <a href=\"https://blog.google/innovation-and-ai/technology/developers-tools/expanding-managed-agents-gemini-api/\">Managed Agents update</a> describes background execution together with remote MCP, custom functions, and credential refresh. Each capability expands what an agent can do, but also expands the number of billable steps and the time during which a task can remain active.</p><h2>Budget the task, not the chat turn</h2><p>A chat-turn budget is too small a boundary for a background agent. Create a task budget that follows the work across model calls, tool calls, retries, waiting periods, and resumptions. The budget should have both a dollar limit and a step limit. A task that has spent little money but made hundreds of low-value tool calls is still unhealthy.</p><p>Keep a ledger keyed by task ID. Record start time, end time, model calls, input and output tokens, tool calls, external service charges, retries, and final outcome. This lets you distinguish productive long-running work from an agent that is alive but making no progress.</p><h2>Use timeouts as financial controls</h2><p>Timeouts are not only reliability settings. A stale task consumes capacity and can wake up again after a deployment or credential refresh. Set separate limits for total wall-clock lifetime, idle time between steps, maximum model calls, and maximum tool calls. When a limit is reached, pause for human approval or terminate with a useful partial result.</p><p>Resumption needs idempotency. A task that is resumed without a durable checkpoint may repeat expensive searches, retrievals, or tool actions. Store the last completed step and the outputs needed to continue. Reconcile resumed work under the original task ID so the second run does not look like a new, unrelated feature.</p><h2>Charge for value, not runtime</h2><p>Longer execution is not automatically more valuable. Track completion rate, time to useful result, human interventions, and cost per completed task. A background agent that spends ten minutes and produces the same result as a two-minute workflow is a routing and prompt problem, even if the user experience hides the delay.</p><h2>A production control loop</h2><ul><li>Give every background task a dollar, step, wall-clock, and idle-time budget.</li><li>Persist checkpoints before expensive or irreversible tool calls.</li><li>Require approval before crossing a risk or spend threshold.</li><li>Terminate stalled tasks and report the reason to the owner.</li><li>Review cost per completed task by workflow version, not only by model.</li></ul><h2>Related</h2><ul><li><a href=\"/research/agent-spend-guardrails-production\">Agent spend guardrails in production</a></li><li><a href=\"/research/agent-total-cost-of-ownership\">Agent total cost of ownership</a></li><li><a href=\"/research/three-agent-budgets\">Three budgets every agent needs</a></li></ul>",
       "faq": [
         {
           "question": "Why do background agents need a different cost model?",
@@ -274,6 +274,176 @@
         {
           "slug": "/research/three-agent-budgets",
           "label": "自主智能体的三层预算模型"
+        }
+      ]
+    },
+    "id": {
+      "title": "Agen latar belakang mengubah jam FinOps",
+      "titleCore": "Agen latar belakang mengubah jam FinOps",
+      "description": "Eksekusi latar belakang membuat agen terus bekerja setelah pengguna pergi. Anggarkan per tugas, batasi waktu dan tool, dan tutup loop saat pekerjaan selesai.",
+      "body": "<p>Eksekusi latar belakang adalah salah satu pola baru paling berguna dalam produk agen: sebuah tugas dapat terus berjalan setelah pengguna menutup aplikasi, sementara agen menunggu, memanggil tool, dan kembali nanti dengan hasil. Ini juga keluar dari model biaya request-response lama. Belanja tidak lagi terpusat pada sesi yang terlihat; ia bisa menumpuk saat tidak ada yang mengawasi.</p><p><a href=\"https://blog.google/innovation-and-ai/technology/developers-tools/expanding-managed-agents-gemini-api/\">Pembaruan Managed Agents</a> dari Google menjelaskan eksekusi latar belakang bersama remote MCP, fungsi kustom, dan penyegaran kredensial. Setiap kemampuan memperluas apa yang bisa dilakukan agen, tetapi juga memperluas jumlah langkah yang dapat ditagih dan waktu tugas tetap aktif.</p><h2>Anggarkan tugas, bukan giliran chat</h2><p>Anggaran per giliran chat terlalu kecil sebagai batas untuk agen latar belakang. Buat anggaran tugas yang mengikuti pekerjaan melintasi pemanggilan model, pemanggilan tool, retry, masa tunggu, dan pelanjutan. Anggaran sebaiknya memiliki batas dolar dan batas langkah. Tugas yang belum banyak menghabiskan uang tetapi melakukan ratusan pemanggilan tool bernilai rendah tetap tidak sehat.</p><p>Simpan buku biaya yang dikunci berdasarkan ID tugas. Catat waktu mulai, waktu selesai, pemanggilan model, token input dan output, pemanggilan tool, biaya layanan eksternal, retry, dan hasil akhir. Ini memungkinkan Anda membedakan pekerjaan jangka panjang yang produktif dari agen yang masih hidup tetapi tidak membuat kemajuan.</p><h2>Gunakan timeout sebagai kontrol finansial</h2><p>Timeout bukan sekadar pengaturan keandalan. Tugas yang basi memakan kapasitas dan bisa bangun kembali setelah deployment atau penyegaran kredensial. Tetapkan batas terpisah untuk total umur wall-clock, waktu idle antar langkah, jumlah maksimum pemanggilan model, dan jumlah maksimum pemanggilan tool. Saat batas tercapai, jeda untuk persetujuan manusia atau akhiri dengan hasil parsial yang berguna.</p><p>Pelanjutan membutuhkan idempotensi. Tugas yang dilanjutkan tanpa checkpoint yang tahan lama dapat mengulang pencarian, pengambilan data, atau aksi tool yang mahal. Simpan langkah terakhir yang selesai dan output yang dibutuhkan untuk melanjutkan. Rekonsiliasikan pekerjaan yang dilanjutkan di bawah ID tugas asli agar eksekusi kedua tidak terlihat seperti fitur baru yang tidak berhubungan.</p><h2>Bayar untuk nilai, bukan waktu jalan</h2><p>Eksekusi yang lebih lama tidak otomatis lebih berharga. Lacak tingkat penyelesaian, waktu hingga hasil yang berguna, intervensi manusia, dan biaya per tugas yang selesai. Agen latar belakang yang menghabiskan sepuluh menit dan menghasilkan hasil yang sama dengan alur kerja dua menit adalah masalah routing dan prompt, meskipun pengalaman pengguna menyembunyikan keterlambatannya.</p><h2>Loop kontrol produksi</h2><ul><li>Berikan setiap tugas latar belakang anggaran dolar, langkah, wall-clock, dan waktu idle.</li><li>Simpan checkpoint sebelum pemanggilan tool yang mahal atau tidak dapat dibatalkan.</li><li>Wajibkan persetujuan sebelum melewati ambang risiko atau belanja.</li><li>Hentikan tugas yang macet dan laporkan alasannya kepada pemilik.</li><li>Tinjau biaya per tugas yang selesai menurut versi alur kerja, bukan hanya menurut model.</li></ul><h2>Terkait</h2><ul><li><a href=\"/research/agent-spend-guardrails-production\">Pagar pengaman belanja agen di produksi</a></li><li><a href=\"/research/agent-total-cost-of-ownership\">Total biaya kepemilikan agen</a></li><li><a href=\"/research/three-agent-budgets\">Tiga anggaran yang dibutuhkan setiap agen</a></li></ul>",
+      "faq": [
+        {
+          "question": "Mengapa agen latar belakang membutuhkan model biaya yang berbeda?",
+          "answer": "Mereka bisa terus berjalan setelah pengguna pergi dan mengumpulkan belanja dari pemanggilan model, pemanggilan tool, retry, masa tunggu, dan pelanjutan. Satu anggaran per giliran chat tidak bisa membatasi pekerjaan yang bertahan melampaui sesi."
+        },
+        {
+          "question": "Batas apa yang sebaiknya dimiliki agen latar belakang?",
+          "answer": "Tetapkan batas terpisah untuk dolar, langkah, wall-clock, waktu idle, pemanggilan model, dan pemanggilan tool. Setiap batas menangkap mode kegagalan yang berbeda, mulai dari loop yang mahal hingga tugas yang tetap hidup tanpa kemajuan."
+        },
+        {
+          "question": "Bagaimana pekerjaan agen yang dilanjutkan sebaiknya dicatat?",
+          "answer": "Gunakan checkpoint yang tahan lama dan pertahankan ID tugas yang sama di setiap pelanjutan. Catat langkah yang selesai dan belanja yang dilanjutkan bersama-sama agar pekerjaan berulang terlihat, tidak salah diklasifikasikan sebagai beban kerja baru."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/agent-spend-guardrails-production",
+          "label": "Pagar pengaman belanja agen di produksi"
+        },
+        {
+          "slug": "/research/agent-total-cost-of-ownership",
+          "label": "Total biaya kepemilikan agen"
+        },
+        {
+          "slug": "/research/three-agent-budgets",
+          "label": "Tiga anggaran yang dibutuhkan setiap agen"
+        }
+      ]
+    },
+    "pl": {
+      "title": "Agenci w tle zmieniają zegar FinOps",
+      "titleCore": "Agenci w tle zmieniają zegar FinOps",
+      "description": "Wykonanie w tle pozwala agentom działać po wyjściu użytkownika. Ustaw budżet na zadanie, limity czasu i narzędzi oraz zamknij pętlę po zakończeniu pracy.",
+      "body": "<p>Wykonanie w tle to jeden z najbardziej przydatnych nowych wzorców w produktach z agentami: zadanie może trwać dalej po zamknięciu aplikacji przez użytkownika, a agent czeka, wywołuje narzędzia i wraca później z wynikiem. To także odejście od starego modelu kosztów żądanie-odpowiedź. Wydatki nie koncentrują się już w widocznej sesji; mogą narastać, gdy nikt nie patrzy.</p><p>Aktualizacja <a href=\"https://blog.google/innovation-and-ai/technology/developers-tools/expanding-managed-agents-gemini-api/\">Managed Agents</a> od Google opisuje wykonanie w tle razem ze zdalnym MCP, funkcjami niestandardowymi i odświeżaniem poświadczeń. Każda z tych możliwości rozszerza to, co agent może zrobić, ale też zwiększa liczbę płatnych kroków i czas, w którym zadanie może pozostać aktywne.</p><h2>Ustaw budżet na zadanie, nie na turę czatu</h2><p>Budżet na turę czatu jest zbyt małą granicą dla agenta w tle. Utwórz budżet zadania, który podąża za pracą przez wywołania modeli, wywołania narzędzi, ponowienia, okresy oczekiwania i wznowienia. Budżet powinien mieć zarówno limit w dolarach, jak i limit kroków. Zadanie, które wydało niewiele pieniędzy, ale wykonało setki mało wartościowych wywołań narzędzi, nadal jest niezdrowe.</p><p>Prowadź rejestr kluczowany identyfikatorem zadania. Zapisuj czas startu i zakończenia, wywołania modeli, tokeny wejścia i wyjścia, wywołania narzędzi, opłaty za usługi zewnętrzne, ponowienia i końcowy wynik. Dzięki temu odróżnisz produktywną długą pracę od agenta, który działa, ale nie robi postępów.</p><h2>Traktuj limity czasu jak kontrolę finansową</h2><p>Limity czasu to nie tylko ustawienia niezawodności. Nieaktualne zadanie zużywa pojemność i może ocknąć się ponownie po wdrożeniu lub odświeżeniu poświadczeń. Ustaw osobne limity na łączny czas życia zadania, bezczynność między krokami, maksymalną liczbę wywołań modeli i maksymalną liczbę wywołań narzędzi. Po osiągnięciu limitu wstrzymaj zadanie do zatwierdzenia przez człowieka albo zakończ je z użytecznym wynikiem częściowym.</p><p>Wznawianie wymaga idempotentności. Zadanie wznowione bez trwałego punktu kontrolnego może powtórzyć drogie wyszukiwania, pobrania lub działania narzędzi. Zapisuj ostatni ukończony krok i dane potrzebne do kontynuacji. Uzgadniaj wznowioną pracę pod pierwotnym identyfikatorem zadania, aby drugie uruchomienie nie wyglądało jak nowa, niepowiązana funkcja.</p><h2>Rozliczaj wartość, nie czas działania</h2><p>Dłuższe wykonanie nie jest automatycznie cenniejsze. Śledź wskaźnik ukończenia, czas do użytecznego wyniku, interwencje człowieka i koszt na ukończone zadanie. Agent, który pracuje dziesięć minut i daje ten sam wynik co przepływ trwający dwie minuty, to problem routingu i promptów, nawet jeśli interfejs ukrywa opóźnienie.</p><h2>Pętla kontrolna w produkcji</h2><ul><li>Nadaj każdemu zadaniu w tle budżet w dolarach, krokach, czasie rzeczywistym i czasie bezczynności.</li><li>Zapisuj punkty kontrolne przed kosztownymi lub nieodwracalnymi wywołaniami narzędzi.</li><li>Wymagaj zatwierdzenia przed przekroczeniem progu ryzyka lub wydatków.</li><li>Kończ zablokowane zadania i zgłaszaj powód właścicielowi.</li><li>Przeglądaj koszt na ukończone zadanie według wersji przepływu, a nie tylko według modelu.</li></ul><h2>Powiązane</h2><ul><li><a href=\"/research/agent-spend-guardrails-production\">Zabezpieczenia wydatków agentów w produkcji</a></li><li><a href=\"/research/agent-total-cost-of-ownership\">Całkowity koszt posiadania agentów</a></li><li><a href=\"/research/three-agent-budgets\">Trzy budżety, które każdy agent potrzebuje</a></li></ul>",
+      "faq": [
+        {
+          "question": "Dlaczego agenci w tle potrzebują innego modelu kosztów?",
+          "answer": "Mogą działać dalej po wyjściu użytkownika i sumować wydatki z wywołań modeli, narzędzi, ponowień, oczekiwań i wznowień. Pojedynczy budżet na turę czatu nie obejmuje pracy trwającej poza sesją."
+        },
+        {
+          "question": "Jakie limity powinien mieć agent w tle?",
+          "answer": "Ustaw osobne limity: w dolarach, krokach, czasie rzeczywistym, bezczynności, wywołaniach modeli i wywołaniach narzędzi. Każdy wychwytuje inny tryb awarii, od drogiej pętli po zadanie, które żyje bez postępu."
+        },
+        {
+          "question": "Jak rozliczać wznowioną pracę agenta?",
+          "answer": "Używaj trwałego punktu kontrolnego i zachowuj ten sam identyfikator zadania przy wznowieniach. Zapisuj ukończone kroki i wydatki wznowienia razem, aby powtórzona praca była widoczna, a nie błędnie uznawana za nowe obciążenie."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/agent-spend-guardrails-production",
+          "label": "Zabezpieczenia wydatków agentów w produkcji"
+        },
+        {
+          "slug": "/research/agent-total-cost-of-ownership",
+          "label": "Całkowity koszt posiadania agentów"
+        },
+        {
+          "slug": "/research/three-agent-budgets",
+          "label": "Trzy budżety, które każdy agent potrzebuje"
+        }
+      ]
+    },
+    "ru": {
+      "title": "Фоновые агенты меняют часы FinOps",
+      "titleCore": "Фоновые агенты и часы FinOps",
+      "description": "Фоновое выполнение продолжается после ухода пользователя. Бюджетируйте по задаче, задавайте лимиты времени и инструментов, закрывайте цикл по завершении.",
+      "body": "<p>Фоновое выполнение — один из самых полезных новых паттернов в агентских продуктах: задача может продолжаться после того, как пользователь закрыл приложение, а агент ждёт, вызывает инструменты и возвращает результат позже. Это также разрыв со старой моделью стоимости «запрос-ответ». Расходы больше не сосредоточены в видимой сессии; они могут накапливаться, пока никто не смотрит.</p><p>В обновлении <a href=\"https://blog.google/innovation-and-ai/technology/developers-tools/expanding-managed-agents-gemini-api/\">Managed Agents</a> от Google фоновое выполнение описано вместе с удалёнными MCP, пользовательскими функциями и обновлением учётных данных. Каждая из этих возможностей расширяет то, что может делать агент, но также увеличивает число оплачиваемых шагов и время, в течение которого задача может оставаться активной.</p><h2>Бюджетируйте задачу, а не ход в чате</h2><p>Бюджет на один ход в чате слишком мал как граница для фонового агента. Создайте бюджет задачи, который следует за работой через вызовы моделей, вызовы инструментов, повторные попытки, периоды ожидания и возобновления. У бюджета должны быть и лимит в долларах, и лимит шагов. Задача, которая потратила мало денег, но сделала сотни малоценных вызовов инструментов, всё равно нездорова.</p><p>Ведите реестр с ключом по ID задачи. Записывайте время начала и окончания, вызовы моделей, входные и выходные токены, вызовы инструментов, сборы внешних сервисов, повторные попытки и итоговый результат. Это позволяет отличить продуктивную долгую работу от агента, который жив, но не продвигается.</p><h2>Используйте таймауты как финансовый контроль</h2><p>Таймауты — это не только настройки надёжности. Зависшая задача расходует мощности и может снова проснуться после деплоя или обновления учётных данных. Задайте отдельные лимиты на общее время жизни по часам, на простой между шагами, на максимальное число вызовов модели и максимальное число вызовов инструментов. Когда лимит достигнут, приостановите задачу до одобрения человеком или завершите её с полезным частичным результатом.</p><p>Возобновление требует идемпотентности. Задача, возобновлённая без надёжной контрольной точки, может повторить дорогие поиски, выборки или действия с инструментами. Сохраняйте последний завершённый шаг и результаты, необходимые для продолжения. Сводите возобновлённую работу под исходным ID задачи, чтобы второй запуск не выглядел как новая, не связанная с первой функция.</p><h2>Платите за ценность, а не за время выполнения</h2><p>Более долгое выполнение не означает автоматически большей ценности. Отслеживайте долю завершённых задач, время до полезного результата, вмешательства человека и стоимость одной завершённой задачи. Фоновый агент, который тратит десять минут и даёт тот же результат, что и workflow за две минуты, — это проблема маршрутизации и промптов, даже если пользовательский опыт скрывает задержку.</p><h2>Рабочий контур управления</h2><ul><li>Задайте каждой фоновой задаче лимиты по деньгам, шагам, времени по часам и времени простоя.</li><li>Сохраняйте контрольные точки до дорогих или необратимых вызовов инструментов.</li><li>Требуйте одобрения перед переходом порога риска или расходов.</li><li>Останавливайте зависшие задачи и сообщайте владельцу причину.</li><li>Проверяйте стоимость завершённой задачи по версии workflow, а не только по модели.</li></ul><h2>Связанное</h2><ul><li><a href=\"/research/agent-spend-guardrails-production\">Ограничители расходов агентов в продакшене</a></li><li><a href=\"/research/agent-total-cost-of-ownership\">Совокупная стоимость владения агентами</a></li><li><a href=\"/research/three-agent-budgets\">Три бюджета, которые нужны каждому агенту</a></li></ul>",
+      "faq": [
+        {
+          "question": "Зачем фоновым агентам отдельная модель стоимости?",
+          "answer": "Они могут продолжать работу после ухода пользователя и накапливать расходы на вызовы моделей, инструментов, повторные попытки, ожидания и возобновления. Бюджет на один ход чата не может ограничить работу, которая длится дольше сессии."
+        },
+        {
+          "question": "Какие лимиты должны быть у фонового агента?",
+          "answer": "Задайте отдельные лимиты по деньгам, шагам, времени по часам, простою, числу вызовов модели и числу вызовов инструментов. Каждый из них ловит свой режим отказа: от дорогого цикла до задачи, которая остаётся живой и не продвигается."
+        },
+        {
+          "question": "Как учитывать расходы на возобновлённую работу агента?",
+          "answer": "Используйте надёжную контрольную точку и сохраняйте один и тот же ID задачи при возобновлениях. Фиксируйте завершённые шаги и расходы на возобновлённую работу вместе, чтобы повторная работа была видна, а не ошибочно считалась новой нагрузкой."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/agent-spend-guardrails-production",
+          "label": "Ограничители расходов агентов в продакшене"
+        },
+        {
+          "slug": "/research/agent-total-cost-of-ownership",
+          "label": "Совокупная стоимость владения агентами"
+        },
+        {
+          "slug": "/research/three-agent-budgets",
+          "label": "Три бюджета, которые нужны каждому агенту"
+        }
+      ]
+    },
+    "tr": {
+      "title": "Arka plan ajanları FinOps saatini değiştiriyor",
+      "titleCore": "Arka plan ajanları ve FinOps maliyet saati",
+      "description": "Arka plan yürütmesi, kullanıcı ayrıldıktan sonra ajanların çalışmaya devam etmesini sağlar. Görev bazında bütçeleyin, süre ve araç sınırları koyun.",
+      "body": "<p>Arka plan yürütmesi, agent ürünlerindeki en kullanışlı yeni desenlerden biri: kullanıcı uygulamayı kapattıktan sonra bir görev devam edebilir; ajan bekler, araçları çağırır ve daha sonra bir sonuçla geri döner. Bu aynı zamanda eski istek-yanıt maliyet modelinden bir kopuş. Harcama artık görünür bir oturumda yoğunlaşmıyor; kimse izlemezken birikebiliyor.</p><p>Google'ın <a href=\"https://blog.google/innovation-and-ai/technology/developers-tools/expanding-managed-agents-gemini-api/\">Managed Agents güncellemesi</a>, arka plan yürütmeyi uzak MCP, özel fonksiyonlar ve kimlik bilgisi yenilemeyle birlikte anlatıyor. Her yetenek bir ajanın yapabileceklerini genişletir, ama faturalanabilir adım sayısını ve bir görevin aktif kalabileceği süreyi de genişletir.</p><h2>Sohbet turunu değil, görevi bütçeleyin</h2><p>Bir arka plan ajanı için sohbet turu bütçesi çok küçük bir sınırdır. Model çağrıları, araç çağrıları, yeniden denemeler, bekleme süreleri ve devamlar boyunca işi izleyen bir görev bütçesi oluşturun. Bütçenin hem dolar limiti hem de adım limiti olmalı. Az para harcayan ama yüzlerce düşük değerli araç çağrısı yapan bir görev yine de sağlıksız.</p><p>Görev kimliğine göre bir defter tutun. Başlangıç ve bitiş zamanı, model çağrıları, giriş ve çıkış tokenları, araç çağrıları, dış servis ücretleri, yeniden denemeler ve nihai sonucu kaydedin. Böylece verimli uzun süren işi, hâlâ canlı ama ilerleme kaydetmeyen ajandan ayırt edebilirsiniz.</p><h2>Zaman aşımlarını finansal kontrol olarak kullanın</h2><p>Zaman aşımları yalnızca güvenilirlik ayarı değildir. Bayat bir görev kapasite tüketir ve bir dağıtım ya da kimlik bilgisi yenilemesinden sonra yeniden uyanabilir. Toplam duvar saati ömrü, adımlar arası boşta kalma süresi, en fazla model çağrısı ve en fazla araç çağrısı için ayrı limitler koyun. Bir limite ulaşıldığında insan onayı için duraklatın ya da kullanışlı bir kısmi sonuçla sonlandırın.</p><p>Devam ettirme idempotent olmalı. Dayanıklı bir kontrol noktası olmadan devam ettirilen görev, pahalı aramaları, geri almaları ya da araç eylemlerini tekrarlayabilir. Tamamlanan son adımı ve devam etmek için gereken çıktıları saklayın. Devam eden işi özgün görev kimliği altında uzlaştırın, böylece ikinci çalıştırma yeni ve ilgisiz bir özellik gibi görünmez.</p><h2>Çalışma süresi değil, değer üzerinden değerlendirin</h2><p>Daha uzun yürütme otomatik olarak daha değerli değildir. Tamamlanma oranını, kullanışlı sonuca kadar geçen süreyi, insan müdahalelerini ve tamamlanan görev başına maliyeti izleyin. On dakika harcayıp iki dakikalık bir iş akışıyla aynı sonucu üreten bir arka plan ajanı, kullanıcı deneyimi gecikmeyi gizlese bile bir yönlendirme ve prompt sorunudur.</p><h2>Üretim kontrol döngüsü</h2><ul><li>Her arka plan görevine bir dolar, adım, duvar saati ve boşta kalma süresi bütçesi verin.</li><li>Pahalı ya da geri alınamaz araç çağrılarından önce kontrol noktaları kaydedin.</li><li>Bir risk ya da harcama eşiğini aşmadan önce onay isteyin.</li><li>Takılan görevleri sonlandırın ve nedenini sahibine bildirin.</li><li>Maliyeti yalnızca modele göre değil, iş akışı sürümüne göre de tamamlanan görev başına inceleyin.</li></ul><h2>İlgili</h2><ul><li><a href=\"/research/agent-spend-guardrails-production\">Üretimde ajan harcama korumaları</a></li><li><a href=\"/research/agent-total-cost-of-ownership\">Ajanın toplam sahiplik maliyeti</a></li><li><a href=\"/research/three-agent-budgets\">Her ajanın ihtiyaç duyduğu üç bütçe</a></li></ul>",
+      "faq": [
+        {
+          "question": "Arka plan ajanları neden farklı bir maliyet modeline ihtiyaç duyar?",
+          "answer": "Kullanıcı ayrıldıktan sonra da çalışmaya devam edebilir ve model çağrıları, araç çağrıları, yeniden denemeler, beklemeler ve devamlar boyunca harcama biriktirebilirler. Tek bir sohbet turu bütçesi, oturumun ötesine uzanan işi sınırlayamaz."
+        },
+        {
+          "question": "Bir arka plan ajanının hangi sınırları olmalı?",
+          "answer": "Ayrı dolar, adım, duvar saati, boşta kalma süresi, model çağrısı ve araç çağrısı sınırları koyun. Her biri, pahalı bir döngüden ilerleme kaydetmeden canlı kalan bir göreve kadar farklı bir hata türünü yakalar."
+        },
+        {
+          "question": "Devam eden ajan işi nasıl muhasebeleştirilmeli?",
+          "answer": "Kalıcı bir kontrol noktası kullanın ve devamlar boyunca aynı görev kimliğini koruyun. Tamamlanan adımları ve devam eden harcamayı birlikte kaydedin ki tekrarlanan iş görünür olsun ve yeni bir iş yükü olarak yanlış sınıflandırılmasın."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/agent-spend-guardrails-production",
+          "label": "Üretimde ajan harcama korumaları"
+        },
+        {
+          "slug": "/research/agent-total-cost-of-ownership",
+          "label": "Ajanın toplam sahiplik maliyeti"
+        },
+        {
+          "slug": "/research/three-agent-budgets",
+          "label": "Her ajanın ihtiyaç duyduğu üç bütçe"
+        }
+      ]
+    },
+    "vi": {
+      "title": "Agent nền đổi nhịp đồng hồ FinOps",
+      "titleCore": "Agent nền đổi nhịp đồng hồ FinOps",
+      "description": "Thực thi nền cho phép agent tiếp tục sau khi người dùng rời đi. Đặt ngân sách theo tác vụ, giới hạn thời gian và công cụ, rồi khép vòng lặp khi xong việc.",
+      "body": "<p>Thực thi nền là một trong những mẫu mới hữu ích nhất trong sản phẩm agent: một tác vụ có thể tiếp tục sau khi người dùng đóng ứng dụng, trong khi agent chờ, gọi công cụ và trả kết quả về sau. Đây cũng là sự đoạn tuyệt với mô hình chi phí request-response cũ. Chi tiêu không còn tập trung trong một phiên nhìn thấy được; nó có thể tích lũy khi không ai theo dõi.</p><p>Bản cập nhật <a href=\"https://blog.google/innovation-and-ai/technology/developers-tools/expanding-managed-agents-gemini-api/\">Managed Agents</a> của Google mô tả thực thi nền cùng với MCP từ xa, hàm tùy chỉnh và làm mới thông tin xác thực. Mỗi khả năng mở rộng những gì agent có thể làm, nhưng cũng mở rộng số bước có thể tính phí và khoảng thời gian tác vụ có thể vẫn còn hoạt động.</p><h2>Đặt ngân sách cho tác vụ, không phải cho lượt chat</h2><p>Ranh giới ngân sách theo lượt chat quá nhỏ cho một agent nền. Hãy tạo ngân sách tác vụ đi theo công việc qua các lần gọi model, lời gọi công cụ, thử lại, khoảng chờ và lần tiếp tục. Ngân sách nên có cả giới hạn tiền và giới hạn số bước. Một tác vụ tốn ít tiền nhưng thực hiện hàng trăm lời gọi công cụ giá trị thấp vẫn là dấu hiệu không khỏe.</p><p>Giữ một sổ cái theo ID tác vụ. Ghi thời điểm bắt đầu, kết thúc, các lần gọi model, token đầu vào và đầu ra, lời gọi công cụ, phí dịch vụ bên ngoài, số lần thử lại và kết quả cuối cùng. Điều này giúp phân biệt công việc dài hạn có hiệu quả với một agent vẫn chạy nhưng không tiến triển.</p><h2>Dùng thời gian chờ như kiểm soát tài chính</h2><p>Thời gian chờ không chỉ là thiết lập độ tin cậy. Một tác vụ bị bỏ quên chiếm dụng năng lực và có thể thức dậy lại sau khi triển khai hoặc làm mới thông tin xác thực. Hãy đặt giới hạn riêng cho tổng thời gian sống, thời gian nhàn rỗi giữa các bước, số lần gọi model tối đa và số lần gọi công cụ tối đa. Khi chạm giới hạn, hãy tạm dừng để con người phê duyệt hoặc kết thúc với một kết quả một phần hữu ích.</p><p>Việc tiếp tục cần tính idempotent. Một tác vụ được tiếp tục mà không có checkpoint bền vững có thể lặp lại các tìm kiếm, truy xuất hoặc hành động công cụ tốn kém. Hãy lưu bước hoàn thành gần nhất và các đầu ra cần để tiếp tục. Đối chiếu công việc được tiếp tục dưới ID tác vụ gốc để lần chạy thứ hai không bị coi là một tính năng mới, không liên quan.</p><h2>Tính phí theo giá trị, không theo thời gian chạy</h2><p>Thực thi lâu hơn không tự động có giá trị hơn. Theo dõi tỷ lệ hoàn thành, thời gian đến kết quả hữu ích, số lần con người can thiệp và chi phí cho mỗi tác vụ hoàn thành. Một agent nền mất mười phút để cho ra kết quả giống một quy trình hai phút là vấn đề định tuyến và prompt, dù trải nghiệm người dùng che giấu độ trễ.</p><h2>Vòng lặp kiểm soát trong sản phẩm</h2><ul><li>Cấp cho mọi tác vụ nền ngân sách tiền, số bước, thời gian thực và thời gian nhàn rỗi.</li><li>Lưu checkpoint trước các lời gọi công cụ tốn kém hoặc không thể hoàn tác.</li><li>Yêu cầu phê duyệt trước khi vượt ngưỡng rủi ro hoặc chi tiêu.</li><li>Kết thúc các tác vụ bị kẹt và báo lý do cho chủ sở hữu.</li><li>Xem chi phí cho mỗi tác vụ hoàn thành theo phiên bản quy trình, không chỉ theo model.</li></ul><h2>Liên quan</h2><ul><li><a href=\"/research/agent-spend-guardrails-production\">Hàng rào chi tiêu agent trong sản phẩm</a></li><li><a href=\"/research/agent-total-cost-of-ownership\">Tổng chi phí sở hữu agent</a></li><li><a href=\"/research/three-agent-budgets\">Ba ngân sách mà mọi agent cần</a></li></ul>",
+      "faq": [
+        {
+          "question": "Vì sao agent nền cần một mô hình chi phí khác?",
+          "answer": "Chúng có thể tiếp tục sau khi người dùng rời đi và tích lũy chi tiêu qua các lần gọi model, lời gọi công cụ, thử lại, chờ và tiếp tục. Ngân sách theo lượt chat không thể giới hạn công việc kéo dài ngoài phiên."
+        },
+        {
+          "question": "Agent nền nên có những giới hạn nào?",
+          "answer": "Đặt riêng giới hạn tiền, số bước, thời gian thực, thời gian nhàn rỗi, số lần gọi model và số lần gọi công cụ. Mỗi giới hạn bắt một kiểu lỗi khác, từ vòng lặp tốn kém đến tác vụ vẫn chạy mà không tiến triển."
+        },
+        {
+          "question": "Công việc agent được tiếp tục nên được hạch toán thế nào?",
+          "answer": "Dùng checkpoint bền vững và giữ nguyên ID tác vụ qua các lần tiếp tục. Ghi các bước đã hoàn thành cùng chi tiêu khi tiếp tục để công việc lặp lại hiển thị rõ thay vì bị phân loại nhầm là khối lượng mới."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/agent-spend-guardrails-production",
+          "label": "Hàng rào chi tiêu agent trong sản phẩm"
+        },
+        {
+          "slug": "/research/agent-total-cost-of-ownership",
+          "label": "Tổng chi phí sở hữu agent"
+        },
+        {
+          "slug": "/research/three-agent-budgets",
+          "label": "Ba ngân sách mà mọi agent cần"
         }
       ]
     }

@@ -15,7 +15,7 @@
       "title": "Your dev environment is a prod workload",
       "titleCore": "Non-production LLM spend",
       "description": "CI runs, local dev, staging and demo instances quietly become a real share of the LLM bill, and they are almost always the least attributed part of it.",
-      "body": "<p>Every FinOps review of LLM spend starts with production traffic, because that is what has a dashboard. Then someone runs the numbers by environment and finds that a meaningful slice of the bill &mdash; frequently double digits as a percentage &mdash; never touched a customer.</p><p>It comes from four places, and they compound.</p><h2>Where non-production spend comes from</h2><p><strong>CI.</strong> Every pull request that runs an evaluation suite calls the model. A suite of two hundred cases across a busy repository is thousands of calls a day, on the most capable model, because whoever wrote the suite quite reasonably wanted it to reflect production.</p><p><strong>Local development.</strong> Engineers iterating on a prompt call the API dozens of times an hour, usually on a shared key, usually with no tagging that says whose loop it was.</p><p><strong>Staging and demo instances.</strong> Long-lived, low-traffic, and configured identically to production &mdash; which means the expensive model and no caching, serving a handful of requests that nobody watches.</p><p><strong>Retries and runaway loops in test.</strong> An agent loop that fails safely in production still burns tokens when it misbehaves in a branch, and nothing in a test environment is set up to notice.</p><h2>Fix attribution before you fix cost</h2><p>The single change that pays for itself is a <strong>separate API key per environment</strong>. It costs an afternoon and turns an unexplained line item into four labelled ones. Tag every request with the environment, and for CI, the repository and workflow. Without that, every proposal below is guesswork.</p><p>Once you can see it, three things usually follow immediately. Non-prod is where a smaller model is almost always fine &mdash; evaluation suites need consistency, not frontier capability, and most of them can pin a cheaper model with no loss of signal. Non-prod is where caching earns the most, because CI replays near-identical prompts all day. And non-prod is where hard spend caps are actually safe to set: a capped test environment fails a build, while a capped production environment fails a customer.</p><h2>The rule</h2><p>Give every non-production environment its own key, its own budget, and its own cap. Then treat the gap between environments as a number you manage deliberately, rather than one you discover in a quarterly review.</p><h2>Related</h2><ul><li><a href=&quot;/research/evals-cost-control&quot;>Cost controls in your evaluation pipeline</a></li><li><a href=&quot;/research/llm-cost-attribution&quot;>LLM cost attribution</a></li><li><a href=&quot;/research/agent-spend-guardrails&quot;>Agent spend guardrails</a></li></ul>",
+      "body": "<p>Every FinOps review of LLM spend starts with production traffic, because that is what has a dashboard. Then someone runs the numbers by environment and finds that a meaningful slice of the bill &mdash; frequently double digits as a percentage &mdash; never touched a customer.</p><p>It comes from four places, and they compound.</p><h2>Where non-production spend comes from</h2><p><strong>CI.</strong> Every pull request that runs an evaluation suite calls the model. A suite of two hundred cases across a busy repository is thousands of calls a day, on the most capable model, because whoever wrote the suite quite reasonably wanted it to reflect production.</p><p><strong>Local development.</strong> Engineers iterating on a prompt call the API dozens of times an hour, usually on a shared key, usually with no tagging that says whose loop it was.</p><p><strong>Staging and demo instances.</strong> Long-lived, low-traffic, and configured identically to production &mdash; which means the expensive model and no caching, serving a handful of requests that nobody watches.</p><p><strong>Retries and runaway loops in test.</strong> An agent loop that fails safely in production still burns tokens when it misbehaves in a branch, and nothing in a test environment is set up to notice.</p><h2>Fix attribution before you fix cost</h2><p>The single change that pays for itself is a <strong>separate API key per environment</strong>. It costs an afternoon and turns an unexplained line item into four labelled ones. Tag every request with the environment, and for CI, the repository and workflow. Without that, every proposal below is guesswork.</p><p>Once you can see it, three things usually follow immediately. Non-prod is where a smaller model is almost always fine &mdash; evaluation suites need consistency, not frontier capability, and most of them can pin a cheaper model with no loss of signal. Non-prod is where caching earns the most, because CI replays near-identical prompts all day. And non-prod is where hard spend caps are actually safe to set: a capped test environment fails a build, while a capped production environment fails a customer.</p><h2>The rule</h2><p>Give every non-production environment its own key, its own budget, and its own cap. Then treat the gap between environments as a number you manage deliberately, rather than one you discover in a quarterly review.</p><h2>Related</h2><ul><li><a href=\"/research/evals-cost-control\">Cost controls in your evaluation pipeline</a></li><li><a href=\"/research/llm-cost-attribution\">LLM cost attribution</a></li><li><a href=\"/research/agent-spend-guardrails\">Agent spend guardrails</a></li></ul>",
       "faq": [
         {
           "question": "How much of an LLM bill is typically non-production?",
@@ -132,6 +132,346 @@
         {
           "slug": "/research/llm-cost-attribution",
           "label": "LLM コストの帰属"
+        }
+      ]
+    },
+    "id": {
+      "title": "Lingkungan dev Anda adalah beban kerja produksi",
+      "titleCore": "Belanja LLM non-produksi",
+      "description": "Proses CI, pengembangan lokal, staging, dan instans demo diam-diam menjadi porsi nyata tagihan LLM, dan hampir selalu paling sedikit diatribusikan.",
+      "body": "<p>Setiap tinjauan FinOps atas belanja LLM dimulai dari trafik produksi, karena hanya itu yang punya dasbor. Lalu seseorang menghitung angkanya per lingkungan dan menemukan bahwa sebagian besar tagihan &mdash; sering kali dua digit dalam persentase &mdash; tidak pernah menyentuh pelanggan.</p><p>Asalnya ada empat tempat, dan dampaknya saling menumpuk.</p><h2>Dari mana belanja non-produksi berasal</h2><p><strong>CI.</strong> Setiap pull request yang menjalankan rangkaian evaluasi memanggil model. Rangkaian dua ratus kasus di repositori yang sibuk berarti ribuan panggilan per hari, pada model paling mumpuni, karena penulis rangkaian itu wajar saja ingin hasilnya mencerminkan produksi.</p><p><strong>Pengembangan lokal.</strong> Insinyur yang mengulang-ulang sebuah prompt memanggil API puluhan kali per jam, biasanya memakai kunci bersama, biasanya tanpa tag yang menunjukkan siapa pemilik loop tersebut.</p><p><strong>Instans staging dan demo.</strong> Berjalan lama, trafiknya rendah, dan dikonfigurasi sama persis dengan produksi &mdash; artinya model yang mahal dan tanpa caching, untuk melayani segelintir permintaan yang tidak diawasi siapa pun.</p><p><strong>Percobaan ulang dan loop tak terkendali saat pengujian.</strong> Loop agen yang gagal dengan aman di produksi tetap membakar token ketika berperilaku salah di sebuah cabang, dan tidak ada yang di lingkungan uji dirancang untuk mendeteksinya.</p><h2>Perbaiki atribusi sebelum memperbaiki biaya</h2><p>Satu perubahan yang langsung menutup biayanya sendiri adalah <strong>kunci API terpisah untuk setiap lingkungan</strong>. Pengerjaannya hanya setengah hari dan mengubah satu baris tagihan yang tidak bisa dijelaskan menjadi empat baris berlabel. Beri tag setiap permintaan dengan lingkungannya, dan untuk CI, beri tag dengan repositori serta workflow-nya. Tanpa itu, setiap usulan di bawah hanyalah tebakan.</p><p>Setelah Anda bisa melihatnya, tiga hal biasanya langsung mengikuti. Non-produksi adalah tempat model yang lebih kecil hampir selalu cukup &mdash; rangkaian evaluasi butuh konsistensi, bukan kemampuan frontier, dan sebagian besar bisa mengunci model yang lebih murah tanpa kehilangan sinyal. Non-produksi adalah tempat caching paling banyak memberi manfaat, karena CI memutar ulang prompt yang hampir identik sepanjang hari. Dan non-produksi adalah tempat batas pengeluaran keras benar-benar aman untuk dipasang: lingkungan uji yang dibatasi akan membuat build gagal, sedangkan lingkungan produksi yang dibatasi akan membuat pelanggan gagal.</p><h2>Aturannya</h2><p>Berikan setiap lingkungan non-produksi kuncinya sendiri, anggarannya sendiri, dan batasnya sendiri. Lalu perlakukan selisih antarlingkungan sebagai angka yang Anda kelola secara sengaja, bukan sesuatu yang baru ditemukan dalam tinjauan triwulanan.</p><h2>Terkait</h2><ul><li><a href=\"/research/evals-cost-control\">Kontrol biaya dalam pipeline evaluasi Anda</a></li><li><a href=\"/research/llm-cost-attribution\">Atribusi biaya LLM</a></li><li><a href=\"/research/agent-spend-guardrails\">Guardrail belanja agen</a></li></ul>",
+      "faq": [
+        {
+          "question": "Berapa bagian tagihan LLM yang biasanya berasal dari non-produksi?",
+          "answer": "Bervariasi, tetapi tim yang mengukurnya rutin terkejut menemukan persentase dua digit yang tidak pernah melayani pelanggan. Rangkaian evaluasi CI biasanya penyumbang terbesar, disusul instans staging yang berjalan lama."
+        },
+        {
+          "question": "Apa yang pertama kali harus diubah?",
+          "answer": "Kunci API terpisah untuk setiap lingkungan, dengan lingkungan diberi tag pada setiap permintaan. Pengerjaannya setengah hari dan mengubah satu baris tagihan yang tidak bisa dijelaskan menjadi baris-baris berlabel, yang menjadi prasyarat setiap perbaikan lain."
+        },
+        {
+          "question": "Apakah aman memasang batas belanja keras di non-produksi?",
+          "answer": "Ya, dan ini satu-satunya tempat batas keras benar-benar aman. Lingkungan uji yang dibatasi akan membuat build gagal, yang akan diperhatikan dan diperbaiki seseorang; lingkungan produksi yang dibatasi akan membuat pelanggan gagal."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/evals-cost-control",
+          "label": "Kontrol biaya dalam pipeline evaluasi Anda"
+        },
+        {
+          "slug": "/research/llm-cost-attribution",
+          "label": "Atribusi biaya LLM"
+        },
+        {
+          "slug": "/research/agent-spend-guardrails",
+          "label": "Guardrail belanja agen"
+        }
+      ]
+    },
+    "pl": {
+      "title": "Twoje środowisko dev to obciążenie produkcyjne",
+      "titleCore": "Wydatki na LLM poza produkcją",
+      "description": "Uruchomienia CI, lokalny dev, staging i instancje demo po cichu stają się realnym udziałem w rachunku za LLM, i prawie zawsze są najsłabiej przypisaną jego częścią.",
+      "body": "<p>Każdy przegląd wydatków na LLM w FinOps zaczyna się od ruchu produkcyjnego, bo to ma dashboard. Potem ktoś rozbija liczby według środowiska i okazuje się, że znaczący fragment rachunku &mdash; często dwucyfrowy procent &mdash; nigdy nie dotknął klienta.</p><p>Bierze się on z czterech miejsc, które się nawarstwiają.</p><h2>Skąd biorą się wydatki poza produkcją</h2><p><strong>CI.</strong> Każdy pull request uruchamiający zestaw ewaluacyjny wywołuje model. Zestaw dwustu przypadków w aktywnym repozytorium to tysiące wywołań dziennie, na najbardziej zaawansowanym modelu, bo ktoś, kto go napisał, słusznie chciał, żeby odzwierciedlał produkcję.</p><p><strong>Lokalny rozwój.</strong> Inżynierowie dopracowujący prompt wywołują API kilkadziesiąt razy na godzinę, zwykle na wspólnym kluczu, zwykle bez tagowania, które mówi, czyja to pętla.</p><p><strong>Staging i instancje demo.</strong> Działają długo, mają mały ruch i są skonfigurowane identycznie jak produkcja &mdash; czyli drogi model i brak cache, obsługujące garstkę żądań, których nikt nie obserwuje.</p><p><strong>Ponowienia i niekontrolowane pętle w testach.</strong> Pętla agenta, która bezpiecznie zawodzi na produkcji, nadal spala tokeny, gdy zachowuje się źle w jakiejś gałęzi, a nic w środowisku testowym nie jest ustawione tak, żeby to zauważyć.</p><h2>Najpierw napraw przypisywanie, potem koszt</h2><p>Jedna zmiana, która się zwraca, to <strong>osobny klucz API dla każdego środowiska</strong>. Zajmuje popołudnie i zamienia niewyjaśnioną pozycję na cztery opisane. Otaguj każde żądanie środowiskiem, a dla CI także repozytorium i workflow. Bez tego każda z poniższych propozycji jest zgadywaniem.</p><p>Gdy już to widzisz, zwykle od razu wynikają trzy rzeczy. Poza produkcją mniejszy model niemal zawsze wystarcza &mdash; zestawy ewaluacyjne potrzebują spójności, a nie możliwości modelu z najwyższej półki, i większość może przypiąć tańszy model bez utraty sygnału. Poza produkcją cache zwraca się najbardziej, bo CI przez cały dzień odtwarza prawie identyczne prompty. I poza produkcją twarde limity wydatków są naprawdę bezpieczne: ograniczone środowisko testowe przerywa build, a ograniczone środowisko produkcyjne przerywa obsługę klienta.</p><h2>Zasada</h2><p>Każde środowisko nieprodukcyjne powinno mieć własny klucz, własny budżet i własny limit. Potem traktuj różnicę między środowiskami jako liczbę, którą zarządzasz świadomie, zamiast odkrywać ją na kwartalnym przeglądzie.</p><h2>Powiązane</h2><ul><li><a href=\"/research/evals-cost-control\">Kontrola kosztów w potoku ewaluacji</a></li><li><a href=\"/research/llm-cost-attribution\">Przypisywanie kosztów LLM</a></li><li><a href=\"/research/agent-spend-guardrails\">Ograniczniki wydatków agentów</a></li></ul>",
+      "faq": [
+        {
+          "question": "Jaka część rachunku za LLM to zwykle środowiska nieprodukcyjne?",
+          "answer": "To zależy, ale zespoły, które to mierzą, regularnie zaskakuje dwucyfrowy procent, który nigdy nie obsłużył klienta. Zestawy ewaluacyjne CI są zwykle największym pojedynczym źródłem, a za nimi idą długo działające instancje stagingowe."
+        },
+        {
+          "question": "Co zmienić jako pierwsze?",
+          "answer": "Osobny klucz API dla każdego środowiska, z tagiem środowiska na każdym żądaniu. Zajmuje to popołudnie i zamienia jedną niewyjaśnioną pozycję na opisane, co jest warunkiem wstępnym każdej innej poprawki."
+        },
+        {
+          "question": "Czy bezpiecznie jest założyć twardy limit wydatków na środowiska nieprodukcyjne?",
+          "answer": "Tak, i to jedyne miejsce, gdzie twardy limit jest naprawdę bezpieczny. Ograniczone środowisko testowe przerywa build, który ktoś zauważy i naprawi; ograniczone środowisko produkcyjne przerywa obsługę klienta."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/evals-cost-control",
+          "label": "Kontrola kosztów w potoku ewaluacji"
+        },
+        {
+          "slug": "/research/llm-cost-attribution",
+          "label": "Przypisywanie kosztów LLM"
+        },
+        {
+          "slug": "/research/agent-spend-guardrails",
+          "label": "Ograniczniki wydatków agentów"
+        }
+      ]
+    },
+    "ru": {
+      "title": "Среда разработки тоже создаёт продакшен-нагрузку",
+      "titleCore": "Расходы на LLM вне продакшена",
+      "description": "Прогоны CI, локальная разработка, staging и демо-инстансы незаметно становятся заметной частью счёта за LLM и почти всегда меньше всего распределены по владельцам.",
+      "body": "<p>Любой FinOps-обзор расходов на LLM начинается с продакшен-трафика, потому что у него есть дашборд. Потом кто-то разбивает цифры по окружениям и обнаруживает, что заметная часть счёта &mdash; нередко двузначный процент &mdash; никогда не касалась клиента.</p><p>Она берётся из четырёх мест, и они накладываются друг на друга.</p><h2>Откуда берутся расходы вне продакшена</h2><p><strong>CI.</strong> Каждый pull request, который запускает набор оценок, вызывает модель. Набор из двухсот кейсов в активном репозитории &mdash; это тысячи вызовов в день, на самой мощной модели, потому что тот, кто писал набор, вполне разумно хотел, чтобы он отражал продакшен.</p><p><strong>Локальная разработка.</strong> Инженеры, которые итерируют промпт, обращаются к API десятки раз в час, обычно с общим ключом и обычно без тегов, по которым видно, чей это цикл.</p><p><strong>Staging и демо-инстансы.</strong> Долгоживущие, с низкой нагрузкой и настроенные так же, как продакшен &mdash; то есть с дорогой моделью и без кэширования, обслуживающие горстку запросов, за которыми никто не следит.</p><p><strong>Повторы и разгулявшиеся циклы в тестах.</strong> Агентный цикл, который безопасно падает в продакшене, всё равно сжигает токены, когда ведёт себя неправильно в какой-то ветке, а в тестовом окружении ничего не настроено на то, чтобы это заметить.</p><h2>Сначала исправьте атрибуцию, потом стоимость</h2><p>Единственное изменение, которое окупается сразу, &mdash; <strong>отдельный API-ключ для каждого окружения</strong>. На это уходит полдня, и одна необъяснённая строка счёта превращается в четыре подписанные. Помечайте каждый запрос окружением, а для CI &mdash; репозиторием и workflow. Без этого все предложения ниже &mdash; гадание.</p><p>Когда вы это видите, обычно сразу следуют три вещи. Вне продакшена почти всегда достаточно модели поменьше: наборам оценок нужна стабильность, а не возможности фронтирной модели, и большинство из них может закрепить более дешёвую модель без потери сигнала. Вне продакшена кэширование окупается лучше всего, потому что CI весь день повторяет почти одинаковые промпты. И вне продакшена жёсткие лимиты расходов действительно безопасны: тестовое окружение с лимитом падает на сборке, а продакшен с лимитом подводит клиента.</p><h2>Правило</h2><p>Дайте каждому непродакшен-окружению свой ключ, свой бюджет и свой лимит. Тогда разрыв между окружениями становится числом, которым вы управляете осознанно, а не тем, что обнаруживаете на квартальном обзоре.</p><h2>Связанное</h2><ul><li><a href=\"/research/evals-cost-control\">Контроль затрат в конвейере оценок</a></li><li><a href=\"/research/llm-cost-attribution\">Атрибуция затрат на LLM</a></li><li><a href=\"/research/agent-spend-guardrails\">Ограничители расходов агентов</a></li></ul>",
+      "faq": [
+        {
+          "question": "Какая доля счёта за LLM обычно приходится на непродакшен?",
+          "answer": "По-разному, но команды, которые это измеряют, регулярно удивляются, находя двузначный процент, который никогда не обслуживал клиента. Наборы оценок в CI обычно дают самый большой вклад, за ними идут долгоживущие staging-инстансы."
+        },
+        {
+          "question": "Что нужно поменять в первую очередь?",
+          "answer": "Отдельный API-ключ для каждого окружения с тегом окружения в каждом запросе. Это занимает полдня и превращает одну непонятную строку счёта в размеченные, что является условием для всех остальных исправлений."
+        },
+        {
+          "question": "Безопасно ли ставить жёсткий лимит расходов на непродакшен?",
+          "answer": "Да, и это единственное место, где жёсткий лимит действительно безопасен. Тестовое окружение с лимитом падает на сборке, что кто-то заметит и исправит; продакшен с лимитом подводит клиента."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/evals-cost-control",
+          "label": "Контроль затрат в конвейере оценок"
+        },
+        {
+          "slug": "/research/llm-cost-attribution",
+          "label": "Атрибуция затрат на LLM"
+        },
+        {
+          "slug": "/research/agent-spend-guardrails",
+          "label": "Ограничители расходов агентов"
+        }
+      ]
+    },
+    "tr": {
+      "title": "Geliştirme ortamınız da bir üretim iş yüküdür",
+      "titleCore": "Üretim dışı LLM harcaması",
+      "description": "CI, yerel geliştirme, staging ve demolar sessizce LLM faturasının gerçek bir payına dönüşür; en az atfedilen kısım da neredeyse hep bunlardır.",
+      "body": "<p>LLM harcamasına yönelik her FinOps incelemesi üretim trafiğiyle başlar, çünkü tek görünür olan odur. Sonra biri rakamları ortama göre ayırır ve faturanın önemli bir dilimini bulur &mdash; çoğu zaman yüzde olarak iki haneli bir oran &mdash; bu dilim hiçbir müşteriye dokunmamıştır.</p><p>Bu harcama dört yerden gelir ve bunlar birbirini büyütür.</p><h2>Üretim dışı harcama nereden gelir</h2><p><strong>CI.</strong> Değerlendirme paketi çalıştıran her pull request modeli çağırır. Yoğun bir depoda iki yüz senaryoluk bir paket günde binlerce çağrı demektir ve bunlar en yetenekli modelde yapılır, çünkü paketi yazan kişi haklı olarak üretimi yansıtmasını istemiştir.</p><p><strong>Yerel geliştirme.</strong> Bir prompt üzerinde çalışan mühendisler saatte onlarca kez API çağırır; genellikle paylaşılan bir anahtarla ve bu döngünün kime ait olduğunu söyleyen bir etiket olmadan.</p><p><strong>Staging ve demo ortamları.</strong> Uzun ömürlü, düşük trafikli ve üretimle birebir aynı yapılandırılmış ortamlar. Yani pahalı model ve önbellek yok; kimsenin izlemediği bir avuç isteğe hizmet ediyorlar.</p><p><strong>Testte yeniden denemeler ve kontrolden çıkan döngüler.</strong> Üretimde güvenle başarısız olan bir ajan döngüsü, bir test dalında hata yaptığında yine jeton harcar; test ortamında bunu fark edecek hiçbir şey kurulu değildir.</p><h2>Maliyetten önce atfı düzeltin</h2><p>Kendini ilk günden amorti eden tek değişiklik, <strong>ortam başına ayrı bir API anahtarı</strong>dır. Bir öğleden sonra sürer ve açıklanamayan tek bir kalemi etiketli dört kaleme dönüştürür. Her isteğe ortamı, CI için de depoyu ve iş akışını etiketleyin. Bu yapılmadan aşağıdaki her öneri tahmin yürütmekten ibarettir.</p><p>Görünür hale gelince genelde üç şey hemen ardından gelir. Üretim dışında daha küçük bir model neredeyse her zaman yeterlidir; değerlendirme paketleri tutarlılık ister, en yetenekli modeli değil, ve çoğu daha ucuz bir modeli sabitleyip sinyal kaybetmeden çalışabilir. Üretim dışı ortamlarda önbellek en çok kazandırır, çünkü CI bütün gün neredeyse aynı prompt'ları tekrar oynatır. Ve sert harcama sınırları burada gerçekten güvenle konulabilir: sınırlanmış bir test ortamı bir derlemeyi durdurur, sınırlanmış bir üretim ortamı ise bir müşteriyi.</p><h2>Kural</h2><p>Her üretim dışı ortama kendi anahtarını, kendi bütçesini ve kendi sınırını verin. Ardından ortamlar arasındaki farkı, üç aylık bir incelemede keşfettiğiniz bir sayı olarak değil, bilerek yönettiğiniz bir sayı olarak ele alın.</p><h2>İlgili</h2><ul><li><a href=\"/research/evals-cost-control\">Değerlendirme hattınızda maliyet kontrolleri</a></li><li><a href=\"/research/llm-cost-attribution\">LLM maliyet atfı</a></li><li><a href=\"/research/agent-spend-guardrails\">Ajan harcama korkulukları</a></li></ul>",
+      "faq": [
+        {
+          "question": "Bir LLM faturasının tipik olarak ne kadarı üretim dışıdır?",
+          "answer": "Değişir, ancak ölçen ekipler çoğu zaman yüzde olarak iki haneli bir oranın hiçbir müşteriye hizmet etmediğini görüp şaşırır. CI değerlendirme paketleri genellikle tek en büyük katkıdır, onu uzun ömürlü staging örnekleri izler."
+        },
+        {
+          "question": "Önce neyi değiştirmeli?",
+          "answer": "Ortam başına ayrı bir API anahtarı ve her isteğe etiketlenmiş ortam. Bir öğleden sonra sürer ve açıklanamayan tek bir kalemi etiketli kalemlere dönüştürür; bu da diğer tüm düzeltmelerin ön koşuludur."
+        },
+        {
+          "question": "Üretim dışına sert bir harcama sınırı koymak güvenli mi?",
+          "answer": "Evet, sert sınırın gerçekten güvenli olduğu tek yer burasıdır. Sınırlanmış bir test ortamı bir derlemeyi durdurur ve birisi bunu fark edip düzeltir; sınırlanmış bir üretim ortamı ise bir müşteriyi durdurur."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/evals-cost-control",
+          "label": "Değerlendirme hattınızda maliyet kontrolleri"
+        },
+        {
+          "slug": "/research/llm-cost-attribution",
+          "label": "LLM maliyet atfı"
+        },
+        {
+          "slug": "/research/agent-spend-guardrails",
+          "label": "Ajan harcama korkulukları"
+        }
+      ]
+    },
+    "vi": {
+      "title": "Môi trường dev của bạn cũng là tải production",
+      "titleCore": "Chi phí LLM ngoài môi trường production",
+      "description": "CI, phát triển cục bộ, staging và demo lặng lẽ chiếm một phần đáng kể trong hóa đơn LLM, và gần như luôn là phần ít được phân bổ chi phí nhất.",
+      "body": "<p>Mọi đợt rà soát chi phí FinOps đều bắt đầu từ lưu lượng production, vì đó là phần có bảng theo dõi. Rồi ai đó chia số liệu theo môi trường và thấy một phần đáng kể của hóa đơn &mdash; thường ở mức hai chữ số phần trăm &mdash; chưa từng chạm tới khách hàng nào.</p><p>Khoản này đến từ bốn nơi, và chúng cộng dồn lên nhau.</p><h2>Chi phí ngoài production đến từ đâu</h2><p><strong>CI.</strong> Mỗi pull request chạy một bộ đánh giá đều gọi model. Một bộ hai trăm trường hợp trong một repository bận rộn là hàng nghìn lời gọi mỗi ngày, trên model mạnh nhất, vì người viết bộ đánh giá hợp lý muốn nó phản ánh production.</p><p><strong>Phát triển cục bộ.</strong> Kỹ sư tinh chỉnh prompt gọi API hàng chục lần mỗi giờ, thường dùng chung một key, thường không có thẻ nào cho biết vòng lặp đó của ai.</p><p><strong>Staging và instance demo.</strong> Chạy lâu dài, ít lưu lượng, và được cấu hình giống hệt production, nghĩa là model đắt tiền và không có cache, phục vụ vài yêu cầu mà không ai theo dõi.</p><p><strong>Thử lại và vòng lặp chạy vô tội vạ trong test.</strong> Một vòng lặp agent vốn thất bại an toàn trong production vẫn đốt token khi nó hoạt động sai trong một nhánh, và không có gì trong môi trường test được thiết lập để phát hiện điều đó.</p><h2>Sửa phân bổ chi phí trước khi sửa chi phí</h2><p>Thay đổi tự trả lại chi phí là <strong>một API key riêng cho mỗi môi trường</strong>. Việc này tốn một buổi chiều và biến một dòng hóa đơn không giải thích được thành bốn dòng có nhãn. Gắn thẻ môi trường cho mọi yêu cầu, và với CI thì gắn thêm repository và workflow. Nếu không có điều này, mọi đề xuất bên dưới đều chỉ là phỏng đoán.</p><p>Khi đã nhìn thấy được, ba điều thường đi theo ngay. Ngoài production, một model nhỏ hơn hầu như luôn đủ dùng: bộ đánh giá cần tính nhất quán, không cần năng lực model biên, và phần lớn có thể ghim một model rẻ hơn mà không mất tín hiệu. Ngoài production là nơi cache sinh lợi nhiều nhất, vì CI lặp lại các prompt gần như giống hệt nhau suốt ngày. Và ngoài production là nơi đặt trần chi tiêu cứng an toàn thực sự: một môi trường test chạm trần sẽ làm hỏng một build, còn một môi trường production chạm trần sẽ làm hỏng trải nghiệm của khách hàng.</p><h2>Nguyên tắc</h2><p>Hãy cấp cho mọi môi trường ngoài production một key riêng, một ngân sách riêng và một trần riêng. Sau đó coi khoảng cách giữa các môi trường là một con số bạn chủ động quản lý, thay vì một thứ bạn phát hiện trong đợt rà soát hằng quý.</p><h2>Liên quan</h2><ul><li><a href=\"/research/evals-cost-control\">Kiểm soát chi phí trong pipeline đánh giá của bạn</a></li><li><a href=\"/research/llm-cost-attribution\">Phân bổ chi phí LLM</a></li><li><a href=\"/research/agent-spend-guardrails\">Guardrail chi tiêu cho agent</a></li></ul>",
+      "faq": [
+        {
+          "question": "Thông thường bao nhiêu phần hóa đơn LLM là ngoài production?",
+          "answer": "Tùy trường hợp, nhưng các đội đo lường thường ngạc nhiên khi thấy một tỷ lệ hai chữ số chưa từng phục vụ khách hàng nào. Bộ đánh giá CI thường là nguồn lớn nhất, tiếp theo là các instance staging chạy lâu dài."
+        },
+        {
+          "question": "Điều đầu tiên nên thay đổi là gì?",
+          "answer": "Một API key riêng cho mỗi môi trường, với môi trường được gắn thẻ trên mọi yêu cầu. Việc này mất một buổi chiều và biến một dòng hóa đơn không rõ nguồn thành các dòng có nhãn, là điều kiện tiên quyết cho mọi cải tiến khác."
+        },
+        {
+          "question": "Có an toàn khi đặt trần chi tiêu cứng cho môi trường ngoài production không?",
+          "answer": "Có, và đây là nơi duy nhất trần cứng thực sự an toàn. Một môi trường test chạm trần sẽ làm hỏng một build, và ai đó sẽ nhận ra và sửa; còn một môi trường production chạm trần sẽ làm hỏng trải nghiệm của khách hàng."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/evals-cost-control",
+          "label": "Kiểm soát chi phí trong pipeline đánh giá của bạn"
+        },
+        {
+          "slug": "/research/llm-cost-attribution",
+          "label": "Phân bổ chi phí LLM"
+        },
+        {
+          "slug": "/research/agent-spend-guardrails",
+          "label": "Guardrail chi tiêu cho agent"
+        }
+      ]
+    },
+    "ar": {
+      "title": "بيئة التطوير لديك عبء إنتاجي",
+      "titleCore": "إنفاق LLM في بيئات غير الإنتاج",
+      "description": "تتحول تشغيلات CI والتطوير المحلي ونسخ التجهيز والعروض التجريبية بصمت إلى حصة حقيقية من فاتورة LLM، وهي غالباً أقل أجزائها نسباً إلى صاحبها.",
+      "body": "<p>تبدأ كل مراجعة FinOps لإنفاق LLM بحركة الإنتاج، لأنها التي لها لوحة. ثم يحسب أحدهم الأرقام بحسب البيئة فيجد أن شريحة معتبرة من الفاتورة &mdash; كثيراً ما تكون برقمين بالنسبة المئوية &mdash; لم تلمس عميلاً قط.</p><p>مصدرها أربعة أماكن، وهي تتراكم.</p><h2>من أين يأتي إنفاق غير الإنتاج</h2><p><strong>التكامل المستمر CI.</strong> كل طلب دمج يشغّل مجموعة تقييم يستدعي النموذج. ومجموعة من مئتي حالة في مستودع نشط تعني آلاف الاستدعاءات يومياً على أقدر نموذج، لأن من كتبها أراد بحق أن تعكس الإنتاج.</p><p><strong>التطوير المحلي.</strong> المهندسون الذين يكررون على مطالبة يستدعون الواجهة عشرات المرات في الساعة، عادةً على مفتاح مشترك، وعادةً دون وسم يبيّن حلقة من كانت.</p><p><strong>نسخ التجهيز والعرض التجريبي.</strong> طويلة العمر وقليلة الحركة ومهيأة مطابقةً للإنتاج &mdash; أي النموذج الغالي دون ذاكرة مؤقتة، تخدم حفنة من الطلبات لا يراقبها أحد.</p><p><strong>إعادة المحاولات والحلقات الجامحة في الاختبار.</strong> حلقة وكيل تفشل بأمان في الإنتاج تحرق الرموز مع ذلك حين تسيء التصرف في فرع، ولا شيء في بيئة الاختبار مهيأ ليلاحظ.</p><h2>أصلح النسب قبل أن تصلح التكلفة</h2><p>التغيير الوحيد الذي يسدد نفسه هو <strong>مفتاح واجهة منفصل لكل بيئة</strong>. يكلف بعد ظهر يوم واحد ويحوّل بنداً غير مفسَّر إلى أربعة بنود موسومة. وسم كل طلب بالبيئة، وفي CI بالمستودع وسير العمل. دون ذلك كل مقترح أدناه تخمين.</p><p>وحين تصبح الرؤية ممكنة تأتي ثلاثة أشياء عادةً فوراً. غير الإنتاج هو المكان الذي يكفي فيه نموذج أصغر دائماً تقريباً &mdash; فمجموعات التقييم تحتاج إلى الاتساق لا إلى قدرة متقدمة، ومعظمها يمكنه تثبيت نموذج أرخص دون خسارة في الإشارة. وغير الإنتاج هو حيث تحقق الذاكرة المؤقتة أكبر مكسب، لأن CI يعيد تشغيل مطالبات متطابقة تقريباً طوال اليوم. وغير الإنتاج هو حيث يكون وضع سقوف إنفاق صارمة آمناً فعلاً: بيئة اختبار ذات سقف تُفشل بناءً، أما بيئة إنتاج ذات سقف فتُفشل عميلاً.</p><h2>القاعدة</h2><p>امنح كل بيئة غير إنتاجية مفتاحها وميزانيتها وسقفها. ثم عامل الفجوة بين البيئات رقماً تديره عن قصد، لا رقماً تكتشفه في مراجعة ربع سنوية.</p><h2>ذات صلة</h2><ul><li><a href=\"/research/evals-cost-control\">ضوابط التكلفة في خط التقييم لديك</a></li><li><a href=\"/research/llm-cost-attribution\">نسب تكلفة LLM</a></li><li><a href=\"/research/agent-spend-guardrails\">ضوابط إنفاق الوكلاء</a></li></ul>",
+      "faq": [
+        {
+          "question": "كم يمثل غير الإنتاج عادةً من فاتورة LLM؟",
+          "answer": "يختلف ذلك، لكن الفرق التي تقيسه تُفاجأ مراراً بأن نسبة برقمين لم تخدم عميلاً قط. وتكون مجموعات تقييم CI عادةً أكبر مساهم منفرد، تليها نسخ التجهيز طويلة العمر."
+        },
+        {
+          "question": "ما أول شيء ينبغي تغييره؟",
+          "answer": "مفتاح واجهة منفصل لكل بيئة، مع وسم البيئة على كل طلب. يستغرق بعد ظهر يوم واحد ويحوّل بنداً غير مفسَّر إلى بنود موسومة، وهذا شرط مسبق لكل إصلاح آخر."
+        },
+        {
+          "question": "هل من الآمن وضع سقف إنفاق صارم على غير الإنتاج؟",
+          "answer": "نعم، وهو المكان الوحيد الذي يكون فيه السقف الصارم آمناً فعلاً. بيئة اختبار ذات سقف تُفشل بناءً يلاحظه أحد ويصلحه، أما بيئة إنتاج ذات سقف فتُفشل عميلاً."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/evals-cost-control",
+          "label": "ضوابط التكلفة في خط التقييم لديك"
+        },
+        {
+          "slug": "/research/llm-cost-attribution",
+          "label": "نسب تكلفة LLM"
+        },
+        {
+          "slug": "/research/agent-spend-guardrails",
+          "label": "ضوابط إنفاق الوكلاء"
+        }
+      ]
+    },
+    "it": {
+      "title": "Il tuo ambiente di sviluppo è un carico di produzione",
+      "titleCore": "Spesa LLM fuori produzione",
+      "description": "CI, sviluppo locale, staging e demo diventano silenziosamente una quota reale della fattura LLM, e sono quasi sempre la parte meno attribuita.",
+      "body": "<p>Ogni revisione FinOps della spesa LLM parte dal traffico di produzione, perché è l'unico che ha una dashboard. Poi qualcuno raggruppa i numeri per ambiente e scopre che una quota consistente della fattura &mdash; spesso a due cifre percentuali &mdash; non ha mai toccato un cliente.</p><p>Arriva da quattro fonti, che si sommano.</p><h2>Da dove arriva la spesa fuori produzione</h2><p><strong>CI.</strong> Ogni pull request che esegue una suite di valutazione chiama il modello. Una suite da duecento casi su un repository attivo significa migliaia di chiamate al giorno, sul modello più capace, perché chi l'ha scritta voleva giustamente che riflettesse la produzione.</p><p><strong>Sviluppo locale.</strong> Gli ingegneri che mettono a punto un prompt chiamano l'API decine di volte all'ora, di solito con una chiave condivisa e senza tag che indichino di chi è quel ciclo.</p><p><strong>Staging e istanze demo.</strong> Sono istanze di lunga durata, a basso traffico, configurate come la produzione &mdash; quindi con il modello costoso e senza cache, a servire una manciata di richieste che nessuno controlla.</p><p><strong>Retry e cicli fuori controllo nei test.</strong> Un ciclo di agenti che in produzione fallisce in sicurezza consuma comunque token quando si comporta male in un branch, e nessun ambiente di test è configurato per accorgersene.</p><h2>Prima l'attribuzione, poi il costo</h2><p>La modifica che si ripaga da sola è una <strong>chiave API separata per ogni ambiente</strong>. Richiede un pomeriggio e trasforma una voce inspiegabile in quattro voci etichettate. Etichettate ogni richiesta con l'ambiente e, per la CI, anche con il repository e il workflow. Senza questo, ogni proposta successiva è solo un'ipotesi.</p><p>Una volta visibile, di solito seguono subito tre cose. Fuori produzione un modello più piccolo va quasi sempre bene: le suite di valutazione richiedono coerenza, non capacità di frontiera, e la maggior parte può fissare un modello più economico senza perdere segnale. Fuori produzione la cache rende di più, perché la CI ripete tutto il giorno prompt quasi identici. E fuori produzione i tetti di spesa rigidi sono davvero sicuri da impostare: un ambiente di test con tetto fa fallire una build, un ambiente di produzione con tetto fa fallire un cliente.</p><h2>La regola</h2><p>Ogni ambiente non di produzione deve avere la propria chiave, il proprio budget e il proprio tetto. Poi trattate il divario tra ambienti come un numero da gestire deliberatamente, invece di scoprirlo in una revisione trimestrale.</p><h2>Correlati</h2><ul><li><a href=\"/research/evals-cost-control\">Controlli dei costi nella pipeline di valutazione</a></li><li><a href=\"/research/llm-cost-attribution\">Attribuzione dei costi LLM</a></li><li><a href=\"/research/agent-spend-guardrails\">Guardrail sulla spesa degli agenti</a></li></ul>",
+      "faq": [
+        {
+          "question": "Quanta parte di una fattura LLM è tipicamente non di produzione?",
+          "answer": "Dipende, ma chi la misura scopre spesso con sorpresa che una quota a due cifre percentuali non ha mai servito un cliente. Le suite di valutazione in CI sono di solito il contributo singolo più grande, seguite dalle istanze di staging di lunga durata."
+        },
+        {
+          "question": "Qual è la prima cosa da cambiare?",
+          "answer": "Una chiave API separata per ambiente, con l'ambiente etichettato su ogni richiesta. Richiede un pomeriggio e trasforma una voce inspiegabile in voci identificate, che è la condizione per ogni altra correzione."
+        },
+        {
+          "question": "È sicuro impostare un tetto di spesa rigido sull'ambiente non di produzione?",
+          "answer": "Sì, ed è l'unico ambiente in cui un tetto rigido è davvero sicuro. Un ambiente di test con tetto fa fallire una build, cosa che qualcuno nota e risolve; un ambiente di produzione con tetto fa fallire un cliente."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/evals-cost-control",
+          "label": "Controlli dei costi nella pipeline di valutazione"
+        },
+        {
+          "slug": "/research/llm-cost-attribution",
+          "label": "Attribuzione dei costi LLM"
+        },
+        {
+          "slug": "/research/agent-spend-guardrails",
+          "label": "Guardrail sulla spesa degli agenti"
+        }
+      ]
+    },
+    "ko": {
+      "title": "개발 환경도 프로덕션 워크로드입니다",
+      "titleCore": "프로덕션 외 LLM 지출",
+      "description": "CI, 로컬 개발, 스테이징, 데모 인스턴스는 조용히 LLM 청구액의 실질적인 몫이 되며, 거의 항상 가장 귀속이 안 되는 부분입니다.",
+      "body": "<p>LLM 지출 검토는 늘 프로덕션 트래픽에서 시작합니다. 대시보드가 있는 것이 그것뿐이기 때문입니다. 그러나 환경별로 나눠 보면, 청구액의 상당한 부분 &mdash; 흔히 퍼센트로 두 자릿수 &mdash; 가 고객에게 한 번도 닿지 않았다는 사실이 드러납니다.</p><p>이 비용은 네 곳에서 생기며, 서로 겹치면서 커집니다.</p><h2>프로덕션 외 지출의 출처</h2><p><strong>CI.</strong> 평가 스위트를 실행하는 모든 풀 리퀘스트가 모델을 호출합니다. 활발한 저장소에서 200개 케이스로 이루어진 스위트는 하루에 수천 번의 호출이며, 대개 가장 성능이 높은 모델을 씁니다. 스위트를 작성한 사람이 프로덕션을 반영하길 원했기 때문입니다.</p><p><strong>로컬 개발.</strong> 프롬프트를 다듬는 엔지니어는 시간당 수십 번 API를 호출합니다. 보통 공유 키를 쓰고, 누구의 반복 작업인지 알 수 있는 태그도 없습니다.</p><p><strong>스테이징과 데모 인스턴스.</strong> 장기간 운영되고 트래픽은 적지만, 프로덕션과 동일하게 설정되어 있습니다. 즉 비싼 모델을 쓰고 캐싱도 없으며, 아무도 지켜보지 않는 소수의 요청을 처리합니다.</p><p><strong>테스트 중의 재시도와 폭주 루프.</strong> 프로덕션에서는 안전하게 실패하는 에이전트 루프도 특정 분기에서 잘못 동작하면 토큰을 계속 소모합니다. 테스트 환경에는 이를 감지하는 장치가 보통 없습니다.</p><h2>비용을 줄이기 전에 귀속부터 고치세요</h2><p>가장 확실하게 비용을 회수하는 변경은 <strong>환경마다 별도의 API 키</strong>를 두는 것입니다. 반나절이면 끝나며, 설명되지 않던 항목 하나가 라벨이 붙은 네 개의 항목으로 바뀝니다. 모든 요청에 환경을 태그하고, CI라면 저장소와 워크플로도 태그하세요. 그렇지 않으면 아래의 모든 제안은 추측에 불과합니다.</p><p>이것이 보이기 시작하면 보통 세 가지가 바로 뒤따릅니다. 프로덕션 외에서는 더 작은 모델이 거의 항상 충분합니다. 평가 스위트에는 높은 성능보다 일관성이 필요하며, 대부분 더 저렴한 모델을 고정해도 신호가 손실되지 않습니다. 또한 프로덕션 외는 캐싱의 효과가 가장 큰 곳입니다. CI는 거의 같은 프롬프트를 하루 종일 반복하기 때문입니다. 그리고 프로덕션 외는 엄격한 지출 상한을 실제로 안전하게 설정할 수 있는 곳입니다. 상한에 걸린 테스트 환경은 빌드를 실패시키지만, 상한에 걸린 프로덕션 환경은 고객을 실패시킵니다.</p><h2>원칙</h2><p>모든 프로덕션 외 환경에 자체 키, 자체 예산, 자체 상한을 부여하세요. 그런 다음 환경 간 차이를 분기별 검토에서 뒤늦게 발견하는 것이 아니라, 의도적으로 관리하는 숫자로 다루세요.</p><h2>관련 글</h2><ul><li><a href=\"/research/evals-cost-control\">평가 파이프라인의 비용 통제</a></li><li><a href=\"/research/llm-cost-attribution\">LLM 비용 귀속</a></li><li><a href=\"/research/agent-spend-guardrails\">에이전트 지출 가드레일</a></li></ul>",
+      "faq": [
+        {
+          "question": "LLM 청구액에서 프로덕션 외 지출은 보통 얼마나 되나요?",
+          "answer": "상황에 따라 다르지만, 측정해 본 팀들은 대개 두 자릿수 퍼센트가 고객에게 전혀 서비스되지 않았다는 사실에 놀랍니다. CI 평가 스위트가 보통 가장 큰 단일 원인이며, 그다음이 장기간 운영되는 스테이징 인스턴스입니다."
+        },
+        {
+          "question": "가장 먼저 바꿔야 할 것은 무엇인가요?",
+          "answer": "환경마다 별도의 API 키를 두고, 모든 요청에 환경을 태그하는 것입니다. 반나절이면 끝나고, 설명되지 않던 항목 하나를 라벨이 붙은 항목들로 바꿔 주며, 다른 모든 개선의 전제 조건이 됩니다."
+        },
+        {
+          "question": "프로덕션 외 환경에 엄격한 지출 상한을 걸어도 안전한가요?",
+          "answer": "네, 이것이 엄격한 상한이 실제로 안전한 유일한 곳입니다. 상한에 걸린 테스트 환경은 빌드를 실패시키고, 누군가 이를 알아차려 고칩니다. 반면 상한에 걸린 프로덕션 환경은 고객을 실패시킵니다."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/evals-cost-control",
+          "label": "평가 파이프라인의 비용 통제"
+        },
+        {
+          "slug": "/research/llm-cost-attribution",
+          "label": "LLM 비용 귀속"
+        },
+        {
+          "slug": "/research/agent-spend-guardrails",
+          "label": "에이전트 지출 가드레일"
+        }
+      ]
+    },
+    "nl": {
+      "title": "Je dev-omgeving is een productieworkload",
+      "titleCore": "LLM-uitgaven buiten productie",
+      "description": "CI-runs, lokale ontwikkeling, staging en demo-instanties worden stilletjes een serieus deel van de LLM-rekening, en zijn bijna altijd het minst toegerekende deel.",
+      "body": "<p>Elke FinOps-review van LLM-uitgaven begint met productieverkeer, omdat daar een dashboard voor is. Dan rekent iemand de cijfers per omgeving door en ziet dat een aanzienlijk deel van de rekening &mdash; vaak in dubbele cijfers als percentage &mdash; nooit een klant heeft aangeraakt.</p><p>Het komt uit vier plekken, en ze stapelen zich op.</p><h2>Waar uitgaven buiten productie vandaan komen</h2><p><strong>CI.</strong> Elke pull request die een evaluatiesuite draait, roept het model aan. Een suite van tweehonderd cases in een drukke repository is duizenden aanroepen per dag, op het meest capabele model, omdat wie de suite schreef heel redelijk wilde dat die productie weerspiegelt.</p><p><strong>Lokale ontwikkeling.</strong> Engineers die aan een prompt itereren, roepen de API tientallen keren per uur aan, meestal op een gedeelde sleutel, meestal zonder tagging die zegt van wiens loop het was.</p><p><strong>Staging- en demo-instanties.</strong> Langlevend, weinig verkeer en identiek geconfigureerd aan productie &mdash; dus het dure model en geen caching, voor een handvol verzoeken waar niemand naar kijkt.</p><p><strong>Nieuwe pogingen en op hol geslagen loops in test.</strong> Een agentloop die in productie veilig faalt, verbrandt nog steeds tokens als hij zich in een branch misdraagt, en niets in een testomgeving is ingericht om dat op te merken.</p><h2>Los toerekening op voordat je kosten oplost</h2><p>De ene wijziging die zichzelf terugbetaalt is een <strong>aparte API-sleutel per omgeving</strong>. Het kost een middag en maakt van een onverklaarde regel vier gelabelde regels. Tag elk verzoek met de omgeving en, voor CI, de repository en workflow. Zonder dat is elk voorstel hieronder giswerk.</p><p>Zodra je het kunt zien, volgen er meestal direct drie dingen. Buiten productie is een kleiner model bijna altijd prima &mdash; evaluatiesuites hebben consistentie nodig, geen frontiercapaciteit, en de meeste kunnen een goedkoper model vastpinnen zonder signaalverlies. Buiten productie verdient caching het meeste, omdat CI de hele dag bijna identieke prompts herhaalt. En buiten productie zijn harde uitgavenplafonds echt veilig om in te stellen: een omgeving met plafond laat een build falen, terwijl een productieomgeving met plafond een klant laat falen.</p><h2>De regel</h2><p>Geef elke omgeving buiten productie een eigen sleutel, een eigen budget en een eigen plafond. Behandel het verschil tussen omgevingen dan als een getal dat je bewust beheert, in plaats van een getal dat je ontdekt in een kwartaalreview.</p><h2>Gerelateerd</h2><ul><li><a href=\"/research/evals-cost-control\">Kostenbeheersing in je evaluatiepipeline</a></li><li><a href=\"/research/llm-cost-attribution\">Toerekening van LLM-kosten</a></li><li><a href=\"/research/agent-spend-guardrails\">Uitgavenguardrails voor agents</a></li></ul>",
+      "faq": [
+        {
+          "question": "Hoeveel van een LLM-rekening is doorgaans niet-productie?",
+          "answer": "Het varieert, maar teams die het meten, zijn regelmatig verrast dat een percentage in dubbele cijfers nooit een klant bediende. CI-evaluatiesuites zijn meestal de grootste enkele bijdrager, gevolgd door langlevende staging-instanties."
+        },
+        {
+          "question": "Wat moet je als eerste veranderen?",
+          "answer": "Een aparte API-sleutel per omgeving, met de omgeving getagd op elk verzoek. Het kost een middag en maakt van één onverklaarde regel gelabelde regels, wat een voorwaarde is voor elke andere oplossing."
+        },
+        {
+          "question": "Is het veilig om een hard uitgavenplafond op niet-productie te zetten?",
+          "answer": "Ja, en het is de enige plek waar een hard plafond echt veilig is. Een geplafonneerde testomgeving laat een build falen, wat iemand opmerkt en herstelt; een geplafonneerde productieomgeving laat een klant falen."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/evals-cost-control",
+          "label": "Kostenbeheersing in je evaluatiepipeline"
+        },
+        {
+          "slug": "/research/llm-cost-attribution",
+          "label": "Toerekening van LLM-kosten"
+        },
+        {
+          "slug": "/research/agent-spend-guardrails",
+          "label": "Uitgavenguardrails voor agents"
+        }
+      ]
+    },
+    "zh": {
+      "title": "你的开发环境也是生产负载",
+      "titleCore": "非生产环境的 LLM 支出",
+      "description": "CI 运行、本地开发、预发布和演示实例会悄悄变成 LLM 账单中实实在在的一部分，而它们几乎总是最缺乏归因的部分。",
+      "body": "<p>每一次 LLM 支出的 FinOps 复盘都从生产流量开始，因为只有它有仪表盘。然后有人按环境拆分数字，发现账单中相当一部分&mdash;&mdash;往往是两位数的百分比&mdash;&mdash;从未触达过任何客户。</p><p>它来自四个地方，而且彼此叠加。</p><h2>非生产支出从哪里来</h2><p><strong>CI。</strong>每个运行评估套件的拉取请求都会调用模型。在一个活跃的代码仓库中，两百个用例的套件意味着每天数千次调用，而且用的是能力最强的模型，因为编写套件的人很合理地希望它能反映生产环境。</p><p><strong>本地开发。</strong>工程师在迭代提示词时，每小时可能调用 API 几十次，通常使用共享密钥，也通常没有标记说明这是谁的循环。</p><p><strong>预发布和演示实例。</strong>长期运行、流量很低，而且配置与生产环境完全相同&mdash;&mdash;这意味着昂贵的模型、没有缓存，却只服务于少量没人关注的请求。</p><p><strong>测试中的重试和失控循环。</strong>一个在生产中能安全失败的智能体循环，在测试分支里出错时仍会消耗 token，而测试环境中没有任何机制会发现它。</p><h2>先修复归因，再修复成本</h2><p>唯一能自我回本的改动，是<strong>为每个环境配置独立的 API 密钥</strong>。它只需要一个下午，就能把一个说不清来源的账单项拆成四个有标签的项目。给每个请求打上环境标签，对 CI 则再加上代码仓库和工作流标签。没有这些，下面的每一项建议都只是猜测。</p><p>一旦能看清楚，通常会立即得出三点结论。非生产环境几乎总是用较小的模型就够了&mdash;&mdash;评估套件需要的是一致性，而不是前沿能力，而且大多数套件可以固定使用更便宜的模型，且不损失信号。非生产环境也是缓存收益最大的地方，因为 CI 整天都在重放几乎相同的提示词。还有，非生产环境是真正可以安全设置硬性支出上限的地方：一个设了上限的测试环境只会导致构建失败，而一个设了上限的生产环境会导致客户失败。</p><h2>规则</h2><p>为每个非生产环境配置独立的密钥、独立的预算和独立的上限。然后，把各环境之间的差距当作一个需要主动管理的数字，而不是等到季度复盘时才发现的东西。</p><h2>相关阅读</h2><ul><li><a href=\"/research/evals-cost-control\">评估流水线中的成本控制</a></li><li><a href=\"/research/llm-cost-attribution\">LLM 成本归因</a></li><li><a href=\"/research/agent-spend-guardrails\">智能体支出护栏</a></li></ul>",
+      "faq": [
+        {
+          "question": "LLM 账单中通常有多少是非生产支出？",
+          "answer": "这因团队而异，但真正去测量的团队常常会惊讶地发现，有两位数百分比的支出从未服务过客户。CI 评估套件通常是最大的单一来源，其次是长期运行的预发布实例。"
+        },
+        {
+          "question": "第一件应该改变的事情是什么？",
+          "answer": "为每个环境配置独立的 API 密钥，并在每个请求上标记环境。这只需要一个下午，就能把一个说不清来源的账单项拆成有标签的项目，而这是其他所有修复的前提。"
+        },
+        {
+          "question": "在非生产环境设置硬性支出上限安全吗？",
+          "answer": "安全，而且这是硬性上限真正安全的少数场景之一。设了上限的测试环境只会导致构建失败，有人会注意到并修复；设了上限的生产环境则会导致客户失败。"
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/evals-cost-control",
+          "label": "评估流水线中的成本控制"
+        },
+        {
+          "slug": "/research/llm-cost-attribution",
+          "label": "LLM 成本归因"
+        },
+        {
+          "slug": "/research/agent-spend-guardrails",
+          "label": "智能体支出护栏"
         }
       ]
     }

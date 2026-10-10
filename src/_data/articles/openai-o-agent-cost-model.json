@@ -262,6 +262,426 @@
           "label": "Economia de agentes"
         }
       ]
+    },
+    "id": {
+      "title": "OpenAI O / AON: model biaya agen selalu aktif",
+      "titleCore": "Model biaya agen selalu aktif OpenAI O / AON",
+      "description": "Berapa biaya agen selalu aktif per minggu pada tarif tingkat OpenAI O, dan kontrol konkurensi yang menjaga tagihan tetap terbatas.",
+      "body": "<p>Referensi yang bocor mengungkap “O” dari OpenAI (nama sandi AON), yaitu asisten selalu aktif yang dirancang untuk tugas berhorizon panjang. Berbeda dengan model chat yang menjawab lalu berhenti, O mendapatkan lingkungan cloud sendiri, dapat menyiapkan konteks eksekusi, menulis kode, meneliti, dan beroperasi terus-menerus selama <strong>berjam-jam, berhari-hari, atau berpotensi berminggu-minggu</strong>. Ini bisa melibatkan beberapa agen yang saling berkomunikasi dalam satu tugas. Pengumuman yang diharapkan: OpenAI Dev Day, 29 September 2026.</p><h2>Apa yang berubah untuk pemodelan biaya</h2><p>Biaya LLM tradisional: token per permintaan × tarif. Biaya O/AON: <strong>waktu × komputasi yang dialokasikan + throughput token</strong>.</p><table><thead><tr><th>Dimensi</th><th>API Chat/Completion</th><th>O / AON (proyeksi)</th></tr></thead><tbody><tr><td>Satuan penagihan</td><td>Per 1M token</td><td>Per jam (komputasi) + per 1M token</td></tr><tr><td>Biaya saat diam</td><td>$0</td><td>>$0 (pemesanan lingkungan)</td></tr><tr><td>Durasi maksimum</td><td>Menit (timeout)</td><td>Hari/minggu</td></tr><tr><td>Paralelisme</td><td>Permintaan berurutan</td><td>Kawanan multi-agen</td></tr><tr><td>Status</td><td>Dikirim dalam konteks</td><td>Lingkungan persisten</td></tr></tbody></table><h2>Model biaya proyeksi (spekulatif, berdasarkan pola kebocoran)</h2><p>OpenAI belum menerbitkan harga. Ada dua struktur yang mungkin:</p><h3>Opsi A: jam komputasi + token (seperti Codespaces)</h3><ul><li>Pemesanan lingkungan: sekitar $0.50-2.00/jam (CPU + memori + penyimpanan)</li><li>Throughput token: tarif standar GPT-5 ditambahkan di atasnya</li><li>Tingkat ultra cepat: pengali token 5-10x saat diaktifkan</li></ul><p>Satu eksekusi agen 24 jam dengan 5M token input / 2M token output:</p><table><thead><tr><th>Komponen</th><th>Biaya (rendah)</th><th>Biaya (tinggi)</th></tr></thead><tbody><tr><td>Lingkungan 24 jam ($1/jam)</td><td>$24</td><td>$48</td></tr><tr><td>5M input @ $5/MTok</td><td>$25</td><td>$25</td></tr><tr><td>2M output @ $15/MTok</td><td>$30</td><td>$30</td></tr><tr><td><strong>Total</strong></td><td><strong>$79</strong></td><td><strong>$103</strong></td></tr></tbody></table><h3>Opsi B: langganan tetap (paket Pro Max)</h3><ul><li>ChatGPT Pro Max $500/bulan mencakup akses O/AON + kuota ultra cepat</li><li>Efektif per jam: $500 / 720 jam = $0.69/jam (jika berjalan 24/7)</li><li>Titik impas dengan Opsi A: sekitar 15 jam/hari penggunaan berkelanjutan</li></ul><h2>Strategi optimasi biaya untuk agen selalu aktif</h2><ol><li><strong>Hibernasi, jangan hentikan.</strong> Jika lingkungan tetap ada, jeda loop agen selama periode diam alih-alih mematikannya. Biaya cold start lebih mahal daripada biaya pemesanan saat diam.</li><li><strong>Kelompokkan token subtugas.</strong> Kumpulkan hasil subtugas dan tulis konteks dalam potongan yang lebih besar untuk meningkatkan rasio cache hit pada lingkungan persisten.</li><li><strong>Arahkan subtugas ke model yang lebih murah.</strong> O/AON mengatur orkestrasi; delegasikan coding ke Sonnet 5.5, riset ke model Flash, dan naik ke model premium hanya untuk keputusan kritis.</li><li><strong>Tetapkan anggaran waktu dan uang yang ketat per tujuan.</strong> “Selesaikan bug ini, maks $10 / 2 jam” dan terapkan melalui orkestrator, bukan berharap saja.</li></ol><h2>Kapan memakai O/AON dan kapan Opus 5.5 berjalan lama</h2><ul><li><strong>O/AON:</strong> riset berhari-hari, pemantauan berkelanjutan, koordinasi multi-agen, tugas yang membutuhkan state lingkungan yang persisten</li><li><strong>Loop agen Opus 5.5:</strong> tugas coding dengan satu tujuan (jam, bukan hari), hasil yang jelas batasannya, eksekusi sekali jalan</li></ul><h2>Bacaan terkait</h2><p>Lihat <a href=\"/research/chatgpt-pro-max-economics\">ekonomi ChatGPT Pro Max</a>, <a href=\"/research/openai-ultra-fast-api-pricing\">harga API Ultra Fast OpenAI</a>, <a href=\"/research/opus-5-5-long-running-agent-cost-analysis\">biaya agen 25 jam Opus 5.5</a>, dan <a href=\"/research/agent-economics\">ekonomi agen</a>.</p>",
+      "faq": [
+        {
+          "question": "Apakah OpenAI O / AON sudah dikonfirmasi?",
+          "answer": "Bocor di dalam kode ChatGPT (huruf “o” kecil sebagai nama produk, “AON” sebagai nama sandi, sufiks email “negative o”). Tibor (kepala produk OpenAI) menyinggungnya di X. Belum diumumkan secara resmi. Dev Day (29 September) adalah kemungkinan besar waktu pengumumannya."
+        },
+        {
+          "question": "Bagaimana penagihannya, per jam atau per token?",
+          "answer": "Belum diketahui. Kebocoran menunjukkan lingkungan cloud yang persisten, jadi kemungkinan besar berupa jam komputasi + throughput token. Bisa juga termasuk dalam Pro Max ($500/bulan)."
+        },
+        {
+          "question": "Berapa biaya eksekusi agen selama seminggu?",
+          "answer": "Diproyeksikan $500-1,500 tergantung tingkat lingkungan dan volume token. Tarif tetap Pro Max lebih menguntungkan jika berjalan lebih dari 15 jam/hari secara berkelanjutan."
+        },
+        {
+          "question": "Bisakah saya membangunnya sendiri dengan Opus 5.5 dan loop?",
+          "answer": "Bisa. Demo klon Minecraft selama 25 jam menunjukkan bahwa agen berhorizon panjang sudah berfungsi saat ini. Keunggulan O/AON: lingkungan terkelola, koordinasi multi-agen, dan integrasi eksekusi email serta tugas."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/chatgpt-pro-max-economics",
+          "label": "Ekonomi ChatGPT Pro Max"
+        },
+        {
+          "slug": "/research/openai-ultra-fast-api-pricing",
+          "label": "Harga API Ultra Fast OpenAI"
+        },
+        {
+          "slug": "/research/opus-5-5-long-running-agent-cost-analysis",
+          "label": "Biaya agen 25 jam Opus 5.5"
+        },
+        {
+          "slug": "/research/agent-economics",
+          "label": "Ekonomi agen"
+        }
+      ]
+    },
+    "pl": {
+      "title": "OpenAI O / AON: model kosztów agenta always-on",
+      "titleCore": "Model kosztów agenta always-on OpenAI O / AON",
+      "description": "Ile kosztuje agent always-on tygodniowo przy stawkach poziomu OpenAI O oraz kontrole równoległości, które ograniczają rachunek.",
+      "body": "<p>Przeciekające odniesienia ujawniają „O” OpenAI (kodowa nazwa AON) – asystenta always-on zaprojektowanego do zadań o długim horyzoncie. W przeciwieństwie do modeli czatu, które odpowiadają i się zatrzymują, O dostaje własne środowisko chmurowe, może tworzyć konteksty wykonania, pisać kod, prowadzić badania i działać nieprzerwanie przez <strong>godziny, dni lub potencjalnie tygodnie</strong>. Może w tym uczestniczyć wielu agentów komunikujących się w tym samym zadaniu. Oczekiwane ogłoszenie: OpenAI Dev Day, 29 września 2026.</p><h2>Co zmienia się w modelowaniu kosztów</h2><p>Tradycyjny koszt LLM: tokeny na żądanie × stawka. Koszt O/AON: <strong>czas × przydzielona moc obliczeniowa + przepustowość tokenów</strong>.</p><table><thead><tr><th>Wymiar</th><th>API czatu/completion</th><th>O / AON (prognoza)</th></tr></thead><tbody><tr><td>Jednostka rozliczeniowa</td><td>Za 1M tokenów</td><td>Za godzinę (moc obliczeniowa) + za 1M tokenów</td></tr><tr><td>Koszt bezczynności</td><td>$0</td><td>>$0 (rezerwacja środowiska)</td></tr><tr><td>Maks. czas trwania</td><td>Minuty (timeout)</td><td>Dni/tygodnie</td></tr><tr><td>Równoległość</td><td>Żądania sekwencyjne</td><td>Roje wielu agentów</td></tr><tr><td>Stan</td><td>Przekazywany w kontekście</td><td>Trwałe środowisko</td></tr></tbody></table><h2>Prognozowany model kosztów (spekulatywny, oparty na wzorcach z wycieków)</h2><p>OpenAI nie opublikowało cen. Dwie prawdopodobne struktury:</p><h3>Opcja A: godzina obliczeniowa + tokeny (jak Codespaces)</h3><ul><li>Rezerwacja środowiska: ok. $0.50-2.00/godzinę (CPU + pamięć + pamięć masowa)</li><li>Przepustowość tokenów: standardowe stawki GPT-5 doliczane na wierzchu</li><li>Poziom ultra fast: mnożnik tokenów 5-10x po włączeniu</li></ul><p>Uruchomienie agenta trwające 24 godziny z 5M tokenów wejścia i 2M tokenów wyjścia:</p><table><thead><tr><th>Składnik</th><th>Koszt (niski)</th><th>Koszt (wysoki)</th></tr></thead><tbody><tr><td>Środowisko 24h ($1/h)</td><td>$24</td><td>$48</td></tr><tr><td>5M wejścia @ $5/MTok</td><td>$25</td><td>$25</td></tr><tr><td>2M wyjścia @ $15/MTok</td><td>$30</td><td>$30</td></tr><tr><td><strong>Razem</strong></td><td><strong>$79</strong></td><td><strong>$103</strong></td></tr></tbody></table><h3>Opcja B: płaska subskrypcja (pakiet Pro Max)</h3><ul><li>ChatGPT Pro Max za $500/mies. obejmuje dostęp do O/AON oraz pulę ultra fast</li><li>Efektywnie za godzinę: $500 / 720 h = $0.69/h (przy pracy 24/7)</li><li>Próg opłacalności względem opcji A: ok. 15 godzin dziennie stałego użycia</li></ul><h2>Strategie optymalizacji kosztów dla agentów always-on</h2><ol><li><strong>Hibernuj, nie kończ.</strong> Jeśli środowisko się utrzymuje, wstrzymuj pętlę agenta w okresach bezczynności zamiast ją wyłączać – zimny start kosztuje więcej niż rezerwacja bezczynności.</li><li><strong>Grupuj tokeny podzadań.</strong> Zbieraj wyniki podzadań i zapisuj kontekst w większych porcjach, by poprawić trafienia w cache w trwałym środowisku.</li><li><strong>Kieruj podzadania do tańszych modeli.</strong> O/AON orkiestruje; kodowanie deleguj do Sonnet 5.5, badania do modeli Flash, a na premium eskaluj tylko krytyczne decyzje.</li><li><strong>Ustaw twarde budżety czasu i pieniędzy na cel.</strong> „Rozwiąż ten błąd, maks. $10 / 2 godziny” – egzekwuj to w orkiestratorze, a nie licz na szczęście.</li></ol><h2>Kiedy O/AON, a kiedy długo działający Opus 5.5?</h2><ul><li><strong>O/AON:</strong> wielodniowe badania, ciągły monitoring, koordynacja wielu agentów, zadania wymagające trwałego stanu środowiska</li><li><strong>Pętla agenta Opus 5.5:</strong> zadania kodowe z jednym celem (godziny, nie dni), dobrze zdefiniowane rezultaty, wykonanie jednorazowe</li></ul><h2>Dalsza lektura</h2><p>Zobacz <a href=\"/research/chatgpt-pro-max-economics\">ekonomię ChatGPT Pro Max</a>, <a href=\"/research/openai-ultra-fast-api-pricing\">ceny OpenAI Ultra Fast API</a>, <a href=\"/research/opus-5-5-long-running-agent-cost-analysis\">koszt 25-godzinnego agenta Opus 5.5</a> i <a href=\"/research/agent-economics\">ekonomię agentów</a>.</p>",
+      "faq": [
+        {
+          "question": "Czy OpenAI O / AON jest potwierdzone?",
+          "answer": "Wyciekło w kodzie ChatGPT (małe „o” jako nazwa produktu, „AON” jako kodowa nazwa, sufiks e-mailowy „negative o”). Tibor, lider produktu w OpenAI, nawiązał do tego na X. Oficjalnie nieogłoszone. Dev Day 29 września to prawdopodobne ogłoszenie."
+        },
+        {
+          "question": "Jak to jest rozliczane – za godzinę czy za token?",
+          "answer": "Nieznane. Przecieki sugerują trwałe środowisko chmurowe, więc prawdopodobnie godzina obliczeniowa plus przepustowość tokenów. Może być wliczone w Pro Max ($500/mies.)."
+        },
+        {
+          "question": "Ile kosztuje tygodniowe uruchomienie agenta?",
+          "answer": "Prognozowane $500-1,500 zależnie od poziomu środowiska i wolumenu tokenów. Płaska stawka Pro Max wygrywa, jeśli działasz stale ponad 15 godzin dziennie."
+        },
+        {
+          "question": "Czy mogę zbudować to sam, używając Opus 5.5 i pętli?",
+          "answer": "Tak. Demo klonu Minecrafta o długości 25 godzin pokazuje, że agenci o długim horyzoncie działają już dziś. Wyróżnik O/AON to zarządzane środowisko, koordynacja wielu agentów oraz integracje z e-mailem i wykonywaniem zadań."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/chatgpt-pro-max-economics",
+          "label": "Ekonomia ChatGPT Pro Max"
+        },
+        {
+          "slug": "/research/openai-ultra-fast-api-pricing",
+          "label": "Ceny OpenAI Ultra Fast API"
+        },
+        {
+          "slug": "/research/opus-5-5-long-running-agent-cost-analysis",
+          "label": "Koszt 25-godzinnego agenta Opus 5.5"
+        },
+        {
+          "slug": "/research/agent-economics",
+          "label": "Ekonomia agentów"
+        }
+      ]
+    },
+    "ru": {
+      "title": "OpenAI O / AON: стоимость постоянно работающего агента",
+      "titleCore": "Модель стоимости постоянно работающего агента OpenAI O / AON",
+      "description": "Сколько в неделю стоит агент, работающий постоянно, по тарифам уровня OpenAI O, и механизмы параллелизма, которые ограничивают счёт.",
+      "body": "<p>Утёкшие ссылки раскрывают «O» от OpenAI (кодовое имя AON) — постоянно работающего ассистента для задач с длинным горизонтом. В отличие от чат-моделей, которые отвечают и останавливаются, O получает собственную облачную среду, может создавать контексты выполнения, писать код, проводить исследования и работать непрерывно в течение <strong>часов, дней или, возможно, недель</strong>. Он может включать несколько агентов, которые общаются по одной задаче. Ожидаемое раскрытие: OpenAI Dev Day, 29 сентября 2026 года.</p><h2>Что меняется для моделирования стоимости</h2><p>Традиционная стоимость LLM: токены на запрос × тариф. Стоимость O/AON: <strong>время × выделенные вычисления + пропускная способность токенов</strong>.</p><table><thead><tr><th>Измерение</th><th>API chat/completions</th><th>O / AON (прогноз)</th></tr></thead><tbody><tr><td>Единица тарификации</td><td>За 1M токенов</td><td>За час (вычисления) + за 1M токенов</td></tr><tr><td>Стоимость простоя</td><td>$0</td><td>>$0 (резерв среды)</td></tr><tr><td>Максимальная длительность</td><td>Минуты (таймаут)</td><td>Дни/недели</td></tr><tr><td>Параллелизм</td><td>Последовательные запросы</td><td>Рои из нескольких агентов</td></tr><tr><td>Состояние</td><td>Передаётся в контексте</td><td>Постоянная среда</td></tr></tbody></table><h2>Прогнозная модель стоимости (умозрительная, по паттернам утечек)</h2><p>OpenAI не опубликовала цены. Две вероятные структуры:</p><h3>Вариант A: час вычислений + токены (как Codespaces)</h3><ul><li>Резерв среды: ~$0.50–2.00/час (CPU + память + хранилище)</li><li>Пропускная способность токенов: сверху стандартные тарифы GPT-5</li><li>Сверхбыстрый уровень: множитель токенов 5–10x при включении</li></ul><p>Запуск агента на 24 часа с 5M входных и 2M выходных токенов:</p><table><thead><tr><th>Компонент</th><th>Стоимость (низкая)</th><th>Стоимость (высокая)</th></tr></thead><tbody><tr><td>Среда 24 ч ($1/ч)</td><td>$24</td><td>$48</td></tr><tr><td>5M входных по $5/MTok</td><td>$25</td><td>$25</td></tr><tr><td>2M выходных по $15/MTok</td><td>$30</td><td>$30</td></tr><tr><td><strong>Итого</strong></td><td><strong>$79</strong></td><td><strong>$103</strong></td></tr></tbody></table><h3>Вариант B: фиксированная подписка (пакет Pro Max)</h3><ul><li>ChatGPT Pro Max за $500/мес. включает доступ к O/AON и квоту сверхбыстрого режима</li><li>Эффективная стоимость в час: $500 / 720 ч = $0.69/ч (при работе 24/7)</li><li>Точка безубыточности относительно варианта A: ~15 часов в день устойчивого использования</li></ul><h2>Стратегии оптимизации стоимости для постоянно работающих агентов</h2><ol><li><strong>Переводить в спячку, а не завершать.</strong> Если среда сохраняется, приостанавливайте цикл агента в периоды простоя вместо остановки: холодный старт обходится дороже резерва на простое.</li><li><strong>Группировать токены подзадач.</strong> Накапливайте результаты подзадач и записывайте контекст большими блоками, чтобы повысить долю попаданий в кэш в постоянной среде.</li><li><strong>Направлять подзадачи на более дешёвые модели.</strong> O/AON оркестрирует; кодирование передавайте Sonnet 5.5, исследования — моделям Flash, а к премиальной модели переходите только для критических решений.</li><li><strong>Задавайте жёсткие бюджеты времени и денег на каждую цель.</strong> «Реши этот баг, макс. $10 / 2 часа» — обеспечивайте через оркестратор, а не на удачу.</li></ol><h2>Когда использовать O/AON, а когда Opus 5.5 для долгих запусков</h2><ul><li><strong>O/AON:</strong> многодневные исследования, непрерывный мониторинг, координация нескольких агентов, задачи, которым нужно постоянное состояние среды</li><li><strong>Цикл агента Opus 5.5:</strong> задачи по коду с одной целью (часы, а не дни), чётко определённые результаты, выполнение за один проход</li></ul><h2>Связанное чтение</h2><p>См. <a href=\"/research/chatgpt-pro-max-economics\">экономику ChatGPT Pro Max</a>, <a href=\"/research/openai-ultra-fast-api-pricing\">цены OpenAI Ultra Fast API</a>, <a href=\"/research/opus-5-5-long-running-agent-cost-analysis\">стоимость 25-часового агента на Opus 5.5</a> и <a href=\"/research/agent-economics\">экономику агентов</a>.</p>",
+      "faq": [
+        {
+          "question": "Подтверждён ли OpenAI O / AON?",
+          "answer": "Утёк в коде ChatGPT (строчная «o» как название продукта, «AON» как кодовое имя, суффикс почты «negative o»). Tibor (продуктовый лидер OpenAI) намекнул в X. Официально не анонсирован. Вероятная презентация — Dev Day (29 сентября)."
+        },
+        {
+          "question": "Как это тарифицируется: за час или за токен?",
+          "answer": "Неизвестно. Утечки указывают на постоянную облачную среду, то есть, вероятно, час вычислений плюс пропускная способность токенов. Может входить в Pro Max ($500 в месяц)."
+        },
+        {
+          "question": "Сколько стоит недельный запуск агента?",
+          "answer": "Прогноз $500–1,500 в зависимости от уровня среды и объёма токенов. Фиксированная ставка Pro Max выгоднее, если работать более 15 часов в сутки непрерывно."
+        },
+        {
+          "question": "Могу ли я построить это сам на Opus 5.5 с циклом?",
+          "answer": "Да: демо на 25 часов с клоном Minecraft показывает, что агенты с длинным горизонтом уже работают. Отличие O/AON: управляемая среда, координация нескольких агентов и интеграции выполнения почты и задач."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/chatgpt-pro-max-economics",
+          "label": "Экономика ChatGPT Pro Max"
+        },
+        {
+          "slug": "/research/openai-ultra-fast-api-pricing",
+          "label": "Цены OpenAI Ultra Fast API"
+        },
+        {
+          "slug": "/research/opus-5-5-long-running-agent-cost-analysis",
+          "label": "Стоимость 25-часового агента Opus 5.5"
+        },
+        {
+          "slug": "/research/agent-economics",
+          "label": "Экономика агентов"
+        }
+      ]
+    },
+    "tr": {
+      "title": "OpenAI O / AON: Her Zaman Açık Ajan Maliyet Modeli",
+      "titleCore": "OpenAI O / AON her zaman açık ajan maliyet modeli",
+      "description": "OpenAI O katman fiyatlarıyla her zaman açık bir ajanın haftalık maliyeti ve faturayı sınırlayan eşzamanlılık kontrolleri.",
+      "body": "<p>Sızdırılan referanslar, OpenAI’nin “O” (kod adı AON) adlı, uzun vadeli görevler için tasarlanmış her zaman açık bir asistan olduğunu ortaya koyuyor. Yanıt verip duran sohbet modellerinin aksine O kendi bulut ortamını alır, yürütme bağlamları kurabilir, kod yazabilir, araştırma yapabilir ve <strong>saatlerce, günlerce ya da belki haftalarca</strong> sürekli çalışabilir. Aynı görev üzerinde birden fazla ajan birbiriyle iletişim kurabilir. Beklenen tanıtım: OpenAI Dev Day, 29 Eylül 2026.</p><h2>Maliyet modellemesi için neler değişiyor?</h2><p>Geleneksel LLM maliyeti: istek başına token × tarife. O/AON maliyeti: <strong>süre × ayrılmış hesaplama + token akışı</strong>.</p><table><thead><tr><th>Boyut</th><th>Chat/Completion API</th><th>O / AON (öngörülen)</th></tr></thead><tbody><tr><td>Faturalandırma birimi</td><td>1M token başına</td><td>Saat başına (hesaplama) + 1M token başına</td></tr><tr><td>Boşta maliyet</td><td>$0</td><td>>$0 (ortam rezervasyonu)</td></tr><tr><td>Maksimum süre</td><td>Dakikalar (zaman aşımı)</td><td>Günler/haftalar</td></tr><tr><td>Paralellik</td><td>Sıralı istekler</td><td>Çok ajanlı sürüler</td></tr><tr><td>Durum</td><td>Bağlamla aktarılır</td><td>Kalıcı ortam</td></tr></tbody></table><h2>Öngörülen maliyet modeli (spekülatif, sızıntı örüntülerine dayalı)</h2><p>OpenAI fiyatlandırmayı yayımlamadı. İki olası yapı var:</p><h3>Seçenek A: hesaplama saati + token (Codespaces gibi)</h3><ul><li>Ortam rezervasyonu: ~$0.50-2.00/saat (CPU + bellek + depolama)</li><li>Token akışı: üzerine standart GPT-5 tarifeleri</li><li>Ultra hızlı katman: etkinleştirildiğinde token için 5-10 kat çarpan</li></ul><p>Girdi 5M / çıktı 2M tokenlık 24 saatlik bir ajan çalıştırması:</p><table><thead><tr><th>Bileşen</th><th>Maliyet (düşük)</th><th>Maliyet (yüksek)</th></tr></thead><tbody><tr><td>24 saatlik ortam ($1/saat)</td><td>$24</td><td>$48</td></tr><tr><td>5M girdi @ $5/MTok</td><td>$25</td><td>$25</td></tr><tr><td>2M çıktı @ $15/MTok</td><td>$30</td><td>$30</td></tr><tr><td><strong>Toplam</strong></td><td><strong>$79</strong></td><td><strong>$103</strong></td></tr></tbody></table><h3>Seçenek B: sabit abonelik (Pro Max paketi)</h3><ul><li>Aylık $500 ChatGPT Pro Max, O/AON erişimini ve ultra hızlı kotayı içerir</li><li>Etkin saatlik maliyet: $500 / 720 saat = $0.69/saat (7/24 çalışırsa)</li><li>Seçenek A ile başa baş noktası: günde yaklaşık 15 saat sürekli kullanım</li></ul><h2>Her zaman açık ajanlar için maliyet optimizasyon stratejileri</h2><ol><li><strong>Sonlandırmayın, uykuya alın.</strong> Ortam kalıcıysa, boşta kalma dönemlerinde ajan döngüsünü sonlandırmak yerine duraklatın. Soğuk başlatma maliyeti, boşta rezervasyondan daha yüksektir.</li><li><strong>Alt görev tokenlarını toplu yazın.</strong> Alt görev sonuçlarını biriktirin ve bağlamı daha büyük parçalar halinde yazarak kalıcı ortamdaki önbellek isabet oranını artırın.</li><li><strong>Alt görevleri daha ucuz modellere yönlendirin.</strong> O/AON orkestrasyon yapar; kodlamayı Sonnet 5.5’e, araştırmayı Flash modellerine devredin ve premium modele yalnızca kritik kararlarda geçin.</li><li><strong>Hedef başına katı süre ve para bütçeleri koyun.</strong> “Bu hatayı çöz, en fazla $10 / 2 saat” gibi. Bunu umuda bırakmayın, orkestratör üzerinden zorunlu kılın.</li></ol><h2>O/AON ne zaman, Opus 5.5 uzun süreli çalışma ne zaman?</h2><ul><li><strong>O/AON:</strong> çok günlük araştırma, sürekli izleme, çok ajanlı koordinasyon ve kalıcı ortam durumu gerektiren görevler</li><li><strong>Opus 5.5 ajan döngüsü:</strong> tek hedefli kodlama görevleri (günler değil saatler), net tanımlı çıktılar, tek seferlik yürütme</li></ul><h2>İlgili okumalar</h2><p>Bakınız <a href=\"/research/chatgpt-pro-max-economics\">ChatGPT Pro Max ekonomisi</a>, <a href=\"/research/openai-ultra-fast-api-pricing\">OpenAI Ultra Fast API fiyatlandırması</a>, <a href=\"/research/opus-5-5-long-running-agent-cost-analysis\">Opus 5.5 25 saatlik ajan maliyeti</a> ve <a href=\"/research/agent-economics\">ajan ekonomisi</a>.</p>",
+      "faq": [
+        {
+          "question": "OpenAI O / AON doğrulandı mı?",
+          "answer": "ChatGPT kodunda sızdırıldı (ürün adı olarak küçük “o”, kod adı olarak “AON”, “negative o” e-posta soneki). OpenAI ürün lideri Tibor X’te ima etti. Resmi olarak duyurulmadı. Dev Day (29 Eylül) en olası tanıtım tarihi."
+        },
+        {
+          "question": "Faturalandırma saat başına mı, token başına mı?",
+          "answer": "Bilinmiyor. Sızıntılar kalıcı bir bulut ortamına işaret ediyor; bu nedenle büyük olasılıkla hesaplama saati + token akışı. Pro Max ($500/ay) içinde paketlenmiş olabilir."
+        },
+        {
+          "question": "Bir haftalık ajan çalıştırmasının maliyeti nedir?",
+          "answer": "Ortam katmanına ve token hacmine bağlı olarak $500-1,500 öngörülüyor. Günde 15 saatten fazla sürekli çalıştırıyorsanız Pro Max sabit ücreti daha avantajlıdır."
+        },
+        {
+          "question": "Opus 5.5 ve bir döngüyle bunu kendim kurabilir miyim?",
+          "answer": "Evet. 25 saatlik Minecraft klonu demosu, uzun vadeli ajanların bugün de çalıştığını gösteriyor. O/AON’un ayırt edici özellikleri: yönetilen ortam, çok ajanlı koordinasyon ve e-posta/görev yürütme entegrasyonları."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/chatgpt-pro-max-economics",
+          "label": "ChatGPT Pro Max ekonomisi"
+        },
+        {
+          "slug": "/research/openai-ultra-fast-api-pricing",
+          "label": "OpenAI Ultra Fast API fiyatlandırması"
+        },
+        {
+          "slug": "/research/opus-5-5-long-running-agent-cost-analysis",
+          "label": "Opus 5.5 25 saatlik ajan maliyeti"
+        },
+        {
+          "slug": "/research/agent-economics",
+          "label": "Ajan ekonomisi"
+        }
+      ]
+    },
+    "vi": {
+      "title": "OpenAI O / AON: Mô hình chi phí agent luôn bật",
+      "titleCore": "Mô hình chi phí agent luôn bật OpenAI O / AON",
+      "description": "Chi phí mỗi tuần của một agent luôn bật theo giá tầng OpenAI O, và các kiểm soát đồng thời giữ hóa đơn trong giới hạn.",
+      "body": "<p>Các tham chiếu bị rò rỉ cho thấy \"O\" của OpenAI (mã nội bộ AON) là một trợ lý luôn bật được thiết kế cho các tác vụ có chân trời dài. Khác với mô hình chat trả lời rồi dừng, O có môi trường cloud riêng, có thể thiết lập ngữ cảnh thực thi, viết mã, nghiên cứu và hoạt động liên tục trong <strong>nhiều giờ, nhiều ngày, hoặc có thể nhiều tuần</strong>. Nó có thể liên quan đến nhiều agent cùng trao đổi trên một tác vụ. Dự kiến ra mắt: OpenAI Dev Day, ngày 29 tháng 9 năm 2026.</p><h2>Điều gì thay đổi đối với mô hình hóa chi phí</h2><p>Chi phí LLM truyền thống: token mỗi yêu cầu × đơn giá. Chi phí O/AON: <strong>thời gian × tài nguyên tính toán được cấp + thông lượng token</strong>.</p><table><thead><tr><th>Khía cạnh</th><th>API chat/completion</th><th>O / AON (dự kiến)</th></tr></thead><tbody><tr><td>Đơn vị tính phí</td><td>Mỗi 1M token</td><td>Mỗi giờ (tính toán) + mỗi 1M token</td></tr><tr><td>Chi phí khi nhàn rỗi</td><td>$0</td><td>>$0 (đặt trước môi trường)</td></tr><tr><td>Thời lượng tối đa</td><td>Vài phút (timeout)</td><td>Nhiều ngày/tuần</td></tr><tr><td>Song song</td><td>Yêu cầu tuần tự</td><td>Bầy nhiều agent</td></tr><tr><td>Trạng thái</td><td>Truyền trong ngữ cảnh</td><td>Môi trường bền vững</td></tr></tbody></table><h2>Mô hình chi phí dự kiến (mang tính suy đoán, dựa trên mẫu rò rỉ)</h2><p>OpenAI chưa công bố giá. Có hai cấu trúc khả dĩ:</p><h3>Phương án A: Giờ tính toán + token (giống Codespaces)</h3><ul><li>Đặt trước môi trường: khoảng $0.50-2.00/giờ (CPU + bộ nhớ + lưu trữ)</li><li>Thông lượng token: cộng thêm đơn giá GPT-5 tiêu chuẩn</li><li>Tầng ultra fast: nhân token 5-10 lần khi được bật</li></ul><p>Một lần chạy agent 24 giờ với 5M token đầu vào / 2M token đầu ra:</p><table><thead><tr><th>Thành phần</th><th>Chi phí (thấp)</th><th>Chi phí (cao)</th></tr></thead><tbody><tr><td>Môi trường 24h ($1/giờ)</td><td>$24</td><td>$48</td></tr><tr><td>5M đầu vào @ $5/MTok</td><td>$25</td><td>$25</td></tr><tr><td>2M đầu ra @ $15/MTok</td><td>$30</td><td>$30</td></tr><tr><td><strong>Tổng</strong></td><td><strong>$79</strong></td><td><strong>$103</strong></td></tr></tbody></table><h3>Phương án B: Gói cố định (gói Pro Max)</h3><ul><li>ChatGPT Pro Max $500/tháng bao gồm quyền truy cập O/AON + hạn mức ultra fast</li><li>Quy đổi theo giờ: $500 / 720 giờ = $0.69/giờ (nếu chạy 24/7)</li><li>Điểm hòa vốn so với Phương án A: khoảng 15 giờ/ngày sử dụng liên tục</li></ul><h2>Tối ưu chi phí cho agent luôn bật</h2><ol><li><strong>Ngủ đông, đừng kết thúc.</strong> Nếu môi trường được giữ lại, hãy tạm dừng vòng lặp agent trong lúc nhàn rỗi thay vì tắt hẳn — khởi động lạnh tốn kém hơn chi phí đặt trước khi nhàn rỗi.</li><li><strong>Gom token của các subtask.</strong> Tích lũy kết quả subtask và ghi ngữ cảnh theo các khối lớn hơn để tăng tỷ lệ trúng cache trên môi trường bền vững.</li><li><strong>Định tuyến subtask sang mô hình rẻ hơn.</strong> O/AON điều phối; giao việc viết mã cho Sonnet 5.5, nghiên cứu cho các mô hình Flash, và chỉ leo thang lên tầng cao cấp cho các quyết định quan trọng.</li><li><strong>Đặt ngân sách thời gian/tiền cứng cho từng mục tiêu.</strong> \"Sửa lỗi này, tối đa $10 / 2 giờ\" — thực thi qua bộ điều phối, đừng trông chờ vào may rủi.</li></ol><h2>Khi nào dùng O/AON so với Opus 5.5 chạy dài</h2><ul><li><strong>O/AON:</strong> nghiên cứu kéo dài nhiều ngày, giám sát liên tục, phối hợp nhiều agent, tác vụ cần trạng thái môi trường bền vững</li><li><strong>Vòng lặp agent Opus 5.5:</strong> tác vụ viết mã với một mục tiêu duy nhất (tính bằng giờ, không phải ngày), đầu ra được định nghĩa rõ, thực thi một lần</li></ul><h2>Đọc thêm</h2><p>Xem <a href=\"/research/chatgpt-pro-max-economics\">kinh tế của ChatGPT Pro Max</a>, <a href=\"/research/openai-ultra-fast-api-pricing\">giá API Ultra Fast của OpenAI</a>, <a href=\"/research/opus-5-5-long-running-agent-cost-analysis\">chi phí agent Opus 5.5 chạy 25 giờ</a>, và <a href=\"/research/agent-economics\">kinh tế agent</a>.</p>",
+      "faq": [
+        {
+          "question": "OpenAI O / AON đã được xác nhận chưa?",
+          "answer": "Rò rỉ trong mã ChatGPT (chữ 'o' viết thường làm tên sản phẩm, 'AON' làm tên mã, hậu tố email 'negative o'). Tibor (trưởng sản phẩm OpenAI) có gợi ý trên X. Chưa được công bố chính thức; Dev Day (29 tháng 9) là thời điểm ra mắt có khả năng nhất."
+        },
+        {
+          "question": "Được tính phí theo giờ hay theo token?",
+          "answer": "Chưa rõ. Rò rỉ cho thấy môi trường cloud bền vững nên có khả năng là giờ tính toán + thông lượng token. Cũng có thể được gộp trong gói Pro Max ($500/tháng)."
+        },
+        {
+          "question": "Chi phí của một lần chạy agent kéo dài một tuần là bao nhiêu?",
+          "answer": "Dự kiến $500-1,500 tùy tầng môi trường và khối lượng token. Gói cố định Pro Max sẽ có lợi hơn nếu bạn chạy trên 15 giờ/ngày liên tục."
+        },
+        {
+          "question": "Tôi có thể tự xây dựng điều này với Opus 5.5 và một vòng lặp không?",
+          "answer": "Có — bản demo nhân bản Minecraft chạy 25 giờ chứng minh agent chân trời dài đã hoạt động hôm nay. Điểm khác biệt của O/AON là môi trường được quản lý, phối hợp nhiều agent và tích hợp thực thi email/tác vụ."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/chatgpt-pro-max-economics",
+          "label": "Kinh tế của ChatGPT Pro Max"
+        },
+        {
+          "slug": "/research/openai-ultra-fast-api-pricing",
+          "label": "Giá API Ultra Fast của OpenAI"
+        },
+        {
+          "slug": "/research/opus-5-5-long-running-agent-cost-analysis",
+          "label": "Chi phí agent Opus 5.5 chạy 25 giờ"
+        },
+        {
+          "slug": "/research/agent-economics",
+          "label": "Kinh tế agent"
+        }
+      ]
+    },
+    "ar": {
+      "title": "OpenAI O / AON: نموذج كلفة الوكيل الدائم التشغيل",
+      "titleCore": "نموذج كلفة الوكيل الدائم التشغيل OpenAI O / AON",
+      "description": "كم يكلف وكيل دائم التشغيل أسبوعياً بأسعار فئة OpenAI O، وضوابط التزامن التي تُبقي الفاتورة محدودة.",
+      "body": "<p>تكشف مراجع مسرّبة عن “O” من OpenAI (اسمه الرمزي AON) — مساعد دائم التشغيل صُمم للمهام بعيدة المدى. وعلى خلاف نماذج المحادثة التي تردّ ثم تتوقف، يحصل O على بيئة سحابية خاصة به، ويستطيع إعداد سياقات التنفيذ وكتابة الشيفرة والبحث والعمل باستمرار لمدة <strong>ساعات أو أيام أو ربما أسابيع</strong>. وقد يشمل عدة وكلاء يتواصلون في المهمة نفسها. الكشف المتوقع: OpenAI Dev Day في 29 سبتمبر 2026.</p><h2>ما الذي يتغير في نمذجة الكلفة</h2><p>كلفة LLM التقليدية: رموز كل طلب × السعر. أما كلفة O/AON فهي: <strong>الزمن × الحوسبة المخصصة + إنتاجية الرموز</strong>.</p><table><thead><tr><th>البُعد</th><th>واجهة المحادثة/الإكمال</th><th>O / AON (متوقع)</th></tr></thead><tbody><tr><td>وحدة الفوترة</td><td>لكل 1M رمز</td><td>لكل ساعة (حوسبة) + لكل 1M رمز</td></tr><tr><td>كلفة الخمول</td><td>$0</td><td>>$0 (حجز البيئة)</td></tr><tr><td>أقصى مدة</td><td>دقائق (مهلة)</td><td>أيام/أسابيع</td></tr><tr><td>التوازي</td><td>طلبات متتابعة</td><td>أسراب متعددة الوكلاء</td></tr><tr><td>الحالة</td><td>تُمرَّر في السياق</td><td>بيئة دائمة</td></tr></tbody></table><h2>نموذج الكلفة المتوقع (تخميني، مبني على أنماط التسريبات)</h2><p>لم تنشر OpenAI تسعيراً. هناك بنيتان محتملتان:</p><h3>الخيار أ: ساعة حوسبة + رموز (مثل Codespaces)</h3><ul><li>حجز البيئة: نحو 0.50-2.00 دولار/ساعة (معالج + ذاكرة + تخزين)</li><li>إنتاجية الرموز: أسعار GPT-5 القياسية فوق ذلك</li><li>فئة Ultra fast: مضاعف رموز بمقدار 5-10 أضعاف عند تفعيلها</li></ul><p>تشغيل وكيل لمدة 24 ساعة بـ 5M رمز إدخال و2M رمز إخراج:</p><table><thead><tr><th>المكوّن</th><th>الكلفة (منخفضة)</th><th>الكلفة (مرتفعة)</th></tr></thead><tbody><tr><td>بيئة 24 ساعة ($1/ساعة)</td><td>$24</td><td>$48</td></tr><tr><td>5M إدخال بسعر $5/MTok</td><td>$25</td><td>$25</td></tr><tr><td>2M إخراج بسعر $15/MTok</td><td>$30</td><td>$30</td></tr><tr><td><strong>الإجمالي</strong></td><td><strong>$79</strong></td><td><strong>$103</strong></td></tr></tbody></table><h3>الخيار ب: اشتراك ثابت (باقة Pro Max)</h3><ul><li>يشمل ChatGPT Pro Max بسعر $500/شهر وصول O/AON + حصة ultra fast</li><li>الساعة الفعلية: $500 / 720 ساعة = $0.69/ساعة (إذا عمل 24/7)</li><li>نقطة التعادل مقابل الخيار أ: نحو 15 ساعة/يوم من الاستخدام المتواصل</li></ul><h2>استراتيجيات تحسين الكلفة للوكلاء الدائمي التشغيل</h2><ol><li><strong>أسبِت ولا تُنهِ.</strong> إذا كانت البيئة دائمة، فأوقف حلقة الوكيل مؤقتاً أثناء فترات الخمول بدلاً من إيقاف التشغيل — فالبدء البارد يكلف أكثر من حجز الخمول.</li><li><strong>اجمع رموز المهام الفرعية.</strong> راكم نتائج المهام الفرعية واكتب السياق بدفعات أكبر لتحسين معدلات إصابة التخزين المؤقت في البيئة الدائمة.</li><li><strong>وجّه المهام الفرعية إلى نماذج أرخص.</strong> يتولى O/AON التنسيق؛ فوّض البرمجة إلى Sonnet 5.5 والبحث إلى نماذج Flash، ولا تصعّد إلى النماذج المتميزة إلا للقرارات الحرجة.</li><li><strong>حدّد ميزانيات صارمة للزمن والمال لكل هدف.</strong> “حل هذا الخلل، بحد أقصى $10 / 2 ساعتين” — وافرضها عبر المنسّق لا بالأمل.</li></ol><h2>متى تستخدم O/AON مقابل Opus 5.5 طويل التشغيل</h2><ul><li><strong>O/AON:</strong> بحث يمتد أياماً، ومراقبة مستمرة، وتنسيق متعدد الوكلاء، ومهام تحتاج حالة بيئة دائمة</li><li><strong>حلقة وكيل Opus 5.5:</strong> مهام برمجة بهدف واحد (ساعات لا أيام)، ومخرجات محددة بوضوح، وتنفيذ دفعة واحدة</li></ul><h2>قراءات ذات صلة</h2><p>انظر <a href=\"/research/chatgpt-pro-max-economics\">اقتصاديات ChatGPT Pro Max</a> و<a href=\"/research/openai-ultra-fast-api-pricing\">تسعير OpenAI Ultra Fast API</a> و<a href=\"/research/opus-5-5-long-running-agent-cost-analysis\">كلفة وكيل Opus 5.5 لمدة 25 ساعة</a> و<a href=\"/research/agent-economics\">اقتصاديات الوكلاء</a>.</p>",
+      "faq": [
+        {
+          "question": "هل OpenAI O / AON مؤكد؟",
+          "answer": "ظهر في شيفرة ChatGPT المسرّبة (حرف o صغير كاسم للمنتج، وAON كاسم رمزي، ولاحقة بريد “negative o”). ولمّح Tibor (قائد المنتج في OpenAI) على X. لم يُعلن رسمياً. ومن المرجح أن يكون Dev Day (29 سبتمبر) موعد الكشف."
+        },
+        {
+          "question": "كيف تتم فوترته — بالساعة أم بالرمز؟",
+          "answer": "غير معروف. توحي التسريبات ببيئة سحابية دائمة، ومن المرجح إذن ساعة حوسبة مع إنتاجية الرموز. وقد يُضمَّن في Pro Max (500 دولار شهرياً)."
+        },
+        {
+          "question": "كم تبلغ كلفة تشغيل وكيل لمدة أسبوع؟",
+          "answer": "نحو 500-1,500 دولار متوقعة بحسب فئة البيئة وحجم الرموز. ويتفوق السعر الثابت لـ Pro Max إذا شغّلته أكثر من 15 ساعة يومياً بصورة متواصلة."
+        },
+        {
+          "question": "هل يمكنني بناء هذا بنفسي باستخدام Opus 5.5 وحلقة؟",
+          "answer": "نعم — فعرض نسخة Minecraft التي استغرقت 25 ساعة يثبت أن الوكلاء بعيدي المدى يعملون اليوم. وما يميز O/AON هو البيئة المُدارة والتنسيق متعدد الوكلاء وتكاملات تنفيذ البريد والمهام."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/chatgpt-pro-max-economics",
+          "label": "اقتصاديات ChatGPT Pro Max"
+        },
+        {
+          "slug": "/research/openai-ultra-fast-api-pricing",
+          "label": "تسعير OpenAI Ultra Fast API"
+        },
+        {
+          "slug": "/research/opus-5-5-long-running-agent-cost-analysis",
+          "label": "كلفة وكيل Opus 5.5 لمدة 25 ساعة"
+        },
+        {
+          "slug": "/research/agent-economics",
+          "label": "اقتصاديات الوكلاء"
+        }
+      ]
+    },
+    "it": {
+      "title": "OpenAI O / AON: costo degli agenti sempre attivi",
+      "titleCore": "Modello di costo dell'agente sempre attivo OpenAI O / AON",
+      "description": "Quanto costa a settimana un agente sempre attivo alle tariffe del livello OpenAI O e quali controlli di concorrenza mantengono la fattura entro limiti.",
+      "body": "<p>Riferimenti trapelati rivelano la “O” di OpenAI (nome in codice AON): un assistente sempre attivo progettato per attività di lungo orizzonte. A differenza dei modelli di chat, che rispondono e si fermano, O ottiene un proprio ambiente cloud, può predisporre contesti di esecuzione, scrivere codice, fare ricerca e operare in modo continuo per <strong>ore, giorni o potenzialmente settimane</strong>. Potrebbe coinvolgere più agenti che comunicano sulla stessa attività. Presentazione prevista: OpenAI Dev Day, 29 settembre 2026.</p><h2>Cosa cambia per la modellazione dei costi</h2><p>Costo LLM tradizionale: token per richiesta × tariffa. Costo di O/AON: <strong>tempo × calcolo allocato + throughput di token</strong>.</p><table><thead><tr><th>Dimensione</th><th>API Chat/Completions</th><th>O / AON (previsto)</th></tr></thead><tbody><tr><td>Unità di fatturazione</td><td>Per 1M di token</td><td>Per ora (calcolo) + per 1M di token</td></tr><tr><td>Costo a riposo</td><td>$0</td><td>>$0 (riserva dell'ambiente)</td></tr><tr><td>Durata massima</td><td>Minuti (timeout)</td><td>Giorni/settimane</td></tr><tr><td>Parallelismo</td><td>Richieste sequenziali</td><td>Sciami multi-agente</td></tr><tr><td>Stato</td><td>Passato nel contesto</td><td>Ambiente persistente</td></tr></tbody></table><h2>Modello di costo previsto (speculativo, basato sui pattern dei leak)</h2><p>OpenAI non ha pubblicato prezzi. Due strutture probabili:</p><h3>Opzione A: ore di calcolo + token (come Codespaces)</h3><ul><li>Riserva dell'ambiente: ~$0.50-2.00/ora (CPU + memoria + storage)</li><li>Throughput di token: tariffe standard di GPT-5 in aggiunta</li><li>Livello ultra veloce: moltiplicatore di 5-10x sui token quando attivato</li></ul><p>Un'esecuzione di agente di 24 ore con 5M di token di input e 2M di output:</p><table><thead><tr><th>Componente</th><th>Costo (basso)</th><th>Costo (alto)</th></tr></thead><tbody><tr><td>Ambiente 24 h ($1/h)</td><td>$24</td><td>$48</td></tr><tr><td>5M di input a $5/MTok</td><td>$25</td><td>$25</td></tr><tr><td>2M di output a $15/MTok</td><td>$30</td><td>$30</td></tr><tr><td><strong>Totale</strong></td><td><strong>$79</strong></td><td><strong>$103</strong></td></tr></tbody></table><h3>Opzione B: abbonamento forfettario (pacchetto Pro Max)</h3><ul><li>ChatGPT Pro Max a $500/mese include l'accesso a O/AON e una quota ultra veloce</li><li>Costo orario effettivo: $500 / 720 h = $0.69/h (se funziona 24/7)</li><li>Pareggio rispetto all'Opzione A: ~15 ore al giorno di uso sostenuto</li></ul><h2>Strategie di ottimizzazione dei costi per gli agenti sempre attivi</h2><ol><li><strong>Ibernare, non terminare.</strong> Se l'ambiente persiste, sospendete il ciclo dell'agente nei periodi di inattività invece di spegnerlo: un avvio a freddo costa più della riserva a riposo.</li><li><strong>Raggruppate i token delle sottoattività.</strong> Accumulate i risultati delle sottoattività e scrivete il contesto in blocchi più grandi per migliorare il tasso di hit della cache sull'ambiente persistente.</li><li><strong>Instradate le sottoattività verso modelli più economici.</strong> O/AON orchestra; delegate il coding a Sonnet 5.5, la ricerca ai modelli Flash e passate a un modello premium solo per le decisioni critiche.</li><li><strong>Fissate budget rigidi di tempo e denaro per obiettivo.</strong> “Risolvi questo bug, massimo $10 / 2 ore”: applicatelo tramite l'orchestratore, senza affidarvi alla speranza.</li></ol><h2>Quando usare O/AON e quando Opus 5.5 a esecuzione lunga</h2><ul><li><strong>O/AON:</strong> ricerca di più giorni, monitoraggio continuo, coordinamento multi-agente, attività che richiedono uno stato persistente dell'ambiente</li><li><strong>Ciclo di agente con Opus 5.5:</strong> attività di coding con un unico obiettivo (ore, non giorni), risultati ben definiti, esecuzione in un solo passaggio</li></ul><h2>Letture correlate</h2><p>Vedete <a href=\"/research/chatgpt-pro-max-economics\">economia di ChatGPT Pro Max</a>, <a href=\"/research/openai-ultra-fast-api-pricing\">prezzi dell'API Ultra Fast di OpenAI</a>, <a href=\"/research/opus-5-5-long-running-agent-cost-analysis\">costo di 25 ore di agente con Opus 5.5</a> e <a href=\"/research/agent-economics\">economia degli agenti</a>.</p>",
+      "faq": [
+        {
+          "question": "OpenAI O / AON è confermato?",
+          "answer": "È trapelato nel codice di ChatGPT (la “o” minuscola come nome del prodotto, “AON” come nome in codice, il suffisso email “negative o”). Tibor, responsabile di prodotto in OpenAI, ne ha accennato su X. Non è stato annunciato ufficialmente; il Dev Day del 29 settembre è la presentazione più probabile."
+        },
+        {
+          "question": "Come viene fatturato: all'ora o per token?",
+          "answer": "Non si sa. I leak suggeriscono un ambiente cloud persistente, quindi probabilmente ore di calcolo più throughput di token. Potrebbe essere incluso nel Pro Max ($500 al mese)."
+        },
+        {
+          "question": "Quanto costa un'esecuzione di agente di una settimana?",
+          "answer": "Si prevedono $500-1,500 in base al livello dell'ambiente e al volume di token. Il forfait Pro Max conviene se si esegue per più di 15 ore al giorno in modo sostenuto."
+        },
+        {
+          "question": "Posso costruirlo da solo con Opus 5.5 e un ciclo?",
+          "answer": "Sì: la demo di 25 ore del clone di Minecraft dimostra che gli agenti di lungo orizzonte funzionano già oggi. Il vantaggio di O/AON sta in un ambiente gestito, nel coordinamento multi-agente e nelle integrazioni per l'esecuzione di email e attività."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/chatgpt-pro-max-economics",
+          "label": "Economia di ChatGPT Pro Max"
+        },
+        {
+          "slug": "/research/openai-ultra-fast-api-pricing",
+          "label": "Prezzi dell'API Ultra Fast di OpenAI"
+        },
+        {
+          "slug": "/research/opus-5-5-long-running-agent-cost-analysis",
+          "label": "Costo di 25 ore di agente con Opus 5.5"
+        },
+        {
+          "slug": "/research/agent-economics",
+          "label": "Economia degli agenti"
+        }
+      ]
+    },
+    "ko": {
+      "title": "OpenAI O / AON: 상시 가동 에이전트 비용 모델",
+      "titleCore": "OpenAI O / AON 상시 가동 에이전트 비용 모델",
+      "description": "OpenAI O 등급 요율로 상시 가동 에이전트의 주간 비용을 추정하고, 청구액을 상한 안에 묶어 두는 동시성 통제를 정리했습니다.",
+      "body": "<p>유출된 참조 자료에 따르면 OpenAI의 \"O\"(코드명 AON)는 장기 작업을 위해 설계된 상시 가동 어시스턴트입니다. 응답하고 멈추는 채팅 모델과 달리 O는 자체 클라우드 환경을 할당받고, 실행 컨텍스트를 구성하고, 코드를 작성하고, 조사하며, <strong>몇 시간, 며칠, 또는 몇 주</strong> 동안 계속 작동할 수 있습니다. 같은 작업을 두고 여러 에이전트가 서로 통신하는 방식도 포함될 수 있습니다. 공개가 예상되는 시점은 2026년 9월 29일 OpenAI Dev Day입니다.</p><h2>비용 모델링에서 무엇이 달라지나요</h2><p>기존 LLM 비용은 요청별 토큰 수 × 요율입니다. O/AON 비용은 <strong>시간 × 할당된 연산 + 토큰 처리량</strong>입니다.</p><table><thead><tr><th>구분</th><th>채팅/Completion API</th><th>O / AON (예상)</th></tr></thead><tbody><tr><td>과금 단위</td><td>1M 토큰당</td><td>시간당(연산) + 1M 토큰당</td></tr><tr><td>유휴 비용</td><td>$0</td><td>>$0 (환경 예약)</td></tr><tr><td>최대 실행 시간</td><td>분 단위(타임아웃)</td><td>며칠/몇 주</td></tr><tr><td>병렬성</td><td>순차 요청</td><td>다중 에이전트 군집</td></tr><tr><td>상태</td><td>컨텍스트로 전달</td><td>영속 환경</td></tr></tbody></table><h2>예상 비용 모델(추측, 유출 패턴 기반)</h2><p>OpenAI는 아직 가격을 공개하지 않았습니다. 가능성이 높은 구조는 두 가지입니다.</p><h3>옵션 A: 연산 시간 + 토큰 (Codespaces 방식)</h3><ul><li>환경 예약: 시간당 약 $0.50-2.00(CPU + 메모리 + 스토리지)</li><li>토큰 처리량: 그 위에 표준 GPT-5 요율 적용</li><li>Ultra fast 등급: 활성화 시 토큰 배수 5-10배</li></ul><p>입력 5M 토큰, 출력 2M 토큰을 쓰는 24시간 에이전트 실행 예시입니다.</p><table><thead><tr><th>구성 요소</th><th>비용(낮음)</th><th>비용(높음)</th></tr></thead><tbody><tr><td>24시간 환경(시간당 $1)</td><td>$24</td><td>$48</td></tr><tr><td>입력 5M 토큰 @ $5/MTok</td><td>$25</td><td>$25</td></tr><tr><td>출력 2M 토큰 @ $15/MTok</td><td>$30</td><td>$30</td></tr><tr><td><strong>합계</strong></td><td><strong>$79</strong></td><td><strong>$103</strong></td></tr></tbody></table><h3>옵션 B: 정액 구독(Pro Max 번들)</h3><ul><li>월 $500의 ChatGPT Pro Max에 O/AON 접근권과 ultra fast 할당량 포함</li><li>실효 시간당 비용: $500 / 720h = $0.69/hr (24/7 가동 시)</li><li>옵션 A와의 손익분기: 하루 약 15시간 지속 사용</li></ul><h2>상시 가동 에이전트의 비용 최적화 전략</h2><ol><li><strong>종료하지 말고 휴면시키세요.</strong> 환경이 유지된다면 유휴 시간에는 에이전트 루프를 중지하고 인스턴스를 내리지 마세요. 콜드 스타트 비용이 유휴 예약 비용보다 큽니다.</li><li><strong>하위 작업 토큰을 묶으세요.</strong> 하위 작업 결과를 모아 더 큰 단위로 컨텍스트를 기록하면 영속 환경에서 캐시 적중률이 올라갑니다.</li><li><strong>하위 작업을 더 저렴한 모델로 라우팅하세요.</strong> O/AON은 오케스트레이션을 맡기고, 코딩은 Sonnet 5.5에, 조사는 Flash 모델에 위임하며, 핵심 결정에만 고급 모델로 올리세요.</li><li><strong>목표마다 시간과 금액 하드 예산을 설정하세요.</strong> \"이 버그를 최대 $10 / 2시간 안에 해결\"처럼 정하고, 기대에 맡기지 말고 오케스트레이터로 강제하세요.</li></ol><h2>O/AON과 Opus 5.5 장기 실행 중 무엇을 쓸까요</h2><ul><li><strong>O/AON:</strong> 며칠에 걸친 조사, 지속적인 모니터링, 다중 에이전트 조율, 영속 환경 상태가 필요한 작업</li><li><strong>Opus 5.5 에이전트 루프:</strong> 단일 목표의 코딩 작업(며칠이 아닌 몇 시간), 명확한 산출물, 일회성 실행</li></ul><h2>함께 읽을 자료</h2><p><a href=\"/research/chatgpt-pro-max-economics\">ChatGPT Pro Max 경제성</a>, <a href=\"/research/openai-ultra-fast-api-pricing\">OpenAI Ultra Fast API 가격</a>, <a href=\"/research/opus-5-5-long-running-agent-cost-analysis\">Opus 5.5 25시간 에이전트 비용</a>, <a href=\"/research/agent-economics\">에이전트 경제성</a>을 참고하세요.</p>",
+      "faq": [
+        {
+          "question": "OpenAI O / AON은 확정된 제품인가요?",
+          "answer": "ChatGPT 코드에서 유출되었습니다(제품명으로 소문자 'o', 코드명으로 'AON', 'negative o' 이메일 접미사). OpenAI 제품 책임자 Tibor가 X에서 힌트를 남겼지만 공식 발표는 없습니다. Dev Day(9월 29일)가 유력한 공개 시점입니다."
+        },
+        {
+          "question": "과금은 시간 단위인가요, 토큰 단위인가요?",
+          "answer": "아직 알 수 없습니다. 유출 내용은 영속 클라우드 환경을 암시하므로 연산 시간 + 토큰 처리량일 가능성이 큽니다. Pro Max(월 $500)에 묶여 제공될 수도 있습니다."
+        },
+        {
+          "question": "일주일짜리 에이전트 실행 비용은 얼마인가요?",
+          "answer": "환경 등급과 토큰 양에 따라 $500-1,500으로 예상됩니다. 하루 15시간 이상 지속 실행한다면 Pro Max 정액 요금이 유리합니다."
+        },
+        {
+          "question": "Opus 5.5와 루프로 이것을 직접 만들 수 있나요?",
+          "answer": "네. 25시간짜리 Minecraft 클론 데모가 오늘날에도 장기 에이전트가 작동함을 보여 줍니다. O/AON의 차별점은 관리형 환경, 다중 에이전트 조율, 이메일 및 작업 실행 연동입니다."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/chatgpt-pro-max-economics",
+          "label": "ChatGPT Pro Max 경제성"
+        },
+        {
+          "slug": "/research/openai-ultra-fast-api-pricing",
+          "label": "OpenAI Ultra Fast API 가격"
+        },
+        {
+          "slug": "/research/opus-5-5-long-running-agent-cost-analysis",
+          "label": "Opus 5.5 25시간 에이전트 비용"
+        },
+        {
+          "slug": "/research/agent-economics",
+          "label": "에이전트 경제성"
+        }
+      ]
+    },
+    "nl": {
+      "title": "OpenAI O / AON: kostenmodel voor always-on agents",
+      "titleCore": "Kostenmodel van de OpenAI O / AON always-on agent",
+      "description": "Wat een always-on agent per week kost tegen de tarieven van de OpenAI O-tier, en de concurrencycontroles die de rekening begrensd houden.",
+      "body": "<p>Gelekte verwijzingen onthullen OpenAI's 'O' (codenaam AON) — een always-on assistent ontworpen voor taken met een lange horizon. In tegenstelling tot chatmodellen die antwoorden en stoppen, krijgt O een eigen cloudomgeving, kan uitvoeringscontexten opzetten, code schrijven, onderzoek doen en continu werken gedurende <strong>uren, dagen of mogelijk weken</strong>. Meerdere agents kunnen aan dezelfde taak communiceren. Verwachte onthulling: OpenAI Dev Day, 29 september 2026.</p><h2>Wat verandert er voor kostenmodellering</h2><p>Traditionele LLM-kosten: tokens per request × tarief. O/AON-kosten: <strong>tijd × toegewezen compute + tokendoorvoer</strong>.</p><table><thead><tr><th>Dimensie</th><th>Chat/Completion API</th><th>O / AON (geprojecteerd)</th></tr></thead><tbody><tr><td>Factureringseenheid</td><td>Per 1M tokens</td><td>Per uur (compute) + per 1M tokens</td></tr><tr><td>Kosten bij inactiviteit</td><td>$0</td><td>>$0 (reservering van de omgeving)</td></tr><tr><td>Maximale duur</td><td>Minuten (timeout)</td><td>Dagen/weken</td></tr><tr><td>Parallellisme</td><td>Opeenvolgende requests</td><td>Multi-agentzwermen</td></tr><tr><td>State</td><td>Meegegeven in context</td><td>Persistente omgeving</td></tr></tbody></table><h2>Geprojecteerd kostenmodel (speculatief, gebaseerd op lekpatronen)</h2><p>OpenAI heeft geen prijzen gepubliceerd. Twee waarschijnlijke structuren:</p><h3>Optie A: computeuur + tokens (zoals Codespaces)</h3><ul><li>Reservering van de omgeving: ~$0.50-2.00/uur (CPU + geheugen + opslag)</li><li>Tokendoorvoer: standaard GPT-5-tarieven er bovenop</li><li>Ultra-fast-tier: 5-10x tokenvermenigvuldiger indien ingeschakeld</li></ul><p>Een agentrun van 24 uur met 5M input / 2M outputtokens:</p><table><thead><tr><th>Component</th><th>Kosten (laag)</th><th>Kosten (hoog)</th></tr></thead><tbody><tr><td>24 uur omgeving ($1/uur)</td><td>$24</td><td>$48</td></tr><tr><td>5M input @ $5/MTok</td><td>$25</td><td>$25</td></tr><tr><td>2M output @ $15/MTok</td><td>$30</td><td>$30</td></tr><tr><td><strong>Totaal</strong></td><td><strong>$79</strong></td><td><strong>$103</strong></td></tr></tbody></table><h3>Optie B: vast abonnement (Pro Max-bundel)</h3><ul><li>$500/mnd ChatGPT Pro Max omvat toegang tot O/AON + ultra-fast-quotum</li><li>Effectief per uur: $500 / 720u = $0.69/uur (bij 24/7)</li><li>Break-even ten opzichte van optie A: ~15 uur per dag aanhoudend gebruik</li></ul><h2>Kostenoptimalisatiestrategieën voor always-on agents</h2><ol><li><strong>Hiberneer, beëindig niet.</strong> Als de omgeving blijft bestaan, pauzeer dan de agentloop tijdens inactieve perioden in plaats van af te sluiten — een koude start kost meer dan een inactieve reservering.</li><li><strong>Bundel tokens van subtaken.</strong> Verzamel resultaten van subtaken en schrijf context in grotere brokken om de cachetreffer-ratio op de persistente omgeving te verbeteren.</li><li><strong>Route subtaken naar goedkopere modellen.</strong> O/AON orkestreert; delegeer codering aan Sonnet 5.5, onderzoek aan Flash-modellen en escaleer alleen naar premium voor kritieke beslissingen.</li><li><strong>Stel harde tijd-/geldbudgetten per doel.</strong> 'Los deze bug op, max $10 / 2 uur' — dwing af via de orchestrator, hoop niet.</li></ol><h2>Wanneer O/AON versus de langlopende Opus 5.5</h2><ul><li><strong>O/AON:</strong> onderzoek van meerdere dagen, continue monitoring, multi-agentcoördinatie, taken die persistente omgevingsstate nodig hebben</li><li><strong>Opus 5.5-agentloop:</strong> codeertaken met één doel (uren, geen dagen), duidelijk gedefinieerde opleveringen, eenmalige uitvoering</li></ul><h2>Verwante lectuur</h2><p>Zie <a href=\"/research/chatgpt-pro-max-economics\">economie van ChatGPT Pro Max</a>, <a href=\"/research/openai-ultra-fast-api-pricing\">prijzen van de OpenAI Ultra Fast API</a>, <a href=\"/research/opus-5-5-long-running-agent-cost-analysis\">kosten van de 25-uurs Opus 5.5-agent</a> en <a href=\"/research/agent-economics\">agenteconomie</a>.</p>",
+      "faq": [
+        {
+          "question": "Is OpenAI O / AON bevestigd?",
+          "answer": "Gelekt in ChatGPT-code (kleine letter 'o' als productnaam, 'AON' als codenaam, e-mailsuffix 'negative o'). Tibor (productlead bij OpenAI) liet iets los op X. Niet officieel aangekondigd. Dev Day (29 sept.) is de waarschijnlijke onthulling."
+        },
+        {
+          "question": "Hoe wordt het gefactureerd — per uur of per token?",
+          "answer": "Onbekend. Lekken suggereren een persistente cloudomgeving → waarschijnlijk computeuur + tokendoorvoer. Kan gebundeld zijn in Pro Max ($500/mnd)."
+        },
+        {
+          "question": "Wat kost een agentrun van een week?",
+          "answer": "Geprojecteerd $500-1.500, afhankelijk van omgevingstier en tokenvolume. Het vaste Pro Max-tarief wint als je meer dan 15 uur per dag aanhoudend draait."
+        },
+        {
+          "question": "Kan ik dit zelf bouwen met Opus 5.5 + een loop?",
+          "answer": "Ja — de 25-uurs Minecraft-kloondemo bewijst dat agents met een lange horizon nu al werken. Het onderscheid van O/AON: beheerde omgeving, multi-agentcoördinatie en integraties voor e-mail en taakuitvoering."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/chatgpt-pro-max-economics",
+          "label": "Economie van ChatGPT Pro Max"
+        },
+        {
+          "slug": "/research/openai-ultra-fast-api-pricing",
+          "label": "Prijzen van de OpenAI Ultra Fast API"
+        },
+        {
+          "slug": "/research/opus-5-5-long-running-agent-cost-analysis",
+          "label": "Kosten van de 25-uurs Opus 5.5-agent"
+        },
+        {
+          "slug": "/research/agent-economics",
+          "label": "Agenteconomie"
+        }
+      ]
+    },
+    "zh": {
+      "title": "OpenAI O / AON：常驻智能体成本模型",
+      "titleCore": "OpenAI O / AON 常驻智能体成本模型",
+      "description": "按 OpenAI O 层级费率计算的常驻智能体每周成本，以及让账单保持在可控范围内的并发控制措施。",
+      "body": "<p>泄露的参考资料显示，OpenAI 的 “O”（代号 AON）是一款面向长周期任务的常驻助手。与只响应一次便停止的聊天模型不同，O 拥有自己的云端环境，可以搭建执行上下文、编写代码、开展研究，并持续运行<strong>数小时、数天，甚至可能数周</strong>。它可能让多个智能体在同一任务上相互通信。预计发布时间：2026 年 9 月 29 日的 OpenAI Dev Day。</p><h2>成本建模有哪些变化</h2><p>传统 LLM 成本：每次请求的 token 数 &times; 费率。O/AON 的成本：<strong>时长 &times; 分配的算力 + token 吞吐量</strong>。</p><table><thead><tr><th>维度</th><th>聊天/补全 API</th><th>O / AON（预计）</th></tr></thead><tbody><tr><td>计费单位</td><td>每 1M token</td><td>每小时（算力）+ 每 1M token</td></tr><tr><td>空闲成本</td><td>$0</td><td>&gt;$0（环境预留）</td></tr><tr><td>最长时长</td><td>数分钟（超时）</td><td>数天或数周</td></tr><tr><td>并行度</td><td>顺序请求</td><td>多智能体集群</td></tr><tr><td>状态</td><td>通过上下文传递</td><td>持久化环境</td></tr></tbody></table><h2>预计成本模型（推测性，基于泄露信息的模式）</h2><p>OpenAI 尚未公布价格。以下是两种可能的结构：</p><h3>方案 A：算力小时 + token（类似 Codespaces）</h3><ul><li>环境预留：约每小时 $0.50 至 $2.00（CPU、内存和存储）</li><li>token 吞吐量：在此之上按标准 GPT-5 费率计费</li><li>超快层级：启用时为 5 至 10 倍的 token 倍率</li></ul><p>一次 24 小时的智能体运行，输入 5M token，输出 2M token：</p><table><thead><tr><th>组成部分</th><th>成本（低）</th><th>成本（高）</th></tr></thead><tbody><tr><td>24 小时环境（$1/小时）</td><td>$24</td><td>$48</td></tr><tr><td>5M 输入 token @ $5/MTok</td><td>$25</td><td>$25</td></tr><tr><td>2M 输出 token @ $15/MTok</td><td>$30</td><td>$30</td></tr><tr><td><strong>合计</strong></td><td><strong>$79</strong></td><td><strong>$103</strong></td></tr></tbody></table><h3>方案 B：固定订阅（Pro Max 套餐）</h3><ul><li>每月 $500 的 ChatGPT Pro Max 包含 O/AON 访问权限及超快配额</li><li>实际小时成本：$500 / 720 小时 = $0.69/小时（若每天 24 小时、每周 7 天运行）</li><li>与方案 A 的盈亏平衡点：约每天持续使用 15 小时</li></ul><h2>常驻智能体的成本优化策略</h2><ol><li><strong>挂起，而非终止。</strong>如果环境会持续存在，在空闲期间暂停智能体循环，而不是关闭环境。冷启动的成本高于空闲时的预留成本。</li><li><strong>批量处理子任务的 token。</strong>累积子任务结果，并以更大的块写入上下文，以提高持久化环境上的缓存命中率。</li><li><strong>将子任务路由到更便宜的模型。</strong>O/AON 负责编排；编码交给 Sonnet 5.5，研究交给 Flash 系列模型，只有关键决策才升级到高端模型。</li><li><strong>为每个目标设置硬性的时间和金额预算。</strong>例如 “解决这个 bug，最多 $10 / 2 小时”，并由编排器强制执行，而不是寄希望于模型自觉。</li></ol><h2>何时使用 O/AON，何时使用 Opus 5.5 长时间运行</h2><ul><li><strong>O/AON：</strong>多日研究、持续监控、多智能体协作，以及需要持久化环境状态的任务</li><li><strong>Opus 5.5 智能体循环：</strong>单一目标的编码任务（以小时计，而非以天计）、定义明确的交付物、一次性执行</li></ul><h2>相关阅读</h2><p>参见 <a href=\"/research/chatgpt-pro-max-economics\">ChatGPT Pro Max 经济性</a>、<a href=\"/research/openai-ultra-fast-api-pricing\">OpenAI 超快 API 定价</a>、<a href=\"/research/opus-5-5-long-running-agent-cost-analysis\">Opus 5.5 25 小时智能体成本</a>，以及<a href=\"/research/agent-economics\">智能体经济性</a>。</p>",
+      "faq": [
+        {
+          "question": "OpenAI O / AON 已被确认了吗？",
+          "answer": "它曾出现在 ChatGPT 代码中（小写 “o” 作为产品名，“AON” 作为代号，并有 “negative o” 邮件后缀）。OpenAI 产品负责人 Tibor 在 X 上做过预告。尚未正式发布。Dev Day（9 月 29 日）很可能是正式揭晓的时间。"
+        },
+        {
+          "question": "它是按小时还是按 token 计费？",
+          "answer": "未知。泄露信息显示，它依托持久化的云端环境，因此很可能是算力小时加 token 吞吐量。也可能包含在每月 $500 的 Pro Max 套餐中。"
+        },
+        {
+          "question": "为期一周的智能体运行成本是多少？",
+          "answer": "预计为每周 $500 至 $1,500，取决于环境层级和 token 用量。若每天持续运行超过 15 小时，Pro Max 的固定费率更划算。"
+        },
+        {
+          "question": "我能用 Opus 5.5 加一个循环自己搭建吗？",
+          "answer": "可以。25 小时的 Minecraft 克隆演示证明，长周期智能体今天就能工作。O/AON 的差异化在于托管环境、多智能体协调，以及邮件和任务执行集成。"
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/chatgpt-pro-max-economics",
+          "label": "ChatGPT Pro Max 经济性"
+        },
+        {
+          "slug": "/research/openai-ultra-fast-api-pricing",
+          "label": "OpenAI 超快 API 定价"
+        },
+        {
+          "slug": "/research/opus-5-5-long-running-agent-cost-analysis",
+          "label": "Opus 5.5 25 小时智能体成本"
+        },
+        {
+          "slug": "/research/agent-economics",
+          "label": "智能体经济性"
+        }
+      ]
     }
   }
 }

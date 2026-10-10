@@ -76,14 +76,14 @@ function pushIfRequested(push, urls) {
     }
     if (/^src\/(?:[a-z]{2}\/)?research\/.+\.njk$/.test(file)) {
       const target = file.replace(/^src\//, "").replace(/\.njk$/, "")
-        .replace(/^(?:de|es|fr|ja|pt|it|ko|zh|nl|ar)\//, "");
+        .replace(/^(?:de|es|fr|ja|pt|it|ko|zh|nl|ar|ru|tr|pl|id|vi)\//, "");
       contentTargets.add(target);
       continue;
     }
     fail(`Refusing publish push because ${file} is outside the article/research content paths.`);
   }
   for (const url of urls) {
-    const path = new URL(url).pathname.replace(/^\/(?:de|es|fr|ja|pt|it|ko|zh|nl|ar)\//, "/").replace(/^\//, "");
+    const path = new URL(url).pathname.replace(/^\/(?:de|es|fr|ja|pt|it|ko|zh|nl|ar|ru|tr|pl|id|vi)\//, "/").replace(/^\//, "");
     if (!contentTargets.has(path)) fail(`Refusing push: ${url} does not match a changed article/research source file.`);
   }
   log(`Outgoing content files:\n${files.join("\n")}`);
@@ -105,13 +105,13 @@ function validateUrls(rawUrls) {
 }
 
 function expectedArticleTitle(url) {
-  const path = new URL(url).pathname.replace(/^\/(?:de|es|fr|ja|pt|it|ko|zh|nl|ar)\//, "/");
+  const path = new URL(url).pathname.replace(/^\/(?:de|es|fr|ja|pt|it|ko|zh|nl|ar|ru|tr|pl|id|vi)\//, "/");
   const slug = path.replace(/^\//, "");
   for (const name of readdirSync(resolve(ROOT, "src/_data/articles"))) {
     if (!name.endsWith(".json")) continue;
     const article = JSON.parse(readFileSync(resolve(ROOT, "src/_data/articles", name), "utf8"));
     if (article.slug === slug) {
-      const lang = new URL(url).pathname.match(/^\/(de|es|fr|ja|pt|it|ko|zh|nl|ar)\//)?.[1] || "en";
+      const lang = new URL(url).pathname.match(/^\/(de|es|fr|ja|pt|it|ko|zh|nl|ar|ru|tr|pl|id|vi)\//)?.[1] || "en";
       const locale = article.languages?.[lang];
       return locale?.titleCore || locale?.title || null;
     }

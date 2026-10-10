@@ -286,6 +286,466 @@
           "label": "Cortes de preço de modelos e orçamentos de roteamento"
         }
       ]
+    },
+    "id": {
+      "title": "System One dan Jev: perutean agen berbasis kalibrasi",
+      "titleCore": "System One Models dan optimasi biaya Jev",
+      "description": "Perutean berbasis kalibrasi memangkas biaya agen 76% dibanding selalu memakai Astra, dengan akurasi hampir setara. Cara kerja eskalasi berbasis keyakinan.",
+      "body": "<p>Diumumkan pada September 2026, <strong>System One Models</strong> dan <strong>Jev</strong> membentuk lapisan perutean berbasis kalibrasi untuk agen LLM. Alih-alih merutekan berdasarkan jenis tugas atau aturan statis, Jev merutekan berdasarkan <em>kalibrasi</em>: model murah (System One) menjawab lebih dulu; jika tingkat keyakinannya di bawah ambang, permintaan dieskalasi ke model premium. Bagi FinOps, ini berarti Anda hanya membayar penalaran ketika model murah benar-benar tidak tahu.</p><h2>Cara kerjanya</h2><ol><li><strong>System One Model</strong> (kecil, cepat, murah) menghasilkan jawaban dan skor keyakinan yang terkalibrasi.</li><li><strong>Gateway Jev</strong> memeriksa: apakah keyakinan &gt;= ambang (misalnya, 0.9)?</li><li><strong>Jika ya:</strong> kembalikan jawaban System One. Biaya: ~$0.10/1M token.</li><li><strong>Jika tidak:</strong> eskalasi ke model premium (Astra, Opus 5.5, dll.). Biaya: $10-50/1M token.</li></ol><h2>Perbandingan biaya</h2><table><thead><tr><th>Strategi</th><th>Rata-rata biaya/tugas</th><th>Akurasi</th></tr></thead><tbody><tr><td>Selalu Astra (effort maksimal)</td><td>$1.73</td><td>50.9</td></tr><tr><td>Selalu Sol</td><td>$0.28</td><td>44.2</td></tr><tr><td>Perutean statis (mudah→Sol, sulit→Astra)</td><td>$0.94</td><td>48.1</td></tr><tr><td>Perutean kalibrasi Jev (ambang 0.9)</td><td>$0.41</td><td>49.8</td></tr></tbody></table><p>Data dari benchmark Jev pada Artificial Analysis Intelligence Index. Perutean kalibrasi mencapai akurasi hampir setara Astra dengan 24% biaya.</p><h2>Mengapa kalibrasi mengalahkan perutean statis</h2><p>Perutean statis salah mengklasifikasikan 15–20% tugas (tugas mudah ditandai sulit, dan sebaliknya). Kalibrasi memperbaiki dirinya sendiri: model <em>tahu kapan ia tidak tahu</em>. Ambang Jev bisa diatur &mdash; naikkan untuk akurasi lebih tinggi, turunkan untuk biaya lebih rendah.</p><h2>Implementasi FinOps</h2><ul><li><strong>Terapkan Jev sebagai gateway:</strong> semua trafik agen melewati Jev; System One adalah default.</li><li><strong>Atur ambang per alur kerja:</strong> chat yang dihadapi pelanggan = 0.95; batch latar belakang = 0.85.</li><li><strong>Lacak tingkat eskalasi:</strong> target 10–20% eskalasi. Lebih tinggi berarti System One kurang terlatih; lebih rendah berarti Anda membayar terlalu mahal.</li><li><strong>Anggarkan tingkat premium:</strong> batasi belanja eskalasi bulanan; beri peringatan di 80%.</li></ul><h2>Integrasi dengan agen yang sudah ada</h2><p>Jev membungkus endpoint apa pun yang kompatibel dengan OpenAI. Agen yang ada memanggil Jev alih-alih memanggil model secara langsung. Tidak perlu perubahan kode pada logika agen &mdash; hanya base URL dan API key yang berubah.</p><h2>Kesimpulan</h2><p>Perutean berbasis kalibrasi adalah primitif FinOps pertama yang mengoptimalkan saat inferensi, bukan saat desain. System One + Jev mengubah pertanyaan ‘model mana?’ dari keputusan arsitektur statis menjadi kontrol biaya dinamis, per permintaan.</p>",
+      "faq": [
+        {
+          "question": "Apa itu System One Models dan Jev?",
+          "answer": "System One adalah model kecil, cepat, dan terkalibrasi. Jev adalah gateway perutean yang memeriksa keyakinan System One dan hanya mengeskalasi ke model premium ketika keyakinan di bawah ambang. Diumumkan September 2026."
+        },
+        {
+          "question": "Berapa banyak penghematan yang bisa dicapai perutean kalibrasi?",
+          "answer": "Benchmark Jev menunjukkan pengurangan biaya 76% dibanding selalu memakai Astra (dari $1.73 menjadi $0.41 per tugas) sambil mempertahankan 98% akurasi Astra pada indeks Artificial Analysis."
+        },
+        {
+          "question": "Apakah perutean kalibrasi menambah latensi?",
+          "answer": "System One merespons dalam ~200 ms. Eskalasi menambah satu round-trip ekstra (~400 ms total). Untuk 80% permintaan yang tidak dieskalasi, latensinya lebih rendah daripada memanggil Astra langsung."
+        },
+        {
+          "question": "Bisakah saya memakai Jev dengan framework agen saya yang sekarang?",
+          "answer": "Bisa. Jev menyediakan API yang kompatibel dengan OpenAI. Ganti base URL ke endpoint Jev; agen tetap berjalan tanpa perubahan. System One adalah model default; model premium dikonfigurasi di tabel perutean Jev."
+        },
+        {
+          "question": "Berapa ambang keyakinan yang tepat?",
+          "answer": "Mulai dari 0.90. Ukur tingkat eskalasi dan akurasi. Naikkan ke 0.95 untuk layanan pelanggan; turunkan ke 0.85 untuk beban batch yang kesalahannya lebih murah."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/jev-agent-controls-and-budgets",
+          "label": "Kontrol dan anggaran agen Jev"
+        },
+        {
+          "slug": "/research/jev-ai-finops-decision-economics",
+          "label": "Ekonomi keputusan Jev untuk FinOps AI"
+        },
+        {
+          "slug": "/research/gpt-6-astra-cost-model",
+          "label": "Model biaya GPT-6 Astra"
+        },
+        {
+          "slug": "/research/model-price-cuts-routing-budget",
+          "label": "Pemotongan harga model dan anggaran perutean"
+        }
+      ]
+    },
+    "pl": {
+      "title": "System One i Jev: routing oparty na kalibracji",
+      "titleCore": "System One Models i optymalizacja kosztów Jev",
+      "description": "Routing oparty na kalibracji obniża koszt agenta o 76% względem zawsze-Astra przy niemal takiej samej dokładności. Jak działa eskalacja z progiem pewności.",
+      "body": "<p>Ogłoszone we wrześniu 2026 roku <strong>System One Models</strong> i <strong>Jev</strong> tworzą warstwę routingu dla agentów LLM opartą na kalibracji. Zamiast kierować według typu zadania lub statycznych reguł, Jev kieruje według <em>kalibracji</em>: tani model (System One) odpowiada pierwszy; jeśli jego pewność jest poniżej progu, żądanie eskaluje do modelu premium. Dla FinOps oznacza to płacenie za rozumowanie tylko wtedy, gdy tani model naprawdę nie wie.</p><h2>Jak to działa</h2><ol><li><strong>System One Model</strong> (mały, szybki, tani) generuje odpowiedź i skalibrowany wynik pewności.</li><li><strong>Brama Jev</strong> sprawdza: czy pewność jest &ge; progu (np. 0.9)?</li><li><strong>Jeśli tak:</strong> zwraca odpowiedź System One. Koszt: ok. $0.10/1M tokenów.</li><li><strong>Jeśli nie:</strong> eskaluje do modelu premium (Astra, Opus 5.5 itd.). Koszt: $10-50/1M tokenów.</li></ol><h2>Porównanie kosztów</h2><table><thead><tr><th>Strategia</th><th>Średni koszt/zadanie</th><th>Dokładność</th></tr></thead><tbody><tr><td>Zawsze Astra (maksymalny wysiłek)</td><td>$1.73</td><td>50.9</td></tr><tr><td>Zawsze Sol</td><td>$0.28</td><td>44.2</td></tr><tr><td>Routing statyczny (łatwe&rarr;Sol, trudne&rarr;Astra)</td><td>$0.94</td><td>48.1</td></tr><tr><td>Routing kalibracyjny Jev (próg 0.9)</td><td>$0.41</td><td>49.8</td></tr></tbody></table><p>Dane z benchmarków Jev na indeksie Artificial Analysis Intelligence Index. Routing kalibracyjny osiąga dokładność bliską Astra przy 24% kosztu.</p><h2>Dlaczego kalibracja bije routing statyczny</h2><p>Routing statyczny błędnie klasyfikuje 15-20% zadań (łatwe oznaczone jako trudne, trudne jako łatwe). Kalibracja sama się koryguje: model <em>wie, kiedy nie wie</em>. Próg Jev jest regulowany: podnieś go, by uzyskać wyższą dokładność, obniż, by zmniejszyć koszt.</p><h2>Wdrożenie w FinOps</h2><ul><li><strong>Wdróż Jev jako bramę:</strong> cały ruch agentów przechodzi przez Jev; System One jest domyślny.</li><li><strong>Ustaw progi per workflow:</strong> czat z klientem = 0.95; batch w tle = 0.85.</li><li><strong>Śledź wskaźnik eskalacji:</strong> celuj w 10-20% eskalacji. Więcej oznacza, że System One jest niedotrenowany; mniej oznacza, że przepłacasz.</li><li><strong>Budżetuj warstwę premium:</strong> ogranicz miesięczne wydatki na eskalacje; alarm przy 80%.</li></ul><h2>Integracja z istniejącymi agentami</h2><p>Jev opakowuje dowolny endpoint zgodny z OpenAI. Istniejący agenci wywołują Jev zamiast modelu bezpośrednio. Bez zmian w logice agenta: zmienia się tylko bazowy URL i klucz API.</p><h2>Podsumowanie</h2><p>Routing oparty na kalibracji to pierwszy prymityw FinOps, który optymalizuje w czasie wnioskowania, a nie na etapie projektowania. System One + Jev zamienia pytanie „który model?” z decyzji architektonicznej podjętej raz w statyczny sposób w dynamiczną, per-żądanie kontrolę kosztów.</p>",
+      "faq": [
+        {
+          "question": "Czym są System One Models i Jev?",
+          "answer": "System One to mały, szybki, skalibrowany model. Jev to brama routingu, która sprawdza pewność System One i eskaluje do modeli premium tylko wtedy, gdy pewność jest poniżej progu. Ogłoszone we wrześniu 2026."
+        },
+        {
+          "question": "Ile może zaoszczędzić routing kalibracyjny?",
+          "answer": "Benchmarki Jev pokazują redukcję kosztu o 76% względem zawsze-Astra (z $1.73 do $0.41 za zadanie) przy zachowaniu 98% dokładności Astra na indeksie Artificial Analysis."
+        },
+        {
+          "question": "Czy routing kalibracyjny dodaje opóźnienie?",
+          "answer": "System One odpowiada w ok. 200ms. Eskalacja dodaje jedną dodatkową rundę (ok. 400ms łącznie). Dla 80% żądań, które nie eskalują, opóźnienie jest niższe niż przy bezpośrednim wywołaniu Astra."
+        },
+        {
+          "question": "Czy mogę użyć Jev z moim istniejącym frameworkiem agentów?",
+          "answer": "Tak. Jev udostępnia API zgodne z OpenAI. Zmień bazowy URL na endpoint Jev; agenci działają bez zmian. System One jest modelem domyślnym, a modele premium konfigurujesz w tabeli routingu Jev."
+        },
+        {
+          "question": "Jaki jest właściwy próg pewności?",
+          "answer": "Zacznij od 0.90. Mierz wskaźnik eskalacji i dokładność. Podnieś do 0.95 dla czatu z klientem; obniż do 0.85 dla obciążeń wsadowych, gdzie błędy są tańsze."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/jev-agent-controls-and-budgets",
+          "label": "Kontrola agentów i budżety Jev"
+        },
+        {
+          "slug": "/research/jev-ai-finops-decision-economics",
+          "label": "Ekonomia decyzji Jev w AI FinOps"
+        },
+        {
+          "slug": "/research/gpt-6-astra-cost-model",
+          "label": "Model kosztów GPT-6 Astra"
+        },
+        {
+          "slug": "/research/model-price-cuts-routing-budget",
+          "label": "Cięcia cen modeli i budżety routingu"
+        }
+      ]
+    },
+    "ru": {
+      "title": "System One и Jev: маршрутизация агентов по калибровке",
+      "titleCore": "Модели System One и оптимизация затрат с Jev",
+      "description": "Маршрутизация по калибровке снижает стоимость агентов на 76% против постоянного Astra при почти той же точности. Эскалация по уверенности.",
+      "body": "<p>Анонсированные в сентябре 2026 года <strong>System One Models</strong> и <strong>Jev</strong> образуют слой маршрутизации для LLM-агентов на основе калибровки. Вместо маршрутизации по типу задачи или статическим правилам Jev маршрутизирует по <em>калибровке</em>: сначала отвечает дешёвая модель (System One); если её уверенность ниже порога, запрос эскалируется на премиум-модель. Для FinOps это значит платить за рассуждения только тогда, когда дешёвая модель действительно не знает ответа.</p><h2>Как это работает</h2><ol><li><strong>System One Model</strong> (малая, быстрая, дешёвая) генерирует ответ и откалиброванную оценку уверенности.</li><li><strong>Шлюз Jev</strong> проверяет: уверенность >= порога (например, 0.9)?</li><li><strong>Если да:</strong> возвращается ответ System One. Стоимость: ~$0.10/1M токенов.</li><li><strong>Если нет:</strong> эскалация на премиум-модель (Astra, Opus 5.5 и т. д.). Стоимость: $10-50/1M токенов.</li></ol><h2>Сравнение стоимости</h2><table><thead><tr><th>Стратегия</th><th>Средняя стоимость/задача</th><th>Точность</th></tr></thead><tbody><tr><td>Всегда Astra (максимальное усилие)</td><td>$1.73</td><td>50.9</td></tr><tr><td>Всегда Sol</td><td>$0.28</td><td>44.2</td></tr><tr><td>Статическая маршрутизация (простые → Sol, сложные → Astra)</td><td>$0.94</td><td>48.1</td></tr><tr><td>Маршрутизация Jev по калибровке (порог 0.9)</td><td>$0.41</td><td>49.8</td></tr></tbody></table><p>Данные из бенчмарков Jev на Artificial Analysis Intelligence Index. Маршрутизация по калибровке достигает почти точности Astra при 24% стоимости.</p><h2>Почему калибровка лучше статической маршрутизации</h2><p>Статическая маршрутизация ошибочно классифицирует 15-20% задач (простые помечаются как сложные и наоборот). Калибровка самокорректируется: модель <em>знает, когда не знает</em>. Порог Jev настраивается: повышайте его для большей точности, понижайте для меньшей стоимости.</p><h2>Внедрение в FinOps</h2><ul><li><strong>Разверните Jev как шлюз:</strong> весь трафик агентов проходит через Jev; System One используется по умолчанию.</li><li><strong>Задавайте пороги для каждого workflow:</strong> клиентский чат = 0.95; фоновый батч = 0.85.</li><li><strong>Отслеживайте долю эскалаций:</strong> цель — 10-20% эскалаций. Выше означает, что System One недообучена; ниже — что вы переплачиваете.</li><li><strong>Бюджетируйте премиум-уровень:</strong> ограничьте ежемесячные траты на эскалации; оповещение при 80%.</li></ul><h2>Интеграция с существующими агентами</h2><p>Jev оборачивает любой OpenAI-совместимый endpoint. Существующие агенты вызывают Jev вместо модели напрямую. Код логики агента не меняется: меняются только базовый URL и API-ключ.</p><h2>Итог</h2><p>Маршрутизация по калибровке — первый примитив FinOps, который оптимизирует во время инференса, а не на этапе проектирования. System One + Jev превращает вопрос «какую модель?» из статического архитектурного решения в динамический контроль затрат на каждый запрос.</p>",
+      "faq": [
+        {
+          "question": "Что такое System One Models и Jev?",
+          "answer": "System One — малая, быстрая и откалиброванная модель. Jev — шлюз маршрутизации, который проверяет уверенность System One и эскалирует на премиум-модели только тогда, когда уверенность ниже порога. Анонсированы в сентябре 2026 года."
+        },
+        {
+          "question": "Насколько может сэкономить маршрутизация по калибровке?",
+          "answer": "Бенчмарки Jev показывают снижение стоимости на 76% по сравнению с постоянным Astra (с $1.73 до $0.41 за задачу) при сохранении 98% точности Astra на индексе Artificial Analysis."
+        },
+        {
+          "question": "Добавляет ли маршрутизация по калибровке задержку?",
+          "answer": "System One отвечает примерно за ~200ms. Эскалация добавляет ещё один цикл запрос-ответ (всего ~400ms). Для 80% запросов без эскалации задержка ниже, чем при прямом вызове Astra."
+        },
+        {
+          "question": "Могу ли я использовать Jev с моим текущим фреймворком агентов?",
+          "answer": "Да. Jev предоставляет OpenAI-совместимый API. Замените базовый URL на endpoint Jev, и агенты будут работать без изменений. System One — модель по умолчанию; премиум-модели настраиваются в таблице маршрутизации Jev."
+        },
+        {
+          "question": "Какой порог уверенности правильный?",
+          "answer": "Начните с 0.90. Измеряйте долю эскалаций и точность. Поднимите порог до 0.95 для клиентских сценариев; снизьте до 0.85 для батч-нагрузок, где ошибки обходятся дешевле."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/jev-agent-controls-and-budgets",
+          "label": "Контроль агентов и бюджеты Jev"
+        },
+        {
+          "slug": "/research/jev-ai-finops-decision-economics",
+          "label": "Экономика решений Jev в AI FinOps"
+        },
+        {
+          "slug": "/research/gpt-6-astra-cost-model",
+          "label": "Модель стоимости GPT-6 Astra"
+        },
+        {
+          "slug": "/research/model-price-cuts-routing-budget",
+          "label": "Снижение цен на модели и бюджеты маршрутизации"
+        }
+      ]
+    },
+    "tr": {
+      "title": "System One ve Jev: kalibrasyona dayalı ajan yönlendirme",
+      "titleCore": "System One Models ve Jev ile maliyet optimizasyonu",
+      "description": "Kalibrasyona dayalı yönlendirme, her zaman Astra kullanmaya göre ajan maliyetini %76 düşürür, doğruluk neredeyse aynı kalır. Güven eşiğiyle yükseltme nasıl çalışır?",
+      "body": "<p>Eylül 2026'da duyurulan <strong>System One Models</strong> ve <strong>Jev</strong>, LLM ajanları için kalibrasyona dayalı bir yönlendirme katmanı oluşturur. Jev, görev türüne ya da statik kurallara göre yönlendirmek yerine <em>kalibrasyona</em> göre yönlendirir: önce ucuz bir model (System One) yanıt verir; güveni eşiğin altındaysa istek premium bir modele yükseltilir. FinOps açısından bu, akıl yürütme için yalnızca ucuz modelin gerçekten bilmediği durumlarda ödeme yapmak anlamına gelir.</p><h2>Nasıl çalışır</h2><ol><li><strong>System One Model</strong> (küçük, hızlı, ucuz) bir yanıt ve kalibre edilmiş bir güven puanı üretir.</li><li><strong>Jev ağ geçidi</strong> kontrol eder: güven eşiğe (örneğin 0.9) eşit ya da üstünde mi?</li><li><strong>Evetse:</strong> System One yanıtı döndürülür. Maliyet: yaklaşık 0,10 $/1M token.</li><li><strong>Hayırsa:</strong> premium bir modele (Astra, Opus 5.5 vb.) yükseltilir. Maliyet: 10-50 $/1M token.</li></ol><h2>Maliyet karşılaştırması</h2><table><thead><tr><th>Strateji</th><th>Görev başına ort. maliyet</th><th>Doğruluk</th></tr></thead><tbody><tr><td>Her zaman Astra (maksimum çaba)</td><td>$1.73</td><td>50.9</td></tr><tr><td>Her zaman Sol</td><td>$0.28</td><td>44.2</td></tr><tr><td>Statik yönlendirme (kolay→Sol, zor→Astra)</td><td>$0.94</td><td>48.1</td></tr><tr><td>Jev kalibrasyon yönlendirmesi (eşik 0.9)</td><td>$0.41</td><td>49.8</td></tr></tbody></table><p>Veriler, Jev'in Artificial Analysis Intelligence Index üzerindeki kıyaslamalarından alınmıştır. Kalibrasyon yönlendirmesi, maliyetin %24'üyle Astra'ya yakın doğruluk sağlar.</p><h2>Kalibrasyon neden statik yönlendirmeden iyidir</h2><p>Statik yönlendirme görevlerin %15-20'sini yanlış sınıflandırır (kolay görevler zor, zor görevler kolay olarak işaretlenir). Kalibrasyon kendini düzeltir: model <em>bilmediğini bilir</em>. Jev'in eşiği ayarlanabilir: doğruluk için yükseltin, maliyet için düşürün.</p><h2>FinOps uygulaması</h2><ul><li><strong>Jev'i ağ geçidi olarak devreye alın:</strong> tüm ajan trafiği Jev'den geçer; varsayılan System One'dır.</li><li><strong>İş akışı başına eşik belirleyin:</strong> müşteriye dönük sohbet = 0.95; arka plan toplu işi = 0.85.</li><li><strong>Yükseltme oranını izleyin:</strong> hedef %10-20 yükseltmedir. Daha yüksek oran System One'ın yetersiz eğitildiğini, daha düşük oran ise fazla ödediğinizi gösterir.</li><li><strong>Premium katmanı bütçeleyin:</strong> aylık yükseltme harcamasına üst sınır koyun; %80'de uyarı verin.</li></ul><h2>Mevcut ajanlarla entegrasyon</h2><p>Jev, OpenAI ile uyumlu her uç noktayı sarar. Mevcut ajanlar modeli doğrudan çağırmak yerine Jev'i çağırır. Ajan mantığında kod değişikliği gerekmez; yalnızca temel URL ve API anahtarı değişir.</p><h2>Sonuç</h2><p>Kalibrasyona dayalı yönlendirme, tasarım zamanında değil çıkarım zamanında optimize eden ilk FinOps ilkelidir. System One + Jev, \"hangi model?\" sorusunu statik bir mimari karardan, istek başına dinamik bir maliyet kontrolüne dönüştürür.</p>",
+      "faq": [
+        {
+          "question": "System One Models ve Jev nedir?",
+          "answer": "System One, küçük, hızlı ve kalibre edilmiş bir modeldir. Jev, System One'ın güvenini kontrol eden ve yalnızca güven eşiğin altına düştüğünde premium modellere yükselten bir yönlendirme ağ geçididir. Eylül 2026'da duyuruldu."
+        },
+        {
+          "question": "Kalibrasyon yönlendirmesi ne kadar tasarruf sağlayabilir?",
+          "answer": "Jev kıyaslamaları, her zaman Astra kullanmaya kıyasla %76 maliyet düşüşü gösterir (görev başına 1,73 $'dan 0,41 $'a) ve Artificial Analysis indeksinde Astra doğruluğunun %98'ini korur."
+        },
+        {
+          "question": "Kalibrasyon yönlendirmesi gecikme ekler mi?",
+          "answer": "System One yaklaşık 200 ms'de yanıt verir. Yükseltme bir ekstra gidiş-dönüş ekler (toplamda yaklaşık 400 ms). Yükseltilmeyen %80'lik istekler için gecikme, Astra'yı doğrudan çağırmaktan daha düşüktür."
+        },
+        {
+          "question": "Jev'i mevcut ajan çerçevemle kullanabilir miyim?",
+          "answer": "Evet. Jev, OpenAI ile uyumlu bir API sunar. Temel URL'yi Jev uç noktasına çevirin; ajanlar değişmeden çalışır. System One varsayılan modeldir; premium modeller Jev'in yönlendirme tablosunda yapılandırılır."
+        },
+        {
+          "question": "Doğru güven eşiği nedir?",
+          "answer": "0.90 ile başlayın. Yükseltme oranını ve doğruluğu ölçün. Müşteriye dönük kullanımda 0.95'e çıkarın; hataların daha ucuz olduğu toplu işlerde 0.85'e düşürün."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/jev-agent-controls-and-budgets",
+          "label": "Jev ajan kontrolleri ve bütçeleri"
+        },
+        {
+          "slug": "/research/jev-ai-finops-decision-economics",
+          "label": "Jev AI FinOps karar ekonomisi"
+        },
+        {
+          "slug": "/research/gpt-6-astra-cost-model",
+          "label": "GPT-6 Astra maliyet modeli"
+        },
+        {
+          "slug": "/research/model-price-cuts-routing-budget",
+          "label": "Model fiyat indirimleri ve yönlendirme bütçeleri"
+        }
+      ]
+    },
+    "vi": {
+      "title": "System One và Jev: Định tuyến agent theo hiệu chuẩn",
+      "titleCore": "System One Models và tối ưu chi phí với Jev",
+      "description": "Định tuyến theo hiệu chuẩn giảm 76% chi phí agent so với luôn dùng Astra, độ chính xác gần như tương đương. Cơ chế leo thang theo ngưỡng tin cậy.",
+      "body": "<p>Được công bố vào tháng 9 năm 2026, <strong>System One Models</strong> và <strong>Jev</strong> tạo thành một lớp định tuyến theo hiệu chuẩn cho agent LLM. Thay vì định tuyến theo loại tác vụ hay quy tắc tĩnh, Jev định tuyến theo <em>hiệu chuẩn</em>: một mô hình rẻ (System One) trả lời trước; nếu độ tin cậy của nó dưới ngưỡng, yêu cầu được leo thang lên mô hình cao cấp. Với FinOps, điều này nghĩa là chỉ trả tiền cho suy luận khi mô hình rẻ thực sự không biết.</p><h2>Cách hoạt động</h2><ol><li><strong>System One Model</strong> (nhỏ, nhanh, rẻ) tạo ra một câu trả lời cùng điểm tin cậy đã hiệu chuẩn.</li><li><strong>Cổng Jev</strong> kiểm tra: độ tin cậy có &ge; ngưỡng (ví dụ 0.9) không?</li><li><strong>Nếu có:</strong> Trả về câu trả lời của System One. Chi phí: khoảng $0.10/1M token.</li><li><strong>Nếu không:</strong> Leo thang lên mô hình cao cấp (Astra, Opus 5.5, v.v.). Chi phí: $10-50/1M token.</li></ol><h2>So sánh chi phí</h2><table><thead><tr><th>Chiến lược</th><th>Chi phí trung bình/tác vụ</th><th>Độ chính xác</th></tr></thead><tbody><tr><td>Luôn dùng Astra (nỗ lực tối đa)</td><td>$1.73</td><td>50.9</td></tr><tr><td>Luôn dùng Sol</td><td>$0.28</td><td>44.2</td></tr><tr><td>Định tuyến tĩnh (dễ &rarr; Sol, khó &rarr; Astra)</td><td>$0.94</td><td>48.1</td></tr><tr><td>Định tuyến hiệu chuẩn của Jev (ngưỡng 0.9)</td><td>$0.41</td><td>49.8</td></tr></tbody></table><p>Số liệu từ các benchmark của Jev trên Artificial Analysis Intelligence Index. Định tuyến theo hiệu chuẩn đạt độ chính xác gần bằng Astra với 24% chi phí.</p><h2>Vì sao hiệu chuẩn hơn định tuyến tĩnh</h2><p>Định tuyến tĩnh phân loại sai 15-20% tác vụ (tác vụ dễ bị đánh dấu là khó, tác vụ khó bị đánh dấu là dễ). Hiệu chuẩn tự điều chỉnh: mô hình <em>biết khi nào nó không biết</em>. Ngưỡng của Jev có thể điều chỉnh: tăng để có độ chính xác cao hơn, giảm để có chi phí thấp hơn.</p><h2>Triển khai FinOps</h2><ul><li><strong>Triển khai Jev như một cổng:</strong> Mọi lưu lượng agent đi qua Jev; System One là mặc định.</li><li><strong>Đặt ngưỡng theo từng quy trình:</strong> Chat hướng tới khách hàng = 0.95; batch nền = 0.85.</li><li><strong>Theo dõi tỷ lệ leo thang:</strong> Mục tiêu 10-20% leo thang. Cao hơn nghĩa là System One chưa được huấn luyện đủ; thấp hơn nghĩa là bạn đang trả quá nhiều.</li><li><strong>Lập ngân sách cho tầng cao cấp:</strong> Giới hạn chi tiêu leo thang hàng tháng; cảnh báo ở mức 80%.</li></ul><h2>Tích hợp với agent hiện có</h2><p>Jev bọc bất kỳ endpoint nào tương thích OpenAI. Các agent hiện có gọi Jev thay vì gọi trực tiếp mô hình. Không cần sửa mã logic agent, chỉ thay đổi base URL và API key.</p><h2>Kết luận</h2><p>Định tuyến theo hiệu chuẩn là nguyên thủy FinOps đầu tiên tối ưu tại thời điểm suy luận, không phải tại thời điểm thiết kế. System One cùng Jev biến câu hỏi \"dùng mô hình nào?\" từ một quyết định kiến trúc tĩnh thành một cơ chế kiểm soát chi phí động cho từng yêu cầu.</p>",
+      "faq": [
+        {
+          "question": "System One Models và Jev là gì?",
+          "answer": "System One là một mô hình nhỏ, nhanh và đã được hiệu chuẩn. Jev là cổng định tuyến kiểm tra độ tin cậy của System One và chỉ leo thang lên mô hình cao cấp khi độ tin cậy dưới ngưỡng. Được công bố vào tháng 9 năm 2026."
+        },
+        {
+          "question": "Định tuyến theo hiệu chuẩn có thể tiết kiệm bao nhiêu?",
+          "answer": "Benchmark của Jev cho thấy giảm 76% chi phí so với luôn dùng Astra (từ $1.73 xuống $0.41 mỗi tác vụ), đồng thời giữ được 98% độ chính xác của Astra trên Artificial Analysis Index."
+        },
+        {
+          "question": "Định tuyến theo hiệu chuẩn có làm tăng độ trễ không?",
+          "answer": "System One phản hồi trong khoảng 200ms. Leo thang thêm một vòng gọi khứ hồi (tổng khoảng 400ms). Với 80% yêu cầu không leo thang, độ trễ thấp hơn so với gọi trực tiếp Astra."
+        },
+        {
+          "question": "Tôi có thể dùng Jev với framework agent hiện có không?",
+          "answer": "Có. Jev cung cấp API tương thích OpenAI. Chỉ cần đổi base URL sang endpoint của Jev; các agent hoạt động không đổi. System One là mô hình mặc định; các mô hình cao cấp được cấu hình trong bảng định tuyến của Jev."
+        },
+        {
+          "question": "Ngưỡng tin cậy phù hợp là bao nhiêu?",
+          "answer": "Bắt đầu từ 0.90. Đo tỷ lệ leo thang và độ chính xác. Tăng lên 0.95 cho chat hướng khách hàng; giảm xuống 0.85 cho khối lượng batch nơi lỗi rẻ hơn."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/jev-agent-controls-and-budgets",
+          "label": "Kiểm soát agent và ngân sách với Jev"
+        },
+        {
+          "slug": "/research/jev-ai-finops-decision-economics",
+          "label": "Kinh tế quyết định FinOps AI với Jev"
+        },
+        {
+          "slug": "/research/gpt-6-astra-cost-model",
+          "label": "Mô hình chi phí GPT-6 Astra"
+        },
+        {
+          "slug": "/research/model-price-cuts-routing-budget",
+          "label": "Cắt giảm giá mô hình và ngân sách định tuyến"
+        }
+      ]
+    },
+    "ar": {
+      "title": "System One وJev: توجيه الوكلاء بالمعايرة",
+      "titleCore": "نماذج System One وتحسين تكلفة Jev",
+      "description": "يخفض التوجيه القائم على المعايرة تكلفة الوكيل 76% مقارنة بـ Astra دائماً بدقة قريبة منه. هكذا يعمل التصعيد المشروط بالثقة.",
+      "body": "<p>أُعلن في سبتمبر 2026 عن <strong>نماذج System One</strong> و<strong>Jev</strong>، وهما معاً طبقة توجيه قائمة على المعايرة لوكلاء LLM. فبدلاً من التوجيه بحسب نوع المهمة أو بقواعد ثابتة، يوجّه Jev بحسب <em>المعايرة</em>: يجيب نموذج رخيص (System One) أولاً؛ وإذا كانت ثقته دون العتبة يُصعَّد الطلب إلى نموذج متميز. وبالنسبة إلى FinOps يعني هذا أنك تدفع ثمن الاستدلال فقط حين لا يعرف النموذج الرخيص فعلاً.</p><h2>كيف يعمل</h2><ol><li><strong>نموذج System One</strong> (صغير وسريع ورخيص) يولّد إجابة مع درجة ثقة معايَرة.</li><li><strong>بوابة Jev</strong> تتحقق: هل الثقة >= العتبة (مثلاً 0.9)؟</li><li><strong>إذا نعم:</strong> تُعاد إجابة System One. التكلفة: نحو $0.10 لكل 1M رمز.</li><li><strong>إذا لا:</strong> يُصعَّد إلى نموذج متميز (Astra أو Opus 5.5 وغيرهما). التكلفة: $10-50 لكل 1M رمز.</li></ol><h2>مقارنة التكلفة</h2><table><thead><tr><th>الاستراتيجية</th><th>متوسط التكلفة لكل مهمة</th><th>الدقة</th></tr></thead><tbody><tr><td>Astra دائماً (أقصى جهد)</td><td>$1.73</td><td>50.9</td></tr><tr><td>Sol دائماً</td><td>$0.28</td><td>44.2</td></tr><tr><td>التوجيه الثابت (السهل→Sol، الصعب→Astra)</td><td>$0.94</td><td>48.1</td></tr><tr><td>توجيه Jev بالمعايرة (العتبة 0.9)</td><td>$0.41</td><td>49.8</td></tr></tbody></table><p>البيانات من معايير Jev على مؤشر الذكاء Artificial Analysis. يحقق التوجيه بالمعايرة دقة قريبة من Astra بنسبة 24% من التكلفة.</p><h2>لماذا تتفوق المعايرة على التوجيه الثابت</h2><p>التوجيه الثابت يخطئ في تصنيف 15-20% من المهام (مهام سهلة تُوسَم صعبة ومهام صعبة تُوسَم سهلة). أما المعايرة فتصحح نفسها بنفسها: النموذج <em>يعرف متى لا يعرف</em>. وعتبة Jev قابلة للضبط &mdash; ارفعها لدقة أعلى أو اخفضها لتكلفة أقل.</p><h2>التطبيق في FinOps</h2><ul><li><strong>انشر Jev بوابةً:</strong> تمر كل حركة الوكلاء عبر Jev، ويكون System One هو الافتراضي.</li><li><strong>اضبط العتبات لكل سير عمل:</strong> المحادثة الموجهة للعملاء = 0.95؛ الدفعات الخلفية = 0.85.</li><li><strong>تتبّع معدل التصعيد:</strong> استهدف تصعيداً بين 10-20%. الأعلى يعني أن System One ناقص التدريب؛ والأقل يعني أنك تدفع أكثر من اللازم.</li><li><strong>ضع ميزانية للشريحة المتميزة:</strong> حدّد سقفاً لإنفاق التصعيد الشهري؛ ونبّه عند 80%.</li></ul><h2>التكامل مع الوكلاء الحاليين</h2><p>يغلّف Jev أي نقطة نهاية متوافقة مع OpenAI. تستدعي الوكلاء الحالية Jev بدلاً من النموذج مباشرة. ولا تغيير في كود منطق الوكيل &mdash; يتغير فقط عنوان base URL ومفتاح API.</p><h2>الخلاصة</h2><p>التوجيه القائم على المعايرة هو أول أساس في FinOps يحسّن وقت الاستدلال لا وقت التصميم. يحوّل System One مع Jev سؤال «أي نموذج؟» من قرار معماري ثابت إلى ضبط ديناميكي للتكلفة لكل طلب.</p>",
+      "faq": [
+        {
+          "question": "ما هي نماذج System One وJev؟",
+          "answer": "System One نموذج صغير وسريع ومعايَر. وJev بوابة توجيه تفحص ثقة System One وتصعّد إلى النماذج المتميزة فقط حين تكون الثقة دون العتبة. أُعلن عنهما في سبتمبر 2026."
+        },
+        {
+          "question": "كم يمكن أن يوفر التوجيه بالمعايرة؟",
+          "answer": "تُظهر معايير Jev خفضاً في التكلفة بنسبة 76% مقارنة بـ Astra دائماً (من $1.73 إلى $0.41 لكل مهمة) مع الحفاظ على 98% من دقة Astra على مؤشر Artificial Analysis."
+        },
+        {
+          "question": "هل يضيف التوجيه بالمعايرة كموناً؟",
+          "answer": "يستجيب System One في نحو 200ms. ويضيف التصعيد رحلة إضافية واحدة (نحو 400ms إجمالاً). وبالنسبة إلى 80% من الطلبات التي لا تُصعَّد يكون الكمون أقل من استدعاء Astra مباشرة."
+        },
+        {
+          "question": "هل يمكنني استخدام Jev مع إطار الوكلاء الحالي لدي؟",
+          "answer": "نعم. يوفر Jev واجهة متوافقة مع OpenAI. غيّر عنوان base URL إلى نقطة نهاية Jev وستعمل الوكلاء دون تعديل. System One هو النموذج الافتراضي، وتُضبط النماذج المتميزة في جدول التوجيه لدى Jev."
+        },
+        {
+          "question": "ما عتبة الثقة المناسبة؟",
+          "answer": "ابدأ من 0.90 وقِس معدل التصعيد والدقة. ارفعها إلى 0.95 للمحادثات الموجهة للعملاء، واخفضها إلى 0.85 لأحمال الدفعات التي تكون الأخطاء فيها أرخص."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/jev-agent-controls-and-budgets",
+          "label": "ضوابط وكلاء Jev وميزانياتهم"
+        },
+        {
+          "slug": "/research/jev-ai-finops-decision-economics",
+          "label": "اقتصاديات قرارات FinOps للذكاء الاصطناعي مع Jev"
+        },
+        {
+          "slug": "/research/gpt-6-astra-cost-model",
+          "label": "نموذج تكلفة GPT-6 Astra"
+        },
+        {
+          "slug": "/research/model-price-cuts-routing-budget",
+          "label": "خفض أسعار النماذج وميزانيات التوجيه"
+        }
+      ]
+    },
+    "it": {
+      "title": "System One e Jev: routing degli agenti per calibrazione",
+      "titleCore": "System One Models e ottimizzazione dei costi con Jev",
+      "description": "Il routing per calibrazione taglia il costo degli agenti del 76% rispetto ad Astra fisso, con precisione quasi uguale. Come funziona l'escalation per confidenza.",
+      "body": "<p>Annunciati a settembre 2026, <strong>System One Models</strong> e <strong>Jev</strong> formano un livello di routing basato sulla calibrazione per gli agenti LLM. Invece di instradare per tipo di attività o con regole statiche, Jev instrada per <em>calibrazione</em>: un modello economico (System One) risponde per primo; se la sua confidenza è sotto soglia, la richiesta viene escalata a un modello premium. Per il FinOps significa pagare il ragionamento solo quando il modello economico davvero non sa la risposta.</p><h2>Come funziona</h2><ol><li><strong>System One Model</strong> (piccolo, veloce, economico) genera una risposta e un punteggio di confidenza calibrato.</li><li>Il <strong>gateway Jev</strong> verifica: la confidenza è >= soglia (es. 0.9)?</li><li><strong>Se sì:</strong> restituisce la risposta di System One. Costo: ~$0.10/1M token.</li><li><strong>Se no:</strong> escala a un modello premium (Astra, Opus 5.5, ecc.). Costo: $10-50/1M token.</li></ol><h2>Confronto dei costi</h2><table><thead><tr><th>Strategia</th><th>Costo medio/attività</th><th>Precisione</th></tr></thead><tbody><tr><td>Sempre Astra (sforzo massimo)</td><td>$1.73</td><td>50.9</td></tr><tr><td>Sempre Sol</td><td>$0.28</td><td>44.2</td></tr><tr><td>Routing statico (facile→Sol, difficile→Astra)</td><td>$0.94</td><td>48.1</td></tr><tr><td>Routing per calibrazione di Jev (soglia 0.9)</td><td>$0.41</td><td>49.8</td></tr></tbody></table><p>Dati dai benchmark di Jev sull'Artificial Analysis Intelligence Index. Il routing per calibrazione raggiunge una precisione vicina ad Astra al 24% del costo.</p><h2>Perché la calibrazione batte il routing statico</h2><p>Il routing statico classifica male il 15-20% delle attività (attività facili segnate come difficili e viceversa). La calibrazione si auto-corregge: il modello <em>sa quando non sa</em>. La soglia di Jev è regolabile: alzala per più precisione, abbassala per meno costo.</p><h2>Implementazione FinOps</h2><ul><li><strong>Distribuisci Jev come gateway:</strong> tutto il traffico degli agenti passa da Jev; System One è il default.</li><li><strong>Imposta soglie per workflow:</strong> chat rivolta al cliente = 0.95; batch in background = 0.85.</li><li><strong>Traccia il tasso di escalation:</strong> obiettivo 10-20% di escalation. Più alto significa che System One è sotto-addestrato; più basso significa che stai pagando troppo.</li><li><strong>Metti un budget al livello premium:</strong> limita la spesa mensile di escalation; allerta all'80%.</li></ul><h2>Integrazione con gli agenti esistenti</h2><p>Jev avvolge qualsiasi endpoint compatibile con OpenAI. Gli agenti esistenti chiamano Jev invece del modello direttamente. Nessuna modifica al codice della logica dell'agente: cambiano solo l'URL base e la chiave API.</p><h2>In sintesi</h2><p>Il routing per calibrazione è il primo primitivo FinOps che ottimizza al momento dell'inferenza, non in fase di progettazione. System One + Jev trasforma «quale modello?» da una decisione di architettura statica in un controllo dei costi dinamico, richiesta per richiesta.</p>",
+      "faq": [
+        {
+          "question": "Cosa sono System One Models e Jev?",
+          "answer": "System One è un modello piccolo, veloce e calibrato. Jev è un gateway di routing che controlla la confidenza di System One e scala a modelli premium solo quando la confidenza è sotto una soglia. Annunciati a settembre 2026."
+        },
+        {
+          "question": "Quanto può far risparmiare il routing per calibrazione?",
+          "answer": "I benchmark di Jev mostrano una riduzione del costo del 76% rispetto ad Astra fisso (da $1.73 a $0.41 per attività), mantenendo il 98% della precisione di Astra sull'indice di Artificial Analysis."
+        },
+        {
+          "question": "Il routing per calibrazione aggiunge latenza?",
+          "answer": "System One risponde in ~200 ms. L'escalation aggiunge un round-trip in più (~400 ms in totale). Per l'80% delle richieste che non vengono escalate, la latenza è inferiore a chiamare Astra direttamente."
+        },
+        {
+          "question": "Posso usare Jev con il mio framework di agenti esistente?",
+          "answer": "Sì. Jev espone un'API compatibile con OpenAI. Cambi l'URL base con l'endpoint di Jev e gli agenti funzionano senza modifiche. System One è il modello predefinito; i modelli premium si configurano nella tabella di routing di Jev."
+        },
+        {
+          "question": "Qual è la soglia di confidenza giusta?",
+          "answer": "Parti da 0.90. Misura il tasso di escalation e la precisione. Alza a 0.95 per il lato cliente; abbassa a 0.85 per i carichi batch dove gli errori costano meno."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/jev-agent-controls-and-budgets",
+          "label": "Controlli e budget degli agenti con Jev"
+        },
+        {
+          "slug": "/research/jev-ai-finops-decision-economics",
+          "label": "Economia decisionale FinOps dell'IA con Jev"
+        },
+        {
+          "slug": "/research/gpt-6-astra-cost-model",
+          "label": "Modello di costo di GPT-6 Astra"
+        },
+        {
+          "slug": "/research/model-price-cuts-routing-budget",
+          "label": "Tagli di prezzo dei modelli e budget di routing"
+        }
+      ]
+    },
+    "ko": {
+      "title": "System One과 Jev: 보정 기반 에이전트 라우팅",
+      "titleCore": "System One 모델과 Jev 비용 최적화",
+      "description": "보정 기반 라우팅은 항상 Astra를 쓸 때보다 에이전트 비용을 76% 줄이면서 정확도는 Astra에 가깝게 유지합니다. 신뢰도 기반 에스컬레이션의 작동 방식.",
+      "body": "<p>2026년 9월에 발표된 <strong>System One 모델</strong>과 <strong>Jev</strong>는 LLM 에이전트를 위한 보정 기반 라우팅 계층을 구성합니다. 작업 유형이나 정적 규칙으로 라우팅하는 대신, Jev는 <em>보정</em>으로 라우팅합니다. 저렴한 모델(System One)이 먼저 답하고, 신뢰도가 임계값보다 낮으면 요청이 프리미엄 모델로 에스컬레이션됩니다. FinOps 관점에서 이는 저렴한 모델이 정말로 모를 때만 추론에 비용을 지불한다는 뜻입니다.</p><h2>작동 방식</h2><ol><li><strong>System One 모델</strong>(작고 빠르며 저렴함)이 답변과 보정된 신뢰도 점수를 생성합니다.</li><li><strong>Jev 게이트웨이</strong>가 확인합니다: 신뢰도가 임계값(예: 0.9) 이상인가?</li><li><strong>그렇다면:</strong> System One의 답변을 반환합니다. 비용: 약 $0.10/1M 토큰.</li><li><strong>그렇지 않다면:</strong> 프리미엄 모델(Astra, Opus 5.5 등)로 에스컬레이션합니다. 비용: $10-50/1M 토큰.</li></ol><h2>비용 비교</h2><table><thead><tr><th>전략</th><th>작업당 평균 비용</th><th>정확도</th></tr></thead><tbody><tr><td>항상 Astra(최대 노력)</td><td>$1.73</td><td>50.9</td></tr><tr><td>항상 Sol</td><td>$0.28</td><td>44.2</td></tr><tr><td>정적 라우팅(쉬움→Sol, 어려움→Astra)</td><td>$0.94</td><td>48.1</td></tr><tr><td>Jev 보정 라우팅(임계값 0.9)</td><td>$0.41</td><td>49.8</td></tr></tbody></table><p>데이터 출처는 Artificial Analysis Intelligence Index에서 실행한 Jev 벤치마크입니다. 보정 라우팅은 Astra에 가까운 정확도를 비용의 24%로 달성합니다.</p><h2>보정이 정적 라우팅을 이기는 이유</h2><p>정적 라우팅은 작업의 15-20%를 잘못 분류합니다(쉬운 작업은 어렵다고, 어려운 작업은 쉽다고 표시). 보정은 스스로 교정합니다. 모델이 <em>자신이 모르는 때를 알기</em> 때문입니다. Jev의 임계값은 조정할 수 있습니다. 정확도를 높이려면 올리고, 비용을 낮추려면 내리세요.</p><h2>FinOps 구현</h2><ul><li><strong>Jev를 게이트웨이로 배포:</strong> 모든 에이전트 트래픽이 Jev를 거치며, System One이 기본값입니다.</li><li><strong>워크플로우별로 임계값 설정:</strong> 고객 대면 채팅 = 0.95, 백그라운드 배치 = 0.85.</li><li><strong>에스컬레이션 비율 추적:</strong> 목표는 10-20% 에스컬레이션입니다. 더 높으면 System One이 충분히 학습되지 않은 것이고, 더 낮으면 과다 지불하고 있는 것입니다.</li><li><strong>프리미엄 티어 예산 책정:</strong> 월간 에스컬레이션 지출에 상한을 두고, 80%에 도달하면 경고하세요.</li></ul><h2>기존 에이전트와의 통합</h2><p>Jev는 모든 OpenAI 호환 엔드포인트를 감쌉니다. 기존 에이전트는 모델을 직접 호출하는 대신 Jev를 호출합니다. 에이전트 로직을 바꿀 필요는 없고, 기본 URL과 API 키만 바뀝니다.</p><h2>결론</h2><p>보정 기반 라우팅은 설계 시점이 아니라 추론 시점에 최적화하는 최초의 FinOps 기본 요소입니다. System One과 Jev는 \"어떤 모델을 쓸까?\"라는 질문을 정적인 아키텍처 결정에서 요청마다 움직이는 동적 비용 통제로 바꿉니다.</p>",
+      "faq": [
+        {
+          "question": "System One 모델과 Jev는 무엇인가요?",
+          "answer": "System One은 작고 빠르며 보정된 모델입니다. Jev는 System One의 신뢰도를 확인하고, 신뢰도가 임계값보다 낮을 때만 프리미엄 모델로 에스컬레이션하는 라우팅 게이트웨이입니다. 2026년 9월에 발표되었습니다."
+        },
+        {
+          "question": "보정 라우팅으로 얼마나 절감할 수 있나요?",
+          "answer": "Jev 벤치마크는 항상 Astra를 쓸 때보다 76% 비용 절감(작업당 $1.73에서 $0.41로)을 보여 주며, Artificial Analysis 지수에서 Astra 정확도의 98%를 유지합니다."
+        },
+        {
+          "question": "보정 라우팅이 지연 시간을 늘리나요?",
+          "answer": "System One은 약 200ms 안에 응답합니다. 에스컬레이션하면 왕복이 한 번 더 추가되어 총 약 400ms가 됩니다. 에스컬레이션되지 않는 요청 80%에서는 Astra를 직접 호출하는 것보다 지연 시간이 낮습니다."
+        },
+        {
+          "question": "기존 에이전트 프레임워크와 Jev를 함께 쓸 수 있나요?",
+          "answer": "네. Jev는 OpenAI 호환 API를 제공합니다. 기본 URL을 Jev 엔드포인트로 바꾸면 에이전트는 그대로 작동합니다. System One이 기본 모델이며, 프리미엄 모델은 Jev의 라우팅 테이블에서 설정합니다."
+        },
+        {
+          "question": "적절한 신뢰도 임계값은 무엇인가요?",
+          "answer": "0.90에서 시작해 에스컬레이션 비율과 정확도를 측정하세요. 고객 대면 워크로드는 0.95로 올리고, 오류 비용이 낮은 배치 워크로드는 0.85로 낮추세요."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/jev-agent-controls-and-budgets",
+          "label": "Jev 에이전트 통제와 예산"
+        },
+        {
+          "slug": "/research/jev-ai-finops-decision-economics",
+          "label": "Jev AI FinOps 의사결정 경제학"
+        },
+        {
+          "slug": "/research/gpt-6-astra-cost-model",
+          "label": "GPT-6 Astra 비용 모델"
+        },
+        {
+          "slug": "/research/model-price-cuts-routing-budget",
+          "label": "모델 가격 인하와 라우팅 예산"
+        }
+      ]
+    },
+    "nl": {
+      "title": "System One en Jev: agentrouting op basis van calibratie",
+      "titleCore": "System One-modellen en Jev-kostenoptimalisatie",
+      "description": "Calibratierouting verlaagt agentkosten met 76% ten opzichte van altijd-Astra bij bijna dezelfde nauwkeurigheid. Zo werkt escalatie op zekerheid.",
+      "body": "<p>Aangekondigd in september 2026 vormen <strong>System One Models</strong> en <strong>Jev</strong> een routinglaag op basis van calibratie voor LLM-agents. In plaats van te routeren op taaktype of statische regels, routeert Jev op <em>calibratie</em>: een goedkoop model (System One) antwoordt eerst; als de zekerheid onder de drempel ligt, wordt het verzoek geëscaleerd naar een premiummodel. Voor FinOps betekent dit dat je alleen betaalt voor redeneren wanneer het goedkope model het echt niet weet.</p><h2>Hoe het werkt</h2><ol><li><strong>System One Model</strong> (klein, snel, goedkoop) genereert een antwoord plus een gecalibreerde zekerheidsscore.</li><li><strong>Jev-gateway</strong> controleert: is de zekerheid >= drempel (bijv. 0.9)?</li><li><strong>Zo ja:</strong> geef het antwoord van System One terug. Kosten: ~$0.10/1M tokens.</li><li><strong>Zo nee:</strong> escaleer naar een premiummodel (Astra, Opus 5.5, enz.). Kosten: $10-50/1M tokens.</li></ol><h2>Kostenvergelijking</h2><table><thead><tr><th>Strategie</th><th>Gem. kosten/taak</th><th>Nauwkeurigheid</th></tr></thead><tbody><tr><td>Altijd Astra (maximale inspanning)</td><td>$1.73</td><td>50.9</td></tr><tr><td>Altijd Sol</td><td>$0.28</td><td>44.2</td></tr><tr><td>Statische routing (makkelijk→Sol, moeilijk→Astra)</td><td>$0.94</td><td>48.1</td></tr><tr><td>Jev-calibratierouting (drempel 0.9)</td><td>$0.41</td><td>49.8</td></tr></tbody></table><p>Data uit Jev-benchmarks op de Artificial Analysis Intelligence Index. Calibratierouting haalt bijna de nauwkeurigheid van Astra tegen 24% van de kosten.</p><h2>Waarom calibratie statische routing verslaat</h2><p>Statische routing classificeert 15-20% van de taken verkeerd (makkelijke taken als moeilijk gemarkeerd, moeilijke als makkelijk). Calibratie corrigeert zichzelf: het model <em>weet wanneer het iets niet weet</em>. De drempel van Jev is instelbaar &mdash; verhoog hem voor hogere nauwkeurigheid, verlaag hem voor lagere kosten.</p><h2>FinOps-implementatie</h2><ul><li><strong>Zet Jev in als gateway:</strong> al het agentverkeer loopt via Jev; System One is de standaard.</li><li><strong>Stel drempels per workflow in:</strong> klantgerichte chat = 0.95; batch op de achtergrond = 0.85.</li><li><strong>Volg het escalatiepercentage:</strong> mik op 10-20% escalatie. Hoger betekent dat System One ondergetraind is; lager betekent dat je te veel betaalt.</li><li><strong>Begroot de premiumtier:</strong> begrens de maandelijkse escalatie-uitgaven; waarschuw bij 80%.</li></ul><h2>Integratie met bestaande agents</h2><p>Jev omhult elk OpenAI-compatibel endpoint. Bestaande agents roepen Jev aan in plaats van het model rechtstreeks. Geen codewijzigingen aan de agentlogica &mdash; alleen de basis-URL en API-sleutel veranderen.</p><h2>Conclusie</h2><p>Routing op basis van calibratie is de eerste FinOps-primitief die optimaliseert op inferentietijd, niet op ontwerptijd. System One + Jev maakt van &ldquo;welk model?&rdquo; een dynamische kostenbeheersing per verzoek in plaats van een statische architectuurbeslissing.</p>",
+      "faq": [
+        {
+          "question": "Wat zijn System One Models en Jev?",
+          "answer": "System One is een klein, snel, gecalibreerd model. Jev is een routinggateway die de zekerheid van System One controleert en alleen naar premiummodellen escaleert wanneer de zekerheid onder een drempel ligt. Aangekondigd in september 2026."
+        },
+        {
+          "question": "Hoeveel kan calibratierouting besparen?",
+          "answer": "Jev-benchmarks tonen 76% kostenreductie ten opzichte van altijd-Astra (van $1.73 naar $0.41 per taak) terwijl 98% van de nauwkeurigheid van Astra op de Artificial Analysis-index behouden blijft."
+        },
+        {
+          "question": "Voegt calibratierouting latentie toe?",
+          "answer": "System One reageert in ~200ms. Escalatie voegt één extra round-trip toe (~400ms in totaal). Voor de 80% van de verzoeken die niet escaleren is de latentie lager dan bij rechtstreeks Astra aanroepen."
+        },
+        {
+          "question": "Kan ik Jev gebruiken met mijn bestaande agentframework?",
+          "answer": "Ja. Jev biedt een OpenAI-compatibele API. Wijzig de basis-URL naar het endpoint van Jev; agents werken ongewijzigd. System One is het standaardmodel; premiummodellen worden geconfigureerd in de routingtabel van Jev."
+        },
+        {
+          "question": "Wat is de juiste zekerheidsdrempel?",
+          "answer": "Begin bij 0.90. Meet escalatiepercentage en nauwkeurigheid. Verhoog naar 0.95 voor klantgerichte toepassingen; verlaag naar 0.85 voor batchworkloads waar fouten goedkoper zijn."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/jev-agent-controls-and-budgets",
+          "label": "Jev-agentcontroles en budgetten"
+        },
+        {
+          "slug": "/research/jev-ai-finops-decision-economics",
+          "label": "Beslissingseconomie van Jev AI FinOps"
+        },
+        {
+          "slug": "/research/gpt-6-astra-cost-model",
+          "label": "Kostenmodel GPT-6 Astra"
+        },
+        {
+          "slug": "/research/model-price-cuts-routing-budget",
+          "label": "Modelprijsverlagingen en routingbudgetten"
+        }
+      ]
+    },
+    "zh": {
+      "title": "System One 与 Jev：基于校准的智能体路由",
+      "titleCore": "System One Models 与 Jev 成本优化",
+      "description": "基于校准的路由，在接近 Astra 精度的前提下，相比始终使用 Astra 可将智能体成本降低 76%。本文说明置信度闸门式升级的工作方式。",
+      "body": "<p>2026 年 9 月发布的 <strong>System One Models</strong> 与 <strong>Jev</strong> 构成了 LLM 智能体的一层基于校准的路由。Jev 不按任务类型或静态规则路由，而是按<em>校准</em>来路由：先由一个便宜的模型（System One）作答；如果它的置信度低于阈值，请求就升级到高端模型。对 FinOps 而言，这意味着只有在便宜模型确实不知道答案时，才为推理付费。</p><h2>工作原理</h2><ol><li><strong>System One 模型</strong>（小型、快速、便宜）生成答案及经过校准的置信度分数。</li><li><strong>Jev 网关</strong>检查：置信度是否 &gt;= 阈值（例如 0.9）？</li><li><strong>若是：</strong>返回 System One 的答案。成本：约 $0.10/1M token。</li><li><strong>若否：</strong>升级到高端模型（Astra、Opus 5.5 等）。成本：$10-50/1M token。</li></ol><h2>成本对比</h2><table><thead><tr><th>策略</th><th>每任务平均成本</th><th>准确率</th></tr></thead><tbody><tr><td>始终使用 Astra（最大力度）</td><td>$1.73</td><td>50.9</td></tr><tr><td>始终使用 Sol</td><td>$0.28</td><td>44.2</td></tr><tr><td>静态路由（简单→Sol，困难→Astra）</td><td>$0.94</td><td>48.1</td></tr><tr><td>Jev 校准路由（阈值 0.9）</td><td>$0.41</td><td>49.8</td></tr></tbody></table><p>数据来自 Jev 在 Artificial Analysis Intelligence Index 上的基准测试。校准路由以约 24% 的成本达到接近 Astra 的准确率。</p><h2>为什么校准胜过静态路由</h2><p>静态路由会误判 15-20% 的任务（简单任务被标为困难，困难任务被标为简单）。校准具有自我修正能力：模型<em>知道自己何时不知道</em>。Jev 的阈值可以调节：调高以换取更高准确率，调低以降低成本。</p><h2>FinOps 落地方式</h2><ul><li><strong>将 Jev 部署为网关：</strong>所有智能体流量都经过 Jev，System One 为默认模型。</li><li><strong>按工作流设置阈值：</strong>面向客户的聊天设为 0.95；后台批处理设为 0.85。</li><li><strong>跟踪升级率：</strong>目标是 10-20% 的升级率。过高说明 System One 训练不足；过低则说明你在多付钱。</li><li><strong>为高端层级做预算：</strong>限制每月的升级支出上限；达到 80% 时发出告警。</li></ul><h2>与现有智能体集成</h2><p>Jev 可以包装任何兼容 OpenAI 的端点。现有智能体改为调用 Jev，而不是直接调用模型。智能体逻辑无需改代码，只需更换基础 URL 和 API 密钥。</p><h2>结论</h2><p>基于校准的路由是第一个在推理时而非设计时进行优化的 FinOps 基础能力。System One + Jev 把“用哪个模型？”从静态的架构决策，变成了每个请求都可动态控制的成本手段。</p>",
+      "faq": [
+        {
+          "question": "System One Models 和 Jev 是什么？",
+          "answer": "System One 是一个小型、快速、经过校准的模型。Jev 是一个路由网关，会检查 System One 的置信度，仅当置信度低于阈值时才升级到高端模型。2026 年 9 月发布。"
+        },
+        {
+          "question": "校准路由能节省多少成本？",
+          "answer": "Jev 基准测试显示，相比始终使用 Astra，成本降低 76%（每任务从 $1.73 降至 $0.41），同时在 Artificial Analysis 指数上保持 Astra 98% 的准确率。"
+        },
+        {
+          "question": "校准路由会增加延迟吗？",
+          "answer": "System One 的响应约为 200 毫秒。升级会增加一次额外往返（总计约 400 毫秒）。对于约 80% 不需要升级的请求，延迟比直接调用 Astra 更低。"
+        },
+        {
+          "question": "我能在现有的智能体框架中使用 Jev 吗？",
+          "answer": "可以。Jev 提供兼容 OpenAI 的 API。只需将基础 URL 改为 Jev 的端点，智能体即可无需改动地运行。System One 是默认模型，高端模型则在 Jev 的路由表中配置。"
+        },
+        {
+          "question": "合适的置信度阈值是多少？",
+          "answer": "从 0.90 开始。测量升级率和准确率。面向客户的场景可提高到 0.95；对错误成本较低的批处理工作负载，可降到 0.85。"
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/jev-agent-controls-and-budgets",
+          "label": "Jev 智能体控制与预算"
+        },
+        {
+          "slug": "/research/jev-ai-finops-decision-economics",
+          "label": "Jev AI FinOps 决策经济学"
+        },
+        {
+          "slug": "/research/gpt-6-astra-cost-model",
+          "label": "GPT-6 Astra 成本模型"
+        },
+        {
+          "slug": "/research/model-price-cuts-routing-budget",
+          "label": "模型降价与路由预算"
+        }
+      ]
     }
   }
 }

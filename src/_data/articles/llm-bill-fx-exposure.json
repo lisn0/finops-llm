@@ -15,7 +15,7 @@
       "title": "Your LLM bill has an FX problem",
       "titleCore": "Currency exposure in LLM spend",
       "description": "Providers bill in dollars. If you budget in euros, pounds or yen, a currency move is a cost increase that nobody attributes to AI.",
-      "body": "<p>Almost every frontier model is priced in US dollars. If your budget is not in dollars, part of your LLM cost line is a currency position you never chose to take.</p><p>A 6% move in EUR/USD is a 6% increase in what your model spend costs you, with no change in token volume, no change in model, and nothing in any usage dashboard to explain it. Finance sees the variance. Engineering, looking at a dashboard denominated in tokens, sees a flat month and cannot help.</p><h2>Why it hides so well</h2><p>Three layers of translation sit between the API call and the ledger. The provider prices per million tokens in USD. The card or invoice converts at some rate, on some date, with some spread. Your accounting system books it at yet another rate. By the time the number reaches a variance report, the FX component and the usage component are the same figure.</p><p>Cloud marketplaces make it worse, not better. Buying through a reseller or a cloud marketplace in local currency looks like it removes the exposure. It usually just moves the conversion upstream and adds a margin to it &mdash; you are still exposed, you have simply stopped being able to see the rate.</p><h2>Separate the two variances</h2><p>The fix is small and entirely a reporting change. Record every request's cost in <strong>USD at the provider's list rate</strong>, as the primary figure, in telemetry. Convert to your reporting currency once, at a stated rate, at the reporting boundary. Then a monthly variance splits cleanly into a usage variance, which engineering owns and can act on, and an FX variance, which treasury owns and engineering cannot fix.</p><p>Two teams arguing about one number is the actual cost here. It is more expensive than the currency move, because it wastes the review that was supposed to find the real growth.</p><h2>When it is worth hedging</h2><p>Rarely, and only at scale. For most companies the correct response is visibility, not a hedge: know the size of the exposure, state the rate you forecast at, and stop letting a treasury effect masquerade as an engineering one. Hedging becomes a real conversation when model spend is large enough to matter next to the company's other dollar costs &mdash; at which point it belongs with those, not in a FinOps review.</p><p>One practical note: if you renegotiate to a local-currency contract, price the conversion. A committed rate in your own currency is worth paying a little for, and worth nothing if the spread hidden inside it is larger than the volatility it removes.</p><h2>Related</h2><ul><li><a href=&quot;/research/ai-spend-variance-bridge&quot;>AI spend variance bridge</a></li><li><a href=&quot;/research/how-to-budget-for-ai-spend&quot;>How to budget for AI spend</a></li><li><a href=&quot;/research/llm-purchasing-guide&quot;>LLM purchasing guide</a></li></ul>",
+      "body": "<p>Almost every frontier model is priced in US dollars. If your budget is not in dollars, part of your LLM cost line is a currency position you never chose to take.</p><p>A 6% move in EUR/USD is a 6% increase in what your model spend costs you, with no change in token volume, no change in model, and nothing in any usage dashboard to explain it. Finance sees the variance. Engineering, looking at a dashboard denominated in tokens, sees a flat month and cannot help.</p><h2>Why it hides so well</h2><p>Three layers of translation sit between the API call and the ledger. The provider prices per million tokens in USD. The card or invoice converts at some rate, on some date, with some spread. Your accounting system books it at yet another rate. By the time the number reaches a variance report, the FX component and the usage component are the same figure.</p><p>Cloud marketplaces make it worse, not better. Buying through a reseller or a cloud marketplace in local currency looks like it removes the exposure. It usually just moves the conversion upstream and adds a margin to it &mdash; you are still exposed, you have simply stopped being able to see the rate.</p><h2>Separate the two variances</h2><p>The fix is small and entirely a reporting change. Record every request's cost in <strong>USD at the provider's list rate</strong>, as the primary figure, in telemetry. Convert to your reporting currency once, at a stated rate, at the reporting boundary. Then a monthly variance splits cleanly into a usage variance, which engineering owns and can act on, and an FX variance, which treasury owns and engineering cannot fix.</p><p>Two teams arguing about one number is the actual cost here. It is more expensive than the currency move, because it wastes the review that was supposed to find the real growth.</p><h2>When it is worth hedging</h2><p>Rarely, and only at scale. For most companies the correct response is visibility, not a hedge: know the size of the exposure, state the rate you forecast at, and stop letting a treasury effect masquerade as an engineering one. Hedging becomes a real conversation when model spend is large enough to matter next to the company's other dollar costs &mdash; at which point it belongs with those, not in a FinOps review.</p><p>One practical note: if you renegotiate to a local-currency contract, price the conversion. A committed rate in your own currency is worth paying a little for, and worth nothing if the spread hidden inside it is larger than the volatility it removes.</p><h2>Related</h2><ul><li><a href=\"/research/ai-spend-variance-bridge\">AI spend variance bridge</a></li><li><a href=\"/research/how-to-budget-for-ai-spend\">How to budget for AI spend</a></li><li><a href=\"/research/llm-purchasing-guide\">LLM purchasing guide</a></li></ul>",
       "faq": [
         {
           "question": "Why does currency show up in an LLM cost review?",
@@ -132,6 +132,346 @@
         {
           "slug": "/research/ai-spend-variance-bridge",
           "label": "AI 支出の差異ブリッジ"
+        }
+      ]
+    },
+    "id": {
+      "title": "Tagihan LLM Anda punya masalah kurs",
+      "titleCore": "Eksposur kurs dalam belanja LLM",
+      "description": "Penyedia menagih dalam dolar. Jika anggaran Anda dalam euro, pound, atau yen, pergerakan kurs menjadi kenaikan biaya yang tidak dikaitkan dengan AI.",
+      "body": "<p>Hampir setiap model frontier dihargai dalam dolar AS. Jika anggaran Anda tidak dalam dolar, sebagian biaya LLM Anda adalah posisi kurs yang tidak pernah Anda pilih.</p><p>Pergerakan 6% pada EUR/USD berarti biaya model Anda naik 6%, tanpa perubahan volume token, tanpa perubahan model, dan tanpa ada yang menjelaskannya di dasbor penggunaan mana pun. Finance melihat selisihnya. Engineering, yang melihat dasbor dalam token, melihat bulan yang datar dan tidak bisa membantu.</p><h2>Mengapa ini begitu tersembunyi</h2><p>Ada tiga lapis konversi antara panggilan API dan buku besar. Penyedia menetapkan harga per satu juta token dalam USD. Kartu atau faktur mengonversinya pada kurs tertentu, di tanggal tertentu, dengan spread tertentu. Sistem akuntansi Anda mencatatnya pada kurs lain lagi. Saat angka itu sampai di laporan selisih, komponen kurs dan komponen penggunaan sudah menjadi satu angka yang sama.</p><p>Marketplace cloud justru memperburuknya. Membeli lewat reseller atau marketplace cloud dengan mata uang lokal terlihat seperti menghilangkan eksposur. Biasanya itu hanya memindahkan konversi ke hulu dan menambahkan margin di atasnya &mdash; Anda tetap terekspos, Anda hanya tidak lagi bisa melihat kursnya.</p><h2>Pisahkan kedua selisih</h2><p>Perbaikannya kecil dan sepenuhnya perubahan pada pelaporan. Catat biaya setiap permintaan dalam <strong>USD pada tarif daftar penyedia</strong> sebagai angka utama di telemetri. Konversikan ke mata uang pelaporan sekali saja, pada kurs yang dinyatakan, di batas pelaporan. Dengan begitu selisih bulanan terbagi bersih menjadi selisih penggunaan, yang dimiliki dan bisa ditindaklanjuti engineering, dan selisih kurs, yang dimiliki treasury dan tidak bisa diperbaiki engineering.</p><p>Dua tim berdebat tentang satu angka adalah biaya sebenarnya di sini. Biaya ini lebih mahal daripada pergerakan kursnya sendiri, karena membuang waktu tinjauan yang seharusnya menemukan pertumbuhan yang sebenarnya.</p><h2>Kapan layak melakukan lindung nilai</h2><p>Jarang, dan hanya pada skala besar. Bagi kebanyakan perusahaan, respons yang tepat adalah visibilitas, bukan lindung nilai: ketahui besar eksposurnya, nyatakan kurs yang Anda proyeksikan, dan berhenti membiarkan efek treasury menyamar sebagai efek engineering. Lindung nilai menjadi diskusi nyata ketika belanja model cukup besar untuk berarti dibandingkan biaya dolar perusahaan lainnya &mdash; saat itu ia harus dibahas bersama biaya tersebut, bukan dalam tinjauan FinOps.</p><p>Catatan praktis: jika Anda menegosiasikan ulang ke kontrak mata uang lokal, hargai konversinya. Kurs tetap dalam mata uang Anda layak dibayar sedikit lebih mahal, tetapi tidak berharga jika spread yang tersembunyi di dalamnya lebih besar daripada volatilitas yang dihilangkannya.</p><h2>Terkait</h2><ul><li><a href=\"/research/ai-spend-variance-bridge\">Jembatan selisih belanja AI</a></li><li><a href=\"/research/how-to-budget-for-ai-spend\">Cara menganggarkan belanja AI</a></li><li><a href=\"/research/llm-purchasing-guide\">Panduan pembelian LLM</a></li></ul>",
+      "faq": [
+        {
+          "question": "Mengapa mata uang muncul dalam tinjauan biaya LLM?",
+          "answer": "Model frontier dihargai dalam dolar AS. Jika Anda melaporkan dalam mata uang lain, setiap pergerakan kurs mengubah biaya tanpa perubahan penggunaan, dan kedua efek itu datang sebagai satu selisih yang tidak terjelaskan."
+        },
+        {
+          "question": "Bagaimana cara memisahkan selisih kurs dari selisih penggunaan?",
+          "answer": "Catat biaya dalam USD pada tarif daftar penyedia sebagai angka utama di telemetri, lalu konversikan sekali pada kurs yang dinyatakan di batas pelaporan. Selisih bulanan kemudian terbagi menjadi bagian penggunaan milik engineering dan bagian kurs milik treasury."
+        },
+        {
+          "question": "Apakah membeli lewat marketplace cloud menghilangkan eksposur?",
+          "answer": "Biasanya tidak. Pembayaran dalam mata uang lokal memindahkan konversi ke hulu dan menambahkan margin. Anda tetap terekspos dan kehilangan visibilitas atas kurs yang dikenakan kepada Anda."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/ai-spend-variance-bridge",
+          "label": "Jembatan selisih belanja AI"
+        },
+        {
+          "slug": "/research/how-to-budget-for-ai-spend",
+          "label": "Cara menganggarkan belanja AI"
+        },
+        {
+          "slug": "/research/llm-purchasing-guide",
+          "label": "Panduan pembelian LLM"
+        }
+      ]
+    },
+    "pl": {
+      "title": "Twój rachunek za LLM ma problem z walutą",
+      "titleCore": "Ekspozycja walutowa w wydatkach na LLM",
+      "description": "Dostawcy fakturują w dolarach. Jeśli budżetujesz w euro, funtach lub jenach, ruch kursu to wzrost kosztów, którego nikt nie przypisuje AI.",
+      "body": "<p>Prawie każdy model z czołówki ma cenę w dolarach amerykańskich. Jeśli Twój budżet nie jest w dolarach, część kosztów LLM to pozycja walutowa, której nigdy nie wybrałeś.</p><p>Ruch EUR/USD o 6% oznacza 6% wyższy koszt Twoich wydatków na modele, bez zmiany wolumenu tokenów, modelu i bez żadnego wyjaśnienia na pulpicie użycia. Finanse widzą odchylenie. Inżynierowie, patrząc na pulpit wyrażony w tokenach, widzą płaski miesiąc i nie mogą pomóc.</p><h2>Dlaczego to tak dobrze się ukrywa</h2><p>Między wywołaniem API a księgą znajdują się trzy warstwy przeliczeń. Dostawca wycenia w USD za milion tokenów. Karta lub faktura przelicza po jakimś kursie, w jakiejś dacie, z jakimś spreadem. Twój system księgowy księguje to po jeszcze innym kursie. Gdy liczba trafia do raportu odchyleń, składnik walutowy i składnik użycia są już jedną wartością.</p><p>Rynki chmurowe pogarszają sprawę. Zakup przez resellera lub marketplace chmurowy w walucie lokalnej wygląda, jakby usuwał ekspozycję. Zwykle tylko przesuwa przeliczenie wyżej i dolicza do niego marżę. Nadal jesteś wystawiony na ryzyko, tylko przestałeś widzieć kurs, po którym jesteś obciążany.</p><h2>Rozdziel dwa odchylenia</h2><p>Rozwiązanie jest małe i w całości dotyczy raportowania. Zapisuj koszt każdego żądania w <strong>USD po cenie katalogowej dostawcy</strong> jako wartość podstawową w telemetrii. Przelicz na walutę raportową raz, po jawnie podanym kursie, na granicy raportowania. Wtedy miesięczne odchylenie dzieli się czysto na odchylenie użycia, za które odpowiada inżynieria i na które może wpłynąć, oraz odchylenie walutowe, za które odpowiada skarbiec, a którego inżynieria nie naprawi.</p><p>Realnym kosztem jest tu to, że dwa zespoły spierają się o jedną liczbę. To droższe niż sam ruch kursu, bo marnuje przegląd, który miał wykryć rzeczywisty wzrost.</p><h2>Kiedy warto się zabezpieczać</h2><p>Rzadko, i tylko przy dużej skali. Dla większości firm właściwą odpowiedzią jest widoczność, a nie hedging: znaj wielkość ekspozycji, podaj kurs, na którym prognozujesz, i przestań pozwalać, by efekt skarbca udawał efekt inżynieryjny. Hedging staje się realną rozmową dopiero wtedy, gdy wydatki na modele są na tyle duże, że liczą się obok pozostałych kosztów w dolarach firmy. Wtedy należy do tamtych kosztów, a nie do przeglądu FinOps.</p><p>Praktyczna uwaga: jeśli renegocjujesz umowę w walucie lokalnej, wyceń przeliczenie. Stały kurs we własnej walucie jest wart odrobiny dopłaty, ale nie jest wart nic, jeśli ukryty w nim spread jest większy niż zmienność, którą eliminuje.</p><h2>Powiązane</h2><ul><li><a href=\"/research/ai-spend-variance-bridge\">Mostek odchyleń wydatków na AI</a></li><li><a href=\"/research/how-to-budget-for-ai-spend\">Jak budżetować wydatki na AI</a></li><li><a href=\"/research/llm-purchasing-guide\">Przewodnik zakupu LLM</a></li></ul>",
+      "faq": [
+        {
+          "question": "Dlaczego waluta pojawia się w przeglądzie kosztów LLM?",
+          "answer": "Modele z czołówki są wyceniane w dolarach amerykańskich. Jeśli raportujesz w innej walucie, każdy ruch kursu zmienia koszt bez zmiany użycia, a oba efekty trafiają jako jedno niewyjaśnione odchylenie."
+        },
+        {
+          "question": "Jak oddzielić odchylenie walutowe od odchylenia użycia?",
+          "answer": "Zapisuj koszt w USD po cenie katalogowej dostawcy jako wartość podstawową w telemetrii i przelicz raz, po jawnie podanym kursie, na granicy raportowania. Miesięczne odchylenie dzieli się wtedy na część użycia, za którą odpowiada inżynieria, i część walutową, za którą odpowiada skarbiec."
+        },
+        {
+          "question": "Czy zakup przez marketplace chmurowy usuwa ekspozycję?",
+          "answer": "Zwykle nie. Płatność w walucie lokalnej przesuwa przeliczenie wyżej i dolicza do niego marżę. Nadal ponosisz ryzyko i tracisz widoczność kursu, po którym jesteś obciążany."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/ai-spend-variance-bridge",
+          "label": "Mostek odchyleń wydatków na AI"
+        },
+        {
+          "slug": "/research/how-to-budget-for-ai-spend",
+          "label": "Jak budżetować wydatki na AI"
+        },
+        {
+          "slug": "/research/llm-purchasing-guide",
+          "label": "Przewodnik zakupu LLM"
+        }
+      ]
+    },
+    "ru": {
+      "title": "В счёте за LLM есть валютный риск",
+      "titleCore": "Валютный риск в расходах на LLM",
+      "description": "Провайдеры выставляют счета в долларах. Если бюджет в евро, фунтах или иенах, колебание курса становится ростом расходов, который никто не относит к ИИ.",
+      "body": "<p>Почти все фронтирные модели оцениваются в долларах США. Если ваш бюджет не в долларах, часть статьи расходов на LLM — это валютная позиция, которую вы никогда не выбирали.</p><p>Движение EUR/USD на 6% означает рост стоимости ваших расходов на модели на 6%, без изменения объёма токенов, без смены модели и без чего-либо в панели использования, что это объясняло бы. Финансисты видят отклонение. Инженеры, глядя на панель в токенах, видят ровный месяц и ничем не могут помочь.</p><h2>Почему это так хорошо скрыто</h2><p>Между вызовом API и бухгалтерской книгой стоят три слоя конвертации. Провайдер назначает цену за миллион токенов в долларах. Карта или счёт конвертируют сумму по некоторому курсу, на некоторую дату, с некоторым спредом. Ваша учётная система проводит её ещё по одному курсу. К тому времени, как цифра попадает в отчёт об отклонениях, валютная составляющая и составляющая использования становятся одним и тем же числом.</p><p>Облачные маркетплейсы ситуацию только ухудшают. Покупка через реселлера или облачный маркетплейс в местной валюте кажется способом убрать риск. Обычно же конвертация просто переезжает выше по цепочке и обрастает наценкой: риск никуда не делся, вы лишь перестали видеть курс.</p><h2>Разделите два отклонения</h2><p>Исправление небольшое и касается только отчётности. В телеметрии фиксируйте стоимость каждого запроса в <strong>долларах по публичному тарифу провайдера</strong> как основную цифру. Конвертируйте в валюту отчётности один раз, по заявленному курсу, на границе отчёта. Тогда месячное отклонение чисто делится на отклонение использования, которым владеет инженерия и на которое она может повлиять, и валютное отклонение, которым владеет казначейство и которое инженерия исправить не может.</p><p>Реальная цена здесь — две команды, спорящие об одной цифре. Это дороже самого валютного движения, потому что тратит впустую разбор, который должен был найти настоящий рост.</p><h2>Когда стоит хеджировать</h2><p>Редко и только при большом масштабе. Для большинства компаний правильный ответ — видимость, а не хедж: знать размер экспозиции, указывать курс, на который вы прогнозируете, и перестать позволять эффекту казначейства выдавать себя за инженерный. Хеджирование становится предметным разговором, когда расходы на модели достаточно велики, чтобы заметно влиять на остальные долларовые расходы компании. Тогда его место — рядом с ними, а не в обзоре FinOps.</p><p>Одно практическое замечание: если вы переходите на контракт в местной валюте, учитывайте стоимость конвертации. Зафиксированный курс в вашей валюте стоит небольшой платы, но ничего не стоит, если скрытый в нём спред больше волатильности, которую он убирает.</p><h2>Связанное</h2><ul><li><a href=\"/research/ai-spend-variance-bridge\">Мост отклонений расходов на ИИ</a></li><li><a href=\"/research/how-to-budget-for-ai-spend\">Как планировать бюджет на расходы на ИИ</a></li><li><a href=\"/research/llm-purchasing-guide\">Руководство по закупке LLM</a></li></ul>",
+      "faq": [
+        {
+          "question": "Почему валюта появляется в обзоре расходов на LLM?",
+          "answer": "Фронтирные модели оцениваются в долларах США. Если вы отчитываетесь в другой валюте, каждое движение курса меняет стоимость без изменения использования, и оба эффекта приходят как одно необъяснённое отклонение."
+        },
+        {
+          "question": "Как отделить валютное отклонение от отклонения использования?",
+          "answer": "Фиксируйте стоимость в долларах по публичному тарифу провайдера как основную цифру в телеметрии и конвертируйте один раз по заявленному курсу на границе отчёта. Месячное отклонение тогда делится на часть использования, которой владеет инженерия, и валютную часть, которой владеет казначейство."
+        },
+        {
+          "question": "Избавляет ли покупка через облачный маркетплейс от риска?",
+          "answer": "Обычно нет. Оплата в местной валюте переносит конвертацию выше по цепочке и добавляет к ней наценку. Риск остаётся, а курс, по которому с вас берут деньги, становится непрозрачным."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/ai-spend-variance-bridge",
+          "label": "Мост отклонений расходов на ИИ"
+        },
+        {
+          "slug": "/research/how-to-budget-for-ai-spend",
+          "label": "Как планировать бюджет на расходы на ИИ"
+        },
+        {
+          "slug": "/research/llm-purchasing-guide",
+          "label": "Руководство по закупке LLM"
+        }
+      ]
+    },
+    "tr": {
+      "title": "LLM faturanızda bir döviz riski var",
+      "titleCore": "LLM harcamalarında döviz maruziyeti",
+      "description": "Sağlayıcılar dolar üzerinden faturalandırır. Bütçenizi euro ile yapıyorsanız, bir kur hareketi kimsenin yapay zekaya atfetmediği bir maliyet artışıdır.",
+      "body": "<p>Neredeyse her öncü model ABD doları cinsinden fiyatlandırılıyor. Bütçeniz dolar cinsinde değilse, LLM maliyet kaleminizin bir kısmı hiç almadığınız bir döviz pozisyonudur.</p><p>EUR/USD'de %6'lık bir hareket, model harcamanızın size maliyetinde %6'lık bir artış demektir; token hacminde, modelde ya da herhangi bir kullanım panelinde bunu açıklayan bir değişiklik olmadan. Finans sapmayı görür. Token cinsinden bir panele bakan mühendislik ise düz bir ay görür ve yardımcı olamaz.</p><h2>Neden bu kadar iyi gizleniyor</h2><p>API çağrısı ile defter arasında üç çeviri katmanı durur. Sağlayıcı fiyatı milyon token başına USD olarak belirler. Kart ya da fatura, belirli bir tarihte belirli bir kurdan ve bir spread ile dönüştürür. Muhasebe sisteminiz bunu bir başka kurdan kaydeder. Sapma raporuna ulaştığında, döviz bileşeni ve kullanım bileşeni aynı rakam hâline gelmiştir.</p><p>Bulut pazarları işleri iyileştirmez, kötüleştirir. Bir satıcı ya da bulut pazarı üzerinden yerel para biriminde satın almak riski ortadan kaldırıyormuş gibi görünür. Genellikle yalnızca dönüşümü yukarı taşır ve üzerine bir marj ekler &mdash; yine maruzsunuzdur, sadece kuru görme yeteneğinizi kaybetmişsinizdir.</p><h2>İki sapmayı ayırın</h2><p>Çözüm küçük ve tamamen bir raporlama değişikliğidir. Her isteğin maliyetini telemetride birincil rakam olarak <strong>sağlayıcının liste fiyatından USD cinsinden</strong> kaydedin. Raporlama sınırında, belirtilmiş bir kurdan raporlama para biriminize yalnızca bir kez çevirin. Böylece aylık sapma temiz biçimde ikiye ayrılır: mühendisliğin etkileyebildiği bir kullanım sapması ve hazinenin sahip olduğu bir döviz sapması.</p><p>Burada asıl maliyet, tek bir rakam üzerinde tartışan iki ekiptir. Bu, döviz hareketinden daha pahalıdır; çünkü gerçek büyümeyi bulması gereken incelemeyi boşa harcar.</p><h2>Ne zaman korunmaya değer?</h2><p>Nadiren ve yalnızca büyük ölçekte. Çoğu şirket için doğru yanıt koruma (hedge) değil, görünürlüktür: maruziyetin büyüklüğünü bilin, tahmin ettiğiniz kuru belirtin ve hazine etkisinin bir mühendislik etkisi gibi görünmesine izin vermeyin. Model harcamaları, şirketin diğer dolar cinsinden maliyetleriyle kıyaslanabilir bir büyüklüğe ulaştığında korunma gerçek bir konu olur &mdash; o noktada bu konu bir FinOps incelemesine değil, o maliyetlerle birlikte ele alınmalıdır.</p><p>Pratik bir not: yerel para birimli bir sözleşmeye geçiyorsanız dönüşümün fiyatını ödeyin. Kendi para biriminizde sabitlenmiş bir kur, içine gizlenmiş spread ortadan kaldırdığı oynaklıktan büyükse hiçbir değer taşımaz; ama bir miktar ödemeye değer.</p><h2>İlgili yazılar</h2><ul><li><a href=\"/research/ai-spend-variance-bridge\">AI harcama sapma köprüsü</a></li><li><a href=\"/research/how-to-budget-for-ai-spend\">AI harcamaları için bütçe nasıl yapılır</a></li><li><a href=\"/research/llm-purchasing-guide\">LLM satın alma rehberi</a></li></ul>",
+      "faq": [
+        {
+          "question": "LLM maliyet incelemesinde neden döviz kuru görünür?",
+          "answer": "Öncü modeller ABD doları cinsinden fiyatlandırılır. Başka bir para biriminde raporluyorsanız, her kur hareketi kullanım değişmeden maliyetinizi değiştirir ve iki etki tek bir açıklanamayan sapma olarak gelir."
+        },
+        {
+          "question": "Döviz sapmasını kullanım sapmasından nasıl ayırırsınız?",
+          "answer": "Telemetride maliyeti birincil rakam olarak sağlayıcının liste fiyatından USD cinsinden kaydedin ve raporlama sınırında belirtilmiş bir kurdan bir kez çevirin. Aylık sapma, mühendisliğin sahip olduğu bir kullanım payına ve hazinenin sahip olduğu bir döviz payına ayrılır."
+        },
+        {
+          "question": "Bulut pazarı üzerinden satın almak maruziyeti ortadan kaldırır mı?",
+          "answer": "Genellikle hayır. Yerel para birimiyle ödemek dönüşümü yukarı taşır ve üzerine bir marj ekler. Maruziyeti korursunuz; ödediğiniz kurun görünürlüğünü ise kaybedersiniz."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/ai-spend-variance-bridge",
+          "label": "AI harcama sapma köprüsü"
+        },
+        {
+          "slug": "/research/how-to-budget-for-ai-spend",
+          "label": "AI harcamaları için bütçe nasıl yapılır"
+        },
+        {
+          "slug": "/research/llm-purchasing-guide",
+          "label": "LLM satın alma rehberi"
+        }
+      ]
+    },
+    "vi": {
+      "title": "Hóa đơn LLM của bạn đang có rủi ro tỷ giá",
+      "titleCore": "Rủi ro tiền tệ trong chi tiêu LLM",
+      "description": "Nhà cung cấp tính phí bằng USD. Nếu bạn lập ngân sách bằng euro, bảng Anh hay yên, một biến động tỷ giá chính là mức tăng chi phí mà không ai quy cho AI.",
+      "body": "<p>Hầu hết mọi model tiên phong đều được định giá bằng đô la Mỹ. Nếu ngân sách của bạn không tính bằng đô la, một phần dòng chi phí LLM của bạn là một vị thế tiền tệ mà bạn chưa bao giờ chủ động chọn.</p><p>Biến động 6% của EUR/USD tương đương chi phí chi tiêu model của bạn tăng 6%, dù khối lượng token, model và mọi thứ khác đều không đổi, và không có gì trên bảng điều khiển sử dụng giải thích được điều đó. Phòng tài chính thấy độ lệch. Kỹ thuật, khi nhìn vào bảng điều khiển tính bằng token, chỉ thấy một tháng phẳng lặng và không thể giúp gì.</p><h2>Vì sao nó ẩn giấu hiệu quả đến vậy</h2><p>Có ba lớp quy đổi nằm giữa lệnh gọi API và sổ cái. Nhà cung cấp định giá theo mỗi triệu token bằng USD. Thẻ hoặc hóa đơn quy đổi theo một tỷ giá nào đó, vào một ngày nào đó, với một mức chênh lệch nào đó. Hệ thống kế toán của bạn ghi sổ theo một tỷ giá khác nữa. Khi con số đến được báo cáo độ lệch, thành phần tỷ giá và thành phần sử dụng đã trở thành cùng một con số.</p><p>Các marketplace đám mây còn làm mọi việc tệ hơn. Mua qua nhà phân phối hoặc marketplace đám mây bằng tiền địa phương trông như thể loại bỏ được rủi ro. Thường thì nó chỉ đẩy việc quy đổi lên phía trước và cộng thêm một khoản biên lợi nhuận. Bạn vẫn chịu rủi ro, chỉ là không còn nhìn thấy tỷ giá đang được áp dụng.</p><h2>Tách riêng hai độ lệch</h2><p>Cách khắc phục nhỏ và hoàn toàn chỉ là thay đổi trong báo cáo. Ghi chi phí của mỗi yêu cầu bằng <strong>USD theo giá niêm yết của nhà cung cấp</strong> làm con số chính trong telemetry. Quy đổi sang đơn vị tiền tệ báo cáo một lần duy nhất, theo một tỷ giá đã nêu rõ, tại thời điểm lập báo cáo. Khi đó độ lệch hằng tháng sẽ tách sạch thành độ lệch sử dụng, do kỹ thuật chịu trách nhiệm và có thể hành động, và độ lệch tỷ giá, do bộ phận quản lý tiền tệ chịu trách nhiệm và kỹ thuật không thể sửa.</p><p>Hai đội cãi nhau về một con số mới là chi phí thực sự ở đây. Nó đắt hơn cả biến động tiền tệ, vì nó làm lãng phí buổi rà soát lẽ ra phải tìm ra mức tăng trưởng thật.</p><h2>Khi nào đáng để phòng hộ</h2><p>Hiếm khi, và chỉ ở quy mô lớn. Với đa số công ty, phản ứng đúng là làm cho nó nhìn thấy được, không phải phòng hộ: biết quy mô của rủi ro, nêu rõ tỷ giá dùng để dự báo, và ngừng để hiệu ứng ngân quỹ giả dạng thành vấn đề kỹ thuật. Phòng hộ chỉ trở thành một cuộc thảo luận thực sự khi chi tiêu model đủ lớn để có ý nghĩa bên cạnh các khoản chi bằng đô la khác của công ty, khi đó nó nên được xử lý cùng các khoản đó, chứ không phải trong một buổi rà soát FinOps.</p><p>Một lưu ý thực tế: nếu bạn tái đàm phán sang hợp đồng bằng tiền địa phương, hãy định giá cả khâu quy đổi. Một tỷ giá cam kết bằng đồng tiền của bạn đáng để trả thêm một chút, nhưng sẽ vô giá trị nếu mức chênh lệch ẩn bên trong lớn hơn mức biến động mà nó loại bỏ.</p><h2>Liên quan</h2><ul><li><a href=\"/research/ai-spend-variance-bridge\">Cầu nối độ lệch chi tiêu AI</a></li><li><a href=\"/research/how-to-budget-for-ai-spend\">Cách lập ngân sách cho chi tiêu AI</a></li><li><a href=\"/research/llm-purchasing-guide\">Hướng dẫn mua LLM</a></li></ul>",
+      "faq": [
+        {
+          "question": "Vì sao tỷ giá xuất hiện trong việc rà soát chi phí LLM?",
+          "answer": "Các model tiên phong được định giá bằng đô la Mỹ. Nếu bạn báo cáo bằng một đồng tiền khác, mỗi biến động tỷ giá sẽ làm thay đổi chi phí của bạn dù mức sử dụng không đổi, và hai hiệu ứng này xuất hiện như một độ lệch duy nhất không giải thích được."
+        },
+        {
+          "question": "Làm thế nào để tách độ lệch tỷ giá khỏi độ lệch sử dụng?",
+          "answer": "Ghi chi phí bằng USD theo giá niêm yết của nhà cung cấp làm con số chính trong telemetry, rồi quy đổi một lần duy nhất theo một tỷ giá đã nêu rõ tại thời điểm báo cáo. Độ lệch hằng tháng khi đó sẽ tách thành phần sử dụng do kỹ thuật chịu trách nhiệm và phần tỷ giá do bộ phận quản lý tiền tệ chịu trách nhiệm."
+        },
+        {
+          "question": "Mua qua marketplace đám mây có loại bỏ được rủi ro này không?",
+          "answer": "Thường là không. Thanh toán bằng tiền địa phương chỉ đẩy việc quy đổi lên phía trước và cộng thêm một khoản biên lợi nhuận. Bạn vẫn giữ rủi ro và mất khả năng nhìn thấy tỷ giá mình đang bị tính."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/ai-spend-variance-bridge",
+          "label": "Cầu nối độ lệch chi tiêu AI"
+        },
+        {
+          "slug": "/research/how-to-budget-for-ai-spend",
+          "label": "Cách lập ngân sách cho chi tiêu AI"
+        },
+        {
+          "slug": "/research/llm-purchasing-guide",
+          "label": "Hướng dẫn mua LLM"
+        }
+      ]
+    },
+    "ar": {
+      "title": "فاتورة LLM لديك فيها مشكلة صرف عملات",
+      "titleCore": "التعرض للعملات في إنفاق LLM",
+      "description": "المزودون يفوترون بالدولار. فإن كانت ميزانيتك باليورو أو الجنيه أو الين، فتحرك العملة زيادة في التكلفة لا ينسبها أحد إلى الذكاء الاصطناعي.",
+      "body": "<p>تُسعَّر تقريباً كل النماذج المتقدمة بالدولار الأمريكي. فإن لم تكن ميزانيتك بالدولار، فجزء من بند تكلفة LLM لديك مركز عملة لم تختر قط أن تتخذه.</p><p>تحرك بنسبة 6% في زوج EUR/USD هو زيادة بنسبة 6% في ما يكلفك إنفاق نماذجك، دون تغيير في حجم الرموز، ودون تغيير في النموذج، ودون شيء في أي لوحة استخدام يفسّر ذلك. يرى قسم المالية التباين. أما الهندسة، وهي تنظر إلى لوحة مقوَّمة بالرموز، فترى شهراً ثابتاً ولا تستطيع المساعدة.</p><h2>لماذا يختبئ جيداً</h2><p>تقع ثلاث طبقات من الترجمة بين استدعاء الواجهة والدفتر. يسعّر المزود لكل مليون رمز بالدولار. وتحوّل البطاقة أو الفاتورة بسعر ما، في تاريخ ما، بهامش ما. ثم يقيّدها نظامك المحاسبي بسعر آخر. وبحلول وصول الرقم إلى تقرير التباين، يصبح مكوّن الصرف ومكوّن الاستخدام رقماً واحداً.</p><p>الأسواق السحابية تزيد الأمر سوءاً لا تحسناً. فالشراء عبر موزّع أو سوق سحابية بالعملة المحلية يبدو كأنه يزيل التعرض. لكنه غالباً ينقل التحويل إلى مرحلة أسبق ويضيف عليه هامشاً &mdash; فتبقى متعرضاً، وكل ما حدث أنك لم تعد ترى السعر.</p><h2>افصل التباينين</h2><p>الحل صغير وهو تغيير في التقارير بالكامل. سجّل تكلفة كل طلب بـ <strong>الدولار وفق سعر القائمة لدى المزود</strong> بوصفها الرقم الأساسي في القياسات. حوّل إلى عملة التقارير مرة واحدة، بسعر معلن، عند حد التقرير. عندها ينقسم التباين الشهري بوضوح إلى تباين استخدام، تملكه الهندسة ويمكنها التصرف بشأنه، وتباين صرف، تملكه الخزينة ولا تستطيع الهندسة إصلاحه.</p><p>فريقان يتجادلان حول رقم واحد هو التكلفة الحقيقية هنا. وهي أغلى من تحرك العملة، لأنها تهدر المراجعة التي كان يفترض أن تكشف النمو الحقيقي.</p><h2>متى يستحق التحوط</h2><p>نادراً، وعلى نطاق كبير فقط. فبالنسبة لمعظم الشركات الاستجابة الصحيحة هي الرؤية لا التحوط: اعرف حجم التعرض، وأعلن السعر الذي تتوقع به، وتوقف عن ترك أثر الخزينة يتنكر في هيئة أثر هندسي. يصبح التحوط نقاشاً حقيقياً حين يكون إنفاق النماذج كبيراً بما يكفي ليهم بجانب تكاليف الشركة الأخرى بالدولار &mdash; وعندها ينتمي إلى تلك التكاليف، لا إلى مراجعة FinOps.</p><p>ملاحظة عملية واحدة: إن أعدت التفاوض إلى عقد بالعملة المحلية، فسعّر التحويل. السعر الملتزم به بعملتك الخاصة يستحق أن تدفع قليلاً مقابله، ولا يساوي شيئاً إن كان الهامش المخبأ فيه أكبر من التقلب الذي يزيله.</p><h2>ذات صلة</h2><ul><li><a href=\"/research/ai-spend-variance-bridge\">جسر تباين إنفاق الذكاء الاصطناعي</a></li><li><a href=\"/research/how-to-budget-for-ai-spend\">كيف تضع ميزانية لإنفاق الذكاء الاصطناعي</a></li><li><a href=\"/research/llm-purchasing-guide\">دليل شراء LLM</a></li></ul>",
+      "faq": [
+        {
+          "question": "لماذا تظهر العملة في مراجعة تكلفة LLM؟",
+          "answer": "تُسعَّر النماذج المتقدمة بالدولار الأمريكي. فإن كنت تعدّ تقاريرك بعملة أخرى، فكل تحرك في سعر الصرف يغيّر تكلفتك دون تغيير في الاستخدام، ويصل الأثران كتباين واحد غير مفسَّر."
+        },
+        {
+          "question": "كيف تفصل تباين الصرف عن تباين الاستخدام؟",
+          "answer": "سجّل التكلفة بالدولار وفق سعر القائمة لدى المزود بوصفها الرقم الأساسي في القياسات، وحوّل مرة واحدة بسعر معلن عند حد التقرير. عندها ينقسم التباين الشهري إلى جزء استخدام تملكه الهندسة وجزء صرف تملكه الخزينة."
+        },
+        {
+          "question": "هل الشراء عبر سوق سحابية يزيل التعرض؟",
+          "answer": "عادةً لا. فالدفع بالعملة المحلية ينقل التحويل إلى مرحلة أسبق ويضيف عليه هامشاً. يبقى التعرض ولا تعود ترى السعر الذي تُحاسَب به."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/ai-spend-variance-bridge",
+          "label": "جسر تباين إنفاق الذكاء الاصطناعي"
+        },
+        {
+          "slug": "/research/how-to-budget-for-ai-spend",
+          "label": "كيف تضع ميزانية لإنفاق الذكاء الاصطناعي"
+        },
+        {
+          "slug": "/research/llm-purchasing-guide",
+          "label": "دليل شراء LLM"
+        }
+      ]
+    },
+    "it": {
+      "title": "La fattura LLM ha un problema di cambio",
+      "titleCore": "Esposizione al cambio nella spesa LLM",
+      "description": "I fornitori fatturano in dollari. Con un budget in euro, una variazione del cambio diventa un aumento di costo che nessuno attribuisce alla IA.",
+      "body": "<p>Quasi tutti i modelli di frontiera hanno prezzi in dollari statunitensi. Se il budget non è in dollari, parte della voce di costo LLM è una posizione di cambio che non si è mai scelto di assumere.</p><p>Un movimento del 6% su EUR/USD equivale a un aumento del 6% della spesa per i modelli, senza variazioni di volume di token o di modello e senza nulla nella dashboard di utilizzo che lo spieghi. La finanza vede lo scostamento; l'ingegneria, che guarda una dashboard espressa in token, vede un mese piatto e non può aiutare.</p><h2>Perché si nasconde così bene</h2><p>Tra la chiamata API e il libro contabile ci sono tre livelli di conversione. Il fornitore fissa il prezzo per milione di token in USD. La carta o la fattura converte a un certo tasso, in una certa data, con un certo spread. Il sistema contabile registra l'importo a un altro tasso ancora. Quando il numero arriva al report sugli scostamenti, la componente di cambio e quella di utilizzo sono diventate la stessa cifra.</p><p>Anche i marketplace cloud peggiorano la situazione. Acquistare tramite un rivenditore o un marketplace in valuta locale sembra eliminare l'esposizione. In genere si limita a spostare la conversione a monte e ad aggiungervi un margine: l'esposizione resta, e il tasso applicato diventa più difficile da vedere.</p><h2>Separare le due varianze</h2><p>La correzione è piccola e riguarda solo il reporting. Registrate il costo di ogni richiesta in <strong>USD al prezzo di listino del fornitore</strong> come dato primario nella telemetria. Convertite nella valuta di reporting una sola volta, a un tasso dichiarato, al confine del reporting. Così la varianza mensile si divide in modo netto: una varianza di utilizzo, che l'ingegneria possiede e può governare, e una varianza di cambio, che spetta alla tesoreria e che l'ingegneria non può correggere.</p><p>Due team che discutono su un solo numero rappresentano il vero costo qui. Costa più dello spostamento valutario, perché fa perdere la revisione che avrebbe dovuto individuare la crescita reale.</p><h2>Quando vale la pena coprirsi</h2><p>Raramente, e solo su larga scala. Per la maggior parte delle aziende la risposta corretta è la visibilità, non la copertura: conoscere la dimensione dell'esposizione, dichiarare il tasso su cui si fa la previsione e smettere di far passare un effetto di tesoreria per un effetto dell'ingegneria. La copertura diventa un discorso reale quando la spesa in modelli è abbastanza grande da contare accanto alle altre spese in dollari dell'azienda; a quel punto va trattata insieme a quelle, non in una revisione FinOps.</p><p>Una nota pratica: se si rinegozia verso un contratto in valuta locale, va valutato il prezzo della conversione. Un tasso fisso nella propria valuta vale un piccolo sovrapprezzo, ma non vale nulla se lo spread nascosto al suo interno supera la volatilità che elimina.</p><h2>Correlati</h2><ul><li><a href=\"/research/ai-spend-variance-bridge\">Ponte di varianza della spesa IA</a></li><li><a href=\"/research/how-to-budget-for-ai-spend\">Come fare il budget della spesa IA</a></li><li><a href=\"/research/llm-purchasing-guide\">Guida agli acquisti di LLM</a></li></ul>",
+      "faq": [
+        {
+          "question": "Perché la valuta compare in una revisione dei costi LLM?",
+          "answer": "I modelli di frontiera hanno prezzi in dollari. Se si riporta in un'altra valuta, ogni movimento del cambio modifica il costo senza variazioni di utilizzo, e i due effetti arrivano come un'unica varianza non spiegata."
+        },
+        {
+          "question": "Come si separa la varianza di cambio da quella di utilizzo?",
+          "answer": "Registrate il costo in USD al prezzo di listino del fornitore come dato primario nella telemetria e convertite una sola volta a un tasso dichiarato al confine del reporting. La varianza mensile si divide così in una parte di utilizzo, di competenza dell'ingegneria, e una parte di cambio, di competenza della tesoreria."
+        },
+        {
+          "question": "Acquistare tramite un marketplace cloud elimina l'esposizione?",
+          "answer": "Di solito no. Pagare in valuta locale sposta la conversione a monte e ci aggiunge un margine. L'esposizione resta, e si perde visibilità sul tasso applicato."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/ai-spend-variance-bridge",
+          "label": "Ponte di varianza della spesa IA"
+        },
+        {
+          "slug": "/research/how-to-budget-for-ai-spend",
+          "label": "Come fare il budget della spesa IA"
+        },
+        {
+          "slug": "/research/llm-purchasing-guide",
+          "label": "Guida agli acquisti di LLM"
+        }
+      ]
+    },
+    "ko": {
+      "title": "LLM 청구서에 환율 문제가 있습니다",
+      "titleCore": "LLM 지출의 환율 노출",
+      "description": "공급자는 달러로 청구합니다. 예산을 유로, 파운드, 엔으로 세운다면 환율 변동은 아무도 AI 탓으로 돌리지 않는 비용 증가가 됩니다.",
+      "body": "<p>거의 모든 프런티어 모델은 미국 달러로 가격이 매겨집니다. 예산이 달러로 짜여 있지 않다면, LLM 비용의 일부는 선택한 적 없는 환율 포지션입니다.</p><p>EUR/USD가 6% 움직이면 모델 지출의 원화 환산 비용도 6% 오릅니다. 토큰 양이나 모델이 바뀌지 않았더라도 말입니다. 사용량 대시보드에도 이를 설명하는 항목은 없습니다. 재무팀은 차이를 보지만, 토큰 단위로 보는 엔지니어링 팀은 평탄한 한 달만 보게 되어 도울 방법이 없습니다.</p><h2>이것이 쉽게 숨는 이유</h2><p>API 호출에서 원장까지는 세 겹의 환산이 있습니다. 공급자는 백만 토큰당 USD로 가격을 매깁니다. 카드나 청구서는 특정 날짜의 특정 환율과 스프레드로 환산합니다. 회계 시스템은 또 다른 환율로 기록합니다. 차이 보고서에 도달할 즈음에는 환율 요소와 사용량 요소가 같은 숫자가 되어 있습니다.</p><p>클라우드 마켓플레이스는 상황을 더 나쁘게 만듭니다. 현지 통화로 리셀러나 클라우드 마켓플레이스를 통해 구매하면 노출이 사라지는 것처럼 보입니다. 보통은 환산이 상류로 옮겨 가고 그 위에 마진이 더해질 뿐입니다. 여전히 노출되어 있고, 적용된 환율을 볼 수 없게 되었을 뿐입니다.</p><h2>두 차이를 분리하세요</h2><p>해결책은 작고, 전적으로 보고 방식의 변경입니다. 텔레메트리에서 모든 요청의 비용을 <strong>공급자 정가 기준 USD</strong>로 기록하고, 이를 기본 수치로 삼으세요. 보고 기준 통화로의 환산은 보고 경계에서 한 번만, 명시된 환율로 하세요. 그러면 월간 차이가 깔끔하게 둘로 나뉩니다. 엔지니어링이 책임지고 조치할 수 있는 사용량 차이와, 재무팀이 책임지고 엔지니어링이 고칠 수 없는 환율 차이입니다.</p><p>하나의 숫자를 두고 두 팀이 다투는 것이 여기서 실제로 드는 비용입니다. 환율 변동보다 더 비쌉니다. 실제 성장을 찾아내야 할 검토 자체를 낭비하기 때문입니다.</p><h2>언제 헤지할 가치가 있나</h2><p>드물고, 규모가 클 때만 그렇습니다. 대부분의 기업에 맞는 대응은 헤지가 아니라 가시성입니다. 노출의 크기를 알고, 예측에 사용하는 환율을 명시하고, 재무 효과가 엔지니어링 효과인 척하는 것을 멈추세요. 모델 지출이 회사의 다른 달러 비용 옆에서 의미를 가질 만큼 커지면, 헤지는 진지한 논의가 됩니다. 그 시점에는 FinOps 검토가 아니라 그 다른 달러 비용들과 함께 다뤄야 합니다.</p><p>실무적인 참고 사항이 하나 있습니다. 현지 통화 계약으로 재협상한다면 환산 비용을 따져 보세요. 확정 환율은 자기 통화로 된 계약의 가치가 있지만, 그 안에 숨은 스프레드가 제거하는 변동성보다 크다면 아무 가치도 없습니다.</p><h2>관련 글</h2><ul><li><a href=\"/research/ai-spend-variance-bridge\">AI 지출 차이 브리지</a></li><li><a href=\"/research/how-to-budget-for-ai-spend\">AI 지출 예산을 세우는 방법</a></li><li><a href=\"/research/llm-purchasing-guide\">LLM 구매 가이드</a></li></ul>",
+      "faq": [
+        {
+          "question": "LLM 비용 검토에 통화가 왜 나타나나요?",
+          "answer": "프런티어 모델은 미국 달러로 가격이 매겨지기 때문입니다. 다른 통화로 보고하면 사용량이 같아도 환율이 움직일 때마다 비용이 바뀌고, 두 효과가 하나의 설명되지 않는 차이로 나타납니다."
+        },
+        {
+          "question": "환율 차이와 사용량 차이를 어떻게 분리하나요?",
+          "answer": "텔레메트리에서 공급자 정가 기준 USD 비용을 기본 수치로 기록하고, 보고 경계에서 명시된 환율로 한 번만 환산하세요. 그러면 월간 차이가 엔지니어링이 책임지는 사용량 부분과 재무팀이 책임지는 환율 부분으로 나뉩니다."
+        },
+        {
+          "question": "클라우드 마켓플레이스로 구매하면 노출이 없어지나요?",
+          "answer": "대부분 그렇지 않습니다. 현지 통화로 결제하면 환산이 상류로 옮겨 가고 그 위에 마진이 더해집니다. 노출은 그대로 남고 실제로 적용된 환율을 볼 수 있는 능력만 잃게 됩니다."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/ai-spend-variance-bridge",
+          "label": "AI 지출 차이 브리지"
+        },
+        {
+          "slug": "/research/how-to-budget-for-ai-spend",
+          "label": "AI 지출 예산을 세우는 방법"
+        },
+        {
+          "slug": "/research/llm-purchasing-guide",
+          "label": "LLM 구매 가이드"
+        }
+      ]
+    },
+    "nl": {
+      "title": "Je LLM-rekening heeft een valutaprobleem",
+      "titleCore": "Valutablootstelling in LLM-uitgaven",
+      "description": "Aanbieders factureren in dollars. Budgetteer je in euro's, ponden of yen, dan is een koersbeweging een kostenstijging die niemand aan AI toeschrijft.",
+      "body": "<p>Bijna elk frontiermodel is geprijsd in Amerikaanse dollars. Is je budget niet in dollars, dan is een deel van je LLM-kostenpost een valutapositie die je nooit bewust hebt ingenomen.</p><p>Een beweging van 6% in EUR/USD is een stijging van 6% in wat je modeluitgaven je kosten, zonder verandering in tokenvolume, zonder ander model en zonder dat een usage-dashboard het verklaart. Finance ziet de afwijking. Engineering kijkt naar een dashboard in tokens, ziet een vlakke maand en kan niet helpen.</p><h2>Waarom het zo goed verborgen blijft</h2><p>Tussen de API-aanroep en het grootboek zitten drie lagen vertaling. De aanbieder prijst per miljoen tokens in USD. De kaart of factuur rekent om tegen een bepaalde koers, op een bepaalde datum, met een bepaalde spread. Je boekhoudsysteem boekt het tegen weer een andere koers. Tegen de tijd dat het getal in een variantierapport staat, zijn de valutacomponent en de gebruikscomponent hetzelfde cijfer.</p><p>Cloudmarktplaatsen maken het erger, niet beter. Kopen via een reseller of een cloudmarktplaats in lokale valuta lijkt de blootstelling weg te nemen. Meestal verschuift de omrekening alleen stroomopwaarts en komt er een marge bovenop &mdash; je blijft blootgesteld, je kunt de koers alleen niet meer zien.</p><h2>Scheid de twee varianties</h2><p>De oplossing is klein en volledig een rapportagewijziging. Leg de kosten van elk verzoek vast in <strong>USD tegen het listtarief van de aanbieder</strong>, als primair cijfer, in de telemetrie. Reken één keer om naar je rapportagevaluta, tegen een vermelde koers, op de rapportagegrens. Dan splitst een maandelijkse afwijking zich netjes in een gebruiksvariantie, waarvan engineering eigenaar is en waar het op kan sturen, en een valutavariantie, waarvan treasury eigenaar is en die engineering niet kan oplossen.</p><p>Twee teams die ruziën over één getal zijn de werkelijke kosten hier. Het is duurder dan de koersbeweging zelf, omdat het de review verspilt die de echte groei had moeten vinden.</p><h2>Wanneer afdekken de moeite waard is</h2><p>Zelden, en alleen op schaal. Voor de meeste bedrijven is het juiste antwoord inzicht, geen afdekking: ken de omvang van de blootstelling, vermeld de koers waartegen je voorspelt en laat een treasury-effect niet langer doorgaan voor een engineeringeffect. Afdekken wordt een serieus gesprek zodra de modeluitgaven groot genoeg zijn naast de andere dollarkosten van het bedrijf &mdash; en dan hoort het bij die kosten thuis, niet in een FinOps-review.</p><p>Een praktische opmerking: als je heronderhandelt naar een contract in lokale valuta, prijs dan de omrekening. Een vaste koers in je eigen valuta is een kleine meerprijs waard, en niets waard als de spread die erin verstopt zit groter is dan de volatiliteit die hij wegneemt.</p><h2>Gerelateerd</h2><ul><li><a href=\"/research/ai-spend-variance-bridge\">Variantiebrug voor AI-uitgaven</a></li><li><a href=\"/research/how-to-budget-for-ai-spend\">Budgetteren voor AI-uitgaven</a></li><li><a href=\"/research/llm-purchasing-guide\">Inkoopgids voor LLM's</a></li></ul>",
+      "faq": [
+        {
+          "question": "Waarom komt valuta voor in een LLM-kostenreview?",
+          "answer": "Frontiermodellen zijn geprijsd in Amerikaanse dollars. Rapporteer je in een andere valuta, dan verandert elke koersbeweging je kosten zonder verandering in gebruik, en beide effecten komen aan als één onverklaarde afwijking."
+        },
+        {
+          "question": "Hoe scheid je valutavariantie van gebruiksvariantie?",
+          "answer": "Leg de kosten vast in USD tegen het listtarief van de aanbieder als primair cijfer in de telemetrie en reken één keer om tegen een vermelde koers op de rapportagegrens. De maandelijkse afwijking splitst dan in een gebruiksdeel van engineering en een valutadeel van treasury."
+        },
+        {
+          "question": "Neemt kopen via een cloudmarktplaats de blootstelling weg?",
+          "answer": "Meestal niet. Betalen in lokale valuta verschuift de omrekening stroomopwaarts en voegt er een marge aan toe. Je houdt de blootstelling en verliest het zicht op de koers die je wordt berekend."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/ai-spend-variance-bridge",
+          "label": "Variantiebrug voor AI-uitgaven"
+        },
+        {
+          "slug": "/research/how-to-budget-for-ai-spend",
+          "label": "Budgetteren voor AI-uitgaven"
+        },
+        {
+          "slug": "/research/llm-purchasing-guide",
+          "label": "Inkoopgids voor LLM's"
+        }
+      ]
+    },
+    "zh": {
+      "title": "你的 LLM 账单有汇率问题",
+      "titleCore": "LLM 支出中的货币敞口",
+      "description": "供应商以美元计费。如果你用欧元、英镑或日元做预算，汇率波动就是一笔没人归因于 AI 的成本增长。",
+      "body": "<p>几乎所有前沿模型都以美元定价。如果你的预算不是以美元计算，那么你的 LLM 成本中就有一部分是你从未主动选择承担的货币头寸。</p>\n\n<p>EUR/USD 变动 6%，就意味着你的模型支出成本上涨 6%，而 token 用量没有变化，模型没有变化，任何用量仪表盘也无法解释这一点。财务部门看到了差异。工程团队看着以 token 计价的仪表盘，只看到一个平稳的月份，也无能为力。</p>\n\n<h2>为什么它如此难以察觉</h2>\n<p>从 API 调用到总账之间有三层换算。供应商按每百万 token 以美元定价。信用卡或账单按某个日期、某个汇率和某个点差进行换算。你的会计系统再按另一个汇率入账。等这个数字进入差异报告时，汇率因素和用量因素已经混成了同一个数字。</p>\n\n<p>云市场让情况更糟，而不是更好。通过经销商或云市场以本币购买，看起来似乎消除了敞口。通常它只是把换算环节前移，并在其中加了一层利差。你仍然承担着敞口，只是再也看不到实际汇率了。</p>\n\n<h2>把两类差异分开</h2>\n<p>修复方法很小，完全是报告口径的调整。在遥测数据中，把每个请求的成本以<strong>供应商标价的美元金额</strong>作为主要数字记录。在报告边界处，以一个明确声明的汇率，将其一次性换算为你的报告货币。这样，月度差异就能干净地拆分为两部分：工程团队负责并能采取行动的用量差异，以及财务团队负责、工程团队无法修复的汇率差异。</p>\n\n<p>两个团队为同一个数字争论，这才是真正的成本。它比汇率波动本身更昂贵，因为它浪费了本应用来发现真实增长的那次审查。</p>\n\n<h2>什么时候值得对冲</h2>\n<p>很少，而且只有在规模足够大时才值得。对大多数公司来说，正确的应对是可见性，而不是对冲：了解敞口有多大，声明你预测所用的汇率，并停止让财务效应冒充工程效应。只有当模型支出大到足以与公司其他美元成本相提并论时，对冲才成为一个实际的讨论，而那时它应当与这些成本一起处理，而不是放在 FinOps 审查里。</p>\n\n<p>一个实用提示：如果你改签了本币合同，请把换算价格算清楚。用自己的货币锁定汇率值得付出一点代价，但如果其中隐含的点差大于它所消除的波动，那就毫无价值。</p>\n\n<h2>相关阅读</h2>\n<ul>\n<li>\n<a href=\"/research/ai-spend-variance-bridge\">AI 支出差异桥</a>\n</li>\n<li>\n<a href=\"/research/how-to-budget-for-ai-spend\">如何为 AI 支出做预算</a>\n</li>\n<li>\n<a href=\"/research/llm-purchasing-guide\">LLM 采购指南</a>\n</li>\n</ul>",
+      "faq": [
+        {
+          "question": "为什么货币问题会出现在 LLM 成本审查中？",
+          "answer": "前沿模型以美元定价。如果你以其他货币报告，每次汇率变动都会改变你的成本，即使用量没有变化；两种效应会合并成一个无法解释的差异。"
+        },
+        {
+          "question": "如何把汇率差异与用量差异分开？",
+          "answer": "在遥测中以供应商标价的美元金额作为主要数字记录成本，并在报告边界处以声明的汇率一次性换算。月度差异随后会拆分为工程团队负责的用量部分，以及财务团队负责的汇率部分。"
+        },
+        {
+          "question": "通过云市场购买能消除敞口吗？",
+          "answer": "通常不能。以本币支付会把换算环节前移，并加上一层利差。你仍然承担敞口，同时失去了对实际计费汇率的可见性。"
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/ai-spend-variance-bridge",
+          "label": "AI 支出差异桥"
+        },
+        {
+          "slug": "/research/how-to-budget-for-ai-spend",
+          "label": "如何为 AI 支出做预算"
+        },
+        {
+          "slug": "/research/llm-purchasing-guide",
+          "label": "LLM 采购指南"
         }
       ]
     }

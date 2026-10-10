@@ -214,6 +214,346 @@
           "label": "Alocação de custos de IA"
         }
       ]
+    },
+    "id": {
+      "title": "Batas Belanja AI Google Cloud: Panduan FinOps",
+      "titleCore": "Batas Belanja AI Google Cloud: Panduan FinOps",
+      "description": "Di mana batas belanja Google Cloud berlaku, apa yang dijedanya, dan bagaimana tim FinOps seharusnya mengatur batas bulanan berbasis estimasi.",
+      "body": "<p>Anggaran batas belanja Google Cloud menambahkan tindakan penegakan pada sebuah anggaran: ketika estimasi biaya kotor melewati target yang dikonfigurasi, penggunaan baru untuk layanan dan proyek yang dipilih dijeda. Itu membuat batas berguna sebagai pembatas belanja yang lepas kendali, tetapi ia bukan plafon tagihan yang presisi, dan bukan pengganti kontrol di tingkat aplikasi.</p><p>Dokumentasi Google saat ini mencantumkan Gemini API, Gemini Enterprise Agent Platform, Cloud Run, dan fungsi Cloud Run sebagai layanan yang memenuhi syarat. Batas dibatasi pada satu proyek dan satu layanan yang memenuhi syarat, dengan periode bulanan yang dimulai pada hari pertama setiap bulan. Periksa <a href=\"https://docs.cloud.google.com/billing/docs/how-to/budgets-spend-caps\">pengaturan dan batasan terkini</a> sebelum merancang sesuatu berdasarkan kelayakan; ketersediaan fitur bisa berubah.</p><h2>Pahami batas penegakannya</h2><p>Ketika batas ditegakkan, permintaan baru ke layanan yang tercakup dalam proyek tersebut dijeda. Proyek dan layanan lain tidak terpengaruh, sumber daya yang ada tidak dihapus, dan penggunaan yang sedang berjalan dapat selesai. Kelebihan biaya akibat keterlambatan pelaporan tetap ditagih, dan biaya tetap yang diperlukan untuk mempertahankan layanan dapat terus berjalan. Jadi batas hanya membatasi penggunaan layak di masa depan setelah penegakan; ia tidak bisa membatalkan penggunaan yang sudah terjadi.</p><p>Google mendasarkan keputusan batas pada estimasi biaya kotor, tidak termasuk penghematan dan kredit. Estimasi bisa memicu penegakan sebelum laporan tagihan final tersedia, tetapi penegakan tidak instan. Tim keuangan sebaiknya memperlakukan batas sebagai pemutus sirkuit protektif dengan jendela kelebihan yang tidak pasti, bukan sebagai jumlah maksimum yang pasti harus dibayar.</p><h2>Pilih cakupan yang terhubung ke pemilik</h2><ol><li><strong>Pisahkan proyek per beban kerja atau lingkungan</strong> bila tim membutuhkan batas dan kebijakan jeda yang berbeda.</li><li><strong>Terapkan satu batas layanan per proyek</strong> karena cakupan yang didokumentasikan tidak mencakup banyak layanan atau proyek dalam satu batas.</li><li><strong>Tentukan pemilik operasional</strong> yang bisa memutuskan apakah beban kerja yang dijeda tetap berhenti, pindah ke cadangan yang disetujui, atau dilanjutkan setelah investigasi.</li><li><strong>Modelkan dependensi</strong> sebelum mengaktifkan batas pada Cloud Run atau fungsi; menjeda penggunaan bisa mengganggu jalur aplikasi meskipun sumber dayanya tetap utuh.</li></ol><h2>Pasangkan batas dengan kontrol yang lebih lunak</h2><p>Gunakan anggaran per permintaan dan per alur kerja di tingkat aplikasi untuk keputusan yang cepat dan mudah dijelaskan. Gunakan anggaran Cloud Billing dan sinyal anomali untuk visibilitas di tingkat proyek serta batas platform yang independen. Peringatan pada ambang yang lebih rendah memberi waktu bagi pemilik layanan untuk menyelidiki sebelum penegakan; dasbor dan runbook sebaiknya mengidentifikasi proyek, layanan, beban kerja, dan prosedur mulai ulang yang terdampak.</p><p>Uji respons operasional di proyek yang tidak kritis. Pastikan siapa yang menerima peringatan, bagaimana tim memverifikasi estimasi belanja, apa yang dilihat pengguna saat permintaan dijeda, dan siapa yang bisa mencabut batas yang sudah ditegakkan. Pertahankan tujuan kapasitas dan kualitas bersama batas keuangan, agar peristiwa pengendalian biaya tidak diam-diam berubah menjadi kegagalan ketersediaan.</p><h2>Daftar periksa implementasi FinOps</h2><ul><li>Verifikasi bahwa layanan memenuhi syarat dan akun penagihan memenuhi prasyarat Google.</li><li>Pilih jumlah bulanan dengan memakai perkiraan permintaan, musiman, dan biaya gangguan bisnis.</li><li>Pisahkan kredit dan diskon dari pemicu biaya kotor saat membandingkan batas dengan ekspektasi tagihan bersih.</li><li>Atur ambang peringatan di bawah batas dan arahkan peringatan ke pemilik anggaran sekaligus responden operasional.</li><li>Dokumentasikan kelebihan yang diharapkan akibat estimasi dan keterlambatan pelaporan; jangan pernah menjanjikan plafon dolar yang keras.</li><li>Tinjau peristiwa batas, permintaan yang dijeda, dampak ke pengguna, dan asumsi perkiraan setelah setiap insiden.</li></ul><h2>FAQ</h2><h3>Apakah batas belanja Google Cloud menjamin tagihan tidak bisa melampaui anggaran?</h3><p>Tidak. Batas ini memakai estimasi biaya kotor dan tidak instan. Penggunaan bisa melampaui target sebelum penegakan, dan kelebihan tersebut ditagih seperti biasa.</p><h3>Apa yang terjadi saat batas belanja tercapai?</h3><p>Penggunaan baru dari layanan yang memenuhi syarat dan dipilih di proyek yang tercakup akan dijeda. Sumber daya yang ada tidak dihapus, dan permintaan yang sedang berjalan selesai.</p><h3>Bisakah satu batas belanja mencakup beberapa proyek atau layanan?</h3><p>Tidak. Cakupan batas belanja yang didokumentasikan Google adalah satu proyek dan satu layanan yang memenuhi syarat per batas, dengan periode anggaran bulanan.</p><h2>Sumber</h2><ul><li><a href=\"https://docs.cloud.google.com/billing/docs/how-to/budgets-spend-caps\">Google Cloud: Mengelola anggaran batas belanja</a></li><li><a href=\"https://cloud.google.com/blog/topics/cost-management/new-early-anomalies-and-spend-caps-on-google-cloud-budgets/\">Google Cloud: Pengumuman anomali dini dan batas belanja</a></li></ul><h2>Terkait</h2><ul><li><a href=\"/research/three-agent-budgets\">Anggaran untuk agen otonom</a></li><li><a href=\"/research/ai-spend-variance-bridge\">Analisis varians belanja AI</a></li><li><a href=\"/research/ai-research-cost-allocation\">Alokasi biaya AI</a></li></ul>",
+      "faq": [
+        {
+          "question": "Apakah batas belanja Google Cloud menjamin tagihan tidak bisa melampaui anggaran?",
+          "answer": "Tidak. Batas ini memakai estimasi biaya kotor dan tidak instan. Penggunaan bisa melampaui target sebelum penegakan, dan kelebihan tersebut ditagih seperti biasa."
+        },
+        {
+          "question": "Apa yang terjadi saat batas belanja tercapai?",
+          "answer": "Penggunaan baru dari layanan yang memenuhi syarat dan dipilih di proyek yang tercakup akan dijeda. Sumber daya yang ada tidak dihapus, dan permintaan yang sedang berjalan selesai."
+        },
+        {
+          "question": "Bisakah satu batas belanja mencakup beberapa proyek atau layanan?",
+          "answer": "Tidak. Cakupan batas belanja yang didokumentasikan Google adalah satu proyek dan satu layanan yang memenuhi syarat per batas, dengan periode anggaran bulanan."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/three-agent-budgets",
+          "label": "Anggaran untuk agen otonom"
+        },
+        {
+          "slug": "/research/ai-spend-variance-bridge",
+          "label": "Analisis varians belanja AI"
+        },
+        {
+          "slug": "/research/ai-research-cost-allocation",
+          "label": "Alokasi biaya AI"
+        }
+      ]
+    },
+    "pl": {
+      "title": "Limity wydatków AI w Google Cloud: przewodnik FinOps",
+      "titleCore": "Limity wydatków AI w Google Cloud: przewodnik FinOps",
+      "description": "Gdzie obowiązują limity wydatków Google Cloud, co wstrzymują i jak zespoły FinOps powinny zarządzać miesięcznymi limitami opartymi na szacunkach kosztów.",
+      "body": "<p>Budżety z limitem wydatków w Google Cloud dodają do budżetu akcję egzekwującą: gdy szacowane koszty brutto przekroczą skonfigurowany próg, nowe użycie wybranej usługi i projektu zostaje wstrzymane. Dzięki temu limit jest użyteczną granicą przed niekontrolowanym wzrostem wydatków, ale nie jest precyzyjnym sufitem na fakturze ani zamiennikiem kontroli na poziomie aplikacji.</p><p>Aktualna dokumentacja Google wymienia jako kwalifikujące się usługi: Gemini API, Gemini Enterprise Agent Platform, Cloud Run oraz Cloud Run functions. Limit obejmuje jeden projekt i jedną kwalifikującą się usługę, z miesięcznym okresem zaczynającym się pierwszego dnia miesiąca. Zanim zaprojektujesz rozwiązanie wokół kwalifikacji, sprawdź <a href=\"https://docs.cloud.google.com/billing/docs/how-to/budgets-spend-caps\">aktualną konfigurację i ograniczenia</a>; dostępność funkcji może się zmieniać.</p><h2>Zrozum granicę egzekwowania</h2><p>Gdy limit zostaje wyegzekwowany, nowe żądania do objętej nim usługi w tym projekcie są wstrzymywane. Inne projekty i usługi nie są dotknięte, istniejące zasoby nie są usuwane, a użycie już trwające może się dokończyć. Przekroczenie spowodowane opóźnieniem raportowania nadal jest rozliczane, a stałe koszty potrzebne do utrzymania usług mogą dalej naliczać się. Limit ogranicza więc przyszłe kwalifikujące się użycie po egzekwowaniu; nie cofnie zużycia, które już nastąpiło.</p><p>Google podejmuje decyzje o limicie na podstawie szacowanego kosztu brutto, bez oszczędności i kredytów. Szacunki mogą uruchomić egzekwowanie przed sfinalizowanymi raportami rozliczeniowymi, ale egzekwowanie nie jest natychmiastowe. Finanse powinny traktować limit jako zabezpieczający wyłącznik automatyczny z niepewnym oknem przekroczenia, a nie jako gwarantowaną maksymalną kwotę do zapłaty.</p><h2>Wybierz zakres, który odpowiada właścicielowi</h2><ol><li><strong>Rozdziel projekty według obciążenia lub środowiska</strong>, jeśli zespoły potrzebują różnych limitów i polityk wstrzymywania.</li><li><strong>Stosuj jeden limit usługi na projekt</strong>, ponieważ udokumentowany zakres nie obejmuje wielu usług ani projektów w jednym limicie.</li><li><strong>Wyznacz operacyjnego właściciela</strong>, który zdecyduje, czy wstrzymane obciążenie ma pozostać zatrzymane, przejść na zatwierdzony plan awaryjny, czy wznowić się po analizie.</li><li><strong>Zmodeluj zależności</strong> przed włączeniem limitu dla Cloud Run lub functions; wstrzymanie użycia może przerwać ścieżki aplikacji, mimo że zasoby pozostają nienaruszone.</li></ol><h2>Połącz limit z łagodniejszymi kontrolami</h2><p>Stosuj budżety na poziomie aplikacji dla każdego żądania i każdego przepływu pracy, aby podejmować szybkie i wyjaśnialne decyzje. Używaj budżetów Cloud Billing i sygnałów anomalii do widoczności na poziomie projektu oraz niezależnej granicy platformy. Alerty przy niższych progach dają właścicielowi usługi czas na analizę przed egzekwowaniem; dashboardy i runbooki powinny wskazywać dotknięty projekt, usługę, obciążenie i procedurę wznowienia.</p><p>Przetestuj reakcję operacyjną w projekcie niekrytycznym. Potwierdź, kto otrzymuje alerty, jak zespół weryfikuje szacunek wydatków, co widzą użytkownicy, gdy żądania są wstrzymane, i kto może zdjąć wyegzekwowany limit. Utrzymuj cele dotyczące pojemności i jakości obok limitu finansowego, aby zdarzenie kontroli kosztów nie zamieniło się po cichu w awarię dostępności.</p><h2>Lista kontrolna wdrożenia FinOps</h2><ul><li>Sprawdź, czy usługa się kwalifikuje i czy konto rozliczeniowe spełnia wymagania Google.</li><li>Wybierz miesięczną kwotę na podstawie prognozowanego popytu, sezonowości i kosztu przerwy w działaniu biznesu.</li><li>Trzymaj kredyty i rabaty oddzielnie od wyzwalacza opartego na koszcie brutto, gdy porównujesz limit z oczekiwaniami dotyczącymi faktury netto.</li><li>Ustaw progi ostrzegawcze poniżej limitu i kieruj alerty zarówno do właściciela budżetu, jak i do osoby reagującej operacyjnie.</li><li>Udokumentuj spodziewane przekroczenie wynikające z szacowania i opóźnienia raportów; nigdy nie obiecuj twardego sufitu w dolarach.</li><li>Po każdym incydencie przejrzyj zdarzenia limitu, wstrzymane żądania, wpływ na użytkowników i założenia prognozy.</li></ul><h2>FAQ</h2><h3>Czy limit wydatków Google Cloud gwarantuje, że rachunek nie przekroczy budżetu?</h3><p>Nie. Limit opiera się na szacowanych kosztach brutto i nie działa natychmiast. Użycie może przekroczyć cel przed egzekwowaniem, a to przekroczenie jest rozliczane normalnie.</p><h3>Co się dzieje po osiągnięciu limitu wydatków?</h3><p>Nowe użycie wybranej kwalifikującej się usługi w objętym zakresem projekcie zostaje wstrzymane. Istniejące zasoby nie są usuwane, a żądania w toku się kończą.</p><h3>Czy jeden limit wydatków może objąć kilka projektów lub usług?</h3><p>Nie. Udokumentowany zakres limitu wydatków to jeden projekt i jedna kwalifikująca się usługa na limit, z miesięcznym okresem budżetowym.</p><h2>Źródła</h2><ul><li><a href=\"https://docs.cloud.google.com/billing/docs/how-to/budgets-spend-caps\">Google Cloud: zarządzanie budżetami z limitem wydatków</a></li><li><a href=\"https://cloud.google.com/blog/topics/cost-management/new-early-anomalies-and-spend-caps-on-google-cloud-budgets/\">Google Cloud: ogłoszenie wczesnych anomalii i limitów wydatków</a></li></ul><h2>Powiązane</h2><ul><li><a href=\"/research/three-agent-budgets\">Budżety dla autonomicznych agentów</a></li><li><a href=\"/research/ai-spend-variance-bridge\">Analiza odchyleń wydatków na AI</a></li><li><a href=\"/research/ai-research-cost-allocation\">Alokacja kosztów AI</a></li></ul>",
+      "faq": [
+        {
+          "question": "Czy limit wydatków Google Cloud gwarantuje, że rachunek nie przekroczy budżetu?",
+          "answer": "Nie. Limit opiera się na szacowanych kosztach brutto i nie działa natychmiast. Użycie może przekroczyć cel przed egzekwowaniem, a to przekroczenie jest rozliczane normalnie."
+        },
+        {
+          "question": "Co się dzieje po osiągnięciu limitu wydatków?",
+          "answer": "Nowe użycie wybranej kwalifikującej się usługi w objętym zakresem projekcie zostaje wstrzymane. Istniejące zasoby nie są usuwane, a żądania w toku się kończą."
+        },
+        {
+          "question": "Czy jeden limit wydatków może objąć kilka projektów lub usług?",
+          "answer": "Nie. Udokumentowany zakres limitu wydatków to jeden projekt i jedna kwalifikująca się usługa na limit, z miesięcznym okresem budżetowym."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/three-agent-budgets",
+          "label": "Budżety dla autonomicznych agentów"
+        },
+        {
+          "slug": "/research/ai-spend-variance-bridge",
+          "label": "Analiza odchyleń wydatków na AI"
+        },
+        {
+          "slug": "/research/ai-research-cost-allocation",
+          "label": "Alokacja kosztów AI"
+        }
+      ]
+    },
+    "ru": {
+      "title": "Лимиты расходов на AI в Google Cloud: гид FinOps",
+      "titleCore": "Лимиты расходов на AI в Google Cloud: гид FinOps",
+      "description": "Где действуют лимиты расходов Google Cloud, что они приостанавливают и как FinOps-командам управлять месячными лимитами, которые считаются по оценке.",
+      "body": "<p>Бюджеты с лимитом расходов в Google Cloud добавляют к бюджету действие принудительного применения: когда оценочная валовая стоимость превышает заданную цель, новое использование выбранного сервиса и проекта приостанавливается. Поэтому лимит полезен как граница для неконтролируемых расходов, но это не точный потолок счёта и не замена контролям на уровне приложения.</p><p>Текущая документация Google перечисляет как подходящие сервисы Gemini API, Gemini Enterprise Agent Platform, Cloud Run и Cloud Run functions. Лимит привязан к одному проекту и одному подходящему сервису, с месячным периодом, который начинается первого числа месяца. Перед тем как проектировать решение вокруг подходящих сервисов, сверьтесь с <a href=\"https://docs.cloud.google.com/billing/docs/how-to/budgets-spend-caps\">актуальной настройкой и ограничениями</a>: доступность функций может меняться.</p><h2>Поймите границу принудительного применения</h2><p>Когда лимит применяется, новые запросы к покрытому сервису в этом проекте приостанавливаются. Другие проекты и сервисы не затрагиваются, существующие ресурсы не удаляются, а использование, которое уже выполняется, может завершиться. Превышение, вызванное задержкой отчётов, всё равно тарифицируется, а фиксированные расходы, нужные для сохранения сервисов, могут продолжать начисляться. Поэтому лимит ограничивает будущее подходящее использование после срабатывания; он не может отменить уже понесённые расходы.</p><p>Google принимает решения по лимиту на основе оценочной валовой стоимости без учёта экономии и кредитов. Оценки могут вызвать срабатывание до финализации биллинговых отчётов, но применяется лимит не мгновенно. Финансовой команде стоит рассматривать лимит как защитный предохранитель с неопределённым окном превышения, а не как гарантированную максимальную сумму к оплате.</p><h2>Выберите область, которая соответствует владельцу</h2><ol><li><strong>Разделяйте проекты по нагрузке или окружению</strong>, если командам нужны разные лимиты и политики остановки.</li><li><strong>Применяйте один лимит сервиса на проект</strong>, потому что задокументированная область действия не охватывает несколько сервисов или проектов в одном лимите.</li><li><strong>Назначьте операционного владельца</strong>, который решит, должна ли приостановленная нагрузка оставаться остановленной, перейти на согласованный резервный вариант или возобновиться после разбора.</li><li><strong>Смоделируйте зависимости</strong> до включения лимита на Cloud Run или функции: приостановка использования может прервать пути приложения, хотя ресурсы останутся на месте.</li></ol><h2>Дополните лимит более мягкими контролями</h2><p>Используйте бюджеты на уровне приложения на запрос и на workflow для быстрых и объяснимых решений. Бюджеты Cloud Billing и сигналы аномалий нужны для видимости на уровне проекта и независимой платформенной границы. Оповещения на более низких порогах дают владельцу сервиса время разобраться до применения лимита; дашборды и runbook должны указывать затронутый проект, сервис, нагрузку и процедуру перезапуска.</p><p>Проверьте операционную реакцию в некритичном проекте. Убедитесь, кто получает оповещения, как команда проверяет оценку расходов, что видят пользователи, когда запросы приостановлены, и кто может снять сработавший лимит. Держите цели по мощности и качеству рядом с финансовым лимитом, чтобы событие контроля затрат не превратилось незаметно в сбой доступности.</p><h2>Чек-лист внедрения FinOps</h2><ul><li>Проверьте, что сервис подходит и что биллинг-аккаунт соответствует требованиям Google.</li><li>Выберите месячную сумму, исходя из прогнозного спроса, сезонности и стоимости простоя для бизнеса.</li><li>При сравнении лимита с ожидаемым чистым счётом держите кредиты и скидки отдельно от триггера по валовой стоимости.</li><li>Ставьте пороги предупреждения ниже лимита и направляйте оповещения и владельцу бюджета, и оперативному дежурному.</li><li>Задокументируйте ожидаемое превышение из-за оценки и задержки отчётов; никогда не обещайте жёсткий потолок в долларах.</li><li>После каждого инцидента разбирайте события лимита, приостановленные запросы, влияние на пользователей и допущения прогноза.</li></ul><h2>FAQ</h2><h3>Гарантирует ли лимит расходов Google Cloud, что счёт не превысит бюджет?</h3><p>Нет. Он использует оценочную валовую стоимость и срабатывает не мгновенно. Использование может превысить цель до срабатывания, и это превышение тарифицируется обычным порядком.</p><h3>Что происходит, когда достигнут лимит расходов?</h3><p>Новое использование выбранного подходящего сервиса в проекте, на который распространяется лимит, приостанавливается. Существующие ресурсы не удаляются, а запросы в обработке завершаются.</p><h3>Может ли один лимит расходов покрывать несколько проектов или сервисов?</h3><p>Нет. Задокументированная область лимита расходов Google — один проект и один подходящий сервис на лимит, с месячным бюджетным периодом.</p><h2>Источники</h2><ul><li><a href=\"https://docs.cloud.google.com/billing/docs/how-to/budgets-spend-caps\">Google Cloud: управление бюджетами с лимитом расходов</a></li><li><a href=\"https://cloud.google.com/blog/topics/cost-management/new-early-anomalies-and-spend-caps-on-google-cloud-budgets/\">Google Cloud: объявление о ранних аномалиях и лимитах расходов</a></li></ul><h2>Связанное</h2><ul><li><a href=\"/research/three-agent-budgets\">Бюджеты для автономных агентов</a></li><li><a href=\"/research/ai-spend-variance-bridge\">Анализ отклонений расходов на AI</a></li><li><a href=\"/research/ai-research-cost-allocation\">Распределение затрат на AI</a></li></ul>",
+      "faq": [
+        {
+          "question": "Гарантирует ли лимит расходов Google Cloud, что счёт не превысит бюджет?",
+          "answer": "Нет. Он использует оценочную валовую стоимость и срабатывает не мгновенно. Использование может превысить цель до срабатывания, и это превышение тарифицируется обычным образом."
+        },
+        {
+          "question": "Что происходит, когда достигнут лимит расходов?",
+          "answer": "Новое использование выбранного подходящего сервиса в проекте, на который распространяется лимит, приостанавливается. Существующие ресурсы не удаляются, а запросы в обработке завершаются."
+        },
+        {
+          "question": "Может ли один лимит покрывать несколько проектов или сервисов?",
+          "answer": "Нет. Задокументированная область лимита Google — один проект и один подходящий сервис на лимит, с месячным бюджетным периодом."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/three-agent-budgets",
+          "label": "Бюджеты для автономных агентов"
+        },
+        {
+          "slug": "/research/ai-spend-variance-bridge",
+          "label": "Анализ отклонений расходов на AI"
+        },
+        {
+          "slug": "/research/ai-research-cost-allocation",
+          "label": "Распределение затрат на AI"
+        }
+      ]
+    },
+    "tr": {
+      "title": "Google Cloud AI harcama limitleri: FinOps rehberi",
+      "titleCore": "Google Cloud AI harcama limitleri: FinOps rehberi",
+      "description": "Google Cloud harcama limitlerinin nereye uygulandığını, neyi durdurduğunu ve tahmine dayalı aylık limitlerin nasıl yönetileceğini anlatıyoruz.",
+      "body": "<p>Google Cloud'un harcama limiti bütçeleri bir bütçeye uygulama adımı ekler: tahmini brüt maliyetler yapılandırılan hedefi aştığında, seçilen hizmet ve proje için yeni kullanım durdurulur. Bu, limiti kontrolsüz harcamaya karşı bir sınır olarak faydalı kılar; ancak kesin bir fatura tavanı değildir ve uygulama düzeyindeki kontrollerin yerini tutmaz.</p><p>Google'ın güncel dokümantasyonu, uygun hizmetler olarak Gemini API, Gemini Enterprise Agent Platform, Cloud Run ve Cloud Run functions'ı listeler. Bir limit tek bir projeyle ve tek bir uygun hizmetle sınırlıdır; dönemi ayın ilk gününde başlayan aylık bir periyottur. Uygunluğa göre bir tasarım yapmadan önce <a href=\"https://docs.cloud.google.com/billing/docs/how-to/budgets-spend-caps\">güncel kurulumu ve kısıtlamaları</a> kontrol edin; özellik kullanılabilirliği değişebilir.</p><h2>Uygulama sınırını anlayın</h2><p>Limit uygulandığında, o projedeki kapsanan hizmete yönelik yeni istekler durdurulur. Diğer projeler ve hizmetler etkilenmez, mevcut kaynaklar silinmez ve devam eden kullanım tamamlanabilir. Raporlama gecikmesinden kaynaklanan aşımlar yine de faturalandırılır, hizmetleri ayakta tutmak için gereken sabit maliyetler de sürebilir. Dolayısıyla limit, uygulamadan sonra gelecekteki uygun kullanımı sınırlar; zaten oluşmuş kullanımı geri alamaz.</p><p>Google limit kararlarını, indirim ve kredileri hariç tutan tahmini brüt maliyete dayandırır. Tahminler, kesinleşmiş fatura raporlarından önce uygulamayı tetikleyebilir, ancak uygulama anlık değildir. Finans ekipleri limiti, garanti edilmiş bir ödenecek azami tutar olarak değil, belirsiz bir aşım penceresi olan koruyucu bir devre kesici olarak ele almalıdır.</p><h2>Bir sahibe karşılık gelen bir kapsam seçin</h2><ol><li><strong>Projeleri iş yüküne veya ortama göre ayırın</strong>; ekipler farklı limitlere ve kesinti politikalarına ihtiyaç duyuyorsa bu gereklidir.</li><li><strong>Proje başına tek bir hizmet limiti uygulayın</strong>; çünkü belgelenen kapsam, tek bir limitte birden fazla hizmeti veya projeyi kapsamaz.</li><li><strong>Operasyonel bir sahip atayın</strong>; durdurulan bir iş yükünün durdurulmuş kalması, onaylı bir yedek sisteme geçmesi veya inceleme sonrası yeniden başlaması gerektiğine karar verebilecek kişi.</li><li><strong>Bağımlılıkları modelleyin</strong>; Cloud Run veya functions için limit etkinleştirmeden önce. Kaynaklar sağlam kalsa bile kullanımın durdurulması uygulama yollarını kesebilir.</li></ol><h2>Limiti daha yumuşak kontrollerle eşleştirin</h2><p>Hızlı ve açıklanabilir kararlar için istek ve iş akışı başına uygulama düzeyinde bütçeler kullanın. Proje düzeyinde görünürlük ve bağımsız bir platform sınırı için Cloud Billing bütçelerini ve anomali sinyallerini kullanın. Daha düşük eşiklerdeki uyarılar, hizmet sahibine uygulamadan önce inceleme için zaman verir; panolar ve runbook'lar etkilenen projeyi, hizmeti, iş yükünü ve yeniden başlatma prosedürünü belirtmelidir.</p><p>Operasyonel yanıtı kritik olmayan bir projede test edin. Uyarıları kimin aldığını, ekibin harcama tahminini nasıl doğruladığını, istekler durdurulduğunda kullanıcıların ne gördüğünü ve uygulanmış bir limiti kimin kaldırabileceğini netleştirin. Kapasite ve kalite hedeflerini finans limitinin yanında tutun; böylece bir maliyet kontrol olayı sessizce bir erişilebilirlik arızasına dönüşmez.</p><h2>FinOps uygulama kontrol listesi</h2><ul><li>Hizmetin uygun olduğunu ve fatura hesabının Google'ın ön koşullarını karşıladığını doğrulayın.</li><li>Aylık tutarı tahmini talep, mevsimsellik ve iş kesintisinin maliyetini kullanarak seçin.</li><li>Limiti net fatura beklentileriyle karşılaştırırken kredi ve indirimleri brüt maliyet tetikleyicisinden ayrı tutun.</li><li>Uyarı eşiklerini limitin altına koyun ve uyarıları hem bir bütçe sahibine hem de bir operasyonel sorumluya yönlendirin.</li><li>Tahmin ve raporlama gecikmesinden kaynaklanan beklenen aşımı belgeleyin; asla sert bir dolar tavanı vaat etmeyin.</li><li>Her olaydan sonra limit olaylarını, durdurulan istekleri, kullanıcı etkisini ve tahmin varsayımlarını gözden geçirin.</li></ul><h2>SSS</h2><h3>Google Cloud harcama limiti, bir faturanın bütçeyi aşamayacağını garanti ediyor mu?</h3><p>Hayır. Tahmini brüt maliyetleri kullanır ve anlık değildir. Kullanım uygulamadan önce hedefi aşabilir ve bu aşım normal şekilde faturalandırılır.</p><h3>Bir harcama limitine ulaşıldığında ne olur?</h3><p>Kapsamdaki projede seçilen uygun hizmetin yeni kullanımı durdurulur. Mevcut kaynaklar silinmez ve devam eden istekler tamamlanır.</p><h3>Bir harcama limiti birden fazla proje veya hizmeti kapsayabilir mi?</h3><p>Hayır. Google'ın belgelediği harcama limiti kapsamı, aylık bir bütçe periyodu içinde limit başına bir proje ve bir uygun hizmettir.</p><h2>Kaynaklar</h2><ul><li><a href=\"https://docs.cloud.google.com/billing/docs/how-to/budgets-spend-caps\">Google Cloud: Manage spend cap budgets</a></li><li><a href=\"https://cloud.google.com/blog/topics/cost-management/new-early-anomalies-and-spend-caps-on-google-cloud-budgets/\">Google Cloud: Early anomalies and spend caps announcement</a></li></ul><h2>İlgili</h2><ul><li><a href=\"/research/three-agent-budgets\">Otonom ajanlar için bütçeler</a></li><li><a href=\"/research/ai-spend-variance-bridge\">AI harcama sapma analizi</a></li><li><a href=\"/research/ai-research-cost-allocation\">AI maliyet tahsisi</a></li></ul>",
+      "faq": [
+        {
+          "question": "Google Cloud harcama limiti, bir faturanın bütçeyi aşamayacağını garanti ediyor mu?",
+          "answer": "Hayır. Tahmini brüt maliyetleri kullanır ve anlık değildir. Kullanım uygulamadan önce hedefi aşabilir ve bu aşım normal şekilde faturalandırılır."
+        },
+        {
+          "question": "Bir harcama limitine ulaşıldığında ne olur?",
+          "answer": "Kapsamdaki projede seçilen uygun hizmetin yeni kullanımı durdurulur. Mevcut kaynaklar silinmez ve devam eden istekler tamamlanır."
+        },
+        {
+          "question": "Bir harcama limiti birden fazla proje veya hizmeti kapsayabilir mi?",
+          "answer": "Hayır. Google'ın belgelediği harcama limiti kapsamı, aylık bir bütçe periyodu içinde limit başına bir proje ve bir uygun hizmettir."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/three-agent-budgets",
+          "label": "Otonom ajanlar için bütçeler"
+        },
+        {
+          "slug": "/research/ai-spend-variance-bridge",
+          "label": "AI harcama sapma analizi"
+        },
+        {
+          "slug": "/research/ai-research-cost-allocation",
+          "label": "AI maliyet tahsisi"
+        }
+      ]
+    },
+    "vi": {
+      "title": "Giới hạn chi tiêu AI Google Cloud: hướng dẫn FinOps",
+      "titleCore": "Giới hạn chi tiêu AI trên Google Cloud: hướng dẫn FinOps",
+      "description": "Giới hạn chi tiêu Google Cloud áp dụng ở đâu, chúng tạm dừng những gì, và đội FinOps nên quản trị giới hạn hàng tháng dựa trên ước tính ra sao.",
+      "body": "<p>Ngân sách có giới hạn chi tiêu của Google Cloud thêm một hành động thực thi vào ngân sách: khi chi phí gộp ước tính vượt mục tiêu đã cấu hình, việc sử dụng mới cho dịch vụ và dự án được chọn sẽ bị tạm dừng. Nhờ vậy, giới hạn hữu ích như một ranh giới chống chi tiêu vượt tầm kiểm soát, nhưng nó không phải là trần chính xác của hóa đơn, cũng không thay thế được các kiểm soát ở tầng ứng dụng.</p><p>Tài liệu hiện hành của Google liệt kê Gemini API, Gemini Enterprise Agent Platform, Cloud Run và Cloud Run functions là các dịch vụ đủ điều kiện. Một giới hạn áp dụng cho một dự án và một dịch vụ đủ điều kiện, với chu kỳ tháng bắt đầu từ ngày đầu tiên của tháng. Hãy xem <a href=\"https://docs.cloud.google.com/billing/docs/how-to/budgets-spend-caps\">cách thiết lập và giới hạn hiện tại</a> trước khi thiết kế dựa trên điều kiện đủ điều kiện; tính sẵn sàng của tính năng có thể thay đổi.</p><h2>Hiểu ranh giới thực thi</h2><p>Khi giới hạn được thực thi, các yêu cầu mới tới dịch vụ được bảo vệ trong dự án đó sẽ bị tạm dừng. Các dự án và dịch vụ khác không bị ảnh hưởng, tài nguyên hiện có không bị xóa, và việc sử dụng đang chạy có thể hoàn tất. Phần vượt mức do độ trễ báo cáo vẫn bị tính phí, và các chi phí cố định cần để duy trì dịch vụ có thể tiếp tục phát sinh. Do đó, giới hạn chỉ kiểm soát việc sử dụng đủ điều kiện trong tương lai sau khi được thực thi; nó không thể đảo ngược phần đã phát sinh.</p><p>Google dựa quyết định giới hạn trên chi phí gộp ước tính, không tính tiết kiệm và tín dụng. Ước tính có thể kích hoạt thực thi trước khi báo cáo thanh toán cuối cùng được phát hành, nhưng việc thực thi không diễn ra tức thời. Bộ phận tài chính nên coi giới hạn như một cầu dao bảo vệ với khoảng vượt mức chưa chắc chắn, chứ không phải số tiền tối đa được đảm bảo phải trả.</p><h2>Chọn phạm vi gắn với một người chịu trách nhiệm</h2><ol><li><strong>Tách dự án theo khối lượng công việc hoặc môi trường</strong> khi các đội cần giới hạn và chính sách gián đoạn khác nhau.</li><li><strong>Áp dụng một giới hạn cho một dịch vụ trên mỗi dự án</strong>, vì phạm vi được tài liệu hóa không bao trùm nhiều dịch vụ hay nhiều dự án trong một giới hạn duy nhất.</li><li><strong>Chỉ định một người phụ trách vận hành</strong> có thể quyết định khối lượng công việc bị tạm dừng sẽ tiếp tục dừng, chuyển sang phương án dự phòng đã được phê duyệt, hay được khôi phục sau khi điều tra.</li><li><strong>Mô hình hóa các phụ thuộc</strong> trước khi bật giới hạn cho Cloud Run hoặc functions; việc tạm dừng sử dụng có thể làm gián đoạn các luồng ứng dụng dù tài nguyên vẫn còn nguyên vẹn.</li></ol><h2>Kết hợp giới hạn với các kiểm soát mềm hơn</h2><p>Dùng ngân sách ở tầng ứng dụng theo từng yêu cầu và từng quy trình để đưa ra quyết định nhanh và dễ giải thích. Dùng ngân sách Cloud Billing và tín hiệu bất thường để có khả năng quan sát ở cấp dự án và một ranh giới nền tảng độc lập. Cảnh báo ở các ngưỡng thấp hơn cho người phụ trách dịch vụ thời gian điều tra trước khi thực thi; bảng điều khiển và sổ tay vận hành cần chỉ rõ dự án, dịch vụ, khối lượng công việc bị ảnh hưởng và quy trình khởi động lại.</p><p>Kiểm thử phản ứng vận hành trong một dự án không quan trọng. Xác nhận ai nhận cảnh báo, đội kiểm tra ước tính chi tiêu như thế nào, người dùng thấy gì khi yêu cầu bị tạm dừng, và ai có thể gỡ một giới hạn đã được thực thi. Giữ các mục tiêu về năng lực và chất lượng song song với giới hạn tài chính, để một sự kiện kiểm soát chi phí không lặng lẽ trở thành sự cố về tính sẵn sàng.</p><h2>Danh sách kiểm tra triển khai FinOps</h2><ul><li>Xác minh dịch vụ đủ điều kiện và tài khoản thanh toán đáp ứng các điều kiện tiên quyết của Google.</li><li>Chọn số tiền hàng tháng dựa trên nhu cầu dự báo, tính mùa vụ và chi phí gián đoạn kinh doanh.</li><li>Tách tín dụng và chiết khấu khỏi điều kiện kích hoạt bằng chi phí gộp khi so sánh giới hạn với kỳ vọng hóa đơn ròng.</li><li>Đặt ngưỡng cảnh báo thấp hơn giới hạn và gửi cảnh báo đến cả người phụ trách ngân sách lẫn người ứng cứu vận hành.</li><li>Ghi lại mức vượt dự kiến do độ trễ ước tính và báo cáo; không bao giờ hứa một trần cứng bằng đô la.</li><li>Sau mỗi sự cố, rà soát các sự kiện giới hạn, các yêu cầu bị tạm dừng, tác động tới người dùng và các giả định dự báo.</li></ul><h2>FAQ</h2><h3>Giới hạn chi tiêu Google Cloud có đảm bảo hóa đơn không vượt ngân sách không?</h3><p>Không. Nó dựa trên chi phí gộp ước tính và không diễn ra tức thời. Việc sử dụng có thể vượt mục tiêu trước khi được thực thi, và phần vượt đó vẫn được tính phí bình thường.</p><h3>Điều gì xảy ra khi đạt giới hạn chi tiêu?</h3><p>Việc sử dụng mới của dịch vụ đủ điều kiện được chọn trong dự án thuộc phạm vi sẽ bị tạm dừng. Tài nguyên hiện có không bị xóa, và các yêu cầu đang xử lý sẽ hoàn tất.</p><h3>Một giới hạn chi tiêu có thể bao phủ nhiều dự án hoặc dịch vụ không?</h3><p>Không. Phạm vi giới hạn chi tiêu được Google tài liệu hóa là một dự án và một dịch vụ đủ điều kiện cho mỗi giới hạn, với chu kỳ ngân sách hàng tháng.</p><h2>Nguồn</h2><ul><li><a href=\"https://docs.cloud.google.com/billing/docs/how-to/budgets-spend-caps\">Google Cloud: Manage spend cap budgets</a></li><li><a href=\"https://cloud.google.com/blog/topics/cost-management/new-early-anomalies-and-spend-caps-on-google-cloud-budgets/\">Google Cloud: Early anomalies and spend caps announcement</a></li></ul><h2>Liên quan</h2><ul><li><a href=\"/research/three-agent-budgets\">Ngân sách cho agent tự động</a></li><li><a href=\"/research/ai-spend-variance-bridge\">Phân tích chênh lệch chi tiêu AI</a></li><li><a href=\"/research/ai-research-cost-allocation\">Phân bổ chi phí AI</a></li></ul>",
+      "faq": [
+        {
+          "question": "Giới hạn chi tiêu Google Cloud có đảm bảo hóa đơn không vượt ngân sách không?",
+          "answer": "Không. Nó dựa trên chi phí gộp ước tính và không diễn ra tức thời. Việc sử dụng có thể vượt mục tiêu trước khi được thực thi, và phần vượt đó vẫn được tính phí bình thường."
+        },
+        {
+          "question": "Điều gì xảy ra khi đạt giới hạn chi tiêu?",
+          "answer": "Việc sử dụng mới của dịch vụ đủ điều kiện được chọn trong dự án thuộc phạm vi sẽ bị tạm dừng. Tài nguyên hiện có không bị xóa, và các yêu cầu đang xử lý sẽ hoàn tất."
+        },
+        {
+          "question": "Một giới hạn chi tiêu có thể bao phủ nhiều dự án hoặc dịch vụ không?",
+          "answer": "Không. Phạm vi giới hạn chi tiêu được Google tài liệu hóa là một dự án và một dịch vụ đủ điều kiện cho mỗi giới hạn, với chu kỳ ngân sách hàng tháng."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/three-agent-budgets",
+          "label": "Ngân sách cho agent tự động"
+        },
+        {
+          "slug": "/research/ai-spend-variance-bridge",
+          "label": "Phân tích chênh lệch chi tiêu AI"
+        },
+        {
+          "slug": "/research/ai-research-cost-allocation",
+          "label": "Phân bổ chi phí AI"
+        }
+      ]
+    },
+    "ar": {
+      "title": "حدود إنفاق الذكاء الاصطناعي في Google Cloud: دليل",
+      "titleCore": "حدود إنفاق الذكاء الاصطناعي في Google Cloud: دليل FinOps",
+      "description": "أين تُطبَّق حدود الإنفاق في Google Cloud، وما الذي توقفه، وكيف ينبغي لفرق FinOps حوكمة الحدود الشهرية القائمة على التقديرات.",
+      "body": "<p>ميزانيات حد الإنفاق في Google Cloud تضيف إجراء إنفاذ إلى الميزانية: حين تتجاوز التكاليف الإجمالية المقدّرة الهدف المضبوط، يُوقَف الاستخدام الجديد للخدمة والمشروع المحددين. وهذا يجعل الحد مفيداً كحدود لمنع الإنفاق الجامح، لكنه ليس سقفاً دقيقاً للفاتورة ولا بديلاً عن الضوابط على مستوى التطبيق.</p><p>تدرج وثائق Google الحالية Gemini API وGemini Enterprise Agent Platform وCloud Run ودوال Cloud Run ضمن الخدمات المؤهلة. ويرتبط الحد بمشروع واحد وخدمة مؤهلة واحدة، بفترة شهرية تبدأ في اليوم الأول من الشهر. راجع <a href=\"https://docs.cloud.google.com/billing/docs/how-to/budgets-spend-caps\">الإعداد الحالي والقيود</a> قبل بناء تصميمك على الأهلية؛ فتوفر الميزة قد يتغير.</p><h2>افهم حدود الإنفاذ</h2><p>عند إنفاذ الحد، تُوقَف الطلبات الجديدة إلى الخدمة المشمولة في ذلك المشروع. أما المشاريع والخدمات الأخرى فلا تتأثر، ولا تُحذف الموارد القائمة، ويمكن للاستخدام الجاري أن يكتمل. ويظل التجاوز الناتج عن تأخر الإبلاغ مفوتراً، وقد تستمر التكاليف الثابتة اللازمة للإبقاء على الخدمات. لذا يحدّ الحد من الاستخدام المؤهل المستقبلي بعد الإنفاذ؛ ولا يمكنه عكس استخدام تحقق بالفعل.</p><p>تبني Google قرارات الحد على التكلفة الإجمالية المقدّرة، دون احتساب الوفورات والأرصدة. قد تطلق التقديرات الإنفاذ قبل صدور تقارير الفوترة النهائية، لكن الإنفاذ ليس فورياً. ينبغي للفريق المالي التعامل مع الحد كقاطع دائرة حمائي له نافذة تجاوز غير مؤكدة، لا كمبلغ أقصى مضمون الدفع.</p><h2>اختر نطاقاً يرتبط بمالك</h2><ol><li><strong>افصل المشاريع بحسب حمل العمل أو البيئة</strong> حيث تحتاج الفرق إلى حدود وسياسات انقطاع مختلفة.</li><li><strong>طبّق حداً واحداً لخدمة واحدة في كل مشروع</strong> لأن النطاق الموثق لا يمتد عبر عدة خدمات أو مشاريع في حد واحد.</li><li><strong>سمِّ مالكاً تشغيلياً</strong> يستطيع أن يقرر هل يبقى حمل العمل الموقوف متوقفاً، أم ينتقل إلى بديل معتمد، أم يُستأنف بعد التحقيق.</li><li><strong>نمذج الاعتماديات</strong> قبل تفعيل حد على Cloud Run أو الدوال؛ فإيقاف الاستخدام قد يقطع مسارات التطبيق رغم بقاء الموارد سليمة.</li></ol><h2>اقرن الحد بضوابط أكثر ليونة</h2><p>استخدم ميزانيات لكل طلب ولكل سير عمل على مستوى التطبيق لقرارات سريعة وقابلة للتفسير. واستخدم ميزانيات Cloud Billing وإشارات الشذوذ لرؤية على مستوى المشروع وحد منصة مستقل. التنبيهات عند عتبات أدنى تمنح مالك الخدمة وقتاً للتحقيق قبل الإنفاذ؛ ويجب أن تحدد لوحات المعلومات وكتيبات التشغيل المشروع والخدمة وحمل العمل المتأثرة وإجراء إعادة التشغيل.</p><p>اختبر الاستجابة التشغيلية في مشروع غير حرج. تأكد من يتلقى التنبيهات، وكيف يتحقق الفريق من تقدير الإنفاق، وماذا يرى المستخدمون حين تُوقَف الطلبات، ومن يستطيع رفع حد مُنفَّذ. أبقِ أهداف السعة والجودة إلى جانب الحد المالي حتى لا يتحول حدث ضبط التكلفة بصمت إلى إخفاق في التوافر.</p><h2>قائمة تحقق لتنفيذ FinOps</h2><ul><li>تحقق من أن الخدمة مؤهلة وأن حساب الفوترة يستوفي متطلبات Google المسبقة.</li><li>اختر مبلغاً شهرياً بالاستناد إلى الطلب المتوقع والموسمية وتكلفة انقطاع العمل.</li><li>أبقِ الأرصدة والخصومات منفصلة عن مُطلِق التكلفة الإجمالية عند مقارنة الحد بتوقعات الفاتورة الصافية.</li><li>اضبط عتبات التحذير دون الحد ووجّه التنبيهات إلى مالك الميزانية والمستجيب التشغيلي معاً.</li><li>وثّق التجاوز المتوقع الناتج عن تأخر التقدير والإبلاغ؛ ولا تعد أبداً بسقف صارم بالدولار.</li><li>راجع أحداث الحد والطلبات الموقوفة وأثر ذلك على المستخدمين وافتراضات التوقع بعد كل حادثة.</li></ul><h2>الأسئلة الشائعة</h2><h3>هل يضمن حد الإنفاق في Google Cloud ألا تتجاوز الفاتورة الميزانية؟</h3><p>لا. فهو يستخدم التكاليف الإجمالية المقدّرة وليس فورياً. يمكن للاستخدام أن يتجاوز الهدف قبل الإنفاذ، ويُفوتر هذا التجاوز بصورة اعتيادية.</p><h3>ماذا يحدث عند بلوغ حد الإنفاق؟</h3><p>يُوقَف الاستخدام الجديد للخدمة المؤهلة المحددة في المشروع المشمول. ولا تُحذف الموارد القائمة، وتكتمل الطلبات الجارية.</p><h3>هل يمكن لحد إنفاق واحد أن يغطي عدة مشاريع أو خدمات؟</h3><p>لا. نطاق حد الإنفاق الموثق لدى Google هو مشروع واحد وخدمة مؤهلة واحدة لكل حد، بفترة ميزانية شهرية.</p><h2>المصادر</h2><ul><li><a href=\"https://docs.cloud.google.com/billing/docs/how-to/budgets-spend-caps\">Google Cloud: Manage spend cap budgets</a></li><li><a href=\"https://cloud.google.com/blog/topics/cost-management/new-early-anomalies-and-spend-caps-on-google-cloud-budgets/\">Google Cloud: Early anomalies and spend caps announcement</a></li></ul><h2>ذات صلة</h2><ul><li><a href=\"/research/three-agent-budgets\">ميزانيات للوكلاء المستقلين</a></li><li><a href=\"/research/ai-spend-variance-bridge\">تحليل تباين إنفاق الذكاء الاصطناعي</a></li><li><a href=\"/research/ai-research-cost-allocation\">توزيع تكلفة الذكاء الاصطناعي</a></li></ul>",
+      "faq": [
+        {
+          "question": "هل يضمن حد الإنفاق في Google Cloud ألا تتجاوز الفاتورة الميزانية؟",
+          "answer": "لا. فهو يستخدم التكاليف الإجمالية المقدّرة وليس فورياً. يمكن للاستخدام أن يتجاوز الهدف قبل الإنفاذ، ويُفوتر هذا التجاوز بصورة اعتيادية."
+        },
+        {
+          "question": "ماذا يحدث عند بلوغ حد الإنفاق؟",
+          "answer": "يُوقَف الاستخدام الجديد للخدمة المؤهلة المحددة في المشروع المشمول. ولا تُحذف الموارد القائمة، وتكتمل الطلبات الجارية."
+        },
+        {
+          "question": "هل يمكن لحد إنفاق واحد أن يغطي عدة مشاريع أو خدمات؟",
+          "answer": "لا. نطاق حد الإنفاق الموثق لدى Google هو مشروع واحد وخدمة مؤهلة واحدة لكل حد، بفترة ميزانية شهرية."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/three-agent-budgets",
+          "label": "ميزانيات للوكلاء المستقلين"
+        },
+        {
+          "slug": "/research/ai-spend-variance-bridge",
+          "label": "تحليل تباين إنفاق الذكاء الاصطناعي"
+        },
+        {
+          "slug": "/research/ai-research-cost-allocation",
+          "label": "توزيع تكلفة الذكاء الاصطناعي"
+        }
+      ]
+    },
+    "it": {
+      "title": "Limiti di spesa IA su Google Cloud: guida FinOps",
+      "titleCore": "Limiti di spesa IA su Google Cloud: guida FinOps",
+      "description": "Dove si applicano i limiti di spesa di Google Cloud, cosa mettono in pausa e come i team FinOps dovrebbero governare i limiti mensili basati su stime.",
+      "body": "<p>I budget con limite di spesa di Google Cloud aggiungono un'azione di applicazione a un budget: quando i costi lordi stimati superano l'obiettivo configurato, il nuovo utilizzo del servizio e del progetto selezionati viene messo in pausa. Questo rende il limite utile come confine contro le spese fuori controllo, ma non è un tetto preciso sulla fattura né un sostituto dei controlli a livello di applicazione.</p><p>La documentazione attuale di Google elenca Gemini API, Gemini Enterprise Agent Platform, Cloud Run e Cloud Run functions come servizi idonei. Un limite è associato a un solo progetto e a un solo servizio idoneo, con un periodo mensile che inizia il primo giorno del mese. Consulta la <a href=\"https://docs.cloud.google.com/billing/docs/how-to/budgets-spend-caps\">configurazione attuale e le limitazioni</a> prima di progettare in base all'idoneità; la disponibilità delle funzionalità può cambiare.</p><h2>Comprendere il confine dell'applicazione</h2><p>Quando il limite viene applicato, le nuove richieste al servizio coperto in quel progetto vengono messe in pausa. Gli altri progetti e servizi non sono interessati, le risorse esistenti non vengono eliminate e l'utilizzo in corso può completarsi. Il superamento causato dal ritardo nei report viene comunque fatturato, e i costi fissi necessari a mantenere i servizi possono continuare. Il limite quindi restringe l'utilizzo futuro idoneo dopo l'applicazione; non può annullare l'utilizzo già sostenuto.</p><p>Google basa le decisioni sul limite sul costo lordo stimato, escludendo risparmi e crediti. Le stime possono attivare l'applicazione prima che siano disponibili i report di fatturazione definitivi, ma l'applicazione non è istantanea. La finanza dovrebbe trattare il limite come un interruttore di protezione con una finestra di superamento incerta, non come un importo massimo garantito da pagare.</p><h2>Scegliere un ambito che corrisponda a un responsabile</h2><ol><li><strong>Separa i progetti per carico di lavoro o ambiente</strong> quando i team hanno bisogno di limiti e politiche di interruzione diversi.</li><li><strong>Applica un limite per servizio a ogni progetto</strong>, perché l'ambito documentato non copre più servizi o progetti in un unico limite.</li><li><strong>Assegna un responsabile operativo</strong> che possa decidere se un carico di lavoro in pausa deve restare fermo, passare a un'alternativa approvata o riprendere dopo un'indagine.</li><li><strong>Modella le dipendenze</strong> prima di attivare un limite su Cloud Run o sulle funzioni; mettere in pausa l'utilizzo può interrompere i percorsi applicativi anche se le risorse restano intatte.</li></ol><h2>Affiancare il limite a controlli più leggeri</h2><p>Usa budget per richiesta e per flusso di lavoro a livello di applicazione per decisioni rapide e spiegabili. Usa i budget di Cloud Billing e i segnali di anomalia per la visibilità a livello di progetto e come confine indipendente della piattaforma. Gli avvisi a soglie più basse danno al responsabile del servizio il tempo di indagare prima dell'applicazione; dashboard e runbook devono indicare il progetto, il servizio, il carico di lavoro e la procedura di riavvio interessati.</p><p>Testa la risposta operativa in un progetto non critico. Verifica chi riceve gli avvisi, come il team controlla la stima della spesa, cosa vedono gli utenti quando le richieste vengono messe in pausa e chi può rimuovere un limite applicato. Mantieni gli obiettivi di capacità e qualità accanto al limite finanziario, così un evento di controllo dei costi non diventa silenziosamente un guasto di disponibilità.</p><h2>Checklist di implementazione FinOps</h2><ul><li>Verifica che il servizio sia idoneo e che l'account di fatturazione soddisfi i prerequisiti di Google.</li><li>Scegli un importo mensile in base alla domanda prevista, alla stagionalità e al costo dell'interruzione per il business.</li><li>Tieni crediti e sconti separati dal trigger sul costo lordo quando confronti il limite con le aspettative di fattura netta.</li><li>Imposta soglie di avviso sotto il limite e instrada gli avvisi sia a un responsabile del budget sia a un responsabile operativo.</li><li>Documenta il superamento atteso dovuto a stima e ritardo dei report; non promettere mai un tetto rigido in dollari.</li><li>Rivedi eventi di limite, richieste in pausa, impatto sugli utenti e ipotesi di previsione dopo ogni incidente.</li></ul><h2>FAQ</h2><h3>Un limite di spesa di Google Cloud garantisce che la fattura non possa superare il budget?</h3><p>No. Usa costi lordi stimati e non è istantaneo. L'utilizzo può superare il target prima dell'applicazione, e quel superamento viene fatturato normalmente.</p><h3>Cosa succede quando si raggiunge un limite di spesa?</h3><p>Il nuovo utilizzo del servizio idoneo selezionato nel progetto nell'ambito viene messo in pausa. Le risorse esistenti non vengono eliminate e le richieste in corso vengono completate.</p><h3>Un unico limite di spesa può coprire più progetti o servizi?</h3><p>No. L'ambito documentato da Google per un limite di spesa è un progetto e un servizio idoneo per limite, con un periodo di budget mensile.</p><h2>Fonti</h2><ul><li><a href=\"https://docs.cloud.google.com/billing/docs/how-to/budgets-spend-caps\">Google Cloud: Manage spend cap budgets</a></li><li><a href=\"https://cloud.google.com/blog/topics/cost-management/new-early-anomalies-and-spend-caps-on-google-cloud-budgets/\">Google Cloud: Early anomalies and spend caps announcement</a></li></ul><h2>Correlati</h2><ul><li><a href=\"/research/three-agent-budgets\">Budget per agenti autonomi</a></li><li><a href=\"/research/ai-spend-variance-bridge\">Analisi della varianza della spesa IA</a></li><li><a href=\"/research/ai-research-cost-allocation\">Allocazione dei costi IA</a></li></ul>",
+      "faq": [
+        {
+          "question": "Un limite di spesa di Google Cloud garantisce che la fattura non possa superare il budget?",
+          "answer": "No. Usa costi lordi stimati e non è istantaneo. L'utilizzo può superare il target prima dell'applicazione, e quel superamento viene fatturato normalmente."
+        },
+        {
+          "question": "Cosa succede quando si raggiunge un limite di spesa?",
+          "answer": "Il nuovo utilizzo del servizio idoneo selezionato nel progetto nell'ambito viene messo in pausa. Le risorse esistenti non vengono eliminate e le richieste in corso vengono completate."
+        },
+        {
+          "question": "Un unico limite di spesa può coprire più progetti o servizi?",
+          "answer": "No. L'ambito documentato da Google per un limite di spesa è un progetto e un servizio idoneo per limite, con un periodo di budget mensile."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/three-agent-budgets",
+          "label": "Budget per agenti autonomi"
+        },
+        {
+          "slug": "/research/ai-spend-variance-bridge",
+          "label": "Analisi della varianza della spesa IA"
+        },
+        {
+          "slug": "/research/ai-research-cost-allocation",
+          "label": "Allocazione dei costi IA"
+        }
+      ]
+    },
+    "ko": {
+      "title": "Google Cloud AI 지출 상한: FinOps 가이드",
+      "titleCore": "Google Cloud AI 지출 상한",
+      "description": "Google Cloud 지출 상한이 적용되는 범위, 일시 중지되는 항목, 그리고 FinOps 팀이 추정 기반 월간 한도를 어떻게 관리해야 하는지 정리합니다.",
+      "body": "<p>Google Cloud의 지출 상한 예산은 예산에 집행 조치를 추가합니다. 추정 총비용이 설정한 목표를 넘으면, 선택한 서비스와 프로젝트에 대한 새 사용이 일시 중지됩니다. 따라서 상한은 폭주하는 지출을 막는 경계로는 유용하지만, 정확한 청구서 상한이나 애플리케이션 수준 통제의 대체물은 아닙니다.</p><p>Google의 현재 문서는 Gemini API, Gemini Enterprise Agent Platform, Cloud Run, Cloud Run functions를 적격 서비스로 나열합니다. 상한은 하나의 프로젝트와 하나의 적격 서비스에 적용되며, 월의 첫날에 시작하는 월간 기간을 따릅니다. 적격 여부를 전제로 설계하기 전에 <a href=\"https://docs.cloud.google.com/billing/docs/how-to/budgets-spend-caps\">최신 설정 방법과 제한 사항</a>을 확인하세요. 기능 제공 범위는 바뀔 수 있습니다.</p><h2>집행 경계 이해하기</h2><p>상한이 집행되면 해당 프로젝트의 적용 서비스에 대한 새 요청이 일시 중지됩니다. 다른 프로젝트와 서비스는 영향을 받지 않고, 기존 리소스는 삭제되지 않으며, 진행 중인 사용은 완료될 수 있습니다. 보고 지연으로 생긴 초과분은 여전히 청구되고, 서비스를 유지하는 데 필요한 고정비는 계속 발생할 수 있습니다. 따라서 상한은 집행 이후의 향후 적격 사용을 제한할 뿐, 이미 발생한 사용을 되돌릴 수는 없습니다.</p><p>Google은 상한 결정을 절감액과 크레딧을 제외한 추정 총비용으로 내립니다. 추정치는 최종 청구 보고서가 나오기 전에 집행을 트리거할 수 있지만, 집행은 즉시 이루어지지 않습니다. 재무팀은 상한을 초과 폭이 불확실한 보호용 차단기로 보아야 하며, 지불해야 할 금액의 보장된 최대치로 보면 안 됩니다.</p><h2>담당자와 연결되는 범위 선택하기</h2><ol><li><strong>워크로드나 환경별로 프로젝트를 분리하세요</strong>. 팀마다 다른 한도와 중단 정책이 필요한 경우에 해당합니다.</li><li><strong>프로젝트당 서비스 상한 하나를 적용하세요</strong>. 문서화된 범위가 하나의 상한에서 여러 서비스나 프로젝트를 포괄하지 않기 때문입니다.</li><li><strong>운영 책임자를 지정하세요</strong>. 일시 중지된 워크로드를 계속 멈춰 둘지, 승인된 대체 경로로 옮길지, 조사 후 재개할지를 결정할 수 있는 사람입니다.</li><li><strong>의존성을 모델링하세요</strong>. Cloud Run이나 functions에 상한을 켜기 전에 확인하세요. 리소스는 그대로 남아 있더라도 사용을 일시 중지하면 애플리케이션 경로가 끊길 수 있습니다.</li></ol><h2>상한을 더 부드러운 통제와 함께 쓰기</h2><p>빠르고 설명 가능한 판단을 위해서는 애플리케이션 수준의 요청별, 워크플로별 예산을 사용하세요. 프로젝트 수준의 가시성과 독립적인 플랫폼 경계를 위해서는 Cloud Billing 예산과 이상 징후 신호를 사용하세요. 더 낮은 임계값의 알림은 집행 전에 서비스 담당자가 조사할 시간을 줍니다. 대시보드와 런북에는 영향받는 프로젝트, 서비스, 워크로드, 재시작 절차를 적어 두세요.</p><p>운영 대응은 중요도가 낮은 프로젝트에서 테스트하세요. 누가 알림을 받는지, 팀이 지출 추정치를 어떻게 검증하는지, 요청이 일시 중지될 때 사용자에게 무엇이 보이는지, 집행된 상한을 누가 해제할 수 있는지를 확인하세요. 비용 통제 이벤트가 조용히 가용성 장애로 번지지 않도록, 재무 한도와 함께 용량 및 품질 목표도 유지하세요.</p><h2>FinOps 구현 체크리스트</h2><ul><li>서비스가 적격인지, 청구 계정이 Google의 사전 요건을 충족하는지 확인하세요.</li><li>예측 수요, 계절성, 업무 중단 비용을 바탕으로 월 금액을 정하세요.</li><li>상한을 순청구 예상치와 비교할 때는 크레딧과 할인을 총비용 트리거와 분리해 두세요.</li><li>경고 임계값을 상한보다 낮게 설정하고, 알림을 예산 책임자와 운영 담당자 모두에게 보내세요.</li><li>추정과 보고 지연으로 예상되는 초과분을 문서화하세요. 달러 기준의 하드 상한을 약속하지 마세요.</li><li>사고가 날 때마다 상한 이벤트, 일시 중지된 요청, 사용자 영향, 예측 가정을 검토하세요.</li></ul><h2>FAQ</h2><h3>Google Cloud 지출 상한이 청구액이 예산을 넘지 않는다고 보장하나요?</h3><p>아니요. 상한은 추정 총비용을 사용하며 즉시 작동하지 않습니다. 집행 전에 사용량이 목표를 넘을 수 있고, 그 초과분은 일반적으로 청구됩니다.</p><h3>지출 상한에 도달하면 어떻게 되나요?</h3><p>범위에 포함된 프로젝트에서 선택한 적격 서비스의 새 사용이 일시 중지됩니다. 기존 리소스는 삭제되지 않으며, 진행 중인 요청은 완료됩니다.</p><h3>하나의 지출 상한으로 여러 프로젝트나 서비스를 포괄할 수 있나요?</h3><p>아니요. Google이 문서화한 지출 상한의 범위는 상한당 하나의 프로젝트와 하나의 적격 서비스이며, 예산 기간은 월 단위입니다.</p><h2>출처</h2><ul><li><a href=\"https://docs.cloud.google.com/billing/docs/how-to/budgets-spend-caps\">Google Cloud: Manage spend cap budgets</a></li><li><a href=\"https://cloud.google.com/blog/topics/cost-management/new-early-anomalies-and-spend-caps-on-google-cloud-budgets/\">Google Cloud: Early anomalies and spend caps announcement</a></li></ul><h2>관련 글</h2><ul><li><a href=\"/research/three-agent-budgets\">자율 에이전트를 위한 예산</a></li><li><a href=\"/research/ai-spend-variance-bridge\">AI 지출 차이 분석</a></li><li><a href=\"/research/ai-research-cost-allocation\">AI 비용 배분</a></li></ul>",
+      "faq": [
+        {
+          "question": "Google Cloud 지출 상한이 청구액이 예산을 넘지 않는다고 보장하나요?",
+          "answer": "아니요. 상한은 추정 총비용을 사용하며 즉시 작동하지 않습니다. 집행 전에 사용량이 목표를 넘을 수 있고, 그 초과분은 일반적으로 청구됩니다."
+        },
+        {
+          "question": "지출 상한에 도달하면 어떻게 되나요?",
+          "answer": "범위에 포함된 프로젝트에서 선택한 적격 서비스의 새 사용이 일시 중지됩니다. 기존 리소스는 삭제되지 않으며, 진행 중인 요청은 완료됩니다."
+        },
+        {
+          "question": "하나의 지출 상한으로 여러 프로젝트나 서비스를 포괄할 수 있나요?",
+          "answer": "아니요. Google이 문서화한 지출 상한의 범위는 상한당 하나의 프로젝트와 하나의 적격 서비스이며, 예산 기간은 월 단위입니다."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/three-agent-budgets",
+          "label": "자율 에이전트를 위한 예산"
+        },
+        {
+          "slug": "/research/ai-spend-variance-bridge",
+          "label": "AI 지출 차이 분석"
+        },
+        {
+          "slug": "/research/ai-research-cost-allocation",
+          "label": "AI 비용 배분"
+        }
+      ]
+    },
+    "nl": {
+      "title": "Spend caps voor AI op Google Cloud: een FinOps-gids",
+      "titleCore": "Spend caps voor AI op Google Cloud: een FinOps-gids",
+      "description": "Waar Google Cloud spend caps gelden, wat ze pauzeren en hoe FinOps-teams maandlimieten op basis van schattingen moeten beheersen.",
+      "body": "<p>De spend-capbudgetten van Google Cloud voegen een handhavingsactie toe aan een budget: wanneer de geschatte brutokosten het ingestelde doel overschrijden, wordt nieuw gebruik van de geselecteerde service en het project gepauzeerd. Daardoor is een cap nuttig als grens tegen op hol geslagen uitgaven, maar het is geen nauwkeurig plafond voor de factuur en geen vervanging voor beheersing op applicatieniveau.</p><p>De huidige documentatie van Google noemt Gemini API, Gemini Enterprise Agent Platform, Cloud Run en Cloud Run functions als in aanmerking komende services. Een cap geldt voor één project en één in aanmerking komende service, met een maandperiode die op de eerste dag van de maand begint. Controleer de <a href=\"https://docs.cloud.google.com/billing/docs/how-to/budgets-spend-caps\">actuele configuratie en beperkingen</a> voordat je rond de geschiktheid ontwerpt; beschikbaarheid van functies kan veranderen.</p><h2>Begrijp de handhavingsgrens</h2><p>Wanneer de cap wordt gehandhaafd, worden nieuwe requests naar de gedekte service in dat project gepauzeerd. Andere projecten en services blijven ongemoeid, bestaande resources worden niet verwijderd en lopend gebruik kan worden afgerond. Overschrijding door rapportagevertraging wordt nog steeds gefactureerd, en vaste kosten die nodig zijn om services te behouden kunnen doorlopen. De cap beperkt dus toekomstig in aanmerking komend gebruik na handhaving; hij kan reeds gemaakt gebruik niet terugdraaien.</p><p>Google baseert capbeslissingen op de geschatte brutokosten, exclusief kortingen en tegoeden. Schattingen kunnen handhaving activeren vóórdat definitieve facturatie wordt gerapporteerd, maar handhaving is niet onmiddellijk. Finance moet de cap behandelen als een beschermende stroomonderbreker met een onzeker overschrijdingsvenster, niet als een gegarandeerd maximaal te betalen bedrag.</p><h2>Kies een scope die bij een eigenaar past</h2><ol><li><strong>Scheid projecten per workload of omgeving</strong> waar teams verschillende limieten en onderbrekingsbeleid nodig hebben.</li><li><strong>Pas één servicecap per project toe</strong>, omdat de gedocumenteerde scope niet meerdere services of projecten in één cap omvat.</li><li><strong>Wijs een operationele eigenaar aan</strong> die kan beslissen of een gepauzeerde workload gestopt moet blijven, naar een goedgekeurde fallback moet gaan of na onderzoek moet hervatten.</li><li><strong>Modelleer afhankelijkheden</strong> voordat je een cap inschakelt op Cloud Run of functions; pauzeren van gebruik kan applicatiepaden onderbreken, ook al blijven de resources intact.</li></ol><h2>Combineer de cap met zachtere controles</h2><p>Gebruik budgetten per request en per workflow op applicatieniveau voor snelle, uitlegbare beslissingen. Gebruik Cloud Billing-budgetten en anomaliesignalen voor inzicht op projectniveau en een onafhankelijke platformgrens. Waarschuwingen bij lagere drempels geven de service-eigenaar tijd om te onderzoeken vóór handhaving; dashboards en runbooks moeten het getroffen project, de service, de workload en de herstartprocedure vermelden.</p><p>Test de operationele reactie in een niet-kritiek project. Bevestig wie de waarschuwingen ontvangt, hoe het team de uitgavenschatting controleert, wat gebruikers zien wanneer requests worden gepauzeerd en wie een afgedwongen cap kan opheffen. Houd capaciteits- en kwaliteitsdoelen naast de financiële limiet, zodat een kostenbeheersingsgebeurtenis niet ongemerkt een beschikbaarheidsstoring wordt.</p><h2>FinOps-implementatiechecklist</h2><ul><li>Controleer of de service in aanmerking komt en of het factuuraccount aan de voorwaarden van Google voldoet.</li><li>Kies een maandbedrag op basis van verwachte vraag, seizoensinvloeden en de bedrijfskosten van onderbreking.</li><li>Houd tegoeden en kortingen gescheiden van de brutokostentrigger wanneer je de cap vergelijkt met de verwachte nettofactuur.</li><li>Stel waarschuwingsdrempels onder de cap in en stuur meldingen naar zowel een budgeteigenaar als een operationele responder.</li><li>Leg de verwachte overschrijding door schatting en rapportagevertraging vast; beloof nooit een hard dollarplafond.</li><li>Bekijk na elk incident capgebeurtenissen, gepauzeerde requests, impact op gebruikers en prognoseaannames.</li></ul><h2>FAQ</h2><h3>Garandeert een spend cap van Google Cloud dat een rekening het budget niet kan overschrijden?</h3><p>Nee. Hij gebruikt geschatte brutokosten en is niet onmiddellijk. Gebruik kan het doel overschrijden voordat handhaving plaatsvindt, en die overschrijding wordt gewoon gefactureerd.</p><h3>Wat gebeurt er als een spend cap wordt bereikt?</h3><p>Nieuw gebruik van de geselecteerde, in aanmerking komende service in het betreffende project wordt gepauzeerd. Bestaande resources worden niet verwijderd en lopende requests worden afgerond.</p><h3>Kan één spend cap meerdere projecten of services dekken?</h3><p>Nee. De gedocumenteerde scope van Google is één project en één in aanmerking komende service per cap, met een maandelijkse budgetperiode.</p><h2>Bronnen</h2><ul><li><a href=\"https://docs.cloud.google.com/billing/docs/how-to/budgets-spend-caps\">Google Cloud: Manage spend cap budgets</a></li><li><a href=\"https://cloud.google.com/blog/topics/cost-management/new-early-anomalies-and-spend-caps-on-google-cloud-budgets/\">Google Cloud: Early anomalies and spend caps announcement</a></li></ul><h2>Gerelateerd</h2><ul><li><a href=\"/research/three-agent-budgets\">Budgetten voor autonome agents</a></li><li><a href=\"/research/ai-spend-variance-bridge\">Variantieanalyse van AI-uitgaven</a></li><li><a href=\"/research/ai-research-cost-allocation\">Toerekening van AI-kosten</a></li></ul>",
+      "faq": [
+        {
+          "question": "Garandeert een spend cap van Google Cloud dat een rekening het budget niet kan overschrijden?",
+          "answer": "Nee. Hij gebruikt geschatte brutokosten en is niet onmiddellijk. Gebruik kan het doel overschrijden voordat handhaving plaatsvindt, en die overschrijding wordt gewoon gefactureerd."
+        },
+        {
+          "question": "Wat gebeurt er als een spend cap wordt bereikt?",
+          "answer": "Nieuw gebruik van de geselecteerde, in aanmerking komende service in het betreffende project wordt gepauzeerd. Bestaande resources worden niet verwijderd en lopende requests worden afgerond."
+        },
+        {
+          "question": "Kan één spend cap meerdere projecten of services dekken?",
+          "answer": "Nee. De gedocumenteerde scope van Google is één project en één in aanmerking komende service per cap, met een maandelijkse budgetperiode."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/three-agent-budgets",
+          "label": "Budgetten voor autonome agents"
+        },
+        {
+          "slug": "/research/ai-spend-variance-bridge",
+          "label": "Variantieanalyse van AI-uitgaven"
+        },
+        {
+          "slug": "/research/ai-research-cost-allocation",
+          "label": "Toerekening van AI-kosten"
+        }
+      ]
+    },
+    "zh": {
+      "title": "Google Cloud AI 支出上限：FinOps 指南",
+      "titleCore": "Google Cloud AI 支出上限：FinOps 指南",
+      "description": "Google Cloud 支出上限适用于哪些服务、会暂停什么，以及 FinOps 团队应如何治理基于估算的月度限额。",
+      "body": "<p>Google Cloud 的支出上限预算会给预算增加一个执行动作：当估算的毛成本超过设定目标时，所选服务和项目的新用量会被暂停。这使上限成为失控支出的边界很有用，但它并不是精确的账单封顶，也不能替代应用层的控制。</p>\n\n<p>Google 当前文档列出的符合条件的服务包括 Gemini API、Gemini Enterprise Agent Platform、Cloud Run 和 Cloud Run functions。上限的作用范围是单个项目和单个符合条件的服务，周期为每月，从当月第一天开始。在围绕资格进行设计之前，请先查看<a href=\"https://docs.cloud.google.com/billing/docs/how-to/budgets-spend-caps\">当前的设置方法和限制</a>，因为功能可用性可能会变化。</p>\n\n<h2>理解执行边界</h2>\n<p>上限执行时，该项目中对已覆盖服务的新请求会被暂停。其他项目和服务不受影响，现有资源不会被删除，正在进行的用量可以完成。由报告延迟造成的超额部分仍会计费，维持服务所需的固定成本也会继续产生。因此，上限只限制执行之后的未来符合条件的用量，无法撤销已经产生的用量。</p>\n\n<p>Google 基于估算的毛成本做上限判断，不扣除节省和抵免。估算可能会在最终账单报告出来之前触发执行，但执行并非即时生效。财务团队应把上限视为一种保护性断路器，其超额窗口是不确定的，而不是可支付金额的硬性上限。</p>\n\n<h2>选择能对应到负责人的范围</h2>\n<ol>\n<li>\n<strong>按负载或环境拆分项目</strong>，适用于各团队需要不同限额和中断策略的场景。</li>\n<li>\n<strong>每个项目只设一个服务上限</strong>，因为文档中的范围不会跨越单个上限中的多个服务或项目。</li>\n<li>\n<strong>指定一名运营负责人</strong>，由其决定被暂停的负载是继续停止、切换到已批准的备用方案，还是在调查后恢复。</li>\n<li>\n<strong>在 Cloud Run 或 functions 上启用上限前，先梳理依赖关系</strong>；即使资源保持完好，暂停用量也可能中断应用的调用路径。</li>\n</ol>\n<h2>把上限与更柔和的控制配合使用</h2>\n<p>用应用层的单请求和单工作流预算来做快速、可解释的决策。用 Cloud Billing 预算和异常信号来获得项目层面的可见性，并构成一道独立的平台边界。较低阈值的告警能给服务负责人留出调查时间，然后再执行；仪表板和运行手册应明确受影响的项目、服务、负载以及重启流程。</p>\n\n<p>先在非关键项目中测试运营响应。确认谁会收到告警，团队如何核实支出估算，请求被暂停时用户会看到什么，以及谁有权解除已执行的上限。把容量和质量目标与财务限额放在一起考虑，避免一次成本控制事件悄无声息地变成可用性故障。</p>\n\n<h2>FinOps 实施清单</h2>\n<ul>\n<li>确认服务符合条件，且结算账户满足 Google 的前提条件。</li>\n<li>根据预测需求、季节性和业务中断成本来选择月度金额。</li>\n<li>将抵免和折扣与毛成本触发值分开，以便把上限与净账单预期进行比较。</li>\n<li>把预警阈值设在上限以下，并将告警同时发送给预算负责人和运营响应人。</li>\n<li>记录因估算和报告延迟可能产生的超额部分；切勿承诺硬性的美元上限。</li>\n<li>每次事件后，复盘上限触发记录、被暂停的请求、用户影响和预测假设。</li>\n</ul>\n<h2>常见问题</h2>\n<h3>Google Cloud 支出上限能否保证账单不超过预算？</h3>\n<p>不能。它基于估算的毛成本，且并非即时生效。在执行之前，用量可能已经超过目标，超出的部分会照常计费。</p>\n\n<h3>达到支出上限时会发生什么？</h3>\n<p>所选的符合条件服务在限定项目中的新用量会被暂停。现有资源不会被删除，正在进行的请求会完成。</p>\n\n<h3>一个支出上限能否覆盖多个项目或服务？</h3>\n<p>不能。Google 文档中规定的支出上限范围是每个上限对应一个项目和一个符合条件的服务，预算周期为每月。</p>\n\n<h2>来源</h2>\n<ul>\n<li>\n<a href=\"https://docs.cloud.google.com/billing/docs/how-to/budgets-spend-caps\">Google Cloud：管理支出上限预算</a>\n</li>\n<li>\n<a href=\"https://cloud.google.com/blog/topics/cost-management/new-early-anomalies-and-spend-caps-on-google-cloud-budgets/\">Google Cloud：早期异常与支出上限的公告</a>\n</li>\n</ul>\n<h2>相关阅读</h2>\n<ul>\n<li>\n<a href=\"/research/three-agent-budgets\">自主智能体的预算</a>\n</li>\n<li>\n<a href=\"/research/ai-spend-variance-bridge\">AI 支出差异分析</a>\n</li>\n<li>\n<a href=\"/research/ai-research-cost-allocation\">AI 成本分摊</a>\n</li>\n</ul>",
+      "faq": [
+        {
+          "question": "Google Cloud 支出上限能保证账单不超过预算吗？",
+          "answer": "不能。它基于估算的毛成本，且并非即时生效。在执行之前，用量可能已经超过目标，超出的部分会照常计费。"
+        },
+        {
+          "question": "达到支出上限时会发生什么？",
+          "answer": "所选符合条件服务在限定项目中的新用量会被暂停。现有资源不会被删除，正在进行的请求会完成。"
+        },
+        {
+          "question": "一个支出上限能覆盖多个项目或服务吗？",
+          "answer": "不能。Google 文档规定的支出上限范围是每个上限对应一个项目和一个符合条件的服务，预算周期为每月。"
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/three-agent-budgets",
+          "label": "自主智能体的预算"
+        },
+        {
+          "slug": "/research/ai-spend-variance-bridge",
+          "label": "AI 支出差异分析"
+        },
+        {
+          "slug": "/research/ai-research-cost-allocation",
+          "label": "AI 成本分摊"
+        }
+      ]
     }
   }
 }

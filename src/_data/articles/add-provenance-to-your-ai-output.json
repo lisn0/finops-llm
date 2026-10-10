@@ -15,7 +15,7 @@
       "title": "Add provenance to your AI output in one day",
       "titleCore": "Add provenance to your AI output",
       "description": "You cannot add the model's watermark yourself. You can add the record that answers the same question, using telemetry you are probably already collecting.",
-      "body": "<p>Start with the thing you cannot do. The text watermark is applied by the model provider during generation; there is no parameter that turns it on, off, or up, and you cannot add it to text after the fact. C2PA signing likewise happens at generation for files the provider produces. If you want a stronger signal than what arrives, the answer is not to add marking &mdash; it is to add a record.</p><p>That record is cheap, it is entirely under your control, and it is the thing that actually gets produced when someone asks you to prove where an output came from. Most teams can build it in a day, because it is one join away from telemetry they already collect for cost attribution.</p><h2>The four fields</h2><p>For every generated artefact, log: the exact <strong>model ID and version</strong>, the <strong>region</strong> it ran in, the <strong>timestamp</strong>, and a stable <strong>artefact ID</strong> that follows the output through your pipeline. That last one is the field teams skip and later wish they had.</p><p>If you already emit per-request usage records for cost attribution, three of the four are in there. What is usually missing is the join: your cost telemetry knows a request happened and what it cost, but not which stored artefact it produced. Adding the artefact ID to the usage record turns two systems into one query.</p><h2>Keep the signed manifest when you control the pipeline</h2><p>Where the provider hands you a C2PA-signed file, the goal is simple: do not lose it. Configure image transforms to preserve metadata explicitly rather than trusting defaults, and re-attach provenance after any re-encode you control. Test the whole path from generation to delivery, not the model output alone.</p><p>For files you produce yourself &mdash; a chart your service renders, an image you compose from generated parts &mdash; you can sign your own C2PA manifest asserting what you did. That is a real option and a genuine improvement in traceability, but it is a project rather than an afternoon, and it is worth doing only after the logging above exists.</p><h2>Mark it for humans too</h2><p>Machine-readable marking and user-visible disclosure are different obligations solving different problems. A visible &quot;generated with AI&quot; label costs nothing to add, is not affected by any pipeline transform, and is what a user actually reads. It is not a substitute for machine-readable marking, and machine-readable marking is not a substitute for it.</p><h2>What it costs to run</h2><p>Four small fields per generated artefact, retained for as long as your compliance window requires. On any realistic volume this is a rounding error against the inference bill itself &mdash; and unlike the inference, it is the part you will be asked to produce. Set the retention period deliberately: too short and the record is gone before the question arrives; unbounded and you are paying storage forever for no reason.</p><p>The sequence that works: add the artefact ID to your existing usage telemetry, verify metadata survives one real image path end to end, add the visible label, then decide whether signing your own manifests is worth it. Only the last step is a project.</p><h2>Related</h2><ul><li><a href=&quot;/research/how-ai-watermarks-get-destroyed&quot;>How AI watermarks get destroyed</a></li><li><a href=&quot;/research/llm-cost-attribution&quot;>LLM cost attribution</a></li><li><a href=&quot;/research/ai-observability&quot;>AI observability</a></li></ul>",
+      "body": "<p>Start with the thing you cannot do. The text watermark is applied by the model provider during generation; there is no parameter that turns it on, off, or up, and you cannot add it to text after the fact. C2PA signing likewise happens at generation for files the provider produces. If you want a stronger signal than what arrives, the answer is not to add marking &mdash; it is to add a record.</p><p>That record is cheap, it is entirely under your control, and it is the thing that actually gets produced when someone asks you to prove where an output came from. Most teams can build it in a day, because it is one join away from telemetry they already collect for cost attribution.</p><h2>The four fields</h2><p>For every generated artefact, log: the exact <strong>model ID and version</strong>, the <strong>region</strong> it ran in, the <strong>timestamp</strong>, and a stable <strong>artefact ID</strong> that follows the output through your pipeline. That last one is the field teams skip and later wish they had.</p><p>If you already emit per-request usage records for cost attribution, three of the four are in there. What is usually missing is the join: your cost telemetry knows a request happened and what it cost, but not which stored artefact it produced. Adding the artefact ID to the usage record turns two systems into one query.</p><h2>Keep the signed manifest when you control the pipeline</h2><p>Where the provider hands you a C2PA-signed file, the goal is simple: do not lose it. Configure image transforms to preserve metadata explicitly rather than trusting defaults, and re-attach provenance after any re-encode you control. Test the whole path from generation to delivery, not the model output alone.</p><p>For files you produce yourself &mdash; a chart your service renders, an image you compose from generated parts &mdash; you can sign your own C2PA manifest asserting what you did. That is a real option and a genuine improvement in traceability, but it is a project rather than an afternoon, and it is worth doing only after the logging above exists.</p><h2>Mark it for humans too</h2><p>Machine-readable marking and user-visible disclosure are different obligations solving different problems. A visible &quot;generated with AI&quot; label costs nothing to add, is not affected by any pipeline transform, and is what a user actually reads. It is not a substitute for machine-readable marking, and machine-readable marking is not a substitute for it.</p><h2>What it costs to run</h2><p>Four small fields per generated artefact, retained for as long as your compliance window requires. On any realistic volume this is a rounding error against the inference bill itself &mdash; and unlike the inference, it is the part you will be asked to produce. Set the retention period deliberately: too short and the record is gone before the question arrives; unbounded and you are paying storage forever for no reason.</p><p>The sequence that works: add the artefact ID to your existing usage telemetry, verify metadata survives one real image path end to end, add the visible label, then decide whether signing your own manifests is worth it. Only the last step is a project.</p><h2>Related</h2><ul><li><a href=\"/research/how-ai-watermarks-get-destroyed\">How AI watermarks get destroyed</a></li><li><a href=\"/research/llm-cost-attribution\">LLM cost attribution</a></li><li><a href=\"/research/ai-observability\">AI observability</a></li></ul>",
       "faq": [
         {
           "question": "Can I add the AI watermark to text myself?",
@@ -132,6 +132,346 @@
         {
           "slug": "/research/how-ai-watermarks-get-destroyed",
           "label": "AI 電子透かしが壊れる仕組み"
+        }
+      ]
+    },
+    "id": {
+      "title": "Tambahkan provenans ke output AI dalam sehari",
+      "titleCore": "Tambahkan provenans ke output AI",
+      "description": "Anda tidak bisa menambahkan watermark model sendiri. Anda bisa menambahkan catatan yang menjawab pertanyaan yang sama, dengan telemetri yang sudah ada.",
+      "body": "<p>Mulai dari hal yang tidak bisa Anda lakukan. Watermark teks diterapkan oleh penyedia model selama proses generasi; tidak ada parameter yang mengaktifkan, menonaktifkan, atau menguatkannya, dan Anda tidak bisa menambahkannya ke teks setelah kejadian. Penandatanganan C2PA juga terjadi saat generasi, untuk file yang dihasilkan penyedia. Jika Anda ingin sinyal yang lebih kuat daripada yang sudah datang, jawabannya bukan menambah penandaan &mdash; melainkan menambah catatan.</p><p>Catatan itu murah, sepenuhnya di bawah kendali Anda, dan itulah yang benar-benar dihasilkan ketika seseorang meminta Anda membuktikan asal sebuah output. Sebagian besar tim bisa membangunnya dalam sehari, karena hanya berjarak satu join dari telemetri yang sudah mereka kumpulkan untuk atribusi biaya.</p><h2>Empat field</h2><p>Untuk setiap artefak yang dihasilkan, catat: <strong>ID dan versi model yang tepat</strong>, <strong>region</strong> tempat model berjalan, <strong>timestamp</strong>, dan <strong>ID artefak</strong> yang stabil dan mengikuti output melalui pipeline Anda. Yang terakhir inilah field yang sering dilewati tim dan kemudian mereka sesali.</p><p>Jika Anda sudah mengeluarkan catatan penggunaan per permintaan untuk atribusi biaya, tiga dari empat field sudah ada. Yang biasanya hilang adalah join-nya: telemetri biaya Anda tahu bahwa sebuah permintaan terjadi dan berapa biayanya, tetapi tidak tahu artefak tersimpan mana yang dihasilkannya. Menambahkan ID artefak ke catatan penggunaan mengubah dua sistem menjadi satu kueri.</p><h2>Simpan manifes yang ditandatangani jika Anda mengendalikan pipeline</h2><p>Jika penyedia memberi Anda file bertanda tangan C2PA, tujuannya sederhana: jangan sampai hilang. Konfigurasikan transformasi gambar agar mempertahankan metadata secara eksplisit, bukan mengandalkan default, dan pasang kembali provenans setelah setiap encode ulang yang Anda kendalikan. Uji seluruh jalur dari generasi hingga pengiriman, bukan hanya output model.</p><p>Untuk file yang Anda hasilkan sendiri &mdash; grafik yang dirender layanan Anda, gambar yang Anda susun dari bagian-bagian hasil generasi &mdash; Anda bisa menandatangani manifes C2PA sendiri yang menyatakan apa yang Anda lakukan. Ini opsi nyata dan peningkatan ketertelusuran yang sungguh-sungguh, tetapi ini proyek, bukan pekerjaan satu sore, dan sebaiknya dilakukan setelah pencatatan di atas sudah ada.</p><h2>Tandai juga untuk manusia</h2><p>Penandaan yang bisa dibaca mesin dan pengungkapan yang terlihat oleh pengguna adalah kewajiban yang berbeda untuk masalah yang berbeda. Label terlihat &quot;dibuat dengan AI&quot; tidak memakan biaya untuk ditambahkan, tidak terpengaruh transformasi pipeline mana pun, dan itulah yang benar-benar dibaca pengguna. Label itu bukan pengganti penandaan yang bisa dibaca mesin, dan penandaan itu juga bukan pengganti label tersebut.</p><h2>Biaya menjalankannya</h2><p>Empat field kecil per artefak yang dihasilkan, disimpan selama jendela kepatuhan Anda membutuhkannya. Pada volume yang realistis, ini hanyalah pembulatan kecil dibanding tagihan inferensi itu sendiri &mdash; dan tidak seperti inferensi, inilah bagian yang akan diminta dari Anda. Tetapkan masa retensi dengan sengaja: terlalu pendek dan catatan sudah hilang sebelum pertanyaan datang; tanpa batas dan Anda membayar penyimpanan selamanya tanpa alasan.</p><p>Urutan yang berhasil: tambahkan ID artefak ke telemetri penggunaan yang sudah ada, verifikasi bahwa metadata bertahan melalui satu jalur gambar nyata dari ujung ke ujung, tambahkan label terlihat, lalu putuskan apakah menandatangani manifes sendiri layak dilakukan. Hanya langkah terakhir yang menjadi proyek.</p><h2>Terkait</h2><ul><li><a href=\"/research/how-ai-watermarks-get-destroyed\">Bagaimana watermark AI dihancurkan</a></li><li><a href=\"/research/llm-cost-attribution\">Atribusi biaya LLM</a></li><li><a href=\"/research/ai-observability\">Observabilitas AI</a></li></ul>",
+      "faq": [
+        {
+          "question": "Bisakah saya menambahkan watermark AI ke teks sendiri?",
+          "answer": "Tidak. Watermark teks diterapkan oleh penyedia model selama pembuatan token dan tidak bisa ditambahkan setelahnya, maupun diaktifkan atau dinonaktifkan lewat parameter. Yang bisa Anda tambahkan adalah catatan provenans: ID model, versi, region, timestamp, dan ID artefak."
+        },
+        {
+          "question": "Apa catatan provenans minimum yang layak dipakai?",
+          "answer": "Empat field per artefak yang dihasilkan: ID dan versi model yang tepat, region, timestamp, serta ID artefak yang stabil dan mengikuti output melalui pipeline Anda. Jika Anda sudah mencatat penggunaan untuk atribusi biaya, ID artefak biasanya satu-satunya field yang hilang."
+        },
+        {
+          "question": "Haruskah saya menandatangani manifes C2PA sendiri?",
+          "answer": "Ini peningkatan nyata untuk file yang Anda hasilkan sendiri, tetapi ini proyek, bukan pekerjaan satu sore. Lakukan setelah Anda memiliki log provenans dan memastikan pipeline gambar Anda mempertahankan manifes yang sudah Anda terima."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/how-ai-watermarks-get-destroyed",
+          "label": "Bagaimana watermark AI dihancurkan"
+        },
+        {
+          "slug": "/research/llm-cost-attribution",
+          "label": "Atribusi biaya LLM"
+        },
+        {
+          "slug": "/research/ai-observability",
+          "label": "Observabilitas AI"
+        }
+      ]
+    },
+    "pl": {
+      "title": "Dodaj proweniencję do wyników AI w jeden dzień",
+      "titleCore": "Dodawanie proweniencji do wyników AI",
+      "description": "Nie dodasz samodzielnie znaku wodnego modelu. Możesz dodać zapis, który odpowiada na to samo pytanie, z telemetrii, którą już zbierasz.",
+      "body": "<p>Zacznijmy od tego, czego nie możesz zrobić. Znak wodny w tekście nakłada dostawca modelu podczas generowania; nie ma parametru, który go włącza, wyłącza lub wzmacnia, i nie da się go dodać do tekstu po fakcie. Podpisywanie C2PA również odbywa się w momencie generowania, w przypadku plików tworzonych przez dostawcę. Jeśli chcesz mocniejszego sygnału niż ten, który do Ciebie dociera, odpowiedzią nie jest dodawanie oznaczeń &mdash; tylko dodanie zapisu.</p><p>Ten zapis jest tani, w całości pod Twoją kontrolą i to właśnie on faktycznie powstaje, gdy ktoś prosi o dowód, skąd wziął się wynik. Większość zespołów zbuduje go w jeden dzień, bo dzieli go jedno złączenie od telemetrii, którą i tak zbierają na potrzeby atrybucji kosztów.</p><h2>Cztery pola</h2><p>Dla każdego wygenerowanego artefaktu zapisuj: dokładny <strong>identyfikator i wersję modelu</strong>, <strong>region</strong>, w którym działał, <strong>znacznik czasu</strong> oraz stabilny <strong>identyfikator artefaktu</strong>, który podąża za wynikiem przez cały pipeline. To ostatnie pole jest tym, które zespoły pomijają, a potem żałują, że go nie mają.</p><p>Jeśli już emitujesz rekordy użycia dla każdego żądania na potrzeby atrybucji kosztów, trzy z czterech pól tam są. Zwykle brakuje złączenia: Twoja telemetria kosztów wie, że żądanie miało miejsce i ile kosztowało, ale nie wie, który zapisany artefakt wyprodukowało. Dodanie identyfikatora artefaktu do rekordu użycia zamienia dwa systemy w jedno zapytanie.</p><h2>Zachowaj podpisany manifest, gdy kontrolujesz pipeline</h2><p>Gdy dostawca przekazuje plik podpisany C2PA, cel jest prosty: nie zgubić go. Skonfiguruj transformacje obrazów tak, by jawnie zachowywały metadane, zamiast polegać na ustawieniach domyślnych, i ponownie dołączaj proweniencję po każdym przekodowaniu, które kontrolujesz. Testuj całą ścieżkę od generowania do dostarczenia, a nie samo wyjście modelu.</p><p>Dla plików, które tworzysz sam &mdash; wykres renderowany przez Twoją usługę albo obraz złożony z wygenerowanych części &mdash; możesz podpisać własny manifest C2PA, deklarujący, co zrobiłeś. To realna opcja i prawdziwa poprawa identyfikowalności, ale to projekt, a nie popołudnie pracy, i warto się za niego zabrać dopiero po wdrożeniu powyższego logowania.</p><h2>Oznacz to także dla ludzi</h2><p>Oznaczenie czytelne dla maszyn i widoczne dla użytkownika ujawnienie to różne obowiązki, rozwiązujące różne problemy. Widoczna etykieta &quot;wygenerowano przez AI&quot; nic nie kosztuje, nie jest naruszana przez żadne przekształcenie i to ją użytkownik faktycznie czyta. Nie zastępuje oznaczenia maszynowego, a oznaczenie maszynowe nie zastępuje jej.</p><h2>Ile to kosztuje</h2><p>Cztery małe pola na wygenerowany artefakt, przechowywane tak długo, jak wymaga okno zgodności. Przy realistycznym wolumenie to pomijalny koszt w porównaniu z samym rachunkiem za inferencję &mdash; a w przeciwieństwie do inferencji, to właśnie tę część będziesz musiał przedstawić. Ustaw okres przechowywania świadomie: zbyt krótki i zapis zniknie, zanim pojawi się pytanie; nieograniczony i płacisz za przechowywanie w nieskończoność bez powodu.</p><p>Sprawdzona kolejność: dodaj identyfikator artefaktu do istniejącej telemetrii użycia, zweryfikuj, że metadane przetrwają jedną prawdziwą ścieżkę obrazu od początku do końca, dodaj widoczną etykietę, a dopiero potem zdecyduj, czy warto podpisywać własne manifesty. Projektem jest tylko ostatni krok.</p><h2>Powiązane</h2><ul><li><a href=\"/research/how-ai-watermarks-get-destroyed\">Jak niszczone są znaki wodne AI</a></li><li><a href=\"/research/llm-cost-attribution\">Atrybucja kosztów LLM</a></li><li><a href=\"/research/ai-observability\">Obserwowalność AI</a></li></ul>",
+      "faq": [
+        {
+          "question": "Czy mogę sam dodać znak wodny AI do tekstu?",
+          "answer": "Nie. Znak wodny w tekście nakłada dostawca modelu podczas generowania tokenów i nie można go dodać później ani włączyć czy wyłączyć parametrem. Możesz natomiast dodać zapis proweniencji: identyfikator i wersję modelu, region, znacznik czasu oraz identyfikator artefaktu."
+        },
+        {
+          "question": "Jaki jest minimalny użyteczny zapis proweniencji?",
+          "answer": "Cztery pola na wygenerowany artefakt: dokładny identyfikator i wersja modelu, region, znacznik czasu oraz stabilny identyfikator artefaktu, który podąża za wynikiem przez pipeline. Jeśli już logujesz użycie na potrzeby atrybucji kosztów, zwykle brakuje tylko identyfikatora artefaktu."
+        },
+        {
+          "question": "Czy powinienem podpisywać własne manifesty C2PA?",
+          "answer": "To realna poprawa dla plików, które tworzysz sam, ale jest to projekt, a nie popołudnie pracy. Zrób to po wdrożeniu logu proweniencji i potwierdzeniu, że Twój pipeline obrazów zachowuje manifesty, które już otrzymujesz."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/how-ai-watermarks-get-destroyed",
+          "label": "Jak niszczone są znaki wodne AI"
+        },
+        {
+          "slug": "/research/llm-cost-attribution",
+          "label": "Atrybucja kosztów LLM"
+        },
+        {
+          "slug": "/research/ai-observability",
+          "label": "Obserwowalność AI"
+        }
+      ]
+    },
+    "ru": {
+      "title": "Добавьте провенанс к выводу ИИ за один день",
+      "titleCore": "Добавляем провенанс к выводу ИИ",
+      "description": "Водяной знак модели вы добавить не можете. Можно добавить запись, которая отвечает на тот же вопрос, на основе телеметрии, которую вы, вероятно, уже собираете.",
+      "body": "<p>Начнём с того, что вы сделать не можете. Текстовый водяной знак ставит провайдер модели во время генерации; нет параметра, который включает его, выключает или усиливает, и добавить его к тексту постфактум нельзя. Подпись C2PA тоже ставится при генерации для файлов, которые создаёт провайдер. Если нужен более сильный сигнал, чем тот, что приходит, ответ не в том, чтобы добавить маркировку, а в том, чтобы добавить запись.</p><p>Эта запись дешёвая, полностью находится под вашим контролем и именно она реально предъявляется, когда кто-то просит доказать, откуда взялся вывод. Большинство команд может построить её за день, потому что она находится в одном соединении от телеметрии, которую они уже собирают для атрибуции расходов.</p><h2>Четыре поля</h2><p>Для каждого созданного артефакта записывайте точный <strong>идентификатор модели и версию</strong>, <strong>регион</strong>, в котором она работала, <strong>временную метку</strong> и стабильный <strong>идентификатор артефакта</strong>, который следует за выводом по всему конвейеру. Последнее поле — то, которое команды обычно пропускают и потом жалеют об этом.</p><p>Если вы уже выдаёте записи об использовании по каждому запросу для атрибуции расходов, три из четырёх полей там есть. Обычно не хватает соединения: телеметрия расходов знает, что запрос произошёл и сколько он стоил, но не знает, какой сохранённый артефакт он создал. Добавление идентификатора артефакта в запись об использовании превращает две системы в один запрос.</p><h2>Сохраняйте подписанный манифест, если вы контролируете конвейер</h2><p>Если провайдер передаёт вам файл с подписью C2PA, цель проста: не потерять её. Настройте преобразования изображений так, чтобы метаданные сохранялись явно, а не полагаясь на значения по умолчанию, и заново прикрепляйте провенанс после любого перекодирования, которое контролируете вы. Проверяйте весь путь от генерации до доставки, а не только вывод модели.</p><p>Для файлов, которые вы создаёте сами, например график, который рендерит ваш сервис, или изображение, собранное из сгенерированных частей, можно подписать собственный манифест C2PA с описанием того, что вы сделали. Это реальный вариант и заметное улучшение прослеживаемости, но это проект, а не дело на полдня, и стоит браться за него только после того, как появится описанное выше логирование.</p><h2>Отмечайте и для людей</h2><p>Машиночитаемая маркировка и видимое для пользователя уведомление — разные обязательства, решающие разные задачи. Видимая надпись «создано с помощью ИИ» ничего не стоит, не затрагивается никаким преобразованием конвейера и именно её пользователь реально читает. Она не заменяет машиночитаемую маркировку, и машиночитаемая маркировка не заменяет её.</p><h2>Во что обходится</h2><p>Четыре небольших поля на каждый созданный артефакт, хранящиеся столько, сколько требует ваше окно соответствия требованиям. При любом реалистичном объёме это погрешность уровня копеек на фоне самого счёта за инференс, и, в отличие от инференса, именно это вас попросят предъявить. Срок хранения задавайте осознанно: слишком короткий, и запись пропадёт до того, как придёт вопрос; бесконечный, и вы будете платить за хранение без причины.</p><p>Последовательность, которая работает: добавьте идентификатор артефакта в существующую телеметрию использования, проверьте, что метаданные переживают один реальный путь с изображением от начала до конца, добавьте видимую надпись, а затем решите, стоит ли подписывать собственные манифесты. Только последний шаг — это проект.</p><h2>Связанное</h2><ul><li><a href=\"/research/how-ai-watermarks-get-destroyed\">Как уничтожают водяные знаки ИИ</a></li><li><a href=\"/research/llm-cost-attribution\">Атрибуция расходов на LLM</a></li><li><a href=\"/research/ai-observability\">Наблюдаемость ИИ</a></li></ul>",
+      "faq": [
+        {
+          "question": "Могу ли я сам добавить водяной знак ИИ в текст?",
+          "answer": "Нет. Его ставит провайдер модели во время генерации токенов, и добавить его постфактум нельзя, как и включить или выключить параметром. Вы можете добавить запись о провенансе: идентификатор и версию модели, регион, временную метку и идентификатор артефакта."
+        },
+        {
+          "question": "Какая минимально рабочая запись о провенансе?",
+          "answer": "Четыре поля на каждый созданный артефакт: точный идентификатор и версия модели, регион, временная метка и стабильный идентификатор артефакта, который следует за выводом по конвейеру. Если вы уже ведёте учёт использования для атрибуции расходов, обычно не хватает только идентификатора артефакта."
+        },
+        {
+          "question": "Стоит ли подписывать собственные манифесты C2PA?",
+          "answer": "Для файлов, которые вы создаёте сами, это реальное улучшение, но это проект, а не дело на полдня. Делайте это после того, как появится журнал провенанса и вы убедитесь, что ваш конвейер изображений сохраняет манифесты, которые вы уже получаете."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/how-ai-watermarks-get-destroyed",
+          "label": "Как уничтожают водяные знаки ИИ"
+        },
+        {
+          "slug": "/research/llm-cost-attribution",
+          "label": "Атрибуция расходов на LLM"
+        },
+        {
+          "slug": "/research/ai-observability",
+          "label": "Наблюдаемость ИИ"
+        }
+      ]
+    },
+    "tr": {
+      "title": "AI çıktınıza bir günde köken kaydı ekleyin",
+      "titleCore": "AI çıktısına köken kaydı ekleme",
+      "description": "Modelin filigranını kendiniz ekleyemezsiniz. Aynı soruyu yanıtlayan kaydı, zaten topladığınız telemetriyle ekleyebilirsiniz.",
+      "body": "<p>Önce yapamayacağınız şeyle başlayalım. Metin filigranını, üretim sırasında model sağlayıcısı uygular; bunu açan, kapatan ya da güçlendiren bir parametre yoktur ve sonradan metne eklenemez. C2PA imzalama da sağlayıcının ürettiği dosyalar için üretim anında yapılır. Gelenden daha güçlü bir sinyal istiyorsanız cevap işaret eklemek değil, bir kayıt eklemektir.</p><p>Bu kayıt ucuzdur, tamamen sizin kontrolünüzdedir ve birisi bir çıktının nereden geldiğini kanıtlamanızı istediğinde gerçekten üretilen şey budur. Çoğu ekip bunu bir günde kurabilir, çünkü maliyet atfı için zaten topladığınız telemetriye yalnızca bir join uzaklıktadır.</p><h2>Dört alan</h2><p>Üretilen her artefakt için şunları kaydedin: tam <strong>model kimliği ve sürümü</strong>, çalıştığı <strong>bölge</strong>, <strong>zaman damgası</strong> ve çıktıyı pipeline boyunca izleyen sabit bir <strong>artefakt kimliği</strong>. Ekiplerin atlayıp sonra keşke dediği alan son olanıdır.</p><p>Maliyet atfı için istek başına kullanım kayıtları üretiyorsanız, dört alanın üçü zaten oradadır. Genellikle eksik olan şey join'dir: maliyet telemetriniz bir isteğin gerçekleştiğini ve ne kadar tuttuğunu bilir, ama hangi kayıtlı artefaktı ürettiğini bilmez. Artefakt kimliğini kullanım kaydına eklemek, iki sistemi tek bir sorguya dönüştürür.</p><h2>Pipeline sizdeyse imzalı manifesti koruyun</h2><p>Sağlayıcı size C2PA imzalı bir dosya verdiğinde hedef basittir: kaybetmemek. Görüntü dönüşümlerini varsayılanlara güvenmek yerine metadatayı açıkça koruyacak şekilde yapılandırın ve kontrol ettiğiniz her yeniden kodlamadan sonra köken bilgisini yeniden ekleyin. Yalnızca model çıktısını değil, üretimden teslimata kadar tüm yolu test edin.</p><p>Kendi ürettiğiniz dosyalar için &mdash; servisinizin oluşturduğu bir grafik ya da üretilmiş parçalardan birleştirdiğiniz bir görsel &mdash; yaptığınız işi beyan eden kendi C2PA manifestinizi imzalayabilirsiniz. Bu gerçek bir seçenek ve izlenebilirlikte gerçek bir iyileştirme, ama bir öğleden sonralık iş değil bir projedir ve yalnızca yukarıdaki kayıt oluşturulduktan sonra yapmaya değer.</p><h2>İnsanlar için de işaretleyin</h2><p>Makine tarafından okunabilir işaretleme ve kullanıcıya görünen açıklama, farklı sorunları çözen farklı yükümlülüklerdir. Görünür bir &quot;AI ile üretildi&quot; etiketi eklemek bir maliyet getirmez, hiçbir pipeline dönüşümünden etkilenmez ve kullanıcının gerçekten okuduğu şeydir. Makine tarafından okunabilir işaretlemenin yerini tutmaz; makine tarafından okunabilir işaretleme de onun yerini tutmaz.</p><h2>Çalıştırmanın maliyeti</h2><p>Üretilen artefakt başına dört küçük alan, uyum penceresinizin gerektirdiği süre boyunca saklanır. Gerçekçi herhangi bir hacimde bu, çıkarım faturasının yanında yuvarlama hatası kadardır &mdash; ve çıkarımın aksine, sizden üretmeniz istenecek olan parça budur. Saklama süresini bilinçli belirleyin: çok kısaysa soru geldiğinde kayıt çoktan silinmiştir; sınırsızsa hiçbir neden olmadan sonsuza kadar depolama parası ödersiniz.</p><p>İşe yarayan sıra şudur: mevcut kullanım telemetrinize artefakt kimliğini ekleyin, metadatanın gerçek bir görüntü yolunda uçtan uca sağkaldığını doğrulayın, görünür etiketi ekleyin, sonra kendi manifestlerinizi imzalamanın değip değmeyeceğine karar verin. Yalnızca son adım bir projedir.</p><h2>İlgili</h2><ul><li><a href=\"/research/how-ai-watermarks-get-destroyed\">AI filigranları nasıl yok edilir</a></li><li><a href=\"/research/llm-cost-attribution\">LLM maliyet atfı</a></li><li><a href=\"/research/ai-observability\">AI gözlemlenebilirliği</a></li></ul>",
+      "faq": [
+        {
+          "question": "Metne AI filigranını kendim ekleyebilir miyim?",
+          "answer": "Hayır. Filigranı model sağlayıcısı üretim sırasında uygular; sonradan eklenemez ve bir parametreyle açılıp kapatılamaz. Ekleyebileceğiniz şey bir köken kaydıdır: model kimliği ve sürümü, bölge, zaman damgası ve artefakt kimliği."
+        },
+        {
+          "question": "Asgari uygulanabilir köken kaydı nedir?",
+          "answer": "Üretilen artefakt başına dört alan: tam model kimliği ve sürümü, bölge, zaman damgası ve pipeline boyunca çıktıyı izleyen sabit bir artefakt kimliği. Maliyet atfı için zaten kullanım kaydı tutuyorsanız, genellikle eksik olan tek alan artefakt kimliğidir."
+        },
+        {
+          "question": "Kendi C2PA manifestlerimi imzalamalı mıyım?",
+          "answer": "Kendi ürettiğiniz dosyalar için gerçek bir iyileştirmedir, ama bir öğleden sonralık iş değil bir projedir. Önce köken kaydına sahip olun ve görüntü pipeline'ınızın aldığınız manifestleri koruduğunu doğrulayın; ondan sonra yapın."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/how-ai-watermarks-get-destroyed",
+          "label": "AI filigranları nasıl yok edilir"
+        },
+        {
+          "slug": "/research/llm-cost-attribution",
+          "label": "LLM maliyet atfı"
+        },
+        {
+          "slug": "/research/ai-observability",
+          "label": "AI gözlemlenebilirliği"
+        }
+      ]
+    },
+    "vi": {
+      "title": "Thêm nguồn gốc cho đầu ra AI của bạn trong một ngày",
+      "titleCore": "Thêm nguồn gốc cho đầu ra AI",
+      "description": "Bạn không thể tự thêm watermark của mô hình. Bạn có thể thêm bản ghi trả lời cùng câu hỏi, dùng telemetry mà có lẽ bạn đang thu thập sẵn.",
+      "body": "<p>Hãy bắt đầu với điều bạn không thể làm. Watermark văn bản được nhà cung cấp mô hình áp dụng trong lúc sinh nội dung; không có tham số nào bật, tắt hay tăng cường nó, và bạn không thể thêm vào văn bản sau khi đã tạo. Ký C2PA cũng diễn ra lúc sinh nội dung đối với các tệp do nhà cung cấp tạo ra. Nếu bạn muốn một tín hiệu mạnh hơn những gì đến tay mình, câu trả lời không phải là thêm đánh dấu, mà là thêm một bản ghi.</p><p>Bản ghi đó rẻ, hoàn toàn nằm dưới sự kiểm soát của bạn, và chính nó là thứ được tạo ra khi có người yêu cầu bạn chứng minh một đầu ra đến từ đâu. Hầu hết các đội có thể xây nó trong một ngày, vì nó chỉ cách một phép join khỏi telemetry mà họ đã thu thập để phân bổ chi phí.</p><h2>Bốn trường</h2><p>Với mỗi artefact được sinh ra, hãy ghi lại: <strong>ID và phiên bản chính xác của model</strong>, <strong>vùng</strong> nơi nó chạy, <strong>dấu thời gian</strong>, và một <strong>ID artefact</strong> ổn định theo đầu ra xuyên suốt pipeline của bạn. Trường cuối cùng là trường mà các đội hay bỏ qua và về sau ước giá mình đã có.</p><p>Nếu bạn đã phát bản ghi sử dụng theo từng yêu cầu để phân bổ chi phí, thì ba trong bốn trường đã có sẵn. Thứ thường còn thiếu là phép join: telemetry chi phí của bạn biết rằng một yêu cầu đã xảy ra và nó tốn bao nhiêu, nhưng không biết artefact lưu trữ nào do nó tạo ra. Thêm ID artefact vào bản ghi sử dụng sẽ biến hai hệ thống thành một truy vấn.</p><h2>Giữ manifest đã ký khi bạn kiểm soát pipeline</h2><p>Khi nhà cung cấp giao cho bạn một tệp đã ký C2PA, mục tiêu rất đơn giản: đừng làm mất nó. Cấu hình phép biến đổi ảnh để giữ metadata một cách tường minh thay vì tin vào mặc định, và gắn lại nguồn gốc sau mọi lần mã hóa lại mà bạn kiểm soát. Kiểm thử toàn bộ đường đi từ lúc sinh đến lúc giao, không chỉ đầu ra của model.</p><p>Với những tệp do chính bạn tạo ra, chẳng hạn một biểu đồ do dịch vụ của bạn render hoặc một ảnh bạn ghép từ các phần được sinh, bạn có thể ký manifest C2PA của riêng mình để khẳng định những gì bạn đã làm. Đây là một lựa chọn thực sự và là cải thiện thật về khả năng truy vết, nhưng nó là một dự án chứ không phải việc của một buổi chiều, và chỉ đáng làm sau khi đã có nhật ký ở trên.</p><h2>Đánh dấu cho cả con người</h2><p>Đánh dấu đọc được bằng máy và thông báo hiển thị cho người dùng là hai nghĩa vụ khác nhau giải quyết những vấn đề khác nhau. Một nhãn hiển thị &quot;được tạo bằng AI&quot; không tốn gì để thêm, không bị ảnh hưởng bởi bất kỳ phép biến đổi nào trong pipeline, và là thứ người dùng thực sự đọc. Nó không thể thay thế đánh dấu bằng máy, và đánh dấu bằng máy cũng không thể thay thế nó.</p><h2>Chi phí vận hành</h2><p>Bốn trường nhỏ cho mỗi artefact được sinh, giữ lại trong suốt khoảng thời gian tuân thủ của bạn yêu cầu. Với bất kỳ khối lượng thực tế nào, đây chỉ là sai số làm tròn so với chính hóa đơn suy luận, và không giống suy luận, đây là phần bạn sẽ được yêu cầu cung cấp. Hãy đặt thời hạn lưu giữ một cách có chủ đích: quá ngắn thì bản ghi đã mất trước khi câu hỏi đến; không giới hạn thì bạn trả tiền lưu trữ mãi mà không có lý do.</p><p>Chuỗi bước hiệu quả là: thêm ID artefact vào telemetry sử dụng hiện có, kiểm chứng metadata còn nguyên sau một đường ảnh thực tế từ đầu đến cuối, thêm nhãn hiển thị, rồi mới quyết định có đáng ký manifest của riêng mình hay không. Chỉ bước cuối cùng mới là một dự án.</p><h2>Liên quan</h2><ul><li><a href=\"/research/how-ai-watermarks-get-destroyed\">Watermark AI bị phá hủy như thế nào</a></li><li><a href=\"/research/llm-cost-attribution\">Phân bổ chi phí LLM</a></li><li><a href=\"/research/ai-observability\">Khả năng quan sát AI</a></li></ul>",
+      "faq": [
+        {
+          "question": "Tôi có thể tự thêm watermark AI vào văn bản không?",
+          "answer": "Không. Watermark văn bản được nhà cung cấp mô hình áp dụng trong lúc sinh token và không thể thêm sau đó, cũng không thể bật hay tắt bằng tham số. Điều bạn có thể thêm là một bản ghi nguồn gốc: ID model, phiên bản, vùng, dấu thời gian và ID artefact."
+        },
+        {
+          "question": "Bản ghi nguồn gốc tối thiểu cần có là gì?",
+          "answer": "Bốn trường cho mỗi artefact được sinh: ID và phiên bản chính xác của model, vùng, dấu thời gian, và một ID artefact ổn định theo đầu ra xuyên suốt pipeline. Nếu bạn đã ghi log sử dụng để phân bổ chi phí, thì thường chỉ còn thiếu trường ID artefact."
+        },
+        {
+          "question": "Tôi có nên tự ký manifest C2PA không?",
+          "answer": "Đó là một cải thiện thực sự với các tệp do chính bạn tạo ra, nhưng nó là một dự án chứ không phải việc của một buổi chiều. Hãy làm sau khi bạn đã có nhật ký nguồn gốc và xác nhận pipeline ảnh của mình giữ được các manifest mà bạn đang nhận."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/how-ai-watermarks-get-destroyed",
+          "label": "Watermark AI bị phá hủy như thế nào"
+        },
+        {
+          "slug": "/research/llm-cost-attribution",
+          "label": "Phân bổ chi phí LLM"
+        },
+        {
+          "slug": "/research/ai-observability",
+          "label": "Khả năng quan sát AI"
+        }
+      ]
+    },
+    "ar": {
+      "title": "أضف إثبات المصدر لمخرجات الذكاء الاصطناعي في يوم",
+      "titleCore": "أضف إثبات المصدر لمخرجات الذكاء الاصطناعي",
+      "description": "لا يمكنك إضافة العلامة المائية للنموذج بنفسك، لكن يمكنك إضافة السجل الذي يجيب عن السؤال نفسه، بقياس عن بُعد تجمعه على الأرجح أصلاً.",
+      "body": "<p>ابدأ بما لا تستطيع فعله. العلامة المائية للنص يطبقها مزود النموذج أثناء التوليد؛ لا يوجد معامل يشغّلها أو يوقفها أو يرفع قوتها، ولا يمكنك إضافتها إلى النص بعد ذلك. وكذلك يجري توقيع C2PA عند التوليد للملفات التي ينتجها المزود. فإذا أردت إشارة أقوى مما يصلك، فالحل ليس إضافة وسم &mdash; بل إضافة سجل.</p><p>هذا السجل رخيص، وهو بالكامل تحت سيطرتك، وهو ما سيُطلب منك فعلاً عندما يطلب أحدهم إثبات مصدر مخرَج ما. يستطيع معظم الفرق بناءه في يوم واحد، لأنه على بُعد عملية ربط واحدة من القياس عن بُعد الذي تجمعه أصلاً لإسناد التكلفة.</p><h2>الحقول الأربعة</h2><p>لكل ناتج مولَّد، سجّل: <strong>معرّف النموذج وإصداره</strong> بدقة، و<strong>المنطقة</strong> التي عمل فيها، و<strong>الطابع الزمني</strong>، و<strong>معرّف الناتج</strong> الثابت الذي يرافق المخرَج عبر مسار عملك. الحقل الأخير هو ما تتجاهله الفرق ثم تتمنى لاحقاً لو امتلكته.</p><p>إذا كنت تصدر أصلاً سجلات استخدام لكل طلب لإسناد التكلفة، فثلاثة من الحقول الأربعة موجودة فيها. الناقص عادةً هو الربط: قياس التكلفة لديك يعرف أن طلباً حدث وكم كلّف، لكنه لا يعرف أي ناتج مخزَّن أنتجه. وإضافة معرّف الناتج إلى سجل الاستخدام تحوّل نظامين إلى استعلام واحد.</p><h2>احتفظ بالبيان الموقَّع حين تتحكم في المسار</h2><p>حين يسلّمك المزود ملفاً موقَّعاً بـ C2PA فالهدف بسيط: لا تفقده. اضبط تحويلات الصور لتحافظ على البيانات الوصفية صراحةً بدلاً من الاعتماد على الإعدادات الافتراضية، وأعد إرفاق إثبات المصدر بعد أي إعادة ترميز تتحكم فيها. اختبر المسار كاملاً من التوليد إلى التسليم، لا مخرجات النموذج وحدها.</p><p>أما الملفات التي تنتجها بنفسك &mdash; مخطط تُصيّره خدمتك، أو صورة تركّبها من أجزاء مولَّدة &mdash; فيمكنك توقيع بيان C2PA خاص بك يقرّر ما فعلته. هذا خيار حقيقي وتحسين فعلي للتتبّع، لكنه مشروع لا عمل عصر يوم، ولا يستحق الإنجاز إلا بعد أن يوجد التسجيل أعلاه.</p><h2>ضع علامة للبشر أيضاً</h2><p>الوسم المقروء آلياً والإفصاح الظاهر للمستخدم التزامان مختلفان يعالجان مشكلتين مختلفتين. ملصق ظاهر بعبارة &quot;مولَّد بالذكاء الاصطناعي&quot; لا يكلّف شيئاً، ولا يتأثر بأي تحويل في المسار، وهو ما يقرؤه المستخدم فعلاً. وهو ليس بديلاً عن الوسم المقروء آلياً، كما أن الوسم المقروء آلياً ليس بديلاً عنه.</p><h2>كم يكلّف تشغيله</h2><p>أربعة حقول صغيرة لكل ناتج مولَّد، تُحفظ طوال مدة نافذة الامتثال لديك. وعلى أي حجم واقعي فهي خطأ تقريب أمام فاتورة الاستدلال نفسها &mdash; وعلى خلاف الاستدلال، هي الجزء الذي سيُطلب منك تقديمه. حدّد مدة الاحتفاظ عن قصد: إن كانت قصيرة جداً اختفى السجل قبل أن يصل السؤال، وإن كانت بلا حد فأنت تدفع ثمن التخزين إلى الأبد بلا سبب.</p><p>التسلسل الذي ينجح: أضف معرّف الناتج إلى قياس الاستخدام الحالي، وتحقق من أن البيانات الوصفية تصمد في مسار صور حقيقي واحد من أوله إلى آخره، وأضف الملصق الظاهر، ثم قرر هل يستحق توقيع بياناتك الخاصة العناء. الخطوة الأخيرة وحدها هي المشروع.</p><h2>ذات صلة</h2><ul><li><a href=\"/research/how-ai-watermarks-get-destroyed\">كيف تُدمَّر العلامات المائية للذكاء الاصطناعي</a></li><li><a href=\"/research/llm-cost-attribution\">إسناد تكلفة LLM</a></li><li><a href=\"/research/ai-observability\">مراقبة الذكاء الاصطناعي</a></li></ul>",
+      "faq": [
+        {
+          "question": "هل أستطيع إضافة العلامة المائية للنص بنفسي؟",
+          "answer": "لا. العلامة المائية للنص يطبقها مزود النموذج أثناء توليد الرموز ولا يمكن إضافتها بعد ذلك، ولا تشغيلها أو إيقافها بمعامل. ما يمكنك إضافته هو سجل إثبات المصدر: معرّف النموذج والإصدار والمنطقة والطابع الزمني ومعرّف الناتج."
+        },
+        {
+          "question": "ما الحد الأدنى القابل للتطبيق لسجل إثبات المصدر؟",
+          "answer": "أربعة حقول لكل ناتج مولَّد: معرّف النموذج والإصدار بدقة، والمنطقة، والطابع الزمني، ومعرّف ناتج ثابت يرافق المخرَج عبر مسارك. إذا كنت تسجل الاستخدام أصلاً لإسناد التكلفة فمعرّف الناتج عادةً هو الحقل الوحيد الناقص."
+        },
+        {
+          "question": "هل يجب أن أوقّع بيانات C2PA الخاصة بي؟",
+          "answer": "هو تحسين حقيقي للملفات التي تنتجها بنفسك، لكنه مشروع لا عمل عصر يوم. افعله بعد أن يتوفر سجل إثبات المصدر وبعد التأكد من أن مسار الصور لديك يحافظ على البيانات التي تتلقاها أصلاً."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/how-ai-watermarks-get-destroyed",
+          "label": "كيف تُدمَّر العلامات المائية للذكاء الاصطناعي"
+        },
+        {
+          "slug": "/research/llm-cost-attribution",
+          "label": "إسناد تكلفة LLM"
+        },
+        {
+          "slug": "/research/ai-observability",
+          "label": "مراقبة الذكاء الاصطناعي"
+        }
+      ]
+    },
+    "it": {
+      "title": "Aggiungi provenienza al tuo output IA in un giorno",
+      "titleCore": "Aggiungere provenienza all'output IA",
+      "description": "Non puoi aggiungere da solo la filigrana del modello. Puoi però aggiungere il registro che risponde alla stessa domanda, usando la telemetria che già raccogli.",
+      "body": "<p>Partiamo da ciò che non puoi fare. La filigrana sul testo viene applicata dal provider del modello durante la generazione: non esiste un parametro che la attivi, la disattivi o la rafforzi, e non puoi aggiungerla al testo a posteriori. Anche la firma C2PA avviene in fase di generazione per i file prodotti dal provider. Se vuoi un segnale più forte di quello che arriva, la risposta non è aggiungere marcature &mdash; è aggiungere un registro.</p><p>Quel registro costa poco, è interamente sotto il tuo controllo, ed è esattamente ciò che serve quando qualcuno ti chiede di dimostrare da dove viene un output. La maggior parte dei team lo costruisce in un giorno, perché dista un solo join dalla telemetria che già raccolgono per l'attribuzione dei costi.</p><h2>I quattro campi</h2><p>Per ogni artefatto generato registra: l'<strong>ID e la versione esatti del modello</strong>, la <strong>regione</strong> in cui è stato eseguito, il <strong>timestamp</strong> e un <strong>ID artefatto</strong> stabile che segua l'output lungo la pipeline. Quest'ultimo è il campo che i team saltano e poi rimpiangono.</p><p>Se già emetti record di utilizzo per richiesta per l'attribuzione dei costi, tre dei quattro sono lì. Di solito manca il join: la tua telemetria dei costi sa che una richiesta c'è stata e quanto è costata, ma non quale artefatto salvato ha prodotto. Aggiungere l'ID artefatto al record di utilizzo trasforma due sistemi in una sola query.</p><h2>Conserva il manifest firmato quando controlli la pipeline</h2><p>Quando il provider ti consegna un file firmato C2PA, l'obiettivo è semplice: non perderlo. Configura le trasformazioni delle immagini per preservare esplicitamente i metadati invece di affidarti ai default, e ricollega la provenienza dopo ogni ricodifica che controlli tu. Testa l'intero percorso dalla generazione alla consegna, non solo l'output del modello.</p><p>Per i file che produci tu stesso &mdash; un grafico generato dal tuo servizio, un'immagine composta da parti generate &mdash; puoi firmare un tuo manifest C2PA che dichiari cosa hai fatto. È un'opzione reale e un miglioramento concreto della tracciabilità, ma è un progetto, non un pomeriggio, e conviene farlo solo dopo che esiste il logging descritto sopra.</p><h2>Marcalo anche per le persone</h2><p>La marcatura leggibile dalle macchine e l'avviso visibile all'utente sono obblighi diversi che risolvono problemi diversi. Un'etichetta visibile &quot;generato con IA&quot; non costa nulla da aggiungere, non è toccata da nessuna trasformazione della pipeline ed è ciò che l'utente legge davvero. Non sostituisce la marcatura automatica, e la marcatura automatica non sostituisce lei.</p><h2>Quanto costa mantenerlo</h2><p>Quattro piccoli campi per ogni artefatto generato, conservati per tutto il tempo richiesto dalla tua finestra di conformità. Su qualunque volume realistico è un arrotondamento rispetto alla fattura di inferenza &mdash; e, a differenza dell'inferenza, è la parte che ti verrà chiesto di produrre. Imposta il periodo di conservazione con cura: troppo breve e il registro sparisce prima che arrivi la domanda; illimitato e paghi lo storage per sempre senza motivo.</p><p>La sequenza che funziona: aggiungi l'ID artefatto alla telemetria di utilizzo esistente, verifica che i metadati sopravvivano a un vero percorso immagine dall'inizio alla fine, aggiungi l'etichetta visibile, poi decidi se firmare i tuoi manifest vale la pena. Solo l'ultimo passo è un progetto.</p><h2>Correlati</h2><ul><li><a href=\"/research/how-ai-watermarks-get-destroyed\">Come vengono distrutte le filigrane IA</a></li><li><a href=\"/research/llm-cost-attribution\">Attribuzione dei costi LLM</a></li><li><a href=\"/research/ai-observability\">Osservabilità IA</a></li></ul>",
+      "faq": [
+        {
+          "question": "Posso aggiungere io la filigrana IA al testo?",
+          "answer": "No. La filigrana sul testo viene applicata dal provider durante la generazione dei token e non può essere aggiunta dopo, né attivata o disattivata con un parametro. Quello che puoi aggiungere è un registro di provenienza: ID e versione del modello, regione, timestamp e ID artefatto."
+        },
+        {
+          "question": "Qual è il registro di provenienza minimo utile?",
+          "answer": "Quattro campi per ogni artefatto generato: ID e versione esatti del modello, regione, timestamp e un ID artefatto stabile che segua l'output lungo la pipeline. Se già registri l'utilizzo per l'attribuzione dei costi, di solito l'unico campo mancante è l'ID artefatto."
+        },
+        {
+          "question": "Conviene firmare i miei manifest C2PA?",
+          "answer": "Per i file che produci tu è un vero miglioramento, ma è un progetto, non un pomeriggio. Fallo dopo aver attivato il registro di provenienza e aver verificato che la tua pipeline immagini conservi i manifest che già ricevi."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/how-ai-watermarks-get-destroyed",
+          "label": "Come vengono distrutte le filigrane IA"
+        },
+        {
+          "slug": "/research/llm-cost-attribution",
+          "label": "Attribuzione dei costi LLM"
+        },
+        {
+          "slug": "/research/ai-observability",
+          "label": "Osservabilità IA"
+        }
+      ]
+    },
+    "ko": {
+      "title": "하루면 AI 출력에 출처 기록을 추가할 수 있습니다",
+      "titleCore": "AI 출력에 출처 기록 추가하기",
+      "description": "모델의 워터마크는 직접 추가할 수 없습니다. 같은 질문에 답하는 기록은 이미 수집하고 있는 텔레메트리를 이용해 추가할 수 있습니다.",
+      "body": "<p>먼저 할 수 없는 일부터 짚겠습니다. 텍스트 워터마크는 생성 과정에서 모델 제공자가 적용하는 것입니다. 이를 켜거나 끄거나 강도를 조절하는 파라미터는 없고, 생성이 끝난 텍스트에 사후에 넣을 수도 없습니다. C2PA 서명 역시 제공자가 만드는 파일에 대해서는 생성 시점에 이루어집니다. 받은 신호보다 더 강한 신호를 원한다면 답은 마킹을 추가하는 것이 아니라 기록을 추가하는 것입니다.</p><p>그 기록은 비용이 적게 들고, 전적으로 여러분의 통제 아래 있으며, 누군가 출력의 출처를 증명하라고 요청할 때 실제로 제시하게 되는 것입니다. 대부분의 팀은 하루 안에 만들 수 있습니다. 비용 귀속을 위해 이미 수집하고 있는 텔레메트리에서 조인 한 번이면 되기 때문입니다.</p><h2>네 가지 필드</h2><p>생성된 모든 산출물마다 다음을 기록하십시오. 정확한 <strong>모델 ID와 버전</strong>, 실행된 <strong>리전</strong>, <strong>타임스탬프</strong>, 그리고 파이프라인을 따라 출력을 추적하는 안정적인 <strong>산출물 ID</strong>입니다. 마지막 항목은 팀들이 흔히 빠뜨렸다가 나중에 아쉬워하는 필드입니다.</p><p>비용 귀속을 위해 요청별 사용 기록을 이미 남기고 있다면, 네 가지 중 세 가지는 이미 들어 있습니다. 보통 빠져 있는 것은 조인입니다. 비용 텔레메트리는 요청이 있었고 그 비용이 얼마였는지는 알지만, 그 요청이 어떤 저장된 산출물을 만들었는지는 모릅니다. 사용 기록에 산출물 ID를 추가하면 두 시스템이 하나의 쿼리로 연결됩니다.</p><h2>파이프라인을 직접 통제한다면 서명된 매니페스트를 보존하십시오</h2><p>제공자가 C2PA 서명된 파일을 넘겨준다면 목표는 단순합니다. 잃어버리지 않는 것입니다. 기본값을 믿지 말고 이미지 변환 설정에서 메타데이터를 명시적으로 보존하도록 지정하고, 직접 통제하는 재인코딩을 거칠 때마다 출처 정보를 다시 붙이십시오. 모델 출력만이 아니라 생성부터 전달까지 전체 경로를 테스트하십시오.</p><p>직접 만든 파일, 예를 들어 서비스가 렌더링하는 차트나 생성된 부품을 조합한 이미지라면, 여러분이 무엇을 했는지 주장하는 자체 C2PA 매니페스트에 서명할 수 있습니다. 이것은 실제로 쓸 수 있는 선택지이고 추적 가능성도 분명히 좋아지지만, 오후 한나절 일이 아니라 프로젝트입니다. 위의 로깅이 갖춰진 뒤에만 할 가치가 있습니다.</p><h2>사람을 위한 표시도 하십시오</h2><p>기계가 읽는 마킹과 사용자에게 보이는 고지는 서로 다른 문제를 푸는 서로 다른 의무입니다. 눈에 보이는 &quot;AI로 생성됨&quot; 라벨은 추가하는 데 비용이 없고, 어떤 파이프라인 변환에도 영향을 받지 않으며, 사용자가 실제로 읽는 것입니다. 기계가 읽는 마킹을 대신하지 못하고, 기계가 읽는 마킹도 이것을 대신하지 못합니다.</p><h2>운영 비용</h2><p>생성된 산출물마다 작은 필드 네 개를 두고, 규정 준수 기간이 요구하는 만큼 보관하면 됩니다. 현실적인 규모에서 이것은 추론 청구서에 비하면 반올림 오차 수준입니다. 그리고 추론과 달리, 나중에 제출해야 할 것은 바로 이 부분입니다. 보관 기간은 신중하게 정하십시오. 너무 짧으면 질문이 도착하기 전에 기록이 사라지고, 무제한이면 아무 이유 없이 영원히 저장 비용을 내게 됩니다.</p><p>효과가 있는 순서는 다음과 같습니다. 기존 사용 텔레메트리에 산출물 ID를 추가하고, 실제 이미지 경로 하나를 끝까지 따라가며 메타데이터가 살아남는지 확인하고, 눈에 보이는 라벨을 추가한 다음, 직접 매니페스트에 서명할 가치가 있는지 결정하십시오. 프로젝트가 되는 것은 마지막 단계뿐입니다.</p><h2>관련 글</h2><ul><li><a href=\"/research/how-ai-watermarks-get-destroyed\">AI 워터마크는 어떻게 파괴되는가</a></li><li><a href=\"/research/llm-cost-attribution\">LLM 비용 귀속</a></li><li><a href=\"/research/ai-observability\">AI 옵저버빌리티</a></li></ul>",
+      "faq": [
+        {
+          "question": "AI 워터마크를 텍스트에 직접 넣을 수 있습니까?",
+          "answer": "아니요. 텍스트 워터마크는 토큰 생성 과정에서 모델 제공자가 적용하며, 생성 후에는 추가할 수 없고 파라미터로 켜거나 끌 수도 없습니다. 여러분이 추가할 수 있는 것은 출처 기록입니다. 모델 ID, 버전, 리전, 타임스탬프, 산출물 ID가 여기에 해당합니다."
+        },
+        {
+          "question": "최소한으로 필요한 출처 기록은 무엇입니까?",
+          "answer": "생성된 산출물마다 네 가지 필드입니다. 정확한 모델 ID와 버전, 리전, 타임스탬프, 그리고 파이프라인을 따라가는 안정적인 산출물 ID입니다. 비용 귀속을 위해 사용량을 이미 기록하고 있다면, 보통 빠진 필드는 산출물 ID 하나뿐입니다."
+        },
+        {
+          "question": "직접 C2PA 매니페스트에 서명해야 합니까?",
+          "answer": "직접 만든 파일에는 실제로 개선이 됩니다. 하지만 오후 한나절이 아니라 프로젝트입니다. 출처 로그를 갖춘 뒤에, 그리고 받은 매니페스트를 이미지 파이프라인이 보존하는지 확인한 뒤에 하십시오."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/how-ai-watermarks-get-destroyed",
+          "label": "AI 워터마크는 어떻게 파괴되는가"
+        },
+        {
+          "slug": "/research/llm-cost-attribution",
+          "label": "LLM 비용 귀속"
+        },
+        {
+          "slug": "/research/ai-observability",
+          "label": "AI 옵저버빌리티"
+        }
+      ]
+    },
+    "nl": {
+      "title": "Voeg herkomst toe aan je AI-output in één dag",
+      "titleCore": "Voeg herkomst toe aan je AI-output",
+      "description": "Je kunt het watermerk van het model niet zelf toevoegen. Wel de registratie die dezelfde vraag beantwoordt, met telemetrie die je al verzamelt.",
+      "body": "<p>Begin met wat je niet kunt doen. Het tekstwatermerk wordt door de modelprovider tijdens het genereren toegepast; er is geen parameter die het aan, uit of sterker zet, en je kunt het achteraf niet aan tekst toevoegen. C2PA-ondertekening gebeurt eveneens bij het genereren, voor bestanden die de provider aanmaakt. Wil je een sterker signaal dan wat er binnenkomt, dan is het antwoord niet meer markering toevoegen &mdash; het is een registratie toevoegen.</p><p>Die registratie is goedkoop, staat volledig onder jouw controle, en is precies wat er daadwerkelijk ontstaat als iemand vraagt te bewijzen waar een output vandaan kwam. De meeste teams kunnen hem in een dag bouwen, omdat hij één join verwijderd is van telemetrie die ze al verzamelen voor kostentoerekening.</p><h2>De vier velden</h2><p>Log voor elk gegenereerd artefact: de exacte <strong>model-ID en versie</strong>, de <strong>regio</strong> waarin het draaide, het <strong>tijdstip</strong>, en een stabiele <strong>artefact-ID</strong> die de output door je pijplijn volgt. Dat laatste veld wordt meestal overgeslagen en later betreurd.</p><p>Als je al usage-records per verzoek wegschrijft voor kostentoerekening, staan er drie van de vier al in. Wat meestal ontbreekt is de join: je kostentelemetrie weet dat een verzoek plaatsvond en wat het kostte, maar niet welk opgeslagen artefact het opleverde. Het artefact-ID aan het usage-record toevoegen maakt van twee systemen één query.</p><h2>Bewaar het ondertekende manifest als je de pijplijn beheert</h2><p>Als de provider je een C2PA-ondertekend bestand geeft, is het doel simpel: verlies het niet. Stel beeldtransformaties zo in dat metadata expliciet behouden blijft in plaats van op standaardinstellingen te vertrouwen, en voeg herkomstgegevens opnieuw toe na elke herencodering die je zelf uitvoert. Test het hele traject van generatie tot levering, niet alleen de modeloutput.</p><p>Voor bestanden die je zelf maakt &mdash; een grafiek die je dienst rendert, een afbeelding die je samenstelt uit gegenereerde delen &mdash; kun je een eigen C2PA-manifest ondertekenen waarin staat wat je deed. Dat is een echte optie en een echte verbetering in traceerbaarheid, maar het is een project en geen middag werk. Doe het pas nadat bovenstaande logging er staat.</p><h2>Markeer het ook zichtbaar voor mensen</h2><p>Machineleesbare markering en zichtbare openbaarmaking aan gebruikers zijn verschillende verplichtingen voor verschillende problemen. Een zichtbaar label &quot;gegenereerd met AI&quot; kost niets, wordt door geen enkele pijplijntransformatie beïnvloed, en is wat een gebruiker daadwerkelijk leest. Het vervangt machineleesbare markering niet, en andersom ook niet.</p><h2>Wat het kost om te draaien</h2><p>Vier kleine velden per gegenereerd artefact, bewaard zolang je compliancevenster dat vereist. Bij elk realistisch volume is dit afrondingsverschil ten opzichte van de inferentiefactuur zelf &mdash; en anders dan de inferentie is dit het deel dat je zult moeten overleggen. Stel de bewaartermijn bewust in: te kort en de registratie is weg voordat de vraag komt; onbeperkt en je betaalt eeuwig opslag voor niets.</p><p>De volgorde die werkt: voeg het artefact-ID toe aan je bestaande usage-telemetrie, controleer of metadata één echt beeldtraject van begin tot eind overleeft, voeg het zichtbare label toe, en beslis dan of eigen manifesten ondertekenen de moeite waard is. Alleen die laatste stap is een project.</p><h2>Gerelateerd</h2><ul><li><a href=\"/research/how-ai-watermarks-get-destroyed\">Hoe AI-watermerken worden vernietigd</a></li><li><a href=\"/research/llm-cost-attribution\">Kostentoerekening voor LLM's</a></li><li><a href=\"/research/ai-observability\">AI-observability</a></li></ul>",
+      "faq": [
+        {
+          "question": "Kan ik zelf het AI-watermerk aan tekst toevoegen?",
+          "answer": "Nee. Het tekstwatermerk wordt door de modelprovider tijdens het genereren van tokens toegepast en kan achteraf niet worden toegevoegd, ook niet met een parameter aan- of uitgezet. Wat je wel kunt toevoegen is een herkomstregistratie: model-ID, versie, regio, tijdstip en artefact-ID."
+        },
+        {
+          "question": "Wat is het minimale bruikbare herkomstrecord?",
+          "answer": "Vier velden per gegenereerd artefact: exacte model-ID en versie, regio, tijdstip, en een stabiel artefact-ID dat de output door je pijplijn volgt. Log je al usage voor kostentoerekening, dan ontbreekt meestal alleen het artefact-ID."
+        },
+        {
+          "question": "Moet ik mijn eigen C2PA-manifesten ondertekenen?",
+          "answer": "Voor bestanden die je zelf maakt is het een echte verbetering, maar het is een project en geen middag werk. Doe het pas nadat je het herkomstlogboek hebt en hebt bevestigd dat je beeldpijplijn de manifesten behoudt die je al ontvangt."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/how-ai-watermarks-get-destroyed",
+          "label": "Hoe AI-watermerken worden vernietigd"
+        },
+        {
+          "slug": "/research/llm-cost-attribution",
+          "label": "Kostentoerekening voor LLM's"
+        },
+        {
+          "slug": "/research/ai-observability",
+          "label": "AI-observability"
+        }
+      ]
+    },
+    "zh": {
+      "title": "一天内为 AI 输出添加溯源记录",
+      "titleCore": "为 AI 输出添加溯源记录",
+      "description": "水印不能由你自己加，但可以记录能回答同一问题的信息，所用的遥测数据你很可能已经在收集。",
+      "body": "<p>先说你做不到的事。文本水印是由模型提供商在生成过程中嵌入的；没有任何参数能开启、关闭或调高它，也无法事后为文本添加。C2PA 签名同样发生在供应商生成文件的那一刻。如果你想要比现有信号更强的标识，答案不是自己加水印，而是加一份记录。</p><p>这份记录成本低，完全由你掌控，也正是有人要求你证明某个输出来源时真正能拿出来的东西。大多数团队一天之内就能做完，因为它只差一次关联，就能接上你为成本归因已经在收集的遥测数据。</p><h2>四个字段</h2><p>对每个生成的产物，记录：确切的<strong>模型 ID 和版本</strong>、运行所在的<strong>区域</strong>、<strong>时间戳</strong>，以及一个稳定的<strong>产物 ID</strong>，让它在你的流水线中一路跟随输出。最后这一项最常被跳过，事后又最让人后悔没有。</p><p>如果你已经为成本归因输出了逐请求的用量记录，那四项中有三项已经在里面了。通常缺的是关联：成本遥测知道一次请求发生了、花了多少钱，却不知道它产出了哪个已存储的产物。把产物 ID 加进用量记录，两套系统就合并成了一次查询。</p><h2>签名清单要在你控制流水线时保留</h2><p>如果供应商交给你的是经 C2PA 签名的文件，目标很简单：别弄丢它。对图像变换要显式配置保留元数据，而不是依赖默认值；在你控制的任何重新编码之后，重新附加溯源信息。要测试从生成到交付的整条路径，而不只是模型输出本身。</p><p>对于你自己生成的文件——比如服务渲染的图表，或由生成部件合成的图像——你可以签署自己的 C2PA 清单，声明你做了什么。这是真实可行的选择，也确实提升了可追溯性，但它是一个项目，而不是一个下午的工作，而且应该在上述日志建好之后再做。</p><h2>也要给人看的标识</h2><p>机器可读的标识与用户可见的披露，是解决不同问题的两种义务。一个可见的“由 AI 生成”标签几乎没有成本，不受任何流水线变换影响，也正是用户实际会读到的东西。它不能替代机器可读标识，机器可读标识也不能替代它。</p><h2>运行成本</h2><p>每个生成产物四个小字段，保留时长取决于你的合规窗口。在任何实际规模下，这相对于推理账单本身都是零头；而且与推理不同，这是你将被要求提供的部分。保留期要审慎设定：太短，问题来了记录已经没了；无上限，则是白白为存储付费。</p><p>行之有效的顺序是：把产物 ID 加入现有用量遥测；在一条真实的图像路径上端到端验证元数据能否保留；加上可见标签；然后再决定是否值得签署自己的清单。只有最后一步才算一个项目。</p><h2>相关阅读</h2><ul><li><a href=\"/research/how-ai-watermarks-get-destroyed\">AI 水印是如何被破坏的</a></li><li><a href=\"/research/llm-cost-attribution\">LLM 成本归因</a></li><li><a href=\"/research/ai-observability\">AI 可观测性</a></li></ul>",
+      "faq": [
+        {
+          "question": "我能自己给文本加 AI 水印吗？",
+          "answer": "不能。文本水印由模型提供商在生成 Token 时嵌入，事后无法添加，也无法通过参数开启或关闭。你能做的是溯源记录：模型 ID、版本、区域、时间戳和产物 ID。"
+        },
+        {
+          "question": "最低限度的可用溯源记录是什么？",
+          "answer": "每个生成产物四个字段——确切的模型 ID 和版本、区域、时间戳，以及一个跟随输出穿过流水线的稳定产物 ID。如果你已经为成本归因记录了用量，通常只缺产物 ID 这一项。"
+        },
+        {
+          "question": "我应该签署自己的 C2PA 清单吗？",
+          "answer": "对于你自己生成的文件，这确实是真正的改进，但它是一个项目，而不是一个下午的工作。应在你有了溯源日志，并确认图像流水线保留了你已收到的清单之后再做。"
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/how-ai-watermarks-get-destroyed",
+          "label": "AI 水印是如何被破坏的"
+        },
+        {
+          "slug": "/research/llm-cost-attribution",
+          "label": "LLM 成本归因"
+        },
+        {
+          "slug": "/research/ai-observability",
+          "label": "AI 可观测性"
         }
       ]
     }

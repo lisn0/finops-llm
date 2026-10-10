@@ -251,6 +251,176 @@
           "label": "التكلفة لكل مهمة ناجحة"
         }
       ]
+    },
+    "id": {
+      "title": "Harga list penyedia AI tidak bisa langsung dibandingkan",
+      "titleCore": "Harga list penyedia AI tidak bisa langsung dibandingkan",
+      "description": "Cara tim engineering menormalkan harga penyedia menurut jenis token, beban kerja, kualitas, latensi, dan overhead operasional.",
+      "body": "<p>Membandingkan penyedia AI berdasarkan harga utama per juta token menghasilkan penghematan palsu. Penyedia menagih jenis token, diskon, aturan konteks, wilayah, dan panggilan tool yang berbeda. Perbandingan yang berguna mengukur <strong>biaya efektif per tugas yang sukses</strong> untuk beban kerja dan target kualitas yang sama.</p><h2>Normalkan unit yang bisa ditagih</h2><p>Susun lembar harga yang dikelompokkan menurut penyedia, model, endpoint, wilayah, jenis token, status cache, status batch, dan tanggal berlaku. Pisahkan biaya input, output, cache-read, cache-write, reasoning, gambar, audio, dan tool. Catat komitmen minimum dan kredit di luar tarif satuan agar perbandingan tidak menyembunyikan asumsi kontrak.</p><h2>Normalkan beban kerja</h2><p>Putar ulang sampel tetap dengan prompt, konteks, batasan output, izin tool, dan uji keberhasilan yang sama. Ukur latensi p50 dan p95, tingkat penyelesaian, retry, perbaikan manusia, dan kualitas output. Model yang 30% lebih murah per token tetapi membutuhkan dua kali retry bisa jadi lebih mahal per tugas yang sukses.</p><h2>Masukkan biaya operasional</h2><p>Arbitrase antarpenyedia punya harga dari sisi engineering. Tambahkan perubahan gateway, observabilitas, logika routing, evaluasi, dukungan, biaya transfer data, dan penanganan kegagalan. Jalankan perhitungan dengan campuran trafik yang realistis, bukan satu prompt ideal. Model paling murah untuk merangkum bisa jadi model yang salah untuk ekstraksi atau penalaran bernilai tinggi.</p><h2>Rutekan berdasarkan kemampuan per dolar</h2><p>Gunakan matriks kemampuan dengan skor kualitas minimum dan biaya efektif maksimum per beban kerja. Arahkan permintaan yang memenuhi syarat ke penyedia termurah yang lolos keduanya. Pertahankan rute cadangan, hitung biaya yang diharapkan, dan uji saat latihan failover. Catat alasan setiap permintaan dirutekan agar penghematan bisa direkonsiliasi dengan faktur.</p><p>Perbandingan harga penyedia bukan papan peringkat. Ini adalah eksperimen terkontrol dengan beban kerja yang sama, standar kualitas, dan penyebut yang memuat seluruh biaya.</p><h2>Terkait</h2><ul><li>Arbitrase provider LLM</li><li>Perutean model tanpa regresi kualitas</li><li>Biaya per tugas yang sukses</li></ul>",
+      "faq": [
+        {
+          "question": "Mengapa harga list penyedia AI sulit dibandingkan?",
+          "answer": "Penyedia berbeda dalam jenis token, diskon cache, tarif batch, wilayah, komitmen, biaya tool, dan kualitas, sehingga harga token utama menggambarkan unit yang berbeda."
+        },
+        {
+          "question": "Apa metrik perbandingan yang tepat?",
+          "answer": "Bandingkan biaya efektif per tugas yang sukses untuk beban kerja, target kualitas, kebutuhan latensi, retry, dan overhead operasional yang sama."
+        },
+        {
+          "question": "Apa saja yang harus ada dalam lembar harga penyedia AI?",
+          "answer": "Lacak penyedia, model, endpoint, wilayah, jenis token, status cache, status batch, tanggal berlaku, komitmen, kredit, dan semua biaya non-token."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/provider-arbitrage",
+          "label": "Arbitrase provider LLM"
+        },
+        {
+          "slug": "/research/model-routing",
+          "label": "Perutean model tanpa regresi kualitas"
+        },
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "Biaya per tugas yang sukses"
+        }
+      ]
+    },
+    "pl": {
+      "title": "Cenniki dostawców AI nie są bezpośrednio porównywalne",
+      "titleCore": "Cenniki dostawców AI nie są bezpośrednio porównywalne",
+      "description": "Jak zespoły inżynierskie normalizują ceny dostawców według typu tokenów, obciążenia, jakości, opóźnienia i kosztów operacyjnych.",
+      "body": "<p>Porównywanie dostawców AI po nagłówkowej cenie za milion tokenów daje fałszywe oszczędności. Dostawcy rozliczają różne typy tokenów, rabaty, zasady kontekstu, regiony i wywołania narzędzi. Przydatne porównanie mierzy <strong>efektywny koszt na udane zadanie</strong> dla tego samego obciążenia i tego samego progu jakości.</p><h2>Znormalizuj jednostkę rozliczeniową</h2><p>Zbuduj arkusz cen z kluczami: dostawca, model, endpoint, region, typ tokenów, stan cache, status batch i data obowiązywania. Trzymaj osobno opłaty za wejście, wyjście, odczyt z cache, zapis do cache, rozumowanie, obrazy, audio i narzędzia. Zapisuj minimalne zobowiązania i kredyty poza stawką jednostkową, żeby porównanie nie ukrywało założeń kontraktowych.</p><h2>Znormalizuj obciążenie</h2><p>Odtwórz stałą próbkę z tymi samymi promptami, kontekstem, ograniczeniami wyjścia, uprawnieniami narzędzi i testem sukcesu. Mierz opóźnienie p50 i p95, wskaźnik ukończenia, ponowne próby, poprawki wykonane przez ludzi oraz jakość wyniku. Model o 30% niższej cenie za token, ale wymagający dwukrotnie większej liczby ponownych prób, może być droższy na udane zadanie.</p><h2>Uwzględnij koszt operacyjny</h2><p>Arbitraż między dostawcami ma cenę inżynierską. Dodaj zmiany w bramce, obserwowalność, logikę routingu, ewaluację, wsparcie, koszt transferu danych i obsługę awarii. Policz to na realistycznym miksie ruchu, a nie na jednym idealnym prompcie. Najtańszy model do streszczeń może być złym wyborem do ekstrakcji albo do wymagającego rozumowania o wysokiej wartości.</p><h2>Kieruj według zdolności na dolara</h2><p>Używaj macierzy zdolności z minimalnym wynikiem jakości i maksymalnym efektywnym kosztem na obciążenie. Kieruj kwalifikujące się żądania do najtańszego dostawcy, który spełnia oba warunki. Zachowaj trasę zapasową, ale licz jej oczekiwany koszt i testuj ją w ćwiczeniach awaryjnych. Zapisuj, dlaczego każde żądanie zostało skierowane tam, gdzie zostało, aby oszczędności dało się uzgodnić z fakturami.</p><p>Porównanie cen dostawców nie jest tabelą wyników. To kontrolowany eksperyment ze wspólnym obciążeniem, progiem jakości i w pełni obciążonym mianownikiem.</p><h2>Powiązane</h2><ul><li>Arbitraż dostawców LLM</li><li>Routing modeli bez regresji jakości</li><li>Koszt na udane zadanie</li></ul>",
+      "faq": [
+        {
+          "question": "Dlaczego cen dostawców AI trudno porównać?",
+          "answer": "Dostawcy różnią się typami tokenów, rabatami za cache, stawkami batch, regionami, zobowiązaniami, opłatami za narzędzia i jakością, więc nagłówkowe ceny tokenów opisują różne jednostki."
+        },
+        {
+          "question": "Jaka metryka porównania jest właściwa?",
+          "answer": "Porównuj efektywny koszt na udane zadanie dla tego samego obciążenia, progu jakości, wymogu opóźnienia, ponownych prób i kosztów operacyjnych."
+        },
+        {
+          "question": "Co powinno znaleźć się w arkuszu cen dostawców AI?",
+          "answer": "Śledź dostawcę, model, endpoint, region, typ tokenów, stan cache, status batch, datę obowiązywania, zobowiązania, kredyty oraz wszystkie opłaty niezwiązane z tokenami."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/provider-arbitrage",
+          "label": "Arbitraż dostawców LLM"
+        },
+        {
+          "slug": "/research/model-routing",
+          "label": "Routing modeli bez regresji jakości"
+        },
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "Koszt na udane zadanie"
+        }
+      ]
+    },
+    "ru": {
+      "title": "Цены провайдеров ИИ нельзя сравнивать напрямую",
+      "titleCore": "Почему прайс-листы провайдеров ИИ не сравнимы напрямую",
+      "description": "Как инженерные команды приводят цены провайдеров к единой базе: по типу токенов, нагрузке, качеству, задержке и операционным издержкам.",
+      "body": "<p>Сравнение ИИ-провайдеров по заявленной цене за миллион токенов дает ложную экономию. Провайдеры тарифицируют разные типы токенов, скидки, правила контекста, регионы и вызовы инструментов. Полезное сравнение измеряет <strong>эффективную стоимость успешной задачи</strong> для одной и той же нагрузки и одного целевого уровня качества.</p><h2>Приведите тарифицируемую единицу к общему виду</h2><p>Составьте таблицу цен по провайдеру, модели, эндпоинту, региону, типу токена, состоянию кэша, пакетной обработке и дате вступления в силу. Храните отдельно входные, выходные токены, чтение и запись кэша, токены рассуждений, изображения, аудио и вызовы инструментов. Минимальные обязательства и кредиты записывайте вне базовой ставки, чтобы сравнение не скрывало договорных допущений.</p><h2>Приведите нагрузку к общему виду</h2><p>Прогоните фиксированную выборку с теми же промптами, контекстом, ограничениями на вывод, правами на инструменты и тестом успеха. Измеряйте задержку p50 и p95, долю завершенных запросов, повторные попытки, ручную доработку и качество результата. Модель, которая дешевле за токен на 30%, но требует вдвое больше повторов, может обходиться дороже в пересчете на успешную задачу.</p><h2>Учитывайте операционные издержки</h2><p>Арбитраж между провайдерами имеет инженерную цену. Добавьте изменения в шлюзе, наблюдаемость, логику маршрутизации, оценку качества, поддержку, стоимость передачи данных и обработку сбоев. Расчет проводите на реалистичном смешении трафика, а не на одном идеальном промпте. Самая дешевая модель для суммаризации может быть неподходящей для извлечения данных или задач, требующих сложных рассуждений.</p><h2>Маршрутизируйте по отдаче на доллар</h2><p>Используйте матрицу возможностей с минимальным порогом качества и максимальной эффективной стоимостью на тип нагрузки. Направляйте подходящие запросы к самому дешевому провайдеру, который проходит оба условия. Держите резервный маршрут, но учитывайте его ожидаемую стоимость и проверяйте его в учениях по отказоустойчивости. Фиксируйте, почему каждый запрос был направлен именно туда, чтобы экономию можно было сверить со счетами.</p><p>Сравнение цен провайдеров — это не таблица лидеров. Это контролируемый эксперимент с общей нагрузкой, планкой качества и полностью учтенным знаменателем.</p><h2>Связанное</h2><ul><li>Арбитраж между LLM-провайдерами</li><li>Маршрутизация моделей без регрессии качества</li><li>Стоимость успешной задачи</li></ul>",
+      "faq": [
+        {
+          "question": "Почему прайс-листы ИИ-провайдеров трудно сравнивать?",
+          "answer": "Провайдеры различаются типами токенов, скидками на кэш, пакетными тарифами, регионами, обязательствами, оплатой инструментов и качеством, поэтому заявленные цены за токен описывают разные единицы."
+        },
+        {
+          "question": "Какая метрика сравнения правильная?",
+          "answer": "Сравнивайте эффективную стоимость успешной задачи для одной и той же нагрузки, целевого уровня качества, требований к задержке, повторных попыток и операционных издержек."
+        },
+        {
+          "question": "Что должно входить в таблицу цен ИИ-провайдера?",
+          "answer": "Провайдер, модель, эндпоинт, регион, тип токена, состояние кэша, статус пакетной обработки, дата вступления в силу, обязательства, кредиты и все платежи, не связанные с токенами."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/provider-arbitrage",
+          "label": "Арбитраж между LLM-провайдерами"
+        },
+        {
+          "slug": "/research/model-routing",
+          "label": "Маршрутизация моделей без регрессии качества"
+        },
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "Стоимость успешной задачи"
+        }
+      ]
+    },
+    "tr": {
+      "title": "AI sağlayıcı liste fiyatları doğrudan karşılaştırılamaz",
+      "titleCore": "AI sağlayıcılarının liste fiyatları doğrudan karşılaştırılamaz",
+      "description": "Mühendislik ekipleri sağlayıcı fiyatlarını token türü, iş yükü, kalite, gecikme ve operasyonel yük açısından nasıl normalize eder.",
+      "body": "<p>Sağlayıcıları başlıktaki milyon token başına fiyata göre karşılaştırmak sahte tasarruflar üretir. Sağlayıcılar farklı token türlerini, indirimleri, bağlam kurallarını, bölgeleri ve araç çağrılarını faturalandırır. Yararlı bir karşılaştırma, aynı iş yükü ve kalite hedefi için <strong>başarılı görev başına etkin maliyeti</strong> ölçer.</p><h2>Faturalanabilir birimi normalize edin</h2><p>Fiyat tablosunu sağlayıcı, model, uç nokta, bölge, token türü, önbellek durumu, toplu işlem durumu ve geçerlilik tarihine göre oluşturun. Girdi, çıktı, önbellek okuma, önbellek yazma, akıl yürütme, görsel, ses ve araç ücretlerini ayrı tutun. Taahhüt edilen minimum tutarları ve kredileri birim fiyatın dışında kaydedin; böylece karşılaştırma bir sözleşme varsayımını gizlemez.</p><h2>İş yükünü normalize edin</h2><p>Aynı promptlar, bağlam, çıktı kısıtları, araç izinleri ve başarı testiyle sabit bir örneklem çalıştırın. p50 ve p95 gecikmesini, tamamlanma oranını, yeniden denemeleri, insan düzeltmesini ve çıktı kalitesini ölçün. Token başına %30 daha ucuz ama iki kat daha fazla yeniden deneme gerektiren bir model, başarılı görev başına daha pahalı olabilir.</p><h2>Operasyonel maliyeti dahil edin</h2><p>Sağlayıcı arbitrajının bir mühendislik maliyeti vardır. Gateway değişikliklerini, gözlemlenebilirliği, yönlendirme mantığını, değerlendirmeyi, desteği, veri aktarım maliyetini ve hata yönetimini ekleyin. Hesabı tek bir ideal prompt yerine gerçekçi bir trafik karışımı üzerinde çalıştırın. Özetleme için en ucuz model, çıkarım veya yüksek değerli akıl yürütme için yanlış model olabilir.</p><h2>Yönlendirmeyi kapasite başına dolara göre yapın</h2><p>Minimum kalite puanı ve iş yükü başına en yüksek etkin maliyeti içeren bir yetenek matrisi kullanın. Uygun istekleri ikisini de geçen en ucuz sağlayıcıya yönlendirin. Yedek bir rota tutun, ama beklenen maliyetini sayın ve arıza tatbikatlarında test edin. Her isteğin neden yönlendirildiğini kaydedin ki tasarruflar faturalarla uzlaştırılabilsin.</p><p>Sağlayıcı fiyat karşılaştırması bir liderlik tablosu değildir. Ortak bir iş yükü, bir kalite çıtası ve tam yüklü bir payda ile yürütülen kontrollü bir deneydir.</p><h2>İlgili</h2><ul><li>LLM sağlayıcı arbitrajı</li><li>Kalite gerilemesi olmadan model yönlendirme</li><li>Başarılı görev başına maliyet</li></ul>",
+      "faq": [
+        {
+          "question": "AI sağlayıcı liste fiyatları neden karşılaştırması zor?",
+          "answer": "Sağlayıcılar token türleri, önbellek indirimleri, toplu fiyatlar, bölgeler, taahhütler, araç ücretleri ve kalite bakımından farklılaştığı için liste fiyatları farklı birimleri tanımlar."
+        },
+        {
+          "question": "Doğru karşılaştırma metriği nedir?",
+          "answer": "Aynı iş yükü, kalite hedefi, gecikme gereksinimi, yeniden deneme sayısı ve operasyonel yük için başarılı görev başına etkin maliyeti karşılaştırın."
+        },
+        {
+          "question": "AI sağlayıcı fiyat tablosunda neler olmalı?",
+          "answer": "Sağlayıcı, model, uç nokta, bölge, token türü, önbellek durumu, toplu işlem durumu, geçerlilik tarihi, taahhütler, krediler ve token dışı tüm ücretleri takip edin."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/provider-arbitrage",
+          "label": "LLM sağlayıcı arbitrajı"
+        },
+        {
+          "slug": "/research/model-routing",
+          "label": "Kalite gerilemesi olmadan model yönlendirme"
+        },
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "Başarılı görev başına maliyet"
+        }
+      ]
+    },
+    "vi": {
+      "title": "Giá niêm yết của các nhà cung cấp AI không so sánh được",
+      "titleCore": "Giá niêm yết của các nhà cung cấp AI không so sánh trực tiếp được",
+      "description": "Các đội kỹ thuật chuẩn hóa giá của nhà cung cấp theo loại token, khối lượng công việc, chất lượng, độ trễ và chi phí vận hành như thế nào.",
+      "body": "<p>So sánh các nhà cung cấp AI bằng giá tiêu đề trên mỗi triệu token tạo ra tiết kiệm giả. Các nhà cung cấp tính phí theo loại token, chiết khấu, quy tắc ngữ cảnh, khu vực và lệnh gọi công cụ khác nhau. Một so sánh hữu ích đo <strong>chi phí hiệu dụng trên mỗi tác vụ thành công</strong> cho cùng một khối lượng công việc và cùng mục tiêu chất lượng.</p>\n<h2>Chuẩn hóa đơn vị có thể tính phí</h2>\n<p>Xây dựng bảng giá theo nhà cung cấp, mô hình, endpoint, khu vực, loại token, trạng thái cache, trạng thái batch và ngày hiệu lực. Tách riêng các khoản phí đầu vào, đầu ra, đọc cache, ghi cache, suy luận, hình ảnh, âm thanh và công cụ. Ghi các cam kết tối thiểu và tín dụng ngoài đơn giá, để việc so sánh không che giấu một giả định hợp đồng.</p>\n<h2>Chuẩn hóa khối lượng công việc</h2>\n<p>Phát lại một mẫu cố định với cùng prompt, ngữ cảnh, ràng buộc đầu ra, quyền công cụ và bài kiểm tra thành công. Đo độ trễ p50 và p95, tỷ lệ hoàn thành, số lần thử lại, công sức con người sửa chữa và chất lượng đầu ra. Một mô hình rẻ hơn 30% trên mỗi token nhưng cần gấp đôi số lần thử lại có thể đắt hơn trên mỗi tác vụ thành công.</p>\n<h2>Tính cả chi phí vận hành</h2>\n<p>Chênh lệch giá giữa các nhà cung cấp cũng có chi phí kỹ thuật. Cộng thêm các thay đổi gateway, observability, logic định tuyến, đánh giá, hỗ trợ, chi phí truyền dữ liệu và xử lý lỗi. Chạy phép tính trên một hỗn hợp lưu lượng thực tế, không phải một prompt lý tưởng duy nhất. Mô hình rẻ nhất để tóm tắt có thể là mô hình sai cho việc trích xuất hoặc suy luận giá trị cao.</p>\n<h2>Định tuyến theo năng lực trên mỗi đô la</h2>\n<p>Dùng một ma trận năng lực với điểm chất lượng tối thiểu và chi phí hiệu dụng tối đa cho mỗi khối lượng công việc. Định tuyến các yêu cầu đủ điều kiện đến nhà cung cấp rẻ nhất vượt qua cả hai. Giữ một tuyến dự phòng, nhưng tính chi phí kỳ vọng của nó và kiểm tra trong các buổi diễn tập chuyển đổi dự phòng. Ghi lại lý do mỗi yêu cầu được định tuyến để tiết kiệm có thể đối chiếu với hóa đơn.</p>\n<p>So sánh giá nhà cung cấp không phải là bảng xếp hạng. Đó là một thí nghiệm có kiểm soát với khối lượng công việc chung, một ngưỡng chất lượng, và mẫu số đã tính đủ mọi chi phí.</p>\n<h2>Liên quan</h2>\n<ul>\n<li>Chênh lệch giá giữa các nhà cung cấp LLM</li>\n<li>Định tuyến mô hình không làm suy giảm chất lượng</li>\n<li>Chi phí trên mỗi tác vụ thành công</li>\n</ul>\n",
+      "faq": [
+        {
+          "question": "Vì sao giá niêm yết của các nhà cung cấp AI khó so sánh?",
+          "answer": "Các nhà cung cấp khác nhau về loại token, chiết khấu cache, mức giá batch, khu vực, cam kết, phí công cụ và chất lượng, nên giá token tiêu đề mô tả những đơn vị khác nhau."
+        },
+        {
+          "question": "Chỉ số so sánh đúng là gì?",
+          "answer": "So sánh chi phí hiệu dụng trên mỗi tác vụ thành công cho cùng khối lượng công việc, mục tiêu chất lượng, yêu cầu độ trễ, số lần thử lại và chi phí vận hành."
+        },
+        {
+          "question": "Bảng giá nhà cung cấp AI nên bao gồm những gì?",
+          "answer": "Theo dõi nhà cung cấp, mô hình, endpoint, khu vực, loại token, trạng thái cache, trạng thái batch, ngày hiệu lực, cam kết, tín dụng và mọi khoản phí không phải token."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/provider-arbitrage",
+          "label": "Chênh lệch giá giữa các nhà cung cấp LLM"
+        },
+        {
+          "slug": "/research/model-routing",
+          "label": "Định tuyến mô hình không làm suy giảm chất lượng"
+        },
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "Chi phí trên mỗi tác vụ thành công"
+        }
+      ]
     }
   }
 }

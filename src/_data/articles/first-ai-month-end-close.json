@@ -267,6 +267,176 @@
           "label": "مراقبة تكاليف النماذج اللغوية"
         }
       ]
+    },
+    "id": {
+      "title": "Tutup bulan pertama untuk produk berbasis AI",
+      "titleCore": "Tutup bulan pertama untuk produk berbasis AI",
+      "description": "Proses tutup bulan yang praktis untuk merekonsiliasi faktur penyedia, telemetri penggunaan, alokasi biaya, dan metrik kualitas AI.",
+      "body": "<p>Tutup bulan AI yang pertama sebaiknya tidak dimulai dari tangkapan layar dashboard. Mulailah dari faktur penyedia yang mentah dan periode pelaporan yang sudah dikunci. Tutup angka kas terlebih dahulu, jelaskan angka penggunaan kedua, lalu alokasikan biaya setelah keduanya cocok. Urutan ini mencegah telemetri yang menarik berubah menjadi laporan keuangan yang tidak bisa diaudit.</p><h2>1. Kunci periode</h2><p>Tentukan zona waktu, batas cut-off faktur, mata uang, dan perlakuan untuk kredit, pajak, diskon komitmen penggunaan, serta penyesuaian yang terlambat. Bekukan daftar harga yang dipakai untuk periode tersebut. Catat ID faktur dan rentang kueri telemetri. Jika periode masih bisa berubah saat orang sedang menyelidikinya, setiap angka berikutnya bersifat sementara.</p><h2>2. Rekonsiliasi dengan penyedia</h2><p>Gabungkan event penggunaan dengan ekspor tagihan penyedia berdasarkan penyedia, akun, model, jenis token, dan hari. Rollup harus menjelaskan biaya input, output, cache, reasoning, gambar, audio, dan terkait tool jika penyedia menyediakannya. Selidiki selisih sisa, jangan menyembunyikannya di ember ‘tidak teralokasi’. Sebuah close boleh memuat selisih yang tidak material dan sudah didokumentasikan; close tidak boleh diam-diam memuat selisih yang tidak diketahui.</p><h2>3. Alokasikan biaya yang sudah direkonsiliasi</h2><p>Terapkan dimensi yang stabil: fitur, tim, lingkungan, kohort pelanggan, dan beban kerja. Pisahkan biaya platform bersama dari konsumsi produk. Jangan mengalokasikan berdasarkan jumlah karyawan hanya karena gateway tidak memiliki tag; catat tingkat biaya yang tidak bertag dan jadikan pemberian tag sebagai tindakan engineering berikutnya. Alokasi adalah keputusan kebijakan, jadi versikan kebijakan bersama datanya.</p><h2>4. Jelaskan pergerakan</h2><p>Hubungkan periode berjalan dengan periode sebelumnya melalui rate, volume, mix, dan efisiensi. Kaitkan setiap pergerakan besar dengan deployment, perubahan trafik, perubahan harga penyedia, migrasi model, atau perubahan perilaku agen. Laporkan biaya p50 dan p95 per tugas yang berhasil, beserta tingkat kegagalan dan retry. Total belanja memberi tahu apa yang terjadi; bridge memberi tahu apa yang harus dilakukan.</p><h2>5. Sign-off dan perbaikan</h2><p>Pemilik close menandatangani rekonsiliasi penyedia, pemilik engineering menandatangani penjelasan penggunaan, dan pemilik finance menandatangani output alokasi. Simpan log pengecualian dengan tenggat waktu dan pemilik. Di bulan kedua, otomatiskan hanya langkah yang sudah stabil di bulan pertama: ingest faktur, pencarian harga, bridge variansi, dan ekspor alokasi.</p><p>Close AI yang bisa dipercaya memang sengaja dibuat membosankan. Setiap dolar punya sumber, setiap alokasi punya aturan, dan setiap variansi punya orang yang bisa menjelaskannya.</p><h2>Terkait</h2><ul><li>Rekonsiliasi faktur untuk belanja AI</li><li>Atribusi biaya LLM</li><li>Pemantauan biaya LLM</li></ul>",
+      "faq": [
+        {
+          "question": "Apa yang sebaiknya menjadi awal tutup bulan AI?",
+          "answer": "Mulailah dari faktur penyedia yang mentah dan periode pelaporan yang sudah dikunci, lalu rekonsiliasikan telemetri sebelum mengalokasikan biaya."
+        },
+        {
+          "question": "Bagaimana belanja AI sebaiknya dialokasikan?",
+          "answer": "Gunakan dimensi yang stabil seperti fitur, tim, lingkungan, kohort pelanggan, dan beban kerja; pisahkan biaya platform bersama dan versikan kebijakannya."
+        },
+        {
+          "question": "Apa yang menjelaskan perubahan belanja AI?",
+          "answer": "Bridge melalui rate, volume, mix model, dan efisiensi menghubungkan pergerakan faktur dengan penyebab dari sisi penyedia, trafik, deployment, atau beban kerja."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/invoice-reconciliation",
+          "label": "Rekonsiliasi faktur untuk belanja AI"
+        },
+        {
+          "slug": "/research/llm-cost-attribution",
+          "label": "Atribusi biaya LLM"
+        },
+        {
+          "slug": "/research/llm-cost-monitoring",
+          "label": "Pemantauan biaya LLM"
+        }
+      ]
+    },
+    "pl": {
+      "title": "Pierwsze zamknięcie miesiąca dla produktu z AI",
+      "titleCore": "Pierwsze zamknięcie miesiąca dla produktu z AI",
+      "description": "Praktyczny proces zamknięcia miesiąca: uzgadnianie faktur dostawców, telemetrii użycia, alokacji kosztów i metryk jakości AI.",
+      "body": "<p>Pierwsze zamknięcie miesiąca w obszarze AI nie powinno zaczynać się od zrzutu ekranu z dashboardu. Powinno zacząć się od surowych faktur dostawców i zablokowanego okresu raportowego. Najpierw zamknij liczbę gotówkową, potem wyjaśnij liczbę zużycia, a koszty alokuj dopiero wtedy, gdy obie się zgadzają. Ta kolejność zapobiega sytuacji, w której atrakcyjna telemetria staje się raportem finansowym, którego nie da się audytować.</p><h2>1. Zablokuj okres</h2><p>Wybierz strefę czasową, termin odcięcia faktur, walutę oraz sposób traktowania kredytów, podatków, rabatów za zobowiązane wykorzystanie i późnych korekt. Zamroź cennik użyty w tym okresie. Zapisz identyfikatory faktur i okno zapytań telemetrii. Jeśli okres może się zmienić, gdy ludzie go analizują, każda późniejsza liczba jest tymczasowa.</p><h2>2. Uzgodnij z dostawcą</h2><p>Połącz zdarzenia użycia z eksportami rozliczeń dostawcy według dostawcy, konta, modelu, typu tokenu i dnia. Zestawienie powinno wyjaśniać opłaty za dane wejściowe, wyjściowe, cache, rozumowanie, obrazy, audio i narzędzia, o ile dostawca je udostępnia. Badaj różnicę resztkową zamiast ukrywać ją w kubełku „nieprzydzielone”. Zamknięcie może zawierać udokumentowaną, nieistotną różnicę; nie może po cichu zawierać nieznanej.</p><h2>3. Alokuj uzgodnione koszty</h2><p>Stosuj stabilne wymiary: funkcję, zespół, środowisko, kohortę klientów i obciążenie. Koszty wspólnej platformy trzymaj osobno od konsumpcji produktu. Nie alokuj według liczby pracowników tylko dlatego, że brakuje tagów w bramce; zapisz udział nieotagowanych kosztów i uczyń tagowanie kolejnym zadaniem inżynieryjnym. Alokacja to wybór polityki, więc wersjonuj politykę razem z danymi.</p><h2>4. Wyjaśnij zmianę</h2><p>Zestaw bieżący okres z poprzednim przez cenę, wolumen, miks i efektywność. Powiąż każdą dużą zmianę z wdrożeniem, zmianą ruchu, zmianą ceny u dostawcy, migracją modelu lub zmianą zachowania agenta. Raportuj koszt na udane zadanie w ujęciu p50 i p95 wraz ze wskaźnikami błędów i ponowień. Łączne wydatki mówią, co się stało; zestawienie mówi, co z tym zrobić.</p><h2>5. Zatwierdź i ulepszaj</h2><p>Właściciel zamknięcia zatwierdza uzgodnienie z dostawcą, właściciel inżynierii wyjaśnienie zużycia, a właściciel finansów wynik alokacji. Prowadź rejestr wyjątków z terminem i właścicielem. W drugim miesiącu automatyzuj tylko te kroki, które w pierwszym były stabilne: pobieranie faktur, wyszukiwanie cen, zestawienie odchyleń i eksport alokacji.</p><p>Wiarygodne zamknięcie AI jest celowo nudne. Każdy dolar ma źródło, każda alokacja ma regułę, a każde odchylenie ma osobę, która potrafi je wyjaśnić.</p><h2>Powiązane</h2><ul><li>Uzgadnianie faktur za wydatki na AI</li><li>Atrybucja kosztów LLM</li><li>Monitoring kosztów LLM</li></ul>",
+      "faq": [
+        {
+          "question": "Od czego powinno zaczynać się zamknięcie miesiąca dla AI?",
+          "answer": "Od surowych faktur dostawców i zablokowanego okresu raportowego; dopiero potem uzgadnia się telemetrię i alokuje koszty."
+        },
+        {
+          "question": "Jak należy alokować wydatki na AI?",
+          "answer": "Stosując stabilne wymiary, takie jak funkcja, zespół, środowisko, kohorta klientów i obciążenie; koszty wspólnej platformy trzyma się osobno, a politykę wersjonuje."
+        },
+        {
+          "question": "Co wyjaśnia zmianę wydatków na AI?",
+          "answer": "Zestawienie przez cenę, wolumen, miks modeli i efektywność łączy ruch na fakturze z przyczyną u dostawcy, w ruchu, we wdrożeniu lub w obciążeniu."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/invoice-reconciliation",
+          "label": "Uzgadnianie faktur za wydatki na AI"
+        },
+        {
+          "slug": "/research/llm-cost-attribution",
+          "label": "Atrybucja kosztów LLM"
+        },
+        {
+          "slug": "/research/llm-cost-monitoring",
+          "label": "Monitoring kosztów LLM"
+        }
+      ]
+    },
+    "ru": {
+      "title": "Первое закрытие месяца для AI-продукта",
+      "titleCore": "Первое закрытие месяца для AI-продукта",
+      "description": "Практический процесс закрытия месяца: сверка счетов провайдеров, телеметрии использования, распределения затрат и метрик качества AI.",
+      "body": "<p>Первое закрытие месяца для AI не должно начинаться со скриншота дашборда. Оно должно начинаться с исходных счетов провайдеров и зафиксированного отчётного периода. Сначала закройте денежную сумму, затем объясните объём использования и только после того, как две цифры сойдутся, распределяйте стоимость. Такой порядок не даёт красивой телеметрии превратиться в финансовый отчёт, который нельзя проверить.</p><h2>1. Зафиксируйте период</h2><p>Выберите часовой пояс, дату отсечки счетов, валюту и правила учёта кредитов, налогов, скидок за обязательства по использованию и поздних корректировок. Заморозьте прайс-лист, который применялся в периоде. Запишите идентификаторы счетов и временное окно выборки телеметрии. Если период может меняться во время расследования, все последующие цифры остаются предварительными.</p><h2>2. Сверьте с провайдером</h2><p>Свяжите события использования с выгрузками биллинга провайдера по провайдеру, аккаунту, модели, типу токенов и дню. Сводка должна объяснять списания за входные токены, выходные токены, кэш, рассуждения, изображения, аудио и связанные с инструментами вызовы, если провайдер их раскрывает. Разбирайте остаток, а не прячьте его в корзине «нераспределённое». Закрытие может содержать задокументированное несущественное расхождение, но не может молча содержать неизвестное.</p><h2>3. Распределите сверенные затраты</h2><p>Применяйте устойчивые измерения: функциональность, команду, окружение, когорту клиентов и тип нагрузки. Держите общие затраты платформы отдельно от потребления продуктов. Не распределяйте расходы по числу сотрудников только потому, что в шлюзе нет тегов; зафиксируйте долю нетегированных затрат и сделайте проставление тегов следующим инженерным действием. Распределение — это выбор политики, поэтому версионируйте политику вместе с данными.</p><h2>4. Объясните изменения</h2><p>Свяжите текущий период с предыдущим через ставку, объём, структуру и эффективность. Привяжите каждое крупное изменение к деплою, изменению трафика, изменению цен провайдера, миграции модели или изменению поведения агента. Отчитывайтесь о стоимости успешной задачи на уровне p50 и p95 вместе с долями сбоев и повторов. Общие расходы показывают, что произошло; мост объясняет, что с этим делать.</p><h2>5. Подпишите и улучшайте</h2><p>Ответственный за закрытие подписывает сверку с провайдером, инженерный владелец подписывает объяснение использования, а финансовый владелец подписывает результат распределения. Ведите журнал исключений с дедлайном и ответственным. Во второй месяц автоматизируйте только те шаги, которые были стабильны в первом: загрузку счетов, поиск цен, мост отклонений и экспорт распределения.</p><p>Надёжное AI-закрытие намеренно скучно. У каждого доллара есть источник, у каждого распределения есть правило, и у каждого отклонения есть человек, который может его объяснить.</p><h2>Связанное</h2><ul><li>Сверка счетов за AI-расходы</li><li>Распределение затрат на LLM</li><li>Мониторинг затрат на LLM</li></ul>",
+      "faq": [
+        {
+          "question": "С чего должно начинаться закрытие месяца для AI?",
+          "answer": "Начните с исходных счетов провайдеров и зафиксированного отчётного периода, затем сверьте телеметрию до распределения затрат."
+        },
+        {
+          "question": "Как нужно распределять расходы на AI?",
+          "answer": "Используйте устойчивые измерения, такие как функциональность, команда, окружение, когорта клиентов и тип нагрузки; держите общие затраты платформы отдельно и версионируйте политику распределения."
+        },
+        {
+          "question": "Что объясняет изменение расходов на AI?",
+          "answer": "Мост по ставке, объёму, структуре моделей и эффективности связывает движение по счетам с причиной у провайдера, в трафике, в деплое или в нагрузке."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/invoice-reconciliation",
+          "label": "Сверка счетов за AI-расходы"
+        },
+        {
+          "slug": "/research/llm-cost-attribution",
+          "label": "Распределение затрат на LLM"
+        },
+        {
+          "slug": "/research/llm-cost-monitoring",
+          "label": "Мониторинг затрат на LLM"
+        }
+      ]
+    },
+    "tr": {
+      "title": "Yapay zeka ağırlıklı bir ürünün ilk ay sonu kapanışı",
+      "titleCore": "Yapay zeka ağırlıklı bir ürünün ilk ay sonu kapanışı",
+      "description": "Sağlayıcı faturalarını, kullanım telemetrisini, dağıtımı ve yapay zeka kalite metriklerini uzlaştırmak için pratik bir ay sonu kapanış süreci.",
+      "body": "<p>İlk yapay zeka ay sonu kapanışı bir gösterge paneli ekran görüntüsüyle başlamamalıdır. Ham sağlayıcı faturaları ve kilitlenmiş bir raporlama dönemiyle başlamalıdır. Önce nakit rakamını kapatın, ikinci olarak kullanım rakamını açıklayın ve maliyeti yalnızca iki rakam uzlaştıktan sonra dağıtın. Bu sıra, çekici telemetrinin denetlenemeyen bir finans raporuna dönüşmesini önler.</p><h2>1. Dönemi kilitleyin</h2><p>Saat dilimini, fatura kesim tarihini, para birimini ve kredilerin, vergilerin, taahhütlü kullanım indirimlerinin ve geç düzeltmelerin nasıl ele alınacağını belirleyin. Dönem için kullanılan fiyat tablosunu dondurun. Fatura kimliklerini ve telemetri sorgu aralığını kaydedin. İnceleme sürerken dönem değişebiliyorsa, sonraki her rakam geçici demektir.</p><h2>2. Sağlayıcıya göre uzlaştırın</h2><p>Kullanım olaylarını sağlayıcı, hesap, model, token türü ve gün bazında sağlayıcı faturalama dökümleriyle birleştirin. Özet, sağlayıcının sunduğu ölçüde girdi, çıktı, önbellek, akıl yürütme, görsel, ses ve araçla ilgili ücretleri açıklamalıdır. Kalan farkı “dağıtılmamış” bir kovaya gizlemek yerine inceleyin. Bir kapanış belgelenmiş önemsiz bir farkı taşıyabilir; ama bilinmeyen bir farkı sessizce taşıyamaz.</p><h2>3. Uzlaştırılmış maliyeti dağıtın</h2><p>Özellik, ekip, ortam, müşteri kohortu ve iş yükü gibi kararlı boyutları uygulayın. Paylaşılan platform maliyetini ürün tüketiminden ayrı tutun. Ağ geçidinde etiket olmadığı için çalışan sayısına göre dağıtım yapmayın; etiketlenmemiş oranı kaydedin ve etiketlemeyi bir sonraki mühendislik işi yapın. Dağıtım bir politika seçimidir, bu nedenle politikayı veriyle birlikte sürümleyin.</p><h2>4. Hareketi açıklayın</h2><p>Mevcut dönemi bir önceki dönemle oran, hacim, karışım ve verimlilik üzerinden köprüleyin. Büyük her hareketi bir dağıtım, trafik değişikliği, sağlayıcı fiyat değişikliği, model geçişi ya da agent davranış değişikliğiyle ilişkilendirin. Başarılı görev başına maliyetin p50 ve p95 değerlerini başarısızlık ve yeniden deneme oranlarıyla birlikte raporlayın. Toplam harcama ne olduğunu söyler; köprü ne yapılacağını söyler.</p><h2>5. Onaylayın ve iyileştirin</h2><p>Kapanış sahibi sağlayıcı uzlaştırmasını, mühendislik sahibi kullanım açıklamasını, finans sahibi dağıtım çıktısını onaylar. Her istisna için son tarih ve sahip bulunan bir istisna günlüğü tutun. İkinci ayda yalnızca ilk ayda kararlı olan adımları otomatikleştirin: fatura alımı, fiyat arama, varyans köprüsü ve dağıtım dışa aktarımı.</p><p>Güvenilir bir yapay zeka kapanışı bilerek sıkıcıdır. Her doların bir kaynağı, her dağıtımın bir kuralı ve her varyansın açıklayabilecek bir kişisi olur.</p><h2>İlgili</h2><ul><li>Yapay zeka harcaması için fatura uzlaştırma</li><li>LLM maliyet atfı</li><li>LLM maliyet izleme</li></ul>",
+      "faq": [
+        {
+          "question": "Bir yapay zeka ay sonu kapanışı neyle başlamalı?",
+          "answer": "Ham sağlayıcı faturaları ve kilitlenmiş bir raporlama dönemiyle başlayın, ardından maliyetleri dağıtmadan önce telemetriyi uzlaştırın."
+        },
+        {
+          "question": "Yapay zeka harcaması nasıl dağıtılmalı?",
+          "answer": "Özellik, ekip, ortam, müşteri kohortu ve iş yükü gibi kararlı boyutları kullanın; paylaşılan platform maliyetini ayrı tutun ve politikayı sürümleyin."
+        },
+        {
+          "question": "Yapay zeka harcamasındaki bir değişikliği ne açıklar?",
+          "answer": "Oran, hacim, model karışımı ve verimlilik üzerinden kurulan bir köprü, fatura hareketini bir sağlayıcı, trafik, dağıtım ya da iş yükü nedenine bağlar."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/invoice-reconciliation",
+          "label": "Yapay zeka harcaması için fatura uzlaştırma"
+        },
+        {
+          "slug": "/research/llm-cost-attribution",
+          "label": "LLM maliyet atfı"
+        },
+        {
+          "slug": "/research/llm-cost-monitoring",
+          "label": "LLM maliyet izleme"
+        }
+      ]
+    },
+    "vi": {
+      "title": "Chốt sổ cuối tháng đầu tiên cho sản phẩm AI",
+      "titleCore": "Chốt sổ cuối tháng đầu tiên cho sản phẩm AI",
+      "description": "Quy trình chốt sổ cuối tháng thực tế để đối chiếu hóa đơn nhà cung cấp, dữ liệu telemetry, phân bổ chi phí và chỉ số chất lượng AI.",
+      "body": "<p>Lần chốt sổ AI đầu tiên không nên bắt đầu bằng ảnh chụp dashboard. Nó nên bắt đầu từ hóa đơn gốc của nhà cung cấp và một kỳ báo cáo đã khóa. Chốt con số tiền mặt trước, giải thích con số sử dụng thứ hai, và chỉ phân bổ chi phí sau khi hai con số khớp nhau. Thứ tự này ngăn dữ liệu telemetry hấp dẫn trở thành một báo cáo tài chính không thể kiểm toán.</p><h2>1. Khóa kỳ báo cáo</h2><p>Chọn múi giờ, mốc cắt hóa đơn, đơn vị tiền tệ và cách xử lý tín dụng, thuế, giảm giá cam kết sử dụng và các điều chỉnh đến muộn. Đóng băng bảng giá được dùng cho kỳ này. Ghi lại mã hóa đơn và khoảng thời gian truy vấn telemetry. Nếu kỳ báo cáo còn có thể thay đổi trong lúc mọi người đang điều tra, thì mọi con số sau đó chỉ là tạm thời.</p><h2>2. Đối chiếu với nhà cung cấp</h2><p>Nối các sự kiện sử dụng với file xuất hóa đơn của nhà cung cấp theo nhà cung cấp, tài khoản, mô hình, loại token và ngày. Phần tổng hợp cần giải thích được chi phí đầu vào, đầu ra, cache, suy luận, hình ảnh, âm thanh và các khoản liên quan đến công cụ, ở những nơi nhà cung cấp có cung cấp. Điều tra phần chênh lệch còn lại thay vì giấu nó vào một nhóm ‘không phân bổ’. Một lần chốt có thể mang một chênh lệch không đáng kể đã được ghi chép; nó không thể âm thầm mang một chênh lệch chưa rõ nguyên nhân.</p><h2>3. Phân bổ chi phí đã đối chiếu</h2><p>Áp dụng các chiều ổn định: tính năng, đội nhóm, môi trường, nhóm khách hàng và loại khối lượng công việc. Giữ chi phí nền tảng dùng chung tách biệt với mức tiêu thụ của sản phẩm. Đừng phân bổ theo số nhân sự chỉ vì gateway thiếu thẻ gắn nhãn; hãy ghi lại tỷ lệ chưa gắn nhãn và biến việc gắn nhãn thành hành động kỹ thuật tiếp theo. Phân bổ là một lựa chọn chính sách, nên hãy đánh phiên bản chính sách cùng với dữ liệu.</p><h2>4. Giải thích biến động</h2><p>Nối kỳ hiện tại với kỳ trước qua giá, khối lượng, cơ cấu và hiệu quả. Liên kết mỗi biến động lớn với một đợt triển khai, thay đổi lưu lượng, thay đổi giá của nhà cung cấp, chuyển đổi mô hình hoặc thay đổi hành vi của agent. Báo cáo chi phí p50 và p95 cho mỗi tác vụ thành công, kèm tỷ lệ lỗi và thử lại. Tổng chi tiêu cho biết điều gì đã xảy ra; cầu nối cho biết bạn nên làm gì.</p><h2>5. Ký duyệt và cải thiện</h2><p>Chủ quy trình chốt ký phần đối chiếu nhà cung cấp, người phụ trách kỹ thuật ký phần giải thích sử dụng, và người phụ trách tài chính ký kết quả phân bổ. Giữ nhật ký ngoại lệ với hạn chót và người chịu trách nhiệm. Sang tháng thứ hai, chỉ tự động hóa những bước đã ổn định trong tháng đầu: nhập hóa đơn, tra cứu giá, cầu nối biến động và xuất dữ liệu phân bổ.</p><p>Một quy trình chốt AI đáng tin cậy được thiết kế để đơn điệu có chủ đích. Mỗi đô la có nguồn gốc, mỗi khoản phân bổ có quy tắc, và mỗi biến động có một người có thể giải thích.</p><h2>Liên quan</h2><ul><li>Đối chiếu hóa đơn cho chi tiêu AI</li><li>Phân bổ chi phí LLM</li><li>Giám sát chi phí LLM</li></ul>",
+      "faq": [
+        {
+          "question": "Quy trình chốt sổ AI cuối tháng nên bắt đầu từ đâu?",
+          "answer": "Bắt đầu từ hóa đơn gốc của nhà cung cấp và một kỳ báo cáo đã khóa, sau đó đối chiếu telemetry trước khi phân bổ chi phí."
+        },
+        {
+          "question": "Chi phí AI nên được phân bổ như thế nào?",
+          "answer": "Dùng các chiều ổn định như tính năng, đội nhóm, môi trường, nhóm khách hàng và loại khối lượng công việc; tách riêng chi phí nền tảng dùng chung và đánh phiên bản chính sách phân bổ."
+        },
+        {
+          "question": "Điều gì giải thích được sự thay đổi trong chi phí AI?",
+          "answer": "Một cầu nối qua giá, khối lượng, cơ cấu mô hình và hiệu quả liên kết biến động trên hóa đơn với nguyên nhân từ nhà cung cấp, lưu lượng, triển khai hoặc khối lượng công việc."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/invoice-reconciliation",
+          "label": "Đối chiếu hóa đơn cho chi tiêu AI"
+        },
+        {
+          "slug": "/research/llm-cost-attribution",
+          "label": "Phân bổ chi phí LLM"
+        },
+        {
+          "slug": "/research/llm-cost-monitoring",
+          "label": "Giám sát chi phí LLM"
+        }
+      ]
     }
   }
 }

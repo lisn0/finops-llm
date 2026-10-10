@@ -15,7 +15,7 @@
       "title": "Rate limits are a cost control",
       "titleCore": "Rate limits, 429s and tier upgrades",
       "description": "A rate limit is the last thing standing between a bug and an unbounded bill. Teams that treat 429s purely as reliability problems raise the ceiling and pay for it.",
-      "body": "<p>When a service starts returning 429s, the reflex is to treat it as an availability incident: raise the limit, upgrade the tier, add retries, restore throughput. That is sometimes correct. It is also the mechanism by which a runaway loop turns into a five-figure invoice, because the only thing that was stopping it has just been removed.</p><h2>What a 429 is actually telling you</h2><p>It says the system is trying to spend faster than its allowance. That happens for two very different reasons, and they need opposite responses. <strong>Real demand growth</strong> &mdash; more users, a launch, a seasonal peak &mdash; means the limit is genuinely too low and raising it buys real revenue. <strong>Runaway behaviour</strong> &mdash; a retry storm, an agent looping, a backfill nobody throttled, a test suite pointed at production keys &mdash; means the limit is doing exactly its job.</p><p>The two are indistinguishable from the error rate alone. They are trivially distinguishable if you look at cost per unit of work: real growth holds the ratio roughly constant while volume rises; a runaway breaks it, spending far more per completed task than yesterday. That single ratio should gate every tier upgrade.</p><h2>Retries make it worse, quietly</h2><p>Naive retry on 429 without exponential backoff and jitter converts one limit breach into a synchronised storm. The requests that succeed are billed; many of the ones that fail have still consumed input processing. And because retries are usually implemented in a client library rather than application code, the amplification does not appear anywhere in the feature's design docs.</p><h2>Use limits deliberately</h2><p>Set your own limits below the provider's, per environment and per feature, so the first thing to break is yours and you control what happens next. Keep non-production strictly capped &mdash; a failed test build is cheap, a capped customer path is not. Alert on the cost-per-task ratio, not just on error counts. And when you do upgrade a tier, treat it as a spending decision with a named owner, because that is what it is.</p><h2>Related</h2><ul><li><a href=&quot;/research/retry-loop-hidden-spend&quot;>Retry loop hidden spend</a></li><li><a href=&quot;/research/llm-cost-attribution&quot;>LLM cost attribution</a></li><li><a href=&quot;/research/token-budget-implementation&quot;>Token budget implementation</a></li></ul>",
+      "body": "<p>When a service starts returning 429s, the reflex is to treat it as an availability incident: raise the limit, upgrade the tier, add retries, restore throughput. That is sometimes correct. It is also the mechanism by which a runaway loop turns into a five-figure invoice, because the only thing that was stopping it has just been removed.</p><h2>What a 429 is actually telling you</h2><p>It says the system is trying to spend faster than its allowance. That happens for two very different reasons, and they need opposite responses. <strong>Real demand growth</strong> &mdash; more users, a launch, a seasonal peak &mdash; means the limit is genuinely too low and raising it buys real revenue. <strong>Runaway behaviour</strong> &mdash; a retry storm, an agent looping, a backfill nobody throttled, a test suite pointed at production keys &mdash; means the limit is doing exactly its job.</p><p>The two are indistinguishable from the error rate alone. They are trivially distinguishable if you look at cost per unit of work: real growth holds the ratio roughly constant while volume rises; a runaway breaks it, spending far more per completed task than yesterday. That single ratio should gate every tier upgrade.</p><h2>Retries make it worse, quietly</h2><p>Naive retry on 429 without exponential backoff and jitter converts one limit breach into a synchronised storm. The requests that succeed are billed; many of the ones that fail have still consumed input processing. And because retries are usually implemented in a client library rather than application code, the amplification does not appear anywhere in the feature's design docs.</p><h2>Use limits deliberately</h2><p>Set your own limits below the provider's, per environment and per feature, so the first thing to break is yours and you control what happens next. Keep non-production strictly capped &mdash; a failed test build is cheap, a capped customer path is not. Alert on the cost-per-task ratio, not just on error counts. And when you do upgrade a tier, treat it as a spending decision with a named owner, because that is what it is.</p><h2>Related</h2><ul><li><a href=\"/research/retry-loop-hidden-spend\">Retry loop hidden spend</a></li><li><a href=\"/research/llm-cost-attribution\">LLM cost attribution</a></li><li><a href=\"/research/token-budget-implementation\">Token budget implementation</a></li></ul>",
       "faq": [
         {
           "question": "Should you always raise a rate limit that is being hit?",
@@ -132,6 +132,346 @@
         {
           "slug": "/research/retry-loop-hidden-spend",
           "label": "リトライループの隠れた支出"
+        }
+      ]
+    },
+    "id": {
+      "title": "Rate limit adalah alat kontrol biaya",
+      "titleCore": "Rate limit, 429, dan kenaikan tier",
+      "description": "Rate limit adalah benteng terakhir antara bug dan tagihan tanpa batas. Tim yang menganggap 429 hanya masalah keandalan akan menaikkan batas dan membayarnya.",
+      "body": "<p>Saat sebuah layanan mulai mengembalikan 429, refleksnya adalah memperlakukannya sebagai insiden ketersediaan: naikkan batas, naikkan tier, tambahkan retry, pulihkan throughput. Kadang itu memang benar. Tetapi itu juga mekanisme yang mengubah loop yang lepas kendali menjadi tagihan lima digit, karena satu-satunya hal yang menghentikannya baru saja dicabut.</p><h2>Apa sebenarnya yang disampaikan 429</h2><p>Artinya sistem mencoba membelanjakan lebih cepat daripada alokasinya. Itu terjadi karena dua alasan yang sangat berbeda, dan keduanya membutuhkan respons yang berlawanan. <strong>Pertumbuhan permintaan yang nyata</strong> &mdash; lebih banyak pengguna, peluncuran, puncak musiman &mdash; berarti batasnya memang terlalu rendah, dan menaikkannya menghasilkan pendapatan nyata. <strong>Perilaku lepas kendali</strong> &mdash; badai retry, agen yang berputar, backfill yang tidak dibatasi, suite tes yang diarahkan ke kunci produksi &mdash; berarti batasnya bekerja persis seperti seharusnya.</p><p>Keduanya tidak bisa dibedakan hanya dari tingkat error. Keduanya sangat mudah dibedakan jika Anda melihat biaya per unit kerja: pertumbuhan nyata menjaga rasio tetap kurang lebih konstan saat volume naik; loop yang lepas kendali merusak rasio itu, dengan belanja jauh lebih besar per tugas yang selesai dibanding kemarin. Rasio tunggal ini seharusnya menjadi gerbang untuk setiap kenaikan tier.</p><h2>Retry memperburuk keadaan, diam-diam</h2><p>Retry naif pada 429 tanpa exponential backoff dan jitter mengubah satu pelanggaran batas menjadi badai yang tersinkronisasi. Permintaan yang berhasil ditagih; banyak yang gagal pun mungkin sudah mengonsumsi pemrosesan input. Dan karena retry biasanya diimplementasikan di library klien, bukan di kode aplikasi, amplifikasi ini tidak muncul di dokumen desain fitur mana pun.</p><h2>Gunakan batas secara sengaja</h2><p>Atur batas Anda sendiri di bawah batas provider, per lingkungan dan per fitur, sehingga yang pertama rusak adalah batas Anda dan Anda yang mengendalikan apa yang terjadi berikutnya. Batasi ketat lingkungan non-produksi &mdash; build tes yang gagal itu murah, jalur pelanggan yang terbatasi tidak. Pasang alert pada rasio biaya per tugas, bukan hanya pada jumlah error. Dan saat Anda menaikkan tier, perlakukan itu sebagai keputusan belanja dengan pemilik yang jelas, karena memang itulah wujudnya.</p><h2>Terkait</h2><ul><li><a href=\"/research/retry-loop-hidden-spend\">Belanja tersembunyi dari retry loop</a></li><li><a href=\"/research/llm-cost-attribution\">Atribusi biaya LLM</a></li><li><a href=\"/research/token-budget-implementation\">Implementasi anggaran token</a></li></ul>",
+      "faq": [
+        {
+          "question": "Apakah rate limit yang sedang tercapai selalu harus dinaikkan?",
+          "answer": "Tidak. Periksa dulu biaya per tugas yang selesai. Pertumbuhan permintaan yang nyata menjaga rasio itu tetap stabil saat volume naik; loop atau badai retry merusaknya, dan menaikkan batas menghilangkan satu-satunya hal yang menahan belanja."
+        },
+        {
+          "question": "Mengapa retry membuat pembatasan rate limit mahal?",
+          "answer": "Retry pada 429 tanpa exponential backoff dan jitter mengubah satu pelanggaran menjadi badai yang tersinkronisasi. Retry yang berhasil tetap ditagih, dan amplifikasinya biasanya ada di library klien, bukan di kode aplikasi Anda."
+        },
+        {
+          "question": "Bagaimana sebaiknya rate limit diatur?",
+          "answer": "Di bawah batas provider, dipisahkan per lingkungan dan per fitur, sehingga batas Anda sendiri gagal lebih dulu dan Anda yang mengendalikan responsnya. Lingkungan non-produksi sebaiknya dibatasi ketat; batas produksi memerlukan pemilik yang jelas."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/retry-loop-hidden-spend",
+          "label": "Belanja tersembunyi dari retry loop"
+        },
+        {
+          "slug": "/research/llm-cost-attribution",
+          "label": "Atribusi biaya LLM"
+        },
+        {
+          "slug": "/research/token-budget-implementation",
+          "label": "Implementasi anggaran token"
+        }
+      ]
+    },
+    "pl": {
+      "title": "Limity szybkości to kontrola kosztów",
+      "titleCore": "Limity szybkości, błędy 429 i podnoszenie poziomu",
+      "description": "Limit szybkości to ostatnia bariera między błędem a rachunkiem bez limitu. Kto traktuje 429 tylko jako problem niezawodności, podnosi sufit i za to płaci.",
+      "body": "<p>Gdy usługa zaczyna zwracać 429, odruchem jest potraktowanie tego jak incydentu dostępności: podnieść limit, przejść na wyższy poziom, dodać ponowne próby, przywrócić przepustowość. Czasem to słuszne. Jest to jednak też mechanizm, dzięki któremu błąd w pętli zamienia się w rachunek na pięć cyfr, bo właśnie usunięto jedyną rzecz, która go powstrzymywała.</p><h2>Co naprawdę mówi 429</h2><p>Oznacza, że system próbuje wydawać szybciej, niż pozwala jego przydział. Dzieje się tak z dwóch bardzo różnych powodów, które wymagają przeciwnych reakcji. <strong>Realny wzrost popytu</strong> &mdash; więcej użytkowników, premiera, szczyt sezonowy &mdash; oznacza, że limit jest rzeczywiście za niski, a jego podniesienie przynosi realne przychody. <strong>Niekontrolowane zachowanie</strong> &mdash; burza ponownych prób, agent w pętli, backfill bez ograniczenia, zestaw testów skierowany na klucze produkcyjne &mdash; oznacza, że limit robi dokładnie to, do czego służy.</p><p>Same wskaźniki błędów tych dwóch przypadków nie rozróżnią. Rozróżnia je koszt na jednostkę pracy: realny wzrost utrzymuje ten stosunek mniej więcej stały, gdy wolumen rośnie; niekontrolowane zachowanie go łamie, bo wydajemy znacznie więcej na ukończone zadanie niż wczoraj. Ten jeden wskaźnik powinien decydować o każdym podniesieniu poziomu.</p><h2>Ponowne próby pogarszają sprawę po cichu</h2><p>Naiwne ponawianie po 429 bez wykładniczego opóźnienia i jitteru zamienia jedno przekroczenie limitu w zsynchronizowaną burzę. Żądania, które się udają, są rozliczane; wiele z tych, które się nie udają, i tak zużyło przetwarzanie wejścia. Ponieważ ponowne próby zwykle są realizowane w bibliotece klienta, a nie w kodzie aplikacji, to wzmocnienie nie pojawia się w dokumentacji projektowej funkcji.</p><h2>Stosuj limity świadomie</h2><p>Ustawiaj własne limity poniżej limitów dostawcy, osobno dla każdego środowiska i funkcji, tak aby pierwszym pęknięciem był Twój limit i to Ty kontrolowałeś, co dzieje się dalej. Trzymaj środowiska nieprodukcyjne ściśle ograniczone: nieudany build testowy jest tani, ograniczona ścieżka klienta już nie. Alarmuj na podstawie wskaźnika koszt na zadanie, a nie tylko liczby błędów. A gdy podnosisz poziom, traktuj to jak decyzję o wydatkach z wyznaczonym właścicielem, bo tym właśnie jest.</p><h2>Powiązane</h2><ul><li><a href=\"/research/retry-loop-hidden-spend\">Ukryte wydatki z pętli ponownych prób</a></li><li><a href=\"/research/llm-cost-attribution\">Przypisywanie kosztów LLM</a></li><li><a href=\"/research/token-budget-implementation\">Wdrażanie budżetu tokenów</a></li></ul>",
+      "faq": [
+        {
+          "question": "Czy zawsze należy podnosić limit szybkości, który jest osiągany?",
+          "answer": "Nie. Najpierw sprawdź koszt na ukończone zadanie. Realny wzrost popytu utrzymuje ten stosunek stały, gdy wolumen rośnie; pętla lub burza ponownych prób go łamie, a podniesienie limitu usuwa jedyną rzecz, która ograniczała wydatki."
+        },
+        {
+          "question": "Dlaczego ponowne próby czynią ograniczanie szybkości kosztownym?",
+          "answer": "Ponawianie po 429 bez wykładniczego opóźnienia i jitteru zamienia jedno przekroczenie w zsynchronizowaną burzę. Udane ponowne próby są rozliczane, a wzmocnienie zwykle siedzi w bibliotece klienta, a nie w kodzie aplikacji."
+        },
+        {
+          "question": "Jak ustawiać limity szybkości?",
+          "answer": "Poniżej sufitu dostawcy, osobno dla każdego środowiska i funkcji, tak aby własny limit pękał pierwszy i to Ty kontrolowałeś reakcję. Środowiska nieprodukcyjne powinny mieć twarde limity; limity produkcyjne wymagają świadomego właściciela."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/retry-loop-hidden-spend",
+          "label": "Ukryte wydatki z pętli ponownych prób"
+        },
+        {
+          "slug": "/research/llm-cost-attribution",
+          "label": "Przypisywanie kosztów LLM"
+        },
+        {
+          "slug": "/research/token-budget-implementation",
+          "label": "Wdrażanie budżetu tokenów"
+        }
+      ]
+    },
+    "ru": {
+      "title": "Лимиты запросов — это контроль расходов",
+      "titleCore": "Лимиты запросов, 429 и повышение тарифа",
+      "description": "Лимит запросов — последнее, что отделяет баг от счета без потолка. Кто считает 429 только проблемой надежности, поднимает потолок и платит за это.",
+      "body": "<p>Когда сервис начинает возвращать 429, рефлекс — видеть в этом инцидент доступности: поднять лимит, перейти на более высокий тариф, добавить повторные попытки, вернуть пропускную способность. Иногда это правильно. Но это же и механизм, по которому зациклившийся процесс превращается в счет на пять цифр, ведь единственное, что его останавливало, только что убрали.</p><h2>Что на самом деле говорит 429</h2><p>Система пытается тратить быстрее, чем позволяет её лимит. Причин две, и реагировать на них нужно противоположно. <strong>Реальный рост спроса</strong> — больше пользователей, запуск, сезонный пик — означает, что лимит действительно мал, и его повышение приносит реальную выручку. <strong>Неконтролируемое поведение</strong> — шторм повторов, зациклившийся агент, бэкфилл без ограничения скорости, тестовый набор, направленный на боевые ключи — означает, что лимит делает именно свою работу.</p><p>По одной только доле ошибок их не различить. Зато легко различить по стоимости единицы работы: при реальном росте соотношение остается примерно постоянным, пока объем растет; при неконтролируемом поведении оно ломается, и на каждую выполненную задачу тратится заметно больше, чем вчера. Именно это соотношение должно служить условием любого повышения тарифа.</p><h2>Повторы незаметно усугубляют ситуацию</h2><p>Наивный повтор при 429 без экспоненциальной задержки и джиттера превращает одно превышение лимита в синхронизированный шторм. Успешные повторы тарифицируются, а многие неудачные все равно успели потребить обработку входных данных. Поскольку повторы обычно реализованы в клиентской библиотеке, а не в коде приложения, это усиление не отражено ни в одном проектном документе функции.</p><h2>Используйте лимиты осознанно</h2><p>Задавайте собственные лимиты ниже лимитов провайдера, отдельно для каждого окружения и функции, чтобы первым ломалось ваше ограничение и вы контролировали дальнейшие действия. Жестко ограничивайте непродуктивные среды: упавшая тестовая сборка стоит недорого, а ограниченный клиентский путь — нет. Настраивайте алерты на соотношение стоимости к задаче, а не только на счетчик ошибок. А повышение тарифа считайте решением о расходах с назначенным ответственным, потому что это именно оно и есть.</p><h2>Связанное</h2><ul><li><a href=\"/research/retry-loop-hidden-spend\">Скрытые расходы на циклы повторов</a></li><li><a href=\"/research/llm-cost-attribution\">Отнесение затрат на LLM</a></li><li><a href=\"/research/token-budget-implementation\">Внедрение бюджета токенов</a></li></ul>",
+      "faq": [
+        {
+          "question": "Нужно ли всегда повышать лимит, который упирается в потолок?",
+          "answer": "Нет. Сначала проверьте стоимость выполненной задачи. Реальный рост спроса сохраняет это соотношение при росте объема; зацикливание или шторм повторов его ломает, а повышение лимита снимает единственное ограничение расходов."
+        },
+        {
+          "question": "Почему повторы делают ограничение запросов дорогим?",
+          "answer": "Повтор при 429 без экспоненциальной задержки и джиттера превращает одно превышение в синхронизированный шторм. Успешные повторы оплачиваются, а усиление обычно живет в клиентской библиотеке, а не в коде вашего приложения."
+        },
+        {
+          "question": "Как задавать лимиты запросов?",
+          "answer": "Ниже потолка провайдера, отдельно для каждого окружения и функции, чтобы первым срабатывал ваш собственный лимит и вы контролировали реакцию. Для непродуктивных сред нужны жесткие ограничения; у производственных лимитов должен быть осознанный владелец."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/retry-loop-hidden-spend",
+          "label": "Скрытые расходы на циклы повторов"
+        },
+        {
+          "slug": "/research/llm-cost-attribution",
+          "label": "Отнесение затрат на LLM"
+        },
+        {
+          "slug": "/research/token-budget-implementation",
+          "label": "Внедрение бюджета токенов"
+        }
+      ]
+    },
+    "tr": {
+      "title": "Rate limitleri bir maliyet kontrolüdür",
+      "titleCore": "Rate limitler, 429 hataları ve tier yükseltmeleri",
+      "description": "Rate limit, bir hata ile sınırsız bir fatura arasındaki son engeldir. 429 hatalarını yalnızca güvenilirlik sorunu sayan ekipler limiti yükseltir ve bedelini öder.",
+      "body": "<p>Bir servis 429 döndürmeye başladığında refleks, bunu bir erişilebilirlik olayı gibi ele almaktır: limiti yükseltmek, tier'ı yükseltmek, yeniden deneme eklemek ve verimi geri getirmek. Bu bazen doğrudur. Ama aynı zamanda kontrolden çıkmış bir döngünün beş haneli bir faturaya dönüşme mekanizmasıdır, çünkü onu durduran tek şey az önce kaldırılmıştır.</p><h2>Bir 429 aslında ne söylüyor</h2><p>Sistemin, izin verilen miktardan daha hızlı harcamaya çalıştığını söyler. Bu, birbirinden çok farklı iki nedenden kaynaklanır ve tepkileri tam tersidir. <strong>Gerçek talep artışı</strong> &mdash; daha fazla kullanıcı, bir lansman, mevsimsel bir zirve &mdash; limitin gerçekten düşük olduğu anlamına gelir ve onu yükseltmek gerçek gelir kazandırır. <strong>Kontrolden çıkmış davranış</strong> &mdash; bir yeniden deneme fırtınası, döngüye giren bir agent, kimsenin kısıtlamadığı bir geriye dönük işlem, üretim anahtarlarına yönlendirilmiş bir test paketi &mdash; ise limitin tam olarak görevini yaptığı anlamına gelir.</p><p>İkisi yalnızca hata oranına bakılarak ayırt edilemez. İş birimi başına maliyete bakılarak kolayca ayırt edilir: gerçek büyümede hacim artarken oran kabaca sabit kalır; kontrolden çıkmış bir durumda ise tamamlanan görev başına harcama dünkünden çok daha yüksek olur ve oran bozulur. Her tier yükseltmesi bu tek oranla kontrol edilmelidir.</p><h2>Yeniden denemeler durumu sessizce kötüleştirir</h2><p>Üssel geri çekilme ve jitter olmadan 429'da yapılan saf yeniden deneme, tek bir limit aşımını eşzamanlı bir fırtınaya dönüştürür. Başarılı istekler faturalandırılır; başarısız olanların birçoğu yine de girdi işleme kaynağı tüketmiş olur. Yeniden denemeler genellikle uygulama kodu yerine bir istemci kütüphanesinde uygulandığı için bu çoğalma, özelliğin tasarım dokümanlarında hiçbir yerde görünmez.</p><h2>Limitleri bilinçli kullanın</h2><p>Kendi limitlerinizi sağlayıcınınkinin altında, ortam ve özellik bazında belirleyin; böylece ilk kırılan şey sizin limitiniz olur ve sonrasında ne olacağını siz kontrol edersiniz. Üretim dışı ortamları sıkıca sınırlayın &mdash; başarısız bir test derlemesi ucuzdur, sınırlandırılmış bir müşteri yolu ise değildir. Yalnızca hata sayılarında değil, görev başına maliyet oranında uyarı kurun. Bir tier'ı yükselttiğinizde de bunu, adı belli bir sorumlusu olan bir harcama kararı olarak ele alın, çünkü öyle de olmalıdır.</p><h2>İlgili</h2><ul><li><a href=\"/research/retry-loop-hidden-spend\">Yeniden deneme döngüsünün gizli harcaması</a></li><li><a href=\"/research/llm-cost-attribution\">LLM maliyet atfı</a></li><li><a href=\"/research/token-budget-implementation\">Token bütçesi uygulaması</a></li></ul>",
+      "faq": [
+        {
+          "question": "Sınıra takılan bir rate limit her zaman yükseltilmeli mi?",
+          "answer": "Hayır. Önce tamamlanan görev başına maliyeti kontrol edin. Gerçek talep artışı hacim büyürken bu oranı sabit tutar; bir döngü veya yeniden deneme fırtınası ise oranı bozar ve limiti yükseltmek harcamayı sınırlayan tek şeyi kaldırır."
+        },
+        {
+          "question": "Yeniden denemeler rate limitlemeyi neden pahalı hale getirir?",
+          "answer": "Üssel geri çekilme ve jitter olmadan 429'da yeniden deneme yapmak, tek bir aşımı eşzamanlı bir fırtınaya çevirir. Başarılı denemeler faturalandırılır ve bu çoğalma genellikle uygulama kodunuzda değil, bir istemci kütüphanesinde yaşar."
+        },
+        {
+          "question": "Rate limitler nasıl belirlenmeli?",
+          "answer": "Sağlayıcının üst sınırının altında, ortam ve özellik bazında ayrı ayrı belirlenmeli; böylece kendi limitiniz önce kırılır ve tepkiyi siz kontrol edersiniz. Üretim dışı ortamlar sıkı sınırlandırılmalı; üretim limitlerinin ise bilinçli bir sahibi olmalı."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/retry-loop-hidden-spend",
+          "label": "Yeniden deneme döngüsünün gizli harcaması"
+        },
+        {
+          "slug": "/research/llm-cost-attribution",
+          "label": "LLM maliyet atfı"
+        },
+        {
+          "slug": "/research/token-budget-implementation",
+          "label": "Token bütçesi uygulaması"
+        }
+      ]
+    },
+    "vi": {
+      "title": "Giới hạn tốc độ cũng là công cụ kiểm soát chi phí",
+      "titleCore": "Giới hạn tốc độ, lỗi 429 và nâng cấp gói",
+      "description": "Giới hạn tốc độ là thứ cuối cùng ngăn một lỗi phần mềm biến thành hóa đơn không đáy. Đội nào chỉ coi 429 là vấn đề độ tin cậy sẽ nâng trần và trả giá cho việc đó.",
+      "body": "<p>Khi một dịch vụ bắt đầu trả về 429, phản xạ thường gặp là xem đây như một sự cố về tính khả dụng: nâng giới hạn, nâng gói, thêm cơ chế thử lại, khôi phục thông lượng. Đôi khi cách làm đó là đúng. Nhưng đó cũng là cơ chế khiến một vòng lặp chạy vượt tầm kiểm soát trở thành hóa đơn lên tới năm chữ số, vì thứ duy nhất đang chặn nó vừa bị gỡ bỏ.</p><h2>Lỗi 429 thực sự cho bạn biết điều gì</h2><p>Nó cho biết hệ thống đang cố tiêu tốn nhanh hơn mức được phép. Điều này xảy ra vì hai lý do rất khác nhau, và cần hai cách xử lý ngược hẳn nhau. <strong>Nhu cầu tăng thật sự</strong> &mdash; nhiều người dùng hơn, một đợt ra mắt, một đỉnh theo mùa &mdash; nghĩa là giới hạn thực sự quá thấp, và nâng lên sẽ mang lại doanh thu thật. <strong>Hành vi chạy vượt tầm kiểm soát</strong> &mdash; bão thử lại, một agent lặp vô hạn, một đợt backfill không có throttle, một bộ kiểm thử trỏ vào khóa production &mdash; nghĩa là giới hạn đang làm đúng nhiệm vụ của nó.</p><p>Chỉ nhìn tỷ lệ lỗi thì không phân biệt được hai trường hợp này. Nhưng nhìn chi phí trên mỗi đơn vị công việc thì dễ dàng phân biệt: khi tăng trưởng thật, tỷ lệ này gần như không đổi dù khối lượng tăng; khi chạy vượt tầm kiểm soát, tỷ lệ bị phá vỡ, chi phí cho mỗi tác vụ hoàn thành tăng vọt so với hôm qua. Chỉ số tỷ lệ này nên là điều kiện để quyết định mọi lần nâng gói.</p><h2>Cơ chế thử lại làm mọi thứ tệ hơn, một cách âm thầm</h2><p>Thử lại ngay khi gặp 429 mà không có backoff luỹ thừa và jitter sẽ biến một lần vượt giới hạn thành một cơn bão đồng bộ. Các yêu cầu thành công đều bị tính phí; nhiều yêu cầu thất bại vẫn đã tiêu tốn xử lý đầu vào. Và vì cơ chế thử lại thường được cài trong thư viện client chứ không nằm trong mã ứng dụng, sự khuếch đại này không xuất hiện ở bất kỳ tài liệu thiết kế tính năng nào.</p><h2>Sử dụng giới hạn có chủ đích</h2><p>Đặt giới hạn của riêng bạn thấp hơn giới hạn của nhà cung cấp, theo từng môi trường và từng tính năng, để thứ đầu tiên bị vỡ là giới hạn của bạn và bạn kiểm soát được bước tiếp theo. Giữ môi trường không phải production bị giới hạn chặt &mdash; một bản build kiểm thử lỗi thì rẻ, còn một luồng khách hàng bị nghẽn thì không. Cảnh báo dựa trên tỷ lệ chi phí trên mỗi tác vụ, không chỉ dựa trên số lỗi. Và khi nâng gói, hãy coi đó là một quyết định chi tiêu có người chịu trách nhiệm được nêu tên, vì đúng là như vậy.</p><h2>Liên quan</h2><ul><li><a href=\"/research/retry-loop-hidden-spend\">Chi phí ẩn của vòng lặp thử lại</a></li><li><a href=\"/research/llm-cost-attribution\">Phân bổ chi phí LLM</a></li><li><a href=\"/research/token-budget-implementation\">Triển khai ngân sách token</a></li></ul>",
+      "faq": [
+        {
+          "question": "Có nên luôn nâng giới hạn tốc độ khi đang bị chạm tới không?",
+          "answer": "Không. Hãy kiểm tra trước chi phí trên mỗi tác vụ hoàn thành. Nhu cầu tăng thật sẽ giữ tỷ lệ đó ổn định khi khối lượng tăng; vòng lặp hoặc bão thử lại sẽ phá vỡ nó, và việc nâng giới hạn sẽ gỡ bỏ thứ duy nhất đang kiểm soát chi tiêu."
+        },
+        {
+          "question": "Vì sao cơ chế thử lại khiến việc giới hạn tốc độ trở nên tốn kém?",
+          "answer": "Thử lại khi gặp 429 mà không có backoff luỹ thừa và jitter sẽ biến một lần vượt giới hạn thành một cơn bão đồng bộ. Các lần thử lại thành công đều bị tính phí, và sự khuếch đại thường nằm trong thư viện client thay vì mã ứng dụng của bạn."
+        },
+        {
+          "question": "Nên đặt giới hạn tốc độ như thế nào?",
+          "answer": "Thấp hơn ngưỡng của nhà cung cấp, đặt riêng cho từng môi trường và tính năng, để giới hạn của bạn vỡ trước và bạn kiểm soát được phản ứng. Môi trường không phải production cần được giới hạn chặt; các giới hạn production cần có người chịu trách nhiệm rõ ràng."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/retry-loop-hidden-spend",
+          "label": "Chi phí ẩn của vòng lặp thử lại"
+        },
+        {
+          "slug": "/research/llm-cost-attribution",
+          "label": "Phân bổ chi phí LLM"
+        },
+        {
+          "slug": "/research/token-budget-implementation",
+          "label": "Triển khai ngân sách token"
+        }
+      ]
+    },
+    "ar": {
+      "title": "حدود المعدل أداة للتحكم في التكلفة",
+      "titleCore": "حدود المعدل وأخطاء 429 وترقيات الفئات",
+      "description": "حد المعدل هو آخر ما يفصل بين خطأ برمجي وفاتورة بلا سقف. الفرق التي تعامل أخطاء 429 كمشكلة موثوقية فقط ترفع السقف وتدفع الثمن.",
+      "body": "<p>عندما تبدأ خدمة بإرجاع 429، يكون رد الفعل المعتاد التعامل معها كحادثة توفر: رفع الحد، أو ترقية الفئة، أو إضافة إعادة محاولة، واستعادة الإنتاجية. وهذا صحيح أحياناً. لكنه أيضاً الآلية التي تحوّل حلقة جامحة إلى فاتورة بخمسة أرقام، لأن الشيء الوحيد الذي كان يوقفها قد أُزيل للتو.</p><h2>ما الذي يعنيه 429 فعلاً</h2><p>يعني أن النظام يحاول الإنفاق أسرع من مخصصه. وهذا يحدث لسببين مختلفين جداً، ويحتاجان إلى استجابتين متعاكستين. <strong>نمو حقيقي في الطلب</strong> &mdash; مستخدمون أكثر، أو إطلاق، أو ذروة موسمية &mdash; يعني أن الحد منخفض فعلاً، ورفعه يشتري إيرادات حقيقية. <strong>سلوك جامح</strong> &mdash; عاصفة إعادة محاولات، أو وكيل يدور في حلقة، أو تعبئة بيانات تاريخية لم تُقنن، أو مجموعة اختبارات موجهة إلى مفاتيح الإنتاج &mdash; يعني أن الحد يؤدي وظيفته تماماً.</p><p>لا يمكن التمييز بينهما من معدل الأخطاء وحده. أما من تكلفة كل وحدة عمل فالتمييز بسيط: النمو الحقيقي يُبقي النسبة ثابتة تقريباً مع ارتفاع الحجم، والسلوك الجامح يكسرها، فينفق أكثر بكثير على كل مهمة مكتملة مقارنة بالأمس. هذه النسبة الواحدة يجب أن تكون شرط أي ترقية لفئة.</p><h2>إعادة المحاولة تزيد الأمر سوءاً بهدوء</h2><p>إعادة المحاولة الساذجة عند 429 دون تراجع أسي وعشوائية (jitter) تحوّل تجاوزاً واحداً للحد إلى عاصفة متزامنة. الطلبات الناجحة تُفوتر، وكثير من الفاشلة قد استهلك معالجة الإدخال. ولأن إعادة المحاولة تُنفَّذ عادةً في مكتبة العميل لا في كود التطبيق، فإن هذا التضخم لا يظهر في أي مستند تصميم للميزة.</p><h2>استخدم الحدود بقصد</h2><p>اضبط حدودك أدنى من حدود المزود، لكل بيئة ولكل ميزة، حتى يكون أول ما ينكسر هو حدك أنت، فتتحكم في الاستجابة التالية. اجعل غير الإنتاج مقيداً بصرامة، فبناء اختبار فاشل رخيص، أما مسار عملاء مقيد فليس كذلك. نبّه على نسبة التكلفة لكل مهمة لا على عدد الأخطاء وحده. وعندما ترقّي الفئة، عامل ذلك كقرار إنفاق له مالك محدد، لأنه كذلك فعلاً.</p><h2>ذات صلة</h2><ul><li><a href=\"/research/retry-loop-hidden-spend\">إنفاق حلقة إعادة المحاولة المخفي</a></li><li><a href=\"/research/llm-cost-attribution\">إسناد تكلفة LLM</a></li><li><a href=\"/research/token-budget-implementation\">تنفيذ ميزانية الرموز</a></li></ul>",
+      "faq": [
+        {
+          "question": "هل يجب دائماً رفع حد المعدل عند بلوغه؟",
+          "answer": "لا. تحقق أولاً من تكلفة كل مهمة مكتملة. النمو الحقيقي يُبقي هذه النسبة ثابتة مع ارتفاع الحجم، أما حلقة جامحة أو عاصفة إعادة محاولات فتكسرها، ورفع الحد يزيل الشيء الوحيد الذي كان يحتوي الإنفاق."
+        },
+        {
+          "question": "لماذا تجعل إعادة المحاولات تحديد المعدل مكلفاً؟",
+          "answer": "إعادة المحاولة عند 429 دون تراجع أسي وعشوائية تحوّل التجاوز الواحد إلى عاصفة متزامنة. المحاولات الناجحة تُفوتر، والتضخم يعيش عادةً في مكتبة العميل لا في كود تطبيقك."
+        },
+        {
+          "question": "كيف تُضبط حدود المعدل؟",
+          "answer": "أدنى من سقف المزود، ومنفصلة لكل بيئة وميزة، حتى ينكسر حدك أنت أولاً فتتحكم في الاستجابة. يجب تقييد غير الإنتاج بصرامة، وتحتاج حدود الإنتاج إلى مالك محدد يقرّرها."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/retry-loop-hidden-spend",
+          "label": "إنفاق إعادة المحاولات المخفي"
+        },
+        {
+          "slug": "/research/llm-cost-attribution",
+          "label": "إسناد تكلفة LLM"
+        },
+        {
+          "slug": "/research/token-budget-implementation",
+          "label": "تنفيذ ميزانية الرموز"
+        }
+      ]
+    },
+    "it": {
+      "title": "I rate limit sono controllo dei costi",
+      "titleCore": "Rate limit, 429 e upgrade di tier",
+      "description": "Un rate limit è l'ultima barriera tra un bug e una fattura senza tetto. Chi tratta i 429 solo come problemi di affidabilità alza il tetto e paga.",
+      "body": "<p>Quando un servizio comincia a restituire 429, il riflesso è trattarlo come un incidente di disponibilità: alzare il limite, passare a un tier superiore, aggiungere retry, ripristinare il throughput. A volte è giusto. È anche il meccanismo con cui un loop fuori controllo diventa una fattura a cinque cifre, perché l'unica cosa che lo fermava è appena stata rimossa.</p><h2>Cosa ti dice davvero un 429</h2><p>Dice che il sistema prova a spendere più in fretta della sua allocazione. Succede per due ragioni molto diverse, che richiedono risposte opposte. <strong>Crescita reale della domanda</strong> &mdash; più utenti, un lancio, un picco stagionale &mdash; significa che il limite è davvero troppo basso e alzarlo genera ricavi reali. <strong>Comportamento fuori controllo</strong> &mdash; una tempesta di retry, un agente in loop, un backfill senza throttling, una suite di test puntata alle chiavi di produzione &mdash; significa che il limite sta facendo esattamente il suo lavoro.</p><p>Le due situazioni non si distinguono dal solo tasso di errore. Si distinguono facilmente guardando il costo per unità di lavoro: la crescita reale mantiene il rapporto più o meno costante mentre il volume sale; un loop fuori controllo lo spezza, spendendo molto di più per attività completata rispetto al giorno prima. Questo singolo rapporto dovrebbe decidere ogni upgrade di tier.</p><h2>I retry peggiorano le cose, in silenzio</h2><p>Un retry ingenuo sui 429 senza backoff esponenziale e jitter trasforma una violazione del limite in una tempesta sincronizzata. Le richieste che riescono vengono fatturate; molte di quelle che falliscono hanno comunque consumato elaborazione dell'input. E poiché i retry sono di solito implementati nella libreria client e non nel codice applicativo, l'amplificazione non compare da nessuna parte nei documenti di design della funzionalità.</p><h2>Usa i limiti in modo deliberato</h2><p>Imposta i tuoi limiti sotto quelli del provider, per ambiente e per funzionalità, così il primo a rompersi è il tuo e controlli cosa succede dopo. Mantieni il non-produzione strettamente limitato: una build di test fallita costa poco, un percorso cliente limitato no. Allerta sul rapporto costo per attività, non solo sui conteggi degli errori. E quando fai un upgrade di tier, trattalo come una decisione di spesa con un responsabile nominato, perché è esattamente questo.</p><h2>Correlati</h2><ul><li><a href=\"/research/retry-loop-hidden-spend\">Spesa nascosta dei loop di retry</a></li><li><a href=\"/research/llm-cost-attribution\">Attribuzione dei costi LLM</a></li><li><a href=\"/research/token-budget-implementation\">Implementazione del budget di token</a></li></ul>",
+      "faq": [
+        {
+          "question": "Bisogna sempre alzare un rate limit che viene raggiunto?",
+          "answer": "No. Controlla prima il costo per attività completata. La crescita reale della domanda mantiene stabile quel rapporto mentre il volume sale; un loop o una tempesta di retry lo spezza, e alzare il limite rimuove l'unica cosa che conteneva la spesa."
+        },
+        {
+          "question": "Perché i retry rendono costoso il rate limiting?",
+          "answer": "Riprovare sui 429 senza backoff esponenziale e jitter trasforma una violazione in una tempesta sincronizzata. I retry riusciti vengono fatturati, e l'amplificazione di solito vive nella libreria client invece che nel codice applicativo."
+        },
+        {
+          "question": "Come vanno impostati i rate limit?",
+          "answer": "Sotto il tetto del provider, separatamente per ambiente e per funzionalità, così il tuo limite si rompe per primo e controlli la risposta. Il non-produzione va limitato in modo rigido; i limiti di produzione richiedono un responsabile deliberato."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/retry-loop-hidden-spend",
+          "label": "Spesa nascosta dei loop di retry"
+        },
+        {
+          "slug": "/research/llm-cost-attribution",
+          "label": "Attribuzione dei costi LLM"
+        },
+        {
+          "slug": "/research/token-budget-implementation",
+          "label": "Implementazione del budget di token"
+        }
+      ]
+    },
+    "ko": {
+      "title": "레이트 리밋은 비용 통제 수단이다",
+      "titleCore": "레이트 리밋, 429 오류, 티어 업그레이드",
+      "description": "레이트 리밋은 버그와 상한 없는 청구서 사이에 남은 마지막 장치입니다. 429를 가용성 문제로만 보는 팀은 한도를 올리고 그 비용을 치르게 됩니다.",
+      "body": "<p>서비스가 429 응답을 돌려주기 시작하면 가용성 장애로 취급하려는 반사적 반응이 나옵니다. 한도를 올리고, 티어를 업그레이드하고, 재시도를 추가해 처리량을 되찾는 것이죠. 이것이 맞을 때도 있습니다. 그러나 동시에 폭주하는 루프가 다섯 자리 청구서로 바뀌는 경로이기도 합니다. 그 루프를 막고 있던 유일한 장치를 방금 제거했기 때문입니다.</p><h2>429가 실제로 알려주는 것</h2><p>시스템이 허용량보다 빠르게 지출하려 한다는 뜻입니다. 원인은 두 가지로 크게 다르고, 대응도 정반대입니다. <strong>실제 수요 증가</strong>(사용자 증가, 출시, 시즌 피크)라면 한도가 정말 낮은 것이므로 올리는 것이 실제 매출을 지키는 길입니다. <strong>폭주</strong>(재시도 폭풍, 루프에 빠진 에이전트, 제한 없이 도는 백필, 운영 키를 겨눈 테스트 스위트)라면 한도가 제 역할을 정확히 하고 있는 것입니다.</p><p>두 경우는 오류율만으로는 구분되지 않습니다. 작업 단위당 비용을 보면 쉽게 구분됩니다. 실제 성장이라면 볼륨이 늘어도 이 비율은 대체로 유지되고, 폭주라면 완료된 작업 하나당 어제보다 훨씬 많이 쓰면서 비율이 무너집니다. 이 비율이 모든 티어 업그레이드의 판단 기준이 되어야 합니다.</p><h2>재시도가 조용히 상황을 악화시킨다</h2><p>지수 백오프와 지터 없이 429에 대해 단순 재시도를 하면, 한 번의 한도 초과가 동기화된 폭풍으로 바뀝니다. 성공한 요청은 과금되고, 실패한 요청 상당수도 이미 입력 처리에 자원을 소모합니다. 게다가 재시도는 보통 애플리케이션 코드가 아니라 클라이언트 라이브러리에 구현되어 있어서, 이 증폭은 기능의 설계 문서 어디에도 나타나지 않습니다.</p><h2>한도를 의도적으로 설정하라</h2><p>제공자의 상한보다 낮게, 환경별·기능별로 자체 한도를 설정하세요. 그러면 가장 먼저 깨지는 것이 우리 쪽 한도가 되고, 그다음 일어날 일을 우리가 통제할 수 있습니다. 비운영 환경은 엄격하게 제한하세요. 실패한 테스트 빌드는 값이 싸지만, 상한이 걸린 고객 경로는 그렇지 않습니다. 알림은 오류 건수가 아니라 작업당 비용 비율을 기준으로 설정하세요. 그리고 티어를 올릴 때는 담당자가 명확한 지출 결정으로 다뤄야 합니다. 실제로 그런 결정이니까요.</p><h2>관련 글</h2><ul><li><a href=\"/research/retry-loop-hidden-spend\">재시도 루프에 숨은 지출</a></li><li><a href=\"/research/llm-cost-attribution\">LLM 비용 귀속</a></li><li><a href=\"/research/token-budget-implementation\">토큰 예산 구현</a></li></ul>",
+      "faq": [
+        {
+          "question": "레이트 리밋에 계속 걸린다면 항상 한도를 올려야 할까요?",
+          "answer": "아닙니다. 먼저 완료된 작업당 비용을 확인하세요. 실제 수요 증가라면 이 비율이 유지되지만, 루프나 재시도 폭풍이라면 비율이 무너집니다. 이때 한도를 올리면 지출을 막던 유일한 장치를 없애는 셈입니다."
+        },
+        {
+          "question": "재시도가 레이트 리밋 운영 비용을 키우는 이유는 무엇인가요?",
+          "answer": "지수 백오프와 지터 없이 429에 재시도하면 한 번의 초과가 동기화된 폭풍이 됩니다. 성공한 재시도는 과금되고, 증폭은 보통 애플리케이션 코드가 아닌 클라이언트 라이브러리에서 일어납니다."
+        },
+        {
+          "question": "레이트 리밋은 어떻게 설정해야 하나요?",
+          "answer": "제공자의 상한보다 낮게, 환경과 기능별로 따로 설정하세요. 그래야 우리 쪽 한도가 먼저 깨지고 대응을 우리가 통제할 수 있습니다. 비운영 환경은 엄격히 제한하고, 운영 환경의 한도는 명확한 담당자가 관리해야 합니다."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/retry-loop-hidden-spend",
+          "label": "재시도 루프에 숨은 지출"
+        },
+        {
+          "slug": "/research/llm-cost-attribution",
+          "label": "LLM 비용 귀속"
+        },
+        {
+          "slug": "/research/token-budget-implementation",
+          "label": "토큰 예산 구현"
+        }
+      ]
+    },
+    "nl": {
+      "title": "Rate limits zijn kostenbeheersing",
+      "titleCore": "Rate limits, 429's en tier-upgrades",
+      "description": "Een rate limit houdt een bug tegen op een onbegrensde rekening. Teams die 429's alleen als uptimeprobleem zien, verhogen het plafond en betalen.",
+      "body": "<p>Als een dienst 429's begint terug te geven, is de reflex het als een beschikbaarheidsincident te behandelen: de limiet verhogen, de tier upgraden, retries toevoegen, de doorvoer herstellen. Soms is dat juist. Het is ook het mechanisme waarmee een op hol geslagen loop een rekening van vijf cijfers wordt, omdat het enige dat hem tegenhield zojuist is weggehaald.</p><h2>Wat een 429 je eigenlijk vertelt</h2><p>Het zegt dat het systeem sneller probeert uit te geven dan zijn budget toelaat. Dat gebeurt om twee heel verschillende redenen, en die vragen om tegengestelde reacties. <strong>Echte vraaggroei</strong> &mdash; meer gebruikers, een lancering, een seizoenspiek &mdash; betekent dat de limiet echt te laag is en dat verhogen echte omzet oplevert. <strong>Op hol geslagen gedrag</strong> &mdash; een retry-storm, een agent die in een loop zit, een backfill die niemand heeft gethrottled, een testsuite die op productiesleutels wijst &mdash; betekent dat de limiet precies doet waarvoor hij bedoeld is.</p><p>De twee zijn aan het foutpercentage alleen niet te onderscheiden. Aan de kosten per werkeenheid zijn ze triviaal te onderscheiden: echte groei houdt de verhouding ruwweg constant terwijl het volume stijgt; een op hol geslagen proces breekt haar, met veel hogere uitgaven per voltooide taak dan gisteren. Die ene verhouding zou elke tier-upgrade moeten bewaken.</p><h2>Retries maken het stilletjes erger</h2><p>Naïef opnieuw proberen bij een 429 zonder exponentiële backoff en jitter verandert één overschrijding van de limiet in een gesynchroniseerde storm. De verzoeken die slagen worden gefactureerd; veel van de verzoeken die falen hebben toch al inputverwerking verbruikt. En omdat retries meestal in een clientbibliotheek zijn geïmplementeerd en niet in applicatiecode, komt de versterking nergens in de ontwerpdocumenten van de feature voor.</p><h2>Gebruik limieten bewust</h2><p>Stel je eigen limieten lager in dan die van de provider, per omgeving en per feature, zodat het eerste dat breekt van jou is en jij bepaalt wat er daarna gebeurt. Houd niet-productie strikt begrensd &mdash; een mislukte testbuild is goedkoop, een afgekapt klantpad niet. Alarmeer op de verhouding kosten per taak, niet alleen op foutaantallen. En als je een tier upgradet, behandel dat dan als een uitgavenbeslissing met een benoemde eigenaar, want dat is het.</p><h2>Gerelateerd</h2><ul><li><a href=\"/research/retry-loop-hidden-spend\">Verborgen uitgaven door retry-loops</a></li><li><a href=\"/research/llm-cost-attribution\">Toerekening van LLM-kosten</a></li><li><a href=\"/research/token-budget-implementation\">Tokenbudget implementeren</a></li></ul>",
+      "faq": [
+        {
+          "question": "Moet je een rate limit die wordt geraakt altijd verhogen?",
+          "answer": "Nee. Kijk eerst naar de kosten per voltooide taak. Echte vraaggroei houdt die verhouding stabiel terwijl het volume stijgt; een op hol geslagen loop of retry-storm breekt haar, en het verhogen van de limiet haalt het enige weg dat de uitgaven begrensde."
+        },
+        {
+          "question": "Waarom maken retries rate limiting duur?",
+          "answer": "Opnieuw proberen bij een 429 zonder exponentiële backoff en jitter verandert één overschrijding in een gesynchroniseerde storm. Geslaagde retries worden gefactureerd, en de versterking zit meestal in een clientbibliotheek en niet in je applicatiecode."
+        },
+        {
+          "question": "Hoe moeten rate limits worden ingesteld?",
+          "answer": "Onder het plafond van de provider, apart per omgeving en per feature, zodat je eigen limiet als eerste breekt en jij de reactie bepaalt. Niet-productie moet strak worden begrensd; productielimieten hebben een bewuste eigenaar nodig."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/retry-loop-hidden-spend",
+          "label": "Verborgen uitgaven door retry-loops"
+        },
+        {
+          "slug": "/research/llm-cost-attribution",
+          "label": "Toerekening van LLM-kosten"
+        },
+        {
+          "slug": "/research/token-budget-implementation",
+          "label": "Tokenbudget implementeren"
+        }
+      ]
+    },
+    "zh": {
+      "title": "速率限制也是一种成本控制",
+      "titleCore": "速率限制、429 与升级套餐",
+      "description": "速率限制是程序缺陷与无上限账单之间的最后一道屏障。只把 429 当作可靠性问题的团队，会提高上限并为此付出代价。",
+      "body": "<p>服务开始返回 429 时，人们的本能反应是把它当作可用性事故处理：提高限额、升级套餐、增加重试，尽快恢复吞吐量。这种做法有时是对的。但它也是失控循环变成五位数账单的途径，因为刚刚被移除的，正是唯一在阻止它的东西。</p><h2>429 实际上在告诉你什么</h2><p>它表示系统想花钱的速度超过了自己的额度。造成这种情况的原因有两种截然不同，需要的应对也完全相反。<strong>真实的需求增长</strong>，例如用户增加、产品上线、季节性高峰，说明限额确实太低，提高它能换来真实的收入。<strong>失控行为</strong>，例如重试风暴、循环运行的智能体、没有限流的回填任务、指向生产密钥的测试套件，说明限额正在恰当地履行它的职责。</p><p>仅凭错误率无法区分这两者。但如果看每单位工作的成本，就很容易分辨：真实增长时，随着量上升，比率大致保持不变；失控时，比率被打破，每完成一个任务的花费远高于前一天。这个比率应当作为每一次套餐升级的门槛。</p><h2>重试会悄悄让情况更糟</h2><p>遇到 429 时，如果重试没有指数退避和抖动，就会把一次超限变成同步的风暴。成功的请求会被计费，而许多失败的请求其实也已经消耗了输入处理资源。而且重试通常在客户端库中实现，而不是在应用代码里，因此这种放大效应不会出现在功能的设计文档中。</p><h2>有意识地使用限额</h2><p>为每个环境和每项功能设置低于服务商上限的自有限额，这样最先触发的是你自己的限额，后续如何处理也由你掌控。非生产环境要严格封顶：一次失败的测试构建成本很低，而被限流的客户路径则不然。告警应基于每任务成本比率，而不只是错误数量。升级套餐时，要把它当作一项有明确负责人的支出决策，因为它本质上就是这样的决策。</p><h2>相关阅读</h2><ul><li><a href=\"/research/retry-loop-hidden-spend\">重试循环的隐性支出</a></li><li><a href=\"/research/llm-cost-attribution\">LLM 成本归因</a></li><li><a href=\"/research/token-budget-implementation\">Token 预算的实现</a></li></ul>",
+      "faq": [
+        {
+          "question": "遇到速率限制时是否应该总是提高限额？",
+          "answer": "不应该。先检查每个完成任务的成本。真实的需求增长会在量上升时保持该比率稳定；而循环或重试风暴会打破这一比率，此时提高限额就等于移除了唯一能约束支出的东西。"
+        },
+        {
+          "question": "为什么重试会让速率限制变得昂贵？",
+          "answer": "遇到 429 时如果不使用指数退避和抖动进行重试，一次超限就会变成同步风暴。成功的重试会被计费，而且这种放大效应通常存在于客户端库中，而不是你的应用代码里。"
+        },
+        {
+          "question": "速率限制应该如何设置？",
+          "answer": "低于服务商的上限，并按环境和功能分别设置，这样你自己的限额会先被触发，你也能掌控后续的应对。非生产环境应严格封顶；生产环境的上限则需要明确的负责人。"
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/retry-loop-hidden-spend",
+          "label": "重试循环的隐性支出"
+        },
+        {
+          "slug": "/research/llm-cost-attribution",
+          "label": "LLM 成本归因"
+        },
+        {
+          "slug": "/research/token-budget-implementation",
+          "label": "Token 预算的实现"
         }
       ]
     }

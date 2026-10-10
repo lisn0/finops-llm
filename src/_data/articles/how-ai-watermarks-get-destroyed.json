@@ -15,7 +15,7 @@
       "title": "Your CDN is deleting your AI watermark",
       "titleCore": "How AI watermarks get destroyed",
       "description": "Nobody strips provenance on purpose. Thumbnailers, translation steps and summarisation chains do it by default, and you find out during the audit.",
-      "body": "<p>The interesting question about AI watermarking is not how to defeat it. It is why so much production output arrives at the end of the pipeline with no provenance left, when nobody involved intended to remove anything. Provenance is not usually attacked. It is optimised away, by systems doing exactly what they were built to do.</p><p>There are two independent failure modes, because there are two independent mechanisms. Image provenance dies by deletion. Text provenance dies by dilution. Both are silent.</p><h2>Deletion: the metadata your pipeline throws away</h2><p>C2PA provenance lives in the file's metadata. Every one of these will discard it unless configured otherwise, and most are configured for bytes rather than evidence:</p><table><thead><tr><th>Stage</th><th>Why it strips</th></tr></thead><tbody><tr><td>Thumbnail and resize jobs</td><td>Re-encodes pixels, drops non-image chunks</td></tr><tr><td>CDN image transforms</td><td>Optimises for delivery size by default</td></tr><tr><td>Format conversion (to WebP/AVIF)</td><td>Metadata often not carried across containers</td></tr><tr><td>Social and CMS uploads</td><td>Third-party platforms normalise and re-encode</td></tr><tr><td>Screenshotting a generated image</td><td>Produces an entirely new file</td></tr></tbody></table><p>The pattern is consistent: anything that re-encodes the image produces a new file, and a new file has no signed manifest unless something deliberately re-attaches one. A single automatic transform between generation and delivery is enough.</p><h2>Dilution: the text steps that erode the signal</h2><p>The text watermark is statistical, so it does not vanish in one step &mdash; it weakens. Each of these reduces detection confidence, and they compound:</p><p>Translation, which re-generates every token in another language. Paraphrasing and &quot;rewrite in our tone&quot; passes. Summarisation, which discards most of the tokens carrying the signal. Passing output through a second model, after which the text is attributable to the last model at best. Heavy human editing. And simple brevity: a two-sentence output never carried much signal to begin with.</p><p>Note that a normal, well-built product does several of these. A pipeline that generates with one model, rewrites for tone with another, translates into five languages, and truncates to a summary card has not done anything wrong. It has also, without a line of code intended for the purpose, produced output no detector will confidently attribute.</p><h2>Why this costs money</h2><p>The bill arrives at the moment you are asked to demonstrate provenance and cannot. Under Article 50, the obligation is to mark generated content; if your delivery path destroys the marking, the obligation is unmet regardless of the model's behaviour at generation time. Remediation is then a pipeline retrofit under deadline, which is the most expensive form of engineering there is.</p><p>The cheaper version is a single test, today: generate one image and one long text through your real production path, and check what survives at the far end. That is an afternoon, and it either confirms your pipeline is clean or finds the exact stage that is not.</p><h2>What to do about it</h2><p>Preserve metadata explicitly in image transforms rather than relying on defaults, and re-attach provenance after any re-encode you control. Where the marking cannot survive &mdash; a third-party platform, a summarisation step you need &mdash; carry the evidence in your own telemetry instead: model ID, version, region and timestamp, joined to the artefact ID. That log is not a substitute for marking, but it is the record that answers the question when the marking is gone.</p><p>And treat the detection result as evidence, not proof. It is a confidence level over a statistical signal; short or heavily processed text will read as inconclusive even when it was genuinely generated. Systems that treat a low-confidence result as a verdict will be wrong in both directions.</p><h2>Related</h2><ul><li><a href=&quot;/research/how-ai-watermarking-works&quot;>How AI watermarking works</a></li><li><a href=&quot;/research/ai-watermarking-compliance-cost&quot;>What AI watermarking actually costs</a></li><li><a href=&quot;/research/ai-observability&quot;>AI observability</a></li></ul>",
+      "body": "<p>The interesting question about AI watermarking is not how to defeat it. It is why so much production output arrives at the end of the pipeline with no provenance left, when nobody involved intended to remove anything. Provenance is not usually attacked. It is optimised away, by systems doing exactly what they were built to do.</p><p>There are two independent failure modes, because there are two independent mechanisms. Image provenance dies by deletion. Text provenance dies by dilution. Both are silent.</p><h2>Deletion: the metadata your pipeline throws away</h2><p>C2PA provenance lives in the file's metadata. Every one of these will discard it unless configured otherwise, and most are configured for bytes rather than evidence:</p><table><thead><tr><th>Stage</th><th>Why it strips</th></tr></thead><tbody><tr><td>Thumbnail and resize jobs</td><td>Re-encodes pixels, drops non-image chunks</td></tr><tr><td>CDN image transforms</td><td>Optimises for delivery size by default</td></tr><tr><td>Format conversion (to WebP/AVIF)</td><td>Metadata often not carried across containers</td></tr><tr><td>Social and CMS uploads</td><td>Third-party platforms normalise and re-encode</td></tr><tr><td>Screenshotting a generated image</td><td>Produces an entirely new file</td></tr></tbody></table><p>The pattern is consistent: anything that re-encodes the image produces a new file, and a new file has no signed manifest unless something deliberately re-attaches one. A single automatic transform between generation and delivery is enough.</p><h2>Dilution: the text steps that erode the signal</h2><p>The text watermark is statistical, so it does not vanish in one step &mdash; it weakens. Each of these reduces detection confidence, and they compound:</p><p>Translation, which re-generates every token in another language. Paraphrasing and &quot;rewrite in our tone&quot; passes. Summarisation, which discards most of the tokens carrying the signal. Passing output through a second model, after which the text is attributable to the last model at best. Heavy human editing. And simple brevity: a two-sentence output never carried much signal to begin with.</p><p>Note that a normal, well-built product does several of these. A pipeline that generates with one model, rewrites for tone with another, translates into five languages, and truncates to a summary card has not done anything wrong. It has also, without a line of code intended for the purpose, produced output no detector will confidently attribute.</p><h2>Why this costs money</h2><p>The bill arrives at the moment you are asked to demonstrate provenance and cannot. Under Article 50, the obligation is to mark generated content; if your delivery path destroys the marking, the obligation is unmet regardless of the model's behaviour at generation time. Remediation is then a pipeline retrofit under deadline, which is the most expensive form of engineering there is.</p><p>The cheaper version is a single test, today: generate one image and one long text through your real production path, and check what survives at the far end. That is an afternoon, and it either confirms your pipeline is clean or finds the exact stage that is not.</p><h2>What to do about it</h2><p>Preserve metadata explicitly in image transforms rather than relying on defaults, and re-attach provenance after any re-encode you control. Where the marking cannot survive &mdash; a third-party platform, a summarisation step you need &mdash; carry the evidence in your own telemetry instead: model ID, version, region and timestamp, joined to the artefact ID. That log is not a substitute for marking, but it is the record that answers the question when the marking is gone.</p><p>And treat the detection result as evidence, not proof. It is a confidence level over a statistical signal; short or heavily processed text will read as inconclusive even when it was genuinely generated. Systems that treat a low-confidence result as a verdict will be wrong in both directions.</p><h2>Related</h2><ul><li><a href=\"/research/how-ai-watermarking-works\">How AI watermarking works</a></li><li><a href=\"/research/ai-watermarking-compliance-cost\">What AI watermarking actually costs</a></li><li><a href=\"/research/ai-observability\">AI observability</a></li></ul>",
       "faq": [
         {
           "question": "Why does my image lose its C2PA provenance?",
@@ -132,6 +132,346 @@
         {
           "slug": "/research/how-ai-watermarking-works",
           "label": "AI 電子透かしの仕組み"
+        }
+      ]
+    },
+    "id": {
+      "title": "CDN Anda menghapus watermark AI Anda",
+      "titleCore": "Cara watermark AI bisa rusak",
+      "description": "Tidak ada yang sengaja menghapus provenans. Thumbnailer, terjemahan, dan rantai ringkasan melakukannya secara default, dan Anda menyadarinya saat audit.",
+      "body": "<p>Pertanyaan yang menarik tentang watermark AI bukanlah bagaimana cara mengakalinya. Yang menarik adalah mengapa begitu banyak output produksi sampai di ujung pipeline tanpa provenans, padahal tidak ada yang bermaksud menghapus apa pun. Provenans biasanya tidak diserang. Ia dioptimalkan hingga hilang, oleh sistem yang melakukan persis apa yang memang dibangun untuk mereka lakukan.</p><p>Ada dua mode kegagalan yang independen, karena ada dua mekanisme yang independen. Provenans gambar mati karena penghapusan. Provenans teks mati karena dilusi. Keduanya senyap.</p><h2>Penghapusan: metadata yang dibuang pipeline Anda</h2><p>Provenans C2PA hidup di dalam metadata file. Setiap tahap berikut akan membuangnya kecuali dikonfigurasi sebaliknya, dan kebanyakan dikonfigurasi untuk byte, bukan untuk bukti:</p><table><thead><tr><th>Tahap</th><th>Mengapa metadata dibuang</th></tr></thead><tbody><tr><td>Job thumbnail dan resize</td><td>Meng-encode ulang piksel, membuang chunk non-gambar</td></tr><tr><td>Transformasi gambar CDN</td><td>Mengoptimalkan ukuran pengiriman secara default</td></tr><tr><td>Konversi format (ke WebP/AVIF)</td><td>Metadata sering tidak terbawa lintas kontainer</td></tr><tr><td>Unggahan media sosial dan CMS</td><td>Platform pihak ketiga menormalkan dan meng-encode ulang</td></tr><tr><td>Tangkapan layar gambar yang dihasilkan</td><td>Menghasilkan file yang sepenuhnya baru</td></tr></tbody></table><p>Polanya konsisten: apa pun yang meng-encode ulang gambar menghasilkan file baru, dan file baru tidak punya manifes bertanda tangan kecuali ada yang sengaja melampirkannya kembali. Satu transformasi otomatis di antara pembuatan dan pengiriman sudah cukup.</p><h2>Dilusi: langkah teks yang mengikis sinyal</h2><p>Watermark teks bersifat statistik, jadi ia tidak hilang dalam satu langkah, melainkan melemah. Masing-masing berikut menurunkan keyakinan deteksi, dan efeknya saling menumpuk:</p><p>Terjemahan, yang meng-generate ulang setiap token dalam bahasa lain. Parafrase dan langkah &quot;tulis ulang dengan gaya kami&quot; juga melemahkannya. Peringkasan membuang sebagian besar token pembawa sinyal. Melewatkan output melalui model kedua membuat teks paling banter dikaitkan dengan model terakhir. Penyuntingan manusia yang berat juga berpengaruh. Dan keringkasan sederhana: output dua kalimat tidak pernah membawa banyak sinyal sejak awal.</p><p>Perhatikan bahwa produk yang normal dan dibangun dengan baik melakukan beberapa dari hal ini. Pipeline yang menghasilkan dengan satu model, menulis ulang nada dengan model lain, menerjemahkan ke lima bahasa, dan memotong menjadi kartu ringkasan tidak melakukan kesalahan apa pun. Namun tanpa satu baris kode yang dimaksudkan untuk itu, ia juga menghasilkan output yang tidak akan diatribusikan dengan yakin oleh detektor mana pun.</p><h2>Mengapa ini memakan biaya</h2><p>Tagihannya datang pada saat Anda diminta membuktikan provenans dan tidak bisa. Berdasarkan Pasal 50, kewajibannya adalah menandai konten yang dihasilkan; jika jalur pengiriman Anda menghancurkan tanda itu, kewajiban tersebut tidak terpenuhi, terlepas dari perilaku model saat pembuatan. Perbaikannya kemudian menjadi retrofit pipeline di bawah tenggat waktu, yang merupakan bentuk rekayasa paling mahal.</p><p>Versi yang lebih murah adalah satu uji, hari ini: hasilkan satu gambar dan satu teks panjang melalui jalur produksi nyata Anda, lalu periksa apa yang bertahan di ujung. Itu butuh satu sore, dan hasilnya akan memastikan pipeline Anda bersih atau menemukan tahap yang tepat yang bermasalah.</p><h2>Apa yang harus dilakukan</h2><p>Pertahankan metadata secara eksplisit dalam transformasi gambar alih-alih mengandalkan default, dan lampirkan kembali provenans setelah setiap re-encode yang Anda kontrol. Jika tanda tidak bisa bertahan, misalnya di platform pihak ketiga atau di langkah peringkasan yang Anda butuhkan, simpan buktinya di telemetri Anda sendiri: ID model, versi, region, dan timestamp, digabung dengan ID artefak. Log itu bukan pengganti penandaan, tetapi itu adalah catatan yang menjawab pertanyaan ketika tanda sudah hilang.</p><p>Dan perlakukan hasil deteksi sebagai bukti, bukan kepastian. Itu adalah tingkat keyakinan atas sinyal statistik; teks pendek atau yang banyak diproses akan terbaca tidak meyakinkan meskipun benar-benar dihasilkan. Sistem yang memperlakukan hasil keyakinan rendah sebagai vonis akan salah ke dua arah.</p><h2>Terkait</h2><ul><li><a href=\"/research/how-ai-watermarking-works\">Cara kerja watermark AI</a></li><li><a href=\"/research/ai-watermarking-compliance-cost\">Berapa sebenarnya biaya watermark AI</a></li><li><a href=\"/research/ai-observability\">Observabilitas AI</a></li></ul>",
+      "faq": [
+        {
+          "question": "Mengapa gambar saya kehilangan provenans C2PA?",
+          "answer": "Setiap tahap yang meng-encode ulang gambar menghasilkan file baru tanpa manifes bertanda tangan. Thumbnailer, transformasi CDN, konversi WebP/AVIF, dan unggahan pihak ketiga menghapus metadata secara default untuk menghemat byte."
+        },
+        {
+          "question": "Apakah menerjemahkan atau meringkas teks AI menghapus watermark?",
+          "answer": "Watermark melemah, tetapi tidak sepenuhnya hilang. Sinyalnya bersifat statistik dan menumpuk di seluruh token, sehingga terjemahan, parafrase, peringkasan, dan lewatan model kedua masing-masing menurunkan keyakinan deteksi, dan efeknya saling menumpuk."
+        },
+        {
+          "question": "Apa yang harus saya lakukan jika pipeline tidak bisa mempertahankan tanda?",
+          "answer": "Simpan buktinya di telemetri Anda sendiri: ID model, versi, region, dan timestamp yang digabung dengan ID artefak. Ini tidak menggantikan penandaan yang dapat dibaca mesin, tetapi itulah catatan yang menjawab pertanyaan provenans saat tanda sudah hilang."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/how-ai-watermarking-works",
+          "label": "Cara kerja watermark AI"
+        },
+        {
+          "slug": "/research/ai-watermarking-compliance-cost",
+          "label": "Berapa sebenarnya biaya watermark AI"
+        },
+        {
+          "slug": "/research/ai-observability",
+          "label": "Observabilitas AI"
+        }
+      ]
+    },
+    "pl": {
+      "title": "Twój CDN usuwa znak wodny AI",
+      "titleCore": "Jak niszczony jest znak wodny AI",
+      "description": "Nikt nie usuwa proweniencji celowo. Miniaturyzatory, kroki tłumaczenia i łańcuchy streszczeń robią to domyślnie, a zauważysz to podczas audytu.",
+      "body": "<p>Ciekawe pytanie o znakowanie wodne AI nie brzmi, jak je obejść. Brzmi: dlaczego tak dużo wyników produkcyjnych dociera na koniec pipeline'u bez śladu proweniencji, skoro nikt z zaangażowanych nie zamierzał niczego usuwać. Proweniencji zwykle nikt nie atakuje. Jest optymalizowana, aż zniknie, przez systemy robiące dokładnie to, do czego zostały zbudowane.</p><p>Są dwa niezależne tryby awarii, bo są dwa niezależne mechanizmy. Proweniencja obrazu ginie przez usunięcie. Proweniencja tekstu ginie przez rozrzedzenie. Obie są ciche.</p><h2>Usunięcie: metadane, które pipeline wyrzuca</h2><p>Proweniencja C2PA żyje w metadanych pliku. Każdy z poniższych etapów je odrzuci, chyba że zostanie skonfigurowany inaczej, a większość jest skonfigurowana pod bajty, a nie pod dowody:</p><table><thead><tr><th>Etap</th><th>Dlaczego usuwa</th></tr></thead><tbody><tr><td>Zadania miniatur i zmiany rozmiaru</td><td>Ponownie koduje piksele, odrzuca fragmenty niebędące obrazem</td></tr><tr><td>Transformacje obrazów w CDN</td><td>Domyślnie optymalizuje rozmiar pod kątem dostarczania</td></tr><tr><td>Konwersja formatu (do WebP/AVIF)</td><td>Metadane często nie są przenoszone między kontenerami</td></tr><tr><td>Wysyłki do mediów społecznościowych i CMS</td><td>Platformy zewnętrzne normalizują i ponownie kodują pliki</td></tr><tr><td>Zrzut ekranu wygenerowanego obrazu</td><td>Tworzy zupełnie nowy plik</td></tr></tbody></table><p>Wzorzec jest spójny: wszystko, co ponownie koduje obraz, tworzy nowy plik, a nowy plik nie ma podpisanego manifestu, chyba że ktoś celowo go dołączy ponownie. Wystarczy jedna automatyczna transformacja między generowaniem a dostarczeniem.</p><h2>Rozrzedzenie: kroki tekstowe, które erodują sygnał</h2><p>Znak wodny w tekście jest statystyczny, więc nie znika w jednym kroku. Słabnie. Każdy z poniższych kroków obniża pewność detekcji, a efekty się kumulują:</p><p>Tłumaczenie, bo regeneruje każdy token w innym języku. Parafrazowanie i &quot;przepisz w naszym tonie&quot; też przechodzą. Streszczanie, bo odrzuca większość tokenów niosących sygnał. Przepuszczenie wyniku przez drugi model, po którym tekst najwyżej przypisuje się ostatniemu modelowi. Intensywna ręczna edycja. I zwykła krótkość: dwuzdaniowy wynik nigdy nie niósł zbyt wiele sygnału.</p><p>Zwróć uwagę, że zwyczajny, dobrze zbudowany produkt robi kilka z tych rzeczy. Pipeline, który generuje jednym modelem, przepisuje ton drugim, tłumaczy na pięć języków i skraca do karty ze streszczeniem, nie zrobił nic złego. Mimo to, bez ani jednej linii kodu przeznaczonej do tego celu, wytworzył wynik, którego żaden detektor nie przypisze z pewnością.</p><h2>Dlaczego to kosztuje</h2><p>Rachunek przychodzi w chwili, gdy trzeba wykazać proweniencję, a nie da się tego zrobić. Zgodnie z artykułem 50 obowiązkiem jest oznaczenie wygenerowanych treści; jeśli ścieżka dostarczania niszczy oznaczenie, obowiązek nie jest spełniony, niezależnie od zachowania modelu podczas generowania. Naprawa to wtedy przebudowa pipeline'u pod presją terminu, czyli najdroższa forma inżynierii, jaka istnieje.</p><p>Tańsza wersja to jeden test, dzisiaj: wygeneruj jeden obraz i jeden długi tekst przez rzeczywistą ścieżkę produkcyjną i sprawdź, co przetrwa do końca. To popołudnie pracy, które albo potwierdzi, że pipeline jest czysty, albo wskaże dokładny etap, który tego nie robi.</p><h2>Co z tym zrobić</h2><p>Zachowuj metadane jawnie w transformacjach obrazów, zamiast polegać na ustawieniach domyślnych, i dołączaj proweniencję ponownie po każdym ponownym kodowaniu, które kontrolujesz. Tam, gdzie oznaczenie nie może przetrwać, na przykład na platformie zewnętrznej albo w kroku streszczania, którego potrzebujesz, zachowaj dowody we własnej telemetrii: identyfikator modelu, wersję, region i znacznik czasu, powiązane z identyfikatorem artefaktu. Ten dziennik nie zastępuje oznaczenia, ale jest zapisem, który odpowiada na pytanie, gdy oznaczenia już nie ma.</p><p>Traktuj też wynik detekcji jako dowód, a nie jako dowód ostateczny. To poziom pewności nad sygnałem statystycznym, a krótki lub mocno przetworzony tekst zostanie uznany za niejednoznaczny nawet wtedy, gdy został naprawdę wygenerowany. Systemy, które traktują wynik o niskiej pewności jako werdykt, będą się mylić w obu kierunkach.</p><h2>Powiązane</h2><ul><li><a href=\"/research/how-ai-watermarking-works\">Jak działa znakowanie wodne AI</a></li><li><a href=\"/research/ai-watermarking-compliance-cost\">Ile naprawdę kosztuje znakowanie wodne AI</a></li><li><a href=\"/research/ai-observability\">Obserwowalność AI</a></li></ul>",
+      "faq": [
+        {
+          "question": "Dlaczego mój obraz traci proweniencję C2PA?",
+          "answer": "Każdy etap, który ponownie koduje obraz, tworzy nowy plik bez podpisanego manifestu. Generatory miniatur, transformacje CDN, konwersja do WebP lub AVIF i wysyłki do podmiotów zewnętrznych domyślnie usuwają metadane, żeby oszczędzać bajty."
+        },
+        {
+          "question": "Czy tłumaczenie lub streszczanie tekstu AI usuwa znak wodny?",
+          "answer": "Nie usuwa go, tylko osłabia. Sygnał jest statystyczny i kumuluje się w tokenach, więc tłumaczenie, parafrazowanie, streszczanie i przepuszczenie przez drugi model każde obniża pewność detekcji, a ich efekty się sumują."
+        },
+        {
+          "question": "Co zrobić, jeśli mój pipeline nie może zachować oznaczenia?",
+          "answer": "Zachowaj dowody we własnej telemetrii: identyfikator modelu, wersję, region i znacznik czasu powiązane z identyfikatorem artefaktu. Nie zastępuje to maszynowo czytelnego oznaczenia, ale jest zapisem, który odpowiada na pytanie o proweniencję, gdy oznaczenia już nie ma."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/how-ai-watermarking-works",
+          "label": "Jak działa znakowanie wodne AI"
+        },
+        {
+          "slug": "/research/ai-watermarking-compliance-cost",
+          "label": "Ile naprawdę kosztuje znakowanie wodne AI"
+        },
+        {
+          "slug": "/research/ai-observability",
+          "label": "Obserwowalność AI"
+        }
+      ]
+    },
+    "ru": {
+      "title": "Ваш CDN удаляет водяной знак ИИ",
+      "titleCore": "Как разрушаются водяные знаки ИИ",
+      "description": "Никто не удаляет происхождение намеренно. Миниатюры, этапы перевода и цепочки суммаризации делают это по умолчанию, и вы узнаёте об этом при аудите.",
+      "body": "<p>Интересный вопрос о водяных знаках ИИ — не как их обойти. Важно, почему так много продуктивного вывода доходит до конца конвейера без следов происхождения, хотя никто из участников ничего не собирался удалять. Происхождение обычно не атакуют. Его оптимизируют до исчезновения системы, которые делают ровно то, для чего их построили.</p><p>Есть два независимых режима отказа, потому что есть два независимых механизма. Происхождение изображения умирает от удаления. Происхождение текста умирает от размытия. Оба процесса тихие.</p><h2>Удаление: метаданные, которые выбрасывает ваш конвейер</h2><p>Происхождение C2PA живёт в метаданных файла. Каждый из следующих этапов его отбросит, если не настроено иное, а большинство из них настроено на байты, а не на доказательства:</p><table><thead><tr><th>Этап</th><th>Почему он удаляет</th></tr></thead><tbody><tr><td>Задачи создания миниатюр и изменения размера</td><td>Перекодируют пиксели, отбрасывают не-изображенческие блоки</td></tr><tr><td>Трансформации изображений в CDN</td><td>По умолчанию оптимизируют размер для доставки</td></tr><tr><td>Конвертация формата (в WebP/AVIF)</td><td>Метаданные часто не переносятся между контейнерами</td></tr><tr><td>Загрузки в соцсети и CMS</td><td>Сторонние платформы нормализуют и перекодируют файлы</td></tr><tr><td>Скриншот сгенерированного изображения</td><td>Создаёт совершенно новый файл</td></tr></tbody></table><p>Закономерность последовательна: всё, что перекодирует изображение, создаёт новый файл, а у нового файла нет подписанного манифеста, если что-то намеренно его не прикрепит снова. Достаточно одной автоматической трансформации между генерацией и доставкой.</p><h2>Размытие: текстовые шаги, которые подтачивают сигнал</h2><p>Текстовый водяной знак статистический, поэтому он не исчезает за один шаг — он слабеет. Каждый из этих шагов снижает уверенность детекции, и эффекты складываются:</p><p>Перевод, который заново генерирует каждый токен на другом языке. Перефразирование и «перепиши в нашем тоне» тоже проходят. Суммаризация, которая отбрасывает большую часть токенов, несущих сигнал. Прогон вывода через вторую модель, после которого текст в лучшем случае приписывается последней модели. Тяжёлое ручное редактирование. И простая краткость: двухпредложенный вывод никогда не нёс много сигнала.</p><p>Обратите внимание, что обычный, хорошо построенный продукт делает несколько таких вещей. Конвейер, который генерирует одной моделью, переписывает тон другой, переводит на пять языков и обрезает до карточки-резюме, не сделал ничего плохого. Однако без единой строки кода, предназначенной для этого, он создал вывод, который ни один детектор уверенно не атрибутирует.</p><h2>Почему это стоит денег</h2><p>Счёт приходит в тот момент, когда вас просят доказать происхождение, а вы не можете. По статье 50 обязанность — маркировать созданный контент; если путь доставки уничтожает маркировку, обязанность не выполнена независимо от поведения модели при генерации. Исправление тогда становится переделкой конвейера под дедлайн, а это самая дорогая форма инженерной работы.</p><p>Более дешёвый вариант — один тест сегодня: сгенерируйте одно изображение и один длинный текст через ваш реальный продакшен-путь и проверьте, что уцелеет на выходе. Это полдня работы, и либо подтвердит, что конвейер чист, либо найдёт именно тот этап, который ломает цепочку.</p><h2>Что с этим делать</h2><p>Сохраняйте метаданные явно в трансформациях изображений, а не полагайтесь на значения по умолчанию, и прикрепляйте происхождение заново после любой перекодировки, которую вы контролируете. Там, где маркировка не может выжить — сторонняя платформа, нужный вам этап суммаризации, — храните доказательства в собственной телеметрии: ID модели, версию, регион и временную метку, связанные с ID артефакта. Этот журнал не заменяет маркировку, но это запись, которая отвечает на вопрос, когда маркировки уже нет.</p><p>И относитесь к результату детекции как к доказательству, а не к приговору. Это уровень уверенности над статистическим сигналом; короткий или сильно обработанный текст будет выглядеть неубедительным, даже если он действительно сгенерирован. Системы, которые принимают результат с низкой уверенностью за вердикт, будут ошибаться в обе стороны.</p><h2>Связанное</h2><ul><li><a href=\"/research/how-ai-watermarking-works\">Как работает водяной знак ИИ</a></li><li><a href=\"/research/ai-watermarking-compliance-cost\">Что на самом деле стоит водяной знак ИИ</a></li><li><a href=\"/research/ai-observability\">Наблюдаемость ИИ</a></li></ul>",
+      "faq": [
+        {
+          "question": "Почему моё изображение теряет происхождение C2PA?",
+          "answer": "Любой этап, который перекодирует изображение, создаёт новый файл без подписанного манифеста. Миниатюры, трансформации CDN, конвертация в WebP или AVIF и сторонние загрузки по умолчанию удаляют метаданные, чтобы сэкономить байты."
+        },
+        {
+          "question": "Удаляет ли перевод или суммаризация текста ИИ водяной знак?",
+          "answer": "Он ослабляется, но не удаляется полностью. Сигнал статистический и накапливается по токенам, поэтому перевод, перефразирование, суммаризация и проходы через вторую модель каждый снижают уверенность детекции, и их эффекты складываются."
+        },
+        {
+          "question": "Что делать, если мой конвейер не может сохранить маркировку?",
+          "answer": "Храните доказательства в собственной телеметрии: ID модели, версию, регион и временную метку, связанные с ID артефакта. Это не заменяет машиночитаемую маркировку, но это запись, которая отвечает на вопрос о происхождении, когда маркировки уже нет."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/how-ai-watermarking-works",
+          "label": "Как работает водяной знак ИИ"
+        },
+        {
+          "slug": "/research/ai-watermarking-compliance-cost",
+          "label": "Что на самом деле стоит водяной знак ИИ"
+        },
+        {
+          "slug": "/research/ai-observability",
+          "label": "Наблюдаемость ИИ"
+        }
+      ]
+    },
+    "tr": {
+      "title": "CDN sistemi AI filigranınızı siliyor",
+      "titleCore": "AI filigranları nasıl yok olur",
+      "description": "Provenansı kimse bilerek kaldırmaz. Küçük resim üreticileri, çeviri adımları ve özetleme zincirleri bunu varsayılan olarak yapar ve bunu denetimde fark edersiniz.",
+      "body": "<p>AI filigranlamasıyla ilgili ilginç soru, ona nasıl karşı koyulacağı değil. Soru, bu kadar çok üretim çıktısının neden hiç provenans kalmadan hattın sonuna ulaştığı. Kimse hiçbir şeyi kaldırmayı amaçlamamışken bu gerçekleşiyor. Provenans genellikle saldırıya uğramaz. Tam da tasarlandıkları işi yapan sistemler tarafından optimize edilerek ortadan kaldırılır.</p><p>İki bağımsız arıza modu var, çünkü iki bağımsız mekanizma var. Görsel provenansı silinerek ölür. Metin provenansı seyrelerek ölür. İkisi de sessizdir.</p><h2>Silme: hattınızın attığı metadata</h2><p>C2PA provenansı dosyanın metadata'sında yaşar. Aşağıdakilerin her biri, aksi yapılandırılmadıkça bunu atar ve çoğu, kanıt için değil bayt için yapılandırılmıştır:</p><table><thead><tr><th>Aşama</th><th>Neden siler</th></tr></thead><tbody><tr><td>Küçük resim ve yeniden boyutlandırma işleri</td><td>Pikselleri yeniden kodlar, görüntü dışı parçaları düşürür</td></tr><tr><td>CDN görsel dönüşümleri</td><td>Varsayılan olarak teslim boyutunu optimize eder</td></tr><tr><td>Biçim dönüşümü (WebP/AVIF'a)</td><td>Metadata kapsayıcılar arasında genellikle taşınmaz</td></tr><tr><td>Sosyal medya ve CMS yüklemeleri</td><td>Üçüncü taraf platformlar normalleştirir ve yeniden kodlar</td></tr><tr><td>Üretilmiş bir görselin ekran görüntüsünü almak</td><td>Tamamen yeni bir dosya üretir</td></tr></tbody></table><p>Örüntü tutarlıdır: görüntüyü yeniden kodlayan her şey yeni bir dosya üretir ve yeni bir dosya, bilerek yeniden eklenmedikçe imzalı bir manifesto taşımaz. Üretim ile teslim arasında tek bir otomatik dönüşüm yeterlidir.</p><h2>Seyreltme: sinyali aşındıran metin adımları</h2><p>Metin filigranı istatistiksel olduğu için tek adımda kaybolmaz &mdash; zayıflar. Bunların her biri tespit güvenini düşürür ve etkileri birikir:</p><p>Çeviri, her token'ı başka bir dilde yeniden üretir. Yeniden ifade etme ve &quot;bizim tonumuzda yeniden yaz&quot; geçişleri de böyledir. Özetleme, sinyali taşıyan token'ların çoğunu atar. Çıktıyı ikinci bir modelden geçirmek, metni en iyi ihtimalle son modele atfedilebilir kılar. Ağır insan düzenlemesi de aynı şeyi yapar. Ve basit kısalık: iki cümlelik bir çıktı hiçbir zaman fazla sinyal taşımadı.</p><p>Dikkat edin, normal ve iyi kurulmuş bir ürün bunlardan birkaçını yapar. Bir modelle üreten, başka bir modelle tona göre yeniden yazan, beş dile çeviren ve bir özet kartına kırpan bir hat bir yanlış yapmış değildir. Ama bu amaçla yazılmış tek bir satır kod olmadan, hiçbir dedektörün güvenle atfedemeyeceği bir çıktı üretmiştir.</p><h2>Bunun neden maliyeti var</h2><p>Fatura, provenansı göstermeniz istendiğinde ama gösteremediğinizde gelir. 50. madde kapsamında yükümlülük, üretilen içeriği işaretlemektir; teslim yolunuz işaretlemeyi yok ediyorsa, üretim anında modelin davranışı ne olursa olsun yükümlülük yerine getirilmemiş olur. Düzeltme, o zaman, son teslim tarihi altında bir hat yeniden inşasıdır ki bu, mühendisliğin en pahalı biçimidir.</p><p>Daha ucuz versiyon, bugün yapılabilecek tek bir testtir: gerçek üretim yolunuzdan bir görsel ve bir uzun metin üretin ve sonunda neyin hayatta kaldığını kontrol edin. Bu bir öğleden sonralık iştir ve ya hattınızın temiz olduğunu doğrular ya da tam olarak hangi aşamanın sorunlu olduğunu bulur.</p><h2>Bu konuda ne yapmalı</h2><p>Görsel dönüşümlerinde varsayılanlara güvenmek yerine metadata'yı açıkça koruyun ve kontrol ettiğiniz her yeniden kodlamadan sonra provenansı yeniden ekleyin. İşaretlemenin hayatta kalamayacağı yerlerde &mdash; üçüncü taraf bir platform ya da ihtiyaç duyduğunuz bir özetleme adımı &mdash; kanıtı bunun yerine kendi telemetrinizde taşıyın: model kimliği, sürüm, bölge ve zaman damgası, yapıt kimliğiyle birleştirilmiş. Bu kayıt işaretlemenin yerini tutmaz, ama işaretleme yok olduğunda soruyu yanıtlayan kayıttır.</p><p>Ve tespit sonucunu kanıt olarak değil, kesin hüküm olarak görmeyin. İstatistiksel bir sinyal üzerindeki bir güven düzeyidir; kısa veya yoğun işlenmiş metin, gerçekten üretilmiş olsa bile sonuçsuz görünecektir. Düşük güvenli sonucu hüküm sayan sistemler her iki yönde de yanılacaktır.</p><h2>İlgili</h2><ul><li><a href=\"/research/how-ai-watermarking-works\">AI filigranlaması nasıl çalışır</a></li><li><a href=\"/research/ai-watermarking-compliance-cost\">AI filigranlamasının gerçekte maliyeti</a></li><li><a href=\"/research/ai-observability\">AI gözlemlenebilirliği</a></li></ul>",
+      "faq": [
+        {
+          "question": "Görselim neden C2PA provenansını kaybediyor?",
+          "answer": "Görüntüyü yeniden kodlayan her aşama, imzalı manifesto olmayan yeni bir dosya üretir. Küçük resim üreticileri, CDN dönüşümleri, WebP ve AVIF dönüşümü ile üçüncü taraf yüklemeler, bayttan tasarruf etmek için metadata'yı varsayılan olarak siler."
+        },
+        {
+          "question": "AI metnini çevirmek veya özetlemek filigranı kaldırır mı?",
+          "answer": "Filigranı kaldırmaz, zayıflatır. Sinyal istatistiksel olup token'lar arasında birikir; bu nedenle çeviri, yeniden ifade etme, özetleme ve ikinci model geçişlerinin her biri tespit güvenini düşürür ve etkileri birikir."
+        },
+        {
+          "question": "Hattım işaretlemeyi koruyamıyorsa ne yapmalıyım?",
+          "answer": "Kanıtı kendi telemetrinizde taşıyın: yapıt kimliğiyle birleştirilmiş model kimliği, sürüm, bölge ve zaman damgası. Makine tarafından okunabilir işaretlemenin yerini tutmaz, ama işaretleme yok olduğunda provenans sorusunu yanıtlayan kayıt budur."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/how-ai-watermarking-works",
+          "label": "AI filigranlaması nasıl çalışır"
+        },
+        {
+          "slug": "/research/ai-watermarking-compliance-cost",
+          "label": "AI filigranlamasının gerçekte maliyeti"
+        },
+        {
+          "slug": "/research/ai-observability",
+          "label": "AI gözlemlenebilirliği"
+        }
+      ]
+    },
+    "vi": {
+      "title": "CDN của bạn đang xóa watermark AI",
+      "titleCore": "Watermark AI bị phá hủy như thế nào",
+      "description": "Không ai cố ý xóa nguồn gốc. Bộ tạo thumbnail, bước dịch và chuỗi tóm tắt làm việc này theo mặc định, và bạn chỉ phát hiện ra trong đợt kiểm toán.",
+      "body": "<p>Câu hỏi thú vị về watermark AI không phải là làm sao để vô hiệu hóa nó. Mà là vì sao có quá nhiều đầu ra sản xuất đến cuối pipeline mà không còn nguồn gốc nào, trong khi không ai liên quan có ý định xóa gì cả. Nguồn gốc thường không bị tấn công. Nó bị tối ưu hóa mất, bởi các hệ thống đang làm đúng việc chúng được thiết kế để làm.</p>\n<p>Có hai cơ chế độc lập, nên có hai kiểu thất bại độc lập. Nguồn gốc của ảnh chết vì bị xóa. Nguồn gốc của văn bản chết vì bị pha loãng. Cả hai đều âm thầm.</p>\n<h2>Xóa: siêu dữ liệu mà pipeline của bạn vứt đi</h2>\n<p>Nguồn gốc C2PA nằm trong siêu dữ liệu của tệp. Mỗi bước dưới đây sẽ loại bỏ nó trừ khi được cấu hình khác, và hầu hết được cấu hình để tiết kiệm byte hơn là để giữ bằng chứng:</p>\n<table>\n<thead>\n<tr>\n<th>Bước</th>\n<th>Vì sao bị xóa</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>Tác vụ tạo thumbnail và thay đổi kích thước</td>\n<td>Mã hóa lại điểm ảnh, bỏ các khối không phải ảnh</td>\n</tr>\n<tr>\n<td>Biến đổi ảnh trên CDN</td>\n<td>Tối ưu theo kích thước giao hàng mặc định</td>\n</tr>\n<tr>\n<td>Chuyển định dạng (sang WebP/AVIF)</td>\n<td>Siêu dữ liệu thường không được mang qua các container khác nhau</td>\n</tr>\n<tr>\n<td>Tải lên mạng xã hội và CMS</td>\n<td>Nền tảng bên thứ ba chuẩn hóa và mã hóa lại</td>\n</tr>\n<tr>\n<td>Chụp màn hình ảnh được tạo ra</td>\n<td>Tạo ra một tệp hoàn toàn mới</td>\n</tr>\n</tbody>\n</table>\n<p>Quy luật rất nhất quán: bất cứ thứ gì mã hóa lại ảnh đều tạo ra một tệp mới, và tệp mới không có manifest có chữ ký trừ khi có ai đó chủ động gắn lại. Chỉ một phép biến đổi tự động giữa lúc sinh và lúc giao là đủ.</p>\n<h2>Pha loãng: các bước văn bản làm mòn tín hiệu</h2>\n<p>Watermark văn bản mang tính thống kê, nên nó không biến mất chỉ trong một bước mà yếu dần. Mỗi bước dưới đây làm giảm độ tin cậy của việc phát hiện, và các tác động cộng dồn lên nhau:</p>\n<p>Dịch thuật, vốn tạo lại mọi token bằng một ngôn ngữ khác. Diễn đạt lại và các lượt &quot;viết lại theo giọng của chúng tôi&quot;. Tóm tắt, vốn loại bỏ phần lớn các token mang tín hiệu. Đưa đầu ra qua một mô hình thứ hai, sau đó văn bản nhiều nhất cũng chỉ quy được về mô hình cuối cùng. Chỉnh sửa thủ công nhiều. Và sự ngắn gọn đơn thuần: một đầu ra hai câu vốn dĩ chưa bao giờ mang nhiều tín hiệu.</p>\n<p>Lưu ý rằng một sản phẩm bình thường, được xây dựng tốt cũng thực hiện vài bước trong số này. Một pipeline sinh bằng một mô hình, viết lại giọng điệu bằng mô hình khác, dịch sang năm ngôn ngữ, và cắt thành thẻ tóm tắt không hề làm điều gì sai. Nhưng nó cũng đã, mà không cần dòng mã nào nhắm đến mục đích đó, tạo ra đầu ra mà không bộ phát hiện nào có thể quy kết một cách tự tin.</p>\n<h2>Vì sao việc này tốn tiền</h2>\n<p>Hóa đơn đến đúng lúc bạn được yêu cầu chứng minh nguồn gốc và không thể làm vậy. Theo Điều 50, nghĩa vụ là đánh dấu nội dung được tạo ra; nếu đường giao hàng của bạn phá hủy dấu hiệu đó, nghĩa vụ vẫn chưa được đáp ứng, bất kể mô hình hành xử thế nào lúc sinh. Khắc phục khi đó là một đợt gắn lại pipeline dưới áp lực thời hạn, dạng kỹ thuật đắt đỏ nhất có thể có.</p>\n<p>Cách rẻ hơn là một bài kiểm thử duy nhất, ngay hôm nay: sinh một ảnh và một văn bản dài qua đường production thật của bạn, rồi kiểm tra xem còn lại gì ở đầu cuối. Việc đó mất một buổi chiều, và nó hoặc xác nhận pipeline của bạn sạch, hoặc tìm ra đúng bước đang gây vấn đề.</p>\n<h2>Nên làm gì</h2>\n<p>Giữ siêu dữ liệu một cách tường minh trong các phép biến đổi ảnh thay vì dựa vào mặc định, và gắn lại nguồn gốc sau mọi lần mã hóa lại mà bạn kiểm soát. Ở những nơi dấu hiệu không thể sống sót, chẳng hạn một nền tảng bên thứ ba hay bước tóm tắt mà bạn cần, hãy lưu bằng chứng trong telemetry của chính bạn: ID mô hình, phiên bản, vùng và dấu thời gian, nối với ID của sản phẩm. Nhật ký đó không thay thế được việc đánh dấu, nhưng nó là bản ghi trả lời câu hỏi khi dấu hiệu đã mất.</p>\n<p>Và hãy xem kết quả phát hiện như bằng chứng, không phải bằng chứng xác thực tuyệt đối. Đó là mức độ tin cậy trên một tín hiệu thống kê; văn bản ngắn hoặc đã qua xử lý nhiều sẽ cho kết quả không kết luận được, ngay cả khi nó thực sự được sinh ra. Hệ thống coi một kết quả độ tin cậy thấp là phán quyết sẽ sai theo cả hai chiều.</p>\n<h2>Liên quan</h2>\n<ul>\n<li>\n<a href=\"/research/how-ai-watermarking-works\">Watermark AI hoạt động như thế nào</a>\n</li>\n<li>\n<a href=\"/research/ai-watermarking-compliance-cost\">Watermark AI thực sự tốn bao nhiêu</a>\n</li>\n<li>\n<a href=\"/research/ai-observability\">Observability cho AI</a>\n</li>\n</ul>\n",
+      "faq": [
+        {
+          "question": "Vì sao ảnh của tôi mất nguồn gốc C2PA?",
+          "answer": "Bất kỳ bước nào mã hóa lại ảnh đều tạo ra một tệp mới không có manifest có chữ ký. Bộ tạo thumbnail, biến đổi CDN, chuyển đổi sang WebP/AVIF và tải lên bên thứ ba đều xóa siêu dữ liệu theo mặc định để tiết kiệm byte."
+        },
+        {
+          "question": "Dịch hoặc tóm tắt văn bản AI có xóa watermark không?",
+          "answer": "Nó làm yếu đi chứ không xóa hẳn. Tín hiệu mang tính thống kê và tích lũy qua các token, nên dịch, diễn đạt lại, tóm tắt và các lượt qua mô hình thứ hai đều làm giảm độ tin cậy khi phát hiện, và tác động của chúng cộng dồn."
+        },
+        {
+          "question": "Tôi nên làm gì nếu pipeline không giữ được dấu hiệu đánh dấu?",
+          "answer": "Lưu bằng chứng trong telemetry của chính bạn: ID mô hình, phiên bản, vùng và dấu thời gian nối với ID sản phẩm. Nó không thay thế việc đánh dấu có thể đọc bằng máy, nhưng là bản ghi trả lời câu hỏi về nguồn gốc khi dấu hiệu đã mất."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/how-ai-watermarking-works",
+          "label": "Watermark AI hoạt động như thế nào"
+        },
+        {
+          "slug": "/research/ai-watermarking-compliance-cost",
+          "label": "Watermark AI thực sự tốn bao nhiêu"
+        },
+        {
+          "slug": "/research/ai-observability",
+          "label": "Observability cho AI"
+        }
+      ]
+    },
+    "ar": {
+      "title": "شبكة CDN لديك تحذف العلامة المائية للذكاء الاصطناعي",
+      "titleCore": "كيف تُدمَّر العلامات المائية للذكاء الاصطناعي",
+      "description": "لا أحد يزيل المصدر عمداً. المصغّرات وخطوات الترجمة وسلاسل التلخيص تفعل ذلك افتراضياً، وتكتشف الأمر أثناء التدقيق.",
+      "body": "<p>السؤال المثير في العلامات المائية للذكاء الاصطناعي ليس كيف تُهزم. بل لماذا تصل مخرجات إنتاجية كثيرة إلى نهاية خط المعالجة دون أي مصدر متبقٍّ، رغم أن أحداً لم يقصد إزالة شيء. المصدر لا يتعرض للهجوم عادةً. بل يُحسَّن حتى يختفي، على يد أنظمة تفعل ما بُنيت له تماماً.</p><p>هناك نمطا فشل مستقلان، لأن هناك آليتين مستقلتين. مصدر الصور يموت بالحذف. ومصدر النص يموت بالتخفيف. وكلاهما صامت.</p><h2>الحذف: البيانات الوصفية التي يرميها خط معالجتك</h2><p>يعيش مصدر C2PA في البيانات الوصفية للملف. وكل واحد مما يلي سيتخلص منها ما لم يُضبط خلاف ذلك، ومعظمها مضبوط على البايتات لا على الأدلة:</p><table><thead><tr><th>المرحلة</th><th>لماذا تزيلها</th></tr></thead><tbody><tr><td>مهام المصغّرات وتغيير الحجم</td><td>تعيد ترميز البكسلات وتسقط الأجزاء غير الصورية</td></tr><tr><td>تحويلات الصور في CDN</td><td>تحسّن حجم التسليم افتراضياً</td></tr><tr><td>تحويل الصيغة (إلى WebP/AVIF)</td><td>البيانات الوصفية كثيراً ما لا تنتقل بين الحاويات</td></tr><tr><td>الرفع إلى وسائل التواصل وأنظمة إدارة المحتوى</td><td>المنصات الخارجية توحّد الملفات وتعيد ترميزها</td></tr><tr><td>التقاط لقطة شاشة لصورة مولَّدة</td><td>ينتج ملفاً جديداً بالكامل</td></tr></tbody></table><p>النمط ثابت: أي شيء يعيد ترميز الصورة ينتج ملفاً جديداً، والملف الجديد لا يحمل بياناً موقَّعاً ما لم يُعِد شيءٌ ما إرفاقه عمداً. ويكفي تحويل آلي واحد بين التوليد والتسليم.</p><h2>التخفيف: خطوات النص التي تُضعف الإشارة</h2><p>العلامة المائية النصية إحصائية، فلا تختفي في خطوة واحدة &mdash; بل تضعف. وكل مما يلي يخفض ثقة الكشف، وتتراكم آثارها:</p><p>الترجمة، التي تعيد توليد كل رمز بلغة أخرى. وتمريرات إعادة الصياغة و«أعد الكتابة بنبرتنا». والتلخيص، الذي يتخلص من معظم الرموز الحاملة للإشارة. وتمرير المخرجات عبر نموذج ثانٍ، فيصبح النص منسوباً إلى النموذج الأخير في أحسن الأحوال. والتحرير البشري الكثيف. والإيجاز البسيط: فمخرج من جملتين لم يحمل إشارة تُذكر من الأصل.</p><p>لاحظ أن منتجاً عادياً جيد البناء يفعل عدة أشياء من هذه. فخط معالجة يولّد بنموذج، ويعيد الكتابة بنبرة محددة بنموذج آخر، ويترجم إلى خمس لغات، ويقتطع ملخصاً في بطاقة، لم يرتكب خطأ. لكنه أنتج أيضاً، دون سطر كود مقصود لذلك، مخرجات لن ينسبها أي كاشف بثقة.</p><h2>لماذا يكلّف هذا مالاً</h2><p>تصل الفاتورة في اللحظة التي يُطلب منك فيها إثبات المصدر ولا تستطيع. فبموجب المادة 50، الالتزام هو وسم المحتوى المولَّد؛ وإن دمّر مسار التسليم لديك الوسم، فالالتزام غير مستوفى مهما كان سلوك النموذج وقت التوليد. ويصبح العلاج تعديلاً لاحقاً لخط المعالجة تحت ضغط الموعد النهائي، وهو أغلى أشكال الهندسة.</p><p>والنسخة الأرخص هي اختبار واحد، اليوم: ولّد صورة واحدة ونصاً طويلاً واحداً عبر مسار الإنتاج الفعلي لديك، وافحص ما الذي يبقى في الطرف الآخر. هذا عمل نصف يوم، وهو إما يؤكد أن خط معالجتك نظيف أو يجد المرحلة المسؤولة بالضبط.</p><h2>ما الذي تفعله حيال ذلك</h2><p>احفظ البيانات الوصفية صراحةً في تحويلات الصور بدلاً من الاعتماد على الإعدادات الافتراضية، وأعد إرفاق المصدر بعد أي إعادة ترميز تتحكم بها. وحيث لا يمكن للوسم أن يبقى &mdash; منصة خارجية، أو خطوة تلخيص تحتاجها &mdash; احمل الدليل في قياساتك الخاصة بدلاً من ذلك: معرّف النموذج والإصدار والمنطقة والطابع الزمني، مربوطة بمعرّف المنتَج. هذا السجل ليس بديلاً عن الوسم، لكنه السجل الذي يجيب عن السؤال حين يختفي الوسم.</p><p>وعامل نتيجة الكشف كدليل لا كإثبات. إنها مستوى ثقة فوق إشارة إحصائية؛ والنص القصير أو الذي خضع لمعالجة كثيفة سيظهر غير حاسم حتى لو كان مولَّداً فعلاً. والأنظمة التي تعامل نتيجة منخفضة الثقة كحكم نهائي ستخطئ في الاتجاهين.</p><h2>ذات صلة</h2><ul><li><a href=\"/research/how-ai-watermarking-works\">كيف تعمل العلامات المائية للذكاء الاصطناعي</a></li><li><a href=\"/research/ai-watermarking-compliance-cost\">كم تكلّف العلامات المائية للذكاء الاصطناعي فعلاً</a></li><li><a href=\"/research/ai-observability\">قابلية رصد الذكاء الاصطناعي</a></li></ul>",
+      "faq": [
+        {
+          "question": "لماذا تفقد صورتي مصدر C2PA؟",
+          "answer": "أي مرحلة تعيد ترميز الصورة تنتج ملفاً جديداً بلا البيان الموقَّع. المصغّرات وتحويلات CDN وتحويل WebP/AVIF والرفع إلى منصات خارجية تزيل جميعها البيانات الوصفية افتراضياً لتوفير البايتات."
+        },
+        {
+          "question": "هل ترجمة نص الذكاء الاصطناعي أو تلخيصه تزيل العلامة المائية؟",
+          "answer": "تُضعفها ولا تزيلها. الإشارة إحصائية وتتراكم عبر الرموز، لذا تخفض الترجمة وإعادة الصياغة والتلخيص وتمريرات النموذج الثاني ثقة الكشف، وتتراكم آثارها."
+        },
+        {
+          "question": "ماذا أفعل إن كان خط معالجتي لا يستطيع الحفاظ على الوسم؟",
+          "answer": "احمل الدليل في قياساتك الخاصة: معرّف النموذج والإصدار والمنطقة والطابع الزمني مربوطة بمعرّف المنتَج. لا يحل هذا محل الوسم المقروء آلياً، لكنه السجل الذي يجيب عن سؤال المصدر حين يختفي الوسم."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/how-ai-watermarking-works",
+          "label": "كيف تعمل العلامات المائية للذكاء الاصطناعي"
+        },
+        {
+          "slug": "/research/ai-watermarking-compliance-cost",
+          "label": "كم تكلّف العلامات المائية للذكاء الاصطناعي فعلاً"
+        },
+        {
+          "slug": "/research/ai-observability",
+          "label": "قابلية رصد الذكاء الاصطناعي"
+        }
+      ]
+    },
+    "it": {
+      "title": "Il tuo CDN sta cancellando il watermark IA",
+      "titleCore": "Come vengono distrutti i watermark IA",
+      "description": "Nessuno elimina la provenienza di proposito. Thumbnailer, traduzioni e catene di sintesi lo fanno di default, e lo scopri durante l'audit.",
+      "body": "<p>La domanda interessante sul watermarking IA non è come aggirarlo. È perché così tanti output di produzione arrivano alla fine della pipeline senza più alcuna provenienza, quando nessuno dei coinvolti aveva intenzione di rimuovere nulla. La provenienza di solito non viene attaccata. Viene ottimizzata via, da sistemi che fanno esattamente ciò per cui sono stati costruiti.</p><p>Esistono due modalità di guasto indipendenti, perché esistono due meccanismi indipendenti. La provenienza delle immagini muore per cancellazione. La provenienza del testo muore per diluizione. Entrambe avvengono in silenzio.</p><h2>Cancellazione: i metadati che la tua pipeline elimina</h2><p>La provenienza C2PA vive nei metadati del file. Ciascuna di queste fasi la scarta, a meno di configurazioni diverse, e la maggior parte è configurata per i byte anziché per le prove:</p><table><thead><tr><th>Fase</th><th>Perché la rimuove</th></tr></thead><tbody><tr><td>Thumbnail e job di ridimensionamento</td><td>Ricodificano i pixel ed eliminano i blocchi non immagine</td></tr><tr><td>Trasformazioni immagine del CDN</td><td>Ottimizzano per la dimensione di consegna per impostazione predefinita</td></tr><tr><td>Conversione di formato (in WebP/AVIF)</td><td>I metadati spesso non vengono trasportati tra i contenitori</td></tr><tr><td>Upload su social e CMS</td><td>Le piattaforme di terze parti normalizzano e ricodificano</td></tr><tr><td>Screenshot di un'immagine generata</td><td>Produce un file completamente nuovo</td></tr></tbody></table><p>Lo schema è coerente: tutto ciò che ricodifica l'immagine produce un nuovo file, e un nuovo file non ha un manifest firmato a meno che qualcosa non ne alleghi deliberatamente uno. Basta una sola trasformazione automatica tra generazione e consegna.</p><h2>Diluizione: i passaggi sul testo che erodono il segnale</h2><p>Il watermark sul testo è statistico, quindi non svanisce in un solo passaggio: si indebolisce. Ciascuno di questi riduce la confidenza di rilevamento, e i loro effetti si sommano:</p><p>La traduzione, che rigenera ogni token in un'altra lingua. Le parafrasi e i &quot;riscrivi nel nostro tono&quot; passano. La sintesi, che scarta gran parte dei token che portano il segnale. Far passare l'output attraverso un secondo modello, dopo il quale il testo è attribuibile tutt'al più all'ultimo modello. La revisione umana pesante. E la semplice brevità: un output di due frasi non ha mai portato molto segnale.</p><p>Nota che un prodotto normale e ben costruito ne fa diversi. Una pipeline che genera con un modello, riscrive il tono con un altro, traduce in cinque lingue e tronca a una scheda di sintesi non ha fatto nulla di sbagliato. Ha anche prodotto, senza una riga di codice pensata a questo scopo, un output che nessun rilevatore attribuirà con sicurezza.</p><h2>Perché costa denaro</h2><p>Il conto arriva nel momento in cui ti viene chiesto di dimostrare la provenienza e non puoi farlo. Secondo l'articolo 50, l'obbligo è marcare i contenuti generati; se il percorso di consegna distrugge la marcatura, l'obbligo non è rispettato a prescindere dal comportamento del modello in fase di generazione. La correzione diventa allora un retrofit della pipeline sotto scadenza, la forma più costosa di ingegneria che esista.</p><p>La versione economica è un unico test, oggi: genera un'immagine e un testo lungo attraverso il tuo vero percorso di produzione e verifica cosa sopravvive all'altro capo. Richiede un pomeriggio, e conferma che la pipeline è pulita oppure individua la fase esatta che non lo è.</p><h2>Cosa fare</h2><p>Conserva esplicitamente i metadati nelle trasformazioni delle immagini invece di affidarti ai default, e riallega la provenienza dopo ogni ricodifica che controlli. Dove la marcatura non può sopravvivere &mdash; una piattaforma di terze parti, un passaggio di sintesi di cui hai bisogno &mdash; porta le prove nella tua telemetria: ID del modello, versione, regione e timestamp, uniti all'ID dell'artefatto. Quel log non sostituisce la marcatura, ma è la registrazione che risponde alla domanda quando la marcatura non c'è più.</p><p>E tratta il risultato del rilevamento come una prova, non come una dimostrazione. È un livello di confidenza su un segnale statistico: un testo breve o molto elaborato risulterà non conclusivo anche quando è stato davvero generato. I sistemi che trattano un risultato a bassa confidenza come un verdetto sbaglieranno in entrambe le direzioni.</p><h2>Correlati</h2><ul><li><a href=\"/research/how-ai-watermarking-works\">Come funziona il watermarking IA</a></li><li><a href=\"/research/ai-watermarking-compliance-cost\">Quanto costa davvero il watermarking IA</a></li><li><a href=\"/research/ai-observability\">Osservabilità IA</a></li></ul>",
+      "faq": [
+        {
+          "question": "Perché la mia immagine perde la provenienza C2PA?",
+          "answer": "Ogni fase che ricodifica l'immagine produce un nuovo file senza il manifest firmato. Thumbnailer, trasformazioni CDN, conversioni in WebP/AVIF e upload di terze parti eliminano i metadati per impostazione predefinita, per risparmiare byte."
+        },
+        {
+          "question": "Tradurre o riassumere testo IA rimuove il watermark?",
+          "answer": "Lo indebolisce, senza rimuoverlo. Il segnale è statistico e si accumula lungo i token, quindi traduzione, parafrasi, sintesi e passaggi attraverso un secondo modello riducono ciascuno la confidenza di rilevamento, e i loro effetti si sommano."
+        },
+        {
+          "question": "Cosa devo fare se la mia pipeline non può preservare la marcatura?",
+          "answer": "Porta le prove nella tua telemetria: ID del modello, versione, regione e timestamp uniti all'ID dell'artefatto. Non sostituisce la marcatura leggibile dalle macchine, ma è la registrazione che risponde a una domanda sulla provenienza quando la marcatura non c'è più."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/how-ai-watermarking-works",
+          "label": "Come funziona il watermarking IA"
+        },
+        {
+          "slug": "/research/ai-watermarking-compliance-cost",
+          "label": "Quanto costa davvero il watermarking IA"
+        },
+        {
+          "slug": "/research/ai-observability",
+          "label": "Osservabilità IA"
+        }
+      ]
+    },
+    "ko": {
+      "title": "CDN이 AI 워터마크를 지우고 있습니다",
+      "titleCore": "AI 워터마크가 훼손되는 방식",
+      "description": "누구도 일부러 출처 정보를 지우지 않습니다. 썸네일 생성, 번역, 요약 단계가 기본 설정으로 지우며, 이는 감사 과정에서 드러납니다.",
+      "body": "<p>AI 워터마크에서 흥미로운 질문은 이를 어떻게 무력화하느냐가 아닙니다. 아무도 무언가를 제거하려 하지 않았는데도, 왜 그렇게 많은 운영 출력물이 파이프라인 끝에서 출처 정보를 잃은 채 도착하는가가 핵심입니다. 출처 정보는 보통 공격받지 않습니다. 시스템이 설계된 대로 정확히 동작하는 과정에서 최적화되어 사라집니다.</p><p>독립적인 실패 모드는 두 가지입니다. 메커니즘이 두 가지이기 때문입니다. 이미지의 출처 정보는 삭제로 사라지고, 텍스트의 출처 정보는 희석으로 사라집니다. 둘 다 아무런 경고 없이 일어납니다.</p><h2>삭제: 파이프라인이 버리는 메타데이터</h2><p>C2PA 출처 정보는 파일의 메타데이터에 들어 있습니다. 다음 항목들은 별도로 설정하지 않으면 모두 이를 버리며, 대부분은 증거가 아니라 바이트 크기에 맞춰 설정되어 있습니다.</p><table><thead><tr><th>단계</th><th>제거되는 이유</th></tr></thead><tbody><tr><td>썸네일 및 리사이즈 작업</td><td>픽셀을 다시 인코딩하면서 이미지가 아닌 청크를 제거함</td></tr><tr><td>CDN 이미지 변환</td><td>기본적으로 전송 용량을 줄이도록 최적화됨</td></tr><tr><td>포맷 변환(WebP/AVIF)</td><td>컨테이너를 바꾸는 과정에서 메타데이터가 전달되지 않는 경우가 많음</td></tr><tr><td>소셜 및 CMS 업로드</td><td>제3자 플랫폼이 이미지를 정규화하고 다시 인코딩함</td></tr><tr><td>생성된 이미지 스크린샷</td><td>완전히 새로운 파일을 만듦</td></tr></tbody></table><p>패턴은 일관됩니다. 이미지를 다시 인코딩하는 모든 작업은 새 파일을 만들고, 새 파일에는 누군가 의도적으로 서명된 매니페스트를 다시 붙이지 않는 한 서명된 매니페스트가 없습니다. 생성과 전달 사이에 자동 변환이 하나만 있어도 충분합니다.</p><h2>희석: 신호를 깎아내는 텍스트 단계</h2><p>텍스트 워터마크는 통계적이므로 한 단계에서 사라지지 않고 점점 약해집니다. 다음 각 단계는 탐지 신뢰도를 떨어뜨리며, 그 효과는 누적됩니다.</p><p>번역은 다른 언어로 모든 토큰을 다시 생성합니다. 바꿔 쓰기나 &quot;우리 톤으로 다시 쓰기&quot; 작업도 신호를 약화시킵니다. 요약은 신호를 담고 있던 토큰 대부분을 버립니다. 출력을 두 번째 모델에 통과시키면 텍스트는 기껏해야 마지막 모델에 귀속됩니다. 심한 사람의 손 편집도 마찬가지입니다. 그리고 두 문장짜리 출력은 애초에 신호를 많이 담지 못합니다.</p><p>참고로 잘 만들어진 일반적인 제품도 이 중 여러 가지를 수행합니다. 한 모델로 생성하고, 다른 모델로 톤을 다듬고, 다섯 개 언어로 번역하고, 요약 카드로 잘라내는 파이프라인은 잘못된 일을 한 것이 아닙니다. 그럼에도 어떤 탐지기도 자신 있게 귀속시키지 못하는 출력을 만들어 냅니다. 그 과정에서 이를 목적으로 한 코드 한 줄 없이 말입니다.</p><h2>이것이 비용이 되는 이유</h2><p>청구서는 출처를 증명하라는 요청을 받았는데 증명할 수 없는 순간에 도착합니다. 제50조에 따르면 생성된 콘텐츠에 표시를 해야 할 의무가 있으며, 전달 경로가 그 표시를 파괴한다면 생성 당시 모델이 어떻게 동작했든 의무는 이행되지 않은 것입니다. 이후의 해결책은 마감에 쫓기며 파이프라인을 뜯어고치는 작업이 되며, 이는 엔지니어링에서 가장 비싼 형태입니다.</p><p>더 저렴한 방법은 오늘 당장 할 수 있는 테스트 하나입니다. 실제 운영 경로로 이미지 하나와 긴 텍스트 하나를 생성해 끝에서 무엇이 살아남는지 확인하세요. 반나절이면 충분하며, 파이프라인이 깨끗한지 확인하거나 문제가 되는 정확한 단계를 찾아낼 수 있습니다.</p><h2>대응 방법</h2><p>이미지 변환에서는 기본값에 기대지 말고 메타데이터를 명시적으로 보존하세요. 직접 제어하는 재인코딩 이후에는 출처 정보를 다시 붙이세요. 표시가 살아남을 수 없는 경우, 예를 들어 제3자 플랫폼이나 꼭 필요한 요약 단계에서는 증거를 자체 텔레메트리에 남기세요. 모델 ID, 버전, 리전, 타임스탬프를 아티팩트 ID와 연결해 두는 것입니다. 이 로그가 표시를 대체하지는 않지만, 표시가 사라졌을 때 질문에 답해 주는 기록이 됩니다.</p><p>그리고 탐지 결과는 증명이 아니라 증거로 다루세요. 이는 통계적 신호에 대한 신뢰도일 뿐입니다. 짧거나 많이 가공된 텍스트는 실제로 생성된 것이라도 결론을 내릴 수 없는 결과로 나타납니다. 낮은 신뢰도 결과를 판정으로 취급하는 시스템은 양방향으로 틀리게 됩니다.</p><h2>관련 글</h2><ul><li><a href=\"/research/how-ai-watermarking-works\">AI 워터마크의 작동 원리</a></li><li><a href=\"/research/ai-watermarking-compliance-cost\">AI 워터마크의 실제 비용</a></li><li><a href=\"/research/ai-observability\">AI 옵저버빌리티</a></li></ul>",
+      "faq": [
+        {
+          "question": "내 이미지의 C2PA 출처 정보가 사라지는 이유는 무엇인가요?",
+          "answer": "이미지를 다시 인코딩하는 단계는 모두 서명된 매니페스트가 없는 새 파일을 만듭니다. 썸네일 생성기, CDN 변환, WebP 및 AVIF 변환, 제3자 업로드는 바이트를 아끼기 위해 기본적으로 메타데이터를 제거합니다."
+        },
+        {
+          "question": "AI 텍스트를 번역하거나 요약하면 워터마크가 제거되나요?",
+          "answer": "제거되기보다는 약해집니다. 신호는 통계적이며 토큰 전체에 걸쳐 쌓이므로, 번역, 바꿔 쓰기, 요약, 두 번째 모델 통과는 각각 탐지 신뢰도를 낮추고 그 효과는 누적됩니다."
+        },
+        {
+          "question": "파이프라인이 표시를 보존할 수 없다면 어떻게 해야 하나요?",
+          "answer": "증거를 자체 텔레메트리에 남기세요. 모델 ID, 버전, 리전, 타임스탬프를 아티팩트 ID와 연결해 두는 것입니다. 기계가 읽을 수 있는 표시를 대체하지는 못하지만, 표시가 사라졌을 때 출처 질문에 답해 주는 기록이 됩니다."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/how-ai-watermarking-works",
+          "label": "AI 워터마크의 작동 원리"
+        },
+        {
+          "slug": "/research/ai-watermarking-compliance-cost",
+          "label": "AI 워터마크의 실제 비용"
+        },
+        {
+          "slug": "/research/ai-observability",
+          "label": "AI 옵저버빌리티"
+        }
+      ]
+    },
+    "nl": {
+      "title": "Je CDN verwijdert je AI-watermerk",
+      "titleCore": "Hoe AI-watermerken worden vernietigd",
+      "description": "Niemand verwijdert herkomst met opzet. Thumbnailers, vertaalstappen en samenvattingsketens doen het standaard, en je ontdekt het tijdens de audit.",
+      "body": "<p>De interessante vraag over AI-watermerken is niet hoe je ze verslaat. Het is waarom zoveel productie-output aan het einde van de pipeline zonder herkomst aankomt, terwijl niemand van plan was iets te verwijderen. Herkomst wordt meestal niet aangevallen. Ze wordt wegbezuinigd, door systemen die precies doen waarvoor ze gebouwd zijn.</p><p>Er zijn twee onafhankelijke faalwijzen, omdat er twee onafhankelijke mechanismen zijn. Beeldherkomst sterft door verwijdering. Tekstherkomst sterft door verdunning. Beide gaan stil.</p><h2>Verwijdering: de metadata die je pipeline weggooit</h2><p>C2PA-herkomst zit in de metadata van het bestand. Elk van deze stappen gooit ze weg tenzij anders geconfigureerd, en de meeste zijn geconfigureerd op bytes in plaats van op bewijs:</p><table><thead><tr><th>Stap</th><th>Waarom het strippen gebeurt</th></tr></thead><tbody><tr><td>Thumbnail- en resize-jobs</td><td>Codeert pixels opnieuw, laat niet-beeldchunks vallen</td></tr><tr><td>CDN-beeldtransformaties</td><td>Optimaliseert standaard op leveringsgrootte</td></tr><tr><td>Formaatconversie (naar WebP/AVIF)</td><td>Metadata wordt vaak niet meegenomen tussen containers</td></tr><tr><td>Uploads naar social media en CMS</td><td>Platformen van derden normaliseren en coderen opnieuw</td></tr><tr><td>Screenshot van een gegenereerde afbeelding</td><td>Levert een compleet nieuw bestand op</td></tr></tbody></table><p>Het patroon is consistent: alles wat de afbeelding opnieuw codeert, produceert een nieuw bestand, en een nieuw bestand heeft geen ondertekend manifest tenzij iets er bewust een opnieuw aan hangt. Eén automatische transformatie tussen generatie en levering is genoeg.</p><h2>Verdunning: de tekststappen die het signaal uithollen</h2><p>Het tekstwatermerk is statistisch, dus het verdwijnt niet in één stap &mdash; het verzwakt. Elk van deze stappen verlaagt de detectiebetrouwbaarheid, en ze stapelen zich op:</p><p>Vertaling, die elk token in een andere taal opnieuw genereert. Parafraseer- en &quot;herschrijf in onze toon&quot;-rondes. Samenvatten, dat de meeste tokens met het signaal weggooit. Output door een tweede model halen, waarna de tekst hooguit aan het laatste model is toe te schrijven. Zware menselijke bewerking. En simpele kortheid: een output van twee zinnen droeg nooit veel signaal.</p><p>Een normaal, goed gebouwd product doet meerdere van deze dingen. Een pipeline die genereert met het ene model, voor de toon herschrijft met een ander, naar vijf talen vertaalt en inkort tot een samenvattingskaart heeft niets verkeerd gedaan. Ze heeft ook, zonder één regel code die daarvoor bedoeld was, output geproduceerd die geen detector met zekerheid zal toeschrijven.</p><h2>Waarom dit geld kost</h2><p>De rekening komt op het moment dat je gevraagd wordt herkomst aan te tonen en dat niet kunt. Onder artikel 50 is de verplichting om gegenereerde content te markeren; als je leveringspad de markering vernietigt, is aan de verplichting niet voldaan, ongeacht het gedrag van het model bij generatie. Herstel is dan een pipeline-aanpassing onder tijdsdruk, de duurste vorm van engineering die er is.</p><p>De goedkopere versie is één test, vandaag: genereer één afbeelding en één lange tekst via je echte productiepad en controleer wat aan het eind overleeft. Dat is een middag werk, en het bevestigt dat je pipeline schoon is of vindt de exacte stap die dat niet is.</p><h2>Wat je eraan kunt doen</h2><p>Behoud metadata expliciet in beeldtransformaties in plaats van op standaardinstellingen te vertrouwen, en hang herkomst opnieuw aan na elke hercodering die je beheert. Waar de markering niet kan overleven &mdash; een platform van derden, een samenvattingsstap die je nodig hebt &mdash; leg het bewijs dan vast in je eigen telemetrie: model-ID, versie, regio en tijdstempel, gekoppeld aan het artefact-ID. Die log vervangt de markering niet, maar is het bewijs dat de vraag beantwoordt als de markering weg is.</p><p>En behandel het detectieresultaat als bewijs, niet als sluitend bewijs. Het is een betrouwbaarheidsniveau over een statistisch signaal; korte of zwaar bewerkte tekst leest als niet-conclusief, ook als ze echt gegenereerd is. Systemen die een resultaat met lage betrouwbaarheid als oordeel behandelen, hebben in beide richtingen ongelijk.</p><h2>Gerelateerd</h2><ul><li><a href=\"/research/how-ai-watermarking-works\">Hoe AI-watermerken werken</a></li><li><a href=\"/research/ai-watermarking-compliance-cost\">Wat AI-watermerken echt kosten</a></li><li><a href=\"/research/ai-observability\">AI-observability</a></li></ul>",
+      "faq": [
+        {
+          "question": "Waarom verliest mijn afbeelding zijn C2PA-herkomst?",
+          "answer": "Elke stap die de afbeelding opnieuw codeert, levert een nieuw bestand op zonder het ondertekende manifest. Thumbnailers, CDN-transformaties, WebP/AVIF-conversie en uploads naar derden strippen standaard metadata om bytes te besparen."
+        },
+        {
+          "question": "Verwijdert vertalen of samenvatten van AI-tekst het watermerk?",
+          "answer": "Het verzwakt het in plaats van het te verwijderen. Het signaal is statistisch en bouwt zich op over tokens, dus vertaling, parafraseren, samenvatten en rondes door een tweede model verlagen elk de detectiebetrouwbaarheid, en hun effecten stapelen zich op."
+        },
+        {
+          "question": "Wat moet ik doen als mijn pipeline de markering niet kan behouden?",
+          "answer": "Leg het bewijs vast in je eigen telemetrie: model-ID, versie, regio en tijdstempel gekoppeld aan het artefact-ID. Het vervangt de machineleesbare markering niet, maar is het bewijs dat een herkomstvraag beantwoordt als de markering weg is."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/how-ai-watermarking-works",
+          "label": "Hoe AI-watermerken werken"
+        },
+        {
+          "slug": "/research/ai-watermarking-compliance-cost",
+          "label": "Wat AI-watermerken echt kosten"
+        },
+        {
+          "slug": "/research/ai-observability",
+          "label": "AI-observability"
+        }
+      ]
+    },
+    "zh": {
+      "title": "你的 CDN 正在删除你的 AI 水印",
+      "titleCore": "AI 水印是如何被破坏的",
+      "description": "没人会刻意去除溯源信息。缩略图生成、翻译和摘要链路会默认这么做，而你要到审计时才会发现。",
+      "body": "<p>关于 AI 水印，有意思的问题并不是如何击破它，而是为什么这么多生产输出在流水线末端已经没有任何溯源信息，而参与其中的人都无意去除任何东西。溯源信息通常不是被攻击掉的，而是被优化掉的 &mdash; 由那些正在做其设计初衷之事的系统造成。</p>\n\n<p>存在两种相互独立的失效模式，因为存在两种相互独立的机制。图像溯源因删除而消失，文本溯源因稀释而消失。两者都是悄无声息的。</p>\n\n<h2>删除：流水线丢弃的元数据</h2>\n<p>C2PA 溯源信息存放在文件的元数据中。下面每一个环节，除非另行配置，都会将其丢弃，而且大多数环节的配置都是为字节数服务，而不是为证据服务：</p>\n\n<table>\n<thead>\n<tr>\n<th>环节</th>\n<th>为何会剥离</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>缩略图与缩放任务</td>\n<td>重新编码像素，丢弃非图像数据块</td>\n</tr>\n<tr>\n<td>CDN 图像变换</td>\n<td>默认为交付体积做优化</td>\n</tr>\n<tr>\n<td>格式转换（转为 WebP/AVIF）</td>\n<td>元数据常常无法跨容器携带</td>\n</tr>\n<tr>\n<td>社交与 CMS 上传</td>\n<td>第三方平台会规范化并重新编码</td>\n</tr>\n<tr>\n<td>对生成图像截图</td>\n<td>会产生一个全新的文件</td>\n</tr>\n</tbody>\n</table>\n<p>规律是一致的：任何重新编码图像的操作都会产生新文件，而除非有人刻意重新附加，否则新文件不会带有签名清单。在生成与交付之间，只要存在一次自动变换，就足以造成破坏。</p>\n\n<h2>稀释：侵蚀信号的文本步骤</h2>\n<p>文本水印是统计性的，因此它不会在一步之内消失，而是逐渐变弱。下面每一项都会降低检测置信度，而且它们会叠加：</p>\n\n<p>翻译会用另一种语言重新生成每一个 token。改写以及“按我们的语气重写”也会。摘要会丢弃大部分携带信号的 token。把输出交给第二个模型处理，之后文本最多只能归因于最后那个模型。大量的人工编辑。还有简单的篇幅短小：两句话的输出本来就很少携带信号。</p>\n\n<p>请注意，一个正常、构建良好的产品就会用到其中好几项。一条流水线先用一个模型生成，再用另一个模型按语气改写，翻译成五种语言，最后截断为摘要卡片，它并没有做错任何事。但它也在没有写一行专门用于此目的代码的情况下，产出了任何检测器都无法有把握地归因的输出。</p>\n\n<h2>为什么这会花钱</h2>\n<p>账单会在你被要求证明溯源、却无法证明的那一刻到来。根据第 50 条，义务是对生成内容进行标识；如果你的交付路径破坏了标识，无论模型在生成时表现如何，义务都没有被履行。届时的补救就是在截止日期压力下对流水线进行改造，这是最昂贵的工程形式。</p>\n\n<p>更便宜的做法是今天就做一次测试：通过你真实的生产路径生成一张图片和一段长文本，检查末端还剩下什么。这只需要半天，它要么确认你的流水线是干净的，要么找出确切的问题环节。</p>\n\n<h2>如何应对</h2>\n<p>在图像变换中显式保留元数据，而不是依赖默认值；对于你可以控制的任何重新编码，之后重新附加溯源信息。对于标识无法保留的情况 &mdash; 第三方平台，或你需要的摘要步骤 &mdash; 请把证据转而记录在你自己的遥测数据中：模型 ID、版本、区域和时间戳，并与制品 ID 关联。这份日志不能替代标识，但当标识已经消失时，它就是能回答问题的记录。</p>\n\n<p>还要把检测结果视为证据，而非证明。它是对统计信号的一个置信度；即使文本确实由模型生成，短文本或经过大量处理的文本也会显示为无定论。把低置信度结果当作判决的系统，在两个方向上都会出错。</p>\n\n<h2>相关阅读</h2>\n<ul>\n<li>\n<a href=\"/research/how-ai-watermarking-works\">AI 水印如何工作</a>\n</li>\n<li>\n<a href=\"/research/ai-watermarking-compliance-cost\">AI 水印的实际成本</a>\n</li>\n<li>\n<a href=\"/research/ai-observability\">AI 可观测性</a>\n</li>\n</ul>",
+      "faq": [
+        {
+          "question": "为什么我的图像会失去 C2PA 溯源信息？",
+          "answer": "任何重新编码图像的环节都会产生一个不带签名清单的新文件。缩略图生成器、CDN 变换、WebP/AVIF 转换和第三方上传，默认都会为节省字节而剥离元数据。"
+        },
+        {
+          "question": "翻译或摘要 AI 文本会去除水印吗？",
+          "answer": "它会削弱水印，但不会去除它。信号是统计性的，并在 token 之间累积，因此翻译、改写、摘要和第二模型处理各自都会降低检测置信度，且效果会叠加。"
+        },
+        {
+          "question": "如果我的流水线无法保留标识，应该怎么办？",
+          "answer": "把证据记录在你自己的遥测数据中：模型 ID、版本、区域和时间戳，并与制品 ID 关联。它不能替代机器可读的标识，但当标识已经消失时，它就是能回答溯源问题的记录。"
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/how-ai-watermarking-works",
+          "label": "AI 水印如何工作"
+        },
+        {
+          "slug": "/research/ai-watermarking-compliance-cost",
+          "label": "AI 水印的实际成本"
+        },
+        {
+          "slug": "/research/ai-observability",
+          "label": "AI 可观测性"
         }
       ]
     }

@@ -261,6 +261,426 @@
           "label": "Como limitar os custos de inferência"
         }
       ]
+    },
+    "id": {
+      "title": "Harga dan kecepatan OpenAI Ultrafast API",
+      "titleCore": "Harga dan kecepatan OpenAI Ultrafast API",
+      "description": "Harga API GPT-6 Astra Ultrafast terkini, klaim kecepatan, batas laju, dan kerangka titik impas untuk beban kerja yang sensitif terhadap latensi.",
+      "body": "<p>OpenAI Ultrafast mempercepat pembuatan output GPT-6 Astra dengan harga enam kali lipat dari token Standard. Panduan terkini menyebut pembuatan hingga delapan kali lebih cepat; pengumuman DevDay menyebut hingga enam kali. Keduanya tidak menjamin latensi end-to-end. Bandingkan tambahan biaya inferensi dengan waktu penyelesaian yang terukur dan nilai bisnisnya sebelum mengarahkan trafik produksi ke tier ini.</p><h2>Apa yang diubah Ultrafast?</h2><p>Ultrafast memperpendek jeda antara token output yang dihasilkan. Ia tidak membuat setiap bagian permintaan menjadi delapan kali lebih cepat: pemrosesan input, pembentukan koneksi jaringan, tool, kode aplikasi, dan menunggu layanan eksternal tetap memengaruhi total latensi. OpenAI merekomendasikan WebSockets, terutama untuk agen yang melakukan beberapa pemanggilan tool dalam waktu singkat, karena overhead koneksi bisa menghapus sebagian keuntungan.</p><h2>Berapa biaya GPT-6 Astra Ultrafast?</h2><p>Tabel harga OpenAI mencantumkan hal berikut per satu juta token teks untuk permintaan GPT-6 Astra dengan konteks pendek:</p><table><thead><tr><th>Tier</th><th>Input</th><th>Input ter-cache</th><th>Penulisan cache</th><th>Output</th></tr></thead><tbody><tr><td>Standard</td><td>$10</td><td>$1</td><td>$12.50</td><td>$50</td></tr><tr><td>Ultrafast</td><td>$60</td><td>$6</td><td>$75</td><td>$300</td></tr></tbody></table><p>Ultrafast adalah 6× tarif Standard yang tercantum untuk setiap kategori token. Periksa halaman harga langsung sebelum menyusun anggaran, karena tarif dan kelayakan bisa berubah. Ultrafast mendukung pemrosesan global dan residensi data di AS; ia tidak mendukung endpoint pemrosesan regional di UE atau wilayah non-AS lainnya. Penyesuaian harga regional dan FedRAMP dapat berlaku jika didukung.</p><h2>Apa arti premium per tugas?</h2><p>Berikut contoh permintaan hipotetis tanpa cache dengan 8,000 token input dan 2,000 token output. Pada tarif Standard biayanya $0.18: $0.08 untuk input dan $0.10 untuk output. Pada tarif Ultrafast biayanya $1.08: $0.48 untuk input dan $0.60 untuk output. Premiumnya $0.90 per tugas. Contoh ini memakai harga token yang dipublikasikan dan jumlah token yang diasumsikan; ia tidak memprediksi latensi atau nilai bisnis dari beban kerja nyata.</p><p>Untuk beban kerja nyata, kalikan jumlah token bulanan untuk input, input ter-cache, penulisan cache, dan output dengan tarif terkini untuk setiap tier. Pertahankan model, prompt, pengaturan reasoning, dan campuran tugas yang sama saat membandingkan tier.</p><h2>Kapan Ultrafast sepadan dengan premiumnya?</h2><p>Uji pada pekerjaan ketika waktu generasi model memengaruhi hasil yang bisa diukur: asisten interaktif dengan target latensi, alur kerja langsung yang menunggu tindakan berikutnya, atau agen yang giliran lebih cepatnya mengurangi waktu idle yang dibayar. Bandingkan waktu penyelesaian end-to-end pada p50 dan p95, tingkat keberhasilan, dan biaya per tugas yang berhasil. Gunakan premium hanya jika waktu yang dihemat dan terukur bernilai lebih daripada biaya tambahannya.</p><p>Untuk pengayaan offline, ringkasan terjadwal, dan pekerjaan lain yang bisa menunggu, Standard atau opsi pemrosesan diskon mungkin lebih cocok. Pertahankan rute cadangan untuk permintaan yang melampaui batas laju Ultrafast.</p><h2>Siapa yang bisa memakai, dan batas apa yang berlaku?</h2><p>Panduan Ultrafast OpenAI saat ini menyatakan bahwa akses GPT-6 Astra tersedia bagi pelanggan API dengan batas laju default. Batas default token per menit yang terdokumentasi adalah 500,000 untuk Build, 1,000,000 untuk Launch, dan 5,000,000 untuk Grow. Batas yang lebih tinggi mungkin memerlukan permintaan ke tim akun OpenAI.</p><h2>Sumber mana yang mendokumentasikan klaim harga dan kecepatan?</h2><p>Sumber utama: <a href=\"https://developers.openai.com/api/docs/guides/ultrafast-mode\">panduan mode Ultrafast OpenAI</a>, <a href=\"https://developers.openai.com/api/docs/pricing\">harga API OpenAI</a>, dan <a href=\"https://openai.com/index/devday-2026-recap/\">rangkuman DevDay 2026 OpenAI</a>. Lihat juga <a href=\"/research/model-routing\">perutean model</a> dan <a href=\"/research/llm-cost-per-user-benchmarks\">benchmark biaya LLM per pengguna</a>.</p>",
+      "faq": [
+        {
+          "question": "Apa itu mode Ultrafast OpenAI?",
+          "answer": "Ultrafast adalah tier layanan Responses API untuk GPT-6 Astra yang memperpendek jeda antara token output yang dihasilkan. Panduan OpenAI saat ini menyebut hingga 8× lebih cepat dari Standard; rangkuman DevDay menyebut pembuatan token hingga 6× lebih cepat. Ini klaim maksimum, bukan jaminan latensi end-to-end."
+        },
+        {
+          "question": "Berapa tambahan biaya GPT-6 Astra Ultrafast?",
+          "answer": "Tabel harga OpenAI saat ini menempatkan Ultrafast pada enam kali tarif Standard GPT-6 Astra: $60 dibanding $10 per juta token input dan $300 dibanding $50 per juta token output. Tarif input ter-cache dan penulisan cache juga 6×."
+        },
+        {
+          "question": "Siapa yang bisa memakai GPT-6 Astra Ultrafast?",
+          "answer": "OpenAI menyatakan GPT-6 Astra Ultrafast tersedia bagi pelanggan API dengan batas laju default. Ia mendukung pemrosesan global dan residensi data di AS, bukan endpoint pemrosesan regional di UE atau wilayah non-AS lainnya."
+        },
+        {
+          "question": "Kapan Ultrafast sepadan dengan biaya tambahannya?",
+          "answer": "Ketika pengurangan latensi end-to-end yang terukur cukup meningkatkan hasil bernilai untuk menutupi biaya inferensi tambahan. Bandingkan biaya dan waktu penyelesaian pada beban kerja yang sama; tugas batch dan tugas tidak mendesak sering bisa tetap di Standard atau pemrosesan diskon."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/model-routing",
+          "label": "Perutean model"
+        },
+        {
+          "slug": "/research/llm-cost-per-user-benchmarks",
+          "label": "Benchmark biaya LLM per pengguna"
+        },
+        {
+          "slug": "/research/chatgpt-pro-max-economics",
+          "label": "ChatGPT Pro Max: ekonomi paket $500"
+        },
+        {
+          "slug": "/research/cap-inference-costs",
+          "label": "Cara membatasi biaya inferensi"
+        }
+      ]
+    },
+    "pl": {
+      "title": "Ceny i szybkość OpenAI Ultrafast API",
+      "titleCore": "Ceny i szybkość OpenAI Ultrafast API",
+      "description": "Aktualne ceny API GPT-6 Astra Ultrafast, deklaracje szybkości, limity szybkości i ramy progu opłacalności dla obciążeń wrażliwych na latencję.",
+      "body": "<p>OpenAI Ultrafast przyspiesza generowanie wyjścia GPT-6 Astra sześciokrotnie w stosunku do standardowych cen tokenów. Aktualny przewodnik podaje do ośmiu razy szybsze generowanie; ogłoszenie DevDay mówiło o do sześciu razy. Żadne z tych nie gwarantuje latencji end-to-end. Porównaj dodatkową opłatę za inferencję ze zmierzonym czasem ukończenia i wartością biznesową, zanim skierujesz na to ruch produkcyjny.</p>\n<h2>Co zmienia Ultrafast?</h2>\n<p>Ultrafast skraca czas między generowanymi tokenami wyjścia. Nie przyspiesza każdego elementu żądania osiem razy: przetwarzanie wejścia, nawiązywanie połączenia, narzędzia, kod aplikacji i czekanie na zewnętrzne usługi nadal wpływają na całkowitą latencję. OpenAI zaleca WebSockets, zwłaszcza dla agentów wykonujących kilka wywołań narzędzi w krótkim odstępie, bo narzut połączenia może zjeść część zysku.</p>\n<h2>Ile kosztuje GPT-6 Astra Ultrafast?</h2>\n<p>Tabela cen OpenAI podaje następujące wartości za milion tokenów tekstowych dla żądań GPT-6 Astra z krótkim kontekstem:</p>\n<table><thead><tr><th>Poziom</th><th>Wejście</th><th>Wejście z cache</th><th>Zapis do cache</th><th>Wyjście</th></tr></thead><tbody><tr><td>Standard</td><td>$10</td><td>$1</td><td>$12.50</td><td>$50</td></tr><tr><td>Ultrafast</td><td>$60</td><td>$6</td><td>$75</td><td>$300</td></tr></tbody></table>\n<p>Ultrafast kosztuje 6× listowanej stawki Standard w każdej kategorii tokenów. Przed budżetowaniem sprawdź aktualną stronę cennika, bo stawki i kwalifikowalność mogą się zmieniać. Ultrafast obsługuje globalne przetwarzanie i rezydencję danych w USA; nie obsługuje endpointów przetwarzania w UE ani innych regionach spoza USA. Tam, gdzie jest to wspierane, mogą obowiązywać regionalne i FedRAMP korekty cen.</p>\n<h2>Co oznacza premia za zadanie?</h2>\n<p>Oto hipotetyczne żądanie bez cache z 8,000 tokenami wejścia i 2,000 tokenami wyjścia. Po stawkach Standard kosztuje $0.18: $0.08 za wejście i $0.10 za wyjście. Po stawkach Ultrafast kosztuje $1.08: $0.48 za wejście i $0.60 za wyjście. Premia wynosi $0.90 za zadanie. Przykład używa opublikowanych cen tokenów i założonej liczby tokenów; nie przewiduje latencji ani wartości biznesowej żadnego obciążenia.</p>\n<p>Dla rzeczywistego obciążenia pomnóż miesięczne tokeny wejścia, wejścia z cache, zapisu do cache i wyjścia przez aktualne ceny każdego poziomu. Przy porównywaniu poziomów zachowaj ten sam model, prompty, ustawienia rozumowania i mix zadań.</p>\n<h2>Kiedy Ultrafast jest wart premii?</h2>\n<p>Testuj go na pracy, w której czas generowania modelu wpływa na mierzalny wynik: interaktywny asystent z celem latencji, żywy workflow czekający na kolejną akcję lub agent, w którym szybsze tury zmniejszają opłacany czas bezczynności. Porównuj p50 i p95 czasu ukończenia end-to-end, wskaźnik sukcesu i koszt udanego zadania. Płać za premię tylko wtedy, gdy zmierzony zaoszczędzony czas ma większą wartość niż dodatkowy koszt.</p>\n<p>Dla wzbogacania offline, zaplanowanych podsumowań i innej pracy, która może poczekać, lepiej pasuje Standard lub zniżkowa opcja przetwarzania. Zachowaj trasę zapasową dla żądań przekraczających limit szybkości Ultrafast.</p>\n<h2>Kto może z tego korzystać i jakie obowiązują limity?</h2>\n<p>Aktualny przewodnik Ultrafast od OpenAI mówi, że dostęp do GPT-6 Astra mają klienci API przy domyślnych limitach szybkości. Udokumentowane domyślne limity tokenów na minutę to 500,000 dla Build, 1,000,000 dla Launch i 5,000,000 dla Grow. Wyższe limity mogą wymagać prośby do zespołu kont OpenAI.</p>\n<h2>Które źródła dokumentują ceny i deklaracje szybkości?</h2>\n<p>Źródła podstawowe: <a href=\"https://developers.openai.com/api/docs/guides/ultrafast-mode\">przewodnik OpenAI po trybie Ultrafast</a>, <a href=\"https://developers.openai.com/api/docs/pricing\">ceny API OpenAI</a> i <a href=\"https://openai.com/index/devday-2026-recap/\">podsumowanie DevDay 2026 OpenAI</a>. Zobacz też <a href=\"/research/model-routing\">routing modeli</a> i <a href=\"/research/llm-cost-per-user-benchmarks\">benchmarki kosztu LLM na użytkownika</a>.</p>",
+      "faq": [
+        {
+          "question": "Czym jest tryb OpenAI Ultrafast?",
+          "answer": "Ultrafast to poziom usługi Responses API dla GPT-6 Astra, który skraca czas między generowanymi tokenami wyjścia. Aktualny przewodnik OpenAI mówi o do 8× szybszym działaniu niż Standard; podsumowanie DevDay opisywało do 6× szybsze generowanie tokenów. To maksymalne deklaracje, a nie gwarancje latencji end-to-end."
+        },
+        {
+          "question": "O ile drożej kosztuje GPT-6 Astra Ultrafast?",
+          "answer": "Aktualny cennik OpenAI podaje Ultrafast na poziomie sześciokrotności stawek GPT-6 Astra Standard: $60 wobec $10 za milion tokenów wejścia oraz $300 wobec $50 za milion tokenów wyjścia. Stawki wejścia z cache i zapisu do cache też są 6×."
+        },
+        {
+          "question": "Kto może używać GPT-6 Astra Ultrafast?",
+          "answer": "OpenAI podaje, że GPT-6 Astra Ultrafast jest dostępny dla klientów API przy domyślnych limitach szybkości. Obsługuje globalne przetwarzanie i rezydencję danych w USA, a nie endpointy przetwarzania w UE ani innych regionach spoza USA."
+        },
+        {
+          "question": "Kiedy Ultrafast jest wart dodatkowego kosztu?",
+          "answer": "Gdy zmierzone skrócenie latencji end-to-end poprawia cenny wynik na tyle, by pokryć dodatkowy koszt inferencji. Porównaj koszt i czas ukończenia na tym samym obciążeniu; zadania wsadowe i inne niepilne mogą zwykle zostać na Standard lub zniżkowym przetwarzaniu."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/model-routing",
+          "label": "Routing modeli"
+        },
+        {
+          "slug": "/research/llm-cost-per-user-benchmarks",
+          "label": "Benchmarki kosztu LLM na użytkownika"
+        },
+        {
+          "slug": "/research/chatgpt-pro-max-economics",
+          "label": "ChatGPT Pro Max: ekonomia planu za $500"
+        },
+        {
+          "slug": "/research/cap-inference-costs",
+          "label": "Jak ograniczać koszty inferencji"
+        }
+      ]
+    },
+    "ru": {
+      "title": "Цены и скорость OpenAI Ultrafast API",
+      "titleCore": "Цены и скорость OpenAI Ultrafast API",
+      "description": "Актуальные цены API GPT-6 Astra Ultrafast, заявленная скорость, лимиты запросов и методика расчета точки безубыточности для задач, чувствительных к задержке.",
+      "body": "<p>OpenAI Ultrafast ускоряет генерацию вывода GPT-6 Astra и стоит в шесть раз дороже стандартных цен за токен. В текущем руководстве заявлена генерация до восьми раз быстрее, а в анонсе DevDay говорилось о шестикратном ускорении. Ни одна из этих цифр не гарантирует сквозную задержку. Прежде чем направлять производственный трафик на этот тариф, сравните дополнительную стоимость инференса с измеренным временем выполнения и бизнес-ценностью.</p>\n<h2>Что меняет Ultrafast?</h2>\n<p>Ultrafast сокращает время между генерируемыми выходными токенами. Он не делает все этапы запроса в восемь раз быстрее: обработка входных данных, установка сетевого соединения, инструменты, код приложения и ожидание внешних сервисов по-прежнему влияют на общую задержку. OpenAI рекомендует WebSockets, особенно для агентов, которые выполняют несколько вызовов инструментов подряд, поскольку накладные расходы на соединение могут свести на нет часть выигрыша.</p>\n<h2>Сколько стоит GPT-6 Astra Ultrafast?</h2>\n<p>Таблица цен OpenAI указывает следующие значения за один миллион текстовых токенов для запросов GPT-6 Astra с коротким контекстом:</p>\n<table><thead><tr><th>Тариф</th><th>Вход</th><th>Вход из кэша</th><th>Запись в кэш</th><th>Выход</th></tr></thead><tbody><tr><td>Standard</td><td>$10</td><td>$1</td><td>$12.50</td><td>$50</td></tr><tr><td>Ultrafast</td><td>$60</td><td>$6</td><td>$75</td><td>$300</td></tr></tbody></table>\n<p>Ultrafast стоит в 6 раз дороже указанной стандартной ставки для каждой категории токенов. Перед составлением бюджета проверьте актуальную страницу цен, так как ставки и условия доступа могут меняться. Ultrafast поддерживает глобальную обработку и хранение данных в США; он не поддерживает региональные конечные точки обработки в ЕС и других регионах за пределами США. Там, где это предусмотрено, могут применяться региональные надбавки и надбавки FedRAMP.</p>\n<h2>Во что обходится надбавка за задачу?</h2>\n<p>Возьмем гипотетический запрос без кэширования с 8,000 входных токенов и 2,000 выходных токенов. По стандартным ставкам он стоит $0.18: $0.08 за вход и $0.10 за выход. По ставкам Ultrafast он стоит $1.08: $0.48 за вход и $0.60 за выход. Надбавка составляет $0.90 за задачу. Этот пример основан на опубликованных ценах за токены и предполагаемом количестве токенов; он не прогнозирует задержку или бизнес-ценность реальной нагрузки.</p>\n<p>Для реальной нагрузки умножьте месячное количество входных, кэшированных входных, записанных в кэш и выходных токенов на актуальные цены каждого тарифа. Сохраняйте одинаковыми модель, промпты, настройки рассуждений и состав задач при сравнении тарифов.</p>\n<h2>Когда Ultrafast оправдывает надбавку?</h2>\n<p>Проверьте его на задачах, где время генерации модели влияет на измеримый результат: интерактивный ассистент с целевой задержкой, живой процесс, который ждет следующего действия, или агент, где более быстрые ходы сокращают оплачиваемое время простоя. Сравните сквозное время выполнения при p50 и p95, долю успешных запросов и стоимость одной успешно выполненной задачи. Платите надбавку, только если измеренная экономия времени стоит дороже дополнительных расходов.</p>\n<p>Для офлайн-обогащения данных, плановых сводок и другой работы, которая может подождать, лучше может подойти Standard или вариант обработки со скидкой. Сохраните резервный маршрут для запросов, которые превышают лимит Ultrafast.</p>\n<h2>Кто может использовать его и какие действуют ограничения?</h2>\n<p>Актуальное руководство OpenAI по Ultrafast сообщает, что доступ к GPT-6 Astra открыт для клиентов API с лимитами по умолчанию. Задокументированные лимиты по умолчанию в токенах в минуту составляют 500,000 для Build, 1,000,000 для Launch и 5,000,000 для Grow. Более высокие лимиты могут потребовать запроса в команду по работе с клиентами OpenAI.</p>\n<h2>Какие источники подтверждают заявления о ценах и скорости?</h2>\n<p>Основные источники: <a href=\"https://developers.openai.com/api/docs/guides/ultrafast-mode\">руководство OpenAI по режиму Ultrafast</a>, <a href=\"https://developers.openai.com/api/docs/pricing\">цены API OpenAI</a> и <a href=\"https://openai.com/index/devday-2026-recap/\">обзор OpenAI DevDay 2026</a>. См. также <a href=\"/research/model-routing\">маршрутизацию моделей</a> и <a href=\"/research/llm-cost-per-user-benchmarks\">бенчмарки стоимости LLM на пользователя</a>.</p>",
+      "faq": [
+        {
+          "question": "Что такое режим OpenAI Ultrafast?",
+          "answer": "Ultrafast — это тариф обслуживания Responses API для GPT-6 Astra, который сокращает время между генерируемыми выходными токенами. В текущем руководстве OpenAI заявлено до 8× быстрее, чем у Standard; в обзоре DevDay говорилось о генерации токенов до 6× быстрее. Это максимальные заявления, а не гарантии сквозной задержки."
+        },
+        {
+          "question": "Насколько дороже GPT-6 Astra Ultrafast?",
+          "answer": "Актуальная таблица цен OpenAI ставит Ultrafast в шесть раз выше стандартных ставок GPT-6 Astra: $60 против $10 за миллион входных токенов и $300 против $50 за миллион выходных токенов. Ставки за вход из кэша и запись в кэш также выше в 6 раз."
+        },
+        {
+          "question": "Кто может использовать GPT-6 Astra Ultrafast?",
+          "answer": "OpenAI сообщает, что GPT-6 Astra Ultrafast доступен клиентам API с лимитами запросов по умолчанию. Он поддерживает глобальную обработку и хранение данных в США, но не региональные конечные точки обработки в ЕС и других регионах за пределами США."
+        },
+        {
+          "question": "Когда Ultrafast стоит своих дополнительных расходов?",
+          "answer": "Когда измеренное сокращение сквозной задержки достаточно улучшает ценный результат, чтобы покрыть дополнительную стоимость инференса. Сравнивайте стоимость и время выполнения на одной и той же нагрузке; пакетные и другие несрочные задачи часто могут оставаться на Standard или на обработке со скидкой."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/model-routing",
+          "label": "Маршрутизация моделей"
+        },
+        {
+          "slug": "/research/llm-cost-per-user-benchmarks",
+          "label": "Бенчмарки стоимости LLM на пользователя"
+        },
+        {
+          "slug": "/research/chatgpt-pro-max-economics",
+          "label": "ChatGPT Pro Max: экономика тарифа за $500"
+        },
+        {
+          "slug": "/research/cap-inference-costs",
+          "label": "Как ограничить расходы на инференс"
+        }
+      ]
+    },
+    "tr": {
+      "title": "OpenAI Ultrafast API fiyatı ve hızı",
+      "titleCore": "OpenAI Ultrafast API fiyatı ve hızı",
+      "description": "GPT-6 Astra Ultrafast API'nin güncel fiyatları, hız iddiaları, oran limitleri ve gecikmeye duyarlı iş yükleri için başa baş çerçevesi.",
+      "body": "<p>OpenAI Ultrafast, GPT-6 Astra çıktı üretimini Standard token fiyatlarının altı katı bedelle hızlandırır. Güncel rehber üretimde sekiz kata kadar hızlanma iddia ediyor; DevDay duyurusu ise altı kata kadar olduğunu belirtmişti. Hiçbiri uçtan uca gecikmeyi garanti etmez. Üretim trafiğini bu katmana yönlendirmeden önce, ek çıkarım ücretini ölçülmüş tamamlanma süresi ve iş değeriyle karşılaştırın.</p>\n<h2>Ultrafast neyi değiştiriyor?</h2>\n<p>Ultrafast, üretilen çıktı token'ları arasındaki süreyi kısaltır. Bir isteğin her bölümünü sekiz kat hızlandırmaz: girdi işleme, ağ kurulumu, araçlar, uygulama kodu ve dış servislerin beklenmesi toplam gecikmeyi etkilemeye devam eder. OpenAI, özellikle kısa aralıklarla birden fazla araç çağrısı yapan agent'lar için WebSocket kullanılmasını önerir; çünkü bağlantı ek yükü kazancın bir kısmını silebilir.</p>\n<h2>GPT-6 Astra Ultrafast ne kadara mal oluyor?</h2>\n<p>OpenAI'nin fiyat tablosu, kısa bağlamlı GPT-6 Astra istekleri için bir milyon metin token'ı başına şu fiyatları listeler:</p>\n<table><thead><tr><th>Katman</th><th>Girdi</th><th>Önbellekteki girdi</th><th>Önbellek yazma</th><th>Çıktı</th></tr></thead><tbody><tr><td>Standard</td><td>$10</td><td>$1</td><td>$12.50</td><td>$50</td></tr><tr><td>Ultrafast</td><td>$60</td><td>$6</td><td>$75</td><td>$300</td></tr></tbody></table>\n<p>Ultrafast, her token kategorisinde listelenen Standard fiyatın 6× katıdır. Fiyatlar ve uygunluk değişebileceği için bütçe yapmadan önce canlı fiyat sayfasını kontrol edin. Ultrafast global işleme ve ABD veri ikametini destekler; AB veya ABD dışındaki diğer bölgesel işleme uç noktalarını desteklemez. Desteklenen yerlerde bölgesel ve FedRAMP fiyat ayarlamaları uygulanabilir.</p>\n<h2>Premium, görev başına ne anlama geliyor?</h2>\n<p>Önbelleksiz, 8,000 girdi ve 2,000 çıktı token'lı varsayımsal bir istek düşünelim. Standard fiyatla $0.18 tutar: $0.08 girdi, $0.10 çıktı. Ultrafast fiyatla $1.08 tutar: $0.48 girdi, $0.60 çıktı. Premium, görev başına $0.90'dır. Bu örnek yayımlanmış token fiyatlarını ve varsayılan token sayılarını kullanır; bir iş yükünün gecikmesini ya da iş değerini tahmin etmez.</p>\n<p>Gerçek bir iş yükü için aylık girdi, önbellekteki girdi, önbellek yazma ve çıktı token'larını her katmanın güncel fiyatıyla çarpın. Katmanları karşılaştırırken aynı modeli, aynı prompt'ları, aynı akıl yürütme ayarlarını ve aynı görev karışımını koruyun.</p>\n<h2>Ultrafast premium'u ne zaman değer?</h2>\n<p>Modelin üretim süresinin ölçülebilir bir sonucu etkilediği işlerde test edin: gecikme hedefi olan etkileşimli bir asistan, bir sonraki eylemi bekleyen canlı bir iş akışı ya da daha hızlı turların ödenen boşta kalma süresini azalttığı bir agent. p50 ve p95 uçtan uca tamamlanma süresini, başarı oranını ve başarılı görev başına maliyeti karşılaştırın. Premium'u yalnızca ölçülen zaman tasarrufunun değeri ek maliyetten fazlaysa kullanın.</p>\n<p>Çevrimdışı zenginleştirme, zamanlanmış özetler ve beklemeye dayanabilen diğer işler için Standard ya da indirimli bir işleme seçeneği daha uygun olabilir. Ultrafast oran limitini aşan istekler için bir yedek rota tutun.</p>\n<h2>Kim kullanabilir, hangi limitler geçerli?</h2>\n<p>OpenAI'nin güncel Ultrafast rehberine göre GPT-6 Astra erişimi, varsayılan oran limitleriyle API müşterilerine sunulmaktadır. Belgelenmiş varsayılan dakika başına token limitleri Build için 500,000, Launch için 1,000,000 ve Grow için 5,000,000'dur. Daha yüksek limitler için OpenAI hesap ekibine talep göndermek gerekebilir.</p>\n<h2>Fiyat ve hız iddialarını hangi kaynaklar belgeliyor?</h2>\n<p>Birincil kaynaklar: <a href=\"https://developers.openai.com/api/docs/guides/ultrafast-mode\">OpenAI Ultrafast modu rehberi</a>, <a href=\"https://developers.openai.com/api/docs/pricing\">OpenAI API fiyatlandırması</a> ve <a href=\"https://openai.com/index/devday-2026-recap/\">OpenAI DevDay 2026 özeti</a>. Ayrıca bkz. <a href=\"/research/model-routing\">model yönlendirme</a> ve <a href=\"/research/llm-cost-per-user-benchmarks\">kullanıcı başına LLM maliyeti kıyaslamaları</a>.</p>",
+      "faq": [
+        {
+          "question": "OpenAI Ultrafast modu nedir?",
+          "answer": "Ultrafast, GPT-6 Astra için üretilen çıktı token'ları arasındaki süreyi azaltan bir Responses API hizmet katmanıdır. OpenAI'nin güncel rehberi Standard'a göre 8× kadar hızlı olduğunu söylüyor; DevDay özeti ise 6× kadar hızlı token üretimi tarif etmişti. Bunlar en yüksek iddialardır, uçtan uca gecikme garantileri değildir."
+        },
+        {
+          "question": "GPT-6 Astra Ultrafast ne kadar daha pahalı?",
+          "answer": "OpenAI'nin güncel fiyat tablosu Ultrafast'i GPT-6 Astra Standard fiyatlarının altı katı olarak listeler: milyon girdi token'ı başına $10 yerine $60, milyon çıktı token'ı başına $50 yerine $300. Önbellekteki girdi ve önbellek yazma fiyatları da 6× katıdır."
+        },
+        {
+          "question": "GPT-6 Astra Ultrafast'i kim kullanabilir?",
+          "answer": "OpenAI, GPT-6 Astra Ultrafast'in varsayılan oran limitleriyle API müşterilerine sunulduğunu belirtiyor. Global işleme ve ABD veri ikametini destekler; AB veya ABD dışındaki diğer bölgesel işleme uç noktalarını desteklemez."
+        },
+        {
+          "question": "Ultrafast ek maliyete ne zaman değer?",
+          "answer": "Ölçülen uçtan uca gecikme azalması, değerli bir sonucu ek çıkarım maliyetini karşılayacak kadar iyileştirdiğinde kullanın. Aynı iş yükünde maliyeti ve tamamlanma süresini karşılaştırın; toplu işler ve acil olmayan diğer görevler çoğu zaman Standard ya da indirimli işlemede kalabilir."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/model-routing",
+          "label": "Model yönlendirme"
+        },
+        {
+          "slug": "/research/llm-cost-per-user-benchmarks",
+          "label": "Kullanıcı başına LLM maliyeti kıyaslamaları"
+        },
+        {
+          "slug": "/research/chatgpt-pro-max-economics",
+          "label": "ChatGPT Pro Max: 500 dolarlık planın ekonomisi"
+        },
+        {
+          "slug": "/research/cap-inference-costs",
+          "label": "Çıkarım maliyetlerine üst sınır koyma"
+        }
+      ]
+    },
+    "vi": {
+      "title": "OpenAI Ultrafast API: Giá và tốc độ",
+      "titleCore": "OpenAI Ultrafast API: Giá và tốc độ",
+      "description": "Giá API GPT-6 Astra Ultrafast hiện tại, các tuyên bố về tốc độ, giới hạn tốc độ và khung hòa vốn cho khối lượng công việc nhạy độ trễ.",
+      "body": "<p>OpenAI Ultrafast tăng tốc độ tạo đầu ra của GPT-6 Astra với giá token gấp sáu lần Standard. Hướng dẫn hiện tại tuyên bố tạo nhanh hơn tới tám lần; thông báo tại DevDay mô tả tới sáu lần. Cả hai đều không đảm bảo độ trễ đầu cuối. Hãy so sánh khoản phí suy luận bổ sung với thời gian hoàn thành đo được và giá trị kinh doanh trước khi định tuyến lưu lượng production sang đó.</p>\n<h2>Ultrafast thay đổi điều gì?</h2>\n<p>Ultrafast rút ngắn khoảng thời gian giữa các token đầu ra được tạo ra. Nó không làm mọi phần của một yêu cầu nhanh hơn tám lần: xử lý đầu vào, thiết lập mạng, công cụ, mã ứng dụng và thời gian chờ dịch vụ bên ngoài vẫn ảnh hưởng đến tổng độ trễ. OpenAI khuyến nghị WebSocket, đặc biệt cho các agent gọi nhiều công cụ liên tiếp, vì chi phí kết nối có thể làm mất một phần lợi ích.</p>\n<h2>GPT-6 Astra Ultrafast tốn bao nhiêu?</h2>\n<p>Bảng giá của OpenAI liệt kê các mức sau cho mỗi một triệu token văn bản với yêu cầu ngữ cảnh ngắn của GPT-6 Astra:</p>\n<table><thead><tr><th>Tầng</th><th>Đầu vào</th><th>Đầu vào đã cache</th><th>Ghi cache</th><th>Đầu ra</th></tr></thead><tbody><tr><td>Standard</td><td>$10</td><td>$1</td><td>$12.50</td><td>$50</td></tr><tr><td>Ultrafast</td><td>$60</td><td>$6</td><td>$75</td><td>$300</td></tr></tbody></table>\n<p>Ultrafast gấp 6× mức Standard được liệt kê cho mỗi loại token. Hãy kiểm tra trang giá trực tiếp trước khi lập ngân sách vì đơn giá và điều kiện đủ điều kiện có thể thay đổi. Ultrafast hỗ trợ xử lý toàn cầu và lưu trú dữ liệu tại Mỹ; không hỗ trợ endpoint xử lý khu vực EU hoặc các khu vực không phải Mỹ khác. Có thể áp dụng điều chỉnh giá theo khu vực và FedRAMP nơi được hỗ trợ.</p>\n<h2>Mức phí cao cấp nghĩa là gì cho mỗi tác vụ?</h2>\n<p>Đây là một yêu cầu giả định chưa cache với 8,000 token đầu vào và 2,000 token đầu ra. Theo giá Standard, nó tốn $0.18: $0.08 cho đầu vào và $0.10 cho đầu ra. Theo giá Ultrafast, nó tốn $1.08: $0.48 cho đầu vào và $0.60 cho đầu ra. Phần phí cao cấp là $0.90 mỗi tác vụ. Ví dụ này dùng giá token đã công bố và số lượng token giả định; nó không dự đoán độ trễ hay giá trị kinh doanh của một khối lượng công việc.</p>\n<p>Với khối lượng công việc thực, hãy nhân số token đầu vào, đầu vào đã cache, ghi cache và đầu ra hằng tháng với giá hiện tại của từng tầng. Giữ nguyên mô hình, prompt, thiết lập suy luận và tổ hợp tác vụ khi so sánh các tầng.</p>\n<h2>Khi nào Ultrafast đáng với mức phí cao cấp?</h2>\n<p>Hãy thử nghiệm trên công việc mà thời gian tạo của mô hình ảnh hưởng đến một kết quả đo được: một trợ lý tương tác có mục tiêu độ trễ, một quy trình trực tiếp đang chờ hành động tiếp theo, hoặc một agent mà lượt xử lý nhanh hơn giảm thời gian chờ trả tiền. So sánh thời gian hoàn thành đầu cuối p50 và p95, tỷ lệ thành công và chi phí mỗi tác vụ thành công. Chỉ dùng mức phí cao cấp khi thời gian tiết kiệm được đo lường có giá trị hơn chi phí gia tăng.</p>\n<p>Với việc làm giàu dữ liệu ngoại tuyến, tóm tắt theo lịch và các công việc có thể chờ, Standard hoặc một tùy chọn xử lý giảm giá có thể phù hợp hơn. Giữ một tuyến dự phòng cho các yêu cầu vượt giới hạn tốc độ của Ultrafast.</p>\n<h2>Ai có thể dùng, và áp dụng giới hạn nào?</h2>\n<p>Hướng dẫn Ultrafast hiện tại của OpenAI nói rằng GPT-6 Astra được cung cấp cho khách hàng API ở giới hạn tốc độ mặc định. Giới hạn token mỗi phút mặc định được ghi nhận là 500,000 cho Build, 1,000,000 cho Launch và 5,000,000 cho Grow. Giới hạn cao hơn có thể cần yêu cầu qua đội tài khoản của OpenAI.</p>\n<h2>Nguồn nào ghi nhận các tuyên bố về giá và tốc độ?</h2>\n<p>Nguồn chính: <a href=\"https://developers.openai.com/api/docs/guides/ultrafast-mode\">hướng dẫn chế độ Ultrafast của OpenAI</a>, <a href=\"https://developers.openai.com/api/docs/pricing\">giá API của OpenAI</a>, và <a href=\"https://openai.com/index/devday-2026-recap/\">tổng kết DevDay 2026 của OpenAI</a>. Xem thêm <a href=\"/research/model-routing\">định tuyến mô hình</a> và <a href=\"/research/llm-cost-per-user-benchmarks\">benchmark chi phí LLM theo người dùng</a>.</p>",
+      "faq": [
+        {
+          "question": "Chế độ OpenAI Ultrafast là gì?",
+          "answer": "Ultrafast là một tầng dịch vụ của Responses API cho GPT-6 Astra, rút ngắn khoảng thời gian giữa các token đầu ra. Hướng dẫn hiện tại của OpenAI nói nhanh hơn tới 8× so với Standard; tổng kết DevDay mô tả tốc độ tạo token nhanh hơn tới 6×. Đây là mức tối đa được tuyên bố, không phải cam kết về độ trễ đầu cuối."
+        },
+        {
+          "question": "GPT-6 Astra Ultrafast đắt hơn bao nhiêu?",
+          "answer": "Bảng giá hiện tại của OpenAI liệt kê Ultrafast gấp sáu lần giá Standard của GPT-6 Astra: $60 so với $10 cho mỗi triệu token đầu vào và $300 so với $50 cho mỗi triệu token đầu ra. Đơn giá đầu vào đã cache và ghi cache cũng gấp 6×."
+        },
+        {
+          "question": "Ai có thể dùng GPT-6 Astra Ultrafast?",
+          "answer": "OpenAI cho biết GPT-6 Astra Ultrafast được cung cấp cho khách hàng API ở giới hạn tốc độ mặc định. Nó hỗ trợ xử lý toàn cầu và lưu trú dữ liệu tại Mỹ, không hỗ trợ endpoint xử lý khu vực EU hoặc các khu vực không phải Mỹ khác."
+        },
+        {
+          "question": "Khi nào Ultrafast đáng với chi phí thêm?",
+          "answer": "Hãy dùng khi việc giảm đo được độ trễ đầu cuối cải thiện một kết quả có giá trị đủ để bù chi phí suy luận bổ sung. So sánh chi phí và thời gian hoàn thành trên cùng một khối lượng công việc; các tác vụ theo lô và việc không gấp thường có thể giữ ở Standard hoặc xử lý giảm giá."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/model-routing",
+          "label": "Định tuyến mô hình"
+        },
+        {
+          "slug": "/research/llm-cost-per-user-benchmarks",
+          "label": "Benchmark chi phí LLM theo người dùng"
+        },
+        {
+          "slug": "/research/chatgpt-pro-max-economics",
+          "label": "ChatGPT Pro Max: kinh tế gói $500"
+        },
+        {
+          "slug": "/research/cap-inference-costs",
+          "label": "Cách giới hạn chi phí suy luận"
+        }
+      ]
+    },
+    "ar": {
+      "title": "تسعير وسرعة OpenAI Ultrafast API",
+      "titleCore": "تسعير وسرعة OpenAI Ultrafast API",
+      "description": "أسعار GPT-6 Astra Ultrafast API الحالية وادعاءات السرعة وحدود المعدل وإطار نقطة التعادل لأحمال العمل الحساسة لزمن الاستجابة.",
+      "body": "<p>تسرّع OpenAI Ultrafast توليد مخرجات GPT-6 Astra بستة أضعاف أسعار رموز Standard. يزعم الدليل الحالي توليداً أسرع بما يصل إلى ثمانية أضعاف، بينما وصف إعلان DevDay ما يصل إلى 6×. ولا يضمن أي منهما زمن الاستجابة من البداية إلى النهاية. قارن رسم الاستدلال الإضافي بزمن الإكمال المقيس والقيمة التجارية قبل توجيه حركة الإنتاج إليها.</p>\n<h2>ما الذي تغيّره Ultrafast؟</h2>\n<p>تقلل Ultrafast الزمن بين رموز المخرجات المولَّدة. لكنها لا تجعل كل جزء من الطلب أسرع ثمانية أضعاف: فمعالجة الإدخال وإعداد الشبكة والأدوات وشيفرة التطبيق والانتظار على الخدمات الخارجية كلها لا تزال تؤثر في زمن الاستجابة الإجمالي. وتوصي OpenAI باستخدام WebSockets، خاصة للوكلاء الذين يجرون عدة استدعاءات أدوات متتابعة بسرعة، لأن كلفة الاتصال قد تمحو جزءاً من المكسب.</p>\n<h2>كم تكلف GPT-6 Astra Ultrafast؟</h2>\n<p>يورد جدول أسعار OpenAI ما يلي لكل مليون رمز نصي لطلبات GPT-6 Astra ذات السياق القصير:</p>\n<table><thead><tr><th>الفئة</th><th>الإدخال</th><th>الإدخال المخزّن مؤقتاً</th><th>كتابة التخزين المؤقت</th><th>الإخراج</th></tr></thead><tbody><tr><td>Standard</td><td>$10</td><td>$1</td><td>$12.50</td><td>$50</td></tr><tr><td>Ultrafast</td><td>$60</td><td>$6</td><td>$75</td><td>$300</td></tr></tbody></table>\n<p>تبلغ Ultrafast ستة أضعاف سعر Standard المدرج لكل فئة رموز. تحقق من صفحة الأسعار الحية قبل وضع الميزانية لأن الأسعار والأهلية قد تتغير. تدعم Ultrafast المعالجة العالمية وإقامة البيانات في الولايات المتحدة؛ ولا تدعم نقاط المعالجة الإقليمية في الاتحاد الأوروبي أو خارج الولايات المتحدة. وقد تنطبق تعديلات أسعار إقليمية وتعديلات FedRAMP حيث تكون مدعومة.</p>\n<h2>ماذا تعني العلاوة لكل مهمة؟</h2>\n<p>إليك طلباً افتراضياً غير مخزّن مؤقتاً بـ 8,000 رمز إدخال و2,000 رمز إخراج. بأسعار Standard يكلف 0.18 دولار: 0.08 للإدخال و0.10 للإخراج. وبأسعار Ultrafast يكلف 1.08 دولار: 0.48 للإدخال و0.60 للإخراج. فالعلاوة 0.90 دولار لكل مهمة. يستخدم هذا المثال أسعار رموز منشورة وأعداد رموز مفترضة؛ ولا يتنبأ بزمن استجابة حمل العمل ولا بقيمته التجارية.</p>\n<p>لحمل عمل حقيقي، اضرب رموز الإدخال والإدخال المخزّن مؤقتاً وكتابة التخزين المؤقت والإخراج الشهرية في الأسعار الحالية لكل فئة. وأبقِ النموذج والموجّهات وإعدادات الاستدلال ومزيج المهام نفسها عند المقارنة بين الفئات.</p>\n<h2>متى تستحق Ultrafast العلاوة؟</h2>\n<p>اختبرها على عمل يؤثر فيه زمن توليد النموذج في نتيجة قابلة للقياس: مساعد تفاعلي له هدف لزمن الاستجابة، أو سير عمل حي ينتظر الإجراء التالي، أو وكيل تقلل فيه الأدوار الأسرع زمن الخمول المدفوع. قارن زمن الإكمال من البداية إلى النهاية عند p50 وp95، ومعدل النجاح، والكلفة لكل مهمة ناجحة. لا تستخدم العلاوة إلا عندما تفوق قيمة الزمن الموفَّر المقيس الكلفة الإضافية.</p>\n<p>أما الإثراء غير المتصل والملخصات المجدولة وغيرها من الأعمال التي تحتمل الانتظار، فقد تناسبها Standard أو خيار معالجة مخفّض أكثر. وأبقِ مساراً احتياطياً للطلبات التي تتجاوز حد معدل Ultrafast.</p>\n<h2>من يستطيع استخدامها، وما الحدود المنطبقة؟</h2>\n<p>يقول دليل Ultrafast الحالي لدى OpenAI إن الوصول إلى GPT-6 Astra متاح لعملاء API بحدود المعدل الافتراضية. وحدود الرموز في الدقيقة الافتراضية الموثَّقة هي 500,000 لـ Build، و1,000,000 لـ Launch، و5,000,000 لـ Grow. وقد تتطلب الحدود الأعلى طلباً إلى فريق حساب OpenAI.</p>\n<h2>ما المصادر التي توثّق ادعاءات التسعير والسرعة؟</h2>\n<p>المصادر الأولية: <a href=\"https://developers.openai.com/api/docs/guides/ultrafast-mode\">دليل وضع Ultrafast من OpenAI</a> و<a href=\"https://developers.openai.com/api/docs/pricing\">أسعار OpenAI API</a> و<a href=\"https://openai.com/index/devday-2026-recap/\">ملخص OpenAI DevDay 2026</a>. وانظر أيضاً <a href=\"/research/model-routing\">توجيه النماذج</a> و<a href=\"/research/llm-cost-per-user-benchmarks\">معايير كلفة LLM لكل مستخدم</a>.</p>",
+      "faq": [
+        {
+          "question": "ما هو وضع OpenAI Ultrafast؟",
+          "answer": "Ultrafast فئة خدمة في Responses API لنموذج GPT-6 Astra تقلل الزمن بين رموز المخرجات المولَّدة. ويقول دليل OpenAI الحالي إنها أسرع حتى 8 أضعاف من Standard؛ بينما وصف ملخص DevDay توليد رموز أسرع حتى 6 أضعاف. وهذه ادعاءات قصوى وليست ضمانات لزمن الاستجابة من البداية إلى النهاية."
+        },
+        {
+          "question": "كم تزيد كلفة GPT-6 Astra Ultrafast؟",
+          "answer": "يورد جدول أسعار OpenAI الحالي Ultrafast بستة أضعاف أسعار GPT-6 Astra Standard: 60 دولاراً مقابل 10 لكل مليون رمز إدخال، و300 مقابل 50 لكل مليون رمز إخراج. وأسعار الإدخال المخزّن مؤقتاً وكتابة التخزين المؤقت أيضاً 6 أضعاف."
+        },
+        {
+          "question": "من يستطيع استخدام GPT-6 Astra Ultrafast؟",
+          "answer": "تقول OpenAI إن GPT-6 Astra Ultrafast متاح لعملاء API بحدود المعدل الافتراضية. وهو يدعم المعالجة العالمية وإقامة البيانات في الولايات المتحدة، ولا يدعم نقاط المعالجة الإقليمية في الاتحاد الأوروبي أو خارج الولايات المتحدة."
+        },
+        {
+          "question": "متى تستحق Ultrafast الكلفة الإضافية؟",
+          "answer": "استخدمها عندما يحسّن انخفاض مقيس في زمن الاستجابة من البداية إلى النهاية نتيجة قيّمة بما يكفي لتغطية كلفة الاستدلال المضافة. قارن الكلفة وزمن الإكمال على حمل العمل نفسه؛ ويمكن غالباً إبقاء المهام الدفعية وغير العاجلة على Standard أو المعالجة المخفّضة."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/model-routing",
+          "label": "توجيه النماذج"
+        },
+        {
+          "slug": "/research/llm-cost-per-user-benchmarks",
+          "label": "معايير كلفة LLM لكل مستخدم"
+        },
+        {
+          "slug": "/research/chatgpt-pro-max-economics",
+          "label": "ChatGPT Pro Max: اقتصاديات خطة 500 دولار"
+        },
+        {
+          "slug": "/research/cap-inference-costs",
+          "label": "كيف تضع سقفاً لكلفة الاستدلال"
+        }
+      ]
+    },
+    "it": {
+      "title": "API Ultrafast di OpenAI: prezzi e velocità",
+      "titleCore": "Prezzi e velocità dell'API OpenAI Ultrafast",
+      "description": "Prezzi attuali dell'API GPT-6 Astra Ultrafast, velocità dichiarata, limiti di frequenza e un modello di pareggio per i carichi sensibili alla latenza.",
+      "body": "<p>OpenAI Ultrafast accelera la generazione dell'output di GPT-6 Astra a sei volte i prezzi standard dei token. La guida attuale dichiara una generazione fino a otto volte più veloce; l'annuncio del DevDay parlava di fino a sei volte. Nessuna delle due cifre garantisce la latenza end-to-end. Confrontate l'addebito aggiuntivo di inferenza con il tempo di completamento misurato e il valore di business prima di instradare il traffico di produzione verso questo livello.</p>\n<h2>Cosa cambia Ultrafast?</h2>\n<p>Ultrafast riduce il tempo tra un token di output generato e il successivo. Non rende ogni parte di una richiesta otto volte più veloce: l'elaborazione dell'input, la configurazione di rete, gli strumenti, il codice applicativo e l'attesa di servizi esterni incidono ancora sulla latenza totale. OpenAI raccomanda WebSocket, soprattutto per gli agenti che effettuano più chiamate di strumenti in rapida successione, perché l'overhead di connessione può annullare parte del guadagno.</p>\n<h2>Quanto costa GPT-6 Astra Ultrafast?</h2>\n<p>La tabella dei prezzi di OpenAI riporta quanto segue per un milione di token di testo, per richieste GPT-6 Astra a contesto breve:</p>\n<table><thead><tr><th>Livello</th><th>Input</th><th>Input in cache</th><th>Scrittura in cache</th><th>Output</th></tr></thead><tbody><tr><td>Standard</td><td>$10</td><td>$1</td><td>$12.50</td><td>$50</td></tr><tr><td>Ultrafast</td><td>$60</td><td>$6</td><td>$75</td><td>$300</td></tr></tbody></table>\n<p>Ultrafast costa 6× la tariffa Standard indicata per ogni categoria di token. Verificate la pagina dei prezzi aggiornata prima di fare il budget, perché tariffe ed eleggibilità possono cambiare. Ultrafast supporta l'elaborazione globale e la residenza dei dati negli Stati Uniti; non supporta endpoint di elaborazione regionali nell'UE o in altre regioni non statunitensi. Dove sono supportati, possono applicarsi adeguamenti regionali e FedRAMP.</p>\n<h2>Cosa significa il sovrapprezzo per attività?</h2>\n<p>Ecco una richiesta ipotetica senza cache con 8,000 token di input e 2,000 di output. Alle tariffe Standard costa $0.18: $0.08 per l'input e $0.10 per l'output. Alle tariffe Ultrafast costa $1.08: $0.48 per l'input e $0.60 per l'output. Il sovrapprezzo è di $0.90 per attività. Questo esempio usa prezzi pubblicati e conteggi di token ipotizzati; non prevede la latenza né il valore di business di un carico reale.</p>\n<p>Per un carico reale, moltiplicate i token mensili di input, input in cache, scrittura in cache e output per i prezzi correnti di ciascun livello. Mantenete lo stesso modello, gli stessi prompt, le stesse impostazioni di ragionamento e lo stesso mix di attività quando confrontate i livelli.</p>\n<h2>Quando Ultrafast vale il sovrapprezzo?</h2>\n<p>Provatelo su lavori in cui il tempo di generazione del modello influisce su un risultato misurabile: un assistente interattivo con un obiettivo di latenza, un flusso dal vivo che attende la prossima azione, o un agente in cui turni più rapidi riducono il tempo di inattività fatturato. Confrontate il tempo di completamento end-to-end p50 e p95, il tasso di successo e il costo per attività riuscita. Usate il sovrapprezzo solo quando il tempo risparmiato misurato vale più del costo incrementale.</p>\n<p>Per l'arricchimento offline, i riepiloghi programmati e gli altri lavori che possono attendere, Standard o un'opzione di elaborazione scontata può essere più adatta. Mantenete una rotta di riserva per le richieste che superano il limite di frequenza di Ultrafast.</p>\n<h2>Chi può usarlo e quali limiti si applicano?</h2>\n<p>La guida attuale di OpenAI su Ultrafast indica che l'accesso a GPT-6 Astra è disponibile per i clienti API con i limiti di frequenza predefiniti. I limiti predefiniti documentati in token al minuto sono 500,000 per Build, 1,000,000 per Launch e 5,000,000 per Grow. Limiti più alti possono richiedere una richiesta al team account di OpenAI.</p>\n<h2>Quali fonti documentano le affermazioni su prezzi e velocità?</h2>\n<p>Fonti primarie: <a href=\"https://developers.openai.com/api/docs/guides/ultrafast-mode\">guida alla modalità Ultrafast di OpenAI</a>, <a href=\"https://developers.openai.com/api/docs/pricing\">prezzi dell'API OpenAI</a> e <a href=\"https://openai.com/index/devday-2026-recap/\">riepilogo del DevDay 2026 di OpenAI</a>. Vedete anche <a href=\"/research/model-routing\">instradamento dei modelli</a> e <a href=\"/research/llm-cost-per-user-benchmarks\">benchmark del costo LLM per utente</a>.</p>",
+      "faq": [
+        {
+          "question": "Cos'è la modalità Ultrafast di OpenAI?",
+          "answer": "Ultrafast è un livello di servizio della Responses API per GPT-6 Astra che riduce il tempo tra i token di output generati. La guida attuale di OpenAI dice fino a 8× più veloce di Standard; il riepilogo del DevDay parlava di generazione di token fino a 6× più veloce. Sono affermazioni massime, non garanzie di latenza end-to-end."
+        },
+        {
+          "question": "Quanto costa in più GPT-6 Astra Ultrafast?",
+          "answer": "La tabella dei prezzi attuale di OpenAI fissa Ultrafast a sei volte le tariffe Standard di GPT-6 Astra: $60 contro $10 per milione di token di input e $300 contro $50 per milione di token di output. Anche le tariffe per input in cache e scrittura in cache sono 6×."
+        },
+        {
+          "question": "Chi può usare GPT-6 Astra Ultrafast?",
+          "answer": "OpenAI dice che GPT-6 Astra Ultrafast è disponibile per i clienti API con i limiti di frequenza predefiniti. Supporta l'elaborazione globale e la residenza dei dati negli Stati Uniti, ma non endpoint di elaborazione regionali nell'UE o in altre regioni non statunitensi."
+        },
+        {
+          "question": "Quando Ultrafast vale il costo extra?",
+          "answer": "Quando le riduzioni misurate della latenza end-to-end migliorano un risultato di valore abbastanza da coprire il costo di inferenza aggiuntivo. Confrontate costo e tempo di completamento sullo stesso carico di lavoro; batch e altre attività non urgenti possono spesso restare su Standard o su elaborazione scontata."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/model-routing",
+          "label": "Instradamento dei modelli"
+        },
+        {
+          "slug": "/research/llm-cost-per-user-benchmarks",
+          "label": "Benchmark del costo LLM per utente"
+        },
+        {
+          "slug": "/research/chatgpt-pro-max-economics",
+          "label": "ChatGPT Pro Max: economia del piano da $500"
+        },
+        {
+          "slug": "/research/cap-inference-costs",
+          "label": "Come limitare i costi di inferenza"
+        }
+      ]
+    },
+    "ko": {
+      "title": "OpenAI Ultrafast API 가격과 속도",
+      "titleCore": "OpenAI Ultrafast API 가격과 속도",
+      "description": "GPT-6 Astra Ultrafast API의 현재 가격, 속도 주장, 레이트 리밋, 지연 시간에 민감한 워크로드를 위한 손익분기 프레임워크를 정리했습니다.",
+      "body": "<p>OpenAI Ultrafast는 Standard 토큰 가격의 여섯 배를 받고 GPT-6 Astra의 출력 생성을 빠르게 합니다. 현재 가이드는 최대 여덟 배 빠른 생성을 주장하고, DevDay 발표는 최대 여섯 배라고 설명했습니다. 두 주장 모두 엔드투엔드 지연 시간을 보장하지 않습니다. 운영 트래픽을 이 티어로 보내기 전에, 추가되는 추론 요금을 측정된 완료 시간 및 비즈니스 가치와 비교하세요.</p>\n<h2>Ultrafast는 무엇을 바꾸나요?</h2>\n<p>Ultrafast는 생성되는 출력 토큰 사이의 시간을 줄입니다. 요청의 모든 부분이 여덟 배 빨라지는 것은 아닙니다. 입력 처리, 네트워크 연결 설정, 도구, 애플리케이션 코드, 외부 서비스 대기 시간은 여전히 전체 지연 시간에 영향을 줍니다. OpenAI는 특히 짧은 간격으로 여러 도구 호출을 하는 에이전트에게 WebSockets를 권장합니다. 연결 오버헤드가 이득의 일부를 지울 수 있기 때문입니다.</p>\n<h2>GPT-6 Astra Ultrafast는 얼마인가요?</h2>\n<p>OpenAI 가격표는 짧은 컨텍스트의 GPT-6 Astra 요청에 대해 백만 텍스트 토큰당 다음 가격을 보여 줍니다:</p>\n<table><thead><tr><th>티어</th><th>입력</th><th>캐시 입력</th><th>캐시 쓰기</th><th>출력</th></tr></thead><tbody><tr><td>Standard</td><td>$10</td><td>$1</td><td>$12.50</td><td>$50</td></tr><tr><td>Ultrafast</td><td>$60</td><td>$6</td><td>$75</td><td>$300</td></tr></tbody></table>\n<p>Ultrafast는 토큰 범주마다 나열된 Standard 요율의 6×입니다. 예산을 세우기 전에 실시간 가격 페이지를 확인하세요. 요율과 자격 조건은 바뀔 수 있습니다. Ultrafast는 글로벌 처리와 미국 데이터 거주를 지원하며, EU 또는 기타 미국 외 지역 처리 엔드포인트는 지원하지 않습니다. 지원되는 경우 지역별 및 FedRAMP 가격 조정이 적용될 수 있습니다.</p>\n<h2>작업당 프리미엄은 무엇을 뜻하나요?</h2>\n<p>캐시 없는 가상의 요청을 예로 들겠습니다. 입력 토큰 8,000개, 출력 토큰 2,000개입니다. Standard 요율에서는 $0.18이며, 입력 $0.08, 출력 $0.10입니다. Ultrafast 요율에서는 $1.08이며, 입력 $0.48, 출력 $0.60입니다. 프리미엄은 작업당 $0.90입니다. 이 예시는 공개된 토큰 가격과 가정한 토큰 수를 사용하며, 실제 워크로드의 지연 시간이나 비즈니스 가치를 예측하지 않습니다.</p>\n<p>실제 워크로드라면 월간 입력, 캐시 입력, 캐시 쓰기, 출력 토큰 수에 각 티어의 현재 가격을 곱하세요. 티어를 비교할 때는 같은 모델, 프롬프트, 추론 설정, 작업 구성을 유지하세요.</p>\n<h2>Ultrafast 프리미엄이 가치 있는 경우는 언제인가요?</h2>\n<p>모델 생성 시간이 측정 가능한 결과에 영향을 주는 작업에서 테스트하세요. 예를 들어 지연 시간 목표가 있는 대화형 어시스턴트, 다음 동작을 기다리는 실시간 워크플로, 턴이 빨라져서 과금되는 유휴 시간이 줄어드는 에이전트입니다. p50과 p95의 엔드투엔드 완료 시간, 성공률, 성공한 작업당 비용을 비교하세요. 측정된 시간 절감의 가치가 추가 비용보다 클 때만 프리미엄을 사용하세요.</p>\n<p>오프라인 보강, 예약된 요약, 기다릴 수 있는 다른 작업에는 Standard나 할인된 처리 옵션이 더 맞을 수 있습니다. Ultrafast 레이트 리밋을 초과하는 요청을 위해 대체 경로를 유지하세요.</p>\n<h2>누가 사용할 수 있고 어떤 제한이 적용되나요?</h2>\n<p>OpenAI의 현재 Ultrafast 가이드에 따르면 GPT-6 Astra에는 기본 레이트 리밋을 가진 API 고객이 접근할 수 있습니다. 문서화된 기본 분당 토큰 한도는 Build 500,000, Launch 1,000,000, Grow 5,000,000입니다. 더 높은 한도는 OpenAI 계정 팀에 요청해야 할 수 있습니다.</p>\n<h2>가격과 속도 주장은 어떤 자료에 나오나요?</h2>\n<p>주요 출처: <a href=\"https://developers.openai.com/api/docs/guides/ultrafast-mode\">OpenAI Ultrafast 모드 가이드</a>, <a href=\"https://developers.openai.com/api/docs/pricing\">OpenAI API 가격</a>, <a href=\"https://openai.com/index/devday-2026-recap/\">OpenAI DevDay 2026 요약</a>. 함께 보면 좋은 자료: <a href=\"/research/model-routing\">모델 라우팅</a>, <a href=\"/research/llm-cost-per-user-benchmarks\">사용자당 LLM 비용 벤치마크</a>.</p>",
+      "faq": [
+        {
+          "question": "OpenAI Ultrafast 모드란 무엇인가요?",
+          "answer": "Ultrafast는 GPT-6 Astra용 Responses API 서비스 티어로, 생성되는 출력 토큰 사이의 시간을 줄입니다. OpenAI의 현재 가이드는 Standard보다 최대 8× 빠르다고 하고, DevDay 요약은 최대 6× 빠른 토큰 생성을 설명했습니다. 이는 최대치 주장이며 엔드투엔드 지연 시간 보장이 아닙니다."
+        },
+        {
+          "question": "GPT-6 Astra Ultrafast는 얼마나 더 비싼가요?",
+          "answer": "OpenAI의 현재 가격표는 Ultrafast를 GPT-6 Astra Standard 요율의 6×로 표시합니다. 입력은 백만 토큰당 $60 대 $10, 출력은 백만 토큰당 $300 대 $50입니다. 캐시 입력과 캐시 쓰기 요율도 6×입니다."
+        },
+        {
+          "question": "누가 GPT-6 Astra Ultrafast를 사용할 수 있나요?",
+          "answer": "OpenAI에 따르면 GPT-6 Astra Ultrafast는 기본 레이트 리밋을 가진 API 고객에게 제공됩니다. 글로벌 처리와 미국 데이터 거주를 지원하며, EU 또는 기타 미국 외 지역 처리 엔드포인트는 지원하지 않습니다."
+        },
+        {
+          "question": "Ultrafast의 추가 비용이 가치 있는 경우는 언제인가요?",
+          "answer": "측정된 엔드투엔드 지연 시간 감소가 가치 있는 결과를 추가 추론 비용을 감당할 만큼 개선할 때 사용하세요. 같은 워크로드에서 비용과 완료 시간을 비교하세요. 배치 등 긴급하지 않은 작업은 대개 Standard나 할인된 처리에 머물 수 있습니다."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/model-routing",
+          "label": "모델 라우팅"
+        },
+        {
+          "slug": "/research/llm-cost-per-user-benchmarks",
+          "label": "사용자당 LLM 비용 벤치마크"
+        },
+        {
+          "slug": "/research/chatgpt-pro-max-economics",
+          "label": "ChatGPT Pro Max: $500 요금제 경제성"
+        },
+        {
+          "slug": "/research/cap-inference-costs",
+          "label": "추론 비용 상한 설정 방법"
+        }
+      ]
+    },
+    "nl": {
+      "title": "Prijs en snelheid van de OpenAI Ultrafast API",
+      "titleCore": "Prijs en snelheid van de OpenAI Ultrafast API",
+      "description": "Actuele API-prijzen van GPT-6 Astra Ultrafast, snelheidsclaims, rate limits en een break-evenkader voor latentiegevoelige workloads.",
+      "body": "<p>OpenAI Ultrafast versnelt de outputgeneratie van GPT-6 Astra tegen zes keer de Standard-tokenprijzen. De huidige gids claimt tot acht keer snellere generatie; de DevDay-aankondiging sprak van tot zes keer. Geen van beide garandeert end-to-endlatentie. Vergelijk de extra inferentiekosten met de gemeten doorlooptijd en de zakelijke waarde voordat je productieverkeer ernaartoe routeert.</p>\n<h2>Wat verandert Ultrafast?</h2>\n<p>Ultrafast verkort de tijd tussen gegenereerde outputtokens. Het maakt niet elk onderdeel van een request acht keer sneller: inputverwerking, netwerkopbouw, tools, applicatiecode en het wachten op externe diensten beïnvloeden de totale latentie nog steeds. OpenAI raadt WebSockets aan, vooral voor agents die snel achter elkaar meerdere toolaanroepen doen, omdat verbindingsoverhead een deel van de winst kan wegnemen.</p>\n<h2>Wat kost GPT-6 Astra Ultrafast?</h2>\n<p>De prijstabel van OpenAI noemt de volgende bedragen per miljoen teksttokens voor GPT-6 Astra-requests met korte context:</p>\n<table><thead><tr><th>Tier</th><th>Input</th><th>Gecachete input</th><th>Cache-write</th><th>Output</th></tr></thead><tbody><tr><td>Standard</td><td>$10</td><td>$1</td><td>$12.50</td><td>$50</td></tr><tr><td>Ultrafast</td><td>$60</td><td>$6</td><td>$75</td><td>$300</td></tr></tbody></table>\n<p>Ultrafast is 6× het vermelde Standard-tarief voor elke tokencategorie. Controleer de actuele prijspagina voordat je budgetteert, want tarieven en geschiktheid kunnen veranderen. Ultrafast ondersteunt globale verwerking en dataresidentie in de VS; het ondersteunt geen EU- of andere niet-Amerikaanse regionale verwerkingsendpoints. Waar ondersteund kunnen regionale en FedRAMP-prijscorrecties gelden.</p>\n<h2>Wat betekent de toeslag per taak?</h2>\n<p>Neem een hypothetisch ongecachet request met 8.000 inputtokens en 2.000 outputtokens. Tegen Standard-tarieven kost het $0.18: $0.08 voor input en $0.10 voor output. Tegen Ultrafast-tarieven kost het $1.08: $0.48 voor input en $0.60 voor output. De toeslag is $0.90 per taak. Dit voorbeeld gebruikt gepubliceerde tokenprijzen en veronderstelde tokenaantallen; het voorspelt niet de latentie of zakelijke waarde van een workload.</p>\n<p>Vermenigvuldig voor een echte workload de maandelijkse input-, gecachete-input-, cache-write- en outputtokens met de actuele prijzen voor elke tier. Houd bij het vergelijken van tiers hetzelfde model, dezelfde prompts, redeneerinstellingen en taakmix aan.</p>\n<h2>Wanneer is Ultrafast de toeslag waard?</h2>\n<p>Test het op werk waarbij de generatietijd van het model een meetbaar resultaat beïnvloedt: een interactieve assistent met een latentiedoel, een live workflow die op de volgende actie wacht, of een agent waarbij snellere beurten betaalde wachttijd verminderen. Vergelijk de p50- en p95-doorlooptijd end-to-end, het slagingspercentage en de kosten per geslaagde taak. Gebruik de toeslag alleen als de gemeten tijdwinst meer waard is dan de extra kosten.</p>\n<p>Voor offline verrijking, geplande samenvattingen en ander werk dat kan wachten passen Standard of een gereduceerde verwerkingsoptie mogelijk beter. Houd een fallbackroute voor requests die de Ultrafast-rate-limit overschrijden.</p>\n<h2>Wie kan het gebruiken en welke limieten gelden?</h2>\n<p>De huidige Ultrafast-gids van OpenAI zegt dat toegang tot GPT-6 Astra beschikbaar is voor API-klanten met standaard rate limits. De gedocumenteerde standaardlimieten voor tokens per minuut zijn 500.000 voor Build, 1.000.000 voor Launch en 5.000.000 voor Grow. Hogere limieten kunnen een verzoek aan het accountteam van OpenAI vereisen.</p>\n<h2>Welke bronnen documenteren de prijs- en snelheidsclaims?</h2>\n<p>Primaire bronnen: <a href=\"https://developers.openai.com/api/docs/guides/ultrafast-mode\">OpenAI Ultrafast-modegids</a>, <a href=\"https://developers.openai.com/api/docs/pricing\">OpenAI API-prijzen</a> en <a href=\"https://openai.com/index/devday-2026-recap/\">OpenAI DevDay 2026 recap</a>. Zie ook <a href=\"/research/model-routing\">modelrouting</a> en <a href=\"/research/llm-cost-per-user-benchmarks\">benchmarks voor LLM-kosten per gebruiker</a>.</p>",
+      "faq": [
+        {
+          "question": "Wat is de Ultrafast-modus van OpenAI?",
+          "answer": "Ultrafast is een Responses API-servicetier voor GPT-6 Astra die de tijd tussen gegenereerde outputtokens verkort. De huidige gids van OpenAI zegt tot 8× sneller dan Standard; de DevDay-recap sprak van tot 6× snellere tokengeneratie. Dit zijn maximale claims, geen end-to-endlatentiegaranties."
+        },
+        {
+          "question": "Hoeveel duurder is GPT-6 Astra Ultrafast?",
+          "answer": "De actuele prijstabel van OpenAI noemt Ultrafast tegen zes keer de Standard-tarieven van GPT-6 Astra: $60 tegenover $10 per miljoen inputtokens en $300 tegenover $50 per miljoen outputtokens. De tarieven voor gecachete input en cache-writes zijn ook 6×."
+        },
+        {
+          "question": "Wie kan GPT-6 Astra Ultrafast gebruiken?",
+          "answer": "OpenAI zegt dat GPT-6 Astra Ultrafast beschikbaar is voor API-klanten met standaard rate limits. Het ondersteunt globale verwerking en dataresidentie in de VS, geen EU- of andere niet-Amerikaanse regionale verwerkingsendpoints."
+        },
+        {
+          "question": "Wanneer is Ultrafast de extra kosten waard?",
+          "answer": "Gebruik het wanneer gemeten verkorting van de end-to-endlatentie een waardevol resultaat genoeg verbetert om de extra inferentiekosten te dekken. Vergelijk kosten en doorlooptijd op dezelfde workload; batch en andere niet-urgente taken kunnen vaak op Standard of gereduceerde verwerking blijven."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/model-routing",
+          "label": "Modelrouting"
+        },
+        {
+          "slug": "/research/llm-cost-per-user-benchmarks",
+          "label": "Benchmarks voor LLM-kosten per gebruiker"
+        },
+        {
+          "slug": "/research/chatgpt-pro-max-economics",
+          "label": "ChatGPT Pro Max: economie van het $500-abonnement"
+        },
+        {
+          "slug": "/research/cap-inference-costs",
+          "label": "Hoe je inferentiekosten begrenst"
+        }
+      ]
+    },
+    "zh": {
+      "title": "OpenAI Ultrafast API 定价与速度",
+      "titleCore": "OpenAI Ultrafast API 定价与速度",
+      "description": "当前 GPT-6 Astra Ultrafast API 的价格、速度声明、速率限制，以及面向延迟敏感型工作负载的盈亏平衡框架。",
+      "body": "<p>OpenAI Ultrafast 以标准 token 价格的 6 倍，加快 GPT-6 Astra 的输出生成速度。当前指南称生成速度最高可快 8 倍；DevDay 公告则称最高可快 6 倍。两者都不保证端到端延迟。在把生产流量路由到它之前，请把新增的推理费用与实测完成时间和业务价值进行对比。</p>\n<h2>Ultrafast 改变了什么？</h2>\n<p>Ultrafast 缩短了相邻生成输出 token 之间的时间。它并不会让请求的每个环节都快 8 倍：输入处理、网络建立、工具、应用代码以及等待外部服务，仍然会影响总延迟。OpenAI 建议使用 WebSockets，尤其适用于快速连续调用多次工具的智能体，因为连接开销可能会抵消部分收益。</p>\n<h2>GPT-6 Astra Ultrafast 的价格是多少？</h2>\n<p>OpenAI 的价格表列出了短上下文 GPT-6 Astra 请求每 1M 个文本 token 的以下价格：</p>\n<table><thead><tr><th>层级</th><th>输入</th><th>缓存输入</th><th>缓存写入</th><th>输出</th></tr></thead><tbody><tr><td>标准</td><td>$10</td><td>$1</td><td>$12.50</td><td>$50</td></tr><tr><td>Ultrafast</td><td>$60</td><td>$6</td><td>$75</td><td>$300</td></tr></tbody></table>\n<p>在每一类 token 上，Ultrafast 都是标准列表费率的 6 倍。编列预算前请查看实时定价页，因为费率和资格可能变化。Ultrafast 支持全球处理和美国数据驻留，但不支持欧盟或其他非美国地区的处理端点。在受支持的地方，可能适用区域及 FedRAMP 的价格调整。</p>\n<h2>这份溢价对每项任务意味着什么？</h2>\n<p>以下是一个假设性的未缓存请求：8,000 个输入 token 和 2,000 个输出 token。按标准费率，成本为 $0.18：输入 $0.08，输出 $0.10。按 Ultrafast 费率，成本为 $1.08：输入 $0.48，输出 $0.60。每项任务的溢价为 $0.90。这个示例使用已公布的 token 价格和假设的 token 数量，并不能预测某个工作负载的延迟或业务价值。</p>\n<p>对于真实的工作负载，请把每月的输入、缓存输入、缓存写入和输出 token 数分别乘以各层级的当前价格。比较不同层级时，请保持相同的模型、提示词、推理设置和任务组合。</p>\n<h2>什么时候 Ultrafast 的溢价是值得的？</h2>\n<p>请在模型生成时间会影响可衡量结果的任务上测试它：带有延迟目标的交互式助手、等待下一步操作的实时工作流，或是更快的轮次能减少付费空闲时间的智能体。比较 p50 和 p95 的端到端完成时间、成功率以及每个成功任务的成本。只有当节省的实测时间价值超过增量成本时，才值得支付这份溢价。</p>\n<p>对于离线丰富化、定时摘要以及其他可以等待的工作，标准层级或有折扣的处理选项可能更合适。对于超出 Ultrafast 速率限制的请求，请保留备用路由。</p>\n<h2>谁可以使用，适用哪些限制？</h2>\n<p>OpenAI 当前的 Ultrafast 指南称，API 客户可在默认速率限制下使用 GPT-6 Astra。文档中的默认每分钟 token 限额为：Build 层级 500,000，Launch 层级 1,000,000，Grow 层级 5,000,000。更高的限额可能需要向 OpenAI 的客户团队申请。</p>\n<h2>哪些来源记录了定价和速度声明？</h2>\n<p>主要来源：<a href=\"https://developers.openai.com/api/docs/guides/ultrafast-mode\">OpenAI Ultrafast 模式指南</a>、<a href=\"https://developers.openai.com/api/docs/pricing\">OpenAI API 定价</a>，以及 <a href=\"https://openai.com/index/devday-2026-recap/\">OpenAI DevDay 2026 回顾</a>。另请参阅<a href=\"/research/model-routing\">模型路由</a>和<a href=\"/research/llm-cost-per-user-benchmarks\">每用户 LLM 成本基准</a>。</p>",
+      "faq": [
+        {
+          "question": "什么是 OpenAI Ultrafast 模式？",
+          "answer": "Ultrafast 是面向 GPT-6 Astra 的 Responses API 服务层级，可缩短相邻生成输出 token 之间的时间。OpenAI 当前指南称比标准层级快至 8 倍；DevDay 回顾则称 token 生成速度最高快 6 倍。这些都是最高值声明，并不是端到端延迟的保证。"
+        },
+        {
+          "question": "GPT-6 Astra Ultrafast 贵多少？",
+          "answer": "OpenAI 当前价格表显示，Ultrafast 为 GPT-6 Astra 标准费率的 6 倍：每 1M 输入 token 为 $60（标准为 $10），每 1M 输出 token 为 $300（标准为 $50）。缓存输入和缓存写入的费率同样为 6 倍。"
+        },
+        {
+          "question": "谁可以使用 GPT-6 Astra Ultrafast？",
+          "answer": "OpenAI 称，API 客户可在默认速率限制下使用 GPT-6 Astra Ultrafast。它支持全球处理和美国数据驻留，但不支持欧盟或其他非美国地区的处理端点。"
+        },
+        {
+          "question": "什么时候 Ultrafast 值得额外成本？",
+          "answer": "当实测的端到端延迟降低，能使一项有价值的结果提升到足以覆盖额外推理成本时，就应使用它。请在相同工作负载上比较成本和完成时间；批处理及其他非紧急任务通常可以保留在标准层级或有折扣的处理选项上。"
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/model-routing",
+          "label": "模型路由"
+        },
+        {
+          "slug": "/research/llm-cost-per-user-benchmarks",
+          "label": "每用户 LLM 成本基准"
+        },
+        {
+          "slug": "/research/chatgpt-pro-max-economics",
+          "label": "ChatGPT Pro Max：500 美元套餐的经济性"
+        },
+        {
+          "slug": "/research/cap-inference-costs",
+          "label": "如何为推理成本设定上限"
+        }
+      ]
     }
   }
 }

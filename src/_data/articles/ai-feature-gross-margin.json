@@ -271,6 +271,176 @@
           "label": "حلقات إعادة المحاولة والإنفاق الخفي"
         }
       ]
+    },
+    "id": {
+      "title": "Ukur margin kotor fitur AI sebelum peluncuran",
+      "titleCore": "Ukur margin kotor fitur AI sebelum Anda merilisnya",
+      "description": "Instrumentasikan fitur AI di staging agar biaya per akun dan margin pada penggunaan tertinggi diketahui sebelum rilis, bukan setelah tagihan pertama.",
+      "body": "<p>Inferensi adalah biaya penyajian layanan, bukan biaya pengembangan. Ia berjalan pada setiap tindakan pelanggan, tumbuh seiring penggunaan, dan masuk ke tagihan yang sama dengan infrastruktur produksi. Memperlakukannya sebagai R&amp;D sampai peluncuran berarti angka margin yang jujur baru muncul bersama siklus penagihan penuh pertama, yaitu waktu terburuk untuk mengetahuinya.</p><h2>Instrumentasikan sebelum meluncurkan, bukan sesudahnya</h2><p>Di staging, beri tag setiap pemanggilan model dengan akun, alur kerja, dan hasilnya, lalu putar ulang trafik yang realistis, bukan loop sintetis. Yang Anda butuhkan adalah distribusi: biaya per tugas berhasil pada p50, p90, dan p99, serta porsi belanja untuk pekerjaan gagal dan diulang yang tetap Anda bayar. Satu rata-rata menyembunyikan akun yang justru menghancurkan margin.</p><h2>Gulung menjadi biaya per akun</h2><p>Kalikan biaya per tugas berhasil dengan perkiraan jumlah tugas per akun per bulan, lalu tambahkan bagian kegagalan. Angka itu bisa dibandingkan dengan harga paket. Hitung untuk penggunaan median, persentil ke-90, dan akun paling berat yang masih Anda terima. Paket berharga tetap gagal di ujung distribusi, karena biaya model terus naik sementara pendapatan berhenti.</p><h2>Empat pendorong biaya yang perlu diperiksa</h2><ul><li><strong>Konteks yang dikirim ulang per giliran.</strong> Percakapan panjang atau dokumen hasil pengambilan besar ditagih ulang di setiap giliran kecuali caching menanganinya.</li><li><strong>Percobaan ulang dan kegagalan.</strong> Ditagih penuh; masukkan ke pembilang, bukan ke anggaran galat.</li><li><strong>Penyebaran agentik.</strong> Satu tindakan pengguna menjadi banyak panggilan model dan alat, dan pengali inilah yang berbeda antar akun.</li><li><strong>Perutean model.</strong> Bawaan yang mengirim kasus mudah ke model mahal adalah pos terbesar yang paling bisa dikendalikan.</li></ul><h2>Hubungkan angka ke sebuah keputusan</h2><p>Hasil latihan ini harus berupa pilihan yang dibuat sebelum peluncuran: batas penggunaan dalam paket, komponen konsumsi dalam harga, model bawaan yang lebih murah dengan eskalasi hanya jika kualitas menuntutnya, atau margin yang diterima dengan tanggal tinjau. Kirim instrumentasi bersama fitur agar angka yang sama terus muncul di produksi dan asumsinya bisa diperiksa, bukan dipertahankan.</p><h2>Laporkan sebagai baris tersendiri</h2><p>Pisahkan biaya AI dari harga pokok pendapatan di dalam margin kotor, dengan biaya per akun dan margin pada setiap persentil penggunaan. Dibaca seperti itu, tagihan yang naik menjadi jelas: belanja yang tumbuh sejajar dengan pendapatan pada biaya per akun yang tetap adalah skala, sedangkan belanja yang tumbuh lebih cepat dari pendapatan adalah erosi dengan penyebab yang bisa ditunjuk.</p>",
+      "faq": [
+        {
+          "question": "Apakah inferensi LLM termasuk harga pokok pendapatan atau biaya R&D?",
+          "answer": "Inferensi berulang yang dipicu penggunaan pelanggan adalah biaya variabel penyajian layanan dan masuk ke harga pokok pendapatan. Fine-tuning satu kali, prototipe, dan evaluasi umumnya tetap berada di belanja pengembangan."
+        },
+        {
+          "question": "Bagaimana cara mengukur margin kotor fitur AI sebelum peluncuran?",
+          "answer": "Beri tag lalu lintas staging per akun, alur kerja, dan hasil; ambil biaya per tugas berhasil pada p50, p90, dan p99; kalikan dengan perkiraan tugas bulanan per akun, tambahkan kegagalan dan percobaan ulang yang dibayar, lalu bandingkan dengan harga paket."
+        },
+        {
+          "question": "Mengapa biaya rata-rata per permintaan meremehkan risiko margin?",
+          "answer": "Biaya AI naik seiring penggunaan sementara harga langganan tetap tidak, sehingga kegagalan margin muncul pada akun terberat, yang justru diratakan oleh rata-rata."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "Biaya per tugas berhasil"
+        },
+        {
+          "slug": "/research/free-tier-is-an-acquisition-cost",
+          "label": "Paket gratis adalah biaya akuisisi"
+        },
+        {
+          "slug": "/research/retry-loop-hidden-spend",
+          "label": "Loop percobaan ulang dan belanja tersembunyi"
+        }
+      ]
+    },
+    "pl": {
+      "title": "Zmierz marżę brutto funkcji AI przed premierą",
+      "titleCore": "Zmierz marżę brutto funkcji AI przed wdrożeniem",
+      "description": "Zainstrumentuj funkcję AI na stagingu, aby znać koszt na konto i marżę na ogonie użycia przed premierą, a nie po pierwszej fakturze.",
+      "body": "<p>Inferencja to koszt obsługi usługi, a nie koszt rozwoju. Uruchamia się przy każdej akcji klienta, rośnie wraz z użyciem i trafia na tę samą fakturę co infrastruktura produkcyjna. Traktowanie jej jak kosztów R&amp;D aż do premiery oznacza, że pierwsza rzetelna liczba marży pojawi się razem z pierwszym pełnym cyklem rozliczeniowym, czyli w najgorszym możliwym momencie, by się o tym dowiedzieć.</p><h2>Instrumentuj przed premierą, nie po niej</h2><p>Na stagingu oznacz każde wywołanie modelu kontem, przepływem pracy i wynikiem, i odtwórz realistyczny ruch zamiast syntetycznej pętli. Potrzebny jest rozkład: koszt udanego zadania w p50, p90 i p99 oraz udział wydatków na zadania nieudane i ponawiane, za które i tak płacisz. Pojedyncza średnia ukrywa konta, które psują marżę.</p><h2>Zsumuj do kosztu na konto</h2><p>Pomnóż koszt udanego zadania przez oczekiwaną liczbę zadań na konto miesięcznie i dodaj udział porażek. Ta liczba jest porównywalna z ceną planu. Wykonaj to raz przy medianie użycia, raz przy 90. percentylu i raz dla najcięższego konta, które nadal akceptujesz. Plany ze stałą ceną zawodzą w ogonie, bo koszt modelu dalej rośnie, gdy przychód już się nie zwiększa.</p><h2>Cztery czynniki kosztowe do sprawdzenia</h2><ul><li><strong>Kontekst wysyłany ponownie w każdej turze.</strong> Długa rozmowa lub duży pobrany dokument są rozliczane przy każdej turze, chyba że pokrywa je cache.</li><li><strong>Ponowienia i błędy.</strong> Rozliczane po pełnej stawce; należą do licznika, a nie do budżetu błędów.</li><li><strong>Rozgałęzienie agentowe.</strong> Jedna akcja użytkownika zamienia się w wiele wywołań modelu i narzędzi, a to mnożnik różni konta między sobą.</li><li><strong>Routing modeli.</strong> Domyślne ustawienie, które wysyła proste przypadki do drogiego modelu, to największa pojedyncza pozycja, na którą masz wpływ.</li></ul><h2>Powiąż liczby z decyzją</h2><p>Wynikiem ćwiczenia powinien być wybór dokonany przed premierą: limit użycia w planie, składnik zależny od zużycia w cenie, tańszy domyślny model z eskalacją tylko tam, gdzie wymaga tego jakość, albo zaakceptowana marża z datą przeglądu. Wdrażaj instrumentację razem z funkcją, aby te same liczby napływały także na produkcji i aby założenie dało się sprawdzić, a nie tylko bronić.</p><h2>Raportuj to jako osobną pozycję</h2><p>Wydziel koszt AI w koszcie przychodów w ramach marży brutto, z kosztem na konto i marżą przy każdym percentylu użycia. Tak czytany rosnący rachunek jest czytelny: wydatki rosnące w tempie przychodu przy stałym koszcie na konto to skala, a wydatki rosnące szybciej niż przychód to erozja o nazwanej przyczynie.</p>",
+      "faq": [
+        {
+          "question": "Czy inferencja LLM to koszt przychodów, czy koszt R&amp;D?",
+          "answer": "Cykliczna inferencja uruchamiana przez użycie przez klienta jest zmiennym kosztem obsługi i należy do kosztu przychodów. Jednorazowe dostrajanie, prototypowanie i uruchomienia ewaluacyjne zwykle pozostają w wydatkach na rozwój."
+        },
+        {
+          "question": "Jak zmierzyć marżę brutto funkcji AI przed premierą?",
+          "answer": "Oznacz ruch na stagingu według konta, przepływu pracy i wyniku; weź koszt udanego zadania w p50, p90 i p99; pomnóż przez oczekiwaną miesięczną liczbę zadań na konto, dodaj płatne błędy i ponowienia i porównaj z ceną planu."
+        },
+        {
+          "question": "Dlaczego średni koszt na żądanie zaniża ryzyko marży?",
+          "answer": "Koszt AI rośnie wraz z użyciem, a stała cena subskrypcji nie, więc błędy marży pojawiają się w najcięższych kontach, które średnia celowo wygładza."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "Koszt udanego zadania"
+        },
+        {
+          "slug": "/research/free-tier-is-an-acquisition-cost",
+          "label": "Darmowy plan to koszt pozyskania klienta"
+        },
+        {
+          "slug": "/research/retry-loop-hidden-spend",
+          "label": "Pętle ponowień i ukryte wydatki"
+        }
+      ]
+    },
+    "ru": {
+      "title": "Измерьте валовую маржу AI-функции до запуска",
+      "titleCore": "Измерьте валовую маржу AI-функции до выпуска",
+      "description": "Инструментируйте AI-функцию в staging, чтобы знать стоимость на аккаунт и маржу на хвосте использования до запуска, а не после первого счёта.",
+      "body": "<p>Инференс — это себестоимость сервиса, а не затраты на разработку. Он выполняется при каждом действии клиента, растёт вместе с использованием и попадает в тот же счёт, что и продакшен-инфраструктура. Если относиться к нему как к R&amp;D до самого запуска, честная цифра маржи появится только с первым полным биллинговым циклом, а это худшее время, чтобы её узнать.</p><h2>Инструментируйте до запуска, а не после</h2><p>В staging помечайте каждый вызов модели аккаунтом, рабочим процессом и результатом, и воспроизводите реалистичный трафик, а не синтетический цикл. Нужно распределение: стоимость успешной задачи на p50, p90 и p99, а также доля расходов на неудачные и повторные запросы, за которые вы всё равно платите. Одно среднее значение скрывает аккаунты, которые разрушают маржу.</p><h2>Пересчитайте в стоимость на аккаунт</h2><p>Умножьте стоимость успешной задачи на ожидаемое число задач на аккаунт в месяц и добавьте долю неудач. Полученное число можно сравнивать с ценой тарифа. Сделайте расчёт один раз при медианном использовании, один раз на 90-м перцентиле и один раз для самого тяжёлого аккаунта, который вы ещё готовы обслуживать. Тарифы с фиксированной ценой ломаются на хвосте, потому что стоимость модели продолжает расти, а выручка уже нет.</p><h2>Четыре драйвера стоимости, которые нужно проверить</h2><ul><li><strong>Контекст, отправляемый повторно в каждом ходе.</strong> Длинный диалог или большой найденный документ оплачиваются заново на каждом шаге, если кэширование их не покрывает.</li><li><strong>Повторы и сбои.</strong> Оплачиваются по полной ставке; их нужно учитывать в числителе, а не в бюджете ошибок.</li><li><strong>Агентное ветвление.</strong> Одно действие пользователя превращается во множество вызовов модели и инструментов, и именно этот множитель отличается между аккаунтами.</li><li><strong>Маршрутизация моделей.</strong> Настройка по умолчанию, которая отправляет простые случаи в дорогую модель, — самая большая статья расходов, которой можно управлять.</li></ul><h2>Свяжите цифры с решением</h2><p>Результатом упражнения должно стать решение, принятое до запуска: ограничение использования в тарифе, компонент оплаты за потребление в цене, более дешёвая модель по умолчанию с эскалацией только там, где это нужно для качества, или принятая маржа с датой пересмотра. Внедряйте инструментирование вместе с функцией, чтобы те же цифры продолжали поступать из продакшена и допущения можно было проверять, а не защищать.</p><h2>Выделите её отдельной строкой в отчёте</h2><p>Выносите стоимость AI в себестоимости внутри валовой маржи, с показателями стоимости на аккаунт и маржи на каждом перцентиле использования. Так растущий счёт становится понятным: расходы, растущие в одном темпе с выручкой при стабильной стоимости на аккаунт, — это масштаб, а расходы, растущие быстрее выручки, — это эрозия с названной причиной.</p>",
+      "faq": [
+        {
+          "question": "Инференс LLM — это себестоимость или затраты на R&D?",
+          "answer": "Регулярный инференс, который запускается использованием клиентами, — это переменная стоимость обслуживания и относится к себестоимости. Разовая дообучка, прототипирование и прогоны оценки обычно остаются в затратах на разработку."
+        },
+        {
+          "question": "Как измерить валовую маржу AI-функции до запуска?",
+          "answer": "Помечайте трафик staging по аккаунту, рабочему процессу и результату; считайте стоимость успешной задачи на p50, p90 и p99; умножьте на ожидаемые задачи в месяц на аккаунт, добавьте оплаченные сбои и повторы и сравните с ценой тарифа."
+        },
+        {
+          "question": "Почему средняя стоимость запроса занижает риск маржи?",
+          "answer": "Стоимость AI растёт вместе с использованием, а фиксированная цена подписки — нет, поэтому провалы маржи проявляются у самых тяжёлых аккаунтов, которые среднее намеренно сглаживает."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "Стоимость успешной задачи"
+        },
+        {
+          "slug": "/research/free-tier-is-an-acquisition-cost",
+          "label": "Бесплатный тариф — это стоимость привлечения"
+        },
+        {
+          "slug": "/research/retry-loop-hidden-spend",
+          "label": "Циклы повторов и скрытые расходы"
+        }
+      ]
+    },
+    "tr": {
+      "title": "AI özelliğinin brüt marjını yayından önce ölçün",
+      "titleCore": "AI özelliğinin brüt marjını göndermeden önce ölçün",
+      "description": "Bir AI özelliğini staging ortamında ölçülebilir hale getirin; hesap başına maliyet ve kullanım kuyruğundaki marj, ilk faturadan sonra değil lansmandan önce bilinsin.",
+      "body": "<p>Çıkarım bir geliştirme maliyeti değil, hizmet sunmanın bir maliyetidir. Her müşteri eyleminde çalışır, kullanımla birlikte büyür ve üretim altyapısıyla aynı faturaya yazılır. Lansmana kadar bunu Ar-Ge gibi ele almak, ilk dürüst marj rakamının ilk tam faturalama döneminde gelmesi demektir; bunu öğrenmek için en kötü zaman budur.</p><h2>Lansmandan sonra değil, önce ölçün</h2><p>Staging ortamında her model çağrısını hesap, iş akışı ve sonuçla etiketleyin; sentetik bir döngü yerine gerçekçi trafik oynatın. Buradan çıkarmanız gereken şey bir dağılımdır: p50, p90 ve p99 düzeyinde başarılı görev başına maliyet, bir de hâlâ ödediğiniz başarısız ve yeniden denenen işlere giden harcama payı. Tek bir ortalama, marjı bozan hesapları gizler.</p><h2>Hesap başına maliyete dönüştürün</h2><p>Başarılı görev başına maliyeti, hesap başına aylık beklenen görev sayısıyla çarpın ve başarısızlık payını ekleyin. Bu rakam planın fiyatıyla karşılaştırılabilir. Bunu bir kez medyan kullanımda, bir kez yüzde 90'lık dilimde ve bir kez kabul edeceğiniz en yoğun hesap için yapın. Sabit fiyatlı planlar kuyruk kısmında başarısız olur, çünkü gelir durduktan sonra model maliyeti artmaya devam eder.</p><h2>Kontrol edilecek dört maliyet sürücüsü</h2><ul><li><strong>Tur başına yeniden gönderilen bağlam.</strong> Uzun bir konuşma veya büyük bir alınmış belge, önbellek kapsamadıkça her turda yeniden faturalandırılır.</li><li><strong>Yeniden denemeler ve başarısızlıklar.</strong> Tam fiyatla faturalandırılır; bunlar bir hata bütçesinde değil, paydada yer almalıdır.</li><li><strong>Ajan yayılımı.</strong> Tek bir kullanıcı eylemi birçok model ve araç çağrısına dönüşür; hesaplar arasında değişen çarpan budur.</li><li><strong>Model yönlendirme.</strong> Kolay vakaları pahalı bir modele gönderen varsayılan ayar, kontrol edilebilir en büyük tek kalemdir.</li></ul><h2>Sayıları bir karara bağlayın</h2><p>Egzersizin çıktısı, lansmandan önce verilmiş bir karar olmalıdır: planda bir kullanım tavanı, fiyatta bir tüketim bileşeni, yalnızca kalitenin gerektirdiği yerde yükseltmeyle birlikte daha ucuz bir varsayılan model veya gözden geçirme tarihi olan kabul edilmiş bir marj. Aynı rakamların üretimde gelmeye devam etmesi için ölçümü özellikle birlikte gönderin; böylece varsayım savunulmak yerine kontrol edilebilir.</p><h2>Bunu ayrı bir satır olarak raporlayın</h2><p>Brüt marjın içinde AI satışların maliyetini ayrı bir kalem olarak gösterin; her kullanım yüzdeliğinde hesap başına maliyet ve marjla birlikte. Bu okumayla yükselen bir fatura okunabilir olur: sabit hesap başına maliyetle gelirle paralel büyüyen harcama ölçektir, gelirden hızlı büyüyen harcama ise adlandırılmış bir nedeni olan erozyondur.</p>",
+      "faq": [
+        {
+          "question": "LLM çıkarımı bir satış maliyeti midir yoksa Ar-Ge maliyeti mi?",
+          "answer": "Müşteri kullanımıyla tetiklenen tekrarlayan çıkarım, değişken bir hizmet sunma maliyetidir ve satış maliyetine dahil edilmelidir. Tek seferlik ince ayar, prototipleme ve değerlendirme çalıştırmaları genellikle geliştirme harcamasında kalır."
+        },
+        {
+          "question": "Bir AI özelliğinin brüt marjını lansmandan önce nasıl ölçersiniz?",
+          "answer": "Staging trafiğini hesap, iş akışı ve sonuca göre etiketleyin; p50, p90 ve p99 düzeyinde başarılı görev başına maliyeti alın; bunu hesap başına beklenen aylık görev sayısıyla çarpın, ödenen başarısızlıkları ve yeniden denemeleri ekleyin ve plan fiyatıyla karşılaştırın."
+        },
+        {
+          "question": "Neden ortalama istek maliyeti marj riskini olduğundan düşük gösterir?",
+          "answer": "AI maliyeti kullanımla birlikte ölçeklenir, sabit bir abonelik fiyatı ise ölçeklenmez; bu yüzden marj sorunları en yoğun hesaplarda ortaya çıkar ve ortalama bunları özellikle düzleştirir."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "Başarılı görev başına maliyet"
+        },
+        {
+          "slug": "/research/free-tier-is-an-acquisition-cost",
+          "label": "Ücretsiz katman bir edinme maliyetidir"
+        },
+        {
+          "slug": "/research/retry-loop-hidden-spend",
+          "label": "Yeniden deneme döngüleri ve gizli harcama"
+        }
+      ]
+    },
+    "vi": {
+      "title": "Đo biên lợi nhuận gộp tính năng AI trước khi ra mắt",
+      "titleCore": "Đo biên lợi nhuận gộp của tính năng AI trước khi phát hành",
+      "description": "Đo lường tính năng AI trong staging để biết chi phí mỗi tài khoản và biên lợi nhuận ở đuôi sử dụng trước khi ra mắt, không phải sau hóa đơn đầu tiên.",
+      "body": "<p>Suy luận là chi phí phục vụ, không phải chi phí phát triển. Nó chạy trên mọi thao tác của khách hàng, tăng theo mức sử dụng và nằm chung hóa đơn với hạ tầng production. Xem nó như R&amp;D cho đến khi ra mắt nghĩa là con số biên lợi nhuận thực tế chỉ xuất hiện cùng chu kỳ thanh toán đầy đủ đầu tiên, tức là thời điểm tệ nhất để biết.</p><h2>Đo lường trước khi ra mắt, không phải sau</h2><p>Trong staging, gắn thẻ mọi lời gọi model với tài khoản, quy trình và kết quả, rồi phát lại lưu lượng thực tế thay vì vòng lặp giả lập. Thứ bạn cần là một phân phối: chi phí mỗi tác vụ thành công ở p50, p90 và p99, cùng phần chi tiêu dành cho tác vụ thất bại và thử lại mà bạn vẫn phải trả. Một mức trung bình duy nhất che giấu những tài khoản làm vỡ biên lợi nhuận.</p><h2>Cộng dồn thành chi phí mỗi tài khoản</h2><p>Nhân chi phí mỗi tác vụ thành công với số tác vụ dự kiến mỗi tài khoản mỗi tháng, rồi cộng phần thất bại. Con số này có thể so sánh với giá của gói. Tính một lần ở mức sử dụng trung vị, một lần ở phân vị 90 và một lần cho tài khoản nặng nhất mà bạn vẫn chấp nhận. Các gói giá cố định thường thất bại ở đuôi, vì chi phí model tiếp tục tăng sau khi doanh thu đã dừng lại.</p><h2>Bốn yếu tố chi phí cần kiểm tra</h2><ul><li><strong>Ngữ cảnh gửi lại mỗi lượt.</strong> Cuộc hội thoại dài hoặc tài liệu truy xuất lớn bị tính phí lại ở mỗi lượt, trừ khi caching bao phủ nó.</li><li><strong>Thử lại và thất bại.</strong> Được tính theo giá đầy đủ; chúng thuộc tử số của phép tính, không nằm trong ngân sách lỗi.</li><li><strong>Phân nhánh agent.</strong> Một thao tác của người dùng biến thành nhiều lời gọi model và tool, và hệ số nhân này khác nhau giữa các tài khoản.</li><li><strong>Định tuyến model.</strong> Mặc định gửi các trường hợp dễ tới một model đắt tiền là dòng chi phí kiểm soát được lớn nhất.</li></ul><h2>Gắn các con số với một quyết định</h2><p>Kết quả của bài tập này phải là một lựa chọn được đưa ra trước khi ra mắt: trần sử dụng trong gói, thành phần tính theo mức tiêu thụ trong giá, một model mặc định rẻ hơn chỉ nâng cấp khi chất lượng yêu cầu, hoặc một biên lợi nhuận được chấp nhận kèm ngày xem xét lại. Triển khai phần đo lường cùng tính năng để các con số tiếp tục về sau khi chạy production, và giả định có thể được kiểm chứng thay vì phải bảo vệ.</p><h2>Báo cáo như một dòng riêng</h2><p>Tách chi phí AI trong giá vốn hàng bán ra khỏi biên lợi nhuận gộp, với chi phí mỗi tài khoản và biên lợi nhuận ở từng phân vị sử dụng. Đọc theo cách đó, hóa đơn tăng sẽ dễ hiểu: chi tiêu tăng cùng nhịp với doanh thu trong khi chi phí mỗi tài khoản đi ngang là quy mô, còn chi tiêu tăng nhanh hơn doanh thu là suy giảm có nguyên nhân rõ ràng.</p>",
+      "faq": [
+        {
+          "question": "Suy luận LLM là giá vốn hàng bán hay chi phí R&D?",
+          "answer": "Suy luận định kỳ do việc sử dụng của khách hàng kích hoạt là chi phí biến đổi của việc phục vụ và thuộc giá vốn hàng bán. Các lần tinh chỉnh, làm nguyên mẫu và chạy đánh giá một lần thường nằm trong chi tiêu phát triển."
+        },
+        {
+          "question": "Làm sao đo biên lợi nhuận gộp của tính năng AI trước khi ra mắt?",
+          "answer": "Gắn thẻ lưu lượng staging theo tài khoản, quy trình và kết quả; lấy chi phí mỗi tác vụ thành công ở p50, p90 và p99; nhân với số tác vụ dự kiến mỗi tháng, cộng phần thất bại và thử lại đã trả tiền, rồi so với giá gói."
+        },
+        {
+          "question": "Vì sao chi phí trung bình mỗi yêu cầu đánh giá thấp rủi ro biên lợi nhuận?",
+          "answer": "Chi phí AI tăng theo mức sử dụng trong khi giá đăng ký cố định thì không, nên lỗi biên lợi nhuận xuất hiện ở các tài khoản nặng nhất, và mức trung bình lại làm mờ chúng một cách có chủ đích."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "Chi phí mỗi tác vụ thành công"
+        },
+        {
+          "slug": "/research/free-tier-is-an-acquisition-cost",
+          "label": "Gói miễn phí là chi phí thu hút khách hàng"
+        },
+        {
+          "slug": "/research/retry-loop-hidden-spend",
+          "label": "Vòng lặp thử lại và chi tiêu ẩn"
+        }
+      ]
     }
   }
 }

@@ -287,6 +287,176 @@
           "label": "توزيع تكاليف الذكاء الاصطناعي"
         }
       ]
+    },
+    "id": {
+      "title": "Biaya per tugas sukses, bukan per request",
+      "titleCore": "Biaya per tugas sukses mengalahkan biaya per request",
+      "description": "Mengapa tim AI produksi sebaiknya mengukur biaya hasil yang berhasil, bukan hanya biaya satu request API.",
+      "body": "<p>Biaya per request berguna, tetapi itu bukan satuan yang sebenarnya dibeli pengguna. Request yang gagal, di-retry tiga kali, atau menghasilkan jawaban yang tidak bisa dipakai bukanlah satuan kerja yang sukses. Untuk AI produksi, metrik yang lebih kuat adalah <strong>biaya per tugas sukses</strong>: seluruh biaya provider dan tool dibagi tugas yang memenuhi ambang kualitas yang ditetapkan.</p><h2>Metriknya</h2><p>Gunakan <code>successful_task_cost = total attributable spend / successful tasks</code>. Sertakan biaya input, output, cache, reasoning, tool, retry, dan fallback. Tentukan sukses sebelum mengukurnya: jawaban dukungan yang diterima pengguna, klasifikasi di atas ambang keyakinannya, atau alur kerja yang selesai tanpa perbaikan manusia.</p><h2>Mengapa rata-rata per request menyesatkan</h2><p>Rata-rata per request membaik ketika Anda menghitung percobaan gagal yang murah. Rata-rata juga menyembunyikan ekor panjang: sebuah fitur bisa punya median biaya request yang rendah sementara kasus gagalnya menghabiskan panggilan reasoning yang mahal dan tinjauan manusia. Segmentasikan menurut fitur, model, kohort pelanggan, dan hasil. Laporkan biaya tugas sukses p50 dan p95 bersama tingkat keberhasilan.</p><h2>Instrumentasi penyebutnya</h2><p>Setiap span model membutuhkan ID request dan tag fitur; aplikasi kemudian harus memancarkan peristiwa hasil yang tertaut ke ID itu. Catat keberhasilan, alasan kegagalan, perbaikan manusia, latensi, dan nilai pendapatan atau layanan jika tersedia. Rekonsiliasikan invoice provider dengan pembilang dan ambil sampel tugas yang selesai untuk memvalidasi penyebutnya.</p><h2>Gunakan untuk memilih optimisasi</h2><p>Jika biaya request tinggi tetapi tingkat keberhasilannya tinggi, routing atau caching mungkin membantu. Jika biaya request rendah tetapi biaya tugas sukses tinggi, kualitas adalah masalahnya: retry, model yang lemah, konteks yang hilang, atau aturan berhenti yang buruk. Optimalkan metrik yang memasukkan biaya kegagalan, lalu verifikasi bahwa kualitas tidak menurun.</p><h2>Terkait</h2><ul><li>Pemantauan biaya LLM</li><li>Biaya per request sebagai KPI produk</li><li>Atribusi biaya LLM</li></ul>",
+      "faq": [
+        {
+          "question": "Apa itu biaya per tugas sukses?",
+          "answer": "Total belanja model, tool, retry, dan fallback yang dapat diatribusikan, dibagi tugas yang memenuhi ambang kualitas atau penyelesaian yang telah ditentukan sebelumnya."
+        },
+        {
+          "question": "Mengapa biaya per request tidak lengkap?",
+          "answer": "Ia menghitung percobaan, bukan hasil, sehingga kegagalan, retry, perbaikan manusia, dan kasus mahal di ekor panjang bisa tetap tidak terlihat."
+        },
+        {
+          "question": "Bagaimana tim sebaiknya mendefinisikan sukses?",
+          "answer": "Tetapkan kondisi penerimaan yang bisa diamati untuk setiap alur kerja, misalnya penerimaan pengguna, ambang keyakinan, atau penyelesaian tanpa perbaikan manusia."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/llm-cost-monitoring",
+          "label": "Pemantauan biaya LLM"
+        },
+        {
+          "slug": "/research/cost-per-request-kpi",
+          "label": "Biaya per request sebagai KPI produk"
+        },
+        {
+          "slug": "/research/llm-cost-attribution",
+          "label": "Atribusi biaya LLM"
+        }
+      ]
+    },
+    "pl": {
+      "title": "Koszt udanego zadania bije koszt żądania",
+      "titleCore": "Koszt udanego zadania bije koszt żądania",
+      "description": "Dlaczego zespoły produkcyjne AI powinny mierzyć koszt udanego wyniku, a nie tylko koszt pojedynczego żądania do API.",
+      "body": "<p>Koszt na żądanie jest użyteczny, ale to nie jednostka, za którą płacą użytkownicy. Żądanie, które się nie udaje, ponawia trzy razy albo daje nieużyteczną odpowiedź, nie jest udaną jednostką pracy. W produkcyjnym AI mocniejszą miarą jest <strong>koszt udanego zadania</strong>: wszystkie koszty dostawców i narzędzi podzielone przez zadania, które spełniają zdefiniowany próg jakości.</p><h2>Miara</h2><p>Użyj <code>successful_task_cost = total attributable spend / successful tasks</code>. Uwzględnij koszty wejścia, wyjścia, cache, rozumowania, narzędzi, ponowień i fallbacków. Zdefiniuj sukces przed pomiarem: odpowiedź wsparcia zaakceptowaną przez użytkownika, klasyfikację powyżej progu pewności albo przepływ ukończony bez naprawy przez człowieka.</p><h2>Dlaczego średnie z żądań wprowadzają w błąd</h2><p>Średnie z żądań poprawiają się, gdy liczysz tanie nieudane próby. Ukrywają też długi ogon: funkcja może mieć niski medianowy koszt żądania, podczas gdy jej nieudane przypadki zużywają drogie wywołania rozumowania i przegląd przez człowieka. Segmentuj według funkcji, modelu, kohorty klientów i wyniku. Raportuj p50 i p95 kosztu udanego zadania obok wskaźnika sukcesu.</p><h2>Instrumentuj mianownik</h2><p>Każdy span modelu potrzebuje identyfikatora żądania i znacznika funkcji; aplikacja musi następnie wysyłać zdarzenie wyniku powiązane z tym identyfikatorem. Zapisuj sukces, powód porażki, naprawę przez człowieka, opóźnienie oraz wartość przychodową lub usługową, jeśli jest dostępna. Uzgadniaj faktury dostawców z licznikiem i próbkuj ukończone zadania, aby zweryfikować mianownik.</p><h2>Użyj jej do wyboru optymalizacji</h2><p>Jeśli koszt żądania jest wysoki, ale wskaźnik sukcesu też, pomocny może być routing lub cache. Jeśli koszt żądania jest niski, a koszt udanego zadania wysoki, problemem jest jakość: ponowienia, słabe modele, brakujący kontekst albo złe reguły zatrzymania. Optymalizuj miarę, która zawiera koszt porażki, a potem sprawdź, czy jakość się nie pogorszyła.</p><h2>Powiązane</h2><ul><li>Monitorowanie kosztów LLM</li><li>Koszt na żądanie jako KPI produktu</li><li>Atrybucja kosztów LLM</li></ul>",
+      "faq": [
+        {
+          "question": "Czym jest koszt udanego zadania?",
+          "answer": "To łączne przypisywalne wydatki na model, narzędzia, ponowienia i fallbacki podzielone przez zadania spełniające zdefiniowany wcześniej próg jakości lub ukończenia."
+        },
+        {
+          "question": "Dlaczego koszt na żądanie jest niepełny?",
+          "answer": "Liczy próby, a nie wyniki, więc porażki, ponowienia, naprawy przez człowieka i drogie przypadki z długiego ogona mogą pozostać niewidoczne."
+        },
+        {
+          "question": "Jak zespoły mają definiować sukces?",
+          "answer": "Zdefiniuj obserwowalny warunek akceptacji dla każdego przepływu, na przykład akceptację przez użytkownika, próg pewności albo ukończenie bez naprawy przez człowieka."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/llm-cost-monitoring",
+          "label": "Monitorowanie kosztów LLM"
+        },
+        {
+          "slug": "/research/cost-per-request-kpi",
+          "label": "Koszt na żądanie jako KPI produktu"
+        },
+        {
+          "slug": "/research/llm-cost-attribution",
+          "label": "Atrybucja kosztów LLM"
+        }
+      ]
+    },
+    "ru": {
+      "title": "Стоимость успешной задачи важнее стоимости запроса",
+      "titleCore": "Стоимость успешной задачи важнее стоимости запроса",
+      "description": "Почему продуктовым AI-командам стоит измерять стоимость успешного результата, а не только стоимость API-запроса.",
+      "body": "<p>Стоимость на запрос полезна, но это не та единица, которую на самом деле покупает пользователь. Запрос, который упал, трижды повторился или выдал непригодный ответ, не является успешной единицей работы. Для продакшн-AI более сильная метрика — <strong>стоимость успешной задачи</strong>: все расходы провайдеров и инструментов, разделенные на задачи, которые проходят заданный порог качества.</p><h2>Метрика</h2><p>Используйте <code>successful_task_cost = total attributable spend / successful tasks</code>. Учитывайте стоимость входа, выхода, кэша, рассуждений, инструментов, повторов и запасных вариантов. Определите успех до измерения: ответ поддержки, принятый пользователем, классификация выше порога уверенности или процесс, завершенный без ручной доработки.</p><h2>Почему средние по запросам вводят в заблуждение</h2><p>Средние по запросам выглядят лучше, если считать дешевые неудачные попытки. Они также скрывают длинный хвост: у функции может быть низкая медианная стоимость запроса, а дорогие сбойные случаи съедают вызовы с рассуждениями и время людей на проверку. Сегментируйте по функции, модели, когорте клиентов и результату. Показывайте p50 и p95 стоимости успешной задачи рядом с долей успехов.</p><h2>Инструментируйте знаменатель</h2><p>Каждый спан модели нужен с ID запроса и тегом функции; приложение затем должно отправлять событие результата, связанное с этим ID. Фиксируйте успех, причину сбоя, ручную доработку, задержку и ценность для бизнеса, где она есть. Сверяйте счета провайдеров с числителем и выборочно проверяйте завершенные задачи, чтобы подтвердить знаменатель.</p><h2>Используйте метрику для выбора оптимизации</h2><p>Если стоимость запроса высокая, а успешность тоже высокая, помогут маршрутизация или кэширование. Если стоимость запроса низкая, а стоимость успешной задачи высокая, проблема в качестве: повторы, слабые модели, нехватка контекста или плохие правила остановки. Оптимизируйте метрику, которая включает стоимость сбоев, и затем проверьте, что качество не просело.</p><h2>Связанное</h2><ul><li>Мониторинг затрат на LLM</li><li>Стоимость запроса как продуктовый KPI</li><li>Атрибуция затрат на LLM</li></ul>",
+      "faq": [
+        {
+          "question": "Что такое стоимость успешной задачи?",
+          "answer": "Это общие отнесенные расходы на модель, инструменты, повторы и запасные варианты, разделенные на задачи, которые соответствуют заранее заданному порогу качества или завершения."
+        },
+        {
+          "question": "Почему стоимости запроса недостаточно?",
+          "answer": "Она считает попытки, а не результаты, поэтому сбои, повторы, ручная доработка и дорогие случаи из длинного хвоста остаются незамеченными."
+        },
+        {
+          "question": "Как командам определить успех?",
+          "answer": "Задайте для каждого процесса наблюдаемое условие приемки, например принятие пользователем, порог уверенности или завершение без ручной доработки."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/llm-cost-monitoring",
+          "label": "Мониторинг затрат на LLM"
+        },
+        {
+          "slug": "/research/cost-per-request-kpi",
+          "label": "Стоимость запроса как продуктовый KPI"
+        },
+        {
+          "slug": "/research/llm-cost-attribution",
+          "label": "Атрибуция затрат на LLM"
+        }
+      ]
+    },
+    "tr": {
+      "title": "Başarılı görev maliyeti, istek maliyetinden daha anlamlı",
+      "titleCore": "Başarılı görev başına maliyet, istek başına maliyetten üstündür",
+      "description": "Yapay zeka ekiplerinin yalnızca API isteğinin maliyetine değil, başarılı bir sonucun maliyetine neden bakması gerektiğini açıklıyoruz.",
+      "body": "<p>İstek başına maliyet faydalıdır, ama kullanıcının satın aldığı birim bu değildir. Başarısız olan, üç kez yeniden deneyen ya da kullanılamaz bir yanıt üreten bir istek tamamlanmış bir iş birimi sayılmaz. Üretimdeki yapay zeka için daha güçlü metrik <strong>başarılı görev başına maliyettir</strong>: tüm sağlayıcı ve araç maliyetlerinin, tanımlı bir kalite eşiğini karşılayan görevlere bölünmüş hali.</p><h2>Metrik</h2><p>Şu formülü kullanın: <code>successful_task_cost = total attributable spend / successful tasks</code>. Girdi, çıktı, önbellek, akıl yürütme, araç, yeniden deneme ve yedek model maliyetlerini dahil edin. Ölçmeden önce başarıyı tanımlayın: kullanıcının kabul ettiği bir destek yanıtı, güven eşiğinin üzerindeki bir sınıflandırma ya da insan düzeltmesi gerektirmeden tamamlanan bir iş akışı.</p><h2>İstek ortalamaları neden yanıltıcıdır</h2><p>Ucuz başarısız denemeler sayıldığında istek ortalamaları iyileşmiş gibi görünür. Ayrıca uzun kuyruğu gizlerler: bir özelliğin medyan istek maliyeti düşük olabilir; buna karşılık başarısız vakalar pahalı akıl yürütme çağrılarını ve insan incelemesini tüketebilir. Özelliğe, modele, müşteri kohortuna ve sonuca göre bölümleyin. Başarı oranının yanında p50 ve p95 başarılı görev maliyetini raporlayın.</p><h2>Paydayı ölçün</h2><p>Her model span’i bir istek kimliği ve özellik etiketi taşımalıdır; uygulama da bu kimliğe bağlı bir sonuç olayı üretmelidir. Başarıyı, başarısızlık nedenini, insan düzeltmesini, gecikmeyi ve varsa gelir ya da hizmet değerini kaydedin. Sağlayıcı faturalarını paya uzlaştırın ve paydayı doğrulamak için tamamlanmış görevlerden örnek alın.</p><h2>Optimizasyonu seçmek için kullanın</h2><p>İstek maliyeti yüksek ama başarı oranı da yüksekse yönlendirme ya da önbellekleme yardımcı olabilir. İstek maliyeti düşük ama başarılı görev maliyeti yüksekse sorun kalitedir: gereksiz yeniden denemeler, zayıf modeller, eksik bağlam ya da zayıf durdurma kuralları. Başarısızlık maliyetini içeren metriği optimize edin, ardından kalitenin gerilemediğini doğrulayın.</p><h2>İlgili</h2><ul><li>LLM maliyet izleme</li><li>Ürün KPI’ı olarak istek başına maliyet</li><li>LLM maliyet atfı</li></ul>",
+      "faq": [
+        {
+          "question": "Başarılı görev başına maliyet nedir?",
+          "answer": "Toplam atfedilebilir model, araç, yeniden deneme ve yedek model harcamasının, önceden tanımlanmış bir kalite ya da tamamlanma eşiğini karşılayan görevlere bölünmüş halidir."
+        },
+        {
+          "question": "İstek başına maliyet neden eksik kalır?",
+          "answer": "Sonuçları değil denemeleri saydığı için başarısızlıklar, yeniden denemeler, insan onarımı ve pahalı uzun kuyruk vakaları görünmez kalabilir."
+        },
+        {
+          "question": "Ekipler başarıyı nasıl tanımlamalı?",
+          "answer": "Her iş akışı için gözlemlenebilir bir kabul koşulu belirleyin; örneğin kullanıcı kabulü, bir güven eşiği ya da insan müdahalesi olmadan tamamlanma."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/llm-cost-monitoring",
+          "label": "LLM maliyet izleme"
+        },
+        {
+          "slug": "/research/cost-per-request-kpi",
+          "label": "Ürün KPI’ı olarak istek başına maliyet"
+        },
+        {
+          "slug": "/research/llm-cost-attribution",
+          "label": "LLM maliyet atfı"
+        }
+      ]
+    },
+    "vi": {
+      "title": "Chi phí mỗi tác vụ thành công hơn chi phí mỗi yêu cầu",
+      "titleCore": "Chi phí mỗi tác vụ thành công hơn chi phí mỗi yêu cầu",
+      "description": "Vì sao các đội AI sản xuất nên đo chi phí của một kết quả thành công, không chỉ chi phí của một yêu cầu API.",
+      "body": "<p>Chi phí mỗi yêu cầu hữu ích, nhưng nó không phải đơn vị mà người dùng trả tiền. Một yêu cầu thất bại, thử lại ba lần, hoặc cho ra câu trả lời không dùng được không phải là một đơn vị công việc thành công. Với AI sản xuất, chỉ số mạnh hơn là <strong>chi phí mỗi tác vụ thành công</strong>: toàn bộ chi phí nhà cung cấp và công cụ chia cho các tác vụ đạt một ngưỡng chất lượng đã định.</p><h2>Chỉ số</h2><p>Dùng <code>successful_task_cost = total attributable spend / successful tasks</code>. Bao gồm chi phí đầu vào, đầu ra, cache, suy luận, công cụ, thử lại và dự phòng. Định nghĩa thành công trước khi đo: một câu trả lời hỗ trợ được người dùng chấp nhận, một phân loại vượt ngưỡng tin cậy, hoặc một quy trình hoàn thành mà không cần con người sửa.</p><h2>Vì sao trung bình theo yêu cầu gây hiểu lầm</h2><p>Trung bình theo yêu cầu cải thiện khi bạn đếm các lần thử thất bại rẻ. Chúng cũng che giấu phần đuôi dài: một tính năng có thể có chi phí trung vị mỗi yêu cầu thấp trong khi các trường hợp thất bại tiêu tốn các lời gọi suy luận đắt đỏ và công rà soát của con người. Hãy phân đoạn theo tính năng, mô hình, nhóm khách hàng và kết quả. Báo cáo p50 và p95 chi phí tác vụ thành công cùng với tỷ lệ thành công.</p><h2>Đo lường mẫu số</h2><p>Mỗi span mô hình cần một ID yêu cầu và thẻ tính năng; sau đó ứng dụng phải phát ra một sự kiện kết quả gắn với ID đó. Ghi lại thành công, lý do thất bại, con người sửa chữa, độ trễ, và giá trị doanh thu hoặc dịch vụ nếu có. Đối chiếu hóa đơn nhà cung cấp với tử số và lấy mẫu các tác vụ đã hoàn thành để kiểm tra mẫu số.</p><h2>Dùng nó để chọn tối ưu hóa</h2><p>Nếu chi phí yêu cầu cao nhưng tỷ lệ thành công cao, định tuyến hoặc cache có thể giúp. Nếu chi phí yêu cầu thấp nhưng chi phí tác vụ thành công cao, vấn đề là chất lượng: thử lại, mô hình yếu, thiếu ngữ cảnh hoặc quy tắc dừng kém. Tối ưu hóa chỉ số bao gồm chi phí thất bại, rồi kiểm tra chất lượng không suy giảm.</p><h2>Liên quan</h2><ul><li>Giám sát chi phí LLM</li><li>Chi phí theo yêu cầu như một KPI sản phẩm</li><li>Phân bổ chi phí LLM</li></ul>",
+      "faq": [
+        {
+          "question": "Chi phí mỗi tác vụ thành công là gì?",
+          "answer": "Đó là tổng chi phí mô hình, công cụ, thử lại và dự phòng có thể quy kết được, chia cho các tác vụ đạt một ngưỡng chất lượng hoặc hoàn thành đã định trước."
+        },
+        {
+          "question": "Vì sao chi phí mỗi yêu cầu chưa đầy đủ?",
+          "answer": "Nó đếm số lần thử chứ không đếm kết quả, nên các thất bại, thử lại, công sửa chữa của con người và các trường hợp đắt đỏ ở phần đuôi dài có thể vẫn không nhìn thấy được."
+        },
+        {
+          "question": "Các đội nên định nghĩa thành công thế nào?",
+          "answer": "Định nghĩa một điều kiện chấp nhận quan sát được cho từng quy trình, chẳng hạn người dùng chấp nhận, ngưỡng tin cậy, hoặc hoàn thành mà không cần con người sửa chữa."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/llm-cost-monitoring",
+          "label": "Giám sát chi phí LLM"
+        },
+        {
+          "slug": "/research/cost-per-request-kpi",
+          "label": "Chi phí theo yêu cầu như một KPI sản phẩm"
+        },
+        {
+          "slug": "/research/llm-cost-attribution",
+          "label": "Phân bổ chi phí LLM"
+        }
+      ]
     }
   }
 }

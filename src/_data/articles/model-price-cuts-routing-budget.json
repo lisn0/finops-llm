@@ -15,7 +15,7 @@
       "title": "Model price cuts do not lower your AI bill automatically",
       "titleCore": "Model price cuts and the routing budget",
       "description": "Falling model prices create savings only when workloads move to the right tier. Rebaseline unit economics, quality, latency, and capacity after every pricing change.",
-      "body": "<p>Model prices are falling quickly, but a lower list price does not automatically produce a lower company bill. Teams often respond to a price cut by increasing usage, keeping premium routing in place, or expanding context and output limits until the savings disappear. The relevant question is not whether price per token fell; it is whether cost per successful task fell.</p><p>OpenAI's <a href=&quot;https://openai.com/index/advancing-the-price-performance-frontier-with-gpt-5-6/&quot;>GPT-5.6 pricing update</a> illustrates the pattern: lower-cost models are positioned for high-volume work, while faster or more capable tiers serve workloads where quality or latency justifies a premium. The same announcement highlights Batch, Flex processing, and prompt caching as ways to match capacity and workload shape to cost.</p><h2>Rebaseline by workload</h2><p>Do not apply a single percentage reduction to the whole invoice. Split spend by workload class: interactive support, extraction, coding, agent planning, evaluation, and batch enrichment. For each class record quality, latency, success rate, tokens, and provider price. Then calculate the current cost per successful task before deciding what to move.</p><p>A price cut can change the routing frontier. A model that was previously too expensive for classification may now be the cheapest option after accounting for retries and failure rates. Conversely, a cheap model that produces more invalid outputs can cost more after repair calls and human review.</p><h2>Use the right lane</h2><p>Interactive work needs predictable latency. Repeated context may benefit from caching. Non-urgent work may fit batch or flexible processing. High-volume production may justify committed capacity. The savings come from matching the workload to the commercial lane, not from choosing the lowest token price in isolation.</p><p>Keep routing behind a feature flag and run a quality-and-cost comparison long enough to cover normal traffic variation. Compare total task cost, including fallback calls, cache behavior, tool calls, and post-processing. If the new route fails its quality SLO, roll it back even when its token price looks attractive.</p><h2>Make price changes operational</h2><ul><li>Track provider price history with effective dates.</li><li>Recalculate budgets and forecasts when a price changes.</li><li>Notify workload owners when their routing frontier moves.</li><li>Measure realized savings against invoices, not a spreadsheet estimate.</li><li>Use the freed budget deliberately: more users, better quality, or lower spend.</li></ul><p>Price changes are opportunities to improve allocation, not reasons to stop measuring. A mature FinOps program treats every new model tier as a routing experiment with an owner, baseline, and success metric.</p><h2>Related</h2><ul><li><a href=&quot;/research/model-routing&quot;>Model routing</a></li><li><a href=&quot;/research/provider-prices-not-comparable&quot;>Why provider prices are not comparable</a></li><li><a href=&quot;/research/cost-per-successful-task&quot;>Cost per successful task</a></li></ul>",
+      "body": "<p>Model prices are falling quickly, but a lower list price does not automatically produce a lower company bill. Teams often respond to a price cut by increasing usage, keeping premium routing in place, or expanding context and output limits until the savings disappear. The relevant question is not whether price per token fell; it is whether cost per successful task fell.</p><p>OpenAI's <a href=\"https://openai.com/index/advancing-the-price-performance-frontier-with-gpt-5-6/\">GPT-5.6 pricing update</a> illustrates the pattern: lower-cost models are positioned for high-volume work, while faster or more capable tiers serve workloads where quality or latency justifies a premium. The same announcement highlights Batch, Flex processing, and prompt caching as ways to match capacity and workload shape to cost.</p><h2>Rebaseline by workload</h2><p>Do not apply a single percentage reduction to the whole invoice. Split spend by workload class: interactive support, extraction, coding, agent planning, evaluation, and batch enrichment. For each class record quality, latency, success rate, tokens, and provider price. Then calculate the current cost per successful task before deciding what to move.</p><p>A price cut can change the routing frontier. A model that was previously too expensive for classification may now be the cheapest option after accounting for retries and failure rates. Conversely, a cheap model that produces more invalid outputs can cost more after repair calls and human review.</p><h2>Use the right lane</h2><p>Interactive work needs predictable latency. Repeated context may benefit from caching. Non-urgent work may fit batch or flexible processing. High-volume production may justify committed capacity. The savings come from matching the workload to the commercial lane, not from choosing the lowest token price in isolation.</p><p>Keep routing behind a feature flag and run a quality-and-cost comparison long enough to cover normal traffic variation. Compare total task cost, including fallback calls, cache behavior, tool calls, and post-processing. If the new route fails its quality SLO, roll it back even when its token price looks attractive.</p><h2>Make price changes operational</h2><ul><li>Track provider price history with effective dates.</li><li>Recalculate budgets and forecasts when a price changes.</li><li>Notify workload owners when their routing frontier moves.</li><li>Measure realized savings against invoices, not a spreadsheet estimate.</li><li>Use the freed budget deliberately: more users, better quality, or lower spend.</li></ul><p>Price changes are opportunities to improve allocation, not reasons to stop measuring. A mature FinOps program treats every new model tier as a routing experiment with an owner, baseline, and success metric.</p><h2>Related</h2><ul><li><a href=\"/research/model-routing\">Model routing</a></li><li><a href=\"/research/provider-prices-not-comparable\">Why provider prices are not comparable</a></li><li><a href=\"/research/cost-per-successful-task\">Cost per successful task</a></li></ul>",
       "faq": [
         {
           "question": "Why do model price cuts not automatically reduce total AI spend?",
@@ -274,6 +274,176 @@
         {
           "slug": "/research/cost-per-successful-task",
           "label": "按成功任务核算成本"
+        }
+      ]
+    },
+    "id": {
+      "title": "Harga model turun tidak otomatis memangkas tagihan AI",
+      "titleCore": "Penurunan harga model dan anggaran routing",
+      "description": "Harga model turun hanya menghemat saat beban kerja pindah ke tingkat yang tepat. Hitung ulang unit economics, kualitas, dan latensi tiap perubahan harga.",
+      "body": "<p>Harga model turun dengan cepat, tetapi harga daftar yang lebih rendah tidak otomatis menurunkan tagihan perusahaan. Tim sering merespons penurunan harga dengan menambah pemakaian, mempertahankan routing premium, atau memperbesar batas konteks dan output sampai penghematannya habis. Pertanyaan yang relevan bukan apakah harga per token turun, melainkan apakah biaya per tugas yang berhasil ikut turun.</p><p>Pembaruan harga <a href=\"https://openai.com/index/advancing-the-price-performance-frontier-with-gpt-5-6/\">GPT-5.6 dari OpenAI</a> menggambarkan pola ini: model berbiaya lebih rendah diposisikan untuk pekerjaan volume tinggi, sementara tingkat yang lebih cepat atau lebih mampu melayani beban kerja yang membenarkan harga premium karena kualitas atau latensi. Pengumuman yang sama menyoroti Batch, pemrosesan Flex, dan prompt caching sebagai cara untuk menyesuaikan kapasitas dan bentuk beban kerja dengan biaya.</p><h2>Hitung ulang per beban kerja</h2><p>Jangan menerapkan satu persentase penurunan ke seluruh tagihan. Pisahkan belanja menurut kelas beban kerja: dukungan interaktif, ekstraksi, coding, perencanaan agent, evaluasi, dan pengayaan batch. Untuk setiap kelas, catat kualitas, latensi, tingkat keberhasilan, jumlah token, dan harga penyedia. Lalu hitung biaya per tugas yang berhasil saat ini sebelum memutuskan apa yang akan dipindahkan.</p><p>Penurunan harga bisa mengubah batas efisiensi routing. Model yang sebelumnya terlalu mahal untuk klasifikasi bisa jadi menjadi opsi termurah setelah memperhitungkan retry dan tingkat kegagalan. Sebaliknya, model murah yang menghasilkan lebih banyak output tidak valid bisa lebih mahal setelah panggilan perbaikan dan tinjauan manusia.</p><h2>Gunakan jalur yang tepat</h2><p>Pekerjaan interaktif membutuhkan latensi yang dapat diprediksi. Konteks yang berulang mungkin diuntungkan oleh caching. Pekerjaan yang tidak mendesak mungkin cocok untuk batch atau pemrosesan fleksibel. Produksi volume tinggi mungkin membenarkan kapasitas berkomitmen. Penghematan datang dari mencocokkan beban kerja dengan jalur komersial yang tepat, bukan dari memilih harga token terendah secara terpisah.</p><p>Jaga routing di balik feature flag dan jalankan perbandingan kualitas-dan-biaya cukup lama untuk mencakup variasi trafik normal. Bandingkan total biaya tugas, termasuk panggilan fallback, perilaku cache, pemanggilan tool, dan pascapemrosesan. Jika rute baru gagal memenuhi SLO kualitas, kembalikan ke rute semula meskipun harga tokennya terlihat menarik.</p><h2>Jadikan perubahan harga bagian dari operasi</h2><ul><li>Catat riwayat harga penyedia beserta tanggal berlakunya.</li><li>Hitung ulang anggaran dan proyeksi setiap kali harga berubah.</li><li>Beri tahu pemilik beban kerja ketika batas efisiensi routing mereka bergeser.</li><li>Ukur penghematan yang benar-benar terjadi berdasarkan tagihan, bukan estimasi spreadsheet.</li><li>Gunakan anggaran yang terbebaskan dengan sengaja: lebih banyak pengguna, kualitas lebih baik, atau belanja lebih rendah.</li></ul><p>Perubahan harga adalah peluang untuk memperbaiki alokasi, bukan alasan untuk berhenti mengukur. Program FinOps yang matang memperlakukan setiap tingkat model baru sebagai eksperimen routing dengan pemilik, baseline, dan metrik keberhasilan.</p><h2>Terkait</h2><ul><li><a href=\"/research/model-routing\">Routing model</a></li><li><a href=\"/research/provider-prices-not-comparable\">Mengapa harga penyedia tidak bisa dibandingkan</a></li><li><a href=\"/research/cost-per-successful-task\">Biaya per tugas yang berhasil</a></li></ul>",
+      "faq": [
+        {
+          "question": "Mengapa penurunan harga model tidak otomatis mengurangi total belanja AI?",
+          "answer": "Pemakaian bisa membengkak, routing premium bisa tetap sama, dan tim bisa menghabiskan penghematan dengan konteks yang lebih panjang atau output yang lebih besar. Total belanja hanya turun ketika beban kerja dialokasikan ulang dan unit economics diukur."
+        },
+        {
+          "question": "Apa yang sebaiknya diukur setelah perubahan harga model?",
+          "answer": "Hitung ulang biaya per tugas yang berhasil untuk setiap beban kerja, termasuk kualitas, latensi, retry, fallback, perilaku cache, pemanggilan tool, dan pascapemrosesan. Bandingkan penghematan yang terjadi dengan tagihan penyedia setelah perubahan."
+        },
+        {
+          "question": "Bagaimana cara memperkenalkan model yang lebih murah dengan aman?",
+          "answer": "Arahkan routing-nya di balik feature flag, bandingkan dengan baseline kualitas dan biaya yang terkunci selama trafik normal, dan kembalikan jika SLO kualitas gagal meskipun harga token lebih rendah."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/model-routing",
+          "label": "Routing model"
+        },
+        {
+          "slug": "/research/provider-prices-not-comparable",
+          "label": "Mengapa harga penyedia tidak bisa dibandingkan"
+        },
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "Biaya per tugas yang berhasil"
+        }
+      ]
+    },
+    "pl": {
+      "title": "Obniżki cen modeli nie obniżają rachunku automatycznie",
+      "titleCore": "Obniżki cen modeli a budżet routingu",
+      "description": "Spadek cen modeli oszczędza tylko wtedy, gdy obciążenia trafiają na właściwy poziom. Po każdej zmianie cen przelicz koszty jednostkowe, jakość i opóźnienia.",
+      "body": "<p>Ceny modeli szybko spadają, ale niższa cena katalogowa nie oznacza automatycznie niższego rachunku firmy. Zespoły często reagują na obniżkę zwiększeniem zużycia, utrzymaniem premium routingu albo rozszerzeniem limitów kontekstu i wyjścia, aż oszczędności znikną. Istotne pytanie nie brzmi, czy cena za token spadła, lecz czy spadł koszt udanego zadania.</p><p>Aktualizacja cen <a href=\"https://openai.com/index/advancing-the-price-performance-frontier-with-gpt-5-6/\">GPT-5.6</a> od OpenAI dobrze pokazuje ten schemat: tańsze modele są przeznaczone do pracy o dużym wolumenie, a szybsze lub bardziej zdolne poziomy obsługują obciążenia, w których jakość lub opóźnienie uzasadniają wyższą cenę. Ta sama zapowiedź wskazuje Batch, Flex processing i prompt caching jako sposoby dopasowania pojemności i kształtu obciążenia do kosztu.</p><h2>Przelicz budżet według obciążenia</h2><p>Nie stosuj jednej procentowej obniżki do całej faktury. Podziel wydatki według klas obciążeń: interaktywna obsługa klienta, ekstrakcja, kodowanie, planowanie agentów, ewaluacja i wzbogacanie wsadowe. Dla każdej klasy zapisz jakość, opóźnienie, wskaźnik sukcesu, tokeny i cenę u dostawcy. Dopiero potem licz bieżący koszt udanego zadania i decyduj, co przenieść.</p><p>Obniżka ceny może zmienić granicę opłacalności routingu. Model, który wcześniej był za drogi do klasyfikacji, może po uwzględnieniu ponowień i wskaźnika błędów okazać się najtańszą opcją. Z kolei tani model, który generuje więcej nieprawidłowych wyników, może kosztować więcej po wywołaniach naprawczych i przeglądzie przez człowieka.</p><h2>Wybierz właściwy tor</h2><p>Praca interaktywna wymaga przewidywalnego opóźnienia. Powtarzający się kontekst może skorzystać z cachowania. Zadania niepilne mogą pasować do przetwarzania wsadowego lub elastycznego. Produkcja o dużym wolumenie może uzasadniać zarezerwowaną pojemność. Oszczędności biorą się z dopasowania obciążenia do właściwego toru handlowego, a nie z wyboru najniższej ceny za token w izolacji.</p><p>Trzymaj routing za flagą funkcji i prowadź porównanie jakości i kosztów na tyle długo, by objąć normalne wahania ruchu. Porównuj łączny koszt zadania, włącznie z wywołaniami awaryjnymi, zachowaniem cache, wywołaniami narzędzi i przetwarzaniem końcowym. Jeśli nowa ścieżka nie spełnia progu jakości SLO, wycofaj ją, nawet gdy jej cena za token wygląda atrakcyjnie.</p><h2>Uczyń zmiany cen operacyjnymi</h2><ul><li>Śledź historię cen dostawców wraz z datami obowiązywania.</li><li>Przeliczaj budżety i prognozy przy każdej zmianie ceny.</li><li>Informuj właścicieli obciążeń, gdy przesunie się ich granica opłacalności routingu.</li><li>Mierz faktyczne oszczędności na podstawie faktur, a nie szacunków w arkuszu.</li><li>Świadomie wykorzystuj zwolniony budżet: więcej użytkowników, lepsza jakość albo niższe wydatki.</li></ul><p>Zmiany cen są okazją do lepszej alokacji, a nie powodem do przestania mierzenia. Dojrzały program FinOps traktuje każdy nowy poziom modelu jako eksperyment routingu z właścicielem, punktem odniesienia i miarą sukcesu.</p><h2>Powiązane</h2><ul><li><a href=\"/research/model-routing\">Routing modeli</a></li><li><a href=\"/research/provider-prices-not-comparable\">Dlaczego ceny dostawców nie są porównywalne</a></li><li><a href=\"/research/cost-per-successful-task\">Koszt udanego zadania</a></li></ul>",
+      "faq": [
+        {
+          "question": "Dlaczego obniżki cen modeli nie zmniejszają automatycznie całkowitych wydatków na AI?",
+          "answer": "Zużycie może wzrosnąć, premium routing może pozostać bez zmian, a zespoły mogą zużyć oszczędności, stosując dłuższy kontekst lub większe odpowiedzi. Całkowite wydatki spadają dopiero wtedy, gdy obciążenia zostaną przeniesione, a koszty jednostkowe zmierzone."
+        },
+        {
+          "question": "Co należy zmierzyć po zmianie ceny modelu?",
+          "answer": "Przelicz koszt udanego zadania dla każdego obciążenia, uwzględniając jakość, opóźnienie, ponowienia, wywołania awaryjne, zachowanie cache, wywołania narzędzi i przetwarzanie końcowe. Porównaj faktyczne oszczędności z fakturami dostawców po zmianie."
+        },
+        {
+          "question": "Jak bezpiecznie wprowadzać tańsze modele?",
+          "answer": "Kieruj na nie ruch za flagą funkcji, porównuj z zablokowanym punktem odniesienia jakości i kosztów na normalnym ruchu i wycofuj zmianę, gdy jakość nie spełnia SLO, nawet jeśli cena za token jest niższa."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/model-routing",
+          "label": "Routing modeli"
+        },
+        {
+          "slug": "/research/provider-prices-not-comparable",
+          "label": "Dlaczego ceny dostawców nie są porównywalne"
+        },
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "Koszt udanego zadania"
+        }
+      ]
+    },
+    "ru": {
+      "title": "Снижение цен на модели не уменьшит счет само",
+      "titleCore": "Снижение цен на модели и бюджет маршрутизации",
+      "description": "Падение цен дает экономию, только если нагрузки переходят на подходящий уровень. Пересчитывайте юнит-экономику, качество и задержку после каждого изменения цен.",
+      "body": "<p>Цены на модели быстро падают, но более низкая прейскурантная цена сама по себе не снижает счет компании. Команды часто реагируют на снижение цен увеличением использования, сохранением премиальной маршрутизации или расширением лимитов контекста и вывода, пока экономия не исчезнет. Важен не вопрос, упала ли цена за токен, а вопрос, упала ли стоимость успешной задачи.</p><p>Обновление цен OpenAI для <a href=\"https://openai.com/index/advancing-the-price-performance-frontier-with-gpt-5-6/\">GPT-5.6</a> иллюстрирует эту закономерность: более дешевые модели позиционируются для объемной работы, а более быстрые или мощные уровни обслуживают нагрузки, где качество или задержка оправдывают надбавку. В том же анонсе отмечаются Batch, Flex-обработка и кэширование промптов как способы согласовать мощности и форму нагрузки со стоимостью.</p><h2>Пересчитайте базу по нагрузкам</h2><p>Не применяйте единое процентное снижение ко всему счету. Разделите расходы по классам нагрузок: интерактивная поддержка, извлечение данных, программирование, планирование агентов, оценка и пакетное обогащение данных. Для каждого класса фиксируйте качество, задержку, долю успешных результатов, токены и цену провайдера. Затем рассчитайте текущую стоимость успешной задачи, прежде чем решать, что переносить.</p><p>Снижение цены может изменить границу эффективной маршрутизации. Модель, которая раньше была слишком дорогой для классификации, после учета повторов и доли ошибок может стать самым дешевым вариантом. И наоборот, дешевая модель, которая выдает больше некорректных ответов, может обойтись дороже из-за повторных вызовов исправления и проверки человеком.</p><h2>Выбирайте подходящий режим</h2><p>Интерактивной работе нужна предсказуемая задержка. Повторяющийся контекст может выиграть от кэширования. Несрочные задачи могут подойти для пакетной или гибкой обработки. Высоконагруженное производство может оправдать зарезервированные мощности. Экономия достигается за счет соответствия нагрузки коммерческому режиму, а не выбора самой низкой цены за токен сама по себе.</p><p>Держите маршрутизацию за флагом функции и проводите сравнение качества и стоимости достаточно долго, чтобы охватить обычные колебания трафика. Сравнивайте общую стоимость задачи, включая резервные вызовы, поведение кэша, вызовы инструментов и постобработку. Если новый маршрут не выполняет SLO по качеству, откатите его, даже если его цена за токен выглядит привлекательно.</p><h2>Сделайте изменения цен операционными</h2><ul><li>Ведите историю цен провайдеров с датами вступления в силу.</li><li>Пересчитывайте бюджеты и прогнозы при каждом изменении цены.</li><li>Уведомляйте владельцев нагрузок, когда сдвигается их граница маршрутизации.</li><li>Измеряйте реальную экономию по счетам, а не по оценке в таблице.</li><li>Направляйте высвободившийся бюджет осознанно: на больше пользователей, лучшее качество или меньшие расходы.</li></ul><p>Изменения цен - это возможность улучшить распределение затрат, а не повод перестать измерять. Зрелая программа FinOps рассматривает каждый новый уровень модели как эксперимент с маршрутизацией, у которого есть владелец, базовый уровень и метрика успеха.</p><h2>Связанные материалы</h2><ul><li><a href=\"/research/model-routing\">Маршрутизация моделей</a></li><li><a href=\"/research/provider-prices-not-comparable\">Почему цены провайдеров несопоставимы</a></li><li><a href=\"/research/cost-per-successful-task\">Стоимость успешной задачи</a></li></ul>",
+      "faq": [
+        {
+          "question": "Почему снижение цен на модели не уменьшает общие расходы на ИИ автоматически?",
+          "answer": "Использование может вырасти, премиальная маршрутизация может сохраниться, а команды могут потратить экономию на более длинный контекст или большие ответы. Общие расходы снижаются только тогда, когда нагрузки перераспределены и измерена юнит-экономика."
+        },
+        {
+          "question": "Что нужно измерить после изменения цен на модели?",
+          "answer": "Пересчитайте стоимость успешной задачи по нагрузкам, учитывая качество, задержку, повторы, резервные вызовы, поведение кэша, вызовы инструментов и постобработку. Сравните реальную экономию со счетами провайдера после изменения."
+        },
+        {
+          "question": "Как безопасно внедрять более дешевые модели?",
+          "answer": "Направляйте трафик на них за флагом функции, сравнивайте с зафиксированным базовым уровнем качества и стоимости на обычном трафике и откатывайтесь, если SLO по качеству не выполняется, даже когда цена за токен ниже."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/model-routing",
+          "label": "Маршрутизация моделей"
+        },
+        {
+          "slug": "/research/provider-prices-not-comparable",
+          "label": "Почему цены провайдеров несопоставимы"
+        },
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "Стоимость успешной задачи"
+        }
+      ]
+    },
+    "tr": {
+      "title": "Model fiyat indirimi faturanızı kendiliğinden düşürmez",
+      "titleCore": "Model indirimleri ve yönlendirme bütçesi",
+      "description": "Fiyat düşüşleri yalnızca iş yükleri doğru katmana geçince tasarruf sağlar. Her değişimden sonra birim ekonomisini, kaliteyi ve gecikmeyi yeniden ölçün.",
+      "body": "<p>Model fiyatları hızla düşüyor, ancak daha düşük bir liste fiyatı şirketin faturasının kendiliğinden azalacağı anlamına gelmez. Ekipler fiyat indirimine kullanımı artırarak, premium yönlendirmeyi olduğu gibi bırakarak ya da bağlam ve çıktı sınırlarını genişleterek karşılık verir ve bu da tasarrufu tamamen yok eder. Asıl soru token başına fiyatın düşüp düşmediği değil; başarılı görev başına maliyetin düşüp düşmediğidir.</p><p>OpenAI'ın <a href=\"https://openai.com/index/advancing-the-price-performance-frontier-with-gpt-5-6/\">GPT-5.6 fiyat güncellemesi</a> bu örüntüyü gösteriyor: daha düşük maliyetli modeller yüksek hacimli işler için konumlandırılırken, daha hızlı ya da daha yetkin katmanlar kalitenin ya da gecikmenin prim gerektirdiği iş yükleri için sunuluyor. Aynı duyuruda, kapasiteyi ve iş yükü yapısını maliyetle eşleştirmenin yolları olarak Batch, Flex işleme ve prompt önbellekleme öne çıkarılıyor.</p><h2>İş yüküne göre yeniden temel alın</h2><p>Tek bir yüzde indirimini tüm faturaya uygulamayın. Harcamayı iş yükü sınıflarına ayırın: etkileşimli destek, veri çıkarımı, kodlama, ajan planlama, değerlendirme ve toplu zenginleştirme. Her sınıf için kaliteyi, gecikmeyi, başarı oranını, token sayısını ve sağlayıcı fiyatını kaydedin. Ardından neyi taşıyacağınıza karar vermeden önce mevcut başarılı görev başına maliyeti hesaplayın.</p><p>Bir fiyat indirimi yönlendirme sınırını değiştirebilir. Daha önce sınıflandırma için fazla pahalı olan bir model, yeniden deneme ve hata oranları hesaba katıldığında en ucuz seçenek haline gelebilir. Tersine, geçersiz çıktı üreten ucuz bir model, onarım çağrıları ve insan incelemesinden sonra daha pahalıya mal olabilir.</p><h2>Doğru şeridi kullanın</h2><p>Etkileşimli işler öngörülebilir gecikme gerektirir. Tekrar eden bağlam önbellekten fayda sağlayabilir. Acil olmayan işler toplu ya da esnek işleme uygun olabilir. Yüksek hacimli üretim, taahhütlü kapasiteyi haklı çıkarabilir. Tasarruf, yalnızca en düşük token fiyatını seçmekten değil, iş yükünü doğru ticari şeritle eşleştirmekten gelir.</p><p>Yönlendirmeyi bir özellik bayrağının arkasında tutun ve normal trafik dalgalanmalarını kapsayacak kadar uzun süre bir kalite ve maliyet karşılaştırması yürütün. Toplam görev maliyetini; yedek çağrıları, önbellek davranışını, araç çağrılarını ve son işlemeyi dahil ederek karşılaştırın. Yeni rota kalite SLO'sunu karşılamıyorsa, token fiyatı cazip görünse bile geri alın.</p><h2>Fiyat değişikliklerini operasyonel hale getirin</h2><ul><li>Sağlayıcı fiyat geçmişini geçerlilik tarihleriyle takip edin.</li><li>Bir fiyat değiştiğinde bütçeleri ve tahminleri yeniden hesaplayın.</li><li>Yönlendirme sınırı değiştiğinde iş yükü sahiplerini bilgilendirin.</li><li>Gerçekleşen tasarrufu bir e-tablo tahmini yerine faturalarla ölçün.</li><li>Açılan bütçeyi bilinçli kullanın: daha fazla kullanıcı, daha iyi kalite ya da daha düşük harcama.</li></ul><p>Fiyat değişiklikleri tahsisi iyileştirmek için fırsatlardır; ölçmeyi bırakmanın gerekçesi değildir. Olgun bir FinOps programı her yeni model katmanını, sahibi, temel değeri ve başarı metriği olan bir yönlendirme deneyi olarak ele alır.</p><h2>İlgili</h2><ul><li><a href=\"/research/model-routing\">Model yönlendirme</a></li><li><a href=\"/research/provider-prices-not-comparable\">Sağlayıcı fiyatları neden karşılaştırılamaz</a></li><li><a href=\"/research/cost-per-successful-task\">Başarılı görev başına maliyet</a></li></ul>",
+      "faq": [
+        {
+          "question": "Model fiyat indirimleri neden toplam AI harcamasını otomatik olarak azaltmaz?",
+          "answer": "Kullanım genişleyebilir, premium yönlendirme değişmeden kalabilir ve ekipler daha uzun bağlam ya da daha büyük çıktılarla tasarrufu tüketebilir. Toplam harcama yalnızca iş yükleri yeniden dağıtıldığında ve birim ekonomisi ölçüldüğünde düşer."
+        },
+        {
+          "question": "Bir model fiyat değişikliğinden sonra neler ölçülmeli?",
+          "answer": "İş yüküne göre başarılı görev başına maliyet yeniden hesaplanmalı; kalite, gecikme, yeniden denemeler, yedek çağrılar, önbellek davranışı, araç çağrıları ve son işleme dahil edilmelidir. Gerçekleşen tasarruf, değişiklikten sonra sağlayıcı faturalarıyla karşılaştırılmalıdır."
+        },
+        {
+          "question": "Daha ucuz modeller güvenli şekilde nasıl devreye alınmalı?",
+          "answer": "Önce bir özellik bayrağının arkasında yönlendirin, normal trafik boyunca kilitli bir kalite ve maliyet temeline karşı test edin ve token fiyatı daha düşük olsa bile kalite SLO'su başarısız olursa geri alın."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/model-routing",
+          "label": "Model yönlendirme"
+        },
+        {
+          "slug": "/research/provider-prices-not-comparable",
+          "label": "Sağlayıcı fiyatları neden karşılaştırılamaz"
+        },
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "Başarılı görev başına maliyet"
+        }
+      ]
+    },
+    "vi": {
+      "title": "Giảm giá model không tự động giảm hóa đơn AI",
+      "titleCore": "Giảm giá model và ngân sách định tuyến",
+      "description": "Giá model giảm chỉ tạo ra tiết kiệm khi công việc chuyển sang đúng tầng. Tính lại kinh tế đơn vị, chất lượng, độ trễ và năng lực sau mỗi lần đổi giá.",
+      "body": "<p>Giá model đang giảm nhanh, nhưng giá niêm yết thấp hơn không tự động kéo theo hóa đơn công ty thấp hơn. Các đội thường phản ứng với đợt giảm giá bằng cách tăng mức sử dụng, giữ nguyên định tuyến cao cấp, hoặc mở rộng giới hạn ngữ cảnh và đầu ra cho đến khi khoản tiết kiệm biến mất. Câu hỏi quan trọng không phải là giá mỗi token có giảm hay không, mà là chi phí mỗi tác vụ thành công có giảm hay không.</p><p>Thông báo cập nhật giá <a href=\"https://openai.com/index/advancing-the-price-performance-frontier-with-gpt-5-6/\">GPT-5.6 của OpenAI</a> minh họa mẫu hình này: các model chi phí thấp được định vị cho công việc khối lượng lớn, còn các tầng nhanh hơn hoặc mạnh hơn phục vụ những khối lượng công việc mà chất lượng hoặc độ trễ xứng đáng với mức giá cao hơn. Cùng thông báo đó nhấn mạnh Batch, xử lý Flex và prompt caching như những cách để khớp năng lực và hình dạng khối lượng công việc với chi phí.</p><h2>Tính lại theo khối lượng công việc</h2><p>Đừng áp dụng một mức giảm phần trăm duy nhất cho toàn bộ hóa đơn. Hãy chia chi phí theo nhóm công việc: hỗ trợ khách hàng tương tác, trích xuất, lập trình, lập kế hoạch cho agent, đánh giá và làm giàu dữ liệu theo lô. Với mỗi nhóm, ghi lại chất lượng, độ trễ, tỷ lệ thành công, số token và giá của nhà cung cấp. Sau đó tính chi phí hiện tại cho mỗi tác vụ thành công trước khi quyết định những gì cần chuyển.</p><p>Một đợt giảm giá có thể thay đổi đường biên định tuyến. Một model trước đây quá đắt cho việc phân loại có thể trở thành lựa chọn rẻ nhất sau khi tính đến việc thử lại và tỷ lệ lỗi. Ngược lại, một model rẻ nhưng tạo ra nhiều đầu ra không hợp lệ có thể tốn kém hơn sau khi tính các lần gọi sửa lỗi và rà soát của con người.</p><h2>Chọn đúng làn</h2><p>Công việc tương tác cần độ trễ có thể dự đoán được. Ngữ cảnh lặp lại có thể hưởng lợi từ caching. Công việc không gấp có thể phù hợp với xử lý theo lô hoặc linh hoạt. Sản xuất khối lượng lớn có thể xứng đáng với năng lực cam kết. Khoản tiết kiệm đến từ việc khớp khối lượng công việc với làn thương mại phù hợp, chứ không phải từ việc chọn giá token thấp nhất đứng riêng lẻ.</p><p>Giữ định tuyến sau feature flag và chạy so sánh chất lượng và chi phí đủ lâu để bao phủ biến động lưu lượng bình thường. So sánh tổng chi phí tác vụ, bao gồm các lần gọi dự phòng, hành vi cache, lệnh gọi công cụ và xử lý hậu kỳ. Nếu tuyến mới không đạt SLO chất lượng, hãy hoàn lại dù giá token của nó trông hấp dẫn.</p><h2>Biến thay đổi giá thành vận hành</h2><ul><li>Theo dõi lịch sử giá của nhà cung cấp theo ngày hiệu lực.</li><li>Tính lại ngân sách và dự báo khi giá thay đổi.</li><li>Thông báo cho chủ sở hữu khối lượng công việc khi đường biên định tuyến của họ thay đổi.</li><li>Đo khoản tiết kiệm thực tế dựa trên hóa đơn, không phải ước tính trên bảng tính.</li><li>Sử dụng ngân sách được giải phóng một cách có chủ đích: thêm người dùng, nâng chất lượng, hoặc giảm chi tiêu.</li></ul><p>Thay đổi giá là cơ hội để cải thiện phân bổ, không phải lý do để ngừng đo lường. Một chương trình FinOps trưởng thành coi mỗi tầng model mới như một thử nghiệm định tuyến có chủ sở hữu, đường cơ sở và chỉ số thành công.</p><h2>Liên quan</h2><ul><li><a href=\"/research/model-routing\">Định tuyến model</a></li><li><a href=\"/research/provider-prices-not-comparable\">Vì sao giá nhà cung cấp không thể so sánh</a></li><li><a href=\"/research/cost-per-successful-task\">Chi phí mỗi tác vụ thành công</a></li></ul>",
+      "faq": [
+        {
+          "question": "Vì sao giảm giá model không tự động giảm tổng chi tiêu AI?",
+          "answer": "Mức sử dụng có thể tăng, định tuyến cao cấp có thể giữ nguyên, và các đội có thể tiêu hết khoản tiết kiệm bằng ngữ cảnh dài hơn hoặc đầu ra lớn hơn. Tổng chi tiêu chỉ giảm khi khối lượng công việc được phân bổ lại và kinh tế đơn vị được đo lường."
+        },
+        {
+          "question": "Cần đo lường gì sau khi giá model thay đổi?",
+          "answer": "Tính lại chi phí mỗi tác vụ thành công theo từng khối lượng công việc, bao gồm chất lượng, độ trễ, lần thử lại, lần dự phòng, hành vi cache, lệnh gọi công cụ và xử lý hậu kỳ. So sánh khoản tiết kiệm thực tế với hóa đơn của nhà cung cấp sau thay đổi."
+        },
+        {
+          "question": "Nên đưa model rẻ hơn vào sử dụng an toàn như thế nào?",
+          "answer": "Đặt chúng sau feature flag, so sánh với đường cơ sở chất lượng và chi phí đã khóa trong lưu lượng bình thường, và hoàn lại khi SLO chất lượng không đạt dù giá token thấp hơn."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/model-routing",
+          "label": "Định tuyến model"
+        },
+        {
+          "slug": "/research/provider-prices-not-comparable",
+          "label": "Vì sao giá nhà cung cấp không thể so sánh"
+        },
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "Chi phí mỗi tác vụ thành công"
         }
       ]
     }

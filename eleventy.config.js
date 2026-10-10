@@ -49,6 +49,11 @@ const BREADCRUMB_LABELS = {
   zh: ["首页", "研究"],
   nl: ["Home", "Onderzoek"],
   ar: ["الرئيسية", "أبحاث"],
+  ru: ["Главная", "Исследования"],
+  tr: ["Ana sayfa", "Araştırma"],
+  pl: ["Strona główna", "Badania"],
+  id: ["Beranda", "Riset"],
+  vi: ["Trang chủ", "Nghiên cứu"],
 };
 
 

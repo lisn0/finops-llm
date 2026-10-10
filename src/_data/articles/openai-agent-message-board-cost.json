@@ -262,6 +262,426 @@
           "label": "Três orçamentos de agentes"
         }
       ]
+    },
+    "id": {
+      "title": "Papan pesan agen OpenAI: jenis biaya baru",
+      "titleCore": "Model biaya papan pesan agen OpenAI",
+      "description": "Agen yang memposting ke papan bersama menciptakan loop token tanpa batas. Model biaya dan empat pengaman untuk belanja antaragen.",
+      "body": "<p>Pada September 2026, peneliti menemukan papan pesan agen OpenAI: lapisan komunikasi tempat agen otonom dapat memposting pesan, membaca balasan, dan mengoordinasikan alur kerja multi-langkah tanpa intervensi manusia. Bagi tim FinOps, ini menghadirkan jenis biaya baru: konsumsi token antaragen yang tumbuh seiring panjang percakapan, bukan seiring kompleksitas tugas.</p><h2>Apa yang dimungkinkan papan pesan</h2><p>Papan pesan berfungsi sebagai bus konteks bersama. Agen orkestrator memposting dekomposisi tugas; agen spesialis mengambil subtugas, memposting temuan, dan menegosiasikan serah terima. Setiap pesan adalah siklus prompt-completion penuh yang ditagih dengan tarif standar model.</p><h2>Model biaya</h2><table><thead><tr><th>Komponen</th><th>Tarif (GPT-6 Astra)</th><th>Tarif (GPT-6 Sol)</th></tr></thead><tbody><tr><td>Posting agen (input)</td><td>$10.00 / 1M</td><td>$2.00 / 1M</td></tr><tr><td>Pembacaan agen (input cache)</td><td>$1.00 / 1M</td><td>$0.20 / 1M</td></tr><tr><td>Balasan agen (output)</td><td>$50.00 / 1M</td><td>$10.00 / 1M</td></tr></tbody></table><p>Koordinasi 10 putaran antara tiga agen dengan harga Astra: sekitar 300K token = $15. Pertukaran yang sama di Sol: $3. Perbedaannya terletak pada apakah tugas <em>membutuhkan</em> penalaran Astra atau token Sol yang lebih murah sudah cukup.</p><h2>Skenario tak terkendali</h2><ul><li><strong>Loop negosiasi:</strong> dua agen berselisih soal serah terima dan saling mengulang lebih dari 50 kali sebelum sepakat.</li><li><strong>Badai siaran:</strong> satu agen memposting ke semua pelanggan; setiap agen membalas dan memicu postingan berikutnya.</li><li><strong>Percakapan yatim:</strong> agen menunggu balasan yang tidak pernah datang, sambil memeriksa papan setiap 30 detik.</li></ul><h2>Kontrol FinOps</h2><ol><li><strong>Anggaran pesan per alur kerja:</strong> batas keras total token papan per ID tugas.</li><li><strong>Batas kedalaman:</strong> maksimal 3 lompatan antaragen sebelum eskalasi ke manusia.</li><li><strong>Routing model:</strong> arahkan koordinasi ke Sol; sisakan Astra hanya untuk langkah sintesis akhir.</li><li><strong>Timeout idle:</strong> tutup utas secara otomatis setelah 5 menit tanpa aktivitas.</li></ol><h2>Kesimpulan</h2><p>Papan pesan membuat sistem multi-agen dapat disusun dari bagian-bagian, tetapi kemampuan menyusun tanpa pengaman biaya adalah kebocoran anggaran. Perlakukan token antaragen sebagai pusat biaya tersendiri dengan peringatan dan anggarannya sendiri.</p>",
+      "faq": [
+        {
+          "question": "Apa itu papan pesan agen OpenAI?",
+          "answer": "Lapisan komunikasi bersama tempat agen otonom dapat memposting pesan, membaca balasan, dan mengoordinasikan alur kerja tanpa intervensi manusia. Ditemukan pada September 2026."
+        },
+        {
+          "question": "Berapa biaya komunikasi antaragen?",
+          "answer": "Dengan tarif GPT-6 Astra: $10/M input, $1/M input cache, $50/M output. Koordinasi 10 putaran antara 3 agen menelan biaya sekitar $15. Di GPT-6 Sol, pertukaran yang sama sekitar $3."
+        },
+        {
+          "question": "Bisakah agen menimbulkan tagihan tanpa batas di papan pesan?",
+          "answer": "Bisa. Tanpa anggaran pesan, batas kedalaman, dan timeout idle, loop negosiasi serta badai siaran dapat mengonsumsi jutaan token. Tim FinOps harus menetapkan batas keras per alur kerja."
+        },
+        {
+          "question": "Sebaiknya saya memakai Astra atau Sol untuk koordinasi agen?",
+          "answer": "Gunakan Sol untuk koordinasi (token murah, cukup untuk serah terima). Sisakan Astra untuk langkah penalaran dan sintesis akhir, tempat kemampuannya memberi nilai lebih."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/gpt-6-astra-cost-model",
+          "label": "Model biaya GPT-6 Astra"
+        },
+        {
+          "slug": "/research/gpt-6-sol-cost-model",
+          "label": "Model biaya GPT-6 Sol"
+        },
+        {
+          "slug": "/research/subagent-fan-out-concurrency-limits",
+          "label": "Batas konkurensi fan-out subagen"
+        },
+        {
+          "slug": "/research/three-agent-budgets",
+          "label": "Tiga anggaran agen"
+        }
+      ]
+    },
+    "pl": {
+      "title": "Tablica wiadomości agentów OpenAI: nowy wektor kosztów",
+      "titleCore": "Koszt tablicy wiadomości agentów OpenAI",
+      "description": "Agenci publikujący na wspólnej tablicy tworzą nieograniczone pętle tokenów. Model kosztów i cztery zabezpieczenia wydatków agent-agent.",
+      "body": "<p>We wrześniu 2026 roku badacze odkryli tablicę wiadomości agentów OpenAI, czyli warstwę komunikacyjną, w której autonomiczne agenty mogą publikować wiadomości, czytać odpowiedzi i koordynować wieloetapowe przepływy pracy bez udziału człowieka. Dla zespołów FinOps oznacza to nowy wektor kosztów: zużycie tokenów między agentami, które rośnie wraz z długością rozmowy, a nie ze złożonością zadania.</p><h2>Co umożliwia tablica wiadomości</h2><p>Tablica działa jak wspólna magistrala kontekstu. Agent orkiestrator publikuje podział zadania; wyspecjalizowane agenty przejmują podzadania, publikują wyniki i negocjują przekazanie pracy. Każda wiadomość to pełny cykl prompt-odpowiedź, rozliczany według standardowych stawek modelu.</p><h2>Model kosztów</h2><table><thead><tr><th>Składnik</th><th>Stawka (GPT-6 Astra)</th><th>Stawka (GPT-6 Sol)</th></tr></thead><tbody><tr><td>Publikacja agenta (wejście)</td><td>$10.00 / 1M</td><td>$2.00 / 1M</td></tr><tr><td>Odczyt przez agenta (wejście z cache)</td><td>$1.00 / 1M</td><td>$0.20 / 1M</td></tr><tr><td>Odpowiedź agenta (wyjście)</td><td>$50.00 / 1M</td><td>$10.00 / 1M</td></tr></tbody></table><p>Koordynacja trzech agentów przez 10 tur po cenach Astra to ~300K tokenów = $15. Ta sama wymiana na Sol kosztuje $3. Różnica polega na tym, czy zadanie <em>wymaga</em> rozumowania Astra, czy wystarczą tańsze tokeny Sol.</p><h2>Scenariusze wymknięcia się spod kontroli</h2><ul><li><strong>Pętle negocjacji:</strong> dwa agenty nie zgadzają się co do przekazania i iterują ponad 50 razy, zanim dojdą do porozumienia.</li><li><strong>Burze rozgłoszeniowe:</strong> jeden agent publikuje do wszystkich subskrybentów; każdy odpowiada, co wywołuje kolejne publikacje.</li><li><strong>Osierocone rozmowy:</strong> agenty czekają na odpowiedź, która nigdy nie nadejdzie, i odpytują tablicę co 30 sekund.</li></ul><h2>Kontrole FinOps</h2><ol><li><strong>Budżet wiadomości na przepływ pracy:</strong> twardy limit łącznych tokenów tablicy na identyfikator zadania.</li><li><strong>Limity głębokości:</strong> maksymalnie 3 przeskoki między agentami przed eskalacją do człowieka.</li><li><strong>Routing modeli:</strong> koordynację kieruj do Sol; Astra zarezerwuj wyłącznie dla końcowego kroku syntezy.</li><li><strong>Limit bezczynności:</strong> automatyczne zamykanie wątków po 5 minutach bez aktywności.</li></ol><h2>Podsumowanie</h2><p>Tablica wiadomości sprawia, że systemy wieloagentowe są składalne, ale składalność bez zabezpieczeń kosztowych to wyciek budżetu. Traktuj tokeny między agentami jako odrębne centrum kosztów, z własnymi alertami i budżetami.</p>",
+      "faq": [
+        {
+          "question": "Czym jest tablica wiadomości agentów OpenAI?",
+          "answer": "Wspólną warstwą komunikacyjną, w której autonomiczne agenty mogą publikować wiadomości, czytać odpowiedzi i koordynować przepływy pracy bez udziału człowieka. Odkryta we wrześniu 2026 roku."
+        },
+        {
+          "question": "Ile kosztuje komunikacja między agentami?",
+          "answer": "Po stawkach GPT-6 Astra: $10/M na wejściu, $1/M z cache, $50/M na wyjściu. Koordynacja 3 agentów przez 10 tur kosztuje ~$15. Na GPT-6 Sol ta sama wymiana kosztuje ~$3."
+        },
+        {
+          "question": "Czy agenty mogą wygenerować nieograniczone rachunki na tablicy wiadomości?",
+          "answer": "Tak. Bez budżetów wiadomości, limitów głębokości i limitów bezczynności pętle negocjacji i burze rozgłoszeniowe mogą zużyć miliony tokenów. Zespoły FinOps muszą wymuszać twarde limity na przepływ pracy."
+        },
+        {
+          "question": "Czy do koordynacji agentów użyć Astra czy Sol?",
+          "answer": "Do koordynacji używaj Sol (tanie tokeny, wystarczające do przekazań). Astra zarezerwuj na końcowy krok rozumowania i syntezy, w którym jego zdolności się opłacają."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/gpt-6-astra-cost-model",
+          "label": "Model kosztów GPT-6 Astra"
+        },
+        {
+          "slug": "/research/gpt-6-sol-cost-model",
+          "label": "Model kosztów GPT-6 Sol"
+        },
+        {
+          "slug": "/research/subagent-fan-out-concurrency-limits",
+          "label": "Limity współbieżności przy rozdzielaniu do subagentów"
+        },
+        {
+          "slug": "/research/three-agent-budgets",
+          "label": "Trzy budżety agentów"
+        }
+      ]
+    },
+    "ru": {
+      "title": "Доска сообщений агентов OpenAI: новый вектор затрат",
+      "titleCore": "Модель стоимости доски сообщений агентов OpenAI",
+      "description": "Агенты, публикующие на общей доске, создают неограниченные циклы токенов. Модель стоимости и четыре защитных механизма для расходов между агентами.",
+      "body": "<p>В сентябре 2026 года исследователи обнаружили доску сообщений агентов OpenAI: коммуникационный слой, где автономные агенты могут публиковать сообщения, читать ответы и координировать многошаговые workflow без участия человека. Для команд FinOps это новый вектор затрат: потребление токенов между агентами растёт с длиной разговора, а не со сложностью задачи.</p><h2>Что даёт доска сообщений</h2><p>Доска работает как общая шина контекста. Агент-оркестратор публикует декомпозицию задачи; агенты-специалисты берут подзадачи, публикуют результаты и согласовывают передачу работы. Каждое сообщение — это полный цикл промпта и ответа, оплачиваемый по стандартным тарифам модели.</p><h2>Модель стоимости</h2><table><thead><tr><th>Компонент</th><th>Тариф (GPT-6 Astra)</th><th>Тариф (GPT-6 Sol)</th></tr></thead><tbody><tr><td>Публикация агента (вход)</td><td>$10.00 / 1M</td><td>$2.00 / 1M</td></tr><tr><td>Чтение агентом (вход из кэша)</td><td>$1.00 / 1M</td><td>$0.20 / 1M</td></tr><tr><td>Ответ агента (выход)</td><td>$50.00 / 1M</td><td>$10.00 / 1M</td></tr></tbody></table><p>Координация из 10 ходов между тремя агентами по ценам Astra: ~300K токенов = $15. Тот же обмен на Sol: $3. Разница в том, <em>требует</em> ли задача рассуждений Astra или хватит более дешёвых токенов Sol.</p><h2>Сценарии выхода из-под контроля</h2><ul><li><strong>Циклы переговоров:</strong> два агента расходятся во мнениях о передаче работы и итерируют более 50 раз, прежде чем прийти к согласию.</li><li><strong>Широковещательные штормы:</strong> один агент публикует для всех подписчиков; каждый отвечает, и это порождает новые публикации.</li><li><strong>Брошенные разговоры:</strong> агенты ждут ответа, который так и не приходит, и опрашивают доску каждые 30 секунд.</li></ul><h2>Средства контроля FinOps</h2><ol><li><strong>Бюджет сообщений на workflow:</strong> жёсткий лимит на общее количество токенов доски для каждого ID задачи.</li><li><strong>Ограничение глубины:</strong> не более 3 переходов между агентами до эскалации человеку.</li><li><strong>Маршрутизация моделей:</strong> координацию направлять на Sol; Astra оставить только для финального шага синтеза.</li><li><strong>Таймаут простоя:</strong> автоматическое закрытие веток после 5 минут без активности.</li></ol><h2>Итог</h2><p>Доска сообщений делает мультиагентные системы компонуемыми, но компонуемость без защиты от затрат — это утечка бюджета. Относитесь к токенам между агентами как к отдельному центру затрат со своими алертами и бюджетами.</p>",
+      "faq": [
+        {
+          "question": "Что такое доска сообщений агентов OpenAI?",
+          "answer": "Общий коммуникационный слой, где автономные агенты публикуют сообщения, читают ответы и координируют workflow без участия человека. Обнаружена в сентябре 2026 года."
+        },
+        {
+          "question": "Сколько стоит коммуникация между агентами?",
+          "answer": "По тарифам GPT-6 Astra: $10/M на вход, $1/M из кэша, $50/M на выход. Координация из 10 ходов между 3 агентами стоит ~$15. На GPT-6 Sol тот же обмен стоит ~$3."
+        },
+        {
+          "question": "Могут ли агенты накрутить неограниченный счёт на доске сообщений?",
+          "answer": "Да. Без бюджетов сообщений, ограничений глубины и таймаутов простоя циклы переговоров и широковещательные штормы могут потребить миллионы токенов. Команды FinOps должны вводить жёсткие лимиты на каждый workflow."
+        },
+        {
+          "question": "Использовать Astra или Sol для координации агентов?",
+          "answer": "Используйте Sol для координации: токены дешёвые, для передач этого достаточно. Astra оставьте для финального шага рассуждений и синтеза, где её возможности окупаются."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/gpt-6-astra-cost-model",
+          "label": "Модель стоимости GPT-6 Astra"
+        },
+        {
+          "slug": "/research/gpt-6-sol-cost-model",
+          "label": "Модель стоимости GPT-6 Sol"
+        },
+        {
+          "slug": "/research/subagent-fan-out-concurrency-limits",
+          "label": "Лимиты параллелизма при fan-out субагентов"
+        },
+        {
+          "slug": "/research/three-agent-budgets",
+          "label": "Бюджеты трёх агентов"
+        }
+      ]
+    },
+    "tr": {
+      "title": "OpenAI Agent Mesaj Panosu: Yeni Bir Maliyet Vektörü",
+      "titleCore": "OpenAI agent mesaj panosu maliyet modeli",
+      "description": "Ortak bir panoya mesaj gönderen ajanlar sınırsız token döngüleri yaratır. Ajanlar arası harcama için maliyet modeli ve dört koruma önlemi.",
+      "body": "<p>Eylül 2026'da araştırmacılar bir OpenAI agent mesaj panosu keşfetti. Bu, otonom ajanların insan müdahalesi olmadan mesaj gönderebildiği, yanıtları okuyabildiği ve çok adımlı iş akışlarını koordine edebildiği bir iletişim katmanı. FinOps ekipleri için bu yeni bir maliyet vektörü anlamına geliyor: ajanlar arası token tüketimi, görevin karmaşıklığına değil konuşmanın uzunluğuna göre artıyor.</p><h2>Mesaj panosunun sağladıkları</h2><p>Pano, ortak bir bağlam veri yolu olarak çalışır. Bir orkestratör ajan görev ayrıştırmasını panoya yazar; uzman ajanlar alt görevleri üstlenir, bulgularını paylaşır ve devirleri müzakere eder. Her mesaj, modelin standart fiyatlarıyla faturalandırılan eksiksiz bir istem-tamamlama döngüsüdür.</p><h2>Maliyet modeli</h2><table><thead><tr><th>Bileşen</th><th>Fiyat (GPT-6 Astra)</th><th>Fiyat (GPT-6 Sol)</th></tr></thead><tbody><tr><td>Ajan gönderisi (girdi)</td><td>$10.00 / 1M</td><td>$2.00 / 1M</td></tr><tr><td>Ajan okuması (önbellekli girdi)</td><td>$1.00 / 1M</td><td>$0.20 / 1M</td></tr><tr><td>Ajan yanıtı (çıktı)</td><td>$50.00 / 1M</td><td>$10.00 / 1M</td></tr></tbody></table><p>Üç ajan arasında 10 turluk bir koordinasyon, Astra fiyatlarıyla: yaklaşık 300K token = $15. Aynı alışveriş Sol'da: $3. Fark, görevin Astra'nın akıl yürütmesini <em>gerektirip</em> gerektirmediğinde, yoksa Sol'un daha ucuz token'larının yeterli olup olmadığındadır.</p><h2>Kontrolden çıkma senaryoları</h2><ul><li><strong>Müzakere döngüleri:</strong> İki ajan bir devir konusunda anlaşamaz ve yakınsamadan önce 50'den fazla kez yineler.</li><li><strong>Yayın fırtınaları:</strong> Bir ajan tüm abonelere gönderir; her biri yanıt verir ve yeni gönderileri tetikler.</li><li><strong>Sahipsiz konuşmalar:</strong> Ajanlar hiç gelmeyecek bir yanıtı bekler ve panoyu her 30 saniyede bir yoklar.</li></ul><h2>FinOps kontrolleri</h2><ol><li><strong>İş akışı başına mesaj bütçesi:</strong> Görev kimliği başına toplam pano token'ları için sert bir üst sınır.</li><li><strong>Derinlik sınırları:</strong> İnsana devir yapılmadan önce en fazla 3 ajanlar arası atlama.</li><li><strong>Model yönlendirme:</strong> Koordinasyonu Sol'a yönlendirin; Astra'yı yalnızca son sentez adımı için ayırın.</li><li><strong>Boşta kalma zaman aşımı:</strong> 5 dakika hareketsizlikten sonra iş parçacıklarını otomatik kapatın.</li></ol><h2>Sonuç</h2><p>Mesaj panosu çok ajanlı sistemleri birleştirilebilir kılar; ancak maliyet korumaları olmayan birleştirilebilirlik bir bütçe sızıntısıdır. Ajanlar arası token'ları, kendi uyarıları ve bütçeleri olan ayrı bir maliyet merkezi olarak ele alın.</p>",
+      "faq": [
+        {
+          "question": "OpenAI agent mesaj panosu nedir?",
+          "answer": "Otonom ajanların mesaj gönderebildiği, yanıtları okuyabildiği ve insan müdahalesi olmadan iş akışlarını koordine edebildiği ortak bir iletişim katmanıdır. Eylül 2026'da keşfedildi."
+        },
+        {
+          "question": "Ajanlar arası iletişim ne kadar tutar?",
+          "answer": "GPT-6 Astra fiyatlarıyla: girdi $10/M, önbellekli $1/M, çıktı $50/M. Üç ajanın katıldığı 10 turluk bir koordinasyon yaklaşık $15 tutar. GPT-6 Sol'da aynı alışveriş yaklaşık $3."
+        },
+        {
+          "question": "Ajanlar mesaj panosunda sınırsız faturalar çıkarabilir mi?",
+          "answer": "Evet. Mesaj bütçeleri, derinlik sınırları ve boşta kalma zaman aşımları olmadan müzakere döngüleri ve yayın fırtınaları milyonlarca token tüketebilir. FinOps ekipleri iş akışı başına sert üst sınırlar uygulamalıdır."
+        },
+        {
+          "question": "Ajan koordinasyonu için Astra mı Sol mu kullanmalıyım?",
+          "answer": "Koordinasyon için Sol kullanın; token'ları ucuzdur ve devirler için yeterlidir. Astra'yı, akıl yürütmesinin karşılığını verdiği son akıl yürütme ve sentez adımına saklayın."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/gpt-6-astra-cost-model",
+          "label": "GPT-6 Astra maliyet modeli"
+        },
+        {
+          "slug": "/research/gpt-6-sol-cost-model",
+          "label": "GPT-6 Sol maliyet modeli"
+        },
+        {
+          "slug": "/research/subagent-fan-out-concurrency-limits",
+          "label": "Alt ajan fan-out eşzamanlılık sınırları"
+        },
+        {
+          "slug": "/research/three-agent-budgets",
+          "label": "Üç ajan bütçesi"
+        }
+      ]
+    },
+    "vi": {
+      "title": "Bảng tin nhắn agent của OpenAI: một vector chi phí mới",
+      "titleCore": "Mô hình chi phí bảng tin nhắn agent của OpenAI",
+      "description": "Các agent đăng lên một bảng tin nhắn chung tạo ra vòng lặp token không giới hạn. Mô hình chi phí và bốn lan can bảo vệ cho chi tiêu giữa các agent.",
+      "body": "<p>Vào tháng 9 năm 2026, các nhà nghiên cứu phát hiện một bảng tin nhắn agent của OpenAI, một lớp giao tiếp mà các agent tự hành có thể đăng tin nhắn, đọc phản hồi và phối hợp các quy trình nhiều bước mà không cần con người can thiệp. Với đội FinOps, điều này đưa vào một vector chi phí mới: lượng token tiêu thụ giữa các agent, tăng theo độ dài cuộc trao đổi chứ không theo độ phức tạp của tác vụ.</p><h2>Bảng tin nhắn cho phép điều gì</h2><p>Bảng tin nhắn hoạt động như một bus ngữ cảnh dùng chung. Một agent điều phối đăng bản phân rã tác vụ; các agent chuyên môn nhận các tác vụ con, đăng kết quả và thương lượng việc bàn giao. Mỗi tin nhắn là một chu kỳ prompt-completion đầy đủ, được tính phí theo đơn giá tiêu chuẩn của mô hình.</p><h2>Mô hình chi phí</h2><table><thead><tr><th>Thành phần</th><th>Đơn giá (GPT-6 Astra)</th><th>Đơn giá (GPT-6 Sol)</th></tr></thead><tbody><tr><td>Agent đăng (đầu vào)</td><td>$10.00 / 1M</td><td>$2.00 / 1M</td></tr><tr><td>Agent đọc (đầu vào đã cache)</td><td>$1.00 / 1M</td><td>$0.20 / 1M</td></tr><tr><td>Agent trả lời (đầu ra)</td><td>$50.00 / 1M</td><td>$10.00 / 1M</td></tr></tbody></table><p>Một cuộc phối hợp 10 lượt giữa ba agent theo giá Astra: khoảng 300K token = $15. Cùng cuộc trao đổi đó trên Sol: $3. Khác biệt nằm ở việc tác vụ <em>có cần</em> khả năng suy luận của Astra hay token rẻ hơn của Sol là đủ.</p><h2>Các kịch bản chạy vượt tầm kiểm soát</h2><ul><li><strong>Vòng lặp thương lượng:</strong> Hai agent bất đồng về một việc bàn giao và lặp lại hơn 50 lần trước khi đi đến thống nhất.</li><li><strong>Bão phát sóng:</strong> Một agent đăng cho mọi người đăng ký; mỗi người trả lời, kích hoạt thêm nhiều bài đăng.</li><li><strong>Cuộc trò chuyện mồ côi:</strong> Các agent chờ một phản hồi không bao giờ đến, truy vấn bảng tin mỗi 30 giây.</li></ul><h2>Các biện pháp kiểm soát FinOps</h2><ol><li><strong>Ngân sách tin nhắn cho mỗi quy trình:</strong> Giới hạn cứng tổng token trên bảng tin cho mỗi mã tác vụ.</li><li><strong>Giới hạn độ sâu:</strong> Tối đa 3 bước nhảy giữa các agent trước khi chuyển cho con người xử lý.</li><li><strong>Định tuyến mô hình:</strong> Đưa việc phối hợp sang Sol; chỉ dành Astra cho bước tổng hợp cuối cùng.</li><li><strong>Hết thời gian chờ khi không hoạt động:</strong> Tự đóng các luồng sau 5 phút không có hoạt động.</li></ol><h2>Kết luận</h2><p>Bảng tin nhắn làm cho các hệ thống nhiều agent có thể ghép nối, nhưng khả năng ghép nối mà không có rào chắn chi phí là một lỗ rò ngân sách. Hãy coi token giữa các agent là một trung tâm chi phí riêng, với cảnh báo và ngân sách riêng.</p>",
+      "faq": [
+        {
+          "question": "Bảng tin nhắn agent của OpenAI là gì?",
+          "answer": "Một lớp giao tiếp chung, nơi các agent tự hành có thể đăng tin nhắn, đọc phản hồi và phối hợp quy trình mà không cần con người can thiệp. Được phát hiện vào tháng 9 năm 2026."
+        },
+        {
+          "question": "Giao tiếp giữa các agent tốn bao nhiêu?",
+          "answer": "Theo đơn giá GPT-6 Astra: $10/M đầu vào, $1/M đã cache, $50/M đầu ra. Một cuộc phối hợp 10 lượt với 3 agent tốn khoảng $15. Trên GPT-6 Sol, cùng cuộc trao đổi đó khoảng $3."
+        },
+        {
+          "question": "Các agent có thể tạo ra hóa đơn không giới hạn trên bảng tin nhắn không?",
+          "answer": "Có. Nếu không có ngân sách tin nhắn, giới hạn độ sâu và hết thời gian chờ khi không hoạt động, vòng lặp thương lượng và bão phát sóng có thể tiêu tốn hàng triệu token. Đội FinOps phải áp đặt giới hạn cứng cho mỗi quy trình."
+        },
+        {
+          "question": "Nên dùng Astra hay Sol để phối hợp agent?",
+          "answer": "Dùng Sol để phối hợp (token rẻ, đủ cho việc bàn giao). Dành Astra cho bước suy luận và tổng hợp cuối cùng, nơi khả năng suy luận của nó thật sự có giá trị."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/gpt-6-astra-cost-model",
+          "label": "Mô hình chi phí GPT-6 Astra"
+        },
+        {
+          "slug": "/research/gpt-6-sol-cost-model",
+          "label": "Mô hình chi phí GPT-6 Sol"
+        },
+        {
+          "slug": "/research/subagent-fan-out-concurrency-limits",
+          "label": "Giới hạn fan-out và đồng thời của subagent"
+        },
+        {
+          "slug": "/research/three-agent-budgets",
+          "label": "Ngân sách cho ba agent"
+        }
+      ]
+    },
+    "ar": {
+      "title": "لوحة رسائل وكلاء OpenAI: متجه كلفة جديد",
+      "titleCore": "نموذج كلفة لوحة رسائل وكلاء OpenAI",
+      "description": "وكلاء ينشرون على لوحة رسائل مشتركة يصنعون حلقات رموز بلا سقف. نموذج كلفة وأربعة ضوابط للإنفاق بين الوكلاء.",
+      "body": "<p>في سبتمبر 2026، اكتشف باحثون لوحة رسائل لوكلاء OpenAI — طبقة تواصل يستطيع فيها الوكلاء المستقلون نشر الرسائل وقراءة الردود وتنسيق سير عمل متعدد الخطوات دون تدخل بشري. وبالنسبة لفرق FinOps، يمثل ذلك متجه كلفة جديداً: استهلاك رموز بين الوكلاء يتناسب مع طول المحادثة لا مع تعقيد المهمة.</p><h2>ما الذي تتيحه لوحة الرسائل</h2><p>تعمل لوحة الرسائل كناقل سياق مشترك. ينشر وكيل منسّق تفكيكاً للمهمة؛ فيستلم الوكلاء المتخصصون المهام الفرعية وينشرون النتائج ويتفاوضون على التسليم. وكل رسالة هي دورة كاملة من الموجّه والإكمال تُفوتر بالأسعار القياسية للنموذج.</p><h2>نموذج الكلفة</h2><table><thead><tr><th>المكوّن</th><th>السعر (GPT-6 Astra)</th><th>السعر (GPT-6 Sol)</th></tr></thead><tbody><tr><td>نشر الوكيل (إدخال)</td><td>$10.00 / 1M</td><td>$2.00 / 1M</td></tr><tr><td>قراءة الوكيل (إدخال مخزّن مؤقتاً)</td><td>$1.00 / 1M</td><td>$0.20 / 1M</td></tr><tr><td>رد الوكيل (إخراج)</td><td>$50.00 / 1M</td><td>$10.00 / 1M</td></tr></tbody></table><p>تنسيق من 10 أدوار بين ثلاثة وكلاء بأسعار Astra: نحو 300K رمز = $15. والتبادل نفسه على Sol: $3. الفرق هو هل <em>تتطلب</em> المهمة استدلال Astra أم تكفيها رموز Sol الأرخص.</p><h2>سيناريوهات الخروج عن السيطرة</h2><ul><li><strong>حلقات التفاوض:</strong> يختلف وكيلان على تسليم ويكرران أكثر من 50 مرة قبل أن يتقاربا.</li><li><strong>عواصف البث:</strong> ينشر وكيل واحد إلى جميع المشتركين؛ فيرد كل منهم ويطلق منشورات أخرى.</li><li><strong>المحادثات اليتيمة:</strong> ينتظر الوكلاء رداً لا يأتي أبداً، ويستطلعون اللوحة كل 30 ثانية.</li></ul><h2>ضوابط FinOps</h2><ol><li><strong>ميزانية رسائل لكل سير عمل:</strong> سقف صارم لإجمالي رموز اللوحة لكل معرّف مهمة.</li><li><strong>حدود العمق:</strong> 3 قفزات كحد أقصى بين الوكلاء قبل التصعيد إلى إنسان.</li><li><strong>توجيه النماذج:</strong> وجّه التنسيق إلى Sol؛ واحتفظ بـ Astra لخطوة التوليف الأخيرة فقط.</li><li><strong>مهلة الخمول:</strong> أغلق الخيوط تلقائياً بعد 5 دقائق من عدم النشاط.</li></ol><h2>الخلاصة</h2><p>تجعل لوحة الرسائل الأنظمة متعددة الوكلاء قابلة للتركيب — لكن قابلية التركيب دون ضوابط كلفة هي تسرّب في الميزانية. تعامل مع الرموز بين الوكلاء كمركز كلفة مستقل له تنبيهاته وميزانياته.</p>",
+      "faq": [
+        {
+          "question": "ما هي لوحة رسائل وكلاء OpenAI؟",
+          "answer": "طبقة تواصل مشتركة يستطيع فيها الوكلاء المستقلون نشر الرسائل وقراءة الردود وتنسيق سير العمل دون تدخل بشري. اكتُشفت في سبتمبر 2026."
+        },
+        {
+          "question": "كم يكلف التواصل بين الوكلاء؟",
+          "answer": "بأسعار GPT-6 Astra: $10 للمليون إدخالاً، و$1 للمليون مخزّناً مؤقتاً، و$50 للمليون إخراجاً. وتنسيق من 10 أدوار بين 3 وكلاء يكلف نحو $15. وعلى GPT-6 Sol: نحو $3 للتبادل نفسه."
+        },
+        {
+          "question": "هل يمكن للوكلاء تكديس فواتير بلا سقف على لوحة الرسائل؟",
+          "answer": "نعم. بلا ميزانيات رسائل وحدود عمق ومهل خمول، يمكن لحلقات التفاوض وعواصف البث أن تستهلك ملايين الرموز. وعلى فرق FinOps فرض سقوف صارمة لكل سير عمل."
+        },
+        {
+          "question": "هل أستخدم Astra أم Sol لتنسيق الوكلاء؟",
+          "answer": "استخدم Sol للتنسيق (رموز رخيصة تكفي للتسليمات). واحتفظ بـ Astra لخطوة الاستدلال والتوليف الأخيرة حيث يؤتي استدلاله ثماره."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/gpt-6-astra-cost-model",
+          "label": "نموذج كلفة GPT-6 Astra"
+        },
+        {
+          "slug": "/research/gpt-6-sol-cost-model",
+          "label": "نموذج كلفة GPT-6 Sol"
+        },
+        {
+          "slug": "/research/subagent-fan-out-concurrency-limits",
+          "label": "حدود التزامن في تفريع الوكلاء الفرعيين"
+        },
+        {
+          "slug": "/research/three-agent-budgets",
+          "label": "ميزانيات الوكلاء الثلاث"
+        }
+      ]
+    },
+    "it": {
+      "title": "Bacheca messaggi degli agenti OpenAI: nuovo costo",
+      "titleCore": "Modello di costo della bacheca messaggi degli agenti OpenAI",
+      "description": "Gli agenti che pubblicano su una bacheca condivisa generano cicli di token senza limiti. Modello di costo e quattro guardrail per la spesa tra agenti.",
+      "body": "<p>Nel settembre 2026 alcuni ricercatori hanno scoperto una bacheca messaggi degli agenti di OpenAI: un livello di comunicazione in cui agenti autonomi possono pubblicare messaggi, leggere risposte e coordinare flussi di lavoro in più passaggi senza intervento umano. Per i team FinOps questo introduce un nuovo vettore di costo: il consumo di token tra agenti, che cresce con la lunghezza della conversazione e non con la complessità del compito.</p><h2>Cosa rende possibile la bacheca messaggi</h2><p>La bacheca funziona come un bus di contesto condiviso. Un agente orchestratore pubblica la scomposizione di un compito; gli agenti specialisti prendono in carico i sottocompiti, pubblicano risultati e negoziano i passaggi di consegna. Ogni messaggio è un ciclo completo prompt-completamento, fatturato alle tariffe standard del modello.</p><h2>Modello di costo</h2><table><thead><tr><th>Componente</th><th>Tariffa (GPT-6 Astra)</th><th>Tariffa (GPT-6 Sol)</th></tr></thead><tbody><tr><td>Pubblicazione dell'agente (input)</td><td>$10.00 / 1M</td><td>$2.00 / 1M</td></tr><tr><td>Lettura dell'agente (input in cache)</td><td>$1.00 / 1M</td><td>$0.20 / 1M</td></tr><tr><td>Risposta dell'agente (output)</td><td>$50.00 / 1M</td><td>$10.00 / 1M</td></tr></tbody></table><p>Una coordinazione di 10 turni tra tre agenti alle tariffe Astra: ~300K token = $15. Lo stesso scambio su Sol: $3. La differenza sta nel capire se il compito <em>richiede</em> il ragionamento di Astra o se bastano i token più economici di Sol.</p><h2>Scenari di esplosione dei costi</h2><ul><li><strong>Cicli di negoziazione:</strong> due agenti non concordano su un passaggio di consegna e iterano più di 50 volte prima di convergere.</li><li><strong>Tempeste di broadcast:</strong> un agente pubblica a tutti gli iscritti; ciascuno risponde, innescando altre pubblicazioni.</li><li><strong>Conversazioni orfane:</strong> gli agenti aspettano una risposta che non arriva mai, interrogando la bacheca ogni 30 secondi.</li></ul><h2>Controlli FinOps</h2><ol><li><strong>Budget messaggi per flusso di lavoro:</strong> limite rigido sul totale dei token della bacheca per ID di compito.</li><li><strong>Limiti di profondità:</strong> massimo 3 passaggi tra agenti prima dell'escalation a un umano.</li><li><strong>Instradamento dei modelli:</strong> indirizzate il coordinamento su Sol; riservate Astra al solo passaggio finale di sintesi.</li><li><strong>Timeout di inattività:</strong> chiusura automatica dei thread dopo 5 minuti di inattività.</li></ol><h2>Conclusione</h2><p>La bacheca rende componibili i sistemi multi-agente, ma la componibilità senza protezioni sui costi è una perdita di budget. Trattate i token tra agenti come un centro di costo distinto, con i propri alert e budget.</p>",
+      "faq": [
+        {
+          "question": "Che cos'è la bacheca messaggi degli agenti OpenAI?",
+          "answer": "Un livello di comunicazione condiviso in cui agenti autonomi possono pubblicare messaggi, leggere risposte e coordinare flussi di lavoro senza intervento umano. Scoperta nel settembre 2026."
+        },
+        {
+          "question": "Quanto costa la comunicazione tra agenti?",
+          "answer": "Alle tariffe di GPT-6 Astra: $10/M input, $1/M in cache, $50/M output. Una coordinazione di 10 turni tra 3 agenti costa ~$15. Su GPT-6 Sol: ~$3 per lo stesso scambio."
+        },
+        {
+          "question": "Gli agenti possono generare fatture senza limiti sulla bacheca messaggi?",
+          "answer": "Sì. Senza budget dei messaggi, limiti di profondità e timeout di inattività, cicli di negoziazione e tempeste di broadcast possono consumare milioni di token. I team FinOps devono imporre limiti rigidi per flusso di lavoro."
+        },
+        {
+          "question": "Devo usare Astra o Sol per coordinare gli agenti?",
+          "answer": "Usate Sol per il coordinamento (token economici, sufficienti per i passaggi di consegna). Riservate Astra alla fase finale di ragionamento e sintesi, dove il suo ragionamento ripaga il costo."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/gpt-6-astra-cost-model",
+          "label": "Modello di costo di GPT-6 Astra"
+        },
+        {
+          "slug": "/research/gpt-6-sol-cost-model",
+          "label": "Modello di costo di GPT-6 Sol"
+        },
+        {
+          "slug": "/research/subagent-fan-out-concurrency-limits",
+          "label": "Limiti di concorrenza nel fan-out dei subagenti"
+        },
+        {
+          "slug": "/research/three-agent-budgets",
+          "label": "Tre budget per agenti"
+        }
+      ]
+    },
+    "ko": {
+      "title": "OpenAI 에이전트 메시지 보드: 새로운 비용 요인",
+      "titleCore": "OpenAI 에이전트 메시지 보드 비용 모델",
+      "description": "공유 메시지 보드에 글을 올리는 에이전트는 상한 없는 토큰 루프를 만듭니다. 에이전트 간 지출을 위한 비용 모델과 네 가지 가드레일을 정리합니다.",
+      "body": "<p>2026년 9월, 연구자들이 OpenAI 에이전트 메시지 보드를 발견했습니다. 자율 에이전트가 사람의 개입 없이 메시지를 게시하고, 응답을 읽고, 여러 단계의 워크플로를 조율할 수 있는 통신 계층입니다. FinOps 팀에게 이는 새로운 비용 요인을 의미합니다. 에이전트 간 토큰 소비는 작업의 복잡도가 아니라 대화의 길이에 따라 늘어나기 때문입니다.</p><h2>메시지 보드가 가능하게 하는 것</h2><p>메시지 보드는 공유 컨텍스트 버스 역할을 합니다. 오케스트레이터 에이전트가 작업 분해 결과를 게시하면, 전문 에이전트들이 하위 작업을 맡고, 결과를 게시하고, 작업 인계를 협의합니다. 각 메시지는 모델의 표준 요금으로 청구되는 완전한 프롬프트-완성 주기입니다.</p><h2>비용 모델</h2><table><thead><tr><th>구성 요소</th><th>요금 (GPT-6 Astra)</th><th>요금 (GPT-6 Sol)</th></tr></thead><tbody><tr><td>에이전트 게시 (입력)</td><td>$10.00 / 1M</td><td>$2.00 / 1M</td></tr><tr><td>에이전트 읽기 (캐시된 입력)</td><td>$1.00 / 1M</td><td>$0.20 / 1M</td></tr><tr><td>에이전트 응답 (출력)</td><td>$50.00 / 1M</td><td>$10.00 / 1M</td></tr></tbody></table><p>Astra 가격으로 세 에이전트가 10턴 동안 조율하면 약 300K 토큰, 즉 $15입니다. 같은 교환을 Sol에서 하면 $3입니다. 차이는 작업이 Astra의 추론을 <em>필요로 하는지</em>, 아니면 더 저렴한 Sol의 토큰으로 충분한지에 달려 있습니다.</p><h2>폭주 시나리오</h2><ul><li><strong>협상 루프:</strong> 두 에이전트가 작업 인계를 두고 의견이 엇갈려, 수렴하기 전까지 50번 이상 반복합니다.</li><li><strong>브로드캐스트 폭풍:</strong> 한 에이전트가 모든 구독자에게 게시하면, 각 구독자가 응답하고 그 응답이 다시 새 게시물을 촉발합니다.</li><li><strong>고아 대화:</strong> 에이전트가 오지 않을 응답을 기다리며 30초마다 보드를 폴링합니다.</li></ul><h2>FinOps 통제</h2><ol><li><strong>워크플로별 메시지 예산:</strong> 작업 ID별 보드 전체 토큰에 엄격한 상한을 둡니다.</li><li><strong>깊이 제한:</strong> 사람에게 에스컬레이션하기 전 에이전트 간 홉은 최대 3회로 제한합니다.</li><li><strong>모델 라우팅:</strong> 조율은 Sol로 보내고, Astra는 최종 종합 단계에만 씁니다.</li><li><strong>유휴 시간 초과:</strong> 5분 동안 활동이 없으면 스레드를 자동으로 닫습니다.</li></ol><h2>결론</h2><p>메시지 보드는 다중 에이전트 시스템을 조합 가능하게 만들지만, 비용 가드 없는 조합 가능성은 예산 누수입니다. 에이전트 간 토큰은 고유한 알림과 예산을 갖춘 별도의 비용 센터로 다루세요.</p>",
+      "faq": [
+        {
+          "question": "OpenAI 에이전트 메시지 보드는 무엇인가요?",
+          "answer": "자율 에이전트가 메시지를 게시하고, 응답을 읽고, 사람의 개입 없이 워크플로를 조율할 수 있는 공유 통신 계층입니다. 2026년 9월에 발견되었습니다."
+        },
+        {
+          "question": "에이전트 간 통신에는 비용이 얼마나 드나요?",
+          "answer": "GPT-6 Astra 요금 기준으로 입력 $10/M, 캐시 $1/M, 출력 $50/M입니다. 3개 에이전트가 10턴 동안 조율하면 약 $15가 듭니다. GPT-6 Sol에서는 같은 교환이 약 $3입니다."
+        },
+        {
+          "question": "에이전트가 메시지 보드에서 상한 없이 비용을 키울 수 있나요?",
+          "answer": "네. 메시지 예산, 깊이 제한, 유휴 시간 초과가 없으면 협상 루프와 브로드캐스트 폭풍이 수백만 토큰을 소비할 수 있습니다. FinOps 팀은 워크플로별로 엄격한 상한을 강제해야 합니다."
+        },
+        {
+          "question": "에이전트 조율에 Astra와 Sol 중 무엇을 써야 하나요?",
+          "answer": "조율에는 Sol을 쓰세요. 토큰이 저렴하고 작업 인계에 충분합니다. Astra는 추론 능력이 효과를 내는 최종 추론 및 종합 단계에 남겨 두세요."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/gpt-6-astra-cost-model",
+          "label": "GPT-6 Astra 비용 모델"
+        },
+        {
+          "slug": "/research/gpt-6-sol-cost-model",
+          "label": "GPT-6 Sol 비용 모델"
+        },
+        {
+          "slug": "/research/subagent-fan-out-concurrency-limits",
+          "label": "서브에이전트 팬아웃의 동시 실행 제한"
+        },
+        {
+          "slug": "/research/three-agent-budgets",
+          "label": "세 에이전트 예산"
+        }
+      ]
+    },
+    "nl": {
+      "title": "OpenAI Agent Message Board: een nieuwe kostenvector",
+      "titleCore": "Kostenmodel van het OpenAI agent message board",
+      "description": "Agents die op een gedeeld prikbord posten, creëren onbegrensde tokenloops. Kostenmodel plus vier guardrails voor uitgaven van agent tot agent.",
+      "body": "<p>In september 2026 ontdekten onderzoekers een OpenAI agent message board — een communicatielaag waarop autonome agents berichten kunnen posten, reacties kunnen lezen en meerstapsworkflows kunnen coördineren zonder menselijke tussenkomst. Voor FinOps-teams introduceert dit een nieuwe kostenvector: tokenverbruik van agent tot agent dat meegroeit met de lengte van het gesprek, niet met de complexiteit van de taak.</p><h2>Wat het message board mogelijk maakt</h2><p>Het message board werkt als een gedeelde contextbus. Een orchestrator-agent post een taakopdeling; gespecialiseerde agents claimen deeltaken, posten bevindingen en onderhandelen over overdrachten. Elk bericht is een volledige prompt-completioncyclus, gefactureerd tegen de standaardtarieven van het model.</p><h2>Kostenmodel</h2><table><thead><tr><th>Component</th><th>Tarief (GPT-6 Astra)</th><th>Tarief (GPT-6 Sol)</th></tr></thead><tbody><tr><td>Agent post (input)</td><td>$10.00 / 1M</td><td>$2.00 / 1M</td></tr><tr><td>Agent leest (gecachete input)</td><td>$1.00 / 1M</td><td>$0.20 / 1M</td></tr><tr><td>Agent antwoordt (output)</td><td>$50.00 / 1M</td><td>$10.00 / 1M</td></tr></tbody></table><p>Een coördinatie van 10 beurten tussen drie agents tegen Astra-prijzen: ~300K tokens = $15. Dezelfde uitwisseling op Sol: $3. Het verschil is of de taak de redenering van Astra <em>vereist</em> of dat de goedkopere tokens van Sol volstaan.</p><h2>Op hol geslagen scenario's</h2><ul><li><strong>Onderhandelingsloops:</strong> Twee agents zijn het oneens over een overdracht en itereren 50+ keer voordat ze convergeren.</li><li><strong>Broadcaststormen:</strong> Eén agent post naar alle abonnees; elk antwoordt, wat meer posts uitlokt.</li><li><strong>Verweesde gesprekken:</strong> Agents wachten op een antwoord dat nooit komt en pollen het board elke 30 seconden.</li></ul><h2>FinOps-controles</h2><ol><li><strong>Berichtenbudget per workflow:</strong> Hard plafond op het totaal aan boardtokens per taak-ID.</li><li><strong>Dieptelimieten:</strong> Max. 3 hops van agent naar agent vóór escalatie naar een mens.</li><li><strong>Modelrouting:</strong> Route coördinatie naar Sol; bewaar Astra alleen voor de laatste syntheseslag.</li><li><strong>Inactiviteitstimeout:</strong> Sluit threads automatisch na 5 minuten inactiviteit.</li></ol><h2>Conclusie</h2><p>Het message board maakt multi-agentsystemen samenstelbaar — maar samenstelbaarheid zonder kostenbeveiliging is een budgetlek. Behandel tokens van agent tot agent als een aparte kostenplaats met eigen alerts en budgetten.</p>",
+      "faq": [
+        {
+          "question": "Wat is het OpenAI agent message board?",
+          "answer": "Een gedeelde communicatielaag waarop autonome agents berichten kunnen posten, reacties kunnen lezen en workflows kunnen coördineren zonder menselijke tussenkomst. Ontdekt in september 2026."
+        },
+        {
+          "question": "Wat kost communicatie van agent tot agent?",
+          "answer": "Tegen GPT-6 Astra-tarieven: $10/M input, $1/M gecacht, $50/M output. Een coördinatie van 10 beurten met 3 agents kost ~$15. Op GPT-6 Sol: ~$3 voor dezelfde uitwisseling."
+        },
+        {
+          "question": "Kunnen agents op het message board onbegrensde rekeningen oplopen?",
+          "answer": "Ja. Zonder berichtenbudgetten, dieptelimieten en inactiviteitstimeouts kunnen onderhandelingsloops en broadcaststormen miljoenen tokens verbruiken. FinOps-teams moeten harde plafonds per workflow afdwingen."
+        },
+        {
+          "question": "Moet ik Astra of Sol gebruiken voor agentcoördinatie?",
+          "answer": "Gebruik Sol voor coördinatie (goedkope tokens, voldoende voor overdrachten). Bewaar Astra voor de laatste redeneer- en syntheseslag, waar zijn redenering zich terugbetaalt."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/gpt-6-astra-cost-model",
+          "label": "Kostenmodel GPT-6 Astra"
+        },
+        {
+          "slug": "/research/gpt-6-sol-cost-model",
+          "label": "Kostenmodel GPT-6 Sol"
+        },
+        {
+          "slug": "/research/subagent-fan-out-concurrency-limits",
+          "label": "Concurrencylimieten voor subagent-fan-out"
+        },
+        {
+          "slug": "/research/three-agent-budgets",
+          "label": "Drie agentbudgetten"
+        }
+      ]
+    },
+    "zh": {
+      "title": "OpenAI 智能体消息板：一种新的成本来源",
+      "titleCore": "OpenAI 智能体消息板成本模型",
+      "description": "向共享消息板发布内容的智能体会产生无上限的 token 循环。这是智能体之间支出的成本模型，以及四项护栏。",
+      "body": "<p>2026 年 9 月，研究人员发现了一个 OpenAI 智能体消息板&mdash;&mdash;一个通信层，自主智能体可以在其中发布消息、读取回复，并在无需人工干预的情况下协调多步骤工作流。对于 FinOps 团队而言，这带来了一种新的成本来源：智能体之间的 token 消耗会随对话长度而增长，而不是随任务复杂度增长。</p><h2>消息板能做什么</h2><p>消息板充当一个共享的上下文总线。编排智能体发布任务拆解；专业智能体认领子任务、发布发现，并协商交接。每一条消息都是一次完整的提示词与补全循环，按模型的标准费率计费。</p><h2>成本模型</h2><table><thead><tr><th>组成部分</th><th>费率（GPT-6 Astra）</th><th>费率（GPT-6 Sol）</th></tr></thead><tbody><tr><td>智能体发帖（输入）</td><td>$10.00 / 1M</td><td>$2.00 / 1M</td></tr><tr><td>智能体读取（缓存输入）</td><td>$1.00 / 1M</td><td>$0.20 / 1M</td></tr><tr><td>智能体回复（输出）</td><td>$50.00 / 1M</td><td>$10.00 / 1M</td></tr></tbody></table><p>三个智能体进行 10 轮协调，按 Astra 定价约为 300K token，即 $15。同样的交流在 Sol 上为 $3。差别在于这项任务<em>是否需要</em> Astra 的推理能力，还是 Sol 更便宜的 token 已经足够。</p><h2>失控场景</h2><ul><li><strong>协商循环：</strong>两个智能体在交接上意见不一，反复迭代 50 次以上才达成一致。</li><li><strong>广播风暴：</strong>一个智能体向所有订阅者发帖；每个订阅者回复，又触发更多发帖。</li><li><strong>孤立对话：</strong>智能体等待一个永远不会到来的回复，每 30 秒轮询一次消息板。</li></ul><h2>FinOps 控制措施</h2><ol><li><strong>按工作流设置消息预算：</strong>对每个任务 ID 的消息板 token 总量设置硬性上限。</li><li><strong>深度限制：</strong>在转交人工之前，智能体之间最多跳转 3 次。</li><li><strong>模型路由：</strong>将协调工作交给 Sol；仅为最终综合步骤保留 Astra。</li><li><strong>空闲超时：</strong>在 5 分钟无活动后自动关闭线程。</li></ol><h2>结论</h2><p>消息板让多智能体系统变得可组合&mdash;&mdash;但没有成本护栏的可组合性就是预算漏洞。应将智能体之间的 token 视为一个独立的成本中心，并为它配置专属的告警和预算。</p>",
+      "faq": [
+        {
+          "question": "什么是 OpenAI 智能体消息板？",
+          "answer": "这是一个共享通信层，自主智能体可以在其中发布消息、读取回复并协调工作流，无需人工干预。它于 2026 年 9 月被发现。"
+        },
+        {
+          "question": "智能体之间的通信要花多少钱？",
+          "answer": "按 GPT-6 Astra 费率：输入 $10/M，缓存 $1/M，输出 $50/M。三个智能体进行 10 轮协调约需 $15。在 GPT-6 Sol 上，同样的交流约为 $3。"
+        },
+        {
+          "question": "智能体能否在消息板上产生无上限的账单？",
+          "answer": "可以。如果没有消息预算、深度限制和空闲超时，协商循环和广播风暴可能消耗数百万 token。FinOps 团队必须为每个工作流强制执行硬性上限。"
+        },
+        {
+          "question": "智能体协调应该用 Astra 还是 Sol？",
+          "answer": "协调用 Sol（token 便宜，足以应付交接）。只在最终的推理和综合步骤中保留 Astra，因为它的推理能力在那里才有价值。"
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/gpt-6-astra-cost-model",
+          "label": "GPT-6 Astra 成本模型"
+        },
+        {
+          "slug": "/research/gpt-6-sol-cost-model",
+          "label": "GPT-6 Sol 成本模型"
+        },
+        {
+          "slug": "/research/subagent-fan-out-concurrency-limits",
+          "label": "子智能体扇出并发限制"
+        },
+        {
+          "slug": "/research/three-agent-budgets",
+          "label": "三个智能体的预算"
+        }
+      ]
     }
   }
 }

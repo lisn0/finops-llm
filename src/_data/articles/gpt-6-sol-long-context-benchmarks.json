@@ -214,6 +214,346 @@
         }
       ],
       "body": "<p><strong>Em 27 de setembro de 2026, o GPT-6 Sol tem exatamente uma pontuação independente de contexto longo: 84% no Artificial Analysis AA-LCR v1.1, empatado com o GPT-5.6 Sol.</strong> Os documentos do teste têm em média cerca de 100K tokens. Ninguém publicou ainda como o GPT-6 Sol se comporta com 256K, 512K ou 1M de tokens. A maioria dos números de contexto longo de «Sol» na internet, incluindo a pontuação de 91,5% no MRCR, é do GPT-5.6 Sol. O GPT-6 Sol foi lançado em 22 de setembro.</p>\n\n<p>Isso importa para o custo porque o contexto longo é onde os preços do GPT-6 saltam. Acima de 272K tokens de entrada, <a href=\"/research/gpt-6-pricing\">a requisição inteira é cobrada pelas tarifas de contexto longo</a>. Decidir quanto contexto um agente mantém significa pesar esse preço contra dados de qualidade que ainda não existem.</p>\n\n<h2>Quais pontuações de contexto longo o GPT-6 Sol tem?</h2>\n\n<p><strong>Uma pontuação agregada, com cerca de 100K tokens.</strong></p>\n\n<table>\n<thead><tr><th>Modelo</th><th>AA-LCR v1.1</th><th>Posição</th></tr></thead>\n<tbody>\n<tr><td>GPT-6 Sol (max)</td><td>84.0%</td><td>7</td></tr>\n<tr><td>GPT-5.6 Sol (max)</td><td>84.0%</td><td>7</td></tr>\n<tr><td>GPT-6 Astra</td><td>80.7%</td><td>27</td></tr>\n<tr><td>Kimi K3 (líder, 24 set. 2026)</td><td>88.7%</td><td>1</td></tr>\n</tbody>\n</table>\n\n<p>O AA-LCR tem 100 perguntas escritas à mão sobre conjuntos de documentos com média de 99.325 tokens. As respostas precisam ser montadas a partir de várias passagens, em vez de encontradas em uma só. Ele testa o raciocínio sobre uma entrada longa. Não mostra como a precisão muda conforme a entrada cresce, porque todas as perguntas têm aproximadamente o mesmo tamanho.</p>\n\n<h2>Quais números de contexto longo são do GPT-5.6 Sol, e não do GPT-6 Sol?</h2>\n\n<p><strong>As pontuações do MRCR.</strong> A cobertura do lançamento do GPT-6 Astra o comparou com o «Sol» no teste MRCR v2 de 8 agulhas da OpenAI. Esse Sol era o GPT-5.6 Sol, e o artigo da Vellum confirma.</p>\n\n<table>\n<thead><tr><th>MRCR v2, 8 agulhas</th><th>256K&ndash;512K</th><th>512K&ndash;1M</th></tr></thead>\n<tbody>\n<tr><td>GPT-6 Astra</td><td>100%</td><td>96.3%</td></tr>\n<tr><td>GPT-5.6 Sol</td><td>91.5%</td><td>73.8%</td></tr>\n<tr><td>GPT-6 Sol</td><td colspan=\"2\">não publicado</td></tr>\n</tbody>\n</table>\n\n<p>A análise do GPT-6 Sol feita pela OrcaRouter diz o mesmo: o GPT-5.6 Sol tem um resultado publicado de recuperação em contexto longo, e o GPT-6 Sol não tem nada equivalente.</p>\n\n<h2>Onde procuramos?</h2>\n\n<p><strong>Os lugares onde isso seria publicado, todos verificados em 27 de setembro de 2026:</strong></p>\n\n<ul>\n<li><strong>Context Arena</strong>, o ranking MRCR. A lista de modelos e os resultados de 8 agulhas não têm entradas do GPT-6. Os modelos mais recentes da OpenAI são GPT-5.6 Sol, Terra e Luna.</li>\n<li><strong>OpenAI</strong>: o post de lançamento do GPT-6 e o apêndice da system card para Sol e Luna. Nenhum dos dois traz resultados do Sol por tamanho de contexto.</li>\n<li><strong>Artificial Analysis</strong>: apenas o AA-LCR, como acima.</li>\n<li><strong>Vals, Vellum, DataCamp, emergent.sh, llm-stats e OrcaRouter</strong>: nenhum resultado de contexto longo por tamanho para o GPT-6 Sol.</li>\n</ul>\n\n<h2>O que as equipes devem fazer até existirem dados por tamanho?</h2>\n\n<p><strong>Manter as requisições ao GPT-6 Sol abaixo de 272K tokens de entrada e compactar cedo.</strong> A evidência até agora mostra o GPT-6 Sol igualando o GPT-5.6 Sol com cerca de 100K. O GPT-5.6 Sol manteve 91,5% até 512K no MRCR, mas caiu para 73,8% além disso. É razoável esperar que o GPT-6 Sol seja utilizável até cerca de 250K, mas isso é uma inferência, não uma medição. Acima de 272K você paga o dobro pela entrada em troca de uma qualidade que ninguém mediu.</p>\n\n<p>No Codex isso já é o padrão. Ele dá ao GPT-6 Sol uma janela de 272K e <a href=\"/research/codex-auto-compact-gpt-6-sol\">compacta em 244.800 tokens</a>. Para os seus próprios agentes, crie alertas para requisições que passem de 272K e trate qualquer aumento como algo a testar. Faça seu próprio teste de recuperação com seus próprios documentos antes de confiar em contexto além de 256K.</p>\n\n<p>Atualizaremos esta página quando a Context Arena ou outro avaliador independente publicar resultados do GPT-6 Sol por tamanho de contexto.</p>\n\n<h2>Fontes</h2>\n\n<ul>\n<li><a href=\"https://artificialanalysis.ai/models/comparisons/gpt-6-sol-vs-gpt-5-6-sol\">Artificial Analysis: GPT-6 Sol vs GPT-5.6 Sol</a></li>\n<li><a href=\"https://artificialanalysis.ai/articles/announcing-aa-lcr\">Artificial Analysis: anúncio do AA-LCR</a></li>\n<li><a href=\"https://benchlm.ai/benchmarks/lcr\">BenchLM: ranking AA-LCR</a></li>\n<li><a href=\"https://www.vellum.ai/blog/gpt-6-astra-benchmarks-explained\">Vellum: benchmarks do GPT-6 Astra explicados</a></li>\n<li><a href=\"https://www.orcarouter.ai/blog/gpt-6-sol-vs-gpt-5-6-sol\">OrcaRouter: GPT-6 Sol vs GPT-5.6 Sol</a></li>\n<li><a href=\"https://contextarena.ai\">Context Arena: ranking MRCR</a></li>\n</ul>\n"
+    },
+    "id": {
+      "title": "Tolok ukur konteks panjang GPT-6 Sol: apa yang diukur",
+      "titleCore": "Tolok ukur konteks panjang GPT-6 Sol: apa yang benar-benar diukur, dan apa itu GPT-5.6 Sol",
+      "description": "Satu-satunya skor konteks panjang independen GPT-6 Sol: AA-LCR 84% di ~100K token, setara GPT-5.6 Sol. MRCR 91,5% yang sering dikutip itu milik GPT-5.6 Sol.",
+      "body": "<p><strong>Per 27 September 2026, GPT-6 Sol hanya punya satu skor konteks panjang independen: 84% di Artificial Analysis AA-LCR v1.1, setara GPT-5.6 Sol.</strong> Dokumen dalam tes ini rata-rata sekitar 100K token. Belum ada yang mempublikasikan bagaimana GPT-6 Sol bertahan di 256K, 512K, atau 1M token. Sebagian besar angka konteks panjang &ldquo;Sol&rdquo; di internet, termasuk skor MRCR 91,5%, adalah milik GPT-5.6 Sol. GPT-6 Sol dirilis pada 22 September.</p>\n\n<p>Ini penting untuk biaya karena konteks panjang adalah titik lonjakan harga GPT-6. Di atas 272K token input, <a href=\"/research/gpt-6-pricing\">seluruh permintaan ditagih dengan tarif konteks panjang</a>. Menentukan seberapa banyak konteks yang dipertahankan agen berarti menimbang harga itu terhadap data kualitas yang belum ada.</p>\n\n<h2>Skor konteks panjang apa yang dimiliki GPT-6 Sol?</h2>\n\n<p><strong>Satu skor agregat, di sekitar 100K token.</strong></p>\n\n<table>\n<thead><tr><th>Model</th><th>AA-LCR v1.1</th><th>Peringkat</th></tr></thead>\n<tbody>\n<tr><td>GPT-6 Sol (max)</td><td>84.0%</td><td>7</td></tr>\n<tr><td>GPT-5.6 Sol (max)</td><td>84.0%</td><td>7</td></tr>\n<tr><td>GPT-6 Astra</td><td>80.7%</td><td>27</td></tr>\n<tr><td>Kimi K3 (pemimpin, 24 Sep 2026)</td><td>88.7%</td><td>1</td></tr>\n</tbody>\n</table>\n\n<p>AA-LCR berisi 100 pertanyaan buatan tangan atas kumpulan dokumen yang rata-rata 99.325 token. Jawabannya harus disusun dari beberapa bagian, bukan ditemukan di satu tempat. Tes ini mengukur penalaran atas input panjang. Tes ini tidak menunjukkan bagaimana akurasi berubah seiring input bertambah, karena semua pertanyaannya memiliki panjang yang kurang lebih sama.</p>\n\n<h2>Angka konteks panjang mana yang milik GPT-5.6 Sol, bukan GPT-6 Sol?</h2>\n\n<p><strong>Skor MRCR.</strong> Pemberitaan peluncuran GPT-6 Astra membandingkannya dengan &ldquo;Sol&rdquo; pada tes MRCR v2 8-needle dari OpenAI. Sol itu adalah GPT-5.6 Sol, dan tulisan Vellum mengonfirmasinya.</p>\n\n<table>\n<thead><tr><th>MRCR v2, 8-needle</th><th>256K&ndash;512K</th><th>512K&ndash;1M</th></tr></thead>\n<tbody>\n<tr><td>GPT-6 Astra</td><td>100%</td><td>96.3%</td></tr>\n<tr><td>GPT-5.6 Sol</td><td>91.5%</td><td>73.8%</td></tr>\n<tr><td>GPT-6 Sol</td><td colspan=\"2\">belum dipublikasikan</td></tr>\n</tbody>\n</table>\n\n<p>Ulasan GPT-6 Sol dari OrcaRouter menyampaikan poin yang sama: GPT-5.6 Sol punya hasil retrieval konteks panjang yang dipublikasikan, sedangkan GPT-6 Sol belum punya yang setara.</p>\n\n<h2>Di mana kami sudah memeriksa?</h2>\n\n<p><strong>Tempat-tempat yang seharusnya mempublikasikannya, semuanya diperiksa pada 27 September 2026:</strong></p>\n\n<ul>\n<li><strong>Context Arena</strong>, papan peringkat MRCR. Daftar model dan hasil 8-needle-nya tidak memuat entri GPT-6. Entri OpenAI terbarunya adalah GPT-5.6 Sol, Terra, dan Luna.</li>\n<li><strong>OpenAI</strong>: postingan peluncuran GPT-6 dan lampiran system card untuk Sol dan Luna. Keduanya tidak memberikan hasil Sol menurut panjang konteks.</li>\n<li><strong>Artificial Analysis</strong>: hanya AA-LCR, seperti di atas.</li>\n<li><strong>Vals, Vellum, DataCamp, emergent.sh, llm-stats, dan OrcaRouter</strong>: tidak ada hasil konteks panjang menurut panjang untuk GPT-6 Sol.</li>\n</ul>\n\n<h2>Apa yang sebaiknya dilakukan tim sampai ada data menurut panjang?</h2>\n\n<p><strong>Jaga permintaan GPT-6 Sol di bawah 272K token input dan lakukan kompaksi lebih awal.</strong> Bukti sejauh ini menunjukkan GPT-6 Sol setara GPT-5.6 Sol di sekitar 100K. GPT-5.6 Sol mempertahankan 91,5% sampai 512K pada MRCR, tetapi turun ke 73,8% di atas itu. Wajar jika memperkirakan GPT-6 Sol masih bisa dipakai hingga sekitar 250K, tetapi itu inferensi, bukan pengukuran. Di atas 272K Anda membayar dua kali lipat untuk input demi kualitas yang belum pernah diukur siapa pun.</p>\n\n<p>Di Codex, ini sudah menjadi default. Codex memberi GPT-6 Sol jendela 272K dan <a href=\"/research/codex-auto-compact-gpt-6-sol\">melakukan kompaksi pada 244.800 token</a>. Untuk agen Anda sendiri, pasang alarm untuk permintaan yang melewati 272K dan perlakukan setiap kenaikan sebagai sesuatu yang harus diuji. Jalankan pemeriksaan retrieval Anda sendiri pada dokumen Anda sebelum mengandalkan konteks di atas 256K.</p>\n\n<p>Kami akan memperbarui halaman ini ketika Context Arena atau evaluator independen lain mempublikasikan hasil GPT-6 Sol menurut panjang konteks.</p>\n\n<h2>Sumber</h2>\n\n<ul>\n<li><a href=\"https://artificialanalysis.ai/models/comparisons/gpt-6-sol-vs-gpt-5-6-sol\">Artificial Analysis: GPT-6 Sol vs GPT-5.6 Sol</a></li>\n<li><a href=\"https://artificialanalysis.ai/articles/announcing-aa-lcr\">Artificial Analysis: pengumuman AA-LCR</a></li>\n<li><a href=\"https://benchlm.ai/benchmarks/lcr\">BenchLM: papan peringkat AA-LCR</a></li>\n<li><a href=\"https://www.vellum.ai/blog/gpt-6-astra-benchmarks-explained\">Vellum: tolok ukur GPT-6 Astra dijelaskan</a></li>\n<li><a href=\"https://www.orcarouter.ai/blog/gpt-6-sol-vs-gpt-5-6-sol\">OrcaRouter: GPT-6 Sol vs GPT-5.6 Sol</a></li>\n<li><a href=\"https://contextarena.ai\">Context Arena: papan peringkat MRCR</a></li>\n</ul>\n",
+      "faq": [
+        {
+          "question": "Seberapa bagus GPT-6 Sol dalam konteks panjang?",
+          "answer": "Skornya 84% pada Artificial Analysis AA-LCR v1.1 di effort maksimum, sama dengan GPT-5.6 Sol dan di atas 80,7% milik GPT-6 Astra. Dokumen AA-LCR rata-rata sekitar 100K token, dan per 27 September 2026 belum ada yang mempublikasikan hasil GPT-6 Sol yang dipecah menurut panjang konteks."
+        },
+        {
+          "question": "Apakah skor MRCR 91,5% milik GPT-6 Sol?",
+          "answer": "Bukan. 91,5% di 256K-512K dan 73,8% di 512K-1M pada MRCR v2 8-needle adalah skor GPT-5.6 Sol. GPT-6 Sol belum punya hasil MRCR yang dipublikasikan, dan Context Arena belum menambahkannya."
+        },
+        {
+          "question": "Apakah GPT-6 Sol ada di papan peringkat MRCR Context Arena?",
+          "answer": "Belum per 27 September 2026. Daftar model dan hasil 8-needle Context Arena tidak memuat model GPT-6. Entri OpenAI terbarunya adalah GPT-5.6 Sol, Terra, dan Luna."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/codex-auto-compact-gpt-6-sol",
+          "label": "Auto-compact Codex pada GPT-6 Sol: default yang sebenarnya"
+        },
+        {
+          "slug": "/research/gpt-6-sol-cost-model",
+          "label": "Harga GPT-6 Sol dan model biaya"
+        },
+        {
+          "slug": "/research/gpt-6-pricing",
+          "label": "Harga GPT-6 dan lonjakan harga konteks panjang 272K"
+        }
+      ]
+    },
+    "pl": {
+      "title": "Benchmarki długiego kontekstu GPT-6 Sol: co zmierzono",
+      "titleCore": "Benchmarki długiego kontekstu GPT-6 Sol: co faktycznie zmierzono i czym jest GPT-5.6 Sol",
+      "description": "Jedyny niezależny wynik GPT-6 Sol w długim kontekście to AA-LCR 84% przy ok. 100K tokenów, tyle co GPT-5.6 Sol. Wynik MRCR 91.5% to GPT-5.6 Sol.",
+      "faq": [
+        {
+          "question": "Jak dobrze GPT-6 Sol radzi sobie z długim kontekstem?",
+          "answer": "Uzyskuje 84% w Artificial Analysis AA-LCR v1.1 na maksymalnym effort, tyle samo co GPT-5.6 Sol i powyżej 80.7% GPT-6 Astra. Dokumenty w AA-LCR mają średnio około 100K tokenów, a na dzień 27 września 2026 roku nikt nie opublikował wyników GPT-6 Sol podzielonych według długości kontekstu."
+        },
+        {
+          "question": "Czy wynik MRCR 91.5% dotyczy GPT-6 Sol?",
+          "answer": "Nie. 91.5% przy 256K-512K i 73.8% przy 512K-1M w MRCR v2 8-needle to wyniki GPT-5.6 Sol. GPT-6 Sol nie ma jeszcze opublikowanego wyniku MRCR, a Context Arena go nie dodało."
+        },
+        {
+          "question": "Czy GPT-6 Sol jest w rankingu MRCR Context Arena?",
+          "answer": "Nie, stan na 27 września 2026 roku. Lista modeli Context Arena i wyniki 8-needle nie zawierają modeli GPT-6. Jego najnowsze wpisy OpenAI to GPT-5.6 Sol, Terra i Luna."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/codex-auto-compact-gpt-6-sol",
+          "label": "Auto-compact w Codex na GPT-6 Sol: prawdziwe ustawienia domyślne"
+        },
+        {
+          "slug": "/research/gpt-6-sol-cost-model",
+          "label": "Ceny i model kosztów GPT-6 Sol"
+        },
+        {
+          "slug": "/research/gpt-6-pricing",
+          "label": "Ceny GPT-6 i skok cen przy długim kontekście od 272K"
+        }
+      ],
+      "body": "<p><strong>Stan na 27 września 2026 roku: GPT-6 Sol ma dokładnie jeden niezależny wynik długiego kontekstu, 84% w Artificial Analysis AA-LCR v1.1, tyle samo co GPT-5.6 Sol.</strong> Dokumenty w tym teście mają średnio około 100K tokenów. Nikt jeszcze nie opublikował, jak GPT-6 Sol radzi sobie przy 256K, 512K czy 1M tokenów. Większość liczb dla „Sol” dotyczących długiego kontekstu w sieci, w tym wynik MRCR 91.5%, dotyczy GPT-5.6 Sol. GPT-6 Sol pojawił się 22 września.</p>\n\n<p>Ma to znaczenie dla kosztów, bo właśnie w długim kontekście ceny GPT-6 skaczą. Powyżej 272K tokenów wejścia <a href=\"/research/gpt-6-pricing\">całe żądanie jest rozliczane według stawek długiego kontekstu</a>. Decydując, ile kontekstu zachowuje agent, trzeba zważyć tę cenę z danymi jakościowymi, które jeszcze nie istnieją.</p>\n\n<h2>Jakie wyniki długiego kontekstu ma GPT-6 Sol?</h2>\n\n<p><strong>Jeden zbiorczy wynik, przy około 100K tokenów.</strong></p>\n\n<table>\n<thead><tr><th>Model</th><th>AA-LCR v1.1</th><th>Miejsce</th></tr></thead>\n<tbody>\n<tr><td>GPT-6 Sol (max)</td><td>84.0%</td><td>7</td></tr>\n<tr><td>GPT-5.6 Sol (max)</td><td>84.0%</td><td>7</td></tr>\n<tr><td>GPT-6 Astra</td><td>80.7%</td><td>27</td></tr>\n<tr><td>Kimi K3 (lider, 24 wrz 2026)</td><td>88.7%</td><td>1</td></tr>\n</tbody>\n</table>\n\n<p>AA-LCR ma 100 ręcznie napisanych pytań nad zestawami dokumentów o średniej długości 99,325 tokenów. Odpowiedzi trzeba złożyć z kilku fragmentów, a nie znaleźć w jednym miejscu. Test sprawdza rozumowanie nad długim wejściem. Nie pokazuje jednak, jak zmienia się dokładność wraz ze wzrostem wejścia, bo wszystkie pytania dotyczą dokumentów o podobnej długości.</p>\n\n<h2>Które wyniki długiego kontekstu należą do GPT-5.6 Sol, a nie GPT-6 Sol?</h2>\n\n<p><strong>Wyniki MRCR.</strong> Materiały launchowe GPT-6 Astra porównywały go z „Sol” w teście MRCR v2 8-needle od OpenAI. Chodziło o GPT-5.6 Sol, co potwierdza write-up Vellum.</p>\n\n<table>\n<thead><tr><th>MRCR v2, 8-needle</th><th>256K&ndash;512K</th><th>512K&ndash;1M</th></tr></thead>\n<tbody>\n<tr><td>GPT-6 Astra</td><td>100%</td><td>96.3%</td></tr>\n<tr><td>GPT-5.6 Sol</td><td>91.5%</td><td>73.8%</td></tr>\n<tr><td>GPT-6 Sol</td><td colspan=\"2\">nie opublikowano</td></tr>\n</tbody>\n</table>\n\n<p>Recenzja GPT-6 Sol w OrcaRouter mówi to samo: GPT-5.6 Sol ma opublikowany wynik wyszukiwania w długim kontekście, a GPT-6 Sol nie ma nic równoważnego.</p>\n\n<h2>Gdzie sprawdzano?</h2>\n\n<p><strong>Miejsca, które mogłyby to opublikować, wszystkie sprawdzone 27 września 2026 roku:</strong></p>\n\n<ul>\n<li><strong>Context Arena</strong>, ranking MRCR. Lista modeli i wyniki 8-needle nie mają wpisów GPT-6. Najnowsze modele OpenAI tam to GPT-5.6 Sol, Terra i Luna.</li>\n<li><strong>OpenAI</strong>: wpis z premierą GPT-6 i załącznik do karty systemowej dla Sol i Luna. Żaden z nich nie podaje wyników Sol według długości kontekstu.</li>\n<li><strong>Artificial Analysis</strong>: tylko AA-LCR, jak wyżej.</li>\n<li><strong>Vals, Vellum, DataCamp, emergent.sh, llm-stats i OrcaRouter</strong>: brak wyników długiego kontekstu według długości dla GPT-6 Sol.</li>\n</ul>\n\n<h2>Co robić, dopóki nie ma danych według długości?</h2>\n\n<p><strong>Trzymaj żądania GPT-6 Sol poniżej 272K tokenów wejścia i kompaktuj wcześnie.</strong> Dotychczasowe dane pokazują, że GPT-6 Sol dorównuje GPT-5.6 Sol przy około 100K. GPT-5.6 Sol utrzymał 91.5% do 512K w MRCR, ale poza tym spadł do 73.8%. Rozsądnie jest oczekiwać, że GPT-6 Sol będzie użyteczny do około 250K, ale to wniosek, a nie pomiar. Powyżej 272K płacisz podwójnie za wejście za jakość, której nikt nie zmierzył.</p>\n\n<p>W Codex to już domyślne ustawienie. Daje GPT-6 Sol okno 272K i <a href=\"/research/codex-auto-compact-gpt-6-sol\">kompaktuje przy 244,800 tokenach</a>. W swoich agentach ustaw alert na żądania przekraczające 272K i traktuj każdy wzrost jako coś do przetestowania. Przed poleganiem na kontekście powyżej 256K uruchom własny test wyszukiwania na własnych dokumentach.</p>\n\n<p>Zaktualizujemy tę stronę, gdy Context Arena lub inny niezależny ewaluator opublikuje wyniki GPT-6 Sol według długości kontekstu.</p>\n\n<h2>Źródła</h2>\n\n<ul>\n<li><a href=\"https://artificialanalysis.ai/models/comparisons/gpt-6-sol-vs-gpt-5-6-sol\">Artificial Analysis: GPT-6 Sol vs GPT-5.6 Sol</a></li>\n<li><a href=\"https://artificialanalysis.ai/articles/announcing-aa-lcr\">Artificial Analysis: zapowiedź AA-LCR</a></li>\n<li><a href=\"https://benchlm.ai/benchmarks/lcr\">BenchLM: ranking AA-LCR</a></li>\n<li><a href=\"https://www.vellum.ai/blog/gpt-6-astra-benchmarks-explained\">Vellum: GPT-6 Astra benchmarks explained</a></li>\n<li><a href=\"https://www.orcarouter.ai/blog/gpt-6-sol-vs-gpt-5-6-sol\">OrcaRouter: GPT-6 Sol vs GPT-5.6 Sol</a></li>\n<li><a href=\"https://contextarena.ai\">Context Arena: ranking MRCR</a></li>\n</ul>\n"
+    },
+    "ru": {
+      "title": "Длинный контекст GPT-6 Sol: что реально измерено",
+      "titleCore": "Бенчмарки длинного контекста GPT-6 Sol: что измерено и что относится к GPT-5.6 Sol",
+      "description": "Единственный независимый результат GPT-6 Sol на длинном контексте: AA-LCR 84% при ~100K токенов, как у GPT-5.6 Sol. Цифра 91.5% MRCR относится к GPT-5.6 Sol.",
+      "faq": [
+        {
+          "question": "Насколько хорош GPT-6 Sol на длинном контексте?",
+          "answer": "Он набирает 84% в Artificial Analysis AA-LCR v1.1 на максимальном усилии, столько же, сколько GPT-5.6 Sol, и выше 80.7% у GPT-6 Astra. Документы AA-LCR в среднем содержат около 100K токенов, а по состоянию на 27 сентября 2026 года никто не опубликовал результаты GPT-6 Sol в разбивке по длине контекста."
+        },
+        {
+          "question": "Цифра MRCR 91.5% относится к GPT-6 Sol?",
+          "answer": "Нет. 91.5% на 256K–512K и 73.8% на 512K–1M в MRCR v2 с 8 иголками — результаты GPT-5.6 Sol. Опубликованного результата MRCR для GPT-6 Sol пока нет, и Context Arena его не добавила."
+        },
+        {
+          "question": "Есть ли GPT-6 Sol в таблице MRCR Context Arena?",
+          "answer": "Нет, по состоянию на 27 сентября 2026 года. Список моделей Context Arena и результаты 8-needle не содержат моделей GPT-6. Самые новые записи OpenAI там — GPT-5.6 Sol, Terra и Luna."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/codex-auto-compact-gpt-6-sol",
+          "label": "Автокомпактирование Codex на GPT-6 Sol: реальные значения по умолчанию"
+        },
+        {
+          "slug": "/research/gpt-6-sol-cost-model",
+          "label": "Цены и модель затрат GPT-6 Sol"
+        },
+        {
+          "slug": "/research/gpt-6-pricing",
+          "label": "Цены GPT-6 и скачок цены за контекст 272K"
+        }
+      ],
+      "body": "<p><strong>По состоянию на 27 сентября 2026 года у GPT-6 Sol ровно один независимый результат по длинному контексту: 84% в Artificial Analysis AA-LCR v1.1, наравне с GPT-5.6 Sol.</strong> Документы в тесте в среднем содержат около 100K токенов. Пока никто не опубликовал, как GPT-6 Sol держится на 256K, 512K или 1M токенов. Большинство цифр «Sol» по длинному контексту в сети, включая 91.5% MRCR, относятся к GPT-5.6 Sol. GPT-6 Sol вышла 22 сентября.</p>\n\n<p>Это важно для стоимости, потому что именно на длинном контексте цены GPT-6 растут. Свыше 272K входных токенов <a href=\"/research/gpt-6-pricing\">весь запрос тарифицируется по ценам длинного контекста</a>. Решая, сколько контекста хранить в агенте, приходится сравнивать эту цену с данными о качестве, которых пока нет.</p>\n\n<h2>Какие результаты по длинному контексту есть у GPT-6 Sol?</h2>\n\n<p><strong>Один агрегированный результат, примерно на 100K токенов.</strong></p>\n\n<table>\n<thead><tr><th>Модель</th><th>AA-LCR v1.1</th><th>Место</th></tr></thead>\n<tbody>\n<tr><td>GPT-6 Sol (max)</td><td>84.0%</td><td>7</td></tr>\n<tr><td>GPT-5.6 Sol (max)</td><td>84.0%</td><td>7</td></tr>\n<tr><td>GPT-6 Astra</td><td>80.7%</td><td>27</td></tr>\n<tr><td>Kimi K3 (лидер, 24 сентября 2026)</td><td>88.7%</td><td>1</td></tr>\n</tbody>\n</table>\n\n<p>В AA-LCR 100 вручную написанных вопросов по наборам документов, которые в среднем содержат 99,325 токенов. Ответы нужно собирать из нескольких фрагментов, а не находить в одном месте. Тест проверяет рассуждения над длинным входом. Он не показывает, как меняется точность при росте входа, потому что все вопросы примерно одной длины.</p>\n\n<h2>Какие цифры по длинному контексту относятся к GPT-5.6 Sol, а не к GPT-6 Sol?</h2>\n\n<p><strong>Результаты MRCR.</strong> В материалах о запуске GPT-6 Astra её сравнивали с «Sol» по тесту OpenAI MRCR v2 8-needle. Этой Sol была GPT-5.6 Sol, что подтверждает разбор от Vellum.</p>\n\n<table>\n<thead><tr><th>MRCR v2, 8-needle</th><th>256K&ndash;512K</th><th>512K&ndash;1M</th></tr></thead>\n<tbody>\n<tr><td>GPT-6 Astra</td><td>100%</td><td>96.3%</td></tr>\n<tr><td>GPT-5.6 Sol</td><td>91.5%</td><td>73.8%</td></tr>\n<tr><td>GPT-6 Sol</td><td colspan=\"2\">не опубликовано</td></tr>\n</tbody>\n</table>\n\n<p>Обзор GPT-6 Sol от OrcaRouter говорит то же самое: у GPT-5.6 Sol есть опубликованный результат поиска на длинном контексте, а у GPT-6 Sol аналога нет.</p>\n\n<h2>Где уже искали?</h2>\n\n<p><strong>Места, где это могли бы опубликовать, все проверены 27 сентября 2026 года:</strong></p>\n\n<ul>\n<li><strong>Context Arena</strong>, таблица лидеров MRCR. В её списке моделей и результатах 8-needle нет записей GPT-6. Её самые новые модели OpenAI — GPT-5.6 Sol, Terra и Luna.</li>\n<li><strong>OpenAI</strong>: пост о запуске GPT-6 и приложение к системной карте для Sol и Luna. Ни в одном из них нет результатов Sol по длине контекста.</li>\n<li><strong>Artificial Analysis</strong>: только AA-LCR, как выше.</li>\n<li><strong>Vals, Vellum, DataCamp, emergent.sh, llm-stats и OrcaRouter</strong>: результатов GPT-6 Sol по длине контекста нет.</li>\n</ul>\n\n<h2>Что делать командам, пока нет данных по длине?</h2>\n\n<p><strong>Держите запросы GPT-6 Sol до 272K входных токенов и сжимайте историю заранее.</strong> Пока данные показывают, что GPT-6 Sol на уровне около 100K не уступает GPT-5.6 Sol. GPT-5.6 Sol держала 91.5% до 512K на MRCR, но за этой отметкой упала до 73.8%. Разумно ожидать, что GPT-6 Sol пригодна примерно до 250K, но это вывод, а не измерение. Свыше 272K вы платите вдвое больше за вход ради качества, которое никто не измерял.</p>\n\n<p>В Codex это уже поведение по умолчанию: там GPT-6 Sol получает окно 272K и <a href=\"/research/codex-auto-compact-gpt-6-sol\">сжимает контекст на 244,800 токенах</a>. Для собственных агентов ставьте алерт на запросы, которые переходят 272K, и проверяйте любой рост. Прежде чем полагаться на контекст больше 256K, прогоните собственную проверку поиска по своим документам.</p>\n\n<p>Мы обновим эту страницу, когда Context Arena или другой независимый оценщик опубликует результаты GPT-6 Sol по длине контекста.</p>\n\n<h2>Источники</h2>\n\n<ul>\n<li><a href=\"https://artificialanalysis.ai/models/comparisons/gpt-6-sol-vs-gpt-5-6-sol\">Artificial Analysis: GPT-6 Sol против GPT-5.6 Sol</a></li>\n<li><a href=\"https://artificialanalysis.ai/articles/announcing-aa-lcr\">Artificial Analysis: анонс AA-LCR</a></li>\n<li><a href=\"https://benchlm.ai/benchmarks/lcr\">BenchLM: таблица лидеров AA-LCR</a></li>\n<li><a href=\"https://www.vellum.ai/blog/gpt-6-astra-benchmarks-explained\">Vellum: разбор бенчмарков GPT-6 Astra</a></li>\n<li><a href=\"https://www.orcarouter.ai/blog/gpt-6-sol-vs-gpt-5-6-sol\">OrcaRouter: GPT-6 Sol против GPT-5.6 Sol</a></li>\n<li><a href=\"https://contextarena.ai\">Context Arena: таблица лидеров MRCR</a></li>\n</ul>\n"
+    },
+    "tr": {
+      "title": "GPT-6 Sol Uzun Bağlam Benchmark'ları: Ölçülenler",
+      "titleCore": "GPT-6 Sol uzun bağlam benchmark'ları: gerçekte ölçülenler ve GPT-5.6 Sol'un sonuçları",
+      "description": "GPT-6 Sol'un tek bağımsız uzun bağlam puanı, yaklaşık 100K tokenda AA-LCR %84; GPT-5.6 Sol ile aynı. Sık alıntılanan %91.5 MRCR ise GPT-5.6 Sol'a ait.",
+      "body": "<p><strong>27 Eylül 2026 itibarıyla GPT-6 Sol'un tam olarak bir bağımsız uzun bağlam puanı var: Artificial Analysis AA-LCR v1.1'de %84, GPT-5.6 Sol ile aynı.</strong> Testin belgeleri ortalama yaklaşık 100K token. Henüz kimse GPT-6 Sol'un 256K, 512K ya da 1M tokenda nasıl performans gösterdiğini yayımlamadı. Çevrimiçi dolaşan &ldquo;Sol&rdquo; uzun bağlam sayılarının çoğu, %91.5 MRCR puanı dahil, GPT-5.6 Sol'a ait. GPT-6 Sol 22 Eylül'de çıktı.</p>\n\n<p>Maliyet açısından bu önemli, çünkü GPT-6 fiyatları en çok uzun bağlamda sıçrıyor. 272K girdi tokenının üzerinde <a href=\"/research/gpt-6-pricing\">tüm istek uzun bağlam tarifesiyle faturalanır</a>. Bir ajanın ne kadar bağlam tutacağına karar vermek, bu fiyatı henüz var olmayan kalite verisiyle tartmak demektir.</p>\n\n<h2>GPT-6 Sol'un hangi uzun bağlam puanları var?</h2>\n\n<p><strong>Yaklaşık 100K tokenda tek bir toplam puan.</strong></p>\n\n<table>\n<thead><tr><th>Model</th><th>AA-LCR v1.1</th><th>Sıra</th></tr></thead>\n<tbody>\n<tr><td>GPT-6 Sol (max)</td><td>84.0%</td><td>7</td></tr>\n<tr><td>GPT-5.6 Sol (max)</td><td>84.0%</td><td>7</td></tr>\n<tr><td>GPT-6 Astra</td><td>80.7%</td><td>27</td></tr>\n<tr><td>Kimi K3 (lider, 24 Eyl 2026)</td><td>88.7%</td><td>1</td></tr>\n</tbody>\n</table>\n\n<p>AA-LCR, ortalama 99.325 tokenlık belge setleri üzerinde elle yazılmış 100 soru içerir. Cevaplar tek bir pasajda bulunmaz, birkaç pasajdan bir araya getirilmelidir. Test, uzun bir girdi üzerinde akıl yürütmeyi ölçer. Girdi büyüdükçe doğruluğun nasıl değiştiğini göstermez, çünkü her soru yaklaşık aynı uzunlukta.</p>\n\n<h2>Hangi uzun bağlam sayıları GPT-5.6 Sol'a ait, GPT-6 Sol'a değil?</h2>\n\n<p><strong>MRCR puanları.</strong> GPT-6 Astra'nın lansman haberleri, onu OpenAI'nin MRCR v2 8-needle testinde &ldquo;Sol&rdquo; ile karşılaştırdı. O Sol, GPT-5.6 Sol'du; Vellum'un yazısı bunu doğruluyor.</p>\n\n<table>\n<thead><tr><th>MRCR v2, 8-needle</th><th>256K&ndash;512K</th><th>512K&ndash;1M</th></tr></thead>\n<tbody>\n<tr><td>GPT-6 Astra</td><td>100%</td><td>96.3%</td></tr>\n<tr><td>GPT-5.6 Sol</td><td>91.5%</td><td>73.8%</td></tr>\n<tr><td>GPT-6 Sol</td><td colspan=\"2\">yayımlanmadı</td></tr>\n</tbody>\n</table>\n\n<p>OrcaRouter'ın GPT-6 Sol incelemesi aynı noktayı söylüyor: GPT-5.6 Sol'un yayımlanmış bir uzun bağlam erişim sonucu var, GPT-6 Sol'un buna denk bir şeyi yok.</p>\n\n<h2>Nerelere baktık?</h2>\n\n<p><strong>Bunu yayımlayabilecek yerler, hepsi 27 Eylül 2026'da kontrol edildi:</strong></p>\n\n<ul>\n<li><strong>Context Arena</strong>, MRCR sıralaması. Model listesi ve 8-needle sonuçlarında hiçbir GPT-6 kaydı yok. En yeni OpenAI modelleri GPT-5.6 Sol, Terra ve Luna.</li>\n<li><strong>OpenAI</strong>: GPT-6 lansman yazısı ve Sol ile Luna için system card eki. İkisi de Sol sonuçlarını bağlam uzunluğuna göre vermiyor.</li>\n<li><strong>Artificial Analysis</strong>: yalnızca AA-LCR, yukarıdaki gibi.</li>\n<li><strong>Vals, Vellum, DataCamp, emergent.sh, llm-stats ve OrcaRouter</strong>: GPT-6 Sol için uzunluğa göre uzun bağlam sonucu yok.</li>\n</ul>\n\n<h2>Uzunluğa göre veri olana kadar ekipler ne yapmalı?</h2>\n\n<p><strong>GPT-6 Sol isteklerini 272K girdi tokenının altında tutun ve erken sıkıştırın.</strong> Şimdiye kadarki kanıt, GPT-6 Sol'un yaklaşık 100K'da GPT-5.6 Sol ile eşit olduğunu gösteriyor. GPT-5.6 Sol, MRCR'da 512K'ya kadar %91.5 tuttu ama bunun ötesinde %73.8'e düştü. GPT-6 Sol'un yaklaşık 250K'ya kadar kullanılabilir olmasını beklemek makul, ama bu bir çıkarım, bir ölçüm değil. 272K'nın üzerinde, kimsenin ölçmediği bir kalite için girdiye iki kat ödersiniz.</p>\n\n<p>Codex'te bu zaten varsayılan. GPT-6 Sol'a 272K pencere veriyor ve <a href=\"/research/codex-auto-compact-gpt-6-sol\">244.800 tokenda sıkıştırıyor</a>. Kendi ajanlarınız için 272K'yı aşan istekler için uyarı kurun ve her artışı test edilmesi gereken bir şey olarak görün. 256K'nın ötesindeki bağlama güvenmeden önce kendi belgelerinizle kendi erişim testinizi çalıştırın.</p>\n\n<p>Context Arena ya da başka bir bağımsız değerlendirici GPT-6 Sol sonuçlarını bağlam uzunluğuna göre yayımladığında bu sayfayı güncelleyeceğiz.</p>\n\n<h2>Kaynaklar</h2>\n\n<ul>\n<li><a href=\"https://artificialanalysis.ai/models/comparisons/gpt-6-sol-vs-gpt-5-6-sol\">Artificial Analysis: GPT-6 Sol vs GPT-5.6 Sol</a></li>\n<li><a href=\"https://artificialanalysis.ai/articles/announcing-aa-lcr\">Artificial Analysis: AA-LCR'nin duyurusu</a></li>\n<li><a href=\"https://benchlm.ai/benchmarks/lcr\">BenchLM: AA-LCR sıralaması</a></li>\n<li><a href=\"https://www.vellum.ai/blog/gpt-6-astra-benchmarks-explained\">Vellum: GPT-6 Astra benchmark'ları açıklandı</a></li>\n<li><a href=\"https://www.orcarouter.ai/blog/gpt-6-sol-vs-gpt-5-6-sol\">OrcaRouter: GPT-6 Sol vs GPT-5.6 Sol</a></li>\n<li><a href=\"https://contextarena.ai\">Context Arena: MRCR sıralaması</a></li>\n</ul>\n",
+      "faq": [
+        {
+          "question": "GPT-6 Sol uzun bağlamda ne kadar iyi?",
+          "answer": "Maksimum eforla Artificial Analysis AA-LCR v1.1'de %84 alıyor; bu GPT-5.6 Sol ile aynı ve GPT-6 Astra'nın %80.7 puanının üzerinde. AA-LCR belgeleri ortalama yaklaşık 100K token içeriyor ve 27 Eylül 2026 itibarıyla kimse GPT-6 Sol sonuçlarını bağlam uzunluğuna göre yayımlamadı."
+        },
+        {
+          "question": "%91.5 MRCR puanı GPT-6 Sol'a mı ait?",
+          "answer": "Hayır. MRCR v2 8-needle testinde 256K-512K için %91.5 ve 512K-1M için %73.8, GPT-5.6 Sol'un puanlarıdır. GPT-6 Sol'un henüz yayımlanmış bir MRCR sonucu yok ve Context Arena bunu eklemedi."
+        },
+        {
+          "question": "GPT-6 Sol, Context Arena MRCR sıralamasında mı?",
+          "answer": "27 Eylül 2026 itibarıyla değil. Context Arena'nın model listesi ve 8-needle sonuçlarında hiçbir GPT-6 modeli yok. En yeni OpenAI kayıtları GPT-5.6 Sol, Terra ve Luna."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/codex-auto-compact-gpt-6-sol",
+          "label": "GPT-6 Sol'da Codex otomatik sıkıştırma: gerçek varsayılanlar"
+        },
+        {
+          "slug": "/research/gpt-6-sol-cost-model",
+          "label": "GPT-6 Sol fiyatlandırması ve maliyet modeli"
+        },
+        {
+          "slug": "/research/gpt-6-pricing",
+          "label": "GPT-6 fiyatları ve 272K uzun bağlam fiyat sıçraması"
+        }
+      ]
+    },
+    "vi": {
+      "title": "Benchmark ngữ cảnh dài của GPT-6 Sol: những gì đã đo",
+      "titleCore": "Benchmark ngữ cảnh dài của GPT-6 Sol: thực tế đã đo những gì, và GPT-5.6 Sol là gì",
+      "description": "Điểm độc lập duy nhất của GPT-6 Sol về ngữ cảnh dài là AA-LCR 84% ở khoảng 100K token, ngang GPT-5.6 Sol. Con số MRCR 91,5% là của GPT-5.6 Sol.",
+      "faq": [
+        {
+          "question": "GPT-6 Sol xử lý ngữ cảnh dài tốt đến mức nào?",
+          "answer": "Ở chế độ nỗ lực tối đa, GPT-6 Sol đạt 84% trên Artificial Analysis AA-LCR v1.1, bằng GPT-5.6 Sol và cao hơn mức 80,7% của GPT-6 Astra. Tài liệu AA-LCR trung bình khoảng 100K token, và tính đến 27/09/2026 chưa ai công bố kết quả GPT-6 Sol chia theo độ dài ngữ cảnh."
+        },
+        {
+          "question": "Điểm MRCR 91,5% có phải của GPT-6 Sol không?",
+          "answer": "Không. 91,5% ở 256K-512K và 73,8% ở 512K-1M trên MRCR v2 8-needle là điểm của GPT-5.6 Sol. GPT-6 Sol chưa có kết quả MRCR nào được công bố, và Context Arena chưa thêm nó vào."
+        },
+        {
+          "question": "GPT-6 Sol có trên bảng xếp hạng MRCR của Context Arena không?",
+          "answer": "Chưa, tính đến 27/09/2026. Danh sách mô hình và kết quả 8-needle của Context Arena không có mô hình GPT-6 nào. Các mục OpenAI mới nhất của họ là GPT-5.6 Sol, Terra và Luna."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/codex-auto-compact-gpt-6-sol",
+          "label": "Auto-compact của Codex trên GPT-6 Sol: mặc định thực tế"
+        },
+        {
+          "slug": "/research/gpt-6-sol-cost-model",
+          "label": "Giá và mô hình chi phí GPT-6 Sol"
+        },
+        {
+          "slug": "/research/gpt-6-pricing",
+          "label": "Giá GPT-6 và mức nhảy giá ngữ cảnh dài 272K"
+        }
+      ],
+      "body": "<p><strong>Tính đến 27 tháng 9 năm 2026, GPT-6 Sol chỉ có đúng một điểm ngữ cảnh dài độc lập: 84% trên Artificial Analysis AA-LCR v1.1, ngang với GPT-5.6 Sol.</strong> Tài liệu của bài kiểm tra trung bình khoảng 100K token. Chưa ai công bố GPT-6 Sol hoạt động ra sao ở 256K, 512K hay 1M token. Phần lớn các con số ngữ cảnh dài của &ldquo;Sol&rdquo; trên mạng, kể cả điểm MRCR 91,5%, đều là của GPT-5.6 Sol. GPT-6 Sol ra mắt ngày 22 tháng 9.</p>\n\n<p>Điều này quan trọng với chi phí vì ngữ cảnh dài là nơi giá GPT-6 tăng vọt. Khi đầu vào vượt 272K token, <a href=\"/research/gpt-6-pricing\">toàn bộ yêu cầu được tính theo mức giá ngữ cảnh dài</a>. Quyết định giữ bao nhiêu ngữ cảnh cho một agent là cân nhắc giữa mức giá đó và dữ liệu chất lượng chưa tồn tại.</p>\n\n<h2>GPT-6 Sol có những điểm ngữ cảnh dài nào?</h2>\n\n<p><strong>Chỉ có một điểm tổng hợp, ở khoảng 100K token.</strong></p>\n\n<table>\n<thead><tr><th>Mô hình</th><th>AA-LCR v1.1</th><th>Xếp hạng</th></tr></thead>\n<tbody>\n<tr><td>GPT-6 Sol (max)</td><td>84.0%</td><td>7</td></tr>\n<tr><td>GPT-5.6 Sol (max)</td><td>84.0%</td><td>7</td></tr>\n<tr><td>GPT-6 Astra</td><td>80.7%</td><td>27</td></tr>\n<tr><td>Kimi K3 (dẫn đầu, 24/09/2026)</td><td>88.7%</td><td>1</td></tr>\n</tbody>\n</table>\n\n<p>AA-LCR gồm 100 câu hỏi viết tay trên các bộ tài liệu trung bình 99.325 token. Câu trả lời phải được ghép từ nhiều đoạn văn thay vì tìm thấy trong một đoạn. Bài test đo khả năng suy luận trên đầu vào dài. Nó không cho thấy độ chính xác thay đổi thế nào khi đầu vào dài thêm, vì mọi câu hỏi đều có độ dài gần như nhau.</p>\n\n<h2>Những con số ngữ cảnh dài nào thuộc GPT-5.6 Sol, không phải GPT-6 Sol?</h2>\n\n<p><strong>Đó là các điểm MRCR.</strong> Bài đưa tin khi ra mắt GPT-6 Astra so sánh nó với &ldquo;Sol&rdquo; trong bài test MRCR v2 8-needle của OpenAI. Sol đó là GPT-5.6 Sol, và bài phân tích của Vellum xác nhận điều này.</p>\n\n<table>\n<thead><tr><th>MRCR v2, 8-needle</th><th>256K&ndash;512K</th><th>512K&ndash;1M</th></tr></thead>\n<tbody>\n<tr><td>GPT-6 Astra</td><td>100%</td><td>96.3%</td></tr>\n<tr><td>GPT-5.6 Sol</td><td>91.5%</td><td>73.8%</td></tr>\n<tr><td>GPT-6 Sol</td><td colspan=\"2\">chưa công bố</td></tr>\n</tbody>\n</table>\n\n<p>Bài đánh giá GPT-6 Sol của OrcaRouter cũng nêu cùng ý: GPT-5.6 Sol có kết quả truy xuất ngữ cảnh dài đã công bố, còn GPT-6 Sol chưa có kết quả tương đương.</p>\n\n<h2>Chúng tôi đã tìm ở đâu?</h2>\n\n<p><strong>Những nơi có thể công bố kết quả, tất cả đã kiểm tra vào ngày 27/09/2026:</strong></p>\n\n<ul>\n<li><strong>Context Arena</strong>, bảng xếp hạng MRCR. Danh sách mô hình và kết quả 8-needle không có mục nào của GPT-6. Các mô hình OpenAI mới nhất của họ là GPT-5.6 Sol, Terra và Luna.</li>\n<li><strong>OpenAI</strong>: bài công bố GPT-6 và phụ lục system card cho Sol và Luna. Không cái nào đưa kết quả của Sol theo độ dài ngữ cảnh.</li>\n<li><strong>Artificial Analysis</strong>: chỉ có AA-LCR, như trên.</li>\n<li><strong>Vals, Vellum, DataCamp, emergent.sh, llm-stats và OrcaRouter</strong>: không có kết quả ngữ cảnh dài theo độ dài cho GPT-6 Sol.</li>\n</ul>\n\n<h2>Trước khi có dữ liệu theo độ dài, các nhóm nên làm gì?</h2>\n\n<p><strong>Giữ các yêu cầu tới GPT-6 Sol dưới 272K token đầu vào và nén ngữ cảnh sớm.</strong> Bằng chứng hiện có cho thấy GPT-6 Sol ngang GPT-5.6 Sol ở khoảng 100K. GPT-5.6 Sol giữ được 91,5% đến 512K trên MRCR nhưng giảm xuống 73,8% sau đó. Có thể kỳ vọng GPT-6 Sol dùng được tới khoảng 250K là hợp lý, nhưng đó là suy luận chứ không phải phép đo. Trên 272K, bạn trả gấp đôi cho phần đầu vào với chất lượng chưa ai đo.</p>\n\n<p>Trong Codex, đây đã là mặc định. Codex cấp cho GPT-6 Sol cửa sổ 272K và <a href=\"/research/codex-auto-compact-gpt-6-sol\">nén ngữ cảnh ở 244.800 token</a>. Với agent của riêng bạn, hãy đặt cảnh báo cho các yêu cầu vượt 272K và coi mọi mức tăng là thứ cần kiểm thử. Tự chạy kiểm tra truy xuất trên tài liệu của mình trước khi dựa vào ngữ cảnh vượt 256K.</p>\n\n<p>Chúng tôi sẽ cập nhật trang này khi Context Arena hoặc một bên đánh giá độc lập khác công bố kết quả GPT-6 Sol theo độ dài ngữ cảnh.</p>\n\n<h2>Nguồn</h2>\n\n<ul>\n<li><a href=\"https://artificialanalysis.ai/models/comparisons/gpt-6-sol-vs-gpt-5-6-sol\">Artificial Analysis: GPT-6 Sol vs GPT-5.6 Sol</a></li>\n<li><a href=\"https://artificialanalysis.ai/articles/announcing-aa-lcr\">Artificial Analysis: công bố AA-LCR</a></li>\n<li><a href=\"https://benchlm.ai/benchmarks/lcr\">BenchLM: bảng xếp hạng AA-LCR</a></li>\n<li><a href=\"https://www.vellum.ai/blog/gpt-6-astra-benchmarks-explained\">Vellum: giải thích benchmark của GPT-6 Astra</a></li>\n<li><a href=\"https://www.orcarouter.ai/blog/gpt-6-sol-vs-gpt-5-6-sol\">OrcaRouter: GPT-6 Sol vs GPT-5.6 Sol</a></li>\n<li><a href=\"https://contextarena.ai\">Context Arena: bảng xếp hạng MRCR</a></li>\n</ul>\n"
+    },
+    "ar": {
+      "title": "معايير السياق الطويل لـ GPT-6 Sol: ما قيس فعلاً",
+      "titleCore": "معايير السياق الطويل لـ GPT-6 Sol: ما قيس فعلاً، وما يخص GPT-5.6 Sol",
+      "description": "درجة GPT-6 Sol المستقلة الوحيدة في السياق الطويل: AA-LCR بنسبة 84% عند نحو 100K رمز، مساوية لـ GPT-5.6 Sol. نسبة MRCR الشائعة 91.5% تخص GPT-5.6 Sol.",
+      "faq": [
+        {
+          "question": "ما مدى جودة GPT-6 Sol في السياق الطويل؟",
+          "answer": "يحقق 84% في Artificial Analysis AA-LCR v1.1 عند الجهد الأقصى، مثل GPT-5.6 Sol وأعلى من 80.7% لدى GPT-6 Astra. تبلغ مستندات AA-LCR نحو 100K رمز في المتوسط، وحتى 27 سبتمبر 2026 لم ينشر أحد نتائج GPT-6 Sol موزعة بحسب طول السياق."
+        },
+        {
+          "question": "هل نسبة MRCR البالغة 91.5% تخص GPT-6 Sol؟",
+          "answer": "لا. نسبة 91.5% عند 256K-512K ونسبة 73.8% عند 512K-1M في MRCR v2 ذي 8 إبر هما درجتا GPT-5.6 Sol. وليس لدى GPT-6 Sol نتيجة MRCR منشورة بعد، ولم تضفه Context Arena."
+        },
+        {
+          "question": "هل GPT-6 Sol في لوحة صدارة MRCR لدى Context Arena؟",
+          "answer": "ليس حتى 27 سبتمبر 2026. فقائمة نماذج Context Arena ونتائج الإبر الـ 8 فيها لا تضم أي نموذج GPT-6. وأحدث مدخلاتها من OpenAI هي GPT-5.6 Sol وTerra وLuna."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/codex-auto-compact-gpt-6-sol",
+          "label": "الضغط التلقائي في Codex على GPT-6 Sol: الإعدادات الافتراضية الفعلية"
+        },
+        {
+          "slug": "/research/gpt-6-sol-cost-model",
+          "label": "أسعار GPT-6 Sol ونموذج التكلفة"
+        },
+        {
+          "slug": "/research/gpt-6-pricing",
+          "label": "أسعار GPT-6 وقفزة سعر السياق الطويل عند 272K"
+        }
+      ],
+      "body": "<p><strong>حتى 27 سبتمبر 2026، لدى GPT-6 Sol درجة مستقلة واحدة فقط في السياق الطويل: 84% في Artificial Analysis AA-LCR v1.1، مساوية لـ GPT-5.6 Sol.</strong> تبلغ مستندات هذا الاختبار نحو 100K رمز في المتوسط. ولم ينشر أحد بعد كيف يصمد GPT-6 Sol عند 256K أو 512K أو 1M رمز. ومعظم أرقام السياق الطويل المنسوبة إلى «Sol» على الإنترنت، ومنها درجة MRCR البالغة 91.5%، تخص GPT-5.6 Sol. أما GPT-6 Sol فصدر في 22 سبتمبر.</p>\n\n<p>هذا مهم للتكلفة لأن السياق الطويل هو الموضع الذي تقفز فيه أسعار GPT-6. فوق 272K رمز إدخال <a href=\"/research/gpt-6-pricing\">يُفوتر الطلب كله بأسعار السياق الطويل</a>. وتحديد حجم السياق الذي يحتفظ به الوكيل يعني الموازنة بين هذا السعر وبيانات جودة لم توجد بعد.</p>\n\n<h2>ما درجات السياق الطويل المتوفرة لـ GPT-6 Sol؟</h2>\n\n<p><strong>درجة إجمالية واحدة، عند نحو 100K رمز.</strong></p>\n\n<table>\n<thead><tr><th>النموذج</th><th>AA-LCR v1.1</th><th>الترتيب</th></tr></thead>\n<tbody>\n<tr><td>GPT-6 Sol (max)</td><td>84.0%</td><td>7</td></tr>\n<tr><td>GPT-5.6 Sol (max)</td><td>84.0%</td><td>7</td></tr>\n<tr><td>GPT-6 Astra</td><td>80.7%</td><td>27</td></tr>\n<tr><td>Kimi K3 (المتصدر، 24 سبتمبر 2026)</td><td>88.7%</td><td>1</td></tr>\n</tbody>\n</table>\n\n<p>يضم AA-LCR 100 سؤال مكتوبة يدوياً على مجموعات مستندات يبلغ متوسطها 99,325 رمزاً. ويجب تركيب الإجابات من عدة مقاطع لا العثور عليها في مقطع واحد. فهو يختبر الاستدلال على مدخل طويل. ولا يُظهر كيف تتغير الدقة مع نمو المدخل، لأن كل الأسئلة بطول متقارب.</p>\n\n<h2>أي أرقام للسياق الطويل تخص GPT-5.6 Sol لا GPT-6 Sol؟</h2>\n\n<p><strong>درجات MRCR.</strong> قارنت التغطية الإعلامية لإطلاق GPT-6 Astra بين Astra و«Sol» في اختبار MRCR v2 ذي 8 إبر من OpenAI. وكان ذلك Sol هو GPT-5.6 Sol، وهو ما يؤكده تقرير Vellum.</p>\n\n<table>\n<thead><tr><th>MRCR v2، 8 إبر</th><th>256K&ndash;512K</th><th>512K&ndash;1M</th></tr></thead>\n<tbody>\n<tr><td>GPT-6 Astra</td><td>100%</td><td>96.3%</td></tr>\n<tr><td>GPT-5.6 Sol</td><td>91.5%</td><td>73.8%</td></tr>\n<tr><td>GPT-6 Sol</td><td colspan=\"2\">غير منشورة</td></tr>\n</tbody>\n</table>\n\n<p>وتذكر مراجعة OrcaRouter لـ GPT-6 Sol الأمر نفسه: لدى GPT-5.6 Sol نتيجة منشورة لاسترجاع السياق الطويل، ولا يوجد لـ GPT-6 Sol ما يعادلها.</p>\n\n<h2>أين بحثنا؟</h2>\n\n<p><strong>المواضع التي كانت ستنشرها، وفُحصت كلها في 27 سبتمبر 2026:</strong></p>\n\n<ul>\n<li><strong>Context Arena</strong>، لوحة صدارة MRCR. لا تضم قائمة نماذجها ونتائج الإبر الـ 8 أي مدخل GPT-6. وأحدث نماذج OpenAI فيها هي GPT-5.6 Sol وTerra وLuna.</li>\n<li><strong>OpenAI</strong>: منشور إطلاق GPT-6 وملحق بطاقة النظام الخاص بـ Sol وLuna. ولا يقدم أي منهما نتائج Sol بحسب طول السياق.</li>\n<li><strong>Artificial Analysis</strong>: AA-LCR فقط، كما أعلاه.</li>\n<li><strong>Vals وVellum وDataCamp وemergent.sh وllm-stats وOrcaRouter</strong>: لا نتائج للسياق الطويل بحسب الطول لـ GPT-6 Sol.</li>\n</ul>\n\n<h2>ماذا ينبغي للفرق أن تفعل إلى أن تتوفر بيانات بحسب الطول؟</h2>\n\n<p><strong>أبقِ طلبات GPT-6 Sol دون 272K رمز إدخال وضغط السياق مبكراً.</strong> تُظهر الأدلة حتى الآن أن GPT-6 Sol يطابق GPT-5.6 Sol عند نحو 100K. وقد حافظ GPT-5.6 Sol على 91.5% حتى 512K في MRCR لكنه هبط إلى 73.8% بعد ذلك. ومن المعقول توقع أن يكون GPT-6 Sol قابلاً للاستخدام حتى نحو 250K، لكن ذلك استنتاج لا قياس. وفوق 272K تدفع ضعف سعر الإدخال مقابل جودة لم يقسها أحد.</p>\n\n<p>وفي Codex هذا هو الافتراضي أصلاً. فهو يمنح GPT-6 Sol نافذة 272K و<a href=\"/research/codex-auto-compact-gpt-6-sol\">يضغط عند 244,800 رمز</a>. أما لوكلائك أنت، فأضف تنبيهاً على الطلبات التي تتجاوز 272K، وعامل أي زيادة على أنها أمر يجب اختباره. وشغّل فحص استرجاع خاصاً بك على مستنداتك قبل الاعتماد على سياق يتجاوز 256K.</p>\n\n<p>سنحدّث هذه الصفحة حين تنشر Context Arena أو جهة تقييم مستقلة أخرى نتائج GPT-6 Sol بحسب طول السياق.</p>\n\n<h2>المصادر</h2>\n\n<ul>\n<li><a href=\"https://artificialanalysis.ai/models/comparisons/gpt-6-sol-vs-gpt-5-6-sol\">Artificial Analysis: GPT-6 Sol مقابل GPT-5.6 Sol</a></li>\n<li><a href=\"https://artificialanalysis.ai/articles/announcing-aa-lcr\">Artificial Analysis: الإعلان عن AA-LCR</a></li>\n<li><a href=\"https://benchlm.ai/benchmarks/lcr\">BenchLM: لوحة صدارة AA-LCR</a></li>\n<li><a href=\"https://www.vellum.ai/blog/gpt-6-astra-benchmarks-explained\">Vellum: شرح معايير GPT-6 Astra</a></li>\n<li><a href=\"https://www.orcarouter.ai/blog/gpt-6-sol-vs-gpt-5-6-sol\">OrcaRouter: GPT-6 Sol مقابل GPT-5.6 Sol</a></li>\n<li><a href=\"https://contextarena.ai\">Context Arena: لوحة صدارة MRCR</a></li>\n</ul>\n"
+    },
+    "it": {
+      "title": "Benchmark contesto lungo di GPT-6 Sol: cosa è misurato",
+      "titleCore": "Benchmark contesto lungo di GPT-6 Sol: cosa è stato misurato e cosa è GPT-5.6 Sol",
+      "description": "Unico punteggio indipendente di GPT-6 Sol sul contesto lungo: AA-LCR 84% a circa 100K token, pari a GPT-5.6 Sol. Il 91,5% MRCR citato spesso è di GPT-5.6 Sol.",
+      "faq": [
+        {
+          "question": "Quanto è bravo GPT-6 Sol con il contesto lungo?",
+          "answer": "Ottiene l'84% sull'Artificial Analysis AA-LCR v1.1 con sforzo massimo, uguale a GPT-5.6 Sol e sopra l'80,7% di GPT-6 Astra. I documenti di AA-LCR hanno in media circa 100K token e, al 27 settembre 2026, nessuno ha pubblicato risultati di GPT-6 Sol suddivisi per lunghezza del contesto."
+        },
+        {
+          "question": "Il punteggio MRCR del 91,5% è di GPT-6 Sol?",
+          "answer": "No. Il 91,5% a 256K-512K e il 73,8% a 512K-1M sull'MRCR v2 con 8 needle sono i punteggi di GPT-5.6 Sol. GPT-6 Sol non ha ancora un risultato MRCR pubblicato e Context Arena non l'ha aggiunto."
+        },
+        {
+          "question": "GPT-6 Sol è nella classifica MRCR di Context Arena?",
+          "answer": "Non al 27 settembre 2026. La lista dei modelli di Context Arena e i risultati a 8 needle non contengono modelli GPT-6. Le voci OpenAI più recenti sono GPT-5.6 Sol, Terra e Luna."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/codex-auto-compact-gpt-6-sol",
+          "label": "Auto-compact di Codex su GPT-6 Sol: i valori predefiniti reali"
+        },
+        {
+          "slug": "/research/gpt-6-sol-cost-model",
+          "label": "Prezzi e modello di costo di GPT-6 Sol"
+        },
+        {
+          "slug": "/research/gpt-6-pricing",
+          "label": "Prezzi di GPT-6 e il salto di prezzo del contesto lungo a 272K"
+        }
+      ],
+      "body": "<p><strong>Al 27 settembre 2026, GPT-6 Sol ha esattamente un punteggio indipendente sul contesto lungo: l'84% sull'Artificial Analysis AA-LCR v1.1, pari a GPT-5.6 Sol.</strong> I documenti del test hanno in media circa 100K token. Nessuno ha ancora pubblicato come GPT-6 Sol regge a 256K, 512K o 1M di token. La maggior parte dei numeri sul contesto lungo di \"Sol\" in circolazione, incluso il punteggio MRCR del 91,5%, riguarda GPT-5.6 Sol. GPT-6 Sol è uscito il 22 settembre.</p>\n\n<p>Questo conta per i costi perché è sul contesto lungo che i prezzi di GPT-6 salgono. Sopra i 272K token di input, <a href=\"/research/gpt-6-pricing\">l'intera richiesta viene fatturata alle tariffe a contesto lungo</a>. Decidere quanto contesto mantiene un agente significa pesare quel prezzo contro dati di qualità che non esistono ancora.</p>\n\n<h2>Quali punteggi sul contesto lungo ha GPT-6 Sol?</h2>\n\n<p><strong>Un solo punteggio aggregato, intorno ai 100K token.</strong></p>\n\n<table>\n<thead><tr><th>Modello</th><th>AA-LCR v1.1</th><th>Posizione</th></tr></thead>\n<tbody>\n<tr><td>GPT-6 Sol (max)</td><td>84.0%</td><td>7</td></tr>\n<tr><td>GPT-5.6 Sol (max)</td><td>84.0%</td><td>7</td></tr>\n<tr><td>GPT-6 Astra</td><td>80.7%</td><td>27</td></tr>\n<tr><td>Kimi K3 (primo, 24 set 2026)</td><td>88.7%</td><td>1</td></tr>\n</tbody>\n</table>\n\n<p>AA-LCR è composto da 100 domande scritte a mano su set di documenti che in media contano 99.325 token. Le risposte vanno ricostruite unendo più passaggi, non trovandole in uno solo. Il test misura il ragionamento su un input lungo. Non mostra come cambia l'accuratezza al crescere dell'input, perché tutte le domande hanno più o meno la stessa lunghezza.</p>\n\n<h2>Quali numeri sul contesto lungo sono di GPT-5.6 Sol e non di GPT-6 Sol?</h2>\n\n<p><strong>I punteggi MRCR.</strong> La copertura del lancio di GPT-6 Astra lo confrontava con \"Sol\" sul test MRCR v2 a 8 needle di OpenAI. Quel Sol era GPT-5.6 Sol, come conferma anche l'analisi di Vellum.</p>\n\n<table>\n<thead><tr><th>MRCR v2, 8 needle</th><th>256K&ndash;512K</th><th>512K&ndash;1M</th></tr></thead>\n<tbody>\n<tr><td>GPT-6 Astra</td><td>100%</td><td>96.3%</td></tr>\n<tr><td>GPT-5.6 Sol</td><td>91.5%</td><td>73.8%</td></tr>\n<tr><td>GPT-6 Sol</td><td colspan=\"2\">non pubblicato</td></tr>\n</tbody>\n</table>\n\n<p>La recensione di GPT-6 Sol di OrcaRouter dice la stessa cosa: GPT-5.6 Sol ha un risultato pubblicato di recupero su contesto lungo, GPT-6 Sol non ha nulla di equivalente.</p>\n\n<h2>Dove abbiamo guardato?</h2>\n\n<p><strong>I posti dove sarebbe pubblicato, tutti verificati il 27 settembre 2026:</strong></p>\n\n<ul>\n<li><strong>Context Arena</strong>, la classifica MRCR. La sua lista di modelli e i risultati a 8 needle non hanno voci GPT-6. Le sue voci OpenAI più recenti sono GPT-5.6 Sol, Terra e Luna.</li>\n<li><strong>OpenAI</strong>: il post di lancio di GPT-6 e l'appendice della system card per Sol e Luna. Nessuno dei due riporta risultati di Sol per lunghezza del contesto.</li>\n<li><strong>Artificial Analysis</strong>: solo AA-LCR, come sopra.</li>\n<li><strong>Vals, Vellum, DataCamp, emergent.sh, llm-stats e OrcaRouter</strong>: nessun risultato di contesto lungo per lunghezza per GPT-6 Sol.</li>\n</ul>\n\n<h2>Cosa devono fare i team finché non esistono dati per lunghezza?</h2>\n\n<p><strong>Tieni le richieste a GPT-6 Sol sotto i 272K token di input e comprimi presto.</strong> La evidenza finora mostra GPT-6 Sol alla pari di GPT-5.6 Sol intorno ai 100K. GPT-5.6 Sol ha mantenuto il 91,5% fino a 512K su MRCR, ma è sceso al 73,8% oltre. È ragionevole aspettarsi che GPT-6 Sol sia utilizzabile fino a circa 250K, ma è una deduzione, non una misura. Oltre 272K paghi il doppio sull'input per una qualità che nessuno ha misurato.</p>\n\n<p>In Codex questo è già il default. Dà a GPT-6 Sol una finestra di 272K e <a href=\"/research/codex-auto-compact-gpt-6-sol\">comprime a 244.800 token</a>. Per i tuoi agenti, imposta un alert sulle richieste che superano 272K e tratta ogni aumento come qualcosa da testare. Esegui un tuo test di recupero sui tuoi documenti prima di affidarti a un contesto oltre 256K.</p>\n\n<p>Aggiorneremo questa pagina quando Context Arena o un altro valutatore indipendente pubblicherà risultati di GPT-6 Sol per lunghezza del contesto.</p>\n\n<h2>Fonti</h2>\n\n<ul>\n<li><a href=\"https://artificialanalysis.ai/models/comparisons/gpt-6-sol-vs-gpt-5-6-sol\">Artificial Analysis: GPT-6 Sol vs GPT-5.6 Sol</a></li>\n<li><a href=\"https://artificialanalysis.ai/articles/announcing-aa-lcr\">Artificial Analysis: annuncio di AA-LCR</a></li>\n<li><a href=\"https://benchlm.ai/benchmarks/lcr\">BenchLM: classifica AA-LCR</a></li>\n<li><a href=\"https://www.vellum.ai/blog/gpt-6-astra-benchmarks-explained\">Vellum: benchmark di GPT-6 Astra spiegati</a></li>\n<li><a href=\"https://www.orcarouter.ai/blog/gpt-6-sol-vs-gpt-5-6-sol\">OrcaRouter: GPT-6 Sol vs GPT-5.6 Sol</a></li>\n<li><a href=\"https://contextarena.ai\">Context Arena: classifica MRCR</a></li>\n</ul>\n"
+    },
+    "ko": {
+      "title": "GPT-6 Sol 장문 맥락 벤치마크: 측정된 내용",
+      "titleCore": "GPT-6 Sol 장문 맥락 벤치마크: 실제 측정 결과와 GPT-5.6 Sol 수치 구분",
+      "description": "GPT-6 Sol의 독립 장문 맥락 점수는 약 100K 토큰에서 AA-LCR 84%뿐이며 GPT-5.6 Sol과 같습니다. 널리 인용되는 MRCR 91.5%는 GPT-5.6 Sol의 수치입니다.",
+      "body": "<p><strong>2026년 9월 27일 기준으로 GPT-6 Sol의 독립 장문 맥락 점수는 하나뿐입니다. Artificial Analysis AA-LCR v1.1에서 받은 84%이며, GPT-5.6 Sol과 같습니다.</strong> 이 테스트 문서들의 평균 길이는 약 100K 토큰입니다. GPT-6 Sol이 256K, 512K, 1M 토큰에서 어떻게 동작하는지는 아직 아무도 발표하지 않았습니다. 온라인에서 보이는 &ldquo;Sol&rdquo; 장문 맥락 수치 대부분, 91.5% MRCR 점수를 포함해, 는 GPT-5.6 Sol의 것입니다. GPT-6 Sol은 9월 22일에 출시되었습니다.</p>\n\n<p>비용과 관련해 이것이 중요한 이유는 GPT-6 가격이 장문 맥락에서 크게 뛰기 때문입니다. 입력 토큰이 272K를 넘으면 <a href=\"/research/gpt-6-pricing\">요청 전체가 장문 맥락 요금으로 청구됩니다</a>. 에이전트가 얼마나 많은 맥락을 유지할지 정하려면, 이 가격과 아직 존재하지 않는 품질 데이터를 비교해야 합니다.</p>\n\n<h2>GPT-6 Sol의 장문 맥락 점수는 무엇인가요?</h2>\n\n<p><strong>약 100K 토큰에서 나온 종합 점수 하나입니다.</strong></p>\n\n<table>\n<thead><tr><th>모델</th><th>AA-LCR v1.1</th><th>순위</th></tr></thead>\n<tbody>\n<tr><td>GPT-6 Sol (max)</td><td>84.0%</td><td>7</td></tr>\n<tr><td>GPT-5.6 Sol (max)</td><td>84.0%</td><td>7</td></tr>\n<tr><td>GPT-6 Astra</td><td>80.7%</td><td>27</td></tr>\n<tr><td>Kimi K3 (선두, 2026년 9월 24일)</td><td>88.7%</td><td>1</td></tr>\n</tbody>\n</table>\n\n<p>AA-LCR은 평균 99,325 토큰 규모의 문서 묶음에 대해 사람이 직접 쓴 100개 질문으로 구성됩니다. 답은 한 구절에서 찾는 것이 아니라 여러 구절을 조합해 도출해야 합니다. 긴 입력에 대한 추론을 테스트하지만, 모든 질문의 길이가 비슷하기 때문에 입력이 길어질수록 정확도가 어떻게 변하는지는 보여 주지 않습니다.</p>\n\n<h2>어떤 장문 맥락 수치가 GPT-5.6 Sol의 것이고 GPT-6 Sol의 것이 아닌가요?</h2>\n\n<p><strong>MRCR 점수입니다.</strong> GPT-6 Astra 출시 보도는 OpenAI의 MRCR v2 8-needle 테스트에서 이를 &ldquo;Sol&rdquo;과 비교했습니다. 그 &ldquo;Sol&rdquo;은 GPT-5.6 Sol이었고, Vellum의 분석도 이를 확인합니다.</p>\n\n<table>\n<thead><tr><th>MRCR v2, 8-needle</th><th>256K&ndash;512K</th><th>512K&ndash;1M</th></tr></thead>\n<tbody>\n<tr><td>GPT-6 Astra</td><td>100%</td><td>96.3%</td></tr>\n<tr><td>GPT-5.6 Sol</td><td>91.5%</td><td>73.8%</td></tr>\n<tr><td>GPT-6 Sol</td><td colspan=\"2\">미발표</td></tr>\n</tbody>\n</table>\n\n<p>OrcaRouter의 GPT-6 Sol 리뷰도 같은 점을 지적합니다. GPT-5.6 Sol에는 장문 맥락 검색 결과가 공개되어 있지만, GPT-6 Sol에는 이에 상응하는 결과가 없습니다.</p>\n\n<h2>어디를 확인했나요?</h2>\n\n<p><strong>결과가 발표될 만한 곳을 모두 2026년 9월 27일에 확인했습니다.</strong></p>\n\n<ul>\n<li><strong>Context Arena</strong>, MRCR 리더보드. 모델 목록과 8-needle 결과에 GPT-6 항목이 없습니다. 가장 최근의 OpenAI 모델은 GPT-5.6 Sol, Terra, Luna입니다.</li>\n<li><strong>OpenAI</strong>: GPT-6 출시 글과 Sol 및 Luna의 시스템 카드 부록. 둘 다 컨텍스트 길이별 Sol 결과를 제시하지 않습니다.</li>\n<li><strong>Artificial Analysis</strong>: 위에서 언급한 AA-LCR만 있습니다.</li>\n<li><strong>Vals, Vellum, DataCamp, emergent.sh, llm-stats, OrcaRouter</strong>: GPT-6 Sol의 길이별 장문 맥락 결과는 없습니다.</li>\n</ul>\n\n<h2>길이별 데이터가 나오기 전까지 팀은 무엇을 해야 하나요?</h2>\n\n<p><strong>GPT-6 Sol 요청은 입력 272K 토큰 미만으로 유지하고 일찍 압축하세요.</strong> 지금까지의 근거는 GPT-6 Sol이 약 100K에서 GPT-5.6 Sol과 같다는 것을 보여 줍니다. GPT-5.6 Sol은 MRCR에서 512K까지 91.5%를 유지했지만 그 이후에는 73.8%로 떨어졌습니다. GPT-6 Sol도 약 250K까지는 쓸 만할 것이라고 기대하는 것은 합리적이지만, 이는 측정이 아니라 추론입니다. 272K를 넘으면 아무도 측정하지 않은 품질에 입력 비용을 두 배로 지불하게 됩니다.</p>\n\n<p>Codex에서는 이것이 이미 기본값입니다. GPT-6 Sol에 272K 창을 주고 <a href=\"/research/codex-auto-compact-gpt-6-sol\">244,800 토큰에서 압축합니다</a>. 자체 에이전트라면 272K를 넘는 요청에 알림을 설정하고, 늘리는 모든 변경은 테스트할 대상으로 다루세요. 256K를 넘는 맥락에 의존하기 전에 자신의 문서로 직접 검색 테스트를 실행하세요.</p>\n\n<p>Context Arena나 다른 독립 평가 기관이 GPT-6 Sol의 길이별 결과를 발표하면 이 페이지를 업데이트하겠습니다.</p>\n\n<h2>출처</h2>\n\n<ul>\n<li><a href=\"https://artificialanalysis.ai/models/comparisons/gpt-6-sol-vs-gpt-5-6-sol\">Artificial Analysis: GPT-6 Sol vs GPT-5.6 Sol</a></li>\n<li><a href=\"https://artificialanalysis.ai/articles/announcing-aa-lcr\">Artificial Analysis: AA-LCR 발표</a></li>\n<li><a href=\"https://benchlm.ai/benchmarks/lcr\">BenchLM: AA-LCR 리더보드</a></li>\n<li><a href=\"https://www.vellum.ai/blog/gpt-6-astra-benchmarks-explained\">Vellum: GPT-6 Astra 벤치마크 해설</a></li>\n<li><a href=\"https://www.orcarouter.ai/blog/gpt-6-sol-vs-gpt-5-6-sol\">OrcaRouter: GPT-6 Sol vs GPT-5.6 Sol</a></li>\n<li><a href=\"https://contextarena.ai\">Context Arena: MRCR 리더보드</a></li>\n</ul>\n",
+      "faq": [
+        {
+          "question": "GPT-6 Sol은 장문 맥락에서 얼마나 좋은가요?",
+          "answer": "최대 노력에서 Artificial Analysis AA-LCR v1.1 84%를 기록했습니다. GPT-5.6 Sol과 같고, GPT-6 Astra의 80.7%보다 높습니다. AA-LCR 문서의 평균은 약 100K 토큰이며, 2026년 9월 27일 기준으로 컨텍스트 길이별 GPT-6 Sol 결과를 공개한 곳은 없습니다."
+        },
+        {
+          "question": "MRCR 91.5% 점수는 GPT-6 Sol의 것인가요?",
+          "answer": "아닙니다. MRCR v2 8-needle에서 256K-512K 구간의 91.5%와 512K-1M 구간의 73.8%는 GPT-5.6 Sol의 점수입니다. GPT-6 Sol의 MRCR 결과는 아직 공개되지 않았고 Context Arena에도 추가되지 않았습니다."
+        },
+        {
+          "question": "GPT-6 Sol은 Context Arena MRCR 리더보드에 있나요?",
+          "answer": "2026년 9월 27일 기준으로는 없습니다. Context Arena의 모델 목록과 8-needle 결과에는 GPT-6 모델이 없습니다. 이곳의 가장 최근 OpenAI 항목은 GPT-5.6 Sol, Terra, Luna입니다."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/codex-auto-compact-gpt-6-sol",
+          "label": "GPT-6 Sol의 Codex 자동 압축: 실제 기본값"
+        },
+        {
+          "slug": "/research/gpt-6-sol-cost-model",
+          "label": "GPT-6 Sol 가격과 비용 모델"
+        },
+        {
+          "slug": "/research/gpt-6-pricing",
+          "label": "GPT-6 가격과 272K 장문 맥락 가격 상승"
+        }
+      ]
+    },
+    "nl": {
+      "title": "Long-contextbenchmarks van GPT-6 Sol: wat is gemeten",
+      "titleCore": "Long-contextbenchmarks van GPT-6 Sol: wat is daadwerkelijk gemeten, en wat is GPT-5.6 Sol",
+      "description": "De enige onafhankelijke long-contextscore van GPT-6 Sol is AA-LCR 84% bij ongeveer 100K tokens, gelijk aan GPT-5.6 Sol. De veelgeciteerde 91.5% MRCR is GPT-5.6 Sol.",
+      "faq": [
+        {
+          "question": "Hoe goed is GPT-6 Sol in lange context?",
+          "answer": "Het scoort 84% op Artificial Analysis AA-LCR v1.1 op max effort, hetzelfde als GPT-5.6 Sol en boven de 80.7% van GPT-6 Astra. AA-LCR-documenten zijn gemiddeld ongeveer 100K tokens, en per 27 september 2026 heeft niemand resultaten van GPT-6 Sol uitgesplitst naar contextlengte gepubliceerd."
+        },
+        {
+          "question": "Is de MRCR-score van 91.5% voor GPT-6 Sol?",
+          "answer": "Nee. 91.5% bij 256K-512K en 73.8% bij 512K-1M op MRCR v2 8-needle zijn de scores van GPT-5.6 Sol. GPT-6 Sol heeft nog geen gepubliceerd MRCR-resultaat, en Context Arena heeft het niet toegevoegd."
+        },
+        {
+          "question": "Staat GPT-6 Sol op het MRCR-leaderboard van Context Arena?",
+          "answer": "Niet per 27 september 2026. De modellijst en 8-needle-resultaten van Context Arena bevatten geen GPT-6-modellen. De nieuwste OpenAI-items zijn GPT-5.6 Sol, Terra en Luna."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/codex-auto-compact-gpt-6-sol",
+          "label": "Auto-compact van Codex op GPT-6 Sol: de echte standaardwaarden"
+        },
+        {
+          "slug": "/research/gpt-6-sol-cost-model",
+          "label": "Prijzen en kostenmodel GPT-6 Sol"
+        },
+        {
+          "slug": "/research/gpt-6-pricing",
+          "label": "GPT-6-prijzen en de prijssprong bij 272K lange context"
+        }
+      ],
+      "body": "<p><strong>Per 27 september 2026 heeft GPT-6 Sol precies één onafhankelijke long-contextscore: 84% op Artificial Analysis AA-LCR v1.1, gelijk aan GPT-5.6 Sol.</strong> De documenten van de test zijn gemiddeld ongeveer 100K tokens. Niemand heeft nog gepubliceerd hoe GPT-6 Sol presteert bij 256K, 512K of 1M tokens. De meeste long-contextcijfers van &ldquo;Sol&rdquo; die online staan, waaronder de MRCR-score van 91.5%, gelden voor GPT-5.6 Sol. GPT-6 Sol kwam uit op 22 september.</p>\n\n<p>Dit telt voor de kosten, omdat de GPT-6-prijzen bij lange context een sprong maken. Boven 272K input-tokens wordt het <a href=\"/research/gpt-6-pricing\">hele request tegen lange-contexttarieven gefactureerd</a>. Bepalen hoeveel context een agent bewaart, betekent die prijs afwegen tegen kwaliteitsdata die nog niet bestaat.</p>\n\n<h2>Welke long-contextscores heeft GPT-6 Sol?</h2>\n\n<p><strong>Eén totaalscore, bij ongeveer 100K tokens.</strong></p>\n\n<table>\n<thead><tr><th>Model</th><th>AA-LCR v1.1</th><th>Rang</th></tr></thead>\n<tbody>\n<tr><td>GPT-6 Sol (max)</td><td>84.0%</td><td>7</td></tr>\n<tr><td>GPT-5.6 Sol (max)</td><td>84.0%</td><td>7</td></tr>\n<tr><td>GPT-6 Astra</td><td>80.7%</td><td>27</td></tr>\n<tr><td>Kimi K3 (koploper, 24 sep 2026)</td><td>88.7%</td><td>1</td></tr>\n</tbody>\n</table>\n\n<p>AA-LCR heeft 100 met de hand geschreven vragen over documentsets die gemiddeld 99,325 tokens tellen. De antwoorden moeten uit meerdere passages worden samengesteld in plaats van op één plek te worden gevonden. Het test redeneren over een lange input. Het laat niet zien hoe de nauwkeurigheid verandert naarmate de input groeit, omdat elke vraag ongeveer even lang is.</p>\n\n<h2>Welke long-contextcijfers zijn GPT-5.6 Sol, niet GPT-6 Sol?</h2>\n\n<p><strong>De MRCR-scores.</strong> In de berichtgeving bij de lancering van GPT-6 Astra werd het vergeleken met &ldquo;Sol&rdquo; op de MRCR v2 8-needle-test van OpenAI. Die Sol was GPT-5.6 Sol, en het artikel van Vellum bevestigt dat.</p>\n\n<table>\n<thead><tr><th>MRCR v2, 8-needle</th><th>256K&ndash;512K</th><th>512K&ndash;1M</th></tr></thead>\n<tbody>\n<tr><td>GPT-6 Astra</td><td>100%</td><td>96.3%</td></tr>\n<tr><td>GPT-5.6 Sol</td><td>91.5%</td><td>73.8%</td></tr>\n<tr><td>GPT-6 Sol</td><td colspan=\"2\">niet gepubliceerd</td></tr>\n</tbody>\n</table>\n\n<p>De review van GPT-6 Sol door OrcaRouter maakt hetzelfde punt: GPT-5.6 Sol heeft een gepubliceerd long-contextretrievalresultaat, en GPT-6 Sol heeft niets vergelijkbaars.</p>\n\n<h2>Waar hebben we gekeken?</h2>\n\n<p><strong>De plekken waar het zou worden gepubliceerd, allemaal gecontroleerd op 27 september 2026:</strong></p>\n\n<ul>\n<li><strong>Context Arena</strong>, het MRCR-leaderboard. De modellijst en 8-needle-resultaten bevatten geen GPT-6-items. De nieuwste OpenAI-modellen zijn GPT-5.6 Sol, Terra en Luna.</li>\n<li><strong>OpenAI</strong>: de lanceringspost van GPT-6 en de bijlage bij de systeemkaart voor Sol en Luna. Geen van beide geeft Sol-resultaten per contextlengte.</li>\n<li><strong>Artificial Analysis</strong>: alleen AA-LCR, zoals hierboven.</li>\n<li><strong>Vals, Vellum, DataCamp, emergent.sh, llm-stats en OrcaRouter</strong>: geen long-contextresultaten per lengte voor GPT-6 Sol.</li>\n</ul>\n\n<h2>Wat moeten teams doen zolang er geen data per lengte is?</h2>\n\n<p><strong>Houd GPT-6 Sol-requests onder 272K input-tokens en compacteer vroeg.</strong> Het bewijs tot nu toe laat zien dat GPT-6 Sol bij ongeveer 100K gelijk presteert aan GPT-5.6 Sol. GPT-5.6 Sol hield 91.5% vast tot 512K op MRCR, maar zakte daarboven naar 73.8%. Het is redelijk te verwachten dat GPT-6 Sol bruikbaar is tot ongeveer 250K, maar dat is een gevolgtrekking, geen meting. Boven 272K betaal je dubbel voor input voor een kwaliteit die niemand heeft gemeten.</p>\n\n<p>In Codex is dit al de standaard. Het geeft GPT-6 Sol een venster van 272K en <a href=\"/research/codex-auto-compact-gpt-6-sol\">compacteert bij 244,800 tokens</a>. Stel voor je eigen agents een alert in op requests die 272K passeren en behandel elke verhoging als iets om te testen. Voer je eigen retrievalcontrole uit op je eigen documenten voordat je op context voorbij 256K vertrouwt.</p>\n\n<p>We werken deze pagina bij zodra Context Arena of een andere onafhankelijke evaluator resultaten van GPT-6 Sol per contextlengte publiceert.</p>\n\n<h2>Bronnen</h2>\n\n<ul>\n<li><a href=\"https://artificialanalysis.ai/models/comparisons/gpt-6-sol-vs-gpt-5-6-sol\">Artificial Analysis: GPT-6 Sol vs GPT-5.6 Sol</a></li>\n<li><a href=\"https://artificialanalysis.ai/articles/announcing-aa-lcr\">Artificial Analysis: announcing AA-LCR</a></li>\n<li><a href=\"https://benchlm.ai/benchmarks/lcr\">BenchLM: AA-LCR leaderboard</a></li>\n<li><a href=\"https://www.vellum.ai/blog/gpt-6-astra-benchmarks-explained\">Vellum: GPT-6 Astra benchmarks explained</a></li>\n<li><a href=\"https://www.orcarouter.ai/blog/gpt-6-sol-vs-gpt-5-6-sol\">OrcaRouter: GPT-6 Sol vs GPT-5.6 Sol</a></li>\n<li><a href=\"https://contextarena.ai\">Context Arena: MRCR leaderboard</a></li>\n</ul>\n"
+    },
+    "zh": {
+      "title": "GPT-6 Sol 长上下文基准：实际测过什么",
+      "titleCore": "GPT-6 Sol 长上下文基准：已测量的内容，以及哪些数字属于 GPT-5.6 Sol",
+      "description": "GPT-6 Sol 唯一的独立长上下文得分是约 100K token 下的 AA-LCR 84%，与 GPT-5.6 Sol 持平。广泛引用的 91.5% MRCR 属于 GPT-5.6 Sol。",
+      "faq": [
+        {
+          "question": "GPT-6 Sol 的长上下文能力如何？",
+          "answer": "在 Artificial Analysis AA-LCR v1.1 上，它在 max 强度下得分 84%，与 GPT-5.6 Sol 相同，高于 GPT-6 Astra 的 80.7%。AA-LCR 的文档平均约为 100K token；截至 2026 年 9 月 27 日，尚无人发布按上下文长度细分的 GPT-6 Sol 结果。"
+        },
+        {
+          "question": "91.5% 的 MRCR 分数是 GPT-6 Sol 的吗？",
+          "answer": "不是。MRCR v2 8-needle 上 256K 至 512K 的 91.5% 和 512K 至 1M 的 73.8%，是 GPT-5.6 Sol 的得分。GPT-6 Sol 尚无已发布的 MRCR 结果，Context Arena 也未添加它。"
+        },
+        {
+          "question": "GPT-6 Sol 在 Context Arena 的 MRCR 排行榜上吗？",
+          "answer": "截至 2026 年 9 月 27 日，不在。Context Arena 的模型列表和 8-needle 结果中没有任何 GPT-6 模型。其最新的 OpenAI 条目是 GPT-5.6 Sol、Terra 和 Luna。"
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/codex-auto-compact-gpt-6-sol",
+          "label": "GPT-6 Sol 上的 Codex 自动压缩：真实默认值"
+        },
+        {
+          "slug": "/research/gpt-6-sol-cost-model",
+          "label": "GPT-6 Sol 定价与成本模型"
+        },
+        {
+          "slug": "/research/gpt-6-pricing",
+          "label": "GPT-6 定价与 272K 长上下文价格跳升"
+        }
+      ],
+      "body": "<p><strong>截至 2026 年 9 月 27 日，GPT-6 Sol 只有一个独立的长上下文得分：Artificial Analysis AA-LCR v1.1 上的 84%，与 GPT-5.6 Sol 持平。</strong>该测试的文档平均约为 100K token。目前还没有人公布 GPT-6 Sol 在 256K、512K 或 1M token 下的表现。网上大多数关于 “Sol” 的长上下文数字，包括 91.5% 的 MRCR 分数，实际上都是 GPT-5.6 Sol 的。GPT-6 Sol 于 9 月 22 日发布。</p>\n\n<p>这对成本很重要，因为长上下文正是 GPT-6 价格跳升的地方。输入超过 272K token 后，<a href=\"/research/gpt-6-pricing\">整个请求都按长上下文价格计费</a>。决定智能体保留多少上下文，需要在这一价格与尚不存在的质量数据之间权衡。</p>\n\n<h2>GPT-6 Sol 有哪些长上下文得分？</h2>\n\n<p><strong>只有一个综合得分，对应约 100K token。</strong></p>\n\n<table>\n<thead><tr><th>模型</th><th>AA-LCR v1.1</th><th>排名</th></tr></thead>\n<tbody>\n<tr><td>GPT-6 Sol（max）</td><td>84.0%</td><td>7</td></tr>\n<tr><td>GPT-5.6 Sol（max）</td><td>84.0%</td><td>7</td></tr>\n<tr><td>GPT-6 Astra</td><td>80.7%</td><td>27</td></tr>\n<tr><td>Kimi K3（领先者，2026 年 9 月 24 日）</td><td>88.7%</td><td>1</td></tr>\n</tbody>\n</table>\n\n<p>AA-LCR 包含 100 道人工撰写的问题，文档集平均为 99,325 token。答案需要综合多个段落，而不是从单一段落中找到。它测试的是对长输入的推理能力。它无法显示准确率如何随输入增长而变化，因为每道题涉及的长度基本相同。</p>\n\n<h2>哪些长上下文数字属于 GPT-5.6 Sol，而非 GPT-6 Sol？</h2>\n\n<p><strong>MRCR 分数。</strong>GPT-6 Astra 的发布报道在 OpenAI 的 MRCR v2 8-needle 测试中，将其与 “Sol” 进行了比较。那里的 Sol 指的是 GPT-5.6 Sol，Vellum 的文章也证实了这一点。</p>\n\n<table>\n<thead><tr><th>MRCR v2，8-needle</th><th>256K&ndash;512K</th><th>512K&ndash;1M</th></tr></thead>\n<tbody>\n<tr><td>GPT-6 Astra</td><td>100%</td><td>96.3%</td></tr>\n<tr><td>GPT-5.6 Sol</td><td>91.5%</td><td>73.8%</td></tr>\n<tr><td>GPT-6 Sol</td><td colspan=\"2\">未发布</td></tr>\n</tbody>\n</table>\n\n<p>OrcaRouter 对 GPT-6 Sol 的评测也得出同样的结论：GPT-5.6 Sol 有已发布的长上下文检索结果，而 GPT-6 Sol 没有对应的数据。</p>\n\n<h2>我们查过哪些地方？</h2>\n\n<p><strong>以下都是可能发布此类数据的地方，均于 2026 年 9 月 27 日查询：</strong></p>\n\n<ul>\n<li><strong>Context Arena</strong>，MRCR 排行榜。其模型列表和 8-needle 结果中没有 GPT-6 条目。其最新的 OpenAI 模型是 GPT-5.6 Sol、Terra 和 Luna。</li>\n<li><strong>OpenAI</strong>：GPT-6 发布文章，以及 Sol 和 Luna 的系统卡附录。两者都没有按上下文长度给出 Sol 的结果。</li>\n<li><strong>Artificial Analysis</strong>：仅有上文提到的 AA-LCR。</li>\n<li><strong>Vals、Vellum、DataCamp、emergent.sh、llm-stats 和 OrcaRouter</strong>：没有 GPT-6 Sol 按长度划分的长上下文结果。</li>\n</ul>\n\n<h2>在按长度划分的数据出现之前，团队应该怎么做？</h2>\n\n<p><strong>将 GPT-6 Sol 请求的输入控制在 272K token 以内，并尽早压缩上下文。</strong>现有证据显示，GPT-6 Sol 在约 100K token 时与 GPT-5.6 Sol 相当。GPT-5.6 Sol 在 MRCR 上可保持到 512K token 时的 91.5%，超过之后降到 73.8%。可以合理预期 GPT-6 Sol 在约 250K token 以内可用，但这只是推断，并非实测。超过 272K 时，你是在为一份无人测量过的质量支付双倍的输入费用。</p>\n\n<p>在 Codex 中，这已经是默认设置。它为 GPT-6 Sol 提供 272K 的窗口，并<a href=\"/research/codex-auto-compact-gpt-6-sol\">在 244,800 token 时压缩</a>。对于你自己的智能体，应对超过 272K 的请求设置告警，并把任何增长都视为需要测试的变化。在依赖 256K 以上的上下文之前，请先用你自己的文档运行一次检索检查。</p>\n\n<p>当 Context Arena 或其他独立评测机构发布按上下文长度划分的 GPT-6 Sol 结果时，我们会更新本页。</p>\n\n<h2>来源</h2>\n\n<ul>\n<li><a href=\"https://artificialanalysis.ai/models/comparisons/gpt-6-sol-vs-gpt-5-6-sol\">Artificial Analysis：GPT-6 Sol 对比 GPT-5.6 Sol</a></li>\n<li><a href=\"https://artificialanalysis.ai/articles/announcing-aa-lcr\">Artificial Analysis：AA-LCR 发布公告</a></li>\n<li><a href=\"https://benchlm.ai/benchmarks/lcr\">BenchLM：AA-LCR 排行榜</a></li>\n<li><a href=\"https://www.vellum.ai/blog/gpt-6-astra-benchmarks-explained\">Vellum：GPT-6 Astra 基准详解</a></li>\n<li><a href=\"https://www.orcarouter.ai/blog/gpt-6-sol-vs-gpt-5-6-sol\">OrcaRouter：GPT-6 Sol 对比 GPT-5.6 Sol</a></li>\n<li><a href=\"https://contextarena.ai\">Context Arena：MRCR 排行榜</a></li>\n</ul>\n"
     }
   }
 }

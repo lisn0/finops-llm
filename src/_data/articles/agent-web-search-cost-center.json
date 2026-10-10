@@ -16,7 +16,7 @@
       "title": "Web search is becoming an agent cost center",
       "titleCore": "Web search is becoming an agent cost center",
       "description": "Agent web search is useful, but each search adds a metered cost beside model tokens. Budget queries, cache results, and measure search cost per successful task.",
-      "body": "<p>Agents are moving from static knowledge to live web research, and that changes the cost model. A single user request can now trigger several searches, a model call to interpret each result, tool retries, and a final synthesis. The search layer is no longer invisible infrastructure; it is a separately metered part of the task.</p><p>Amazon Bedrock AgentCore, for example, documents Web Search as a usage-priced capability at $7 per 1,000 queries. The exact price will vary by provider and product, but the FinOps lesson is universal: count tool calls as billable work alongside input and output tokens. See the <a href=&quot;https://aws.amazon.com/blogs/aws/announcing-web-search-on-amazon-bedrock-agentcore-ground-your-ai-agents-in-current-accurate-web-knowledge/&quot;>AWS announcement</a> for the current example.</p><h2>One prompt can become many searches</h2><p>Search amplification comes from planning. An agent may rewrite a question, search several sources, follow a result, retry a timeout, and search again after finding conflicting evidence. If the application reports only the user's original prompt, finance sees a low-volume feature while the provider sees a high-volume tool workload.</p><p>Record the parent task ID, search provider, query count, result fetches, retry count, and whether the result changed the final answer. Then calculate search cost per successful task. A search that never contributes to a useful answer is a candidate for a policy change, not just a line item to accept.</p><h2>Control the search budget</h2><ul><li>Set a maximum search-query budget per task and per user tier.</li><li>Use a cheaper first pass for discovery, then reserve deep research for high-value tasks.</li><li>Cache stable queries and normalize harmless wording differences.</li><li>Stop after the evidence threshold is met instead of letting the planner keep exploring.</li><li>Make retries exponential and cap them independently from model retries.</li></ul><h2>Measure freshness against spend</h2><p>Freshness is valuable only when it changes the decision. Compare answer quality and task success across search depths: no search, one search, and bounded multi-search. Some workflows need current information; others are paying for repeated retrieval of facts that change slowly.</p><p>Report three numbers together: model cost, search cost, and cost per successful task. This prevents a cheaper model from looking efficient when it is compensating with a large number of paid searches. It also gives product teams a defensible way to decide when live web grounding is worth the premium.</p><h2>Related</h2><ul><li><a href=&quot;/research/mcp-server-cost-impact&quot;>MCP server cost impact</a></li><li><a href=&quot;/research/agent-total-cost-of-ownership&quot;>Agent total cost of ownership</a></li><li><a href=&quot;/research/cost-per-successful-task&quot;>Cost per successful task</a></li></ul>",
+      "body": "<p>Agents are moving from static knowledge to live web research, and that changes the cost model. A single user request can now trigger several searches, a model call to interpret each result, tool retries, and a final synthesis. The search layer is no longer invisible infrastructure; it is a separately metered part of the task.</p><p>Amazon Bedrock AgentCore, for example, documents Web Search as a usage-priced capability at $7 per 1,000 queries. The exact price will vary by provider and product, but the FinOps lesson is universal: count tool calls as billable work alongside input and output tokens. See the <a href=\"https://aws.amazon.com/blogs/aws/announcing-web-search-on-amazon-bedrock-agentcore-ground-your-ai-agents-in-current-accurate-web-knowledge/\">AWS announcement</a> for the current example.</p><h2>One prompt can become many searches</h2><p>Search amplification comes from planning. An agent may rewrite a question, search several sources, follow a result, retry a timeout, and search again after finding conflicting evidence. If the application reports only the user's original prompt, finance sees a low-volume feature while the provider sees a high-volume tool workload.</p><p>Record the parent task ID, search provider, query count, result fetches, retry count, and whether the result changed the final answer. Then calculate search cost per successful task. A search that never contributes to a useful answer is a candidate for a policy change, not just a line item to accept.</p><h2>Control the search budget</h2><ul><li>Set a maximum search-query budget per task and per user tier.</li><li>Use a cheaper first pass for discovery, then reserve deep research for high-value tasks.</li><li>Cache stable queries and normalize harmless wording differences.</li><li>Stop after the evidence threshold is met instead of letting the planner keep exploring.</li><li>Make retries exponential and cap them independently from model retries.</li></ul><h2>Measure freshness against spend</h2><p>Freshness is valuable only when it changes the decision. Compare answer quality and task success across search depths: no search, one search, and bounded multi-search. Some workflows need current information; others are paying for repeated retrieval of facts that change slowly.</p><p>Report three numbers together: model cost, search cost, and cost per successful task. This prevents a cheaper model from looking efficient when it is compensating with a large number of paid searches. It also gives product teams a defensible way to decide when live web grounding is worth the premium.</p><h2>Related</h2><ul><li><a href=\"/research/mcp-server-cost-impact\">MCP server cost impact</a></li><li><a href=\"/research/agent-total-cost-of-ownership\">Agent total cost of ownership</a></li><li><a href=\"/research/cost-per-successful-task\">Cost per successful task</a></li></ul>",
       "faq": [
         {
           "question": "Why is web search a new agent cost center?",
@@ -279,6 +279,176 @@
         {
           "slug": "/research/cost-per-successful-task",
           "label": "按成功任务核算成本"
+        }
+      ]
+    },
+    "id": {
+      "title": "Pencarian web menjadi pusat biaya agen",
+      "titleCore": "Pencarian web menjadi pusat biaya agen",
+      "description": "Pencarian web agen berguna, tetapi setiap pencarian menambah biaya terukur di luar token model. Batasi kueri, cache hasil, dan ukur biaya per tugas berhasil.",
+      "body": "<p>Agen bergerak dari pengetahuan statis ke riset web langsung, dan itu mengubah model biayanya. Satu permintaan pengguna kini bisa memicu beberapa pencarian, satu panggilan model untuk menafsirkan setiap hasil, percobaan ulang tool, dan sintesis akhir. Lapisan pencarian tidak lagi menjadi infrastruktur yang tak terlihat; ia adalah bagian tugas yang diukur dan ditagih secara terpisah.</p><p>Amazon Bedrock AgentCore, misalnya, mendokumentasikan Web Search sebagai kapabilitas berbasis penggunaan dengan harga $7 per 1.000 kueri. Harga pastinya bervariasi menurut penyedia dan produk, tetapi pelajaran FinOps-nya berlaku umum: hitung pemanggilan tool sebagai pekerjaan yang dapat ditagih, bersama token input dan output. Lihat <a href=\"https://aws.amazon.com/blogs/aws/announcing-web-search-on-amazon-bedrock-agentcore-ground-your-ai-agents-in-current-accurate-web-knowledge/\">pengumuman AWS</a> untuk contoh terkini.</p><h2>Satu prompt bisa menjadi banyak pencarian</h2><p>Amplifikasi pencarian berasal dari perencanaan. Agen dapat menulis ulang pertanyaan, mencari di banyak sumber, mengikuti satu hasil, mencoba ulang saat timeout, dan mencari lagi setelah menemukan bukti yang saling bertentangan. Jika aplikasi hanya mencatat prompt asli pengguna, tim keuangan melihat fitur dengan volume rendah, sementara penyedia melihat beban tool yang bervolume tinggi.</p><p>Catat ID tugas induk, penyedia pencarian, jumlah kueri, jumlah pengambilan hasil, jumlah percobaan ulang, dan apakah hasil mengubah jawaban akhir. Lalu hitung biaya pencarian per tugas berhasil. Pencarian yang tidak pernah berkontribusi pada jawaban yang berguna adalah kandidat untuk perubahan kebijakan, bukan sekadar baris biaya yang diterima begitu saja.</p><h2>Kendalikan anggaran pencarian</h2><ul><li>Tetapkan batas maksimum kueri pencarian per tugas dan per tingkat pengguna.</li><li>Gunakan laluan pertama yang lebih murah untuk penemuan, lalu sisihkan riset mendalam untuk tugas bernilai tinggi.</li><li>Cache kueri yang stabil dan normalkan perbedaan kata yang tidak berarti.</li><li>Berhenti setelah ambang bukti terpenuhi, alih-alih membiarkan perencana terus menjelajah.</li><li>Buat percobaan ulang eksponensial dan batasi secara terpisah dari percobaan ulang model.</li></ul><h2>Ukur kesegaran data terhadap pengeluaran</h2><p>Kesegaran data bernilai hanya jika mengubah keputusan. Bandingkan kualitas jawaban dan keberhasilan tugas pada kedalaman pencarian yang berbeda: tanpa pencarian, satu pencarian, dan pencarian berganda yang dibatasi. Sebagian alur kerja memang membutuhkan informasi terkini; yang lain membayar pengambilan berulang untuk fakta yang berubah pelan.</p><p>Laporkan tiga angka bersama: biaya model, biaya pencarian, dan biaya per tugas berhasil. Ini mencegah model yang lebih murah tampak efisien padahal ia mengimbangi dengan jumlah pencarian berbayar yang besar. Ini juga memberi tim produk cara yang dapat dipertanggungjawabkan untuk memutuskan kapan grounding web langsung sepadan dengan premi biayanya.</p><h2>Terkait</h2><ul><li><a href=\"/research/mcp-server-cost-impact\">Dampak biaya server MCP</a></li><li><a href=\"/research/agent-total-cost-of-ownership\">Total biaya kepemilikan agen</a></li><li><a href=\"/research/cost-per-successful-task\">Biaya per tugas berhasil</a></li></ul>",
+      "faq": [
+        {
+          "question": "Mengapa pencarian web menjadi pusat biaya baru untuk agen?",
+          "answer": "Agen dapat mengeluarkan banyak pencarian, mengambil hasilnya, mencoba ulang panggilan yang gagal, lalu melakukan pemanggilan model tambahan untuk menafsirkannya. Pencarian ditagih terpisah di beberapa platform, sehingga harus dihitung di samping pengeluaran token."
+        },
+        {
+          "question": "Bagaimana biaya agen untuk pencarian web sebaiknya diukur?",
+          "answer": "Kaitkan setiap kueri dengan ID tugas induk dan catat penyedia, jumlah kueri, percobaan ulang, serta apakah hasilnya mengubah jawaban. Laporkan biaya pencarian dan biaya model bersama sebagai biaya per tugas berhasil."
+        },
+        {
+          "question": "Bagaimana tim bisa menekan pengeluaran pencarian web agen?",
+          "answer": "Tetapkan anggaran kueri, cache pencarian yang stabil, gunakan kedalaman pencarian yang dibatasi, berhenti saat ambang bukti terpenuhi, dan terapkan batas percobaan ulang secara terpisah dari kebijakan percobaan ulang panggilan model."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/mcp-server-cost-impact",
+          "label": "Dampak biaya server MCP"
+        },
+        {
+          "slug": "/research/agent-total-cost-of-ownership",
+          "label": "Total biaya kepemilikan agen"
+        },
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "Biaya per tugas berhasil"
+        }
+      ]
+    },
+    "pl": {
+      "title": "Wyszukiwanie w sieci staje się kosztem agentów AI",
+      "titleCore": "Wyszukiwanie w sieci jako centrum kosztów agentów",
+      "description": "Wyszukiwanie przez agentów jest użyteczne, ale każde zapytanie kosztuje obok tokenów modelu. Ustal budżet, cachuj wyniki i mierz koszt udanego zadania.",
+      "body": "<p>Agenci przechodzą od statycznej wiedzy do badania sieci na żywo, a to zmienia model kosztów. Pojedyncze zapytanie użytkownika może teraz uruchomić kilka wyszukiwań, wywołanie modelu do interpretacji każdego wyniku, ponowienia po błędach narzędzi i końcową syntezę. Warstwa wyszukiwania nie jest już niewidoczną infrastrukturą; to osobno rozliczana część zadania.</p><p>Amazon Bedrock AgentCore, na przykład, dokumentuje Web Search jako możliwość rozliczaną za użycie, po 7 dolarów za 1000 zapytań. Dokładna cena zależy od dostawcy i produktu, ale lekcja dla FinOps jest uniwersalna: wywołania narzędzi należy liczyć jako płatną pracę obok tokenów wejścia i wyjścia. Aktualny przykład znajdziesz w <a href=\"https://aws.amazon.com/blogs/aws/announcing-web-search-on-amazon-bedrock-agentcore-ground-your-ai-agents-in-current-accurate-web-knowledge/\">ogłoszeniu AWS</a>.</p><h2>Jedno zapytanie może zamienić się w wiele wyszukiwań</h2><p>Wzmocnienie liczby wyszukiwań bierze się z planowania. Agent może przeformułować pytanie, przeszukać kilka źródeł, podążyć za wynikiem, ponowić próbę po przekroczeniu limitu czasu i szukać ponownie po znalezieniu sprzecznych dowodów. Jeśli aplikacja raportuje tylko pierwotny prompt użytkownika, finanse widzą funkcję o niskim wolumenie, podczas gdy dostawca widzi duże obciążenie narzędziami.</p><p>Zapisuj identyfikator zadania nadrzędnego, dostawcę wyszukiwania, liczbę zapytań, pobrania wyników, liczbę ponowień oraz to, czy wynik zmienił końcową odpowiedź. Następnie oblicz koszt wyszukiwania na udane zadanie. Wyszukiwanie, które nigdy nie przyczynia się do użytecznej odpowiedzi, jest kandydatem do zmiany polityki, a nie tylko pozycją, którą można zaakceptować.</p><h2>Kontroluj budżet wyszukiwania</h2><ul><li>Ustaw maksymalny budżet zapytań na zadanie i na poziom użytkownika.</li><li>Użyj tańszego pierwszego przebiegu do odkrywania, a głębokie badania zarezerwuj dla zadań o wysokiej wartości.</li><li>Cachuj stabilne zapytania i normalizuj nieszkodliwe różnice w sformułowaniu.</li><li>Zatrzymuj się, gdy osiągnięty zostanie próg dowodów, zamiast pozwalać planerowi dalej eksplorować.</li><li>Stosuj wykładnicze opóźnienia ponowień i ogranicz je niezależnie od ponowień wywołań modelu.</li></ul><h2>Mierz świeżość w relacji do wydatków</h2><p>Świeżość ma wartość tylko wtedy, gdy zmienia decyzję. Porównuj jakość odpowiedzi i sukces zadań przy różnych głębokościach wyszukiwania: bez wyszukiwania, z jednym wyszukiwaniem i z ograniczonym wieloma wyszukiwaniami. Niektóre procesy wymagają aktualnych informacji; inne płacą za wielokrotne pobieranie faktów, które zmieniają się powoli.</p><p>Raportuj razem trzy liczby: koszt modelu, koszt wyszukiwania i koszt na udane zadanie. Dzięki temu tańszy model nie będzie wyglądał na efektywny, gdy rekompensuje to dużą liczbą płatnych wyszukiwań. Zespoły produktowe dostają też uzasadniony sposób na decyzję, kiedy połączenie z siecią na żywo jest warte dopłaty.</p><h2>Powiązane</h2><ul><li><a href=\"/research/mcp-server-cost-impact\">Wpływ kosztów serwerów MCP</a></li><li><a href=\"/research/agent-total-cost-of-ownership\">Całkowity koszt posiadania agenta</a></li><li><a href=\"/research/cost-per-successful-task\">Koszt na udane zadanie</a></li></ul>",
+      "faq": [
+        {
+          "question": "Dlaczego wyszukiwanie w sieci jest nowym centrum kosztów agenta?",
+          "answer": "Agent może wykonać wiele wyszukiwań, pobrać wyniki, ponowić nieudane wywołania, a następnie wykonać kolejne wywołania modelu, by je zinterpretować. Na niektórych platformach wyszukiwanie jest rozliczane osobno, więc trzeba je liczyć obok zużycia tokenów."
+        },
+        {
+          "question": "Jak mierzyć koszty wyszukiwania w sieci przez agentów?",
+          "answer": "Przypisz każde zapytanie do identyfikatora zadania nadrzędnego i zapisuj dostawcę, liczbę zapytań, ponowienia oraz to, czy wynik zmienił odpowiedź. Raportuj koszt wyszukiwania i koszt modelu razem jako koszt na udane zadanie."
+        },
+        {
+          "question": "Jak zespoły mogą ograniczyć wydatki agentów na wyszukiwanie w sieci?",
+          "answer": "Ustawiaj budżety zapytań, cachuj stabilne wyszukiwania, stosuj ograniczoną głębokość wyszukiwania, zatrzymuj się po osiągnięciu progu dowodów i stosuj limity ponowień niezależnie od polityki ponowień wywołań modelu."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/mcp-server-cost-impact",
+          "label": "Wpływ kosztów serwerów MCP"
+        },
+        {
+          "slug": "/research/agent-total-cost-of-ownership",
+          "label": "Całkowity koszt posiadania agenta"
+        },
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "Koszt na udane zadanie"
+        }
+      ]
+    },
+    "ru": {
+      "title": "Веб-поиск становится статьёй расходов агентов",
+      "titleCore": "Веб-поиск как статья расходов агентов",
+      "description": "Поиск агента полезен, но каждый запрос стоит денег помимо токенов модели. Ставьте лимиты, кэшируйте результаты и считайте стоимость на успешную задачу.",
+      "body": "<p>Агенты переходят от статичных знаний к живому веб-исследованию, и модель стоимости меняется. Один запрос пользователя теперь может запустить несколько поисков, вызов модели для разбора каждого результата, повторы при сбоях инструмента и финальный синтез. Слой поиска больше не невидимая инфраструктура: это отдельно тарифицируемая часть задачи.</p><p>Например, Amazon Bedrock AgentCore описывает веб-поиск как возможность с оплатой за использование: $7 за 1,000 запросов. Цена зависит от провайдера и продукта, но урок FinOps универсален: вызовы инструментов считаются оплачиваемой работой наравне с входными и выходными токенами. Актуальный пример см. в <a href=\"https://aws.amazon.com/blogs/aws/announcing-web-search-on-amazon-bedrock-agentcore-ground-your-ai-agents-in-current-accurate-web-knowledge/\">объявлении AWS</a>.</p><h2>Один запрос может стать множеством поисков</h2><p>Усиление поиска идёт от планирования. Агент может переформулировать вопрос, искать по нескольким источникам, пройти по ссылке, повторить запрос после таймаута и искать снова, найдя противоречивые данные. Если приложение фиксирует только исходный запрос пользователя, финансы видят функцию с низкой нагрузкой, а провайдер получает большую нагрузку от вызовов инструментов.</p><p>Записывайте ID родительской задачи, провайдера поиска, число запросов, число загруженных результатов, число повторов и то, изменил ли результат итоговый ответ. Затем считайте стоимость поиска на успешную задачу. Поиск, который ни разу не помог полезному ответу, — кандидат на изменение политики, а не просто статья расходов, которую нужно принять.</p><h2>Контролируйте бюджет поиска</h2><ul><li>Задавайте максимальное число поисковых запросов на задачу и на тариф пользователя.</li><li>Для первичного обнаружения используйте более дешёвый проход, а глубокое исследование оставляйте для задач высокой ценности.</li><li>Кэшируйте стабильные запросы и нормализуйте безобидные различия в формулировках.</li><li>Останавливайтесь, когда достигнут порог доказательств, а не давайте планировщику исследовать бесконечно.</li><li>Делайте повторы с экспоненциальной задержкой и ограничивайте их отдельно от повторов модели.</li></ul><h2>Сверяйте свежесть данных с расходами</h2><p>Свежесть ценна, только если меняет решение. Сравнивайте качество ответа и успех задач при разной глубине поиска: без поиска, с одним запросом и с ограниченным набором запросов. Некоторым процессам нужна актуальная информация; другие платят за повторное получение фактов, которые меняются медленно.</p><p>Показывайте три числа вместе: стоимость модели, стоимость поиска и стоимость на успешную задачу. Так дешёвая модель не будет выглядеть эффективной, если она компенсирует слабость большим числом платных поисков. Продуктовым командам это же даёт обоснование, когда живая веб-опора стоит своей цены.</p><h2>Связанное</h2><ul><li><a href=\"/research/mcp-server-cost-impact\">Влияние стоимости MCP-серверов</a></li><li><a href=\"/research/agent-total-cost-of-ownership\">Совокупная стоимость владения агентом</a></li><li><a href=\"/research/cost-per-successful-task\">Стоимость на успешную задачу</a></li></ul>",
+      "faq": [
+        {
+          "question": "Почему веб-поиск стал новой статьёй расходов агента?",
+          "answer": "Агент может выполнить несколько поисков, загрузить результаты, повторить упавшие вызовы и затем сделать дополнительные вызовы модели для их разбора. Поиск на некоторых платформах тарифицируется отдельно, поэтому его нужно учитывать наряду с расходом токенов."
+        },
+        {
+          "question": "Как измерять стоимость веб-поиска агентов?",
+          "answer": "Привязывайте каждый запрос к ID родительской задачи и записывайте провайдера, число запросов, повторы и то, изменил ли результат ответ. Показывайте стоимость поиска и стоимость модели вместе как стоимость на успешную задачу."
+        },
+        {
+          "question": "Как командам снизить расходы агентов на веб-поиск?",
+          "answer": "Задавайте лимиты запросов, кэшируйте стабильные поиски, ограничивайте глубину поиска, останавливайтесь при достижении порога доказательств и ставьте лимиты повторов отдельно от политики повторов вызовов модели."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/mcp-server-cost-impact",
+          "label": "Влияние стоимости MCP-серверов"
+        },
+        {
+          "slug": "/research/agent-total-cost-of-ownership",
+          "label": "Совокупная стоимость владения агентом"
+        },
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "Стоимость на успешную задачу"
+        }
+      ]
+    },
+    "tr": {
+      "title": "Web araması bir ajan maliyet merkezine dönüşüyor",
+      "titleCore": "Web araması bir ajan maliyet merkezi oluyor",
+      "description": "Her arama, model tokenlarının yanına ölçülen bir maliyet ekliyor. Sorguları bütçeleyin, sonuçları önbelleğe alın ve başarılı görev başına maliyeti ölçün.",
+      "body": "<p>Ajanlar statik bilgiden canlı web araştırmasına geçiyor ve bu maliyet modelini değiştiriyor. Tek bir kullanıcı isteği artık birkaç arama, her sonucu yorumlayan bir model çağrısı, araç yeniden denemeleri ve son bir sentez tetikleyebilir. Arama katmanı artık görünmez altyapı değil; görevin ayrıca ölçülen bir parçası.</p><p>Örneğin Amazon Bedrock AgentCore, Web Search özelliğini 1.000 sorgu başına 7 dolar kullanıma dayalı bir özellik olarak belgeliyor. Kesin fiyat sağlayıcıya ve ürüne göre değişir, ama FinOps dersi evrensel: araç çağrılarını girdi ve çıktı tokenlarıyla birlikte faturalandırılabilir iş olarak sayın. Güncel örnek için <a href=\"https://aws.amazon.com/blogs/aws/announcing-web-search-on-amazon-bedrock-agentcore-ground-your-ai-agents-in-current-accurate-web-knowledge/\">AWS duyurusuna</a> bakın.</p><h2>Tek bir prompt birçok aramaya dönüşebilir</h2><p>Arama çoğalması planlamadan gelir. Bir ajan soruyu yeniden yazabilir, birkaç kaynakta arayabilir, bir sonucun peşinden gidebilir, zaman aşımını yeniden deneyebilir ve çelişkili kanıt bulunca yeniden arayabilir. Uygulama yalnızca kullanıcının özgün prompt'unu raporlarsa, finans düşük hacimli bir özellik görür; sağlayıcı ise yüksek hacimli bir araç yükü görür.</p><p>Üst görev kimliğini, arama sağlayıcısını, sorgu sayısını, sonuç çekimlerini, yeniden deneme sayısını ve sonucun nihai cevabı değiştirip değiştirmediğini kaydedin. Sonra başarılı görev başına arama maliyetini hesaplayın. Yararlı bir cevaba hiç katkı sağlamayan arama, kabul edilecek bir satır kalemi değil, bir politika değişikliği adayıdır.</p><h2>Arama bütçesini kontrol edin</h2><ul><li>Görev başına ve kullanıcı katmanı başına en fazla arama sorgusu bütçesi belirleyin.</li><li>Keşif için daha ucuz bir ilk geçiş kullanın; derin araştırmayı yüksek değerli görevlere ayırın.</li><li>Sabit sorguları önbelleğe alın ve zararsız kelime farklarını normalleştirin.</li><li>Planlayıcının keşfe devam etmesine izin vermek yerine kanıt eşiğine ulaşılınca durun.</li><li>Yeniden denemeleri üstel yapın ve model yeniden denemelerinden bağımsız olarak sınırlayın.</li></ul><h2>Güncelliği harcamayla birlikte ölçün</h2><p>Güncellik yalnızca karar değiştirdiğinde değerlidir. Cevap kalitesini ve görev başarısını arama derinlikleri arasında karşılaştırın: arama yok, tek arama ve sınırlı çoklu arama. Bazı iş akışları güncel bilgiye ihtiyaç duyar; bazıları yavaş değişen gerçekleri tekrar tekrar çekmek için ödeme yapar.</p><p>Üç sayıyı birlikte raporlayın: model maliyeti, arama maliyeti ve başarılı görev başına maliyet. Bu, ucuz bir modelin çok sayıda ücretli aramayla telafi ederken verimli görünmesini engeller. Ayrıca ürün ekiplerine canlı web temelinin ek ücrete değip değmediğine dair savunulabilir bir karar yolu verir.</p><h2>İlgili</h2><ul><li><a href=\"/research/mcp-server-cost-impact\">MCP sunucu maliyet etkisi</a></li><li><a href=\"/research/agent-total-cost-of-ownership\">Ajan toplam sahip olma maliyeti</a></li><li><a href=\"/research/cost-per-successful-task\">Başarılı görev başına maliyet</a></li></ul>",
+      "faq": [
+        {
+          "question": "Neden web araması yeni bir ajan maliyet merkezi?",
+          "answer": "Bir ajan birden fazla arama başlatabilir, sonuçları çekebilir, başarısız çağrıları yeniden deneyebilir ve sonra bunları yorumlamak için ek model çağrıları yapabilir. Bazı platformlarda arama ayrıca ölçülür, bu yüzden token harcamasının yanında sayılmalıdır."
+        },
+        {
+          "question": "Web araması ajan maliyetleri nasıl ölçülmeli?",
+          "answer": "Her sorguyu üst görev kimliğine bağlayın; sağlayıcıyı, sorgu sayısını, yeniden denemeleri ve sonucun cevabı değiştirip değiştirmediğini kaydedin. Arama maliyetini ve model maliyetini birlikte, başarılı görev başına maliyet olarak raporlayın."
+        },
+        {
+          "question": "Ekipler ajan web araması harcamasını nasıl azaltabilir?",
+          "answer": "Sorgu bütçeleri koyun, sabit aramaları önbelleğe alın, sınırlı arama derinliği kullanın, kanıt eşiğine ulaşınca durun ve yeniden deneme sınırlarını model çağrısı yeniden denemelerinden bağımsız uygulayın."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/mcp-server-cost-impact",
+          "label": "MCP sunucu maliyet etkisi"
+        },
+        {
+          "slug": "/research/agent-total-cost-of-ownership",
+          "label": "Ajan toplam sahip olma maliyeti"
+        },
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "Başarılı görev başına maliyet"
+        }
+      ]
+    },
+    "vi": {
+      "title": "Tìm kiếm web đang trở thành trung tâm chi phí của agent",
+      "titleCore": "Tìm kiếm web đang trở thành trung tâm chi phí của agent",
+      "description": "Tìm kiếm web của agent hữu ích, nhưng mỗi lần tìm kiếm là khoản phí riêng. Hãy giới hạn truy vấn, cache kết quả và đo chi phí trên mỗi tác vụ thành công.",
+      "body": "<p>Agent đang chuyển từ kiến thức tĩnh sang nghiên cứu web trực tiếp, và điều đó thay đổi mô hình chi phí. Một yêu cầu của người dùng giờ có thể kích hoạt nhiều lần tìm kiếm, một lần gọi mô hình để diễn giải từng kết quả, các lần thử lại khi công cụ lỗi, và bước tổng hợp cuối cùng. Lớp tìm kiếm không còn là hạ tầng vô hình; nó là một phần được tính phí riêng trong tác vụ.</p>\n<p>Ví dụ, Amazon Bedrock AgentCore ghi rõ Web Search là tính năng tính theo lượng dùng với giá $7 cho mỗi 1,000 truy vấn. Giá chính xác sẽ khác nhau tùy nhà cung cấp và sản phẩm, nhưng bài học FinOps là phổ quát: hãy tính mỗi lần gọi công cụ là một khối việc có phí, cùng với token đầu vào và đầu ra. Xem <a href=\"https://aws.amazon.com/blogs/aws/announcing-web-search-on-amazon-bedrock-agentcore-ground-your-ai-agents-in-current-accurate-web-knowledge/\">thông báo của AWS</a> để có ví dụ hiện tại.</p>\n<h2>Một prompt có thể thành nhiều lần tìm kiếm</h2>\n<p>Sự khuếch đại tìm kiếm đến từ khâu lập kế hoạch. Một agent có thể viết lại câu hỏi, tìm trên nhiều nguồn, đi theo một kết quả, thử lại khi bị timeout, rồi tìm lại sau khi gặp bằng chứng mâu thuẫn. Nếu ứng dụng chỉ ghi nhận prompt gốc của người dùng, tài chính sẽ thấy một tính năng có lượng yêu cầu thấp, trong khi nhà cung cấp thấy một khối lượng công cụ rất lớn.</p>\n<p>Hãy ghi lại ID tác vụ cha, nhà cung cấp tìm kiếm, số truy vấn, số lần lấy kết quả, số lần thử lại, và việc kết quả có làm thay đổi câu trả lời cuối hay không. Sau đó tính chi phí tìm kiếm trên mỗi tác vụ thành công. Một lần tìm kiếm không bao giờ góp phần vào câu trả lời hữu ích là ứng viên cho một thay đổi chính sách, chứ không chỉ là một dòng chi phí để chấp nhận.</p>\n<h2>Kiểm soát ngân sách tìm kiếm</h2>\n<ul>\n<li>Đặt giới hạn số truy vấn tối đa cho mỗi tác vụ và cho mỗi cấp người dùng.</li>\n<li>Dùng một lượt đầu rẻ hơn để khám phá, rồi dành nghiên cứu sâu cho các tác vụ có giá trị cao.</li>\n<li>Cache các truy vấn ổn định và chuẩn hóa những khác biệt câu chữ vô hại.</li>\n<li>Dừng khi đã đạt ngưỡng bằng chứng thay vì để bộ lập kế hoạch tiếp tục khám phá.</li>\n<li>Dùng thử lại theo cấp số nhân và giới hạn riêng biệt với số lần thử lại của mô hình.</li>\n</ul>\n<h2>Đo độ tươi mới so với chi tiêu</h2>\n<p>Độ tươi mới chỉ có giá trị khi nó thay đổi quyết định. Hãy so sánh chất lượng câu trả lời và tỷ lệ thành công của tác vụ theo các độ sâu tìm kiếm: không tìm kiếm, một lần tìm kiếm, và nhiều lần tìm kiếm có giới hạn. Một số quy trình cần thông tin hiện tại; số khác đang trả tiền để truy xuất lặp lại những dữ kiện thay đổi chậm.</p>\n<p>Báo cáo ba con số cùng lúc: chi phí mô hình, chi phí tìm kiếm, và chi phí trên mỗi tác vụ thành công. Cách này ngăn một mô hình rẻ hơn trông có vẻ hiệu quả trong khi đang bù đắp bằng số lượng lớn lần tìm kiếm có phí. Nó cũng cho đội sản phẩm một cơ sở vững chắc để quyết định khi nào việc dựa vào web trực tiếp đáng với mức giá cao hơn.</p>\n<h2>Liên quan</h2>\n<ul>\n<li>\n<a href=\"/research/mcp-server-cost-impact\">Tác động chi phí của máy chủ MCP</a>\n</li>\n<li>\n<a href=\"/research/agent-total-cost-of-ownership\">Tổng chi phí sở hữu của agent</a>\n</li>\n<li>\n<a href=\"/research/cost-per-successful-task\">Chi phí trên mỗi tác vụ thành công</a>\n</li>\n</ul>\n",
+      "faq": [
+        {
+          "question": "Vì sao tìm kiếm web trở thành trung tâm chi phí mới của agent?",
+          "answer": "Một agent có thể phát nhiều lần tìm kiếm, lấy kết quả, thử lại các lần gọi lỗi, rồi gọi thêm mô hình để diễn giải. Một số nền tảng tính phí tìm kiếm riêng, nên phải đếm nó cùng với chi tiêu token."
+        },
+        {
+          "question": "Chi phí tìm kiếm web của agent nên được đo như thế nào?",
+          "answer": "Gắn mỗi truy vấn với ID tác vụ cha và ghi lại nhà cung cấp, số truy vấn, số lần thử lại, và việc kết quả có làm thay đổi câu trả lời hay không. Báo cáo chi phí tìm kiếm và chi phí mô hình cùng nhau dưới dạng chi phí trên mỗi tác vụ thành công."
+        },
+        {
+          "question": "Các đội có thể giảm chi tiêu tìm kiếm web của agent bằng cách nào?",
+          "answer": "Đặt ngân sách truy vấn, cache các tìm kiếm ổn định, dùng độ sâu tìm kiếm có giới hạn, dừng khi đạt ngưỡng bằng chứng, và áp dụng giới hạn thử lại độc lập với chính sách thử lại của lệnh gọi mô hình."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/mcp-server-cost-impact",
+          "label": "Tác động chi phí của máy chủ MCP"
+        },
+        {
+          "slug": "/research/agent-total-cost-of-ownership",
+          "label": "Tổng chi phí sở hữu của agent"
+        },
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "Chi phí trên mỗi tác vụ thành công"
         }
       ]
     }

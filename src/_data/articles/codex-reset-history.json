@@ -428,6 +428,706 @@
           "label": "Claude Max 20x vs 5x: o limite semanal, medido"
         }
       ]
+    },
+    "id": {
+      "title": "Reset limit Codex: cara kerjanya dan log bertanggal",
+      "titleCore": "Reset batas penggunaan Codex: cara kerjanya, reset tersimpan, dan log bertanggal",
+      "description": "Kapan batas Codex direset, apa itu reset tersimpan dan kapan kedaluwarsa, plus log bertanggal setiap reset OpenAI pada Agustus dan September 2026.",
+      "faq": [
+        {
+          "question": "Kapan batas penggunaan Codex direset?",
+          "answer": "Jendela 5 jam direset 5 jam setelah dibuka. Jendela mingguan direset sekitar 7 hari setelah permintaan pertamanya, jadi tidak punya hari tetap dan berbeda antarpengguna dengan paket yang sama."
+        },
+        {
+          "question": "Apa itu reset Codex tersimpan?",
+          "answer": "Satu reset sekali pakai yang dimuat OpenAI ke akun Anda untuk ditebus nanti. Menebusnya mengembalikan jendela 5 jam dan mingguan ke 0% dan memajukan tanggal reset mingguan Anda."
+        },
+        {
+          "question": "Apakah reset Codex tersimpan kedaluwarsa?",
+          "answer": "Ya, sekitar 30 hari setelah diberikan, tanpa pengingat. Tebus satu saat penunjuk mingguan Anda tinggi dan sebelum 30 hari habis."
+        },
+        {
+          "question": "Seberapa sering OpenAI mereset limit Codex?",
+          "answer": "Pelacak komunitas menghitung 55 reset satu kali sejak September 2025, rata-rata satu setiap 6,9 hari, biasanya untuk peluncuran, pencapaian pengguna, atau bug penggunaan. Tidak ada yang dijadwalkan."
+        },
+        {
+          "question": "Bagaimana cara memeriksa penggunaan Codex dan waktu reset saya?",
+          "answer": "Jalankan /status di CLI Codex, atau buka halaman penggunaan Codex di pengaturan ChatGPT. Keduanya menampilkan persentase yang terpakai di tiap jendela dan kapan direset."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/claude-vs-codex-october-2026",
+          "label": "Claude vs Codex Oktober 2026: mana yang menang di $100"
+        },
+        {
+          "slug": "/research/claude-fable-5-1-vs-opus-5-5-cost",
+          "label": "Fable 5.1 vs Opus 5.5: apakah 2,5x sepadan?"
+        },
+        {
+          "slug": "/research/chatgpt-pro-100-real-codex-multiplier",
+          "label": "ChatGPT Pro $100 sebenarnya 2,6x Plus, bukan 5x"
+        },
+        {
+          "slug": "/research/codex-pro-100-heavy-user-resets-log",
+          "label": "8 jendela mingguan Codex dalam 12 hari di Pro $100"
+        },
+        {
+          "slug": "/research/codex-resets-value-12-days",
+          "label": "Bagaimana reset mengubah paket $40 menjadi penggunaan $1.211"
+        },
+        {
+          "slug": "/research/codex-banked-reset-when-to-redeem",
+          "label": "Kapan menebus reset tersimpan Codex"
+        },
+        {
+          "slug": "/research/codex-prompt-caching-cost",
+          "label": "98% input Codex kami di-cache: tagihannya"
+        },
+        {
+          "slug": "/research/codex-usage-limits-chatgpt-pro",
+          "label": "Berapa banyak Codex yang disertakan ChatGPT Pro, dalam dolar"
+        },
+        {
+          "slug": "/research/claude-max-vs-chatgpt-pro-codex-200",
+          "label": "Claude Max vs ChatGPT Pro: studi 60 hari lengkap"
+        },
+        {
+          "slug": "/research/claude-max-20x-vs-5x-weekly-limit",
+          "label": "Claude Max 20x vs 5x: batas mingguan, terukur"
+        }
+      ],
+      "body": "<p><strong>Batas penggunaan Codex direset menurut dua jam: jendela 5 jam dan jendela mingguan yang dimulai dengan permintaan pertama Anda setelah reset terakhir.</strong> Selain itu, OpenAI secara rutin mereset batas semua orang lebih awal, baik langsung maupun sebagai reset &ldquo;tersimpan&rdquo; yang Anda tebus nanti. Pelacak pihak ketiga menghitung 55 reset satu kali ini sejak September 2025, sekitar satu setiap 6,9 hari. Log bertanggal di bawah mencakup Agustus dan September 2026.</p>\n\n<p>Jika Anda ingin tahu nilai satu minggu Codex dalam dolar untuk Plus, Pro 5x, dan Pro 20x, itu ada di <a href=\"/research/codex-usage-limits-chatgpt-pro\">halaman batas penggunaan Codex</a> kami. Halaman ini membahas kapan penunjuk kembali ke nol.</p>\n\n<h2>Kapan batas penggunaan Codex direset?</h2>\n\n<p><strong>Jendela 5 jam direset 5 jam setelah dibuka. Jendela mingguan direset sekitar 7 hari setelah permintaan pertamanya, bukan pada hari yang tetap.</strong> Periode mingguan baru dimulai dengan permintaan Codex pertama Anda setelah periode sebelumnya berakhir. Jika Anda berhenti memakai Codex selama tiga hari, minggu berikutnya dimulai saat Anda kembali, jadi dua orang dengan paket yang sama direset pada hari yang berbeda. <a href=\"https://github.com/openai/codex/issues/28246\">GitHub issue #28246</a> mendokumentasikan penetapan ini dan waktu berbayar yang bisa merugikan Anda.</p>\n\n<p>Kedua jendela diperiksa terpisah. Jendela 5 jam yang baru tidak membantu jika penunjuk mingguan sudah 100%.</p>\n\n<h2>Bagaimana cara memeriksa kapan batas Codex saya direset?</h2>\n\n<ul>\n<li><strong>Di CLI:</strong> jalankan <code>/status</code> dalam sesi Codex. Perintah ini menampilkan persentase yang sudah dipakai di tiap jendela dan kapan masing-masing direset. Versi CLI terbaru juga punya <code>/usage</code>.</li>\n<li><strong>Di web:</strong> halaman penggunaan Codex di pengaturan ChatGPT menampilkan jendela yang sama, ditambah reset tersimpan apa pun di akun Anda.</li>\n</ul>\n\n<h2>Apa itu reset Codex tersimpan?</h2>\n\n<p><strong>Satu reset sekali pakai yang ditaruh OpenAI di akun Anda untuk dipakai nanti, alih-alih langsung mereset Anda.</strong> Saat Anda menebusnya dari pengaturan penggunaan, jendela 5 jam dan jendela mingguan Anda kembali ke 0% terpakai, dan tanggal reset mingguan Anda bergeser menjadi seminggu dari saat itu. Reset ini tidak menaikkan jatah paket Anda.</p>\n\n<p><strong>Reset tersimpan kedaluwarsa sekitar 30 hari setelah diberikan</strong>, dan tidak ada pengingat. Pengguna sudah meminta OpenAI memperpanjang masa itu di <a href=\"https://github.com/openai/codex/issues/28888\">GitHub issue #28888</a>. Aturan praktisnya: tebus reset tersimpan saat penunjuk mingguan Anda tinggi, bukan saat hampir kosong, dan tebus sebelum 30 hari habis.</p>\n\n<h2>Mengapa OpenAI terus mereset batas Codex?</h2>\n\n<p><strong>Terutama untuk merayakan peluncuran dan pencapaian jumlah pengguna, dan sesekali untuk mengganti bug yang menghitung penggunaan terlalu banyak.</strong> Sebagian besar reset diumumkan di X oleh Thibault Sottiaux (@thsottiaux), yang memimpin rekayasa Codex. Reset pernah menandai 8 juta, 9 juta, 10 juta, 15 juta, dan 20 juta pengguna aktif, rilis model baru, dan pada 29 Agustus serangkaian perbaikan untuk bug yang telah membebankan penggunaan terlalu besar kepada pengguna.</p>\n\n<p>Tidak ada reset ini yang dijadwalkan. Anda tidak bisa merencanakan beban kerja di sekitar reset berikutnya, dan Anda sebaiknya tidak menghitung harga paket dengan anggapan reset itu akan datang.</p>\n\n<h2>Log reset Codex: Agustus dan September 2026</h2>\n\n<p>Log ini hanya mencantumkan reset yang tercatat di <a href=\"https://codex-resets.com/\">codex-resets.com</a> dan <a href=\"https://aiidelist.com/codex-reset\">aiidelist</a>. Tanggal dalam UTC. Reset &ldquo;langsung&rdquo; berlaku untuk semua akun berbayar sekaligus. Reset &ldquo;tersimpan&rdquo; dimasukkan ke akun untuk ditebus dalam 30 hari.</p>\n\n<table>\n<thead><tr><th>Tanggal</th><th>Jenis</th><th>Alasan</th></tr></thead>\n<tbody>\n<tr><td>1 Agu 2026</td><td>Langsung</td><td>Efisiensi meningkat di Luna</td></tr>\n<tr><td>8 Agu 2026</td><td>Langsung</td><td>Rilis GPT-5.6 Sol</td></tr>\n<tr><td>11 Agu 2026</td><td>Langsung</td><td>Tanpa alasan</td></tr>\n<tr><td>13 Agu 2026</td><td>Langsung</td><td>15 juta pengguna aktif</td></tr>\n<tr><td>21 Agu 2026</td><td>Tersimpan</td><td>20 juta pengguna aktif</td></tr>\n<tr><td>24 Agu 2026</td><td>Langsung</td><td>Perbaikan penggunaan dirilis</td></tr>\n<tr><td>25 Agu 2026</td><td>Langsung</td><td>Tanpa alasan</td></tr>\n<tr><td>27 Agu 2026</td><td>Langsung</td><td>Tanpa alasan</td></tr>\n<tr><td>29 Agu 2026</td><td>Langsung</td><td>Perbaikan bug yang menghitung penggunaan terlalu banyak</td></tr>\n<tr><td>22 Sep 2026</td><td>Tersimpan</td><td>Rilis GPT-6 Sol dan Luna</td></tr>\n<tr><td>26 Sep 2026</td><td>Langsung</td><td>Reset akhir pekan</td></tr>\n</tbody>\n</table>\n\n<p>Pelacak tidak sepakat soal awal September. aiidelist juga mencantumkan reset tersimpan pada 3 dan 5 September untuk akun yang menunggu GPT-6 Astra, serta reset pada 31 Agustus, 8 September, dan 12 September. codex-resets.com tidak menunjukkan reset antara 29 Agustus dan 22 September. Juli adalah bulan paling sibuk, dengan serangkaian reset yang terkait dengan pencapaian 7 juta hingga 10 juta pengguna.</p>\n\n<h2>Di mana saya bisa melacak reset Codex?</h2>\n\n<p>Beberapa situs komunitas memantau pengumuman dan mencatat setiap reset. Tidak ada yang dikelola oleh OpenAI.</p>\n\n<ul>\n<li><a href=\"https://codex-resets.com/\">codex-resets.com</a>: riwayat lengkap dengan interval rata-rata dan median.</li>\n<li><a href=\"https://codex-reset.com/\">codex-reset.com</a>: jumlah hari sejak reset terakhir.</li>\n<li><a href=\"https://aiidelist.com/codex-reset\">pelacak reset Codex aiidelist</a>: linimasa bertanggal dengan alasan.</li>\n<li><a href=\"https://usagereset.com/\">usagereset.com</a>: melacak reset Codex dan Claude Code.</li>\n</ul>\n\n<h2>Apakah Claude Code juga melakukan reset kejutan?</h2>\n\n<p><strong>Tidak sebagai kebiasaan.</strong> Paket Claude memakai struktur dua jendela yang sama, yaitu sesi 5 jam dan batas mingguan, tetapi Anthropic tidak menjalankan program reset berdasarkan pencapaian. Nilai satu minggu Claude ada di <a href=\"/research/claude-max-20x-vs-5x-weekly-limit\">halaman batas mingguan Claude Max</a> kami.</p>\n\n<h2>Baru: 12 hari log Codex Pro $100 yang nyata</h2>\n\n<p>Kami mencatat setiap token selama dua minggu penggunaan Codex yang berat dan menerbitkan datanya. Satu minggu penuh Pro $100 bernilai $175 pada harga API, jadi <a href=\"/research/chatgpt-pro-100-real-codex-multiplier\">pengali sebenarnya adalah 2,6x Plus, bukan 5x</a>. Dengan reset global dan tersimpan, kami memperoleh <a href=\"/research/codex-pro-100-heavy-user-resets-log\">8 jendela mingguan dalam 12 hari</a>, senilai <a href=\"/research/codex-resets-value-12-days\">$1.211 penggunaan API</a>. Kami juga memutuskan <a href=\"/research/codex-banked-reset-when-to-redeem\">kapan menebus reset tersimpan</a> dan mengapa <a href=\"/research/codex-prompt-caching-cost\">98% input telah di-cache</a>. Setiap artikel menyertakan CSV-nya.</p>\n\n<h2>Sumber</h2>\n\n<ul>\n<li><a href=\"https://codex-resets.com/\">codex-resets.com: riwayat dan statistik reset Codex</a></li>\n<li><a href=\"https://aiidelist.com/codex-reset\">aiidelist: pelacak reset Codex</a></li>\n<li><a href=\"https://github.com/openai/codex/issues/28246\">GitHub openai/codex #28246: jendela kuota terikat pada penggunaan pertama setelah reset</a></li>\n<li><a href=\"https://github.com/openai/codex/issues/28888\">GitHub openai/codex #28888: perpanjang masa kedaluwarsa reset tersimpan melewati 30 hari</a></li>\n<li><a href=\"https://help.openai.com/en/articles/20001507-paid-weekly-work-and-codex-rate-limit-resets\">Bantuan OpenAI: reset mingguan batas Work dan Codex untuk paket berbayar</a></li>\n</ul>"
+    },
+    "pl": {
+      "title": "Resety limitów Codex: jak działają i dziennik",
+      "titleCore": "Resety limitów użycia Codex: jak działają, zapasowe resety i datowany dziennik",
+      "description": "Kiedy resetują się limity użycia Codex, czym jest zapasowy reset i kiedy wygasa, oraz datowany dziennik każdego resetu OpenAI w sierpniu i wrześniu 2026.",
+      "related": [
+        {
+          "slug": "/research/claude-vs-codex-october-2026",
+          "label": "Claude vs Codex w październiku 2026: co wygrywa przy $100"
+        },
+        {
+          "slug": "/research/claude-fable-5-1-vs-opus-5-5-cost",
+          "label": "Fable 5.1 vs Opus 5.5: czy 2,5x się opłaca?"
+        },
+        {
+          "slug": "/research/chatgpt-pro-100-real-codex-multiplier",
+          "label": "ChatGPT Pro $100 to naprawdę 2,6x Plus, nie 5x"
+        },
+        {
+          "slug": "/research/codex-pro-100-heavy-user-resets-log",
+          "label": "8 tygodniowych okien Codex w 12 dni na Pro $100"
+        },
+        {
+          "slug": "/research/codex-resets-value-12-days",
+          "label": "Jak resety zamieniły plan za $40 w $1,211 użycia"
+        },
+        {
+          "slug": "/research/codex-banked-reset-when-to-redeem",
+          "label": "Kiedy zrealizować zapasowy reset Codex"
+        },
+        {
+          "slug": "/research/codex-prompt-caching-cost",
+          "label": "98% wejścia Codex było w cache: rachunek"
+        },
+        {
+          "slug": "/research/codex-usage-limits-chatgpt-pro",
+          "label": "Ile Codex zawiera ChatGPT Pro, w dolarach"
+        },
+        {
+          "slug": "/research/claude-max-vs-chatgpt-pro-codex-200",
+          "label": "Claude Max vs ChatGPT Pro: pełne 60-dniowe badanie"
+        },
+        {
+          "slug": "/research/claude-max-20x-vs-5x-weekly-limit",
+          "label": "Claude Max 20x vs 5x: tygodniowy limit, zmierzony"
+        }
+      ],
+      "body": "<p><strong>Limity użycia Codex resetują się według dwóch zegarów: 5-godzinnego okna i tygodniowego okna, które startuje od pierwszego żądania po poprzednim resecie.</strong> Ponadto OpenAI regularnie resetuje limity wszystkich od razu, albo jako &ldquo;zapasowy&rdquo; reset, który realizujesz później. Zewnętrzne trackery zliczyły 55 takich jednorazowych resetów od września 2025, czyli mniej więcej jeden co 6,9 dnia. Poniższy datowany dziennik obejmuje sierpień i wrzesień 2026.</p>\n\n<p>Jeśli chcesz wiedzieć, ile tygodniowy limit Codex jest wart w dolarach na Plus, Pro 5x i Pro 20x, to jest na naszej <a href=\"/research/codex-usage-limits-chatgpt-pro\">stronie o limitach użycia Codex</a>. Ta strona dotyczy tego, kiedy wskaźnik wraca do zera.</p>\n\n<h2>Kiedy resetują się limity użycia Codex?</h2>\n\n<p><strong>Okno 5-godzinne resetuje się 5 godzin po otwarciu. Tygodniowe okno resetuje się około 7 dni po pierwszym żądaniu, a nie w stały dzień.</strong> Nowy tygodniowy okres zaczyna się od pierwszego żądania Codex po zakończeniu poprzedniego. Jeśli nie korzystasz z Codex przez trzy dni, następny tydzień zacznie się, gdy wrócisz, więc dwie osoby na tym samym planie resetują się w różne dni. <a href=\"https://github.com/openai/codex/issues/28246\">GitHub issue #28246</a> opisuje to przypisanie okna i płatny czas, jaki może kosztować.</p>\n\n<p>Oba okna są sprawdzane osobno. Świeże okno 5-godzinne nie pomaga, jeśli tygodniowy wskaźnik jest na 100%.</p>\n\n<h2>Jak sprawdzić, kiedy mój limit Codex się resetuje?</h2>\n\n<ul>\n<li><strong>W CLI:</strong> uruchom <code>/status</code> w sesji Codex. Pokazuje procent zużycia w każdym oknie i moment resetu każdego z nich. Nowsze wersje CLI mają też <code>/usage</code>.</li>\n<li><strong>W przeglądarce:</strong> strona użycia Codex w ustawieniach ChatGPT pokazuje te same okna oraz zapasowe resety na Twoim koncie.</li>\n</ul>\n\n<h2>Czym jest zapasowy reset Codex?</h2>\n\n<p><strong>Jednorazowy reset, który OpenAI umieszcza na Twoim koncie do późniejszego użycia, zamiast resetować limity od razu.</strong> Kiedy go zrealizujesz w ustawieniach użycia, zarówno okno 5-godzinne, jak i tygodniowe wracają do 0% zużycia, a data tygodniowego resetu przesuwa się o tydzień od tego momentu. Nie zwiększa to limitu Twojego planu.</p>\n\n<p><strong>Zapasowe resety wygasają około 30 dni po przyznaniu</strong>, a nic o tym nie przypomina. Użytkownicy poprosili OpenAI o wydłużenie tego terminu w <a href=\"https://github.com/openai/codex/issues/28888\">GitHub issue #28888</a>. Praktyczna zasada: realizuj zapasowy reset, gdy tygodniowy wskaźnik jest wysoki, a nie gdy jest prawie pusty, i rób to przed upływem 30 dni.</p>\n\n<h2>Dlaczego OpenAI wciąż resetuje limity Codex?</h2>\n\n<p><strong>Głównie z okazji premier i kamieni milowych użytkowników, a czasem jako rekompensata za błędy, które zawyżały zużycie.</strong> Większość resetów ogłasza na X Thibault Sottiaux (@thsottiaux), który kieruje inżynierią Codex. Resety oznaczały 8M, 9M, 10M, 15M i 20M aktywnych użytkowników, nowe wydania modeli oraz 29 sierpnia zestaw poprawek błędów, które naliczały użytkownikom zbyt dużo zużycia.</p>\n\n<p>Żaden z tych resetów nie jest zaplanowany. Nie możesz oprzeć obciążenia na następnym, i nie powinieneś wyceniać planu przy założeniu, że nadejdzie.</p>\n\n<h2>Dziennik resetów Codex: sierpień i wrzesień 2026</h2>\n\n<p>Ten dziennik zawiera tylko resety zapisane zarówno przez <a href=\"https://codex-resets.com/\">codex-resets.com</a>, jak i <a href=\"https://aiidelist.com/codex-reset\">aiidelist</a>. Daty są w UTC. Resety &ldquo;natychmiastowe&rdquo; dotyczą wszystkich płatnych kont naraz. Resety &ldquo;zapasowe&rdquo; są ładowane na konta do realizacji w ciągu 30 dni.</p>\n\n<table>\n<thead><tr><th>Data</th><th>Typ</th><th>Okazja</th></tr></thead>\n<tbody>\n<tr><td>1 sie 2026</td><td>Natychmiastowy</td><td>Wzrost wydajności Luny</td></tr>\n<tr><td>8 sie 2026</td><td>Natychmiastowy</td><td>Premiera GPT-5.6 Sol</td></tr>\n<tr><td>11 sie 2026</td><td>Natychmiastowy</td><td>Brak podanego powodu</td></tr>\n<tr><td>13 sie 2026</td><td>Natychmiastowy</td><td>15M aktywnych użytkowników</td></tr>\n<tr><td>21 sie 2026</td><td>Zapasowy</td><td>20M aktywnych użytkowników</td></tr>\n<tr><td>24 sie 2026</td><td>Natychmiastowy</td><td>Wdrożone poprawki zużycia</td></tr>\n<tr><td>25 sie 2026</td><td>Natychmiastowy</td><td>Brak podanego powodu</td></tr>\n<tr><td>27 sie 2026</td><td>Natychmiastowy</td><td>Brak podanego powodu</td></tr>\n<tr><td>29 sie 2026</td><td>Natychmiastowy</td><td>Poprawki błędów, które zawyżały zużycie</td></tr>\n<tr><td>22 wrz 2026</td><td>Zapasowy</td><td>Premiera GPT-6 Sol i Luny</td></tr>\n<tr><td>26 wrz 2026</td><td>Natychmiastowy</td><td>Reset weekendowy</td></tr>\n</tbody>\n</table>\n\n<p>Trackery nie zgadzają się co do początku września. aiidelist wymienia też zapasowe resety 3 i 5 września dla kont czekających na GPT-6 Astra oraz resety 31 sierpnia, 8 września i 12 września. codex-resets.com nie pokazuje żadnego resetu między 29 sierpnia a 22 września. Lipiec był najbardziej intensywnym miesiącem, z serią resetów związanych z kamieniami milowymi 7M do 10M użytkowników.</p>\n\n<h2>Gdzie śledzić resety Codex?</h2>\n\n<p>Kilka społecznościowych stron obserwuje ogłoszenia i zapisuje każdy reset. Żadna nie jest prowadzona przez OpenAI.</p>\n\n<ul>\n<li><a href=\"https://codex-resets.com/\">codex-resets.com</a>: pełna historia ze średnimi i medianami odstępów.</li>\n<li><a href=\"https://codex-reset.com/\">codex-reset.com</a>: dni od ostatniego resetu.</li>\n<li><a href=\"https://aiidelist.com/codex-reset\">aiidelist Codex reset tracker</a>: datowa oś czasu z powodami.</li>\n<li><a href=\"https://usagereset.com/\">usagereset.com</a>: śledzi resety Codex i Claude Code.</li>\n</ul>\n\n<h2>Czy Claude Code też ma nagłe resety?</h2>\n\n<p><strong>Nie jako zasada.</strong> Plany Claude mają tę samą dwuoknową strukturę, 5-godzinną sesję i tygodniowy limit, ale Anthropic nie prowadzi programu resetów z okazji kamieni milowych. Ile jest wart tydzień Claude, opisujemy na naszej <a href=\"/research/claude-max-20x-vs-5x-weekly-limit\">stronie o tygodniowym limicie Claude Max</a>.</p>\n\n<h2>Nowość: 12 dni prawdziwych logów Codex Pro $100</h2>\n\n<p>Zapisaliśmy każdy token z intensywnej dwutygodniowej pracy z Codex i opublikowaliśmy dane. Pełny tydzień Pro $100 był wart $175 według cen API, więc <a href=\"/research/chatgpt-pro-100-real-codex-multiplier\">prawdziwy mnożnik to 2,6x Plus, nie 5x</a>. Dzięki resetom globalnym i zapasowym dostaliśmy <a href=\"/research/codex-pro-100-heavy-user-resets-log\">8 tygodniowych okien w 12 dni</a>, wartych <a href=\"/research/codex-resets-value-12-days\">$1,211 użycia API</a>. Opracowaliśmy też, <a href=\"/research/codex-banked-reset-when-to-redeem\">kiedy zrealizować zapasowy reset</a>, oraz to, dlaczego <a href=\"/research/codex-prompt-caching-cost\">98% wejścia było w cache</a>. Każdy artykuł zawiera swój CSV.</p>\n\n<h2>Źródła</h2>\n\n<ul>\n<li><a href=\"https://codex-resets.com/\">codex-resets.com: historia resetów Codex i statystyki</a></li>\n<li><a href=\"https://aiidelist.com/codex-reset\">aiidelist: tracker resetów Codex</a></li>\n<li><a href=\"https://github.com/openai/codex/issues/28246\">GitHub openai/codex #28246: okna limitów przypisane do pierwszego użycia po resecie</a></li>\n<li><a href=\"https://github.com/openai/codex/issues/28888\">GitHub openai/codex #28888: wydłużenie wygasania zapasowych resetów poza 30 dni</a></li>\n<li><a href=\"https://help.openai.com/en/articles/20001507-paid-weekly-work-and-codex-rate-limit-resets\">Pomoc OpenAI: płatne tygodniowe resety limitów Work i Codex</a></li>\n</ul>",
+      "faq": [
+        {
+          "question": "Kiedy resetują się limity użycia Codex?",
+          "answer": "Okno 5-godzinne resetuje się 5 godzin po otwarciu. Tygodniowe okno resetuje się około 7 dni po pierwszym żądaniu, więc nie ma stałego dnia i różni się między użytkownikami tego samego planu."
+        },
+        {
+          "question": "Czym jest zapasowy reset Codex?",
+          "answer": "Jednorazowy reset, który OpenAI ładuje na Twoje konto do późniejszej realizacji. Realizacja ustawia zarówno okno 5-godzinne, jak i tygodniowe z powrotem na 0% i przesuwa datę tygodniowego resetu do przodu."
+        },
+        {
+          "question": "Czy zapasowe resety Codex wygasają?",
+          "answer": "Tak, około 30 dni po przyznaniu, bez przypomnienia. Zrealizuj go, gdy tygodniowy wskaźnik jest wysoki i zanim miną 30 dni."
+        },
+        {
+          "question": "Jak często OpenAI resetuje limity Codex?",
+          "answer": "Trackery społecznościowe zliczyły 55 jednorazowych resetów od września 2025, średnio jeden co 6,9 dnia, zwykle z okazji premier, kamieni milowych użytkowników lub błędów w zużyciu. Żaden nie jest zaplanowany."
+        },
+        {
+          "question": "Jak sprawdzić zużycie Codex i czas resetu?",
+          "answer": "Uruchom /status w CLI Codex albo otwórz stronę użycia Codex w ustawieniach ChatGPT. Obie pokazują procent zużycia w każdym oknie i moment jego resetu."
+        }
+      ]
+    },
+    "ru": {
+      "title": "Сбросы лимитов Codex: как работают, плюс журнал",
+      "titleCore": "Сбросы лимитов использования Codex: как они работают, накопленные сбросы и датированный журнал",
+      "description": "Когда сбрасываются лимиты Codex, что такое накопленный сброс и когда он истекает, плюс датированный журнал всех сбросов OpenAI за август и сентябрь 2026.",
+      "related": [
+        {
+          "slug": "/research/claude-vs-codex-october-2026",
+          "label": "Claude против Codex в октябре 2026: кто выигрывает на $100"
+        },
+        {
+          "slug": "/research/claude-fable-5-1-vs-opus-5-5-cost",
+          "label": "Fable 5.1 против Opus 5.5: стоят ли 2,5x своих денег?"
+        },
+        {
+          "slug": "/research/chatgpt-pro-100-real-codex-multiplier",
+          "label": "ChatGPT Pro $100 на самом деле 2,6x от Plus, а не 5x"
+        },
+        {
+          "slug": "/research/codex-pro-100-heavy-user-resets-log",
+          "label": "8 недельных окон Codex за 12 дней на Pro $100"
+        },
+        {
+          "slug": "/research/codex-resets-value-12-days",
+          "label": "Как сбросы превратили план за $40 в $1,211 использования"
+        },
+        {
+          "slug": "/research/codex-banked-reset-when-to-redeem",
+          "label": "Когда активировать накопленный сброс Codex"
+        },
+        {
+          "slug": "/research/codex-prompt-caching-cost",
+          "label": "98% нашего входа Codex было закэшировано: счёт"
+        },
+        {
+          "slug": "/research/codex-usage-limits-chatgpt-pro",
+          "label": "Сколько Codex включает ChatGPT Pro, в долларах"
+        },
+        {
+          "slug": "/research/claude-max-vs-chatgpt-pro-codex-200",
+          "label": "Claude Max против ChatGPT Pro: полное 60-дневное исследование"
+        },
+        {
+          "slug": "/research/claude-max-20x-vs-5x-weekly-limit",
+          "label": "Claude Max 20x против 5x: недельный лимит, измеренный"
+        }
+      ],
+      "body": "<p><strong>Лимиты использования Codex сбрасываются по двум часам: 5-часовое окно и недельное окно, которое начинается с вашего первого запроса после последнего сброса.</strong> Кроме того, OpenAI регулярно сбрасывает лимиты всем досрочно, либо сразу, либо в виде «накопленного» сброса, который вы активируете позже. Сторонние трекеры насчитали 55 таких разовых сбросов с сентября 2025 года, примерно один каждые 6,9 дня. Датированный журнал ниже охватывает август и сентябрь 2026 года.</p>\n\n<p>Если вы хотите знать, что неделя Codex стоит в долларах на Plus, Pro 5x и Pro 20x, это на нашей <a href=\"/research/codex-usage-limits-chatgpt-pro\">странице лимитов использования Codex</a>. Эта страница о том, когда индикатор возвращается к нулю.</p>\n\n<h2>Когда сбрасываются лимиты использования Codex?</h2>\n\n<p><strong>5-часовое окно сбрасывается через 5 часов после открытия. Недельное окно сбрасывается примерно через 7 дней после первого запроса, а не в фиксированный день.</strong> Новый недельный период начинается с вашего первого запроса к Codex после окончания предыдущего. Если вы не пользуетесь Codex три дня, следующая неделя начнётся, когда вы вернётесь, поэтому два человека на одном тарифе сбрасываются в разные дни. <a href=\"https://github.com/openai/codex/issues/28246\">GitHub issue #28246</a> описывает эту привязку и оплачиваемое время, которое она может стоить.</p>\n\n<p>Два окна проверяются отдельно. Свежее 5-часовое окно не помогает, если недельный индикатор на 100%.</p>\n\n<h2>Как проверить, когда сбрасывается мой лимит Codex?</h2>\n\n<ul>\n<li><strong>В CLI:</strong> выполните <code>/status</code> в сессии Codex. Команда покажет процент использования в каждом окне и время сброса каждого. В новых версиях CLI есть также <code>/usage</code>.</li>\n<li><strong>В вебе:</strong> страница использования Codex в настройках ChatGPT показывает те же окна, а также накопленные сбросы вашего аккаунта.</li>\n</ul>\n\n<h2>Что такое накопленный сброс Codex?</h2>\n\n<p><strong>Разовый сброс, который OpenAI записывает на ваш аккаунт для использования позже, а не сбрасывает лимиты сразу.</strong> Когда вы активируете его в настройках использования, оба окна, 5-часовое и недельное, возвращаются к 0% использования, а дата недельного сброса переносится на неделю вперёд от этого момента. Он не увеличивает квоту вашего тарифа.</p>\n\n<p><strong>Накопленные сбросы истекают примерно через 30 дней после начисления</strong>, и никто не напоминает об этом. Пользователи просили OpenAI продлить срок в <a href=\"https://github.com/openai/codex/issues/28888\">GitHub issue #28888</a>. Практическое правило: активируйте накопленный сброс, когда недельный индикатор высокий, а не когда он почти пуст, и делайте это до истечения 30 дней.</p>\n\n<h2>Почему OpenAI постоянно сбрасывает лимиты Codex?</h2>\n\n<p><strong>В основном чтобы отметить запуски и достижения по числу пользователей, а иногда чтобы компенсировать ошибки, из-за которых использование считалось завышенным.</strong> Большинство сбросов объявляет в X Thibault Sottiaux (@thsottiaux), который руководит разработкой Codex. Сбросы приходились на 8M, 9M, 10M, 15M и 20M активных пользователей, на выпуски новых моделей и 29 августа на пакет исправлений ошибок, из-за которых пользователям начисляли слишком много использования.</p>\n\n<p>Ни один из этих сбросов не запланирован. Нельзя строить рабочую нагрузку вокруг следующего и не стоит закладывать его в расчёт стоимости тарифа.</p>\n\n<h2>Журнал сбросов Codex: август и сентябрь 2026</h2>\n\n<p>В журнале перечислены только сбросы, которые фиксируют и <a href=\"https://codex-resets.com/\">codex-resets.com</a>, и <a href=\"https://aiidelist.com/codex-reset\">aiidelist</a>. Даты указаны в UTC. «Немедленные» сбросы действуют сразу для всех платных аккаунтов. «Накопленные» сбросы загружаются на аккаунты и должны быть активированы в течение 30 дней.</p>\n\n<table>\n<thead><tr><th>Дата</th><th>Тип</th><th>Повод</th></tr></thead>\n<tbody>\n<tr><td>1 авг. 2026</td><td>Немедленный</td><td>Повышение эффективности Luna</td></tr>\n<tr><td>8 авг. 2026</td><td>Немедленный</td><td>Выпуск GPT-5.6 Sol</td></tr>\n<tr><td>11 авг. 2026</td><td>Немедленный</td><td>Причина не указана</td></tr>\n<tr><td>13 авг. 2026</td><td>Немедленный</td><td>15M активных пользователей</td></tr>\n<tr><td>21 авг. 2026</td><td>Накопленный</td><td>20M активных пользователей</td></tr>\n<tr><td>24 авг. 2026</td><td>Немедленный</td><td>Внедрены исправления использования</td></tr>\n<tr><td>25 авг. 2026</td><td>Немедленный</td><td>Причина не указана</td></tr>\n<tr><td>27 авг. 2026</td><td>Немедленный</td><td>Причина не указана</td></tr>\n<tr><td>29 авг. 2026</td><td>Немедленный</td><td>Исправления ошибок, которые завышали использование</td></tr>\n<tr><td>22 сент. 2026</td><td>Накопленный</td><td>Выпуск GPT-6 Sol и Luna</td></tr>\n<tr><td>26 сент. 2026</td><td>Немедленный</td><td>Сброс на выходных</td></tr>\n</tbody>\n</table>\n\n<p>Трекеры расходятся в данных за начало сентября. aiidelist также указывает накопленные сбросы 3 и 5 сентября для аккаунтов, ожидающих GPT-6 Astra, а также сбросы 31 августа, 8 сентября и 12 сентября. codex-resets.com не показывает сбросов между 29 августа и 22 сентября. Самым насыщенным месяцем был июль: серия сбросов была связана с отметками от 7M до 10M пользователей.</p>\n\n<h2>Где отслеживать сбросы Codex?</h2>\n\n<p>Несколько сообществ следят за объявлениями и фиксируют каждый сброс. Ни один из них не управляется OpenAI.</p>\n\n<ul>\n<li><a href=\"https://codex-resets.com/\">codex-resets.com</a>: полная история со средними и медианными интервалами.</li>\n<li><a href=\"https://codex-reset.com/\">codex-reset.com</a>: дни с последнего сброса.</li>\n<li><a href=\"https://aiidelist.com/codex-reset\">трекер сбросов Codex от aiidelist</a>: датированная хронология с причинами.</li>\n<li><a href=\"https://usagereset.com/\">usagereset.com</a>: отслеживает сбросы Codex и Claude Code.</li>\n</ul>\n\n<h2>Делает ли Claude Code внезапные сбросы?</h2>\n\n<p><strong>Не как правило.</strong> Тарифы Claude используют ту же двухоконную структуру: 5-часовую сессию и недельный лимит, но Anthropic не проводит программу сбросов по случаю достижений. Что стоит неделя Claude, описано на нашей <a href=\"/research/claude-max-20x-vs-5x-weekly-limit\">странице недельного лимита Claude Max</a>.</p>\n\n<h2>Новое: 12 дней реальных логов Codex Pro $100</h2>\n\n<p>Мы зафиксировали каждый токен напряжённой двухнедельной работы с Codex и опубликовали данные. Полная неделя Pro $100 стоила $175 по ценам API, поэтому <a href=\"/research/chatgpt-pro-100-real-codex-multiplier\">реальный множитель составляет 2,6x от Plus, а не 5x</a>. Используя глобальные и накопленные сбросы, мы получили <a href=\"/research/codex-pro-100-heavy-user-resets-log\">8 недельных окон за 12 дней</a> на <a href=\"/research/codex-resets-value-12-days\">$1,211 использования API</a>. Мы также разобрались, <a href=\"/research/codex-banked-reset-when-to-redeem\">когда активировать накопленный сброс</a>, и почему <a href=\"/research/codex-prompt-caching-cost\">98% входных данных были закэшированы</a>. Каждая статья публикуется вместе со своим CSV.</p>\n\n<h2>Источники</h2>\n\n<ul>\n<li><a href=\"https://codex-resets.com/\">codex-resets.com: история сбросов Codex и статистика</a></li>\n<li><a href=\"https://aiidelist.com/codex-reset\">aiidelist: трекер сбросов Codex</a></li>\n<li><a href=\"https://github.com/openai/codex/issues/28246\">GitHub openai/codex #28246: окна квот привязаны к первому использованию после сброса</a></li>\n<li><a href=\"https://github.com/openai/codex/issues/28888\">GitHub openai/codex #28888: продлить срок действия накопленных сбросов дольше 30 дней</a></li>\n<li><a href=\"https://help.openai.com/en/articles/20001507-paid-weekly-work-and-codex-rate-limit-resets\">Справка OpenAI: еженедельные сбросы лимитов Work и Codex для платных тарифов</a></li>\n</ul>",
+      "faq": [
+        {
+          "question": "Когда сбрасываются лимиты использования Codex?",
+          "answer": "5-часовое окно сбрасывается через 5 часов после открытия. Недельное окно сбрасывается примерно через 7 дней после первого запроса, поэтому у него нет фиксированного дня, и оно различается у пользователей одного тарифа."
+        },
+        {
+          "question": "Что такое накопленный сброс Codex?",
+          "answer": "Разовый сброс, который OpenAI записывает на ваш аккаунт для использования позже. Его активация возвращает 5-часовое и недельное окна к 0% и переносит дату недельного сброса вперёд."
+        },
+        {
+          "question": "Истекают ли накопленные сбросы Codex?",
+          "answer": "Да, примерно через 30 дней после начисления, и без напоминания. Активируйте сброс, когда недельный индикатор высокий, и до истечения 30 дней."
+        },
+        {
+          "question": "Как часто OpenAI сбрасывает лимиты Codex?",
+          "answer": "Сообщества насчитали 55 разовых сбросов с сентября 2025 года, в среднем один каждые 6,9 дня. Обычно их выпускают к запускам, отметкам по числу пользователей или при ошибках в учёте использования. Ни один не запланирован."
+        },
+        {
+          "question": "Как проверить использование Codex и время сброса?",
+          "answer": "Выполните /status в CLI Codex или откройте страницу использования Codex в настройках ChatGPT. Оба варианта показывают процент использования в каждом окне и время его сброса."
+        }
+      ]
+    },
+    "tr": {
+      "title": "Codex Limit Sıfırlamaları: Nasıl Çalışır + Kayıt",
+      "titleCore": "Codex kullanım limiti sıfırlamaları: nasıl çalışır, saklı sıfırlamalar ve tarihli kayıt",
+      "description": "Codex limitleri ne zaman sıfırlanır, saklı sıfırlama nedir ve ne zaman sona erer; ayrıca Ağustos-Eylül 2026 OpenAI sıfırlamalarının tarihli kaydı.",
+      "related": [
+        {
+          "slug": "/research/claude-vs-codex-october-2026",
+          "label": "Ekim 2026'da Claude vs Codex: $100'de hangisi kazanır"
+        },
+        {
+          "slug": "/research/claude-fable-5-1-vs-opus-5-5-cost",
+          "label": "Fable 5.1 vs Opus 5.5: 2,5 kat buna değer mi?"
+        },
+        {
+          "slug": "/research/chatgpt-pro-100-real-codex-multiplier",
+          "label": "ChatGPT Pro $100 aslında 5x değil, Plus'ın 2,6 katı"
+        },
+        {
+          "slug": "/research/codex-pro-100-heavy-user-resets-log",
+          "label": "Pro $100'de 12 günde 8 Codex haftalık pencere"
+        },
+        {
+          "slug": "/research/codex-resets-value-12-days",
+          "label": "Sıfırlamalar $40'lık bir planı nasıl $1.211 kullanıma çevirdi"
+        },
+        {
+          "slug": "/research/codex-banked-reset-when-to-redeem",
+          "label": "Saklı bir Codex sıfırlamasını ne zaman kullanmalı"
+        },
+        {
+          "slug": "/research/codex-prompt-caching-cost",
+          "label": "Codex girdimizin %98'i önbellekteydi: fatura"
+        },
+        {
+          "slug": "/research/codex-usage-limits-chatgpt-pro",
+          "label": "ChatGPT Pro Codex'e dolar cinsinden ne kadar dahil"
+        },
+        {
+          "slug": "/research/claude-max-vs-chatgpt-pro-codex-200",
+          "label": "Claude Max vs ChatGPT Pro: 60 günlük tam çalışma"
+        },
+        {
+          "slug": "/research/claude-max-20x-vs-5x-weekly-limit",
+          "label": "Claude Max 20x vs 5x: haftalık limit, ölçüldü"
+        }
+      ],
+      "body": "<p><strong>Codex kullanım limitleri iki saatle sıfırlanır: 5 saatlik bir pencere ve son sıfırlamadan sonraki ilk isteğinizle başlayan haftalık bir pencere.</strong> Buna ek olarak OpenAI, herkesin limitlerini düzenli olarak erken sıfırlar; ya hemen ya da daha sonra kullanacağınız &ldquo;saklı&rdquo; bir sıfırlama olarak. Üçüncü taraf takipçiler Eylül 2025'ten bu yana bu tek seferlik 55 sıfırlamayı saymış; yaklaşık her 6,9 günde bir. Aşağıdaki tarihli kayıt Ağustos ve Eylül 2026'yı kapsar.</p>\n\n<p>Plus, Pro 5x ve Pro 20x'te bir Codex haftasının dolar cinsinden ne değerde olduğunu öğrenmek istiyorsanız bu bilgi <a href=\"/research/codex-usage-limits-chatgpt-pro\">Codex kullanım limitleri sayfamızda</a>. Bu sayfa, göstergenin ne zaman sıfıra döndüğüyle ilgili.</p>\n\n<h2>Codex kullanım limitleri ne zaman sıfırlanır?</h2>\n\n<p><strong>5 saatlik pencere, açıldıktan 5 saat sonra sıfırlanır. Haftalık pencere ise ilk isteğinizden yaklaşık 7 gün sonra sıfırlanır; sabit bir güne bağlı değildir.</strong> Yeni haftalık dönem, öncekinin bittiği andan sonraki ilk Codex isteğinizle başlar. Üç gün Codex kullanmazsanız bir sonraki haftanız siz geri döndüğünüzde başlar; dolayısıyla aynı pakette olan iki kişi farklı günlerde sıfırlanır. <a href=\"https://github.com/openai/codex/issues/28246\">GitHub issue #28246</a> bu sabitlemeyi ve maliyetinin ne olabileceğini belgeler.</p>\n\n<p>İki pencere ayrı ayrı kontrol edilir. Haftalık gösterge %100'deyken yeni bir 5 saatlik pencere yardımcı olmaz.</p>\n\n<h2>Codex limitimin ne zaman sıfırlanacağını nasıl kontrol ederim?</h2>\n\n<ul>\n<li><strong>CLI'da:</strong> bir Codex oturumunda <code>/status</code> çalıştırın. Her pencerede kullanılan yüzdeyi ve her birinin ne zaman sıfırlanacağını gösterir. Yeni CLI sürümlerinde <code>/usage</code> da bulunur.</li>\n<li><strong>Web'de:</strong> ChatGPT ayarlarındaki Codex kullanım sayfası aynı pencereleri ve hesabınızdaki saklı sıfırlamaları gösterir.</li>\n</ul>\n\n<h2>Saklı Codex sıfırlaması nedir?</h2>\n\n<p><strong>OpenAI'nin hesabınıza, hemen sıfırlamak yerine daha sonra kullanmanız için koyduğu tek seferlik bir sıfırlama.</strong> Kullanım ayarlarından kullandığınızda hem 5 saatlik hem de haftalık pencereniz %0 kullanıma döner ve haftalık sıfırlama tarihiniz bu andan itibaren bir hafta ileri kayar. Paketinizin kotasını artırmaz.</p>\n\n<p><strong>Saklı sıfırlamalar verildikten yaklaşık 30 gün sonra sona erer</strong> ve bunu size hatırlatan bir şey yoktur. Kullanıcılar bunun uzatılmasını <a href=\"https://github.com/openai/codex/issues/28888\">GitHub issue #28888</a> üzerinden istedi. Pratik kural: saklı sıfırlamayı haftalık göstergeniz neredeyse boşken değil, yüksekken kullanın ve 30 gün dolmadan kullanın.</p>\n\n<h2>OpenAI Codex limitlerini neden sürekli sıfırlıyor?</h2>\n\n<p><strong>Çoğunlukla lansmanları ve kullanıcı kilometre taşlarını kutlamak için, ara sıra da fazla kullanım sayan hataları telafi etmek için.</strong> Çoğu sıfırlama, Codex mühendisliğine liderlik eden Thibault Sottiaux (@thsottiaux) tarafından X'te duyurulur. Sıfırlamalar 8M, 9M, 10M, 15M ve 20M aktif kullanıcıyı, yeni model sürümlerini ve 29 Ağustos'ta kullanıcılardan fazla kullanım ücreti alan hatalara yönelik bir dizi düzeltmeyi işaretledi.</p>\n\n<p>Bu sıfırlamaların hiçbiri planlanmış değildir. Bir iş yükünü bir sonrakine göre planlayamazsınız ve bir paketi, bir sonrakinin geleceği varsayımıyla fiyatlandırmamalısınız.</p>\n\n<h2>Codex sıfırlama kaydı: Ağustos ve Eylül 2026</h2>\n\n<p>Bu kayıt yalnızca hem <a href=\"https://codex-resets.com/\">codex-resets.com</a> hem de <a href=\"https://aiidelist.com/codex-reset\">aiidelist</a> tarafından kaydedilen sıfırlamaları listeler. Tarihler UTC'dir. &ldquo;Anında&rdquo; sıfırlamalar tüm ücretli hesaplara aynı anda uygulanır. &ldquo;Saklı&rdquo; sıfırlamalar, 30 gün içinde kullanılmak üzere hesaplara yüklenir.</p>\n\n<table>\n<thead><tr><th>Tarih</th><th>Tür</th><th>Sebep</th></tr></thead>\n<tbody>\n<tr><td>1 Ağu 2026</td><td>Anında</td><td>Luna'da verimlilik kazanımları</td></tr>\n<tr><td>8 Ağu 2026</td><td>Anında</td><td>GPT-5.6 Sol sürümü</td></tr>\n<tr><td>11 Ağu 2026</td><td>Anında</td><td>Neden belirtilmedi</td></tr>\n<tr><td>13 Ağu 2026</td><td>Anında</td><td>15M aktif kullanıcı</td></tr>\n<tr><td>21 Ağu 2026</td><td>Saklı</td><td>20M aktif kullanıcı</td></tr>\n<tr><td>24 Ağu 2026</td><td>Anında</td><td>Kullanım düzeltmeleri yayınlandı</td></tr>\n<tr><td>25 Ağu 2026</td><td>Anında</td><td>Neden belirtilmedi</td></tr>\n<tr><td>27 Ağu 2026</td><td>Anında</td><td>Neden belirtilmedi</td></tr>\n<tr><td>29 Ağu 2026</td><td>Anında</td><td>Fazla kullanım sayan hataların düzeltmeleri</td></tr>\n<tr><td>22 Eyl 2026</td><td>Saklı</td><td>GPT-6 Sol ve Luna sürümü</td></tr>\n<tr><td>26 Eyl 2026</td><td>Anında</td><td>Hafta sonu sıfırlaması</td></tr>\n</tbody>\n</table>\n\n<p>Takipçiler Eylül'ün başı konusunda hemfikir değil. aiidelist, GPT-6 Astra bekleyen hesaplar için 3 ve 5 Eylül'de saklı sıfırlamalar, ayrıca 31 Ağustos, 8 Eylül ve 12 Eylül'de sıfırlamalar listeliyor. codex-resets.com ise 29 Ağustos ile 22 Eylül arasında hiçbir sıfırlama göstermiyor. Temmuz en yoğun ay oldu; 7M'den 10M'e kadar kullanıcı kilometre taşlarına bağlı bir sıfırlama dizisi vardı.</p>\n\n<h2>Codex sıfırlamalarını nereden takip edebilirim?</h2>\n\n<p>Birkaç topluluk sitesi duyuruları izler ve her sıfırlamayı kaydeder. Hiçbiri OpenAI tarafından işletilmez.</p>\n\n<ul>\n<li><a href=\"https://codex-resets.com/\">codex-resets.com</a>: ortalama ve medyan aralıklarla tam geçmiş.</li>\n<li><a href=\"https://codex-reset.com/\">codex-reset.com</a>: son sıfırlamadan bu yana geçen gün sayısı.</li>\n<li><a href=\"https://aiidelist.com/codex-reset\">aiidelist Codex sıfırlama takipçisi</a>: nedenleriyle tarihli zaman çizelgesi.</li>\n<li><a href=\"https://usagereset.com/\">usagereset.com</a>: Codex ve Claude Code sıfırlamalarını takip eder.</li>\n</ul>\n\n<h2>Claude Code da sürpriz sıfırlamalar yapıyor mu?</h2>\n\n<p><strong>Alışkanlık olarak hayır.</strong> Claude paketleri aynı iki pencereli yapıyı kullanır: 5 saatlik oturum ve haftalık limit. Ancak Anthropic kilometre taşı sıfırlama programı yürütmez. Bir Claude haftasının neye değer olduğu <a href=\"/research/claude-max-20x-vs-5x-weekly-limit\">Claude Max haftalık limit sayfamızda</a>.</p>\n\n<h2>Yeni: Codex Pro $100 için 12 günlük gerçek kayıtlar</h2>\n\n<p>Yoğun bir Codex iki haftasının her tokenini kaydettik ve verileri yayımladık. Tam bir Pro $100 haftası API fiyatlarıyla $175 değerindeydi; dolayısıyla <a href=\"/research/chatgpt-pro-100-real-codex-multiplier\">gerçek çarpan 5x değil, Plus'ın 2,6 katı</a>. Genel ve saklı sıfırlamaları kullanarak <a href=\"/research/codex-pro-100-heavy-user-resets-log\">12 günde 8 haftalık pencere</a> elde ettik; değeri <a href=\"/research/codex-resets-value-12-days\">$1.211 API kullanımı</a>. Ayrıca <a href=\"/research/codex-banked-reset-when-to-redeem\">saklı bir sıfırlamayı ne zaman kullanmanız gerektiğini</a> ve girdinin neden <a href=\"/research/codex-prompt-caching-cost\">%98'inin önbelleğe alındığını</a> de inceledik. Her makale CSV dosyasını da paylaşır.</p>\n\n<h2>Kaynaklar</h2>\n\n<ul>\n<li><a href=\"https://codex-resets.com/\">codex-resets.com: Codex sıfırlama geçmişi ve istatistikleri</a></li>\n<li><a href=\"https://aiidelist.com/codex-reset\">aiidelist: Codex sıfırlama takipçisi</a></li>\n<li><a href=\"https://github.com/openai/codex/issues/28246\">GitHub openai/codex #28246: kota pencereleri sıfırlamadan sonraki ilk kullanıma sabitlenir</a></li>\n<li><a href=\"https://github.com/openai/codex/issues/28888\">GitHub openai/codex #28888: saklı sıfırlama süresinin 30 günün ötesine uzatılması</a></li>\n<li><a href=\"https://help.openai.com/en/articles/20001507-paid-weekly-work-and-codex-rate-limit-resets\">OpenAI Yardım: Ücretli haftalık Work ve Codex hız limiti sıfırlamaları</a></li>\n</ul>",
+      "faq": [
+        {
+          "question": "Codex kullanım limitleri ne zaman sıfırlanır?",
+          "answer": "5 saatlik pencere, açıldıktan 5 saat sonra sıfırlanır. Haftalık pencere ilk isteğinizden yaklaşık 7 gün sonra sıfırlanır; bu nedenle sabit bir günü yoktur ve aynı paketteki kullanıcılar arasında farklılık gösterir."
+        },
+        {
+          "question": "Saklı Codex sıfırlaması nedir?",
+          "answer": "OpenAI'nin daha sonra kullanmanız için hesabınıza yüklediği tek seferlik bir sıfırlamadır. Kullanıldığında hem 5 saatlik hem haftalık pencere %0'a döner ve haftalık sıfırlama tarihiniz ileri alınır."
+        },
+        {
+          "question": "Saklı Codex sıfırlamaları sona erer mi?",
+          "answer": "Evet, verildikten yaklaşık 30 gün sonra, hatırlatma yapılmadan. Haftalık göstergeniz yüksekken ve 30 gün dolmadan birini kullanın."
+        },
+        {
+          "question": "OpenAI Codex limitlerini ne sıklıkla sıfırlıyor?",
+          "answer": "Topluluk takipçileri Eylül 2025'ten bu yana 55 tek seferlik sıfırlama saymış; ortalama her 6,9 günde bir. Genellikle lansmanlar, kullanıcı kilometre taşları veya kullanım hataları için yapılır. Hiçbiri planlanmış değildir."
+        },
+        {
+          "question": "Codex kullanımımı ve sıfırlama zamanımı nasıl kontrol ederim?",
+          "answer": "Codex CLI'da /status çalıştırın ya da ChatGPT ayarlarındaki Codex kullanım sayfasını açın. İkisi de her pencerede kullanılan yüzdeyi ve sıfırlanma zamanını gösterir."
+        }
+      ]
+    },
+    "vi": {
+      "title": "Reset giới hạn Codex: cách hoạt động và nhật ký",
+      "titleCore": "Reset giới hạn Codex: cách hoạt động, reset dự trữ và nhật ký theo ngày",
+      "description": "Khi giới hạn Codex được reset, reset dự trữ là gì và hết hạn khi nào, cùng nhật ký theo ngày các lần reset của OpenAI trong tháng Tám và Chín 2026.",
+      "body": "<p>\n<strong>Giới hạn sử dụng Codex reset theo hai đồng hồ: một cửa sổ 5 giờ và một cửa sổ tuần bắt đầu từ yêu cầu đầu tiên của bạn sau lần reset trước.</strong> Ngoài ra, OpenAI thường xuyên reset giới hạn của mọi người sớm hơn, hoặc ngay lập tức, hoặc dưới dạng một lần reset &ldquo;dự trữ&rdquo; mà bạn đổi sau. Các trình theo dõi bên thứ ba ghi nhận 55 lần reset một lần kể từ tháng Chín 2025, trung bình cứ khoảng 6.9 ngày một lần. Nhật ký theo ngày bên dưới bao gồm tháng Tám và tháng Chín 2026.</p>\n\n<p>Nếu bạn muốn biết một tuần Codex có giá trị bao nhiêu đô la trên Plus, Pro 5x và Pro 20x, điều đó có trên <a href=\"/research/codex-usage-limits-chatgpt-pro\">trang giới hạn sử dụng Codex</a> của chúng tôi. Trang này nói về thời điểm đồng hồ quay về không.</p>\n\n<h2>Giới hạn sử dụng Codex reset khi nào?</h2>\n\n<p>\n<strong>Cửa sổ 5 giờ reset sau 5 giờ kể từ khi mở. Cửa sổ tuần reset khoảng 7 ngày sau yêu cầu đầu tiên, chứ không vào một ngày cố định.</strong> Một chu kỳ tuần mới bắt đầu từ yêu cầu Codex đầu tiên sau khi chu kỳ trước kết thúc. Nếu bạn ngừng dùng Codex trong ba ngày, tuần tiếp theo của bạn bắt đầu khi bạn quay lại, nên hai người cùng gói sẽ reset vào những ngày khác nhau. <a href=\"https://github.com/openai/codex/issues/28246\">GitHub issue #28246</a> ghi lại cơ chế neo này và khoảng thời gian trả phí mà nó có thể khiến bạn mất.</p>\n\n<p>Hai cửa sổ được kiểm tra riêng. Một cửa sổ 5 giờ mới không giúp ích gì nếu đồng hồ tuần đang ở 100%.</p>\n\n<h2>Làm sao để biết giới hạn Codex của tôi reset khi nào?</h2>\n\n<ul>\n<li>\n<strong>Trong CLI:</strong> chạy <code>/status</code> trong phiên Codex. Nó hiển thị phần trăm đã dùng ở mỗi cửa sổ và thời điểm mỗi cửa sổ reset. Các phiên bản CLI gần đây cũng có <code>/usage</code>.</li>\n<li>\n<strong>Trên web:</strong> trang sử dụng Codex trong cài đặt ChatGPT hiển thị các cửa sổ tương tự, cùng mọi reset dự trữ trong tài khoản của bạn.</li>\n</ul>\n\n<h2>Reset Codex dự trữ là gì?</h2>\n\n<p>\n<strong>Một lần reset một lần mà OpenAI đặt vào tài khoản của bạn để bạn dùng sau, thay vì reset ngay tại chỗ.</strong> Khi bạn đổi nó từ cài đặt sử dụng, cả cửa sổ 5 giờ và cửa sổ tuần đều quay về 0% đã dùng, và ngày reset tuần của bạn dời đến một tuần kể từ lúc đó. Nó không nâng hạn mức của gói bạn.</p>\n\n<p>\n<strong>Reset dự trữ hết hạn khoảng 30 ngày sau khi được cấp</strong>, và không có gì nhắc bạn. Người dùng đã yêu cầu OpenAI kéo dài thời hạn này trong <a href=\"https://github.com/openai/codex/issues/28888\">GitHub issue #28888</a>. Quy tắc thực tế: hãy đổi reset dự trữ khi đồng hồ tuần đang cao, chứ không phải khi gần cạn, và đổi trước khi hết 30 ngày.</p>\n\n<h2>Vì sao OpenAI liên tục reset giới hạn Codex?</h2>\n\n<p>\n<strong>Chủ yếu để ăn mừng các đợt ra mắt và cột mốc người dùng, và thỉnh thoảng để bù cho các lỗi đếm mức sử dụng quá cao.</strong> Phần lớn các lần reset được thông báo trên X bởi Thibault Sottiaux (@thsottiaux), người dẫn dắt kỹ thuật Codex. Các lần reset đã đánh dấu 8M, 9M, 10M, 15M và 20M người dùng hoạt động, các bản phát hành mô hình mới, và vào ngày 29 tháng Tám là một loạt bản sửa cho các lỗi từng tính quá nhiều mức sử dụng.</p>\n\n<p>Không lần reset nào trong số này được lên lịch. Bạn không thể lập kế hoạch khối lượng công việc quanh lần kế tiếp, và bạn không nên định giá gói dựa trên giả định nó sẽ đến.</p>\n\n<h2>Nhật ký reset Codex: tháng Tám và tháng Chín 2026</h2>\n\n<p>Nhật ký này chỉ liệt kê những lần reset mà cả <a href=\"https://codex-resets.com/\">codex-resets.com</a> và <a href=\"https://aiidelist.com/codex-reset\">aiidelist</a> đều ghi nhận. Ngày theo UTC. Reset &ldquo;ngay lập tức&rdquo; áp dụng cho mọi tài khoản trả phí cùng lúc. Reset &ldquo;dự trữ&rdquo; được nạp vào tài khoản để đổi trong vòng 30 ngày.</p>\n\n<table>\n<thead>\n<tr>\n<th>Ngày</th>\n<th>Loại</th>\n<th>Dịp</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>1 tháng Tám 2026</td>\n<td>Ngay lập tức</td>\n<td>Cải thiện hiệu quả trên Luna</td>\n</tr>\n<tr>\n<td>8 tháng Tám 2026</td>\n<td>Ngay lập tức</td>\n<td>Ra mắt GPT-5.6 Sol</td>\n</tr>\n<tr>\n<td>11 tháng Tám 2026</td>\n<td>Ngay lập tức</td>\n<td>Không nêu lý do</td>\n</tr>\n<tr>\n<td>13 tháng Tám 2026</td>\n<td>Ngay lập tức</td>\n<td>15M người dùng hoạt động</td>\n</tr>\n<tr>\n<td>21 tháng Tám 2026</td>\n<td>Dự trữ</td>\n<td>20M người dùng hoạt động</td>\n</tr>\n<tr>\n<td>24 tháng Tám 2026</td>\n<td>Ngay lập tức</td>\n<td>Các bản sửa lỗi sử dụng đã được triển khai</td>\n</tr>\n<tr>\n<td>25 tháng Tám 2026</td>\n<td>Ngay lập tức</td>\n<td>Không nêu lý do</td>\n</tr>\n<tr>\n<td>27 tháng Tám 2026</td>\n<td>Ngay lập tức</td>\n<td>Không nêu lý do</td>\n</tr>\n<tr>\n<td>29 tháng Tám 2026</td>\n<td>Ngay lập tức</td>\n<td>Sửa các lỗi đếm mức sử dụng quá cao</td>\n</tr>\n<tr>\n<td>22 tháng Chín 2026</td>\n<td>Dự trữ</td>\n<td>Ra mắt GPT-6 Sol và Luna</td>\n</tr>\n<tr>\n<td>26 tháng Chín 2026</td>\n<td>Ngay lập tức</td>\n<td>Reset cuối tuần</td>\n</tr>\n</tbody>\n</table>\n\n<p>Các trình theo dõi không thống nhất về đầu tháng Chín. aiidelist cũng liệt kê các reset dự trữ vào ngày 3 và 5 tháng Chín cho các tài khoản đang chờ GPT-6 Astra, và các reset vào ngày 31 tháng Tám, 8 tháng Chín và 12 tháng Chín. codex-resets.com không ghi nhận lần reset nào từ 29 tháng Tám đến 22 tháng Chín. Tháng Bảy là tháng bận rộn nhất, với một chuỗi reset gắn với các cột mốc 7M đến 10M người dùng.</p>\n\n<h2>Tôi có thể theo dõi reset Codex ở đâu?</h2>\n\n<p>Một số trang cộng đồng theo dõi các thông báo và ghi lại từng lần reset. Không trang nào do OpenAI điều hành.</p>\n\n<ul>\n<li>\n<a href=\"https://codex-resets.com/\">codex-resets.com</a>: lịch sử đầy đủ với khoảng cách trung bình và trung vị.</li>\n<li>\n<a href=\"https://codex-reset.com/\">codex-reset.com</a>: số ngày kể từ lần reset gần nhất.</li>\n<li>\n<a href=\"https://aiidelist.com/codex-reset\">Trình theo dõi reset Codex của aiidelist</a>: dòng thời gian theo ngày kèm lý do.</li>\n<li>\n<a href=\"https://usagereset.com/\">usagereset.com</a>: theo dõi reset của Codex và Claude Code.</li>\n</ul>\n\n<h2>Claude Code cũng có reset bất ngờ không?</h2>\n\n<p>\n<strong>Không phải theo thói quen.</strong> Các gói Claude dùng cùng cấu trúc hai cửa sổ, một phiên 5 giờ và một giới hạn tuần, nhưng Anthropic không chạy chương trình reset theo cột mốc. Một tuần Claude có giá trị bao nhiêu được trình bày trên <a href=\"/research/claude-max-20x-vs-5x-weekly-limit\">trang giới hạn tuần của Claude Max</a> của chúng tôi.</p>\n\n<h2>Mới: nhật ký 12 ngày Codex Pro $100 thực tế</h2>\n\n<p>Chúng tôi ghi lại từng token trong hai tuần Codex nặng và công bố dữ liệu. Một tuần Pro $100 đầy đủ có giá trị $175 theo giá API, nên <a href=\"/research/chatgpt-pro-100-real-codex-multiplier\">hệ số thực tế là 2.6x Plus, không phải 5x</a>. Dùng reset toàn cục và reset dự trữ, chúng tôi đạt <a href=\"/research/codex-pro-100-heavy-user-resets-log\">8 cửa sổ tuần trong 12 ngày</a>, tương đương <a href=\"/research/codex-resets-value-12-days\">$1,211 mức sử dụng API</a>. Chúng tôi cũng tìm ra <a href=\"/research/codex-banked-reset-when-to-redeem\">khi nào nên đổi reset dự trữ</a> và vì sao <a href=\"/research/codex-prompt-caching-cost\">98% đầu vào được cache</a>. Mỗi bài đều kèm CSV.</p>\n\n<h2>Nguồn</h2>\n\n<ul>\n<li>\n<a href=\"https://codex-resets.com/\">codex-resets.com: lịch sử và thống kê reset Codex</a>\n</li>\n<li>\n<a href=\"https://aiidelist.com/codex-reset\">aiidelist: trình theo dõi reset Codex</a>\n</li>\n<li>\n<a href=\"https://github.com/openai/codex/issues/28246\">GitHub openai/codex #28246: cửa sổ hạn mức neo vào lần sử dụng đầu tiên sau reset</a>\n</li>\n<li>\n<a href=\"https://github.com/openai/codex/issues/28888\">GitHub openai/codex #28888: kéo dài thời hạn reset dự trữ vượt 30 ngày</a>\n</li>\n<li>\n<a href=\"https://help.openai.com/en/articles/20001507-paid-weekly-work-and-codex-rate-limit-resets\">Trung tâm trợ giúp OpenAI: reset tuần có trả phí của Work và giới hạn tốc độ Codex</a>\n</li>\n</ul>\n",
+      "faq": [
+        {
+          "question": "Giới hạn sử dụng Codex reset khi nào?",
+          "answer": "Cửa sổ 5 giờ reset sau 5 giờ kể từ khi mở. Cửa sổ tuần reset khoảng 7 ngày sau yêu cầu đầu tiên, nên nó không có ngày cố định và khác nhau giữa những người cùng gói."
+        },
+        {
+          "question": "Reset Codex dự trữ là gì?",
+          "answer": "Một lần reset một lần mà OpenAI nạp vào tài khoản để bạn đổi sau. Khi đổi, cả cửa sổ 5 giờ và cửa sổ tuần đều quay về 0% và ngày reset tuần của bạn được dời về phía trước."
+        },
+        {
+          "question": "Reset Codex dự trữ có hết hạn không?",
+          "answer": "Có, khoảng 30 ngày sau khi được cấp, và không có nhắc nhở. Hãy đổi một lần khi đồng hồ tuần đang cao và trước khi hết 30 ngày."
+        },
+        {
+          "question": "OpenAI reset giới hạn Codex thường xuyên đến mức nào?",
+          "answer": "Các trình theo dõi cộng đồng ghi nhận 55 lần reset một lần kể từ tháng Chín 2025, trung bình cứ 6.9 ngày một lần, thường nhân dịp ra mắt, cột mốc người dùng hoặc lỗi sử dụng. Không lần nào được lên lịch."
+        },
+        {
+          "question": "Tôi kiểm tra mức sử dụng Codex và thời điểm reset bằng cách nào?",
+          "answer": "Chạy /status trong Codex CLI, hoặc mở trang sử dụng Codex trong cài đặt ChatGPT. Cả hai đều hiển thị phần trăm đã dùng ở mỗi cửa sổ và thời điểm nó reset."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/claude-vs-codex-october-2026",
+          "label": "Claude vs Codex tháng Mười 2026: bên nào thắng ở $100"
+        },
+        {
+          "slug": "/research/claude-fable-5-1-vs-opus-5-5-cost",
+          "label": "Fable 5.1 so với Opus 5.5: 2.5x có đáng không?"
+        },
+        {
+          "slug": "/research/chatgpt-pro-100-real-codex-multiplier",
+          "label": "ChatGPT Pro $100 thực ra là 2.6x Plus, không phải 5x"
+        },
+        {
+          "slug": "/research/codex-pro-100-heavy-user-resets-log",
+          "label": "8 cửa sổ tuần Codex trong 12 ngày trên Pro $100"
+        },
+        {
+          "slug": "/research/codex-resets-value-12-days",
+          "label": "Reset biến gói $40 thành $1,211 mức sử dụng"
+        },
+        {
+          "slug": "/research/codex-banked-reset-when-to-redeem",
+          "label": "Khi nào nên đổi reset Codex dự trữ"
+        },
+        {
+          "slug": "/research/codex-prompt-caching-cost",
+          "label": "98% đầu vào Codex của chúng tôi được cache: hóa đơn"
+        },
+        {
+          "slug": "/research/codex-usage-limits-chatgpt-pro",
+          "label": "ChatGPT Pro bao gồm bao nhiêu Codex, tính bằng đô la"
+        },
+        {
+          "slug": "/research/claude-max-vs-chatgpt-pro-codex-200",
+          "label": "Claude Max so với ChatGPT Pro: nghiên cứu 60 ngày đầy đủ"
+        },
+        {
+          "slug": "/research/claude-max-20x-vs-5x-weekly-limit",
+          "label": "Claude Max 20x so với 5x: giới hạn tuần, đã đo"
+        }
+      ]
+    },
+    "ar": {
+      "title": "إعادة ضبط حدود استخدام Codex: كيف تعمل + السجل",
+      "titleCore": "إعادة ضبط حدود استخدام Codex: كيف تعمل، والإعادات المخزّنة، وسجل مؤرَّخ",
+      "description": "متى تُعاد حدود استخدام Codex، وما الإعادة المخزّنة ومتى تنتهي صلاحيتها، مع سجل مؤرَّخ بكل إعادة ضبط أجرتها OpenAI في أغسطس وسبتمبر 2026.",
+      "related": [
+        {
+          "slug": "/research/claude-vs-codex-october-2026",
+          "label": "Claude مقابل Codex في أكتوبر 2026: من يفوز عند 100 دولار"
+        },
+        {
+          "slug": "/research/claude-fable-5-1-vs-opus-5-5-cost",
+          "label": "Fable 5.1 مقابل Opus 5.5: هل يستحق 2.5 ضعف؟"
+        },
+        {
+          "slug": "/research/chatgpt-pro-100-real-codex-multiplier",
+          "label": "ChatGPT Pro بسعر 100 دولار يعادل فعلاً 2.6 ضعف Plus لا 5 أضعاف"
+        },
+        {
+          "slug": "/research/codex-pro-100-heavy-user-resets-log",
+          "label": "8 نوافذ أسبوعية لـ Codex في 12 يوماً على Pro بسعر 100 دولار"
+        },
+        {
+          "slug": "/research/codex-resets-value-12-days",
+          "label": "كيف حوّلت الإعادات خطة بـ 40 دولاراً إلى استخدام بقيمة 1,211 دولاراً"
+        },
+        {
+          "slug": "/research/codex-banked-reset-when-to-redeem",
+          "label": "متى تستبدل إعادة Codex المخزّنة"
+        },
+        {
+          "slug": "/research/codex-prompt-caching-cost",
+          "label": "98% من إدخال Codex لدينا كان مخزناً مؤقتاً: الفاتورة"
+        },
+        {
+          "slug": "/research/codex-usage-limits-chatgpt-pro",
+          "label": "كم من Codex يتضمنه ChatGPT Pro، بالدولار"
+        },
+        {
+          "slug": "/research/claude-max-vs-chatgpt-pro-codex-200",
+          "label": "Claude Max مقابل ChatGPT Pro: الدراسة الكاملة لـ 60 يوماً"
+        },
+        {
+          "slug": "/research/claude-max-20x-vs-5x-weekly-limit",
+          "label": "Claude Max بمضاعف 20x مقابل 5x: الحد الأسبوعي مقيساً"
+        }
+      ],
+      "body": "<p><strong>تُعاد حدود استخدام Codex على ساعتين: نافذة مدتها 5 ساعات ونافذة أسبوعية تبدأ بأول طلب لك بعد آخر إعادة ضبط.</strong> وفوق ذلك، تعيد OpenAI ضبط حدود الجميع مبكراً بانتظام، إما فوراً أو كإعادة «مخزّنة» تستبدلها لاحقاً. تحصي المتتبعات الخارجية 55 إعادة استثنائية من هذا النوع منذ سبتمبر 2025، أي ما يقارب واحدة كل 6.9 أيام. ويغطي السجل المؤرَّخ أدناه أغسطس وسبتمبر 2026.</p>\n\n<p>إذا أردت معرفة قيمة أسبوع Codex بالدولار على Plus وPro 5x وPro 20x، فذلك في <a href=\"/research/codex-usage-limits-chatgpt-pro\">صفحة حدود استخدام Codex</a>. أما هذه الصفحة فعن موعد عودة المؤشر إلى الصفر.</p>\n\n<h2>متى تُعاد حدود استخدام Codex؟</h2>\n\n<p><strong>تُعاد نافذة الـ 5 ساعات بعد 5 ساعات من فتحها. وتُعاد النافذة الأسبوعية بعد نحو 7 أيام من أول طلب فيها، لا في يوم ثابت.</strong> تبدأ الفترة الأسبوعية الجديدة بأول طلب Codex لك بعد انتهاء الفترة السابقة. فإذا توقفت عن استخدام Codex ثلاثة أيام، يبدأ أسبوعك التالي حين تعود، ولذلك يُعاد ضبط شخصين على الخطة نفسها في يومين مختلفين. توثق <a href=\"https://github.com/openai/codex/issues/28246\">مسألة GitHub رقم 28246</a> هذا الارتباط بأول استخدام والوقت المدفوع الذي قد يكلفك إياه.</p>\n\n<p>تُفحص النافذتان بشكل منفصل. ولا تفيدك نافذة جديدة مدتها 5 ساعات إذا كان المؤشر الأسبوعي عند 100%.</p>\n\n<h2>كيف أعرف موعد إعادة ضبط حد Codex لدي؟</h2>\n\n<ul>\n<li><strong>في سطر الأوامر:</strong> شغّل <code>/status</code> داخل جلسة Codex. يعرض النسبة المستخدمة في كل نافذة وموعد إعادة ضبط كل منهما. وتتضمن الإصدارات الحديثة من CLI أيضاً <code>/usage</code>.</li>\n<li><strong>على الويب:</strong> تعرض صفحة استخدام Codex في إعدادات ChatGPT النوافذ نفسها، إضافة إلى أي إعادات مخزّنة في حسابك.</li>\n</ul>\n\n<h2>ما إعادة Codex المخزّنة؟</h2>\n\n<p><strong>إعادة ضبط لمرة واحدة تضعها OpenAI في حسابك لتستخدمها لاحقاً، بدلاً من إعادة ضبطك فوراً.</strong> عند استبدالها من إعدادات الاستخدام، تعود نافذتا الـ 5 ساعات والأسبوعية إلى 0% مستخدم، ويتحرك موعد إعادة الضبط الأسبوعية إلى أسبوع من تلك اللحظة. وهي لا ترفع مخصصات خطتك.</p>\n\n<p><strong>تنتهي صلاحية الإعادات المخزّنة بعد نحو 30 يوماً من منحها</strong>، ولا شيء يذكّرك بذلك. وقد طلب المستخدمون من OpenAI تمديد المدة في <a href=\"https://github.com/openai/codex/issues/28888\">مسألة GitHub رقم 28888</a>. القاعدة العملية: استبدل الإعادة المخزّنة حين يكون مؤشرك الأسبوعي مرتفعاً لا حين يكون شبه فارغ، واستبدلها قبل انقضاء الـ 30 يوماً.</p>\n\n<h2>لماذا تواصل OpenAI إعادة ضبط حدود Codex؟</h2>\n\n<p><strong>في الغالب للاحتفال بالإطلاقات ومحطات المستخدمين، وأحياناً للتعويض عن أخطاء بالغت في احتساب الاستخدام.</strong> يُعلَن عن معظم الإعادات على X من Thibault Sottiaux (@thsottiaux)، الذي يقود هندسة Codex. وقد ارتبطت الإعادات ببلوغ 8M و9M و10M و15M و20M مستخدم نشط، وبإصدارات نماذج جديدة، وفي 29 أغسطس بمجموعة إصلاحات لأخطاء كانت تحمّل المستخدمين استخداماً زائداً.</p>\n\n<p>لا شيء من هذه الإعادات مجدول. لا يمكنك بناء عبء عمل على الإعادة التالية، ولا ينبغي أن تسعّر خطة على افتراض أنها ستأتي.</p>\n\n<h2>سجل إعادات Codex: أغسطس وسبتمبر 2026</h2>\n\n<p>يسرد هذا السجل فقط الإعادات التي يسجلها كل من <a href=\"https://codex-resets.com/\">codex-resets.com</a> و<a href=\"https://aiidelist.com/codex-reset\">aiidelist</a>. التواريخ بالتوقيت العالمي UTC. تُطبَّق الإعادات «الفورية» على جميع الحسابات المدفوعة دفعة واحدة. أما الإعادات «المخزّنة» فتُحمَّل في الحسابات لتُستبدل خلال 30 يوماً.</p>\n\n<table>\n<thead><tr><th>التاريخ</th><th>النوع</th><th>المناسبة</th></tr></thead>\n<tbody>\n<tr><td>1 أغسطس 2026</td><td>فورية</td><td>مكاسب كفاءة في Luna</td></tr>\n<tr><td>8 أغسطس 2026</td><td>فورية</td><td>إطلاق GPT-5.6 Sol</td></tr>\n<tr><td>11 أغسطس 2026</td><td>فورية</td><td>دون سبب معلن</td></tr>\n<tr><td>13 أغسطس 2026</td><td>فورية</td><td>15M مستخدم نشط</td></tr>\n<tr><td>21 أغسطس 2026</td><td>مخزّنة</td><td>20M مستخدم نشط</td></tr>\n<tr><td>24 أغسطس 2026</td><td>فورية</td><td>وصول إصلاحات الاستخدام</td></tr>\n<tr><td>25 أغسطس 2026</td><td>فورية</td><td>دون سبب معلن</td></tr>\n<tr><td>27 أغسطس 2026</td><td>فورية</td><td>دون سبب معلن</td></tr>\n<tr><td>29 أغسطس 2026</td><td>فورية</td><td>إصلاحات لأخطاء بالغت في احتساب الاستخدام</td></tr>\n<tr><td>22 سبتمبر 2026</td><td>مخزّنة</td><td>إطلاق GPT-6 Sol وLuna</td></tr>\n<tr><td>26 سبتمبر 2026</td><td>فورية</td><td>إعادة عطلة نهاية الأسبوع</td></tr>\n</tbody>\n</table>\n\n<p>تختلف المتتبعات حول أوائل سبتمبر. يسرد aiidelist أيضاً إعادات مخزّنة في 3 و5 سبتمبر للحسابات التي تنتظر GPT-6 Astra، وإعادات في 31 أغسطس و8 سبتمبر و12 سبتمبر. أما codex-resets.com فلا يُظهر أي إعادة بين 29 أغسطس و22 سبتمبر. وكان يوليو أكثر الشهور ازدحاماً، بسلسلة إعادات ارتبطت بمحطات المستخدمين من 7M إلى 10M.</p>\n\n<h2>أين يمكنني تتبع إعادات Codex؟</h2>\n\n<p>تراقب عدة مواقع مجتمعية الإعلانات وتسجل كل إعادة. ولا يديرها أي منها OpenAI.</p>\n\n<ul>\n<li><a href=\"https://codex-resets.com/\">codex-resets.com</a>: السجل الكامل مع متوسط الفواصل ووسيطها.</li>\n<li><a href=\"https://codex-reset.com/\">codex-reset.com</a>: عدد الأيام منذ آخر إعادة.</li>\n<li><a href=\"https://aiidelist.com/codex-reset\">متتبع إعادات Codex من aiidelist</a>: خط زمني مؤرَّخ مع الأسباب.</li>\n<li><a href=\"https://usagereset.com/\">usagereset.com</a>: يتتبع إعادات Codex وClaude Code.</li>\n</ul>\n\n<h2>هل يجري Claude Code إعادات مفاجئة أيضاً؟</h2>\n\n<p><strong>ليس كعادة.</strong> تستخدم خطط Claude بنية النافذتين نفسها: جلسة من 5 ساعات وحد أسبوعي، لكن Anthropic لا تدير برنامج إعادات للمحطات. وقيمة أسبوع Claude موجودة في <a href=\"/research/claude-max-20x-vs-5x-weekly-limit\">صفحة الحد الأسبوعي لـ Claude Max</a>.</p>\n\n<h2>جديد: 12 يوماً من سجلات Codex Pro بسعر 100 دولار الحقيقية</h2>\n\n<p>سجّلنا كل رمز خلال أسبوعين مكثفين مع Codex ونشرنا البيانات. بلغت قيمة أسبوع كامل من Pro بسعر 100 دولار ما يعادل 175 دولاراً بأسعار الواجهة البرمجية، فـ<a href=\"/research/chatgpt-pro-100-real-codex-multiplier\">المضاعف الحقيقي 2.6 ضعف Plus لا 5 أضعاف</a>. وباستخدام الإعادات العامة والمخزّنة حصلنا على <a href=\"/research/codex-pro-100-heavy-user-resets-log\">8 نوافذ أسبوعية في 12 يوماً</a>، قيمتها <a href=\"/research/codex-resets-value-12-days\">1,211 دولاراً من استخدام الواجهة البرمجية</a>. كما حدّدنا <a href=\"/research/codex-banked-reset-when-to-redeem\">متى تستبدل الإعادة المخزّنة</a> ولماذا <a href=\"/research/codex-prompt-caching-cost\">98% من الإدخال كان مخزناً مؤقتاً</a>. وكل مقال يرفق ملف CSV الخاص به.</p>\n\n<h2>المصادر</h2>\n\n<ul>\n<li><a href=\"https://codex-resets.com/\">codex-resets.com: سجل إعادات Codex وإحصاءاتها</a></li>\n<li><a href=\"https://aiidelist.com/codex-reset\">aiidelist: متتبع إعادات Codex</a></li>\n<li><a href=\"https://github.com/openai/codex/issues/28246\">GitHub openai/codex #28246: نوافذ الحصة ترتبط بأول استخدام بعد الإعادة</a></li>\n<li><a href=\"https://github.com/openai/codex/issues/28888\">GitHub openai/codex #28888: تمديد انتهاء صلاحية الإعادة المخزّنة إلى ما بعد 30 يوماً</a></li>\n<li><a href=\"https://help.openai.com/en/articles/20001507-paid-weekly-work-and-codex-rate-limit-resets\">مركز مساعدة OpenAI: إعادات الحدود الأسبوعية المدفوعة للعمل وCodex</a></li>\n</ul>",
+      "faq": [
+        {
+          "question": "متى تُعاد حدود استخدام Codex؟",
+          "answer": "تُعاد نافذة الـ 5 ساعات بعد 5 ساعات من فتحها. وتُعاد النافذة الأسبوعية بعد نحو 7 أيام من أول طلب فيها، فلا يوجد يوم ثابت وتختلف بين المستخدمين على الخطة نفسها."
+        },
+        {
+          "question": "ما إعادة Codex المخزّنة؟",
+          "answer": "إعادة ضبط لمرة واحدة تحمّلها OpenAI في حسابك لتستبدلها لاحقاً. استبدالها يعيد نافذتي الـ 5 ساعات والأسبوعية إلى 0% ويقدّم موعد إعادة الضبط الأسبوعية."
+        },
+        {
+          "question": "هل تنتهي صلاحية إعادات Codex المخزّنة؟",
+          "answer": "نعم، بعد نحو 30 يوماً من منحها ودون أي تذكير. استبدل إعادة واحدة حين يكون مؤشرك الأسبوعي مرتفعاً وقبل انقضاء الـ 30 يوماً."
+        },
+        {
+          "question": "كم مرة تعيد OpenAI ضبط حدود Codex؟",
+          "answer": "تحصي المتتبعات المجتمعية 55 إعادة استثنائية منذ سبتمبر 2025، بمتوسط واحدة كل 6.9 أيام، وعادة بسبب إطلاقات أو محطات مستخدمين أو أخطاء استخدام. ولا شيء منها مجدول."
+        },
+        {
+          "question": "كيف أتحقق من استخدامي في Codex وموعد إعادة الضبط؟",
+          "answer": "شغّل /status في Codex CLI، أو افتح صفحة استخدام Codex في إعدادات ChatGPT. كلاهما يعرض النسبة المستخدمة في كل نافذة وموعد إعادتها."
+        }
+      ]
+    },
+    "it": {
+      "title": "Reset dei limiti di Codex: come funzionano + registro",
+      "titleCore": "Limiti di Codex: come si azzerano e registro datato dei reset",
+      "description": "Quando si azzerano i limiti di Codex, cos'è un reset accantonato e quando scade, più un registro datato di ogni reset OpenAI di agosto e settembre 2026.",
+      "related": [
+        {
+          "slug": "/research/claude-vs-codex-october-2026",
+          "label": "Claude contro Codex a ottobre 2026: chi vince a 100 $"
+        },
+        {
+          "slug": "/research/claude-fable-5-1-vs-opus-5-5-cost",
+          "label": "Fable 5.1 contro Opus 5.5: 2.5x vale la pena?"
+        },
+        {
+          "slug": "/research/chatgpt-pro-100-real-codex-multiplier",
+          "label": "ChatGPT Pro da 100 $ vale davvero 2.6x Plus, non 5x"
+        },
+        {
+          "slug": "/research/codex-pro-100-heavy-user-resets-log",
+          "label": "8 finestre settimanali di Codex in 12 giorni su Pro da 100 $"
+        },
+        {
+          "slug": "/research/codex-resets-value-12-days",
+          "label": "Come i reset hanno trasformato un piano da 40 $ in 1.211 $ di uso"
+        },
+        {
+          "slug": "/research/codex-banked-reset-when-to-redeem",
+          "label": "Quando riscattare un reset accantonato di Codex"
+        },
+        {
+          "slug": "/research/codex-prompt-caching-cost",
+          "label": "Il 98% dell'input di Codex era in cache: la bolletta"
+        },
+        {
+          "slug": "/research/codex-usage-limits-chatgpt-pro",
+          "label": "Quanto include Codex in ChatGPT Pro, in dollari"
+        },
+        {
+          "slug": "/research/claude-max-vs-chatgpt-pro-codex-200",
+          "label": "Claude Max contro ChatGPT Pro: lo studio completo di 60 giorni"
+        },
+        {
+          "slug": "/research/claude-max-20x-vs-5x-weekly-limit",
+          "label": "Claude Max 20x contro 5x: il limite settimanale, misurato"
+        }
+      ],
+      "body": "<p><strong>I limiti d'uso di Codex si azzerano su due orologi: una finestra di 5 ore e una finestra settimanale che parte dalla prima richiesta dopo l'ultimo reset.</strong> In più OpenAI azzera periodicamente i limiti di tutti, subito oppure con un reset &ldquo;accantonato&rdquo; da riscattare più tardi. I tracker di terze parti contano 55 di questi reset una tantum da settembre 2025, circa uno ogni 6.9 giorni. Il registro datato qui sotto copre agosto e settembre 2026.</p>\n\n<p>Se vuoi sapere quanto vale una settimana di Codex in dollari su Plus, Pro 5x e Pro 20x, è nella nostra <a href=\"/research/codex-usage-limits-chatgpt-pro\">pagina sui limiti d'uso di Codex</a>. Questa pagina riguarda quando il contatore torna a zero.</p>\n\n<h2>Quando si azzerano i limiti d'uso di Codex?</h2>\n\n<p><strong>La finestra di 5 ore si azzera 5 ore dopo la sua apertura. La finestra settimanale si azzera circa 7 giorni dopo la prima richiesta, non in un giorno fisso.</strong> Un nuovo periodo settimanale parte con la tua prima richiesta a Codex dopo la fine del precedente. Se smetti di usare Codex per tre giorni, la settimana successiva inizia quando torni, quindi due persone con lo stesso piano si azzerano in giorni diversi. <a href=\"https://github.com/openai/codex/issues/28246\">La issue #28246 su GitHub</a> documenta questo ancoraggio e il tempo a pagamento che può costarti.</p>\n\n<p>Le due finestre vengono controllate separatamente. Una finestra di 5 ore appena aperta non aiuta se il contatore settimanale è al 100%.</p>\n\n<h2>Come faccio a sapere quando si azzera il mio limite di Codex?</h2>\n\n<ul>\n<li><strong>Nella CLI:</strong> esegui <code>/status</code> in una sessione di Codex. Mostra la percentuale usata in ciascuna finestra e quando si azzera. Le versioni recenti della CLI hanno anche <code>/usage</code>.</li>\n<li><strong>Sul web:</strong> la pagina dell'uso di Codex nelle impostazioni di ChatGPT mostra le stesse finestre, più gli eventuali reset accantonati sul tuo account.</li>\n</ul>\n\n<h2>Cos'è un reset di Codex accantonato?</h2>\n\n<p><strong>Un reset una tantum che OpenAI mette sul tuo account perché tu lo usi più tardi, invece di azzerarti sul momento.</strong> Quando lo riscatti dalle impostazioni dell'uso, sia la finestra di 5 ore sia quella settimanale tornano allo 0% usato, e la data di reset settimanale si sposta a una settimana da quel momento. Non aumenta il limite del tuo piano.</p>\n\n<p><strong>I reset accantonati scadono circa 30 giorni dopo la concessione</strong>, e nessuno te lo ricorda. Gli utenti hanno chiesto a OpenAI di estenderlo nella <a href=\"https://github.com/openai/codex/issues/28888\">issue #28888 su GitHub</a>. La regola pratica: riscatta un reset accantonato quando il contatore settimanale è alto, non quando è quasi vuoto, e prima che passino i 30 giorni.</p>\n\n<h2>Perché OpenAI azzera continuamente i limiti di Codex?</h2>\n\n<p><strong>Soprattutto per celebrare lanci e traguardi di utenti, e occasionalmente per compensare bug che contavano troppo l'uso.</strong> La maggior parte dei reset viene annunciata su X da Thibault Sottiaux (@thsottiaux), che guida l'ingegneria di Codex. Sono stati fatti reset per 8M, 9M, 10M, 15M e 20M di utenti attivi, per nuovi rilasci di modelli e, il 29 agosto, per una serie di correzioni a bug che addebitavano agli utenti troppo uso.</p>\n\n<p>Nessuno di questi reset è programmato. Non puoi pianificare un carico di lavoro attorno al prossimo, e non dovresti prezzare un piano contando che arrivi.</p>\n\n<h2>Registro dei reset di Codex: agosto e settembre 2026</h2>\n\n<p>Questo registro elenca solo i reset che sia <a href=\"https://codex-resets.com/\">codex-resets.com</a> sia <a href=\"https://aiidelist.com/codex-reset\">aiidelist</a> registrano. Le date sono in UTC. I reset &ldquo;immediati&rdquo; si applicano a tutti gli account a pagamento insieme. I reset &ldquo;accantonati&rdquo; vengono caricati sugli account da riscattare entro 30 giorni.</p>\n\n<table>\n<thead><tr><th>Data</th><th>Tipo</th><th>Occasione</th></tr></thead>\n<tbody>\n<tr><td>1 ago 2026</td><td>Immediato</td><td>Guadagni di efficienza su Luna</td></tr>\n<tr><td>8 ago 2026</td><td>Immediato</td><td>Rilascio di GPT-5.6 Sol</td></tr>\n<tr><td>11 ago 2026</td><td>Immediato</td><td>Nessun motivo indicato</td></tr>\n<tr><td>13 ago 2026</td><td>Immediato</td><td>15M di utenti attivi</td></tr>\n<tr><td>21 ago 2026</td><td>Accantonato</td><td>20M di utenti attivi</td></tr>\n<tr><td>24 ago 2026</td><td>Immediato</td><td>Correzioni dell'uso rilasciate</td></tr>\n<tr><td>25 ago 2026</td><td>Immediato</td><td>Nessun motivo indicato</td></tr>\n<tr><td>27 ago 2026</td><td>Immediato</td><td>Nessun motivo indicato</td></tr>\n<tr><td>29 ago 2026</td><td>Immediato</td><td>Correzioni per bug che contavano troppo l'uso</td></tr>\n<tr><td>22 set 2026</td><td>Accantonato</td><td>Rilascio di GPT-6 Sol e Luna</td></tr>\n<tr><td>26 set 2026</td><td>Immediato</td><td>Reset del fine settimana</td></tr>\n</tbody>\n</table>\n\n<p>I tracker non concordano su inizio settembre. aiidelist elenca anche reset accantonati il 3 e il 5 settembre per gli account in attesa di GPT-6 Astra, e reset il 31 agosto, l'8 settembre e il 12 settembre. codex-resets.com non mostra nessun reset tra il 29 agosto e il 22 settembre. Luglio è stato il mese più intenso, con una serie di reset legata ai traguardi da 7M a 10M di utenti.</p>\n\n<h2>Dove posso seguire i reset di Codex?</h2>\n\n<p>Diversi siti della comunità seguono gli annunci e registrano ogni reset. Nessuno è gestito da OpenAI.</p>\n\n<ul>\n<li><a href=\"https://codex-resets.com/\">codex-resets.com</a>: storico completo con intervalli medi e mediani.</li>\n<li><a href=\"https://codex-reset.com/\">codex-reset.com</a>: giorni dall'ultimo reset.</li>\n<li><a href=\"https://aiidelist.com/codex-reset\">tracker dei reset di Codex di aiidelist</a>: cronologia datata con i motivi.</li>\n<li><a href=\"https://usagereset.com/\">usagereset.com</a>: segue i reset di Codex e Claude Code.</li>\n</ul>\n\n<h2>Anche Claude Code fa reset a sorpresa?</h2>\n\n<p><strong>Non come abitudine.</strong> I piani Claude usano la stessa struttura a due finestre, una sessione di 5 ore e un limite settimanale, ma Anthropic non ha un programma di reset legati ai traguardi. Quanto vale una settimana di Claude è nella nostra <a href=\"/research/claude-max-20x-vs-5x-weekly-limit\">pagina sul limite settimanale di Claude Max</a>.</p>\n\n<h2>Novità: 12 giorni di log reali di Codex Pro da 100 $</h2>\n\n<p>Abbiamo registrato ogni token di due settimane di uso intenso di Codex e ne abbiamo pubblicato i dati. Una settimana piena di Pro da 100 $ valeva 175 $ a prezzi API, quindi il <a href=\"/research/chatgpt-pro-100-real-codex-multiplier\">moltiplicatore reale è 2.6x Plus, non 5x</a>. Usando reset globali e accantonati abbiamo ottenuto <a href=\"/research/codex-pro-100-heavy-user-resets-log\">8 finestre settimanali in 12 giorni</a>, per un valore di <a href=\"/research/codex-resets-value-12-days\">1.211 $ di uso API</a>. Abbiamo anche calcolato <a href=\"/research/codex-banked-reset-when-to-redeem\">quando riscattare un reset accantonato</a> e perché il <a href=\"/research/codex-prompt-caching-cost\">98% dell'input era in cache</a>. Ogni articolo include il suo CSV.</p>\n\n<h2>Fonti</h2>\n\n<ul>\n<li><a href=\"https://codex-resets.com/\">codex-resets.com: storico dei reset di Codex e statistiche</a></li>\n<li><a href=\"https://aiidelist.com/codex-reset\">aiidelist: tracker dei reset di Codex</a></li>\n<li><a href=\"https://github.com/openai/codex/issues/28246\">GitHub openai/codex #28246: le finestre di quota si ancorano al primo uso dopo il reset</a></li>\n<li><a href=\"https://github.com/openai/codex/issues/28888\">GitHub openai/codex #28888: estendere la scadenza dei reset accantonati oltre 30 giorni</a></li>\n<li><a href=\"https://help.openai.com/en/articles/20001507-paid-weekly-work-and-codex-rate-limit-resets\">OpenAI Help: reset settimanali del lavoro a pagamento e dei limiti di frequenza di Codex</a></li>\n</ul>",
+      "faq": [
+        {
+          "question": "Quando si azzerano i limiti d'uso di Codex?",
+          "answer": "La finestra di 5 ore si azzera 5 ore dopo la sua apertura. La finestra settimanale si azzera circa 7 giorni dopo la prima richiesta, quindi non ha un giorno fisso e differisce tra utenti dello stesso piano."
+        },
+        {
+          "question": "Cos'è un reset di Codex accantonato?",
+          "answer": "Un reset una tantum che OpenAI carica sul tuo account da riscattare più tardi. Riscattandolo, sia la finestra di 5 ore sia quella settimanale tornano allo 0% e la data di reset settimanale si sposta in avanti."
+        },
+        {
+          "question": "I reset di Codex accantonati scadono?",
+          "answer": "Sì, circa 30 giorni dopo la concessione, senza alcun promemoria. Riscattane uno quando il contatore settimanale è alto e prima che siano passati i 30 giorni."
+        },
+        {
+          "question": "Ogni quanto OpenAI azzera i limiti di Codex?",
+          "answer": "I tracker della comunità contano 55 reset una tantum da settembre 2025, in media uno ogni 6.9 giorni, di solito per lanci, traguardi di utenti o bug nell'uso. Nessuno è programmato."
+        },
+        {
+          "question": "Come controllo il mio uso di Codex e l'orario del reset?",
+          "answer": "Esegui /status nella CLI di Codex, oppure apri la pagina dell'uso di Codex nelle impostazioni di ChatGPT. Entrambe mostrano la percentuale usata in ciascuna finestra e quando si azzera."
+        }
+      ]
+    },
+    "ko": {
+      "title": "Codex 사용 한도 리셋: 작동 방식과 날짜별 로그",
+      "titleCore": "Codex 사용 한도 리셋: 작동 방식, 이월 리셋, 날짜별 로그",
+      "description": "Codex 한도가 언제 리셋되는지, 이월 리셋이 무엇이며 언제 만료되는지, 2026년 8~9월 OpenAI 리셋의 날짜별 로그입니다.",
+      "body": "<p><strong>Codex 사용 한도는 두 개의 시계로 리셋됩니다. 5시간 창과, 지난 리셋 이후 첫 요청에서 시작되는 주간 창입니다.</strong> 그 위에 OpenAI가 모든 사용자의 한도를 정기적으로 일찍 리셋합니다. 즉시 리셋되기도 하고, 나중에 쓰는 “이월” 리셋으로 주어지기도 합니다. 제3자 추적기는 2025년 9월 이후 이런 일회성 리셋을 55회 집계했고, 약 6.9일에 한 번꼴입니다. 아래 날짜별 로그는 2026년 8월과 9월을 다룹니다.</p>\n\n<p>Codex 주간이 Plus, Pro 5x, Pro 20x에서 달러로 얼마인지 알고 싶다면 <a href=\"/research/codex-usage-limits-chatgpt-pro\">Codex 사용 한도 페이지</a>를 보세요. 이 페이지는 게이지가 언제 0으로 돌아가는지에 관한 것입니다.</p>\n\n<h2>Codex 사용 한도는 언제 리셋되나요?</h2>\n\n<p><strong>5시간 창은 열린 뒤 5시간이 지나면 리셋됩니다. 주간 창은 첫 요청 후 약 7일이 지나면 리셋되며, 고정된 요일이 아닙니다.</strong> 새 주간 기간은 이전 기간이 끝난 뒤 첫 Codex 요청과 함께 시작됩니다. Codex를 3일 쓰지 않으면 다음 주는 돌아올 때 시작되므로, 같은 플랜의 두 사람이 서로 다른 요일에 리셋됩니다. <a href=\"https://github.com/openai/codex/issues/28246\">GitHub 이슈 #28246</a>이 이 고정 방식과 그로 인해 날릴 수 있는 유료 시간을 기록합니다.</p>\n\n<p>두 창은 따로 확인됩니다. 주간 게이지가 100%이면 새 5시간 창은 도움이 되지 않습니다.</p>\n\n<h2>Codex 한도가 언제 리셋되는지 어떻게 확인하나요?</h2>\n\n<ul>\n<li><strong>CLI에서:</strong> Codex 세션에서 <code>/status</code>를 실행하세요. 창마다 사용한 비율과 각 창이 언제 리셋되는지 보여 줍니다. 최근 CLI 버전에는 <code>/usage</code>도 있습니다.</li>\n<li><strong>웹에서:</strong> ChatGPT 설정의 Codex 사용량 페이지가 같은 창을 보여 주고, 계정의 이월 리셋도 함께 표시합니다.</li>\n</ul>\n\n<h2>Codex 이월 리셋이란 무엇인가요?</h2>\n\n<p><strong>OpenAI가 그 자리에서 리셋하는 대신 나중에 쓰도록 계정에 넣어 주는 일회성 리셋입니다.</strong> 사용 설정에서 이를 쓰면 5시간 창과 주간 창이 모두 0% 사용으로 돌아가고, 주간 리셋 날짜는 그 시점부터 일주일 뒤로 옮겨집니다. 플랜의 사용 허용량은 늘지 않습니다.</p>\n\n<p><strong>이월 리셋은 부여된 뒤 약 30일이 지나면 만료되며</strong>, 아무도 알려 주지 않습니다. 사용자들은 <a href=\"https://github.com/openai/codex/issues/28888\">GitHub 이슈 #28888</a>에서 이 기간을 늘려 달라고 OpenAI에 요청했습니다. 실용적인 규칙은 이렇습니다. 주간 게이지가 거의 비었을 때가 아니라 높을 때 이월 리셋을 쓰고, 30일이 지나기 전에 쓰세요.</p>\n\n<h2>OpenAI는 왜 Codex 한도를 계속 리셋하나요?</h2>\n\n<p><strong>대개 출시와 사용자 마일스톤을 기념하기 위해서이고, 가끔은 사용량을 과다 집계한 버그를 보상하기 위해서입니다.</strong> 대부분의 리셋은 Codex 엔지니어링을 이끄는 Thibault Sottiaux(@thsottiaux)가 X에서 발표합니다. 리셋은 활성 사용자 8M, 9M, 10M, 15M, 20M 달성, 새 모델 출시, 그리고 8월 29일에 사용량을 너무 많이 청구하던 버그 수정 묶음을 표시했습니다.</p>\n\n<p>이 리셋들은 어느 것도 예정되어 있지 않습니다. 다음 리셋을 기준으로 작업량을 계획할 수 없고, 리셋이 온다고 가정하고 플랜 가격을 매겨서도 안 됩니다.</p>\n\n<h2>Codex 리셋 로그: 2026년 8월과 9월</h2>\n\n<p>이 로그는 <a href=\"https://codex-resets.com/\">codex-resets.com</a>과 <a href=\"https://aiidelist.com/codex-reset\">aiidelist</a>가 모두 기록한 리셋만 나열합니다. 날짜는 UTC입니다. “즉시” 리셋은 모든 유료 계정에 한꺼번에 적용됩니다. “이월” 리셋은 30일 안에 쓰도록 계정에 들어갑니다.</p>\n\n<table>\n<thead><tr><th>날짜</th><th>유형</th><th>계기</th></tr></thead>\n<tbody>\n<tr><td>2026년 8월 1일</td><td>즉시</td><td>Luna 효율 개선</td></tr>\n<tr><td>2026년 8월 8일</td><td>즉시</td><td>GPT-5.6 Sol 출시</td></tr>\n<tr><td>2026년 8월 11일</td><td>즉시</td><td>이유 없음</td></tr>\n<tr><td>2026년 8월 13일</td><td>즉시</td><td>활성 사용자 15M</td></tr>\n<tr><td>2026년 8월 21일</td><td>이월</td><td>활성 사용자 20M</td></tr>\n<tr><td>2026년 8월 24일</td><td>즉시</td><td>사용량 수정 반영</td></tr>\n<tr><td>2026년 8월 25일</td><td>즉시</td><td>이유 없음</td></tr>\n<tr><td>2026년 8월 27일</td><td>즉시</td><td>이유 없음</td></tr>\n<tr><td>2026년 8월 29일</td><td>즉시</td><td>사용량을 과다 집계한 버그 수정</td></tr>\n<tr><td>2026년 9월 22일</td><td>이월</td><td>GPT-6 Sol과 Luna 출시</td></tr>\n<tr><td>2026년 9월 26일</td><td>즉시</td><td>주말 리셋</td></tr>\n</tbody>\n</table>\n\n<p>추적기들은 9월 초에 대해 의견이 다릅니다. aiidelist는 GPT-6 Astra를 기다리는 계정에 대해 9월 3일과 5일의 이월 리셋, 그리고 8월 31일, 9월 8일, 9월 12일의 리셋도 나열합니다. codex-resets.com은 8월 29일부터 9월 22일 사이에 리셋이 없다고 표시합니다. 7월이 가장 바빴던 달이었고, 7M에서 10M 사용자 마일스톤에 맞춘 리셋이 연달아 있었습니다.</p>\n\n<h2>Codex 리셋은 어디서 추적하나요?</h2>\n\n<p>여러 커뮤니티 사이트가 발표를 지켜보고 리셋을 하나씩 기록합니다. OpenAI가 운영하는 곳은 없습니다.</p>\n\n<ul>\n<li><a href=\"https://codex-resets.com/\">codex-resets.com</a>: 평균 및 중앙값 간격이 포함된 전체 이력.</li>\n<li><a href=\"https://codex-reset.com/\">codex-reset.com</a>: 마지막 리셋 이후 경과 일수.</li>\n<li><a href=\"https://aiidelist.com/codex-reset\">aiidelist Codex 리셋 추적기</a>: 이유가 포함된 날짜별 연표.</li>\n<li><a href=\"https://usagereset.com/\">usagereset.com</a>: Codex와 Claude Code 리셋을 추적.</li>\n</ul>\n\n<h2>Claude Code에도 깜짝 리셋이 있나요?</h2>\n\n<p><strong>습관적으로는 없습니다.</strong> Claude 플랜도 같은 두 창 구조를 씁니다. 5시간 세션과 주간 한도입니다. 하지만 Anthropic은 마일스톤 리셋 프로그램을 운영하지 않습니다. Claude 한 주의 가치는 <a href=\"/research/claude-max-20x-vs-5x-weekly-limit\">Claude Max 주간 한도 페이지</a>에 있습니다.</p>\n\n<h2>신규: Codex Pro $100 실제 로그 12일</h2>\n\n<p>우리는 Codex를 집중해서 쓴 2주간의 모든 토큰을 기록하고 데이터를 공개했습니다. Pro $100의 완전한 한 주는 API 가격으로 $175의 가치가 있었습니다. 따라서 <a href=\"/research/chatgpt-pro-100-real-codex-multiplier\">실제 배율은 Plus의 2.6배이지 5배가 아닙니다</a>. 전역 리셋과 이월 리셋을 써서 <a href=\"/research/codex-pro-100-heavy-user-resets-log\">12일 만에 주간 창 8개</a>를 얻었고, 이는 <a href=\"/research/codex-resets-value-12-days\">$1,211 상당의 API 사용량</a>입니다. 또한 <a href=\"/research/codex-banked-reset-when-to-redeem\">이월 리셋을 언제 쓸지</a>, 그리고 <a href=\"/research/codex-prompt-caching-cost\">입력의 98%가 캐시된 이유</a>도 정리했습니다. 모든 글에 CSV를 함께 실었습니다.</p>\n\n<h2>출처</h2>\n\n<ul>\n<li><a href=\"https://codex-resets.com/\">codex-resets.com: Codex 리셋 이력과 통계</a></li>\n<li><a href=\"https://aiidelist.com/codex-reset\">aiidelist: Codex 리셋 추적기</a></li>\n<li><a href=\"https://github.com/openai/codex/issues/28246\">GitHub openai/codex #28246: 할당량 창이 리셋 후 첫 사용에 고정됨</a></li>\n<li><a href=\"https://github.com/openai/codex/issues/28888\">GitHub openai/codex #28888: 이월 리셋 만료를 30일 이후로 연장</a></li>\n<li><a href=\"https://help.openai.com/en/articles/20001507-paid-weekly-work-and-codex-rate-limit-resets\">OpenAI 도움말: 유료 주간 Work 및 Codex 한도 리셋</a></li>\n</ul>",
+      "faq": [
+        {
+          "question": "Codex 사용 한도는 언제 리셋되나요?",
+          "answer": "5시간 창은 열린 뒤 5시간 후에 리셋됩니다. 주간 창은 첫 요청 후 약 7일에 리셋되므로 고정된 요일이 없고, 같은 플랜이라도 사용자마다 다릅니다."
+        },
+        {
+          "question": "Codex 이월 리셋이란 무엇인가요?",
+          "answer": "OpenAI가 나중에 쓰도록 계정에 넣어 주는 일회성 리셋입니다. 쓰면 5시간 창과 주간 창이 0%로 돌아가고 주간 리셋 날짜가 뒤로 옮겨집니다."
+        },
+        {
+          "question": "Codex 이월 리셋은 만료되나요?",
+          "answer": "네, 부여된 뒤 약 30일이 지나면 알림 없이 만료됩니다. 주간 게이지가 높을 때, 30일이 지나기 전에 쓰세요."
+        },
+        {
+          "question": "OpenAI는 Codex 한도를 얼마나 자주 리셋하나요?",
+          "answer": "커뮤니티 추적기는 2025년 9월 이후 일회성 리셋을 55회 집계했으며, 평균 약 6.9일에 한 번꼴입니다. 대개 출시, 사용자 마일스톤, 사용량 버그 때문이고 예정된 것은 없습니다."
+        },
+        {
+          "question": "Codex 사용량과 리셋 시간은 어떻게 확인하나요?",
+          "answer": "Codex CLI에서 /status를 실행하거나 ChatGPT 설정의 Codex 사용량 페이지를 여세요. 두 곳 모두 창마다 사용 비율과 리셋 시각을 보여 줍니다."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/claude-vs-codex-october-2026",
+          "label": "2026년 10월 Claude vs Codex: $100에서 어느 쪽이 이길까"
+        },
+        {
+          "slug": "/research/claude-fable-5-1-vs-opus-5-5-cost",
+          "label": "Fable 5.1 대 Opus 5.5: 2.5배 가격은 가치가 있을까?"
+        },
+        {
+          "slug": "/research/chatgpt-pro-100-real-codex-multiplier",
+          "label": "ChatGPT Pro $100은 실제로 Plus의 2.6배, 5배가 아님"
+        },
+        {
+          "slug": "/research/codex-pro-100-heavy-user-resets-log",
+          "label": "Pro $100으로 12일 만에 Codex 주간 창 8개"
+        },
+        {
+          "slug": "/research/codex-resets-value-12-days",
+          "label": "리셋으로 $40 플랜이 $1,211 사용량이 된 방법"
+        },
+        {
+          "slug": "/research/codex-banked-reset-when-to-redeem",
+          "label": "Codex 이월 리셋을 언제 쓸지"
+        },
+        {
+          "slug": "/research/codex-prompt-caching-cost",
+          "label": "Codex 입력 98%가 캐시됐습니다: 청구서"
+        },
+        {
+          "slug": "/research/codex-usage-limits-chatgpt-pro",
+          "label": "ChatGPT Pro에 포함된 Codex 사용량, 달러로"
+        },
+        {
+          "slug": "/research/claude-max-vs-chatgpt-pro-codex-200",
+          "label": "Claude Max vs ChatGPT Pro: 60일 전체 연구"
+        },
+        {
+          "slug": "/research/claude-max-20x-vs-5x-weekly-limit",
+          "label": "Claude Max 20x 대 5x: 주간 한도를 측정하다"
+        }
+      ]
+    },
+    "nl": {
+      "title": "Resets van Codex-gebruikslimieten: werking + logboek",
+      "titleCore": "Resets van Codex-gebruikslimieten: hoe ze werken, banked resets en een gedateerd logboek",
+      "description": "Wanneer Codex-gebruikslimieten resetten, wat een banked reset is en wanneer die verloopt, plus een gedateerd logboek van OpenAI-resets in aug en sep 2026.",
+      "related": [
+        {
+          "slug": "/research/claude-vs-codex-october-2026",
+          "label": "Claude vs Codex in oktober 2026: wie wint bij $100"
+        },
+        {
+          "slug": "/research/claude-fable-5-1-vs-opus-5-5-cost",
+          "label": "Fable 5.1 vs Opus 5.5: is 2.5x het waard?"
+        },
+        {
+          "slug": "/research/chatgpt-pro-100-real-codex-multiplier",
+          "label": "ChatGPT Pro $100 is in werkelijkheid 2.6x Plus, geen 5x"
+        },
+        {
+          "slug": "/research/codex-pro-100-heavy-user-resets-log",
+          "label": "8 wekelijkse Codex-vensters in 12 dagen op Pro $100"
+        },
+        {
+          "slug": "/research/codex-resets-value-12-days",
+          "label": "Hoe resets een abonnement van $40 veranderden in $1,211 aan gebruik"
+        },
+        {
+          "slug": "/research/codex-banked-reset-when-to-redeem",
+          "label": "Wanneer je een Codex banked reset inwisselt"
+        },
+        {
+          "slug": "/research/codex-prompt-caching-cost",
+          "label": "98% van onze Codex-input was gecachet: de rekening"
+        },
+        {
+          "slug": "/research/codex-usage-limits-chatgpt-pro",
+          "label": "Hoeveel Codex ChatGPT Pro bevat, in dollars"
+        },
+        {
+          "slug": "/research/claude-max-vs-chatgpt-pro-codex-200",
+          "label": "Claude Max vs ChatGPT Pro: de volledige studie van 60 dagen"
+        },
+        {
+          "slug": "/research/claude-max-20x-vs-5x-weekly-limit",
+          "label": "Claude Max 20x vs 5x: de weeklimiet, gemeten"
+        }
+      ],
+      "body": "<p><strong>Codex-gebruikslimieten resetten op twee klokken: een venster van 5 uur en een weekvenster dat begint met je eerste verzoek na de laatste reset.</strong> Daarbovenop reset OpenAI regelmatig ieders limieten vroegtijdig, direct of als een &ldquo;banked&rdquo; reset die je later inwisselt. Trackers van derden tellen sinds september 2025 55 van die eenmalige resets, ongeveer één per 6.9 dagen. Het gedateerde logboek hieronder beslaat augustus en september 2026.</p>\n\n<p>Wil je weten wat een Codex-week in dollars waard is op Plus, Pro 5x en Pro 20x, dan staat dat op onze <a href=\"/research/codex-usage-limits-chatgpt-pro\">pagina over Codex-gebruikslimieten</a>. Deze pagina gaat over het moment waarop de meter terug naar nul gaat.</p>\n\n<h2>Wanneer resetten Codex-gebruikslimieten?</h2>\n\n<p><strong>Het venster van 5 uur reset 5 uur nadat het opent. Het weekvenster reset ongeveer 7 dagen na het eerste verzoek, niet op een vaste dag.</strong> Een nieuwe weekperiode begint met je eerste Codex-verzoek nadat de vorige is afgelopen. Als je drie dagen niet met Codex werkt, begint je volgende week wanneer je terugkomt, dus twee mensen met hetzelfde abonnement resetten op verschillende dagen. <a href=\"https://github.com/openai/codex/issues/28246\">GitHub-issue #28246</a> documenteert dit verankeren en de betaalde tijd die het je kan kosten.</p>\n\n<p>De twee vensters worden afzonderlijk gecontroleerd. Een vers venster van 5 uur helpt niet als de weekmeter op 100% staat.</p>\n\n<h2>Hoe controleer ik wanneer mijn Codex-limiet reset?</h2>\n\n<ul>\n<li><strong>In de CLI:</strong> voer <code>/status</code> uit in een Codex-sessie. Dat toont het gebruikte percentage in elk venster en wanneer elk venster reset. Recente CLI-versies hebben ook <code>/usage</code>.</li>\n<li><strong>Op het web:</strong> de Codex-gebruikspagina in de ChatGPT-instellingen toont dezelfde vensters, plus eventuele banked resets op je account.</li>\n</ul>\n\n<h2>Wat is een banked Codex-reset?</h2>\n\n<p><strong>Een eenmalige reset die OpenAI op je account zet om later te gebruiken, in plaats van je ter plekke te resetten.</strong> Wanneer je hem inwisselt via de gebruiksinstellingen, gaan zowel je venster van 5 uur als je weekvenster terug naar 0% gebruikt, en je weekresetdatum schuift naar een week vanaf dat moment. Het verhoogt de toelage van je abonnement niet.</p>\n\n<p><strong>Banked resets verlopen ongeveer 30 dagen nadat ze zijn toegekend</strong>, en niets herinnert je eraan. Gebruikers hebben OpenAI in <a href=\"https://github.com/openai/codex/issues/28888\">GitHub-issue #28888</a> gevraagd dat te verlengen. De praktische regel: wissel een banked reset in wanneer je weekmeter hoog staat, niet wanneer hij bijna leeg is, en doe dat voordat de 30 dagen om zijn.</p>\n\n<h2>Waarom blijft OpenAI Codex-limieten resetten?</h2>\n\n<p><strong>Vooral om lanceringen en gebruikersmijlpalen te vieren, en af en toe om bugs te compenseren die het gebruik te hoog telden.</strong> De meeste resets worden op X aangekondigd door Thibault Sottiaux (@thsottiaux), die de Codex-engineering leidt. Resets markeerden 8M, 9M, 10M, 15M en 20M actieve gebruikers, nieuwe modelreleases, en op 29 augustus een reeks fixes voor bugs die gebruikers te veel gebruik hadden aangerekend.</p>\n\n<p>Geen van deze resets is gepland. Je kunt geen workload rond de volgende plannen, en je moet een abonnement niet prijzen in de veronderstelling dat hij komt.</p>\n\n<h2>Logboek van Codex-resets: augustus en september 2026</h2>\n\n<p>Dit logboek vermeldt alleen de resets die zowel <a href=\"https://codex-resets.com/\">codex-resets.com</a> als <a href=\"https://aiidelist.com/codex-reset\">aiidelist</a> registreren. Datums zijn in UTC. &ldquo;Immediate&rdquo;-resets gelden voor alle betaalde accounts tegelijk. &ldquo;Banked&rdquo;-resets worden in accounts geladen en moeten binnen 30 dagen worden ingewisseld.</p>\n\n<table>\n<thead><tr><th>Datum</th><th>Type</th><th>Aanleiding</th></tr></thead>\n<tbody>\n<tr><td>1 aug 2026</td><td>Immediate</td><td>Efficiëntiewinst op Luna</td></tr>\n<tr><td>8 aug 2026</td><td>Immediate</td><td>Release van GPT-5.6 Sol</td></tr>\n<tr><td>11 aug 2026</td><td>Immediate</td><td>Geen reden opgegeven</td></tr>\n<tr><td>13 aug 2026</td><td>Immediate</td><td>15M actieve gebruikers</td></tr>\n<tr><td>21 aug 2026</td><td>Banked</td><td>20M actieve gebruikers</td></tr>\n<tr><td>24 aug 2026</td><td>Immediate</td><td>Gebruiksfixes doorgevoerd</td></tr>\n<tr><td>25 aug 2026</td><td>Immediate</td><td>Geen reden opgegeven</td></tr>\n<tr><td>27 aug 2026</td><td>Immediate</td><td>Geen reden opgegeven</td></tr>\n<tr><td>29 aug 2026</td><td>Immediate</td><td>Fixes voor bugs die het gebruik te hoog telden</td></tr>\n<tr><td>22 sep 2026</td><td>Banked</td><td>Release van GPT-6 Sol en Luna</td></tr>\n<tr><td>26 sep 2026</td><td>Immediate</td><td>Reset in het weekend</td></tr>\n</tbody>\n</table>\n\n<p>De trackers zijn het niet eens over begin september. aiidelist vermeldt ook banked resets op 3 en 5 september voor accounts die op GPT-6 Astra wachtten, en resets op 31 augustus, 8 september en 12 september. codex-resets.com toont geen reset tussen 29 augustus en 22 september. Juli was de drukste maand, met een reeks resets rond de gebruikersmijlpalen van 7M tot 10M.</p>\n\n<h2>Waar kan ik Codex-resets volgen?</h2>\n\n<p>Verschillende communitysites volgen de aankondigingen en loggen elke reset. Geen daarvan wordt door OpenAI beheerd.</p>\n\n<ul>\n<li><a href=\"https://codex-resets.com/\">codex-resets.com</a>: volledige geschiedenis met gemiddelde en mediane intervallen.</li>\n<li><a href=\"https://codex-reset.com/\">codex-reset.com</a>: dagen sinds de laatste reset.</li>\n<li><a href=\"https://aiidelist.com/codex-reset\">aiidelist Codex-resettracker</a>: gedateerde tijdlijn met redenen.</li>\n<li><a href=\"https://usagereset.com/\">usagereset.com</a>: volgt resets van Codex en Claude Code.</li>\n</ul>\n\n<h2>Doet Claude Code ook verrassingsresets?</h2>\n\n<p><strong>Niet als gewoonte.</strong> Claude-abonnementen gebruiken dezelfde structuur met twee vensters, een sessie van 5 uur en een weeklimiet, maar Anthropic voert geen mijlpaalresetprogramma. Wat een Claude-week waard is, staat op onze <a href=\"/research/claude-max-20x-vs-5x-weekly-limit\">pagina over de weeklimiet van Claude Max</a>.</p>\n\n<h2>Nieuw: 12 dagen echte Codex Pro $100-logs</h2>\n\n<p>We hebben elk token van een zware Codex-periode van twee weken gelogd en de data gepubliceerd. Een volle Pro $100-week was tegen API-prijzen $175 waard, dus de <a href=\"/research/chatgpt-pro-100-real-codex-multiplier\">echte multiplier is 2.6x Plus, geen 5x</a>. Met globale en banked resets kwamen we op <a href=\"/research/codex-pro-100-heavy-user-resets-log\">8 weekvensters in 12 dagen</a>, goed voor <a href=\"/research/codex-resets-value-12-days\">$1,211 aan API-gebruik</a>. We hebben ook uitgewerkt <a href=\"/research/codex-banked-reset-when-to-redeem\">wanneer je een banked reset inwisselt</a> en waarom <a href=\"/research/codex-prompt-caching-cost\">98% van de input gecachet was</a>. Bij elk artikel zit zijn CSV.</p>\n\n<h2>Bronnen</h2>\n\n<ul>\n<li><a href=\"https://codex-resets.com/\">codex-resets.com: geschiedenis en statistieken van Codex-resets</a></li>\n<li><a href=\"https://aiidelist.com/codex-reset\">aiidelist: Codex-resettracker</a></li>\n<li><a href=\"https://github.com/openai/codex/issues/28246\">GitHub openai/codex #28246: quotavensters verankeren aan het eerste gebruik na een reset</a></li>\n<li><a href=\"https://github.com/openai/codex/issues/28888\">GitHub openai/codex #28888: verloop van banked resets verlengen voorbij 30 dagen</a></li>\n<li><a href=\"https://help.openai.com/en/articles/20001507-paid-weekly-work-and-codex-rate-limit-resets\">OpenAI Help: Paid weekly Work and Codex rate limit resets</a></li>\n</ul>",
+      "faq": [
+        {
+          "question": "Wanneer resetten Codex-gebruikslimieten?",
+          "answer": "Het venster van 5 uur reset 5 uur nadat het opent. Het weekvenster reset ongeveer 7 dagen na het eerste verzoek, dus het heeft geen vaste dag en verschilt tussen gebruikers met hetzelfde abonnement."
+        },
+        {
+          "question": "Wat is een banked Codex-reset?",
+          "answer": "Een eenmalige reset die OpenAI op je account laadt om later in te wisselen. Bij inwisselen gaan zowel het venster van 5 uur als het weekvenster terug naar 0% en schuift je weekresetdatum vooruit."
+        },
+        {
+          "question": "Verlopen banked Codex-resets?",
+          "answer": "Ja, ongeveer 30 dagen nadat ze zijn toegekend, zonder herinnering. Wissel er een in wanneer je weekmeter hoog staat en voordat de 30 dagen om zijn."
+        },
+        {
+          "question": "Hoe vaak reset OpenAI Codex-limieten?",
+          "answer": "Communitytrackers tellen sinds september 2025 55 eenmalige resets, gemiddeld één per 6.9 dagen, meestal voor lanceringen, gebruikersmijlpalen of gebruiksbugs. Geen ervan is gepland."
+        },
+        {
+          "question": "Hoe controleer ik mijn Codex-gebruik en resettijd?",
+          "answer": "Voer /status uit in de Codex CLI, of open de Codex-gebruikspagina in de ChatGPT-instellingen. Beide tonen het gebruikte percentage in elk venster en wanneer het reset."
+        }
+      ]
+    },
+    "zh": {
+      "title": "Codex 限额重置：机制、储备重置与日志",
+      "titleCore": "Codex 使用限额重置：机制、储备重置与 2026 年 8 至 9 月日志",
+      "description": "Codex 限额何时重置、什么是储备重置及其何时过期，并附 2026 年 8 至 9 月 OpenAI 每次重置的日期记录。",
+      "body": "<p>\n<strong>Codex 使用限额按两个时钟重置：一个 5 小时窗口，以及一个从你上次重置后的第一次请求开始计时的周窗口。</strong>除此之外，OpenAI 会定期提前重置所有人的限额，有的立即生效，有的则以可以稍后兑换的&ldquo;储备&rdquo;重置形式发放。第三方追踪站统计，自 2025 年 9 月以来共有 55 次此类一次性重置，大约每 6.9 天一次。下方的日期记录覆盖 2026 年 8 月和 9 月。</p>\n\n\n<p>如果你想知道 Plus、Pro 5x 和 Pro 20x 上一个 Codex 周值多少美元，请看我们的<a href=\"/research/codex-usage-limits-chatgpt-pro\">Codex 使用限额页面</a>。本页讲的是仪表什么时候回到零。</p>\n\n\n<h2>什么时候重置 Codex 使用限额？</h2>\n\n<p>\n<strong>5 小时窗口在开启后 5 小时重置。周窗口大约在你第一次请求后 7 天重置，而不是固定某一天。</strong>新的周期从你上一个周期结束后的第一次 Codex 请求开始。如果你停用 Codex 三天，下一周就从你回来时开始，因此同一套餐的两个人会在不同的日子重置。<a href=\"https://github.com/openai/codex/issues/28246\">GitHub issue #28246</a> 记录了这种锚定机制，以及它可能让你多付的时间。</p>\n\n\n<p>两个窗口分别计算。只要周仪表已经到 100%，新开的 5 小时窗口也没用。</p>\n\n\n<h2>如何查看 Codex 限额何时重置？</h2>\n\n<ul>\n<li>\n<strong>在 CLI 中：</strong>在 Codex 会话里运行 <code>/status</code>。它会显示每个窗口已用的百分比，以及各自的重置时间。较新的 CLI 版本还支持 <code>/usage</code>。</li>\n<li>\n<strong>在网页上：</strong>ChatGPT 设置中的 Codex 使用页面显示相同的窗口，以及你账户上的任何储备重置。</li>\n</ul>\n\n<h2>什么是储备 Codex 重置？</h2>\n\n<p>\n<strong>OpenAI 为你的账户预留的一次性重置，供你之后使用，而不是当场重置。</strong>在使用设置中兑换后，你的 5 小时窗口和周窗口都会回到已用 0%，周重置日期则顺延到兑换时起一周后。它不会提高你套餐的额度。</p>\n\n\n<p>\n<strong>储备重置大约在发放后 30 天过期</strong>，而且没有任何提醒。用户已经在 <a href=\"https://github.com/openai/codex/issues/28888\">GitHub issue #28888</a> 中请求 OpenAI 延长这一期限。实用的规则是：当周仪表很高时兑换储备重置，而不是快见底时；并且一定要在 30 天到期前兑换。</p>\n\n\n<h2>OpenAI 为什么一直重置 Codex 限额？</h2>\n\n<p>\n<strong>主要为了庆祝发布和用户里程碑，偶尔也为了补偿多计了用量的 bug。</strong>大多数重置由 Codex 工程负责人 Thibault Sottiaux（@thsottiaux）在 X 上宣布。重置出现在 8M、9M、10M、15M 和 20M 活跃用户的节点，也出现在新模型发布时，以及 8 月 29 日那次，当时一批修复上线，解决了曾经多收用户过多用量的 bug。</p>\n\n\n<p>这些重置都不是定期安排的。你无法围绕下一次重置来规划工作负载，也不应该假设它会到来而去定价套餐。</p>\n\n\n<h2>Codex 重置记录：2026 年 8 月和 9 月</h2>\n\n<p>本记录只包含 <a href=\"https://codex-resets.com/\">codex-resets.com</a> 和 <a href=\"https://aiidelist.com/codex-reset\">aiidelist</a> 同时记录的重置。日期为 UTC。&ldquo;即时&rdquo;重置对所有付费账户同时生效。&ldquo;储备&rdquo;重置会加载到账户中，需在 30 天内兑换。</p>\n\n\n<table>\n<thead>\n<tr>\n<th>日期</th>\n<th>类型</th>\n<th>原因</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>1 Aug 2026</td>\n<td>即时</td>\n<td>Luna 效率提升</td>\n</tr>\n<tr>\n<td>8 Aug 2026</td>\n<td>即时</td>\n<td>GPT-5.6 Sol 发布</td>\n</tr>\n<tr>\n<td>11 Aug 2026</td>\n<td>即时</td>\n<td>未说明原因</td>\n</tr>\n<tr>\n<td>13 Aug 2026</td>\n<td>即时</td>\n<td>15M 活跃用户</td>\n</tr>\n<tr>\n<td>21 Aug 2026</td>\n<td>储备</td>\n<td>20M 活跃用户</td>\n</tr>\n<tr>\n<td>24 Aug 2026</td>\n<td>即时</td>\n<td>用量修复上线</td>\n</tr>\n<tr>\n<td>25 Aug 2026</td>\n<td>即时</td>\n<td>未说明原因</td>\n</tr>\n<tr>\n<td>27 Aug 2026</td>\n<td>即时</td>\n<td>未说明原因</td>\n</tr>\n<tr>\n<td>29 Aug 2026</td>\n<td>即时</td>\n<td>修复多计用量的 bug</td>\n</tr>\n<tr>\n<td>22 Sep 2026</td>\n<td>储备</td>\n<td>GPT-6 Sol 和 Luna 发布</td>\n</tr>\n<tr>\n<td>26 Sep 2026</td>\n<td>即时</td>\n<td>周末重置</td>\n</tr>\n</tbody>\n</table>\n\n<p>各追踪站对 9 月初的记录有分歧。aiidelist 还列出了 9 月 3 日和 5 日的储备重置，适用于等待 GPT-6 Astra 的账户，另有 8 月 31 日、9 月 8 日和 9 月 12 日的重置。codex-resets.com 显示 8 月 29 日到 9 月 22 日之间没有重置。7 月是最密集的一个月，一连串重置与 7M 到 10M 用户的里程碑相关。</p>\n\n\n<h2>在哪里追踪 Codex 重置？</h2>\n\n<p>有几个社区网站追踪公告并记录每次重置，它们都不是 OpenAI 运营的。</p>\n\n\n<ul>\n<li>\n<a href=\"https://codex-resets.com/\">codex-resets.com</a>：完整历史，附平均和中位间隔。</li>\n<li>\n<a href=\"https://codex-reset.com/\">codex-reset.com</a>：距上次重置的天数。</li>\n<li>\n<a href=\"https://aiidelist.com/codex-reset\">aiidelist Codex 重置追踪</a>：带原因的日期时间线。</li>\n<li>\n<a href=\"https://usagereset.com/\">usagereset.com</a>：追踪 Codex 和 Claude Code 的重置。</li>\n</ul>\n\n<h2>Claude Code 也有突发重置吗？</h2>\n\n<p>\n<strong>通常没有。</strong>Claude 套餐采用同样的两窗口结构，即 5 小时会话和周限额，但 Anthropic 并不运行里程碑式重置计划。Claude 一周值多少，请看我们的 <a href=\"/research/claude-max-20x-vs-5x-weekly-limit\">Claude Max 周限额页面</a>。</p>\n\n\n<h2>新内容：12 天真实 Codex Pro $100 日志</h2>\n\n<p>我们记录了一段重度使用 Codex 两周的全部 token，并公开了数据。一个完整的 Pro $100 周按 API 价格值 $175，因此<a href=\"/research/chatgpt-pro-100-real-codex-multiplier\">真实倍率是 Plus 的 2.6 倍，而不是 5 倍</a>。借助全局和储备重置，我们在 12 天内拿到了 <a href=\"/research/codex-pro-100-heavy-user-resets-log\">8 个周窗口</a>，价值 <a href=\"/research/codex-resets-value-12-days\">$1,211 的 API 用量</a>。我们还算出了<a href=\"/research/codex-banked-reset-when-to-redeem\">何时兑换储备重置</a>，以及为何<a href=\"/research/codex-prompt-caching-cost\">98% 的输入命中了缓存</a>。每篇文章都附带 CSV。</p>\n\n\n<h2>来源</h2>\n\n<ul>\n<li>\n<a href=\"https://codex-resets.com/\">codex-resets.com：Codex 重置历史与统计</a>\n</li>\n<li>\n<a href=\"https://aiidelist.com/codex-reset\">aiidelist：Codex 重置追踪</a>\n</li>\n<li>\n<a href=\"https://github.com/openai/codex/issues/28246\">GitHub openai/codex #28246：配额窗口锚定到重置后的第一次使用</a>\n</li>\n<li>\n<a href=\"https://github.com/openai/codex/issues/28888\">GitHub openai/codex #28888：将储备重置有效期延长到 30 天以上</a>\n</li>\n<li>\n<a href=\"https://help.openai.com/en/articles/20001507-paid-weekly-work-and-codex-rate-limit-resets\">OpenAI 帮助中心：付费周 Work 与 Codex 速率限制重置</a>\n</li>\n</ul>",
+      "faq": [
+        {
+          "question": "Codex 使用限额何时重置？",
+          "answer": "5 小时窗口在开启后 5 小时重置。周窗口大约在你第一次请求后 7 天重置，因此没有固定的日子，同一套餐的不同用户也会不同。"
+        },
+        {
+          "question": "什么是储备 Codex 重置？",
+          "answer": "OpenAI 加载到你账户上、供你稍后兑换的一次性重置。兑换后 5 小时窗口和周窗口都会回到 0%，并把你的周重置日期往后推。"
+        },
+        {
+          "question": "储备 Codex 重置会过期吗？",
+          "answer": "会，大约在发放后 30 天过期，且没有任何提醒。当周仪表很高时兑换，并在 30 天到期前完成。"
+        },
+        {
+          "question": "OpenAI 多久重置一次 Codex 限额？",
+          "answer": "社区追踪站统计，自 2025 年 9 月以来共有 55 次一次性重置，平均每 6.9 天一次，通常出于发布、用户里程碑或用量 bug。都不是定期安排的。"
+        },
+        {
+          "question": "如何查看我的 Codex 用量和重置时间？",
+          "answer": "在 Codex CLI 中运行 /status，或打开 ChatGPT 设置中的 Codex 使用页面。两者都会显示每个窗口已用的百分比及其重置时间。"
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/claude-vs-codex-october-2026",
+          "label": "Claude 对比 Codex：2026 年 10 月 $100 档谁更值"
+        },
+        {
+          "slug": "/research/claude-fable-5-1-vs-opus-5-5-cost",
+          "label": "Fable 5.1 对比 Opus 5.5：贵 2.5 倍值不值？"
+        },
+        {
+          "slug": "/research/chatgpt-pro-100-real-codex-multiplier",
+          "label": "ChatGPT Pro $100 实际是 Plus 的 2.6 倍，而非 5 倍"
+        },
+        {
+          "slug": "/research/codex-pro-100-heavy-user-resets-log",
+          "label": "12 天内 Pro $100 上的 8 个 Codex 周窗口"
+        },
+        {
+          "slug": "/research/codex-resets-value-12-days",
+          "label": "重置如何把 $40 的套餐变成 $1,211 的用量"
+        },
+        {
+          "slug": "/research/codex-banked-reset-when-to-redeem",
+          "label": "何时兑换 Codex 储备重置"
+        },
+        {
+          "slug": "/research/codex-prompt-caching-cost",
+          "label": "我们 98% 的 Codex 输入命中缓存：账单"
+        },
+        {
+          "slug": "/research/codex-usage-limits-chatgpt-pro",
+          "label": "ChatGPT Pro 包含多少 Codex 用量（按美元计）"
+        },
+        {
+          "slug": "/research/claude-max-vs-chatgpt-pro-codex-200",
+          "label": "Claude Max 对比 ChatGPT Pro：完整 60 天研究"
+        },
+        {
+          "slug": "/research/claude-max-20x-vs-5x-weekly-limit",
+          "label": "Claude Max 20x 对比 5x：实测周限额"
+        }
+      ]
     }
   }
 }

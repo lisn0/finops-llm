@@ -291,6 +291,176 @@
           "label": "التكلفة لكل مهمة ناجحة"
         }
       ]
+    },
+    "id": {
+      "title": "Loop retry yang diam-diam menambah biaya inferensi",
+      "titleCore": "Loop retry yang diam-diam menambah biaya inferensi",
+      "description": "Bagaimana retry, fallback, dan kegagalan tool melipatgandakan biaya LLM produksi, beserta telemetri dan batas yang menghentikan kebocoran ini.",
+      "body": "<p>Retry bukan ketahanan tanpa biaya. Setiap retry adalah panggilan model lagi, dan sebuah agen bisa mengubah satu error sementara menjadi lima percobaan berbayar sebelum ada yang melihat kegagalan. Kontrol pertama adalah mengukur pajak retry: pengeluaran retry dan fallback dibagi total pengeluaran inferensi, disegmentasi menurut workflow dan alasan kegagalan.</p><h2>Hitung seluruh pohon percobaan</h2><p>Catat permintaan induk, nomor percobaan, provider, model, panggilan tool, latensi, kelas error, token, dan hasil akhir. ID permintaan saja tidak cukup ketika sebuah panggilan tool memicu permintaan model bersarang. Catat hubungan induk-anak agar satu tugas pengguna bisa direkonstruksi sebagai pohon.</p><h2>Pisahkan retry yang berguna dari retry yang boros</h2><p>Mencoba ulang rate limit mungkin memulihkan tugas yang berharga. Mencoba ulang error validasi dengan prompt yang sama biasanya hanya menghasilkan kegagalan identik lagi. Timeout provider, input tool yang rusak, context overflow, dan penolakan kualitas memerlukan kebijakan yang berbeda. Berikan setiap kelas kegagalan jumlah percobaan maksimum dan jalur eskalasi.</p><h2>Tetapkan anggaran di batas loop</h2><p>Gunakan batas token per permintaan, batas dolar per workflow, dan durasi waktu nyata maksimum. Batas lunak bisa mengarahkan percobaan berikutnya ke model yang lebih kecil; batas keras menghentikan loop dan mengembalikan status yang bisa dipulihkan. Jangan mengandalkan peringatan bulanan untuk mengendalikan permintaan yang bisa menghabiskan anggarannya dalam hitungan detik.</p><h2>Tinjau pajak bersama kualitas</h2><p>Tingkat retry yang rendah belum tentu baik jika percobaan pertama lebih sering gagal. Lacak biaya tugas yang berhasil, tingkat penyelesaian, latensi, dan pajak retry secara bersamaan. Perbaiki dulu sumber dolar terbesar: panggilan tool duplikat, konteks berlebih pada retry, rantai fallback yang mengulang kapabilitas yang sama, atau validator yang menolak jawaban tanpa mengubah prompt.</p><p>Perbaikan yang tahan lama bukan “matikan retry.” Yang diperlukan adalah membuat setiap percobaan tambahan terlihat, terbatas, dan dibenarkan oleh peningkatan hasil yang bisa diukur.</p><h2>Terkait</h2><ul><li>Guardrail pengeluaran agen</li><li>Pemantauan biaya LLM</li><li>Biaya per tugas yang berhasil</li></ul>",
+      "faq": [
+        {
+          "question": "Apa itu pajak retry dalam sistem LLM?",
+          "answer": "Pajak retry adalah pengeluaran yang disebabkan oleh retry dan fallback dibagi total pengeluaran inferensi, diukur menurut workflow dan alasan kegagalan."
+        },
+        {
+          "question": "Bagaimana tim sebaiknya mengendalikan loop retry agen?",
+          "answer": "Tetapkan batas token per permintaan, dolar per workflow, jumlah percobaan, dan waktu nyata, dengan perilaku routing lunak dan penghentian keras."
+        },
+        {
+          "question": "Apakah semua retry sebaiknya dimatikan?",
+          "answer": "Tidak. Klasifikasikan kegagalan terlebih dahulu; coba ulang error provider yang sementara ketika pemulihannya bernilai, tetapi hentikan error validasi dan konteks yang deterministik."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/agent-spend-guardrails",
+          "label": "Guardrail pengeluaran agen"
+        },
+        {
+          "slug": "/research/llm-cost-monitoring",
+          "label": "Pemantauan biaya LLM"
+        },
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "Biaya per tugas yang berhasil"
+        }
+      ]
+    },
+    "pl": {
+      "title": "Pętla ponowień po cichu zwiększa wydatki na inferencję",
+      "titleCore": "Ukryte wydatki na ponowienia",
+      "description": "Jak ponowienia, fallbacki i błędy narzędzi mnożą wydatki na LLM w produkcji oraz jakie telemetria i limity zatrzymują ten wyciek.",
+      "body": "<p>Ponowienie to nie darmowa odporność. To kolejne wywołanie modelu, a agent może zamienić jeden przejściowy błąd w pięć płatnych prób, zanim ktokolwiek zobaczy awarię. Pierwszą kontrolą jest zmierzenie podatku od ponowień: wydatków na ponowienia i fallbacki podzielonych przez całkowity wydatek na inferencję, z podziałem na przepływ pracy i przyczynę błędu.</p><h2>Policz całe drzewo prób</h2><p>Zapisuj żądanie nadrzędne, numer próby, dostawcę, model, wywołanie narzędzia, opóźnienie, klasę błędu, tokeny i ostateczny wynik. Samego identyfikatora żądania nie wystarczy, gdy wywołanie narzędzia uruchamia zagnieżdżone żądanie do modelu. Zapisuj relacje rodzic-dziecko, aby jedno zadanie użytkownika dało się odtworzyć jako drzewo.</p><h2>Oddziel użyteczne ponowienia od marnotrawnych</h2><p>Ponowienie po limicie szybkości może uratować cenne zadanie. Ponowienie błędu walidacji tym samym promptem zwykle kupuje kolejną identyczną porażkę. Timeout dostawcy, źle sformatowane dane wejściowe narzędzia, przepełnienie kontekstu i odrzucenie ze względu na jakość wymagają różnych zasad. Każdej klasie błędu przypisz maksymalną liczbę prób i ścieżkę eskalacji.</p><h2>Ustaw budżety na granicy pętli</h2><p>Stosuj limit tokenów na żądanie, limit dolarów na przepływ pracy i maksymalny czas rzeczywisty. Miękki limit może skierować kolejną próbę do mniejszego modelu; twardy limit zatrzymuje pętlę i zwraca stan, który da się odzyskać. Nie polegaj na miesięcznym alercie, by kontrolować żądanie, które może wydać swój budżet w ciągu sekund.</p><h2>Oceniaj podatek razem z jakością</h2><p>Niski wskaźnik ponowień nie jest automatycznie dobry, jeśli pierwsza próba częściej zawodzi. Śledź razem koszt zadania zakończonego sukcesem, wskaźnik ukończenia, opóźnienie i podatek od ponowień. Naprawiaj najpierw największe kwoty: zduplikowane wywołania narzędzi, zbyt duży kontekst przy ponowieniach, łańcuchy fallbacków powtarzające tę samą zdolność albo walidatory odrzucające odpowiedzi bez zmiany promptu.</p><p>Trwałym rozwiązaniem nie jest „wyłącz ponowienia”. Jest nim uczynienie każdej dodatkowej próby widoczną, ograniczoną i uzasadnioną mierzalną poprawą wyniku.</p><h2>Powiązane</h2><ul><li>Zabezpieczenia wydatków agentów</li><li>Monitorowanie kosztów LLM</li><li>Koszt zadania zakończonego sukcesem</li></ul>",
+      "faq": [
+        {
+          "question": "Czym jest podatek od ponowień w systemach LLM?",
+          "answer": "Podatkiem od ponowień jest wydatek spowodowany ponowieniami i fallbackami podzielony przez całkowity wydatek na inferencję, mierzony według przepływu pracy i przyczyny błędu."
+        },
+        {
+          "question": "Jak zespoły powinny kontrolować pętle ponowień agentów?",
+          "answer": "Ustawiając limity na żądanie: tokeny, dolary na przepływ pracy, liczbę prób i czas rzeczywisty, z miękkim kierowaniem i twardym zatrzymaniem."
+        },
+        {
+          "question": "Czy wszystkie ponowienia należy wyłączyć?",
+          "answer": "Nie. Najpierw sklasyfikuj błędy; ponawiaj przejściowe błędy dostawcy, gdy odzyskanie wyniku jest wartościowe, ale zatrzymuj deterministyczne błędy walidacji i kontekstu."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/agent-spend-guardrails",
+          "label": "Zabezpieczenia wydatków agentów"
+        },
+        {
+          "slug": "/research/llm-cost-monitoring",
+          "label": "Monitorowanie kosztów LLM"
+        },
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "Koszt zadania zakończonego sukcesem"
+        }
+      ]
+    },
+    "ru": {
+      "title": "Цикл повторов, незаметно добавляющий расходы на инференс",
+      "titleCore": "Цикл повторов, незаметно добавляющий расходы на инференс",
+      "description": "Как повторы, фолбэки и сбои инструментов умножают расходы на продакшн LLM, и какие телеметрия и лимиты останавливают эту утечку.",
+      "body": "<p>Повтор не является бесплатной устойчивостью. Это еще один вызов модели, и агент может превратить одну временную ошибку в пять оплачиваемых попыток, прежде чем кто-либо заметит сбой. Первый контроль &mdash; измерить налог на повторы: расходы на повторы и фолбэки, деленные на весь расход на инференс, с разбивкой по workflow и причине сбоя.</p><h2>Считайте все дерево попыток</h2><p>Логируйте родительский запрос, номер попытки, провайдера, модель, вызов инструмента, задержку, класс ошибки, токены и итоговый результат. Одного request ID недостаточно, когда вызов инструмента запускает вложенный запрос к модели. Фиксируйте связи родитель-потомок, чтобы задачу пользователя можно было восстановить как дерево.</p><h2>Отделяйте полезные повторы от бесполезных</h2><p>Повтор при превышении лимита запросов может спасти ценную задачу. Повтор ошибки валидации с тем же промптом обычно приносит еще одну такую же ошибку. Таймаут провайдера, некорректный ввод инструмента, переполнение контекста и отказ по качеству требуют разных политик. Для каждого класса ошибок задайте максимальное число попыток и путь эскалации.</p><h2>Ставьте бюджеты на границе цикла</h2><p>Используйте потолок токенов на запрос, потолок в долларах на workflow и максимальную длительность по часам. Мягкий потолок может направить следующую попытку на более компактную модель; жесткий потолок останавливает цикл и возвращает восстанавливаемое состояние. Не полагайтесь на ежемесячный алерт для контроля запроса, который может сжечь бюджет за секунды.</p><h2>Оценивайте налог вместе с качеством</h2><p>Низкая доля повторов сама по себе не хороша, если первая попытка проваливается чаще. Отслеживайте стоимость успешной задачи, долю завершенных задач, задержку и налог на повторы вместе. Начинайте с самых крупных статей: дублирующие вызовы инструментов, раздутый контекст при повторах, цепочки фолбэков, повторяющие ту же возможность, или валидаторы, которые отклоняют ответы без изменения промпта.</p><p>Устойчивое решение &mdash; не &laquo;отключить повторы&raquo;. Нужно сделать каждую дополнительную попытку видимой, ограниченной и оправданной измеримым улучшением результата.</p><h2>Связанное</h2><ul><li>Ограничители расходов агентов</li><li>Мониторинг затрат на LLM</li><li>Стоимость успешной задачи</li></ul>",
+      "faq": [
+        {
+          "question": "Что такое налог на повторы в LLM-системах?",
+          "answer": "Налог на повторы &mdash; это расходы, вызванные повторами и фолбэками, деленные на весь расход на инференс и измеренные по workflow и причине сбоя."
+        },
+        {
+          "question": "Как командам контролировать циклы повторов агентов?",
+          "answer": "Задайте лимиты на запрос по токенам, на workflow по долларам, по числу попыток и по времени, с мягкой перемаршрутизацией и жестким остановом."
+        },
+        {
+          "question": "Стоит ли отключить все повторы?",
+          "answer": "Нет. Сначала классифицируйте сбои: повторяйте временные ошибки провайдера, когда восстановление ценно, но останавливайте детерминированные ошибки валидации и контекста."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/agent-spend-guardrails",
+          "label": "Ограничители расходов агентов"
+        },
+        {
+          "slug": "/research/llm-cost-monitoring",
+          "label": "Мониторинг затрат на LLM"
+        },
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "Стоимость успешной задачи"
+        }
+      ]
+    },
+    "tr": {
+      "title": "Sessizce inference harcamasını artıran retry döngüsü",
+      "titleCore": "Retry döngüsü ve gizli inference maliyeti",
+      "description": "Retry, fallback ve araç hatalarının LLM harcamasını nasıl katladığı; sızıntıyı durduran telemetri ve limitler.",
+      "body": "<p>Bir retry, bedava bir dayanıklılık mekanizması değildir. Bu, bir model çağrısı daha demektir ve bir agent, tek bir geçici hatayı kimse bir arıza görmeden beş ücretli denemeye dönüştürebilir. İlk kontrol retry vergisini ölçmektir: retry ve fallback harcamasının toplam inference harcamasına oranı, iş akışına ve hata nedenine göre ayrıştırılmış olarak.</p><h2>Tüm deneme ağacını say</h2><p>Üst istek, deneme numarası, sağlayıcı, model, araç çağrısı, gecikme, hata sınıfı, token sayısı ve nihai sonucu kaydedin. Bir araç çağrısı iç içe bir model isteği tetikleyebildiğinden tek başına bir istek ID'si yeterli değildir. Bir kullanıcı görevinin ağaç olarak yeniden kurulabilmesi için üst-alt ilişkilerini kaydedin.</p><h2>Faydalı ve israf olan retry'ları ayırın</h2><p>Rate limit hatasını yeniden denemek değerli bir görevi kurtarabilir. Aynı prompt ile doğrulama hatasını yeniden denemek ise çoğunlukla aynı hatayı tekrar satın almak demektir. Sağlayıcı zaman aşımı, bozuk araç girdisi, bağlam taşması ve kalite reddi farklı politikalar gerektirir. Her hata sınıfına bir maksimum deneme sayısı ve bir yükseltme yolu atayın.</p><h2>Bütçeleri döngü sınırında belirleyin</h2><p>İstek başına bir token tavanı, iş akışı başına bir dolar tavanı ve bir maksimum duvar saati süresi kullanın. Yumuşak bir tavan bir sonraki denemeyi daha küçük bir modele yönlendirebilir; sert bir tavan ise döngüyü durdurur ve kurtarılabilir bir durum döndürür. Saniyeler içinde bütçesini tüketebilecek bir isteği aylık bir uyarıyla kontrol etmeye çalışmayın.</p><h2>Vergiyi kaliteyle birlikte gözden geçirin</h2><p>İlk denemenin daha sık başarısız olduğu durumda düşük bir retry oranı otomatik olarak iyi değildir. Başarılı görev maliyetini, tamamlanma oranını, gecikmeyi ve retry vergisini birlikte izleyin. En büyük dolarları önce düzeltin: tekrarlanan araç çağrıları, retry'larda aşırı büyük bağlam, aynı yeteneği tekrarlayan fallback zincirleri veya prompt'u değiştirmeden yanıtları reddeden doğrulayıcılar.</p><p>Kalıcı çözüm “retry'ları kapatmak” değildir. Her ekstra denemeyi görünür, sınırlı ve ölçülebilir bir sonuç iyileşmesiyle gerekçelendirilmiş hale getirmektir.</p><h2>İlgili</h2><ul><li>Agent harcama korkulukları</li><li>LLM maliyet izleme</li><li>Başarılı görev başına maliyet</li></ul>",
+      "faq": [
+        {
+          "question": "LLM sistemlerinde retry vergisi nedir?",
+          "answer": "Retry ve fallback'lerin neden olduğu harcamanın toplam inference harcamasına bölünmesiyle elde edilen orandır ve iş akışı ile hata nedeni bazında ölçülür."
+        },
+        {
+          "question": "Ekipler agent retry döngülerini nasıl kontrol etmeli?",
+          "answer": "İstek başına token, iş akışı başına dolar, deneme sayısı ve duvar saati limitleri koyun; yumuşak tavanda yönlendirme, sert tavanda durdurma davranışı tanımlayın."
+        },
+        {
+          "question": "Tüm retry'lar kapatılmalı mı?",
+          "answer": "Hayır. Önce hataları sınıflandırın; kurtarmanın değerli olduğu geçici sağlayıcı hatalarını yeniden deneyin, deterministik doğrulama ve bağlam hatalarında durun."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/agent-spend-guardrails",
+          "label": "Agent harcama korkulukları"
+        },
+        {
+          "slug": "/research/llm-cost-monitoring",
+          "label": "LLM maliyet izleme"
+        },
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "Başarılı görev başına maliyet"
+        }
+      ]
+    },
+    "vi": {
+      "title": "Vòng lặp thử lại âm thầm làm tăng chi phí suy luận",
+      "titleCore": "Vòng lặp thử lại làm tăng chi phí suy luận",
+      "description": "Cách thử lại, fallback và lỗi công cụ nhân chi phí LLM production, cùng telemetry và giới hạn để chặn rò rỉ chi phí.",
+      "body": "<p>Thử lại không phải là khả năng phục hồi miễn phí. Đó là một lần gọi mô hình khác, và một agent có thể biến một lỗi thoáng qua thành năm lần thử có tính phí trước khi ai kịp thấy một thất bại. Biện pháp kiểm soát đầu tiên là đo thuế thử lại: chi phí thử lại và fallback chia cho tổng chi phí suy luận, phân theo quy trình và lý do lỗi.</p><h2>Đếm toàn bộ cây lần thử</h2><p>Ghi lại yêu cầu cha, số lần thử, nhà cung cấp, mô hình, lệnh gọi công cụ, độ trễ, loại lỗi, số token và kết quả cuối cùng. Chỉ có mã yêu cầu là không đủ khi một lệnh gọi công cụ kích hoạt một yêu cầu mô hình lồng bên trong. Hãy ghi quan hệ cha-con để có thể dựng lại một tác vụ người dùng dưới dạng cây.</p><h2>Tách thử lại hữu ích khỏi thử lại lãng phí</h2><p>Thử lại khi bị giới hạn tốc độ có thể cứu lại một tác vụ có giá trị. Thử lại lỗi xác thực với cùng prompt thường chỉ mua thêm một thất bại giống hệt. Lỗi timeout của nhà cung cấp, đầu vào công cụ sai định dạng, tràn ngữ cảnh và từ chối vì chất lượng cần các chính sách khác nhau. Hãy gán cho mỗi loại lỗi một số lần thử tối đa và một đường leo thang.</p><h2>Đặt ngân sách ở ranh giới vòng lặp</h2><p>Dùng trần token cho mỗi yêu cầu, trần đô la cho mỗi quy trình và thời lượng thực tối đa. Một trần mềm có thể chuyển lần thử tiếp theo sang mô hình nhỏ hơn; một trần cứng dừng vòng lặp và trả về trạng thái có thể khôi phục. Đừng dựa vào cảnh báo hàng tháng để kiểm soát một yêu cầu có thể tiêu hết ngân sách chỉ trong vài giây.</p><h2>Xem xét thuế cùng chất lượng</h2><p>Tỷ lệ thử lại thấp không tự động là tốt nếu lần thử đầu tiên thất bại thường xuyên hơn. Hãy theo dõi đồng thời chi phí mỗi tác vụ thành công, tỷ lệ hoàn thành, độ trễ và thuế thử lại. Xử lý các khoản đô la lớn nhất trước: lệnh gọi công cụ trùng lặp, ngữ cảnh quá lớn ở các lần thử lại, chuỗi fallback lặp lại cùng một năng lực, hoặc bộ kiểm tra từ chối câu trả lời mà không thay đổi prompt.</p><p>Giải pháp bền vững không phải là “tắt thử lại”. Đó là làm cho mọi lần thử thêm đều hiển thị, có giới hạn, và được biện minh bằng một cải thiện đo được về kết quả.</p><h2>Liên quan</h2><ul><li>Các rào chắn chi tiêu của agent</li><li>Giám sát chi phí LLM</li><li>Chi phí mỗi tác vụ thành công</li></ul>",
+      "faq": [
+        {
+          "question": "Thuế thử lại trong hệ thống LLM là gì?",
+          "answer": "Thuế thử lại là khoản chi phí do thử lại và fallback gây ra, chia cho tổng chi phí suy luận, được đo theo quy trình và lý do lỗi."
+        },
+        {
+          "question": "Đội ngũ nên kiểm soát vòng lặp thử lại của agent như thế nào?",
+          "answer": "Đặt giới hạn token cho mỗi yêu cầu, đô la cho mỗi quy trình, số lần thử và thời lượng thực, kèm hành vi định tuyến mềm và dừng cứng."
+        },
+        {
+          "question": "Có nên tắt toàn bộ thử lại không?",
+          "answer": "Không. Hãy phân loại lỗi trước; thử lại lỗi tạm thời của nhà cung cấp khi việc phục hồi có giá trị, nhưng dừng với lỗi xác thực và lỗi ngữ cảnh mang tính quyết định."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/agent-spend-guardrails",
+          "label": "Rào chắn chi tiêu của agent"
+        },
+        {
+          "slug": "/research/llm-cost-monitoring",
+          "label": "Giám sát chi phí LLM"
+        },
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "Chi phí mỗi tác vụ thành công"
+        }
+      ]
     }
   }
 }

@@ -15,7 +15,7 @@
       "title": "How to price a model that has no price",
       "titleCore": "Pricing an open-weight model",
       "description": "Qwen3.8-Flash-Next shipped as open weights with no hosted rate. Here is the arithmetic that turns an instance-hour into a cost per million tokens.",
-      "body": "<p>Qwen3.8-Flash-Next arrived on 26 August 2026 as an open-weight preview of the Qwen4 architecture: roughly 6B active parameters, a 262,144-token native context, and no hosted pricing announced. That combination breaks the usual comparison. Every closed model gives you a number per million tokens; an open-weight release gives you a checkpoint and leaves the number to you.</p><p>The number is not hard to compute. It is just that most teams never compute it, and instead compare a $0 download against a $3.00/MTok API and conclude the download is cheaper. It might be. The arithmetic decides, and the arithmetic has exactly one term people forget.</p><h2>The formula</h2><p>Cost per million tokens is the hourly price of the instance divided by how many tokens that instance produces in an hour:</p><pre><code>cost per MTok = hourly_price / (tokens_per_second * 3600) * 1,000,000</code></pre><p>At $2.00 per hour and a measured 1,500 tokens per second, that is 2.00 / 5,400,000 * 1,000,000 = <strong>$0.37 per million tokens</strong>. Against a hosted model at $3.00/MTok output, self-hosting looks like an eight-fold saving. That figure is also wrong, because it assumes the GPU is busy every second you pay for.</p><h2>The term everyone forgets: utilisation</h2><p>You rent the hour; you use a fraction of it. Divide by that fraction:</p><table><thead><tr><th>Utilisation</th><th>Effective cost per MTok</th></tr></thead><tbody><tr><td>100%</td><td>$0.37</td></tr><tr><td>60%</td><td>$0.62</td></tr><tr><td>30%</td><td>$1.23</td></tr><tr><td>10%</td><td>$3.70</td></tr></tbody></table><p>At 10% utilisation the self-hosted model costs more than the hosted API it was meant to replace. Most first deployments sit between 10% and 30%, because traffic is bursty and the instance is provisioned for the peak. The saving is real, but it is a saving on <em>utilisation</em>, not on weights.</p><h2>What else belongs in the number</h2><p>Storage and egress for the checkpoint. Idle time between the instance booting and the model being warm &mdash; on a large-context model, loading is minutes, and you pay for all of them. Redundancy, if the workload needs more than one instance to survive a node failure. And engineering time, which is not billed hourly but is the largest line in year one.</p><p>None of that argues against self-hosting. It argues against comparing a free download to a per-token rate without doing the division.</p><h2>Measure before you commit</h2><p>Run the model on the instance you would actually rent, with your own prompt shapes and your own context lengths, and record tokens per second under concurrency &mdash; not the single-stream number from the model card. Then take your real hourly traffic profile and compute utilisation. Two numbers, one division, and the decision makes itself.</p><p>The long context is where this bites hardest. A 262K-token context is a memory footprint before it is a feature: it dictates the instance class, and the instance class dictates the hourly price at the top of the formula. Price the context you actually send, not the context the model supports.</p><h2>Related</h2><ul><li><a href=&quot;/research/open-source-vs-closed-cost&quot;>Open source vs closed model cost</a></li><li><a href=&quot;/research/cost-per-request-kpi&quot;>Cost per request as a KPI</a></li><li><a href=&quot;/research/provider-arbitrage&quot;>Provider arbitrage</a></li></ul>",
+      "body": "<p>Qwen3.8-Flash-Next arrived on 26 August 2026 as an open-weight preview of the Qwen4 architecture: roughly 6B active parameters, a 262,144-token native context, and no hosted pricing announced. That combination breaks the usual comparison. Every closed model gives you a number per million tokens; an open-weight release gives you a checkpoint and leaves the number to you.</p><p>The number is not hard to compute. It is just that most teams never compute it, and instead compare a $0 download against a $3.00/MTok API and conclude the download is cheaper. It might be. The arithmetic decides, and the arithmetic has exactly one term people forget.</p><h2>The formula</h2><p>Cost per million tokens is the hourly price of the instance divided by how many tokens that instance produces in an hour:</p><pre><code>cost per MTok = hourly_price / (tokens_per_second * 3600) * 1,000,000</code></pre><p>At $2.00 per hour and a measured 1,500 tokens per second, that is 2.00 / 5,400,000 * 1,000,000 = <strong>$0.37 per million tokens</strong>. Against a hosted model at $3.00/MTok output, self-hosting looks like an eight-fold saving. That figure is also wrong, because it assumes the GPU is busy every second you pay for.</p><h2>The term everyone forgets: utilisation</h2><p>You rent the hour; you use a fraction of it. Divide by that fraction:</p><table><thead><tr><th>Utilisation</th><th>Effective cost per MTok</th></tr></thead><tbody><tr><td>100%</td><td>$0.37</td></tr><tr><td>60%</td><td>$0.62</td></tr><tr><td>30%</td><td>$1.23</td></tr><tr><td>10%</td><td>$3.70</td></tr></tbody></table><p>At 10% utilisation the self-hosted model costs more than the hosted API it was meant to replace. Most first deployments sit between 10% and 30%, because traffic is bursty and the instance is provisioned for the peak. The saving is real, but it is a saving on <em>utilisation</em>, not on weights.</p><h2>What else belongs in the number</h2><p>Storage and egress for the checkpoint. Idle time between the instance booting and the model being warm &mdash; on a large-context model, loading is minutes, and you pay for all of them. Redundancy, if the workload needs more than one instance to survive a node failure. And engineering time, which is not billed hourly but is the largest line in year one.</p><p>None of that argues against self-hosting. It argues against comparing a free download to a per-token rate without doing the division.</p><h2>Measure before you commit</h2><p>Run the model on the instance you would actually rent, with your own prompt shapes and your own context lengths, and record tokens per second under concurrency &mdash; not the single-stream number from the model card. Then take your real hourly traffic profile and compute utilisation. Two numbers, one division, and the decision makes itself.</p><p>The long context is where this bites hardest. A 262K-token context is a memory footprint before it is a feature: it dictates the instance class, and the instance class dictates the hourly price at the top of the formula. Price the context you actually send, not the context the model supports.</p><h2>Related</h2><ul><li><a href=\"/research/open-source-vs-closed-cost\">Open source vs closed model cost</a></li><li><a href=\"/research/cost-per-request-kpi\">Cost per request as a KPI</a></li><li><a href=\"/research/provider-arbitrage\">Provider arbitrage</a></li></ul>",
       "faq": [
         {
           "question": "How do I convert an instance hourly price into a cost per million tokens?",
@@ -132,6 +132,346 @@
         {
           "slug": "/research/open-source-vs-closed-cost",
           "label": "オープンモデルとクローズドモデルのコスト"
+        }
+      ]
+    },
+    "id": {
+      "title": "Cara memberi harga model yang tidak punya harga",
+      "titleCore": "Menghitung harga model open-weight",
+      "description": "Qwen3.8-Flash-Next dirilis sebagai open weights tanpa tarif hosted. Berikut hitungannya, dari harga per jam instance ke biaya per juta token.",
+      "body": "<p>Qwen3.8-Flash-Next hadir pada 26 Agustus 2026 sebagai pratinjau open-weight dari arsitektur Qwen4: sekitar 6B parameter aktif, konteks asli 262.144 token, dan belum ada harga hosted yang diumumkan. Kombinasi ini merusak perbandingan biasa. Setiap model tertutup memberi Anda angka per juta token; rilis open-weight memberi Anda checkpoint dan menyerahkan angkanya kepada Anda.</p><p>Angkanya tidak sulit dihitung. Hanya saja, kebanyakan tim tidak pernah menghitungnya, dan malah membandingkan unduhan $0 dengan API $3,00/MTok lalu menyimpulkan unduhan itu lebih murah. Bisa jadi memang begitu. Hitungan yang menentukan, dan hitungan itu punya satu suku yang sering dilupakan.</p><h2>Rumusnya</h2><p>Biaya per juta token adalah harga per jam instance dibagi jumlah token yang dihasilkan instance itu dalam satu jam:</p><pre><code>cost per MTok = hourly_price / (tokens_per_second * 3600) * 1,000,000</code></pre><p>Dengan $2,00 per jam dan 1.500 token per detik yang diukur, hasilnya 2.00 / 5.400.000 * 1.000.000 = <strong>$0,37 per juta token</strong>. Dibandingkan model hosted seharga $3,00/MTok output, self-hosting tampak hemat delapan kali lipat. Angka itu juga keliru, karena mengasumsikan GPU sibuk setiap detik yang Anda bayar.</p><h2>Suku yang sering dilupakan: utilisasi</h2><p>Anda menyewa satu jam penuh; Anda hanya memakai sebagian. Bagi dengan bagian itu:</p><table><thead><tr><th>Utilisasi</th><th>Biaya efektif per MTok</th></tr></thead><tbody><tr><td>100%</td><td>$0,37</td></tr><tr><td>60%</td><td>$0,62</td></tr><tr><td>30%</td><td>$1,23</td></tr><tr><td>10%</td><td>$3,70</td></tr></tbody></table><p>Pada utilisasi 10%, model self-hosted justru lebih mahal daripada API hosted yang seharusnya digantikannya. Sebagian besar deployment pertama berada di antara 10% dan 30%, karena trafiknya bursty dan instance disiapkan untuk puncak. Penghematannya nyata, tetapi itu penghematan pada <em>utilisasi</em>, bukan pada bobot model.</p><h2>Apa lagi yang masuk ke angka</h2><p>Penyimpanan dan egress untuk checkpoint. Waktu menganggur antara instance menyala dan model siap, karena pada model konteks besar proses pemuatan bisa memakan menit, dan Anda membayar semuanya. Redundansi, jika beban kerja memerlukan lebih dari satu instance agar tetap hidup saat satu node gagal. Dan waktu engineering, yang tidak ditagihkan per jam tetapi merupakan pos terbesar pada tahun pertama.</p><p>Tidak satu pun dari itu membatalkan self-hosting. Yang dibantahnya adalah membandingkan unduhan gratis dengan tarif per token tanpa melakukan pembagian.</p><h2>Ukur sebelum berkomitmen</h2><p>Jalankan model pada instance yang benar-benar akan Anda sewa, dengan bentuk prompt dan panjang konteks Anda sendiri, lalu catat token per detik di bawah konkurensi &mdash; bukan angka single-stream dari model card. Setelah itu, ambil profil trafik per jam yang nyata dan hitung utilisasinya. Dua angka, satu pembagian, dan keputusannya terbentuk sendiri.</p><p>Konteks panjang adalah tempat hal ini paling terasa. Konteks 262K token adalah footprint memori sebelum menjadi fitur: ia menentukan kelas instance, dan kelas instance menentukan harga per jam di bagian atas rumus. Hitung konteks yang benar-benar Anda kirim, bukan konteks yang didukung model.</p><h2>Terkait</h2><ul><li><a href=\"/research/open-source-vs-closed-cost\">Biaya model open source vs tertutup</a></li><li><a href=\"/research/cost-per-request-kpi\">Biaya per permintaan sebagai KPI</a></li><li><a href=\"/research/provider-arbitrage\">Arbitrase provider</a></li></ul>",
+      "faq": [
+        {
+          "question": "Bagaimana cara mengubah harga per jam instance menjadi biaya per juta token?",
+          "answer": "Bagi harga per jam dengan token per detik dikali 3600, lalu kalikan satu juta. Pada $2,00 per jam dan 1.500 token per detik, hasilnya $0,37 per juta token, sebelum disesuaikan dengan utilisasi."
+        },
+        {
+          "question": "Mengapa utilisasi memengaruhi biaya sebesar itu?",
+          "answer": "Anda membayar seluruh jam tetapi hanya menghasilkan token pada sebagian waktunya. Bagi biaya ideal dengan utilisasi Anda: $0,37 per juta pada beban penuh menjadi $1,23 pada 30% dan $3,70 pada 10%, saat API hosted sudah lebih murah."
+        },
+        {
+          "question": "Apakah model open-weight tanpa harga terbit berarti gratis?",
+          "answer": "Tidak. Open weights menghapus biaya lisensi, bukan biaya penyajian. Tarif sebenarnya ditentukan oleh harga instance, throughput di bawah konkurensi, dan utilisasi, ditambah penyimpanan, waktu pemanasan, redundansi, dan jam engineering."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/open-source-vs-closed-cost",
+          "label": "Biaya model open source vs tertutup"
+        },
+        {
+          "slug": "/research/cost-per-request-kpi",
+          "label": "Biaya per permintaan sebagai KPI"
+        },
+        {
+          "slug": "/research/provider-arbitrage",
+          "label": "Arbitrase provider"
+        }
+      ]
+    },
+    "pl": {
+      "title": "Jak wycenić model, który nie ma ceny",
+      "titleCore": "Wycena modelu o otwartych wagach",
+      "description": "Qwen3.8-Flash-Next trafił na rynek z otwartymi wagami i bez stawki hostowanej. Oto arytmetyka, która zamienia godzinę instancji w koszt za milion tokenów.",
+      "body": "<p>Qwen3.8-Flash-Next pojawił się 26 sierpnia 2026 jako podgląd z otwartymi wagami architektury Qwen4: około 6B aktywnych parametrów, natywny kontekst 262,144 tokenów i brak ogłoszonej ceny hostowanej. Ta kombinacja łamie zwykłe porównanie. Każdy model zamknięty podaje liczbę za milion tokenów; wydanie z otwartymi wagami daje punkt kontrolny i zostawia liczbę tobie.</p><p>Ta liczba nie jest trudna do obliczenia. Problem w tym, że większość zespołów jej nie liczy, tylko porównuje pobieranie za $0 z API za $3.00/MTok i wnioskuje, że pobieranie jest tańsze. Być może tak jest. Decyduje arytmetyka, a arytmetyka ma dokładnie jeden składnik, o którym ludzie zapominają.</p><h2>Wzór</h2><p>Koszt za milion tokenów to godzinowa cena instancji podzielona przez liczbę tokenów, jaką ta instancja wytwarza w ciągu godziny:</p><pre><code>cost per MTok = hourly_price / (tokens_per_second * 3600) * 1,000,000</code></pre><p>Przy $2.00 za godzinę i zmierzonych 1,500 tokenach na sekundę wychodzi 2.00 / 5,400,000 * 1,000,000 = <strong>$0.37 za milion tokenów</strong>. W porównaniu z modelem hostowanym za $3.00/MTok wyjścia self-hosting wygląda na ośmiokrotną oszczędność. Ta liczba też jest błędna, bo zakłada, że GPU jest zajęte w każdej sekundzie, za którą płacisz.</p><h2>Składnik, o którym wszyscy zapominają: wykorzystanie</h2><p>Wynajmujesz godzinę, a używasz jej ułamka. Podziel przez ten ułamek:</p><table><thead><tr><th>Wykorzystanie</th><th>Efektywny koszt za MTok</th></tr></thead><tbody><tr><td>100%</td><td>$0.37</td></tr><tr><td>60%</td><td>$0.62</td></tr><tr><td>30%</td><td>$1.23</td></tr><tr><td>10%</td><td>$3.70</td></tr></tbody></table><p>Przy 10% wykorzystania model self-hostowany kosztuje więcej niż hostowane API, które miał zastąpić. Większość pierwszych wdrożeń mieści się między 10% a 30%, bo ruch jest nierówny, a instancja jest dobierana pod szczyt. Oszczędność jest realna, ale dotyczy <em>wykorzystania</em>, a nie wag.</p><h2>Co jeszcze powinno wejść do tej liczby</h2><p>Przechowywanie i ruch wychodzący dla punktu kontrolnego. Czas bezczynności między uruchomieniem instancji a rozgrzaniem modelu: przy modelu o dużym kontekście ładowanie trwa minuty, a płacisz za każdą z nich. Redundancja, jeśli obciążenie wymaga więcej niż jednej instancji, by przetrwać awarię węzła. I czas inżynierów, który nie jest rozliczany godzinowo, ale w pierwszym roku to największa pozycja.</p><p>Nic z tego nie przemawia przeciwko self-hostingowi. Przemawia przeciwko porównywaniu darmowego pobrania ze stawką za token bez wykonania dzielenia.</p><h2>Mierz, zanim się zobowiążesz</h2><p>Uruchom model na instancji, którą faktycznie wynajmiesz, z własnymi kształtami promptów i własnymi długościami kontekstu, i zapisz tokeny na sekundę przy współbieżności, a nie liczbę dla pojedynczego strumienia z karty modelu. Następnie weź swój rzeczywisty profil ruchu godzinowego i policz wykorzystanie. Dwie liczby, jedno dzielenie, a decyzja podejmuje się sama.</p><p>Długi kontekst uderza najmocniej. Kontekst 262K tokenów to najpierw zużycie pamięci, dopiero potem funkcja: determinuje klasę instancji, a klasa instancji determinuje godzinową cenę na górze wzoru. Wyceniaj kontekst, który faktycznie wysyłasz, a nie ten, który model obsługuje.</p><h2>Powiązane</h2><ul><li><a href=\"/research/open-source-vs-closed-cost\">Koszt modelu open source kontra zamkniętego</a></li><li><a href=\"/research/cost-per-request-kpi\">Koszt na żądanie jako KPI</a></li><li><a href=\"/research/provider-arbitrage\">Arbitraż dostawców</a></li></ul>",
+      "faq": [
+        {
+          "question": "Jak przeliczyć godzinową cenę instancji na koszt za milion tokenów?",
+          "answer": "Podziel godzinową cenę przez tokeny na sekundę razy 3600, a potem pomnóż przez milion. Przy $2.00 za godzinę i 1,500 tokenach na sekundę wychodzi $0.37 za milion tokenów, przed korektą o wykorzystanie."
+        },
+        {
+          "question": "Dlaczego wykorzystanie tak bardzo zmienia koszt?",
+          "answer": "Płacisz za całą godzinę, ale generujesz tokeny tylko przez jej część. Podziel idealny koszt przez swoje wykorzystanie: $0.37 za milion przy pełnym obciążeniu staje się $1.23 przy 30% i $3.70 przy 10%, a wtedy hostowane API jest tańsze."
+        },
+        {
+          "question": "Czy model o otwartych wagach bez opublikowanej ceny jest darmowy?",
+          "answer": "Nie. Otwarte wagi usuwają koszt licencji, a nie koszt obsługi. Realną stawkę ustalają cena instancji, przepustowość przy współbieżności i wykorzystanie, plus przechowywanie, rozgrzewanie, redundancja i godziny inżynierów."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/open-source-vs-closed-cost",
+          "label": "Koszt modelu open source kontra zamkniętego"
+        },
+        {
+          "slug": "/research/cost-per-request-kpi",
+          "label": "Koszt na żądanie jako KPI"
+        },
+        {
+          "slug": "/research/provider-arbitrage",
+          "label": "Arbitraż dostawców"
+        }
+      ]
+    },
+    "ru": {
+      "title": "Как назначить цену модели, у которой её нет",
+      "titleCore": "Цена модели с открытыми весами",
+      "description": "Qwen3.8-Flash-Next вышла с открытыми весами без облачной ставки. Вот арифметика, которая переводит час инстанса в стоимость за миллион токенов.",
+      "body": "<p>Qwen3.8-Flash-Next появилась 26 августа 2026 года как превью с открытыми весами архитектуры Qwen4: примерно 6B активных параметров, нативный контекст 262,144 токена и без объявленной облачной цены. Это ломает обычное сравнение. Закрытая модель дает одно число за миллион токенов, а релиз с открытыми весами дает чекпоинт и оставляет число вам.</p><p>Число посчитать несложно. Просто большинство команд его не считают: сравнивают загрузку за $0 с API по $3.00/MTok и делают вывод, что загрузка дешевле. Возможно, так и есть. Решает арифметика, а в ней есть ровно один член, который люди забывают.</p><h2>Формула</h2><p>Стоимость за миллион токенов — это почасовая цена инстанса, деленная на количество токенов, которое инстанс выдает за час:</p><pre><code>cost per MTok = hourly_price / (tokens_per_second * 3600) * 1,000,000</code></pre><p>При $2.00 в час и измеренных 1,500 токенах в секунду получается 2.00 / 5,400,000 * 1,000,000 = <strong>$0.37 за миллион токенов</strong>. По сравнению с облачной моделью по $3.00/MTok на выходе самостоятельное развертывание выглядит как восьмикратная экономия. Но и эта цифра неверна, потому что предполагает, что GPU занят каждую секунду, за которую вы платите.</p><h2>Член, который все забывают: загрузка</h2><p>Вы арендуете час, а используете его часть. Делите на эту долю:</p><table><thead><tr><th>Загрузка</th><th>Эффективная стоимость за MTok</th></tr></thead><tbody><tr><td>100%</td><td>$0.37</td></tr><tr><td>60%</td><td>$0.62</td></tr><tr><td>30%</td><td>$1.23</td></tr><tr><td>10%</td><td>$3.70</td></tr></tbody></table><p>При загрузке 10% собственная модель стоит дороже облачного API, которое она должна была заменить. Большинство первых развертываний попадают в диапазон от 10% до 30%, потому что трафик неравномерен, а инстанс рассчитан на пик. Экономия реальна, но это экономия на <em>загрузке</em>, а не на весах.</p><h2>Что еще входит в расчет</h2><p>Хранение и исходящий трафик для чекпоинта. Простой между запуском инстанса и моментом, когда модель прогрета: для модели с большим контекстом загрузка занимает минуты, и за все эти минуты вы платите. Резервирование, если нагрузке нужно больше одного инстанса, чтобы пережить сбой узла. И время инженеров, которое не тарифицируется почасово, но в первый год оно самая большая статья.</p><p>Ничто из этого не говорит против самостоятельного развертывания. Оно говорит против сравнения бесплатной загрузки с тарифом за токен без выполнения деления.</p><h2>Измерьте, прежде чем обязываться</h2><p>Запустите модель на инстансе, который вы реально арендуете, с вашими формами промптов и вашими длинами контекста, и записывайте токены в секунду при параллельной нагрузке, а не одиночный поток из карточки модели. Затем возьмите реальный почасовой профиль трафика и посчитайте загрузку. Два числа, одно деление, и решение принимается само.</p><p>Длинный контекст бьет сильнее всего. Контекст 262K токенов сначала становится расходом памяти, и только потом функцией: он задает класс инстанса, а класс инстанса задает почасовую цену в верхней части формулы. Считайте стоимость того контекста, который вы реально отправляете, а не того, который поддерживает модель.</p><h2>Связанное</h2><ul><li><a href=\"/research/open-source-vs-closed-cost\">Стоимость открытых и закрытых моделей</a></li><li><a href=\"/research/cost-per-request-kpi\">Стоимость запроса как KPI</a></li><li><a href=\"/research/provider-arbitrage\">Арбитраж провайдеров</a></li></ul>",
+      "faq": [
+        {
+          "question": "Как перевести почасовую цену инстанса в стоимость за миллион токенов?",
+          "answer": "Разделите почасовую цену на токены в секунду, умноженные на 3600, и умножьте на миллион. При $2.00 в час и 1,500 токенах в секунду выходит $0.37 за миллион токенов, до поправки на загрузку."
+        },
+        {
+          "question": "Почему загрузка так сильно меняет стоимость?",
+          "answer": "Вы платите за весь час, но генерируете токены только в его части. Разделите идеальную стоимость на вашу загрузку: $0.37 за миллион при полной нагрузке становится $1.23 при 30% и $3.70 при 10%, и тогда облачный API дешевле."
+        },
+        {
+          "question": "Значит ли открытая модель без опубликованной цены, что она бесплатна?",
+          "answer": "Нет. Открытые веса убирают стоимость лицензии, но не стоимость обслуживания. Реальную ставку задают цена инстанса, пропускная способность при параллельной нагрузке и загрузка, а также хранение, время прогрева, резервирование и часы инженеров."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/open-source-vs-closed-cost",
+          "label": "Стоимость открытых и закрытых моделей"
+        },
+        {
+          "slug": "/research/cost-per-request-kpi",
+          "label": "Стоимость запроса как KPI"
+        },
+        {
+          "slug": "/research/provider-arbitrage",
+          "label": "Арбитраж провайдеров"
+        }
+      ]
+    },
+    "tr": {
+      "title": "Fiyatı olmayan bir modele fiyat biçmek",
+      "titleCore": "Açık ağırlıklı bir modelin fiyatlandırması",
+      "description": "Qwen3.8-Flash-Next açık ağırlıklarla, barındırılan bir tarife olmadan yayımlandı. Bir instance saatini milyon token başına maliyete çeviren hesap budur.",
+      "body": "<p>Qwen3.8-Flash-Next, 26 Ağustos 2026'da Qwen4 mimarisinin açık ağırlıklı bir önizlemesi olarak çıktı: yaklaşık 6 milyar aktif parametre, 262,144 token yerel bağlam ve açıklanmış bir barındırılan fiyat yok. Bu kombinasyon alışılmış karşılaştırmayı bozar. Kapalı her model milyon token başına bir sayı verir; açık ağırlıklı bir sürüm ise size bir checkpoint verir ve sayıyı hesaplamayı size bırakır.</p><p>Sayıyı hesaplamak zor değil. Yalnızca çoğu ekip bunu hiç yapmıyor; $0 değerindeki bir indirmeyi $3.00/MTok'luk bir API ile karşılaştırıp indirmenin daha ucuz olduğu sonucuna varıyorlar. Belki de öyledir. Ama sonucu hesap belirler ve hesapta insanların unuttuğu tek bir terim vardır.</p><h2>Formül</h2><p>Milyon token başına maliyet, instance'ın saatlik fiyatının o instance'ın bir saatte ürettiği token sayısına bölünmesiyle bulunur:</p><pre><code>MTok başına maliyet = saatlik_fiyat / (saniyedeki_token * 3600) * 1,000,000</code></pre><p>Saatte $2.00 ve ölçülen saniyede 1,500 token ile hesap şöyle: 2.00 / 5,400,000 * 1,000,000 = <strong>milyon token başına $0.37</strong>. 3.00 $/MTok çıktı fiyatlı barındırılan bir modelle karşılaştırıldığında, kendi barındırmanın sekiz kat tasarruf gibi görünmesi bu yüzden. Ama bu rakam da yanlış, çünkü ödediğiniz her saniye GPU'nun meşgul olduğunu varsayar.</p><h2>Herkesin unuttuğu terim: kullanım oranı</h2><p>Saati kiralarsınız; ama onun yalnızca bir kısmını kullanırsınız. Bu kısma bölün:</p><table><thead><tr><th>Kullanım oranı</th><th>Etkin MTok maliyeti</th></tr></thead><tbody><tr><td>%100</td><td>$0.37</td></tr><tr><td>%60</td><td>$0.62</td></tr><tr><td>%30</td><td>$1.23</td></tr><tr><td>%10</td><td>$3.70</td></tr></tbody></table><p>Kullanım oranı %10 olduğunda, kendi barındırdığınız model, yerini almak için tasarlandığı barındırılan API'den daha pahalıya gelir. Çoğu ilk dağıtım %10 ile %30 arasında kalır; çünkü trafik dalgalıdır ve instance zirve yük için boyutlandırılmıştır. Tasarruf gerçektir, ama bu bir <em>kullanım oranı</em> tasarrufudur, ağırlıklar tasarrufu değildir.</p><h2>Sayıya dahil edilmesi gereken diğer kalemler</h2><p>Checkpoint için depolama ve çıkış trafiği. Instance açıldıktan sonra modelin hazır hale gelmesine kadar geçen boşta bekleme süresi; büyük bağlamlı bir modelde yükleme dakikalar sürer ve bunların hepsi için ödeme yaparsınız. Bir düğüm arızasında ayakta kalmak için birden fazla instance gerekiyorsa yedeklilik. Ve saatlik faturalanmayan ama ilk yılın en büyük kalemi olan mühendislik zamanı.</p><p>Bunların hiçbiri kendi barındırmaya karşı bir argüman değildir. Yalnızca, bölme işlemini yapmadan ücretsiz bir indirmeyi token başına bir tarifeyle karşılaştırmanın yanlış olduğunu gösterir.</p><h2>Taahhütten önce ölçün</h2><p>Modeli gerçekte kiralayacağınız instance üzerinde, kendi prompt yapılarınız ve bağlam uzunluklarınızla çalıştırın; eşzamanlılık altında saniyedeki token sayısını kaydedin &mdash; model kartındaki tek akış sayısını değil. Ardından gerçek saatlik trafik profilinizden kullanım oranını hesaplayın. İki sayı, bir bölme işlemi ve karar kendiliğinden ortaya çıkar.</p><p>Uzun bağlam en çok bu noktada zorlar. 262K tokenlık bir bağlam, bir özellikten önce bir bellek ayak izidir: instance sınıfını o belirler ve instance sınıfı da formülün başındaki saatlik fiyatı belirler. Modelin desteklediği bağlamı değil, gerçekten gönderdiğiniz bağlamı fiyatlandırın.</p><h2>İlgili</h2><ul><li><a href=\"/research/open-source-vs-closed-cost\">Açık kaynak ile kapalı model maliyeti</a></li><li><a href=\"/research/cost-per-request-kpi\">KPI olarak istek başına maliyet</a></li><li><a href=\"/research/provider-arbitrage\">Sağlayıcı arbitrajı</a></li></ul>",
+      "faq": [
+        {
+          "question": "Bir instance'ın saatlik fiyatını milyon token başına maliyete nasıl çevirebilirim?",
+          "answer": "Saatlik fiyatı saniyedeki token sayısı çarpı 3600'e bölün, sonra bir milyonla çarpın. Saatte $2.00 ve saniyede 1,500 token ile bu, kullanım oranı hesaba katılmadan önce milyon token başına $0.37 eder."
+        },
+        {
+          "question": "Kullanım oranı maliyeti neden bu kadar değiştiriyor?",
+          "answer": "Saatin tamamı için ödeme yaparsınız ama token yalnızca bir kısmında üretirsiniz. İdeal maliyeti kullanım oranınıza bölün: tam yükte milyon başına $0.37 olan maliyet, %30'da $1.23 ve %10'da $3.70 olur; bu noktada barındırılan bir API daha ucuzdur."
+        },
+        {
+          "question": "Yayımlanmış fiyatı olmayan bir açık ağırlıklı model ücretsiz mi demektir?",
+          "answer": "Hayır. Açık ağırlıklar lisans maliyetini ortadan kaldırır, sunum maliyetini değil. Gerçek tarifeyi instance fiyatınız, eşzamanlılık altındaki verim ve kullanım oranınız belirler; buna depolama, ısınma süresi, yedeklilik ve mühendislik saatleri eklenir."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/open-source-vs-closed-cost",
+          "label": "Açık kaynak ile kapalı model maliyeti"
+        },
+        {
+          "slug": "/research/cost-per-request-kpi",
+          "label": "KPI olarak istek başına maliyet"
+        },
+        {
+          "slug": "/research/provider-arbitrage",
+          "label": "Sağlayıcı arbitrajı"
+        }
+      ]
+    },
+    "vi": {
+      "title": "Cách định giá một mô hình không có giá",
+      "titleCore": "Định giá một mô hình trọng số mở",
+      "description": "Qwen3.8-Flash-Next ra mắt dưới dạng trọng số mở, không có mức giá lưu trữ. Đây là phép tính biến một giờ instance thành chi phí trên mỗi triệu token.",
+      "body": "<p>Qwen3.8-Flash-Next ra mắt ngày 26 tháng 8 năm 2026 dưới dạng bản xem trước trọng số mở của kiến trúc Qwen4: khoảng 6B tham số hoạt động, cửa sổ ngữ cảnh gốc 262,144 token và chưa công bố giá lưu trữ. Sự kết hợp đó phá vỡ cách so sánh thông thường. Một mô hình đóng cho bạn một con số trên mỗi triệu token; một bản phát hành trọng số mở cho bạn một checkpoint và để con số đó cho bạn tự tính.</p><p>Con số này không khó tính. Chỉ là hầu hết các đội không bao giờ tính nó, mà thay vào đó so sánh bản tải về 0 USD với API 3.00 USD/MTok rồi kết luận bản tải về rẻ hơn. Có thể đúng. Phép tính mới quyết định, và phép tính đó có đúng một thành phần mà người ta hay quên.</p><h2>Công thức</h2><p>Chi phí trên mỗi triệu token bằng giá theo giờ của instance chia cho số token mà instance đó tạo ra trong một giờ:</p><pre><code>cost per MTok = hourly_price / (tokens_per_second * 3600) * 1,000,000</code></pre><p>Với 2.00 USD mỗi giờ và 1,500 token mỗi giây đo được, con số là 2.00 / 5,400,000 * 1,000,000 = <strong>0.37 USD cho mỗi triệu token</strong>. So với một mô hình được host với giá 3.00 USD/MTok đầu ra, tự host trông như tiết kiệm gấp tám lần. Con số đó cũng sai, vì nó giả định GPU bận mỗi giây bạn trả tiền.</p><h2>Thành phần bị bỏ quên: mức sử dụng</h2><p>Bạn thuê theo giờ nhưng chỉ dùng một phần của nó. Hãy chia cho phần đó:</p><table><thead><tr><th>Mức sử dụng</th><th>Chi phí hiệu dụng mỗi MTok</th></tr></thead><tbody><tr><td>100%</td><td>$0.37</td></tr><tr><td>60%</td><td>$0.62</td></tr><tr><td>30%</td><td>$1.23</td></tr><tr><td>10%</td><td>$3.70</td></tr></tbody></table><p>Ở mức sử dụng 10%, mô hình tự host tốn kém hơn chính API được host mà nó định thay thế. Hầu hết các triển khai đầu tiên nằm trong khoảng 10% đến 30%, vì lưu lượng dao động thất thường và instance được cấp phát theo đỉnh tải. Khoản tiết kiệm là có thật, nhưng nó là tiết kiệm trên <em>mức sử dụng</em>, không phải trên trọng số.</p><h2>Những gì khác nên nằm trong con số</h2><p>Lưu trữ và băng thông ra cho checkpoint. Thời gian nhàn rỗi giữa lúc instance khởi động và lúc mô hình sẵn sàng &mdash; với một mô hình ngữ cảnh lớn, việc nạp mất vài phút và bạn trả cho tất cả. Dự phòng, nếu khối lượng công việc cần nhiều hơn một instance để sống sót khi một node hỏng. Và thời gian kỹ sư, vốn không tính theo giờ nhưng là khoản lớn nhất trong năm đầu.</p><p>Không điều nào trong số đó phản đối việc tự host. Chúng chỉ phản đối việc so sánh một bản tải miễn phí với mức giá theo token mà không thực hiện phép chia.</p><h2>Đo trước khi cam kết</h2><p>Chạy mô hình trên instance mà bạn thực sự sẽ thuê, với các prompt và độ dài ngữ cảnh của riêng bạn, rồi ghi lại token mỗi giây dưới tải đồng thời &mdash; không phải con số một luồng trong model card. Sau đó lấy hồ sơ lưu lượng theo giờ thực tế của bạn và tính mức sử dụng. Hai con số, một phép chia, và quyết định tự khắc được đưa ra.</p><p>Ngữ cảnh dài là nơi điều này gây tổn hại nặng nhất. Ngữ cảnh 262K token là một lượng bộ nhớ trước khi nó là một tính năng: nó quyết định loại instance, và loại instance quyết định giá theo giờ ở đầu công thức. Hãy định giá theo ngữ cảnh bạn thực sự gửi đi, không phải ngữ cảnh mà mô hình hỗ trợ.</p><h2>Liên quan</h2><ul><li><a href=\"/research/open-source-vs-closed-cost\">Chi phí mô hình mã nguồn mở so với đóng</a></li><li><a href=\"/research/cost-per-request-kpi\">Chi phí theo yêu cầu như một KPI</a></li><li><a href=\"/research/provider-arbitrage\">Chênh lệch giá giữa các nhà cung cấp</a></li></ul>",
+      "faq": [
+        {
+          "question": "Làm sao để đổi giá instance theo giờ thành chi phí trên mỗi triệu token?",
+          "answer": "Chia giá theo giờ cho số token mỗi giây nhân với 3600, rồi nhân với một triệu. Với 2.00 USD mỗi giờ và 1,500 token mỗi giây, kết quả là 0.37 USD cho mỗi triệu token, trước khi điều chỉnh theo mức sử dụng."
+        },
+        {
+          "question": "Vì sao mức sử dụng làm chi phí thay đổi nhiều đến vậy?",
+          "answer": "Bạn trả cho cả giờ nhưng chỉ tạo token trong một phần của nó. Chia chi phí lý tưởng cho mức sử dụng: 0.37 USD mỗi triệu khi tải đầy thành 1.23 USD ở 30% và 3.70 USD ở 10%, khi đó một API được host sẽ rẻ hơn."
+        },
+        {
+          "question": "Mô hình trọng số mở không có giá công bố có nghĩa là miễn phí không?",
+          "answer": "Không. Trọng số mở loại bỏ chi phí bản quyền, không loại bỏ chi phí phục vụ. Giá thực tế do giá instance, thông lượng dưới đồng thời và mức sử dụng quyết định, cộng thêm lưu trữ, thời gian khởi động, dự phòng và giờ kỹ sư."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/open-source-vs-closed-cost",
+          "label": "Chi phí mô hình mã nguồn mở so với đóng"
+        },
+        {
+          "slug": "/research/cost-per-request-kpi",
+          "label": "Chi phí theo yêu cầu như một KPI"
+        },
+        {
+          "slug": "/research/provider-arbitrage",
+          "label": "Chênh lệch giá giữa các nhà cung cấp"
+        }
+      ]
+    },
+    "ar": {
+      "title": "كيف تسعّر نموذجاً بلا سعر",
+      "titleCore": "تسعير نموذج مفتوح الأوزان",
+      "description": "صدر Qwen3.8-Flash-Next بأوزان مفتوحة ودون سعر مستضاف. إليك الحساب الذي يحوّل ساعة المثيل إلى كلفة لكل مليون رمز.",
+      "body": "<p>وصل Qwen3.8-Flash-Next في 26 أغسطس 2026 كمعاينة مفتوحة الأوزان لمعمارية Qwen4: نحو 6B معامل نشط، وسياق أصلي بحجم 262,144 رمز، ودون الإعلان عن أي تسعير مستضاف. وهذا المزيج يكسر المقارنة المعتادة. فكل نموذج مغلق يمنحك رقماً لكل مليون رمز؛ أما الإصدار مفتوح الأوزان فيمنحك نقطة حفظ (checkpoint) ويترك الرقم لك.</p><p>الرقم ليس صعب الحساب. لكن معظم الفرق لا تحسبه أبداً، فتقارن تنزيلاً بسعر 0 دولار مع API بسعر 3.00 دولار/MTok وتستنتج أن التنزيل أرخص. قد يكون كذلك. الحساب هو الحَكَم، وفي الحساب حدّ واحد بالتحديد ينساه الناس.</p><h2>المعادلة</h2><p>الكلفة لكل مليون رمز هي سعر المثيل بالساعة مقسوماً على عدد الرموز التي ينتجها ذلك المثيل في الساعة:</p><pre><code>cost per MTok = hourly_price / (tokens_per_second * 3600) * 1,000,000</code></pre><p>بسعر 2.00 دولار في الساعة ومعدل مقيس قدره 1,500 رمز في الثانية، يكون الناتج 2.00 / 5,400,000 * 1,000,000 = <strong>0.37 دولار لكل مليون رمز</strong>. وبالمقارنة مع نموذج مستضاف بسعر 3.00 دولار/MTok للمخرجات، تبدو الاستضافة الذاتية توفيراً بثمانية أضعاف. وهذا الرقم خاطئ أيضاً، لأنه يفترض أن وحدة GPU مشغولة في كل ثانية تدفع ثمنها.</p><h2>الحد الذي ينساه الجميع: الاستخدام</h2><p>أنت تستأجر الساعة وتستخدم جزءاً منها. اقسم على ذلك الجزء:</p><table><thead><tr><th>نسبة الاستخدام</th><th>الكلفة الفعلية لكل MTok</th></tr></thead><tbody><tr><td>100%</td><td>0.37 دولار</td></tr><tr><td>60%</td><td>0.62 دولار</td></tr><tr><td>30%</td><td>1.23 دولار</td></tr><tr><td>10%</td><td>3.70 دولار</td></tr></tbody></table><p>عند استخدام 10% تكلف الاستضافة الذاتية أكثر من API المستضاف الذي كان يُراد استبداله. تقع معظم عمليات النشر الأولى بين 10% و30%، لأن الحركة متقطعة والمثيل مجهّز لذروتها. التوفير حقيقي، لكنه توفير في <em>الاستخدام</em> لا في الأوزان.</p><h2>ما الذي يجب أن يدخل في الرقم أيضاً</h2><p>التخزين والخروج (egress) الخاصان بنقطة الحفظ. والوقت الخامل بين إقلاع المثيل وجاهزية النموذج &mdash; ففي النماذج ذات السياق الكبير يستغرق التحميل دقائق، وأنت تدفع ثمنها كلها. والتكرار الاحتياطي إذا كان حمل العمل يحتاج أكثر من مثيل واحد ليصمد أمام عطل عقدة. ووقت الهندسة الذي لا يُفوتر بالساعة لكنه أكبر بند في السنة الأولى.</p><p>لا شيء من ذلك يُجادل ضد الاستضافة الذاتية. إنه يُجادل ضد مقارنة تنزيل مجاني بسعر لكل رمز دون إجراء القسمة.</p><h2>قِس قبل أن تلتزم</h2><p>شغّل النموذج على المثيل الذي ستستأجره فعلاً، بأشكال موجّهاتك وأطوال سياقك، وسجّل الرموز في الثانية تحت التزامن &mdash; لا رقم التدفق الواحد من بطاقة النموذج. ثم خذ ملف حركتك الفعلي بالساعة واحسب الاستخدام. رقمان وقسمة واحدة، فيحسم القرار نفسه.</p><p>السياق الطويل هو الموضع الذي يظهر فيه الأثر بأشد صورة. فسياق بحجم 262K رمز هو بصمة ذاكرة قبل أن يكون ميزة: إنه يحدد فئة المثيل، وفئة المثيل تحدد السعر بالساعة في أعلى المعادلة. سعّر السياق الذي ترسله فعلاً، لا السياق الذي يدعمه النموذج.</p><h2>ذات صلة</h2><ul><li><a href=\"/research/open-source-vs-closed-cost\">كلفة النماذج المفتوحة مقابل المغلقة</a></li><li><a href=\"/research/cost-per-request-kpi\">الكلفة لكل طلب كمؤشر أداء</a></li><li><a href=\"/research/provider-arbitrage\">المراجحة بين المزودين</a></li></ul>",
+      "faq": [
+        {
+          "question": "كيف أحوّل سعر المثيل بالساعة إلى كلفة لكل مليون رمز؟",
+          "answer": "اقسم سعر الساعة على حاصل ضرب الرموز في الثانية في 3600، ثم اضرب في مليون. بسعر 2.00 دولار في الساعة و1,500 رمز في الثانية تكون الكلفة 0.37 دولار لكل مليون رمز، قبل التعديل بحسب الاستخدام."
+        },
+        {
+          "question": "لماذا يغيّر الاستخدام الكلفة بهذا القدر؟",
+          "answer": "أنت تدفع ثمن الساعة كاملة لكنك تولّد الرموز في جزء منها فقط. اقسم الكلفة المثالية على نسبة استخدامك: 0.37 دولار للمليون عند الحمل الكامل تصبح 1.23 دولار عند 30% و3.70 دولار عند 10%، وعندها يصبح API المستضاف أرخص."
+        },
+        {
+          "question": "هل غياب سعر معلن لنموذج مفتوح الأوزان يعني أنه مجاني؟",
+          "answer": "لا. الأوزان المفتوحة تزيل كلفة الترخيص لا كلفة التقديم. السعر الحقيقي يحدده سعر المثيل، وإنتاجيتك تحت التزامن، ونسبة استخدامك، إضافة إلى التخزين ووقت التهيئة والتكرار الاحتياطي وساعات الهندسة."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/open-source-vs-closed-cost",
+          "label": "كلفة النماذج المفتوحة مقابل المغلقة"
+        },
+        {
+          "slug": "/research/cost-per-request-kpi",
+          "label": "الكلفة لكل طلب كمؤشر أداء"
+        },
+        {
+          "slug": "/research/provider-arbitrage",
+          "label": "المراجحة بين المزودين"
+        }
+      ]
+    },
+    "it": {
+      "title": "Come dare un prezzo a un modello che non ha prezzo",
+      "titleCore": "Prezzo di un modello a pesi aperti",
+      "description": "Qwen3.8-Flash-Next è uscito con pesi aperti e senza tariffa ospitata. Ecco il calcolo che trasforma un'ora di istanza in costo per milione di token.",
+      "body": "<p>Qwen3.8-Flash-Next è arrivato il 26 agosto 2026 come anteprima a pesi aperti dell'architettura Qwen4: circa 6B di parametri attivi, un contesto nativo di 262,144 token e nessuna tariffa ospitata annunciata. Questa combinazione rompe il confronto abituale. Ogni modello chiuso ti dà un numero per milione di token; una release a pesi aperti ti dà un checkpoint e lascia il numero a te.</p><p>Il numero non è difficile da calcolare. Il fatto è che la maggior parte dei team non lo calcola mai, e confronta un download da $0 con un'API da $3.00/MTok concludendo che il download costa meno. Potrebbe essere vero. Decide l'aritmetica, e l'aritmetica ha esattamente un termine che la gente dimentica.</p><h2>La formula</h2><p>Il costo per milione di token è il prezzo orario dell'istanza diviso per quanti token quell'istanza produce in un'ora:</p><pre><code>cost per MTok = hourly_price / (tokens_per_second * 3600) * 1,000,000</code></pre><p>A $2.00 l'ora e 1,500 token al secondo misurati, fa 2.00 / 5,400,000 * 1,000,000 = <strong>$0.37 per milione di token</strong>. Rispetto a un modello ospitato a $3.00/MTok di output, l'auto-hosting sembra un risparmio di otto volte. Anche questa cifra è sbagliata, perché presuppone che la GPU sia occupata ogni secondo che paghi.</p><h2>Il termine che tutti dimenticano: l'utilizzo</h2><p>Affitti l'ora; ne usi una frazione. Dividi per quella frazione:</p><table><thead><tr><th>Utilizzo</th><th>Costo effettivo per MTok</th></tr></thead><tbody><tr><td>100%</td><td>$0.37</td></tr><tr><td>60%</td><td>$0.62</td></tr><tr><td>30%</td><td>$1.23</td></tr><tr><td>10%</td><td>$3.70</td></tr></tbody></table><p>Al 10% di utilizzo, il modello self-hosted costa più dell'API ospitata che doveva sostituire. La maggior parte dei primi deployment sta tra il 10% e il 30%, perché il traffico è a raffiche e l'istanza è dimensionata sul picco. Il risparmio è reale, ma è un risparmio sull'<em>utilizzo</em>, non sui pesi.</p><h2>Cos'altro entra nel numero</h2><p>Storage ed egress per il checkpoint. Il tempo di inattività tra l'avvio dell'istanza e il modello pronto a girare &mdash; su un modello con contesto grande, il caricamento richiede minuti, e li paghi tutti. La ridondanza, se il carico richiede più di un'istanza per sopravvivere a un guasto di nodo. E il tempo di ingegneria, che non è fatturato a ore ma è la voce più grande nel primo anno.</p><p>Niente di tutto questo va contro l'auto-hosting. Va contro il confrontare un download gratuito con una tariffa a token senza fare la divisione.</p><h2>Misura prima di impegnarti</h2><p>Esegui il modello sull'istanza che affitteresti davvero, con le tue forme di prompt e le tue lunghezze di contesto, e registra i token al secondo sotto concorrenza &mdash; non il numero a flusso singolo della model card. Poi prendi il tuo profilo di traffico orario reale e calcola l'utilizzo. Due numeri, una divisione, e la decisione si prende da sola.</p><p>Il contesto lungo è dove il problema morde di più. Un contesto da 262K token è un'impronta di memoria prima ancora di essere una funzionalità: determina la classe di istanza, e la classe di istanza determina il prezzo orario in cima alla formula. Prezza il contesto che invii davvero, non quello che il modello supporta.</p><h2>Correlati</h2><ul><li><a href=\"/research/open-source-vs-closed-cost\">Costo dei modelli open source rispetto a quelli chiusi</a></li><li><a href=\"/research/cost-per-request-kpi\">Costo per richiesta come KPI</a></li><li><a href=\"/research/provider-arbitrage\">Arbitraggio tra provider</a></li></ul>",
+      "faq": [
+        {
+          "question": "Come si converte il prezzo orario di un'istanza in costo per milione di token?",
+          "answer": "Dividi il prezzo orario per i token al secondo moltiplicati per 3600, poi moltiplica per un milione. A $2.00 l'ora e 1,500 token al secondo fa $0.37 per milione di token, prima di correggere per l'utilizzo."
+        },
+        {
+          "question": "Perché l'utilizzo cambia così tanto il costo?",
+          "answer": "Paghi l'ora intera ma generi token solo per una parte di essa. Dividi il costo ideale per il tuo utilizzo: $0.37 per milione a pieno carico diventano $1.23 al 30% e $3.70 al 10%, e a quel punto un'API ospitata costa meno."
+        },
+        {
+          "question": "Un modello a pesi aperti senza prezzo pubblicato è gratuito?",
+          "answer": "No. I pesi aperti eliminano il costo della licenza, non quello del serving. La tariffa reale dipende dal prezzo dell'istanza, dal throughput sotto concorrenza e dall'utilizzo, più storage, tempo di avvio, ridondanza e ore di ingegneria."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/open-source-vs-closed-cost",
+          "label": "Costo dei modelli open source rispetto a quelli chiusi"
+        },
+        {
+          "slug": "/research/cost-per-request-kpi",
+          "label": "Costo per richiesta come KPI"
+        },
+        {
+          "slug": "/research/provider-arbitrage",
+          "label": "Arbitraggio tra provider"
+        }
+      ]
+    },
+    "ko": {
+      "title": "가격이 없는 모델에 가격을 매기는 법",
+      "titleCore": "오픈 웨이트 모델의 가격 산정",
+      "description": "Qwen3.8-Flash-Next는 호스팅 요금 없이 오픈 웨이트로 공개되었습니다. 인스턴스 시간당 가격을 100만 토큰당 비용으로 바꾸는 계산을 정리했습니다.",
+      "body": "<p>Qwen3.8-Flash-Next는 2026년 8월 26일 Qwen4 아키텍처의 오픈 웨이트 프리뷰로 공개되었습니다. 활성 파라미터는 약 6B, 네이티브 컨텍스트는 262,144 토큰이며, 호스팅 요금은 발표되지 않았습니다. 이 조합은 일반적인 비교 방식을 무너뜨립니다. 클로즈드 모델은 100만 토큰당 가격을 제시하지만, 오픈 웨이트는 체크포인트만 제공하고 숫자는 직접 계산하도록 남겨 둡니다.</p><p>그 숫자를 계산하는 것은 어렵지 않습니다. 다만 대부분의 팀이 계산하지 않을 뿐입니다. 대신 $0짜리 다운로드와 $3.00/MTok짜리 API를 비교하고, 다운로드가 더 싸다고 결론 내립니다. 실제로 더 쌀 수도 있습니다. 하지만 계산이 답을 줍니다. 그리고 그 계산에는 사람들이 잊기 쉬운 항목이 정확히 하나 있습니다.</p><h2>공식</h2><p>100만 토큰당 비용은 인스턴스의 시간당 가격을 그 시간 동안 생성하는 토큰 수로 나눈 값입니다.</p><pre><code>cost per MTok = hourly_price / (tokens_per_second * 3600) * 1,000,000</code></pre><p>시간당 $2.00이고 측정된 처리량이 초당 1,500 토큰이라면, 2.00 / 5,400,000 * 1,000,000 = <strong>100만 토큰당 $0.37</strong>입니다. 출력 기준 $3.00/MTok인 호스팅 모델과 비교하면 자체 호스팅이 8배 저렴해 보입니다. 하지만 이 수치도 틀렸습니다. 비용을 지불하는 매 순간 GPU가 계속 일하고 있다고 가정하기 때문입니다.</p><h2>사람들이 잊는 항목: 가동률</h2><p>시간 단위로 빌리지만 실제로 쓰는 것은 그중 일부입니다. 그 비율로 나누십시오.</p><table><thead><tr><th>가동률</th><th>실효 비용(100만 토큰당)</th></tr></thead><tbody><tr><td>100%</td><td>$0.37</td></tr><tr><td>60%</td><td>$0.62</td></tr><tr><td>30%</td><td>$1.23</td></tr><tr><td>10%</td><td>$3.70</td></tr></tbody></table><p>가동률이 10%일 때 자체 호스팅 모델은 대체하려던 호스팅 API보다 비쌉니다. 대부분의 초기 배포는 10%에서 30% 사이에 머뭅니다. 트래픽이 들쭉날쭉하고 인스턴스는 피크에 맞춰 준비되기 때문입니다. 절감 효과는 실제로 존재하지만, 그것은 가중치의 절감이 아니라 <em>가동률</em>의 절감입니다.</p><h2>숫자에 함께 넣어야 할 것</h2><p>체크포인트의 스토리지와 이그레스 비용이 있습니다. 인스턴스가 부팅된 뒤 모델이 준비될 때까지의 유휴 시간도 있습니다. 대형 컨텍스트 모델은 로딩에 몇 분이 걸리고, 그 시간 모두에 대해 비용을 지불합니다. 노드 장애를 견디려면 인스턴스를 둘 이상 두어야 할 수도 있으므로 이중화 비용도 포함해야 합니다. 마지막으로 엔지니어링 시간이 있습니다. 시간당으로 청구되지는 않지만 첫 해에 가장 큰 항목입니다.</p><p>이 중 어느 것도 자체 호스팅에 반대하는 근거는 아닙니다. 다만 무료 다운로드와 토큰당 요금을 나눗셈 없이 비교해서는 안 된다는 뜻입니다.</p><h2>약속하기 전에 측정하십시오</h2><p>실제로 빌릴 인스턴스에서 자신의 프롬프트 형태와 컨텍스트 길이로 모델을 실행하고, 모델 카드의 단일 스트림 수치가 아니라 동시 처리 상태의 초당 토큰 수를 기록하십시오. 그다음 실제 시간대별 트래픽 프로파일로 가동률을 계산합니다. 숫자 두 개와 나눗셈 한 번이면 결정은 저절로 내려집니다.</p><p>긴 컨텍스트에서 이 문제가 가장 크게 드러납니다. 262K 토큰 컨텍스트는 기능이 되기 전에 메모리 부담입니다. 인스턴스 등급을 결정하고, 그 등급이 공식 맨 위의 시간당 가격을 결정합니다. 모델이 지원하는 컨텍스트가 아니라 실제로 보내는 컨텍스트에 가격을 매기십시오.</p><h2>관련 자료</h2><ul><li><a href=\"/research/open-source-vs-closed-cost\">오픈소스 대 클로즈드 모델 비용</a></li><li><a href=\"/research/cost-per-request-kpi\">KPI로서의 요청당 비용</a></li><li><a href=\"/research/provider-arbitrage\">제공자 차익거래</a></li></ul>",
+      "faq": [
+        {
+          "question": "인스턴스의 시간당 가격을 100만 토큰당 비용으로 어떻게 바꾸나요?",
+          "answer": "시간당 가격을 초당 토큰 수에 3600을 곱한 값으로 나누고, 그 결과에 100만을 곱하십시오. 시간당 $2.00, 초당 1,500 토큰이면 가동률을 반영하기 전에도 100만 토큰당 $0.37입니다."
+        },
+        {
+          "question": "가동률이 비용을 그렇게 크게 바꾸는 이유는 무엇인가요?",
+          "answer": "시간 전체에 대해 비용을 지불하지만 토큰은 그중 일부 시간에만 생성하기 때문입니다. 이상적인 비용을 가동률로 나누십시오. full load의 100만 토큰당 $0.37은 30%에서 $1.23, 10%에서 $3.70이 되며, 이 시점에는 호스팅 API가 더 저렴합니다."
+        },
+        {
+          "question": "가격이 공개되지 않은 오픈 웨이트 모델은 무료라는 뜻인가요?",
+          "answer": "아닙니다. 오픈 웨이트는 라이선스 비용을 없앨 뿐 서비스 제공 비용은 없애지 않습니다. 실제 단가는 인스턴스 가격, 동시 처리 상태의 처리량, 가동률로 정해지며, 스토리지, 웜업, 이중화, 엔지니어링 시간이 더해집니다."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/open-source-vs-closed-cost",
+          "label": "오픈소스 대 클로즈드 모델 비용"
+        },
+        {
+          "slug": "/research/cost-per-request-kpi",
+          "label": "KPI로서의 요청당 비용"
+        },
+        {
+          "slug": "/research/provider-arbitrage",
+          "label": "제공자 차익거래"
+        }
+      ]
+    },
+    "nl": {
+      "title": "Hoe je een model prijst dat geen prijs heeft",
+      "titleCore": "Een open-weight model prijzen",
+      "description": "Qwen3.8-Flash-Next verscheen als open weights zonder gehost tarief. Dit is de rekensom die een instance-uur omzet in kosten per miljoen tokens.",
+      "body": "<p>Qwen3.8-Flash-Next verscheen op 26 augustus 2026 als open-weight preview van de Qwen4-architectuur: ongeveer 6B actieve parameters, een native context van 262.144 tokens en geen aangekondigde hosted prijs. Die combinatie breekt de gebruikelijke vergelijking. Elk gesloten model geeft je een getal per miljoen tokens; een open-weight release geeft je een checkpoint en laat het getal aan jou over.</p><p>Het getal is niet moeilijk te berekenen. De meeste teams doen het alleen nooit en vergelijken een download van $0 met een API van $3.00/MTok, om te concluderen dat de download goedkoper is. Dat kan. De rekensom beslist, en die rekensom heeft precies één term die mensen vergeten.</p><h2>De formule</h2><p>Kosten per miljoen tokens zijn de uurprijs van de instance gedeeld door het aantal tokens dat die instance per uur produceert:</p><pre><code>cost per MTok = hourly_price / (tokens_per_second * 3600) * 1,000,000</code></pre><p>Bij $2.00 per uur en een gemeten 1.500 tokens per seconde is dat 2.00 / 5.400.000 * 1.000.000 = <strong>$0.37 per miljoen tokens</strong>. Naast een gehost model van $3.00/MTok output lijkt zelf hosten een achtvoudige besparing. Dat cijfer is ook onjuist, omdat het aanneemt dat de GPU elke seconde bezig is waarvoor je betaalt.</p><h2>De term die iedereen vergeet: benutting</h2><p>Je huurt het uur; je gebruikt er een fractie van. Deel door die fractie:</p><table><thead><tr><th>Benutting</th><th>Effectieve kosten per MTok</th></tr></thead><tbody><tr><td>100%</td><td>$0.37</td></tr><tr><td>60%</td><td>$0.62</td></tr><tr><td>30%</td><td>$1.23</td></tr><tr><td>10%</td><td>$3.70</td></tr></tbody></table><p>Bij 10% benutting kost het zelfgehoste model meer dan de gehoste API die het moest vervangen. De meeste eerste deployments zitten tussen 10% en 30%, omdat verkeer piekerig is en de instance voor de piek is ingericht. De besparing is echt, maar het is een besparing op <em>benutting</em>, niet op gewichten.</p><h2>Wat nog meer in het getal hoort</h2><p>Opslag en egress voor het checkpoint. Leegloop tussen het opstarten van de instance en het moment dat het model warm is &mdash; bij een model met grote context duurt laden minuten, en je betaalt voor elke minuut. Redundantie, als de workload meer dan één instance nodig heeft om een nodestoring te overleven. En engineeringtijd, die niet per uur wordt gefactureerd maar in jaar één de grootste regel is.</p><p>Niets hiervan pleit tegen zelf hosten. Het pleit tegen het vergelijken van een gratis download met een tarief per token zonder de deling uit te voeren.</p><h2>Meet voordat je je vastlegt</h2><p>Draai het model op de instance die je daadwerkelijk zou huren, met je eigen promptvormen en contextlengtes, en leg de tokens per seconde onder gelijktijdigheid vast &mdash; niet het single-stream-getal uit de modelkaart. Neem dan je echte uurprofiel van het verkeer en bereken de benutting. Twee getallen, één deling, en de beslissing volgt vanzelf.</p><p>Bij lange context bijt dit het hardst. Een context van 262K tokens is eerst een geheugenvoetafdruk en pas daarna een feature: ze bepaalt de instanceklasse, en de instanceklasse bepaalt de uurprijs bovenaan de formule. Prijs de context die je echt verstuurt, niet de context die het model ondersteunt.</p><h2>Gerelateerd</h2><ul><li><a href=\"/research/open-source-vs-closed-cost\">Kosten van open-source versus gesloten modellen</a></li><li><a href=\"/research/cost-per-request-kpi\">Kosten per verzoek als KPI</a></li><li><a href=\"/research/provider-arbitrage\">Provider-arbitrage</a></li></ul>",
+      "faq": [
+        {
+          "question": "Hoe reken ik de uurprijs van een instance om naar kosten per miljoen tokens?",
+          "answer": "Deel de uurprijs door tokens per seconde maal 3600 en vermenigvuldig met een miljoen. Bij $2.00 per uur en 1.500 tokens per seconde is dat $0.37 per miljoen tokens — vóór correctie voor benutting."
+        },
+        {
+          "question": "Waarom verandert benutting de kosten zo sterk?",
+          "answer": "Je betaalt het hele uur, maar genereert maar een deel van de tijd tokens. Deel de ideale kosten door je benutting: $0.37 per miljoen bij volle belasting wordt $1.23 bij 30% en $3.70 bij 10%, en dan is een gehoste API goedkoper."
+        },
+        {
+          "question": "Betekent een open-weight model zonder gepubliceerde prijs dat het gratis is?",
+          "answer": "Nee. Open weights halen de licentiekosten weg, niet de servingkosten. Het echte tarief wordt bepaald door je instanceprijs, je doorvoer onder gelijktijdigheid en je benutting — plus opslag, opwarmtijd, redundantie en engineeringuren."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/open-source-vs-closed-cost",
+          "label": "Kosten van open-source versus gesloten modellen"
+        },
+        {
+          "slug": "/research/cost-per-request-kpi",
+          "label": "Kosten per verzoek als KPI"
+        },
+        {
+          "slug": "/research/provider-arbitrage",
+          "label": "Provider-arbitrage"
+        }
+      ]
+    },
+    "zh": {
+      "title": "没有价格的模型该如何定价",
+      "titleCore": "开放权重模型的定价",
+      "description": "Qwen3.8-Flash-Next 以开放权重发布，但未提供托管费率。下面的算术能把实例小时价格换算为每百万 token 的成本。",
+      "body": "<p>Qwen3.8-Flash-Next 于 2026 年 8 月 26 日以 Qwen4 架构的开放权重预览版发布：约 6B 激活参数，原生上下文 262,144 个 token，并且未公布托管定价。这种组合打破了常规比较方式。每个闭源模型都会给出一个每百万 token 的价格；而开放权重发布只给你一个检查点，价格要由你自己算出来。</p><p>这个数字并不难算。只是大多数团队从来不算，而是把 $0 的下载与 $3.00/MTok 的 API 价格做对比，然后得出下载更便宜的结论。也许确实如此，但应由算术来决定，而这套算术恰好有一项常被忽略的成本项。</p><h2>公式</h2><p>每百万 token 的成本，等于实例的每小时价格除以该实例一小时内生成的 token 数：</p><pre><code>cost per MTok = hourly_price / (tokens_per_second * 3600) * 1,000,000</code></pre><p>按每小时 $2.00、实测每秒 1,500 个 token 计算，即 2.00 / 5,400,000 * 1,000,000 = <strong>每百万 token $0.37</strong>。与标价为每百万输出 token $3.00 的托管模型相比，自托管看起来能节省 8 倍。但这个数字也是错的，因为它假设你为之付费的每一秒 GPU 都在忙碌。</p><h2>大家都会忘记的一项：利用率</h2><p>你租下的是一个小时，但实际只用了其中一部分。用这部分比例去除：</p><table><thead><tr><th>利用率</th><th>每百万 token 的有效成本</th></tr></thead><tbody><tr><td>100%</td><td>$0.37</td></tr><tr><td>60%</td><td>$0.62</td></tr><tr><td>30%</td><td>$1.23</td></tr><tr><td>10%</td><td>$3.70</td></tr></tbody></table><p>当利用率为 10% 时，自托管模型的成本已经高于它本来要替代的托管 API。大多数首次部署的利用率介于 10% 到 30% 之间，因为流量是突发性的，而实例却按峰值配置。节省确实存在，但它节省的是<em>利用率</em>，而不是权重本身的费用。</p><h2>还有哪些应计入这个数字</h2><p>检查点的存储与出站流量费用。实例启动到模型就绪之间的空闲时间。在大上下文模型上，加载需要数分钟，而这些时间全部都要付费。冗余，如果工作负载需要多个实例才能在节点故障时存活。以及工程时间，它不按小时计费，却是第一年最大的一项支出。</p><p>上述这些都不是反对自托管的理由，它们只说明：在没有做除法之前，不应把免费下载与按 token 计费的费率直接对比。</p><h2>承诺之前先测量</h2><p>用你真正会租用的实例运行模型，使用你自己的提示词形态和上下文长度，并记录并发状态下的每秒 token 数，而不是模型卡上的单流数字。然后根据你真实的每小时流量曲线计算利用率。两个数字、一次除法，决策自然就出来了。</p><p>长上下文是问题最突出的地方。262K token 的上下文首先是一笔内存占用，然后才是一项功能：它决定了实例规格，而实例规格又决定了公式顶端的每小时价格。应按你实际发送的上下文定价，而不是按模型所支持的上下文定价。</p><h2>相关阅读</h2><ul><li><a href=\"/research/open-source-vs-closed-cost\">开源与闭源模型成本对比</a></li><li><a href=\"/research/cost-per-request-kpi\">把每次请求成本作为 KPI</a></li><li><a href=\"/research/provider-arbitrage\">供应商套利</a></li></ul>",
+      "faq": [
+        {
+          "question": "如何把实例的每小时价格换算为每百万 token 的成本？",
+          "answer": "用每小时价格除以每秒 token 数乘以 3600，再乘以一百万。以每小时 $2.00、每秒 1,500 个 token 计算，结果是每百万 token $0.37，这还未计入利用率的影响。"
+        },
+        {
+          "question": "为什么利用率会如此显著地改变成本？",
+          "answer": "你为整个小时付费，但只在其中一部分时间生成 token。用理想成本除以利用率：满载时每百万 $0.37，利用率 30% 时升至 $1.23，10% 时升至 $3.70，此时托管 API 反而更便宜。"
+        },
+        {
+          "question": "没有公开价格的开放权重模型就意味着免费吗？",
+          "answer": "不是。开放权重去掉的是许可费用，而不是服务成本。真实费率取决于实例价格、并发下的吞吐量和利用率，还要加上存储、预热时间、冗余和工程工时。"
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/open-source-vs-closed-cost",
+          "label": "开源与闭源模型成本对比"
+        },
+        {
+          "slug": "/research/cost-per-request-kpi",
+          "label": "把每次请求成本作为 KPI"
+        },
+        {
+          "slug": "/research/provider-arbitrage",
+          "label": "供应商套利"
         }
       ]
     }

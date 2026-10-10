@@ -15,7 +15,7 @@
       "title": "Verbose prompts have a tax",
       "titleCore": "How prompting style shows up on the bill",
       "description": "Politeness, repetition and defensive instructions all cost tokens on every single call. Prompt style is a recurring line item, not a stylistic preference.",
-      "body": "<p>Prompts grow the way configuration files grow. Someone adds an instruction to fix a failure mode. Someone else adds an example. A third person adds a paragraph explaining why the second instruction matters. Nothing is ever removed, because removing it might reintroduce a bug nobody can reproduce. Six months later the system prompt is three thousand tokens and no one can say which two hundred of them are load-bearing.</p><h2>Why it compounds</h2><p>Unlike output, which varies with the task, prompt overhead is paid on <em>every single request</em>, identically, forever. A thousand wasted tokens on a feature serving ten million calls a month is ten billion tokens a month of pure formatting.</p><p>In multi-turn conversations it is worse: the system prompt is resent on every turn, so its cost scales with turn count, not request count. And in agent loops, where a single user action can trigger a dozen model calls, the same bloated preamble is billed a dozen times for one piece of work.</p><h2>What is actually wasteful</h2><p>Not politeness, which is a handful of tokens and occasionally improves compliance. The real weight sits in: <strong>redundant instructions</strong> that restate the same rule three ways, <strong>defensive boilerplate</strong> added for a model generation that no longer needs it, <strong>examples that duplicate</strong> rather than cover distinct cases, and <strong>explanations aimed at human readers</strong> of the prompt file rather than at the model.</p><p>That third category is the largest in practice. Few-shot examples are expensive per token and teams rarely revisit whether five are doing work that two would do.</p><h2>Treat the prompt as code with a budget</h2><p>Measure the fixed prompt overhead as a share of average request size &mdash; if it is over half, it is a cost problem, not a style question. Put the stable part first so caching applies, which makes the remaining bloat far cheaper without deleting anything. Then run an ablation: remove one block, run your evals, keep the removal if quality holds. Prompt trimming without an eval suite is guesswork, and the failure mode &mdash; a quality regression discovered by customers &mdash; costs more than the tokens saved.</p><h2>Related</h2><ul><li><a href=&quot;/research/prompt-caching-economics&quot;>Prompt caching economics</a></li><li><a href=&quot;/research/evals-cost-control&quot;>Evals as cost control</a></li><li><a href=&quot;/research/token-budget-implementation&quot;>Token budget implementation</a></li></ul>",
+      "body": "<p>Prompts grow the way configuration files grow. Someone adds an instruction to fix a failure mode. Someone else adds an example. A third person adds a paragraph explaining why the second instruction matters. Nothing is ever removed, because removing it might reintroduce a bug nobody can reproduce. Six months later the system prompt is three thousand tokens and no one can say which two hundred of them are load-bearing.</p><h2>Why it compounds</h2><p>Unlike output, which varies with the task, prompt overhead is paid on <em>every single request</em>, identically, forever. A thousand wasted tokens on a feature serving ten million calls a month is ten billion tokens a month of pure formatting.</p><p>In multi-turn conversations it is worse: the system prompt is resent on every turn, so its cost scales with turn count, not request count. And in agent loops, where a single user action can trigger a dozen model calls, the same bloated preamble is billed a dozen times for one piece of work.</p><h2>What is actually wasteful</h2><p>Not politeness, which is a handful of tokens and occasionally improves compliance. The real weight sits in: <strong>redundant instructions</strong> that restate the same rule three ways, <strong>defensive boilerplate</strong> added for a model generation that no longer needs it, <strong>examples that duplicate</strong> rather than cover distinct cases, and <strong>explanations aimed at human readers</strong> of the prompt file rather than at the model.</p><p>That third category is the largest in practice. Few-shot examples are expensive per token and teams rarely revisit whether five are doing work that two would do.</p><h2>Treat the prompt as code with a budget</h2><p>Measure the fixed prompt overhead as a share of average request size &mdash; if it is over half, it is a cost problem, not a style question. Put the stable part first so caching applies, which makes the remaining bloat far cheaper without deleting anything. Then run an ablation: remove one block, run your evals, keep the removal if quality holds. Prompt trimming without an eval suite is guesswork, and the failure mode &mdash; a quality regression discovered by customers &mdash; costs more than the tokens saved.</p><h2>Related</h2><ul><li><a href=\"/research/prompt-caching-economics\">Prompt caching economics</a></li><li><a href=\"/research/evals-cost-control\">Evals as cost control</a></li><li><a href=\"/research/token-budget-implementation\">Token budget implementation</a></li></ul>",
       "faq": [
         {
           "question": "Does saying please to an LLM cost money?",
@@ -132,6 +132,346 @@
         {
           "slug": "/research/prompt-caching-economics",
           "label": "プロンプトキャッシュの経済学"
+        }
+      ]
+    },
+    "id": {
+      "title": "Prompt yang bertele-tele punya pajak",
+      "titleCore": "Gaya prompt muncul di tagihan Anda",
+      "description": "Basa-basi, pengulangan, dan instruksi defensif memakan token di setiap panggilan. Gaya prompt adalah pos biaya berulang, bukan sekadar preferensi gaya.",
+      "body": "<p>Prompt tumbuh seperti berkas konfigurasi. Seseorang menambahkan instruksi untuk memperbaiki satu mode kegagalan. Orang lain menambahkan contoh. Orang ketiga menambahkan paragraf yang menjelaskan mengapa instruksi kedua penting. Tidak ada yang pernah dihapus, karena menghapusnya mungkin memunculkan kembali bug yang tidak bisa direproduksi siapa pun. Enam bulan kemudian, system prompt sudah tiga ribu token dan tidak ada yang bisa menyebutkan dua ratus di antaranya yang benar-benar menopang hasil.</p><h2>Mengapa biayanya menumpuk</h2><p>Berbeda dengan output, yang bervariasi mengikuti tugas, overhead prompt dibayar pada <em>setiap permintaan</em>, sama persis, selamanya. Seribu token yang terbuang pada satu fitur yang melayani sepuluh juta panggilan per bulan berarti sepuluh miliar token per bulan hanya untuk format.</p><p>Dalam percakapan multi-giliran keadaannya lebih buruk: system prompt dikirim ulang di setiap giliran, jadi biayanya mengikuti jumlah giliran, bukan jumlah permintaan. Dan dalam loop agen, ketika satu tindakan pengguna bisa memicu belasan panggilan model, preambel yang gemuk itu ditagihkan belasan kali untuk satu pekerjaan.</p><h2>Apa yang sebenarnya boros</h2><p>Bukan sopan santun, yang hanya beberapa token dan kadang justru membantu kepatuhan. Bobot sebenarnya ada pada: <strong>instruksi berlebih</strong> yang menyatakan aturan yang sama tiga kali, <strong>boilerplate defensif</strong> yang ditambahkan untuk generasi model yang sudah tidak membutuhkannya, <strong>contoh yang menduplikasi</strong> alih-alih mencakup kasus yang berbeda, dan <strong>penjelasan yang ditujukan kepada pembaca manusia</strong> dari file prompt, bukan kepada model.</p><p>Kategori ketiga adalah yang terbesar dalam praktik. Few-shot example mahal per token, dan tim jarang meninjau apakah lima contoh benar-benar bekerja, padahal dua saja sudah cukup.</p><h2>Perlakukan prompt sebagai kode dengan anggaran</h2><p>Ukur overhead prompt tetap sebagai porsi dari rata-rata ukuran permintaan. Jika lebih dari separuh, itu masalah biaya, bukan soal gaya. Letakkan bagian yang stabil di awal agar cache berlaku, sehingga sisa bloat jauh lebih murah tanpa menghapus apa pun. Lalu jalankan ablasi: hapus satu blok, jalankan eval Anda, dan simpan penghapusan jika kualitasnya tetap. Memangkas prompt tanpa rangkaian eval adalah tebakan, dan mode kegagalannya &mdash; regresi kualitas yang ditemukan pelanggan &mdash; lebih mahal daripada token yang dihemat.</p><h2>Terkait</h2><ul><li><a href=\"/research/prompt-caching-economics\">Ekonomi cache prompt</a></li><li><a href=\"/research/evals-cost-control\">Eval sebagai kontrol biaya</a></li><li><a href=\"/research/token-budget-implementation\">Implementasi anggaran token</a></li></ul>",
+      "faq": [
+        {
+          "question": "Apakah mengucapkan tolong ke LLM menghabiskan biaya?",
+          "answer": "Beberapa token per panggilan, nyata tetapi sepele. Bagian prompt yang mahal adalah instruksi berlebih, boilerplate defensif yang sudah usang, dan contoh few-shot yang diduplikasi, bukan kesopanan."
+        },
+        {
+          "question": "Mengapa bloat prompt lebih buruk di agen?",
+          "answer": "Satu tindakan pengguna bisa memicu banyak panggilan model, dan system prompt dikirim ulang di setiap panggilan. Overhead tetap yang sama ditagihkan per panggilan, bukan per tugas."
+        },
+        {
+          "question": "Bagaimana cara memangkas prompt dengan aman?",
+          "answer": "Jalankan ablasi terhadap rangkaian eval: hapus satu blok per waktu, jalankan ulang eval, dan simpan penghapusan hanya jika kualitas tetap. Memangkas tanpa eval berisiko regresi yang biayanya lebih besar daripada token yang dihemat."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/prompt-caching-economics",
+          "label": "Ekonomi cache prompt"
+        },
+        {
+          "slug": "/research/evals-cost-control",
+          "label": "Eval sebagai kontrol biaya"
+        },
+        {
+          "slug": "/research/token-budget-implementation",
+          "label": "Implementasi anggaran token"
+        }
+      ]
+    },
+    "pl": {
+      "title": "Rozwlekłe prompty mają swój podatek",
+      "titleCore": "Jak styl promptu wpływa na rachunek",
+      "description": "Grzeczność, powtórzenia i zabezpieczające instrukcje kosztują tokeny przy każdym wywołaniu. Styl promptu to stała pozycja kosztów, a nie kwestia gustu.",
+      "body": "<p>Prompty rosną tak, jak rosną pliki konfiguracyjne. Ktoś dodaje instrukcję, żeby naprawić błąd. Ktoś inny dorzuca przykład. Trzecia osoba dopisuje akapit, który tłumaczy, dlaczego druga instrukcja jest ważna. Niczego się nie usuwa, bo usunięcie mogłoby przywrócić błąd, którego nikt nie umie odtworzyć. Po sześciu miesiącach system prompt ma trzy tysiące tokenów i nikt nie potrafi wskazać, które dwieście z nich są istotne.</p><h2>Dlaczego to się kumuluje</h2><p>W przeciwieństwie do wyjścia, które zmienia się wraz z zadaniem, narzut promptu płaci się przy <em>każdym żądaniu</em>, identycznie, zawsze. Tysiąc zbędnych tokenów w funkcji obsługującej dziesięć milionów wywołań miesięcznie to dziesięć miliardów tokenów miesięcznie samego formatowania.</p><p>W rozmowach wieloturowych jest gorzej: system prompt wysyła się ponownie przy każdej turze, więc jego koszt rośnie wraz z liczbą tur, a nie żądań. W pętlach agentów jedna akcja użytkownika może uruchomić kilkanaście wywołań modelu, i ta sama rozdęta preambuła jest rozliczany kilkanaście razy za jedną pracę.</p><h2>Co jest naprawdę marnotrawstwem</h2><p>Nie grzeczność, która to kilka tokenów i czasem poprawia zgodność z poleceniem. Największy ciężar niosą: <strong>nadmiarowe instrukcje</strong>, które powtarzają tę samą zasadę na trzy sposoby, <strong>zabezpieczający boilerplate</strong> dodany dla generacji modeli, która już go nie potrzebuje, <strong>przykłady dublujące się</strong> zamiast pokrywać różne przypadki, oraz <strong>wyjaśnienia skierowane do ludzi</strong> czytających plik promptu, a nie do modelu.</p><p>Ostatnia kategoria jest w praktyce największa. Przykłady few-shot są drogie w przeliczeniu na token, a zespoły rzadko sprawdzają, czy pięć przykładów robi coś, co zrobiłyby dwa.</p><h2>Traktuj prompt jak kod z budżetem</h2><p>Zmierz stały narzut promptu jako udział w średnim rozmiarze żądania. Jeśli przekracza połowę, to problem kosztowy, a nie kwestia stylu. Umieść stabilną część na początku, żeby działał cache, co sprawia, że reszta bałaganu jest dużo tańsza bez usuwania czegokolwiek. Potem zrób ablację: usuń jeden blok, uruchom swoje evale i zostaw usunięcie, jeśli jakość się utrzymuje. Przycinanie promptu bez zestawu evali to zgadywanie, a tryb awarii, czyli regresja jakości wykryta przez klientów, kosztuje więcej niż zaoszczędzone tokeny.</p><h2>Powiązane</h2><ul><li><a href=\"/research/prompt-caching-economics\">Ekonomia cache promptów</a></li><li><a href=\"/research/evals-cost-control\">Evale jako kontrola kosztów</a></li><li><a href=\"/research/token-budget-implementation\">Wdrażanie budżetu tokenów</a></li></ul>",
+      "faq": [
+        {
+          "question": "Czy uprzejme „proszę” dla LLM kosztuje pieniądze?",
+          "answer": "Kilka tokenów na wywołanie: realnie, ale znikomo. Drogie są nadmiarowe instrukcje, przestarzały zabezpieczający boilerplate i zdublowane przykłady few-shot, a nie uprzejmość."
+        },
+        {
+          "question": "Dlaczego rozdęte prompty są gorsze w agentach?",
+          "answer": "Jedna akcja użytkownika może uruchomić wiele wywołań modelu, a system prompt wysyła się przy każdym z nich. Ten sam stały narzut jest rozliczany za każde wywołanie, a nie za całe zadanie."
+        },
+        {
+          "question": "Jak bezpiecznie przyciąć prompt?",
+          "answer": "Zrób ablację na zestawie evali: usuwaj po jednym bloku, uruchamiaj evale i zachowuj usunięcie tylko wtedy, gdy jakość się utrzymuje. Przycinanie bez evali ryzykuje regresję, która kosztuje więcej niż zaoszczędzone tokeny."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/prompt-caching-economics",
+          "label": "Ekonomia cache promptów"
+        },
+        {
+          "slug": "/research/evals-cost-control",
+          "label": "Evale jako kontrola kosztów"
+        },
+        {
+          "slug": "/research/token-budget-implementation",
+          "label": "Wdrażanie budżetu tokenów"
+        }
+      ]
+    },
+    "ru": {
+      "title": "Многословные промпты облагаются налогом",
+      "titleCore": "Как стиль промпта отражается в счёте",
+      "description": "Вежливость, повторы и защитные инструкции стоят токенов при каждом вызове. Стиль промпта — регулярная статья расходов, а не вопрос вкуса.",
+      "body": "<p>Промпты растут так же, как конфигурационные файлы. Кто-то добавляет инструкцию, чтобы устранить сбой. Кто-то другой добавляет пример. Третий пишет абзац о том, почему вторая инструкция важна. Ничего не удаляется, потому что удаление может вернуть баг, который никто не может воспроизвести. Через полгода системный промпт занимает три тысячи токенов, и никто не скажет, какие из них две сотни несущие.</p><h2>Почему это накапливается</h2><p>В отличие от вывода, который зависит от задачи, накладные расходы промпта платятся при <em>каждом запросе</em>, одинаково и навсегда. Тысяча лишних токенов в функции с десятью миллионами вызовов в месяц — это десять миллиардов токенов в месяц чистого оформления.</p><p>В многоходовых диалогах хуже: системный промпт отправляется заново на каждом ходе, так что его стоимость растёт с числом ходов, а не запросов. В циклах агентов одно действие пользователя может вызвать десяток обращений к модели, и один и тот же раздутый преамбул оплачивается десять раз за одну работу.</p><h2>Что действительно расточительно</h2><p>Не вежливость: это несколько токенов, которые иногда даже повышают соблюдение инструкций. Реальный вес создают: <strong>избыточные инструкции</strong>, которые трижды пересказывают одно и то же правило, <strong>защитный шаблонный текст</strong>, добавленный для поколения моделей, которому он уже не нужен, <strong>примеры, которые дублируют друг друга</strong> вместо того, чтобы покрывать разные случаи, и <strong>объяснения, адресованные людям</strong>, читающим файл с промптом, а не модели.</p><p>На практике последняя категория самая большая. Примеры few-shot дороги в пересчёте на токен, и команды редко проверяют, не справились бы два примера там, где работают пять.</p><h2>Относитесь к промпту как к коду с бюджетом</h2><p>Измерьте постоянную часть промпта как долю среднего размера запроса. Если она больше половины, это проблема стоимости, а не стиля. Поставьте стабильную часть в начало, чтобы сработал кэш, и остаток станет заметно дешевле без удаления чего-либо. Затем проведите абляцию: уберите один блок, прогоните свои evals и оставьте удаление, если качество не просело. Сокращение промпта без набора evals — это гадание, а сбой, который найдут клиенты, обойдётся дороже сэкономленных токенов.</p><h2>Связанное</h2><ul><li><a href=\"/research/prompt-caching-economics\">Экономика кэширования промптов</a></li><li><a href=\"/research/evals-cost-control\">Evals как контроль затрат</a></li><li><a href=\"/research/token-budget-implementation\">Реализация бюджета токенов</a></li></ul>",
+      "faq": [
+        {
+          "question": "Стоит ли деньги вежливость в обращении к LLM?",
+          "answer": "Несколько токенов на вызов: это реально, но пренебрежимо мало. Дорогие части промпта — избыточные инструкции, устаревший защитный шаблонный текст и дублирующиеся примеры few-shot, а не любезность."
+        },
+        {
+          "question": "Почему раздутый промпт хуже в агентах?",
+          "answer": "Одно действие пользователя может вызвать много обращений к модели, и системный промпт отправляется при каждом из них. Один и тот же фиксированный объём оплачивается за каждый вызов, а не за задачу целиком."
+        },
+        {
+          "question": "Как безопасно сократить промпт?",
+          "answer": "Проведите абляцию на наборе evals: убирайте по одному блоку, заново прогоняйте evals и оставляйте удаление, только если качество сохранилось. Сокращение без evals рискует регрессией, которая обойдётся дороже сэкономленных токенов."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/prompt-caching-economics",
+          "label": "Экономика кэширования промптов"
+        },
+        {
+          "slug": "/research/evals-cost-control",
+          "label": "Evals как контроль затрат"
+        },
+        {
+          "slug": "/research/token-budget-implementation",
+          "label": "Реализация бюджета токенов"
+        }
+      ]
+    },
+    "tr": {
+      "title": "Uzun promptların bir vergisi var",
+      "titleCore": "Prompt yazım tarzı faturada nasıl görünür",
+      "description": "Kibarlık, tekrar ve savunmacı talimatların her çağrıda token maliyeti var. Prompt üslubu bir zevk meselesi değil, tekrarlanan bir gider kalemidir.",
+      "body": "<p>Promptlar yapılandırma dosyaları gibi büyür. Biri bir hata türünü düzeltmek için bir talimat ekler. Bir başkası bir örnek ekler. Üçüncü biri ikinci talimatın neden önemli olduğunu anlatan bir paragraf ekler. Hiçbir şey silinmez, çünkü silmek kimsenin yeniden üretemediği bir hatayı geri getirebilir. Altı ay sonra sistem promptu üç bin token olur ve bunların hangi iki yüzünün yapıyı taşıdığını kimse söyleyemez.</p><h2>Neden birikir</h2><p>Görev başına değişen çıktıdan farklı olarak, prompt ek yükü <em>her isteğin</em> üzerinde, aynı miktarda, sonsuza dek ödenir. Ayda on milyon çağrı alan bir özellikte harcanan bin token, ayda on milyar tokenlik saf biçimlendirme demektir.</p><p>Çok turlu konuşmalarda durum daha kötüdür: sistem promptu her turda yeniden gönderilir, dolayısıyla maliyeti istek sayısıyla değil tur sayısıyla büyür. Tek bir kullanıcı eyleminin düzinelerce model çağrısı tetikleyebildiği ajan döngülerinde ise aynı şişkin önsöz, tek bir iş için düzinelerce kez faturalanır.</p><h2>Gerçekten israf olan nedir</h2><p>Kibarlık değil; o birkaç tokenlik bir şeydir ve bazen uyumu artırır. Asıl ağırlık şunlardadır: aynı kuralı üç ayrı biçimde tekrarlayan <strong>yinelenen talimatlar</strong>, artık ihtiyaç duyulmayan bir model nesli için eklenmiş <strong>savunmacı şablon metinler</strong>, farklı durumları kapsamak yerine çoğaltan <strong>örnekler</strong> ve modele değil, promptu okuyan insanlara yönelik <strong>açıklamalar</strong>.</p><p>Pratikte en büyük kategori üçüncüsüdür. Few-shot örnekler token başına pahalıdır ve ekipler beş örneğin iki örneğin yapacağı işi yapıp yapmadığını nadiren yeniden sorgular.</p><h2>Promptu bütçeli bir kod gibi ele alın</h2><p>Sabit prompt yükünü ortalama istek boyutunun bir oranı olarak ölçün; yarısının üzerindeyse bu bir üslup meselesi değil, bir maliyet sorunudur. Sabit kısmı başa koyun ki önbellekleme devreye girsin; bu, hiçbir şeyi silmeden kalan şişkinliği çok daha ucuz hale getirir. Sonra bir ablasyon çalıştırın: bir bloğu kaldırın, değerlendirmelerinizi çalıştırın ve kalite tutuyorsa kaldırmayı koruyun. Değerlendirme paketi olmadan prompt kısaltmak tahmine dayalıdır; başarısızlık biçimi &mdash; müşterilerin keşfettiği bir kalite gerilemesi &mdash; kazanılan tokenlardan daha pahalıya mal olur.</p><h2>İlgili</h2><ul><li><a href=\"/research/prompt-caching-economics\">Prompt önbellekleme ekonomisi</a></li><li><a href=\"/research/evals-cost-control\">Maliyet kontrolü olarak değerlendirmeler</a></li><li><a href=\"/research/token-budget-implementation\">Token bütçesi uygulaması</a></li></ul>",
+      "faq": [
+        {
+          "question": "LLM’e lütfen demek para harcatır mı?",
+          "answer": "Çağrı başına birkaç token: gerçek ama önemsiz. Pahalı olan kısım yinelenen talimatlar, eski savunmacı şablonlar ve çoğaltılmış few-shot örnekler, kibarlık değil."
+        },
+        {
+          "question": "Ajanlarda prompt şişkinliği neden daha kötü?",
+          "answer": "Tek bir kullanıcı eyleminin birçok model çağrısını tetikleyebilmesi ve sistem promptunun her birinde yeniden gönderilmesi nedeniyle. Aynı sabit yük, görev başına değil çağrı başına faturalanır."
+        },
+        {
+          "question": "Bir promptu güvenli biçimde nasıl kısaltırsınız?",
+          "answer": "Bir değerlendirme paketine karşı ablasyon çalıştırın: bir seferde bir bloğu kaldırın, değerlendirmeleri yeniden çalıştırın ve kaldırmayı yalnızca kalite tutarsa koruyun. Değerlendirme olmadan kısaltmak, kazanılan tokenlardan pahalıya mal olan bir gerilemeye yol açabilir."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/prompt-caching-economics",
+          "label": "Prompt önbellekleme ekonomisi"
+        },
+        {
+          "slug": "/research/evals-cost-control",
+          "label": "Maliyet kontrolü olarak değerlendirmeler"
+        },
+        {
+          "slug": "/research/token-budget-implementation",
+          "label": "Token bütçesi uygulaması"
+        }
+      ]
+    },
+    "vi": {
+      "title": "Prompt dài phải chịu một khoản thuế",
+      "titleCore": "Phong cách prompt xuất hiện trên hóa đơn như thế nào",
+      "description": "Lịch sự, lặp lại và chỉ dẫn phòng thủ đều tốn token ở mọi lần gọi. Phong cách prompt là một khoản chi định kỳ, không phải sở thích hình thức.",
+      "body": "<p>Prompt lớn lên giống như các tệp cấu hình. Ai đó thêm một chỉ dẫn để sửa một lỗi. Người khác thêm một ví dụ. Người thứ ba thêm một đoạn giải thích vì sao chỉ dẫn thứ hai quan trọng. Không có gì được xóa, vì xóa đi có thể làm xuất hiện lại một lỗi mà không ai tái hiện được. Sáu tháng sau, system prompt dài ba nghìn token và không ai nói được hai trăm token nào trong số đó thực sự cần thiết.</p><h2>Vì sao nó cộng dồn</h2><p>Khác với output, vốn thay đổi theo tác vụ, chi phí overhead của prompt được trả ở <em>mọi yêu cầu</em>, giống nhau, mãi mãi. Một nghìn token lãng phí trong một tính năng phục vụ mười triệu lần gọi mỗi tháng là mười tỷ token mỗi tháng chỉ để định dạng.</p><p>Trong hội thoại nhiều lượt thì còn tệ hơn: system prompt được gửi lại ở mỗi lượt, nên chi phí tăng theo số lượt chứ không theo số yêu cầu. Và trong vòng lặp agent, một hành động của người dùng có thể kích hoạt hàng chục lần gọi model, cùng một phần mở đầu phình to bị tính tiền hàng chục lần cho một việc duy nhất.</p><h2>Thứ thực sự lãng phí</h2><p>Không phải sự lịch sự, vốn chỉ là vài token và đôi khi còn giúp model làm theo tốt hơn. Phần nặng nằm ở: <strong>chỉ dẫn trùng lặp</strong> nhắc cùng một quy tắc ba cách khác nhau, <strong>boilerplate phòng thủ</strong> được thêm cho một thế hệ model không còn cần nữa, <strong>ví dụ trùng nhau</strong> thay vì bao quát các trường hợp khác nhau, và <strong>giải thích hướng tới người đọc</strong> tệp prompt thay vì hướng tới model.</p><p>Loại thứ ba là loại lớn nhất trong thực tế. Ví dụ few-shot tốn kém trên mỗi token, và các nhóm hiếm khi xem lại liệu năm ví dụ có đang làm việc mà hai ví dụ cũng làm được hay không.</p><h2>Coi prompt như mã nguồn có ngân sách</h2><p>Đo phần overhead cố định của prompt như một tỷ lệ trên kích thước yêu cầu trung bình &mdash; nếu nó vượt quá một nửa, đó là vấn đề chi phí, không phải vấn đề phong cách. Đặt phần ổn định lên đầu để caching có tác dụng, khi đó phần phình còn lại rẻ hơn nhiều mà không cần xóa gì. Sau đó chạy ablation: bỏ một khối, chạy eval của bạn, giữ việc bỏ đi nếu chất lượng vẫn ổn. Cắt tỉa prompt mà không có bộ eval là đoán mò, và kiểu lỗi &mdash; một lần suy giảm chất lượng do khách hàng phát hiện &mdash; còn tốn hơn số token tiết kiệm được.</p><h2>Liên quan</h2><ul><li><a href=\"/research/prompt-caching-economics\">Kinh tế của prompt caching</a></li><li><a href=\"/research/evals-cost-control\">Eval như công cụ kiểm soát chi phí</a></li><li><a href=\"/research/token-budget-implementation\">Triển khai ngân sách token</a></li></ul>",
+      "faq": [
+        {
+          "question": "Nói lịch sự với LLM có tốn tiền không?",
+          "answer": "Vài token mỗi lần gọi: có thật nhưng không đáng kể. Phần tốn kém của prompt là chỉ dẫn trùng lặp, boilerplate phòng thủ đã lỗi thời và ví dụ bị nhân bản, chứ không phải sự lịch sự."
+        },
+        {
+          "question": "Vì sao prompt phình to lại tệ hơn trong agent?",
+          "answer": "Một hành động của người dùng có thể kích hoạt nhiều lần gọi model, và system prompt được gửi lại ở mỗi lần. Cùng một phần overhead cố định bị tính tiền theo từng lần gọi thay vì theo từng tác vụ."
+        },
+        {
+          "question": "Làm sao để cắt tỉa prompt an toàn?",
+          "answer": "Chạy ablation với bộ eval: bỏ từng khối một, chạy lại eval, và chỉ giữ việc bỏ đi nếu chất lượng vẫn ổn. Cắt tỉa mà không có eval dễ gây ra một lần suy giảm chất lượng còn tốn hơn số token tiết kiệm được."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/prompt-caching-economics",
+          "label": "Kinh tế của prompt caching"
+        },
+        {
+          "slug": "/research/evals-cost-control",
+          "label": "Eval như công cụ kiểm soát chi phí"
+        },
+        {
+          "slug": "/research/token-budget-implementation",
+          "label": "Triển khai ngân sách token"
+        }
+      ]
+    },
+    "ar": {
+      "title": "للمطالبات المطولة ضريبة",
+      "titleCore": "كيف يظهر أسلوب كتابة المطالبات على الفاتورة",
+      "description": "المجاملة والتكرار والتعليمات الدفاعية كلها تكلّف رموزاً في كل استدعاء. أسلوب المطالبة بند متكرر في الفاتورة، لا تفضيل أسلوبي.",
+      "body": "<p>تنمو المطالبات كما تنمو ملفات الإعدادات. يضيف أحدهم تعليمة لإصلاح نمط فشل. ويضيف آخر مثالاً. ويضيف ثالث فقرة تشرح لماذا تهم التعليمة الثانية. ولا يُزال شيء أبداً، لأن إزالته قد تعيد خطأً لا يستطيع أحد استنساخه. وبعد ستة أشهر تصبح مطالبة النظام ثلاثة آلاف رمز، ولا أحد يعرف أي مئتين منها هي الحاملة للوظيفة.</p><h2>لماذا يتراكم</h2><p>بخلاف الإخراج الذي يتفاوت بحسب المهمة، يُدفع عبء المطالبة في <em>كل طلب على حدة</em> بالمقدار نفسه إلى الأبد. ألف رمز مهدور في ميزة تخدم عشرة ملايين استدعاء شهرياً يعني عشرة مليارات رمز شهرياً من التنسيق المحض.</p><p>وفي المحادثات متعددة الدورات يزداد الأمر سوءاً: تُعاد مطالبة النظام في كل دورة، فتتناسب تكلفتها مع عدد الدورات لا عدد الطلبات. وفي حلقات الوكلاء، حيث قد يطلق إجراء مستخدم واحد اثني عشر استدعاء للنموذج، تُحاسَب المقدمة المتضخمة نفسها اثنتي عشرة مرة على عمل واحد.</p><h2>ما الهدر الحقيقي</h2><p>ليست المجاملة، فهي حفنة رموز وقد تحسّن الامتثال أحياناً. الثقل الحقيقي في: <strong>التعليمات المكررة</strong> التي تعيد صياغة القاعدة نفسها بثلاث طرق، و<strong>النصوص الدفاعية الجاهزة</strong> المضافة لجيل من النماذج لم يعد بحاجة إليها، و<strong>الأمثلة المتكررة</strong> بدل أن تغطي حالات متمايزة، و<strong>الشروحات الموجهة للقراء البشر</strong> لملف المطالبة لا للنموذج.</p><p>والفئة الثالثة هي الأكبر عملياً. أمثلة التعلم بالقليل مكلفة لكل رمز، ونادراً ما تراجع الفرق ما إذا كانت خمسة أمثلة تؤدي عملاً يكفيه مثالان.</p><h2>عامل المطالبة ككود له ميزانية</h2><p>قِس العبء الثابت للمطالبة كنسبة من متوسط حجم الطلب &mdash; فإن زاد على النصف فهو مشكلة تكلفة لا مسألة أسلوب. ضع الجزء الثابت أولاً ليُطبَّق التخزين المؤقت، فيصبح ما تبقى من التضخم أرخص بكثير دون حذف أي شيء. ثم أجرِ اختبار استئصال: أزل كتلة واحدة، وشغّل تقييماتك، وأبقِ الإزالة إن حافظت الجودة على مستواها. تقليم المطالبات دون مجموعة تقييم تخمين، وصورة الفشل &mdash; تراجع في الجودة يكتشفه العملاء &mdash; تكلّف أكثر من الرموز الموفَّرة.</p><h2>ذات صلة</h2><ul><li><a href=\"/research/prompt-caching-economics\">اقتصاديات التخزين المؤقت للمطالبات</a></li><li><a href=\"/research/evals-cost-control\">التقييمات كأداة للتحكم في التكلفة</a></li><li><a href=\"/research/token-budget-implementation\">تنفيذ ميزانية الرموز</a></li></ul>",
+      "faq": [
+        {
+          "question": "هل قول من فضلك لنموذج لغوي يكلّف مالاً؟",
+          "answer": "حفنة رموز لكل استدعاء، وهي حقيقية لكنها تافهة. الأجزاء المكلفة في المطالبة هي التعليمات المكررة والنصوص الدفاعية القديمة وأمثلة التعلم بالقليل المتكررة، لا المجاملة."
+        },
+        {
+          "question": "لماذا يكون تضخم المطالبة أسوأ في الوكلاء؟",
+          "answer": "إجراء مستخدم واحد قد يطلق استدعاءات كثيرة للنموذج، وتُعاد مطالبة النظام مع كل منها. فيُحاسَب العبء الثابت نفسه مرة لكل استدعاء بدل مرة لكل مهمة."
+        },
+        {
+          "question": "كيف تقلّم مطالبة بأمان؟",
+          "answer": "أجرِ اختبار استئصال مقابل مجموعة تقييم: أزل كتلة واحدة في كل مرة، وأعد تشغيل التقييمات، ولا تبقِ الإزالة إلا إذا حافظت الجودة. التقليم دون تقييمات يخاطر بتراجع يكلّف أكثر من الرموز الموفَّرة."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/prompt-caching-economics",
+          "label": "اقتصاديات التخزين المؤقت للمطالبات"
+        },
+        {
+          "slug": "/research/evals-cost-control",
+          "label": "التقييمات كأداة للتحكم في التكلفة"
+        },
+        {
+          "slug": "/research/token-budget-implementation",
+          "label": "تنفيذ ميزانية الرموز"
+        }
+      ]
+    },
+    "it": {
+      "title": "I prompt prolissi hanno una tassa",
+      "titleCore": "Come lo stile del prompt compare in fattura",
+      "description": "Cortesia, ripetizioni e istruzioni difensive costano token a ogni chiamata. Lo stile del prompt è una voce ricorrente in fattura, non una preferenza estetica.",
+      "body": "<p>I prompt crescono come i file di configurazione. Qualcuno aggiunge un'istruzione per correggere un guasto. Qualcun altro aggiunge un esempio. Una terza persona aggiunge un paragrafo che spiega perché la seconda istruzione conta. Non si toglie mai nulla, perché rimuoverla potrebbe reintrodurre un bug che nessuno sa riprodurre. Sei mesi dopo il system prompt è di tremila token e nessuno sa dire quali duecento siano portanti.</p><h2>Perché si accumula</h2><p>A differenza dell'output, che varia con l'attività, l'overhead del prompt si paga su <em>ogni singola richiesta</em>, in modo identico, per sempre. Mille token sprecati su una funzionalità che serve dieci milioni di chiamate al mese sono dieci miliardi di token mensili di pura formattazione.</p><p>Nelle conversazioni multi-turno va peggio: il system prompt viene rispedito a ogni turno, quindi il suo costo scala con il numero di turni, non di richieste. E nei loop degli agenti, dove una sola azione dell'utente può innescare una dozzina di chiamate al modello, lo stesso preambolo gonfio viene fatturato una dozzina di volte per un unico lavoro.</p><h2>Cosa è davvero sprecato</h2><p>Non la cortesia, che sono poche decine di token e a volte migliora la conformità. Il peso vero sta in: <strong>istruzioni ridondanti</strong> che ripetono la stessa regola in tre modi, <strong>boilerplate difensivo</strong> aggiunto per una generazione di modelli che non ne ha più bisogno, <strong>esempi duplicati</strong> invece di coprire casi distinti, e <strong>spiegazioni rivolte ai lettori umani</strong> del file del prompt invece che al modello.</p><p>Quest'ultima categoria è in pratica la più pesante. Gli esempi few-shot costano molto per token e i team raramente rivedono se cinque esempi facciano un lavoro che ne farebbero due.</p><h2>Trattare il prompt come codice con un budget</h2><p>Misura l'overhead fisso del prompt come quota della dimensione media della richiesta: se supera la metà, è un problema di costo, non una questione di stile. Metti la parte stabile in testa così si applica la cache, il che rende il resto del gonfiore molto più economico senza cancellare nulla. Poi fai un'ablation: rimuovi un blocco, esegui le tue valutazioni, tieni la rimozione se la qualità regge. Ridurre il prompt senza una suite di valutazione è un'ipotesi, e il rischio &mdash; una regressione di qualità scoperta dai clienti &mdash; costa più dei token risparmiati.</p><h2>Correlati</h2><ul><li><a href=\"/research/prompt-caching-economics\">Economia del prompt caching</a></li><li><a href=\"/research/evals-cost-control\">Le valutazioni come controllo dei costi</a></li><li><a href=\"/research/token-budget-implementation\">Implementazione del budget di token</a></li></ul>",
+      "faq": [
+        {
+          "question": "Dire «per favore» a un LLM costa denaro?",
+          "answer": "Qualche token per chiamata, reale ma trascurabile. Le parti costose di un prompt sono le istruzioni ridondanti, il boilerplate difensivo superato e gli esempi few-shot duplicati, non la cortesia."
+        },
+        {
+          "question": "Perché il gonfiore dei prompt è peggiore negli agenti?",
+          "answer": "Una singola azione dell'utente può innescare molte chiamate al modello, e il system prompt viene rispedito in ciascuna. Lo stesso overhead fisso viene fatturato una volta per chiamata invece che una volta per attività."
+        },
+        {
+          "question": "Come si riduce un prompt in modo sicuro?",
+          "answer": "Esegui un'ablation contro una suite di valutazione: rimuovi un blocco alla volta, rilancia le valutazioni e mantieni la rimozione solo se la qualità regge. Ridurre senza valutazioni rischia una regressione che costa più dei token risparmiati."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/prompt-caching-economics",
+          "label": "Economia del prompt caching"
+        },
+        {
+          "slug": "/research/evals-cost-control",
+          "label": "Le valutazioni come controllo dei costi"
+        },
+        {
+          "slug": "/research/token-budget-implementation",
+          "label": "Implementazione del budget di token"
+        }
+      ]
+    },
+    "ko": {
+      "title": "장황한 프롬프트에는 세금이 붙는다",
+      "titleCore": "프롬프트 스타일이 청구서에 나타나는 방식",
+      "description": "정중한 표현, 반복, 방어적 지시문은 모든 호출마다 토큰을 소모합니다. 프롬프트 스타일은 취향이 아니라 반복되는 비용 항목입니다.",
+      "body": "<p>프롬프트는 설정 파일이 자라는 방식과 같이 커집니다. 누군가 실패 사례를 막기 위해 지시문을 추가하고, 다른 누군가는 예시를 더하고, 세 번째 사람은 두 번째 지시문이 왜 중요한지 설명하는 단락을 덧붙입니다. 재현할 수 없는 버그가 다시 생길까 봐 무엇 하나 제거되지 않습니다. 여섯 달 뒤 시스템 프롬프트는 3,000 토큰이 되고, 그중 어느 200 토큰이 실제로 필요한지는 아무도 설명하지 못합니다.</p><h2>왜 비용이 누적되는가</h2><p>작업에 따라 달라지는 출력과 달리, 프롬프트 오버헤드는 <em>모든 요청</em>에서 동일하게, 영원히 지불됩니다. 월 1,000만 번 호출되는 기능에서 1,000 토큰이 낭비되면 한 달에 100억 토큰이 순수한 형식 비용으로 나가는 셈입니다.</p><p>멀티턴 대화에서는 상황이 더 나쁩니다. 시스템 프롬프트가 매 턴마다 다시 전송되므로 비용은 요청 수가 아니라 턴 수에 비례합니다. 에이전트 루프에서는 사용자 한 번의 동작이 모델 호출을 열 번 이상 유발할 수 있고, 같은 부풀어 오른 서두가 그만큼 여러 번 청구됩니다.</p><h2>실제로 낭비되는 것</h2><p>정중한 표현이 문제는 아닙니다. 정중한 표현은 몇 개의 토큰에 불과하고, 가끔은 지시 준수율을 높이기도 합니다. 실제 부담은 <strong>중복된 지시</strong>(같은 규칙을 세 가지 방식으로 반복하는 것), <strong>더 이상 필요 없는 모델 세대를 위해 추가된 방어적 상투문</strong>, <strong>서로 다른 사례를 다루지 않고 겹치기만 하는 예시</strong>, 그리고 <strong>모델이 아니라 프롬프트 파일을 읽는 사람을 위한 설명</strong>에서 생깁니다.</p><p>실무에서는 세 번째 범주가 가장 큽니다. 퓨샷 예시는 토큰당 비용이 높은데, 다섯 개가 하는 일을 두 개로 충분히 할 수 있는지 다시 검토하는 팀은 드뭅니다.</p><h2>예산이 있는 코드처럼 프롬프트를 다루기</h2><p>고정 프롬프트 오버헤드가 평균 요청 크기에서 차지하는 비율을 측정하세요. 절반을 넘는다면 스타일 문제가 아니라 비용 문제입니다. 안정적인 부분을 앞에 두면 캐시가 적용되어, 아무것도 삭제하지 않고도 나머지 부풀림의 비용을 훨씬 낮출 수 있습니다. 그다음에는 어블레이션을 실행하세요. 블록 하나를 제거하고 평가를 돌린 뒤 품질이 유지되면 제거를 유지합니다. 평가 세트 없이 프롬프트를 줄이는 것은 추측일 뿐이며, 고객이 발견하는 품질 회귀는 절약한 토큰보다 훨씬 비쌉니다.</p><h2>관련 글</h2><ul><li><a href=\"/research/prompt-caching-economics\">프롬프트 캐싱의 경제성</a></li><li><a href=\"/research/evals-cost-control\">비용 통제 수단으로서의 평가</a></li><li><a href=\"/research/token-budget-implementation\">토큰 예산 구현</a></li></ul>",
+      "faq": [
+        {
+          "question": "LLM에 정중하게 말하면 돈이 드나요?",
+          "answer": "호출당 몇 개의 토큰이 들어 실제로 발생하지만 아주 적은 양입니다. 프롬프트에서 비용이 많이 드는 부분은 중복된 지시, 낡은 방어용 상투문, 중복된 퓨샷 예시이지 정중한 표현이 아닙니다."
+        },
+        {
+          "question": "에이전트에서는 프롬프트 부풀림이 왜 더 나쁜가요?",
+          "answer": "사용자 한 번의 동작이 여러 모델 호출을 유발할 수 있고, 시스템 프롬프트는 호출할 때마다 다시 전송됩니다. 따라서 같은 고정 오버헤드가 작업당이 아니라 호출당 청구됩니다."
+        },
+        {
+          "question": "프롬프트를 안전하게 줄이려면 어떻게 해야 하나요?",
+          "answer": "평가 세트로 어블레이션을 실행하세요. 블록을 하나씩 제거하고 평가를 다시 돌려 품질이 유지될 때만 제거를 유지합니다. 평가 없이 줄이면 절약한 토큰보다 비싼 품질 회귀가 생길 수 있습니다."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/prompt-caching-economics",
+          "label": "프롬프트 캐싱의 경제성"
+        },
+        {
+          "slug": "/research/evals-cost-control",
+          "label": "비용 통제 수단으로서의 평가"
+        },
+        {
+          "slug": "/research/token-budget-implementation",
+          "label": "토큰 예산 구현"
+        }
+      ]
+    },
+    "nl": {
+      "title": "Uitgebreide prompts kosten belasting",
+      "titleCore": "Hoe promptstijl op de rekening terechtkomt",
+      "description": "Beleefdheid, herhaling en defensieve instructies kosten bij elke aanroep tokens. Promptstijl is een terugkerende kostenpost, geen stijlvoorkeur.",
+      "body": "<p>Prompts groeien zoals configuratiebestanden groeien. Iemand voegt een instructie toe om een foutmodus op te lossen. Iemand anders voegt een voorbeeld toe. Een derde voegt een alinea toe die uitlegt waarom de tweede instructie ertoe doet. Er wordt nooit iets verwijderd, omdat verwijderen een bug kan terugbrengen die niemand kan reproduceren. Zes maanden later is de systeemprompt drieduizend tokens lang en kan niemand zeggen welke tweehonderd daarvan dragend zijn.</p><h2>Waarom het zich opstapelt</h2><p>In tegenstelling tot output, die met de taak varieert, wordt promptoverhead bij <em>elk afzonderlijk verzoek</em> betaald, identiek, voor altijd. Duizend verspilde tokens op een feature met tien miljoen aanroepen per maand is tien miljard tokens per maand aan pure opmaak.</p><p>In gesprekken met meerdere beurten is het erger: de systeemprompt wordt bij elke beurt opnieuw verstuurd, dus de kosten schalen met het aantal beurten, niet met het aantal verzoeken. En in agentlussen, waar één gebruikersactie een dozijn modelaanroepen kan veroorzaken, wordt dezelfde opgeblazen inleiding een dozijn keer gefactureerd voor één stuk werk.</p><h2>Wat echt verspilling is</h2><p>Niet beleefdheid, die een handvol tokens kost en soms de naleving verbetert. Het echte gewicht zit in: <strong>overbodige instructies</strong> die dezelfde regel op drie manieren herhalen, <strong>defensieve standaardtekst</strong> toegevoegd voor een modelgeneratie die het niet meer nodig heeft, <strong>voorbeelden die dupliceren</strong> in plaats van afzonderlijke gevallen te dekken, en <strong>uitleg gericht op menselijke lezers</strong> van het promptbestand in plaats van op het model.</p><p>Die derde categorie is in de praktijk de grootste. Few-shot-voorbeelden zijn per token duur en teams herzien zelden of vijf voorbeelden werk doen dat twee ook zouden doen.</p><h2>Behandel de prompt als code met een budget</h2><p>Meet de vaste promptoverhead als aandeel van de gemiddelde verzoekgrootte &mdash; als die boven de helft ligt, is het een kostenprobleem en geen stijlkwestie. Zet het stabiele deel vooraan zodat caching van toepassing is, wat de resterende opgeblazenheid veel goedkoper maakt zonder iets te verwijderen. Voer dan een ablatie uit: verwijder één blok, draai je evals en behoud de verwijdering als de kwaliteit standhoudt. Prompts inkorten zonder evalsuite is gokken, en de faalmodus &mdash; een kwaliteitsregressie die door klanten wordt ontdekt &mdash; kost meer dan de bespaarde tokens.</p><h2>Gerelateerd</h2><ul><li><a href=\"/research/prompt-caching-economics\">Kosteneconomie van prompt-caching</a></li><li><a href=\"/research/evals-cost-control\">Evals als kostenbeheersing</a></li><li><a href=\"/research/token-budget-implementation\">Implementatie van tokenbudgetten</a></li></ul>",
+      "faq": [
+        {
+          "question": "Kost het geld om 'alsjeblieft' tegen een LLM te zeggen?",
+          "answer": "Een handvol tokens per aanroep, wat reëel maar triviaal is. De dure delen van een prompt zijn overbodige instructies, verouderde defensieve standaardtekst en gedupliceerde few-shot-voorbeelden, niet beleefdheid."
+        },
+        {
+          "question": "Waarom is promptopzwelling erger bij agents?",
+          "answer": "Eén gebruikersactie kan veel modelaanroepen veroorzaken en de systeemprompt wordt bij elk ervan opnieuw verstuurd. Dezelfde vaste overhead wordt per aanroep gefactureerd in plaats van per taak."
+        },
+        {
+          "question": "Hoe kort je een prompt veilig in?",
+          "answer": "Voer een ablatie uit tegen een evalsuite: verwijder één blok tegelijk, draai de evals opnieuw en behoud de verwijdering alleen als de kwaliteit standhoudt. Inkorten zonder evals riskeert een regressie die meer kost dan de bespaarde tokens."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/prompt-caching-economics",
+          "label": "Kosteneconomie van prompt-caching"
+        },
+        {
+          "slug": "/research/evals-cost-control",
+          "label": "Evals als kostenbeheersing"
+        },
+        {
+          "slug": "/research/token-budget-implementation",
+          "label": "Implementatie van tokenbudgetten"
+        }
+      ]
+    },
+    "zh": {
+      "title": "冗长的提示词有隐形税",
+      "titleCore": "提示词写法如何体现在账单上",
+      "description": "礼貌用语、重复表述和防御性指令，每次调用都会消耗 token。提示词风格是一项持续计费的开支，而不只是文风偏好。",
+      "body": "<p>提示词的膨胀方式和配置文件一样。有人为修复某种故障添加一条指令，另一人添加一个示例，第三人再补一段解释第二条指令为何重要的文字。没有任何东西会被删除，因为删掉它可能让某个无人能复现的缺陷重新出现。六个月后，系统提示词有三千个 token，却没人说得清其中哪两百个真正起作用。</p><h2>为什么会不断累积</h2><p>输出会随任务变化，而提示词的开销则在<em>每一次请求</em>上以相同的数量被支付，而且永远如此。一个服务月均千万次调用的功能里，每次请求浪费一千个 token，就是每月一百亿个纯粹用于格式的 token。</p><p>在多轮对话中情况更糟：系统提示词每一轮都会重新发送，因此成本随轮数增长，而不是随请求数增长。在智能体循环中，用户的一次操作可能触发十几次模型调用，同一段臃肿的前置文字就要为这一件工作计费十几次。</p><h2>真正浪费的是什么</h2><p>不是礼貌用语，它只占几个 token，有时还能略微提高遵循度。真正的负担在于：<strong>冗余指令</strong>，用三种方式重复同一条规则；<strong>防御性模板</strong>，为已不再需要的模型代际而添加；<strong>重复的示例</strong>，它们没有覆盖不同情况，而是彼此复制；以及<strong>面向人类读者的解释</strong>，它们针对的是读提示词文件的人，而不是模型。</p><p>实践中第三类占比最大。少样本示例按 token 计价很贵，而团队很少重新审视：五个示例的作用，两个是否就能做到。</p><h2>把提示词当作有预算的代码来对待</h2><p>将固定的提示词开销按平均请求大小的占比来衡量。如果超过一半，那就是成本问题，而不是风格问题。把稳定的部分放在最前面，使缓存生效，这样即使不删除任何内容，剩余的冗余也会便宜得多。然后做一次消融实验：每次移除一个模块，运行你的评估，只有在质量不受影响时才保留删除。没有评估套件的提示词精简只是猜测，而那种失败模式，也就是客户发现的质量回退，代价远高于节省下来的 token。</p><h2>相关</h2><ul><li><a href=\"/research/prompt-caching-economics\">提示词缓存的经济学</a></li><li><a href=\"/research/evals-cost-control\">以评估作为成本控制</a></li><li><a href=\"/research/token-budget-implementation\">Token 预算的实现</a></li></ul>",
+      "faq": [
+        {
+          "question": "对 LLM 说“请”会产生费用吗？",
+          "answer": "每次调用只有几个 token，确实存在但微不足道。提示词中真正昂贵的部分是冗余指令、过时的防御性模板和重复的少样本示例，而不是礼貌用语。"
+        },
+        {
+          "question": "为什么智能体中的提示词膨胀问题更严重？",
+          "answer": "用户的一次操作可能触发多次模型调用，而系统提示词会在每次调用时重新发送。同样的固定开销是按调用次数计费，而不是按任务计费。"
+        },
+        {
+          "question": "如何安全地精简提示词？",
+          "answer": "针对评估套件做消融实验：每次移除一个模块，重新运行评估，只有在质量保持不变时才保留删除。没有评估就精简，可能引发代价超过节省 token 的质量回退。"
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/prompt-caching-economics",
+          "label": "提示词缓存的经济学"
+        },
+        {
+          "slug": "/research/evals-cost-control",
+          "label": "以评估作为成本控制"
+        },
+        {
+          "slug": "/research/token-budget-implementation",
+          "label": "Token 预算的实现"
         }
       ]
     }

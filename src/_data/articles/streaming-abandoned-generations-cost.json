@@ -15,7 +15,7 @@
       "title": "Abandoned streaming responses still cost money",
       "titleCore": "Streaming responses and abandoned generations",
       "description": "A user can abandon a streaming response while the model keeps generating. Measure abandoned output, cancel upstream work, and report cost per completed response.",
-      "body": "<p>Streaming makes an AI product feel fast, but it also makes an unfinished response easy to mistake for a cancelled request. A user closes the tab, loses the connection, or presses stop; the provider may continue generating until the request is cancelled or the output reaches its limit. The visible response is shorter, but the bill is not necessarily shorter.</p><h2>The abandoned tail is a real cost</h2><p>Track three events separately: time to first token, tokens delivered to the client, and tokens generated upstream. The gap between delivered and generated output is the abandoned tail. It represents work the user never received, and it can be large in long-form answers, coding agents, and tool-using workflows.</p><p>Do not measure this only as a percentage of requests. A small number of abandoned, high-token generations can dominate the waste. Report abandoned output tokens and their cost by feature, model, device, connection type, and cancellation reason.</p><h2>Cancellation has to travel upstream</h2><p>Stopping the browser renderer is not the same as stopping the model request. Propagate the client disconnect or an explicit stop action through your gateway to the provider request. Set a short grace period for reconnects, then cancel. For agent workflows, cancel the active generation and any queued tool work that no longer has a live parent task.</p><p>Keep an idempotent request identifier so a cancellation race cannot produce duplicate accounting. Record whether the provider confirmed cancellation; otherwise classify the remaining tokens as uncertain spend instead of silently calling them savings.</p><h2>Use a better KPI</h2><p>Cost per request is misleading when many responses are abandoned. Use cost per delivered response and cost per successful task, then show the abandonment rate beside both. A product change that increases time to first token may increase abandonment even when total tokens per request stay flat.</p><h2>Practical controls</h2><ul><li>Emit a cancellation event with request, feature, model, and token counters.</li><li>Cancel upstream work on disconnect and explicit stop.</li><li>Cap maximum output for interactive workloads.</li><li>Compare generated, delivered, and billed tokens during invoice reconciliation.</li><li>Alert when abandoned-token cost rises faster than successful-task volume.</li></ul><h2>Related</h2><ul><li><a href=&quot;/research/llm-cost-attribution&quot;>LLM cost attribution</a></li><li><a href=&quot;/research/agent-spend-guardrails&quot;>Agent spend guardrails</a></li><li><a href=&quot;/research/retry-loop-hidden-spend&quot;>Retry loop hidden spend</a></li></ul>",
+      "body": "<p>Streaming makes an AI product feel fast, but it also makes an unfinished response easy to mistake for a cancelled request. A user closes the tab, loses the connection, or presses stop; the provider may continue generating until the request is cancelled or the output reaches its limit. The visible response is shorter, but the bill is not necessarily shorter.</p><h2>The abandoned tail is a real cost</h2><p>Track three events separately: time to first token, tokens delivered to the client, and tokens generated upstream. The gap between delivered and generated output is the abandoned tail. It represents work the user never received, and it can be large in long-form answers, coding agents, and tool-using workflows.</p><p>Do not measure this only as a percentage of requests. A small number of abandoned, high-token generations can dominate the waste. Report abandoned output tokens and their cost by feature, model, device, connection type, and cancellation reason.</p><h2>Cancellation has to travel upstream</h2><p>Stopping the browser renderer is not the same as stopping the model request. Propagate the client disconnect or an explicit stop action through your gateway to the provider request. Set a short grace period for reconnects, then cancel. For agent workflows, cancel the active generation and any queued tool work that no longer has a live parent task.</p><p>Keep an idempotent request identifier so a cancellation race cannot produce duplicate accounting. Record whether the provider confirmed cancellation; otherwise classify the remaining tokens as uncertain spend instead of silently calling them savings.</p><h2>Use a better KPI</h2><p>Cost per request is misleading when many responses are abandoned. Use cost per delivered response and cost per successful task, then show the abandonment rate beside both. A product change that increases time to first token may increase abandonment even when total tokens per request stay flat.</p><h2>Practical controls</h2><ul><li>Emit a cancellation event with request, feature, model, and token counters.</li><li>Cancel upstream work on disconnect and explicit stop.</li><li>Cap maximum output for interactive workloads.</li><li>Compare generated, delivered, and billed tokens during invoice reconciliation.</li><li>Alert when abandoned-token cost rises faster than successful-task volume.</li></ul><h2>Related</h2><ul><li><a href=\"/research/llm-cost-attribution\">LLM cost attribution</a></li><li><a href=\"/research/agent-spend-guardrails\">Agent spend guardrails</a></li><li><a href=\"/research/retry-loop-hidden-spend\">Retry loop hidden spend</a></li></ul>",
       "faq": [
         {
           "question": "Does stopping a streaming response stop model billing?",
@@ -274,6 +274,176 @@
         {
           "slug": "/research/retry-loop-hidden-spend",
           "label": "重试循环中的隐性成本"
+        }
+      ]
+    },
+    "id": {
+      "title": "Streaming yang ditinggalkan tetap menelan biaya",
+      "titleCore": "Respons streaming dan generasi yang ditinggalkan",
+      "description": "Pengguna meninggalkan streaming, tetapi model terus berjalan. Ukur output yang ditinggalkan, batalkan pekerjaan di hulu, dan hitung biaya per respons selesai.",
+      "body": "<p>Streaming membuat produk AI terasa cepat, tetapi juga membuat respons yang belum selesai mudah disangka permintaan yang sudah dibatalkan. Pengguna menutup tab, kehilangan koneksi, atau menekan stop; penyedia mungkin terus menghasilkan sampai permintaan dibatalkan atau output mencapai batasnya. Respons yang terlihat lebih pendek, tetapi tagihannya belum tentu ikut lebih pendek.</p><h2>Ekor yang ditinggalkan adalah biaya nyata</h2><p>Lacak tiga peristiwa secara terpisah: waktu hingga token pertama, token yang sampai ke klien, dan token yang dihasilkan di hulu. Selisih antara output yang terkirim dan yang dihasilkan adalah ekor yang ditinggalkan. Itu mewakili pekerjaan yang tidak pernah diterima pengguna, dan bisa besar pada jawaban panjang, agen pengkodean, serta alur kerja yang memakai tool.</p><p>Jangan hanya mengukur ini sebagai persentase permintaan. Sejumlah kecil generasi yang ditinggalkan dengan token banyak bisa mendominasi pemborosan. Laporkan token output yang ditinggalkan dan biayanya menurut fitur, model, perangkat, jenis koneksi, dan alasan pembatalan.</p><h2>Pembatalan harus sampai ke hulu</h2><p>Menghentikan renderer browser tidak sama dengan menghentikan permintaan model. Teruskan pemutusan klien atau aksi stop eksplisit melalui gateway Anda ke permintaan penyedia. Beri masa tenggang singkat untuk koneksi ulang, lalu batalkan. Untuk alur kerja agen, batalkan generasi yang aktif dan pekerjaan tool yang masih antre tetapi sudah tidak punya tugas induk yang hidup.</p><p>Simpan pengenal permintaan yang idempoten agar balapan pembatalan tidak menghasilkan pencatatan ganda. Catat apakah penyedia mengonfirmasi pembatalan; jika tidak, golongkan token sisanya sebagai belanja yang belum pasti, bukan diam-diam menyebutnya penghematan.</p><h2>Gunakan KPI yang lebih baik</h2><p>Biaya per permintaan menyesatkan ketika banyak respons ditinggalkan. Gunakan biaya per respons yang terkirim dan biaya per tugas berhasil, lalu tampilkan tingkat peninggalan di samping keduanya. Perubahan produk yang menaikkan waktu hingga token pertama bisa menaikkan peninggalan, meskipun total token per permintaan tetap sama.</p><h2>Kontrol praktis</h2><ul><li>Kirim peristiwa pembatalan dengan permintaan, fitur, model, dan penghitung token.</li><li>Batalkan pekerjaan hulu saat terputus dan saat stop eksplisit.</li><li>Batasi output maksimum untuk beban kerja interaktif.</li><li>Bandingkan token yang dihasilkan, terkirim, dan ditagih saat rekonsiliasi faktur.</li><li>Beri peringatan ketika biaya token yang ditinggalkan naik lebih cepat daripada volume tugas berhasil.</li></ul><h2>Terkait</h2><ul><li><a href=\"/research/llm-cost-attribution\">Atribusi biaya LLM</a></li><li><a href=\"/research/agent-spend-guardrails\">Guardrail belanja agen</a></li><li><a href=\"/research/retry-loop-hidden-spend\">Belanja tersembunyi dari loop percobaan ulang</a></li></ul>",
+      "faq": [
+        {
+          "question": "Apakah menghentikan respons streaming juga menghentikan penagihan model?",
+          "answer": "Belum tentu. Menutup tab atau menghentikan renderer tidak menjamin permintaan model hulu dibatalkan. Teruskan pemutusan dan aksi stop melalui gateway, lalu rekonsiliasi token yang dihasilkan, terkirim, dan ditagih."
+        },
+        {
+          "question": "Bagaimana output streaming yang ditinggalkan sebaiknya diukur?",
+          "answer": "Lacak token yang dihasilkan di hulu dikurangi token yang dikirim ke klien, lalu laporkan selisihnya menurut fitur, model, perangkat, dan alasan pembatalan. Ukur juga biaya dolarnya, karena beberapa generasi panjang bisa mendominasi pemborosan."
+        },
+        {
+          "question": "Apa KPI yang lebih baik daripada biaya per permintaan untuk AI streaming?",
+          "answer": "Gunakan biaya per respons yang terkirim dan biaya per tugas berhasil, dengan tingkat peninggalan di sampingnya. Biaya per permintaan menyembunyikan apakah pengguna menerima output dan apakah pekerjaan menghasilkan nilai bisnis."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/llm-cost-attribution",
+          "label": "Atribusi biaya LLM"
+        },
+        {
+          "slug": "/research/agent-spend-guardrails",
+          "label": "Guardrail belanja agen"
+        },
+        {
+          "slug": "/research/retry-loop-hidden-spend",
+          "label": "Belanja tersembunyi dari loop percobaan ulang"
+        }
+      ]
+    },
+    "pl": {
+      "title": "Porzucone odpowiedzi strumieniowe nadal kosztują",
+      "titleCore": "Odpowiedzi strumieniowe i porzucone generacje",
+      "description": "Użytkownik porzuca odpowiedź, a model dalej generuje. Mierz porzucone tokeny, anuluj pracę upstream i licz koszt za dostarczoną odpowiedź.",
+      "body": "<p>Streaming sprawia, że produkt AI wydaje się szybki, ale nieukończona odpowiedź łatwo wziąć za anulowane żądanie. Użytkownik zamyka kartę, traci połączenie albo naciska stop; dostawca może dalej generować, aż żądanie zostanie anulowane lub wynik osiągnie limit. Widoczna odpowiedź jest krótsza, ale rachunek niekoniecznie.</p><h2>Porzucony ogon to realny koszt</h2><p>Śledź trzy zdarzenia osobno: czas do pierwszego tokena, tokeny dostarczone do klienta i tokeny wygenerowane po stronie dostawcy. Różnica między dostarczonymi a wygenerowanymi to porzucony ogon. Reprezentuje pracę, której użytkownik nigdy nie otrzymał, i może być duża w długich odpowiedziach, agentach kodujących i przepływach z narzędziami.</p><p>Nie mierz tego wyłącznie jako procentu żądań. Mała liczba porzuconych, bardzo długich generacji może dominować w marnotrawstwie. Raportuj porzucone tokeny wyjściowe i ich koszt według funkcji, modelu, urządzenia, typu połączenia i przyczyny anulowania.</p><h2>Anulowanie musi dotrzeć do dostawcy</h2><p>Zatrzymanie renderera w przeglądarce to nie to samo co zatrzymanie żądania do modelu. Przekaż rozłączenie klienta albo jawną akcję stop przez bramkę do żądania u dostawcy. Ustaw krótki okres karencji na ponowne połączenie, a potem anuluj. W workflow agentowych anuluj aktywną generację i kolejkowaną pracę narzędzi, która nie ma już żywego zadania nadrzędnego.</p><p>Utrzymuj idempotentny identyfikator żądania, aby wyścig anulowania nie wygenerował zduplikowanych rozliczeń. Zapisz, czy dostawca potwierdził anulowanie; w przeciwnym razie oznacz pozostałe tokeny jako niepewny wydatek, zamiast po cichu nazywać je oszczędnością.</p><h2>Użyj lepszego KPI</h2><p>Koszt na żądanie wprowadza w błąd, gdy wiele odpowiedzi jest porzucanych. Używaj kosztu na dostarczoną odpowiedź i kosztu na udane zadanie, i pokazuj obok nich wskaźnik porzuceń. Zmiana produktu, która wydłuża czas do pierwszego tokena, może zwiększyć porzucenia, nawet gdy łączna liczba tokenów na żądanie się nie zmienia.</p><h2>Praktyczne mechanizmy kontrolne</h2><ul><li>Emituj zdarzenie anulowania z licznikami żądania, funkcji, modelu i tokenów.</li><li>Anuluj pracę upstream przy rozłączeniu i przy jawnym stop.</li><li>Ogranicz maksymalne wyjście dla obciążeń interaktywnych.</li><li>Porównuj tokeny wygenerowane, dostarczone i zafakturowane przy uzgadnianiu faktur.</li><li>Alarmuj, gdy koszt porzuconych tokenów rośnie szybciej niż wolumen udanych zadań.</li></ul><h2>Powiązane</h2><ul><li><a href=\"/research/llm-cost-attribution\">Atrybucja kosztów LLM</a></li><li><a href=\"/research/agent-spend-guardrails\">Zabezpieczenia wydatków agentów</a></li><li><a href=\"/research/retry-loop-hidden-spend\">Ukryte wydatki w pętlach ponowień</a></li></ul>",
+      "faq": [
+        {
+          "question": "Czy zatrzymanie odpowiedzi strumieniowej zatrzymuje naliczanie opłat?",
+          "answer": "Niekoniecznie. Zamknięcie karty lub zatrzymanie renderera nie gwarantuje, że żądanie do modelu u dostawcy zostało anulowane. Przekaż rozłączenia i jawne akcje stop przez bramkę, a potem uzgodnij wygenerowane, dostarczone i zafakturowane tokeny."
+        },
+        {
+          "question": "Jak mierzyć porzucone wyjście strumieniowe?",
+          "answer": "Śledź tokeny wygenerowane upstream minus tokeny dostarczone do klienta i raportuj różnicę według funkcji, modelu, urządzenia i przyczyny anulowania. Mierz też koszt w dolarach, bo kilka długich generacji może dominować w marnotrawstwie."
+        },
+        {
+          "question": "Jaki KPI jest lepszy niż koszt na żądanie dla strumieniowego AI?",
+          "answer": "Koszt na dostarczoną odpowiedź i koszt na udane zadanie, obok wskaźnika porzuceń. Koszt na żądanie ukrywa, czy użytkownik otrzymał wynik i czy praca przyniosła wartość biznesową."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/llm-cost-attribution",
+          "label": "Atrybucja kosztów LLM"
+        },
+        {
+          "slug": "/research/agent-spend-guardrails",
+          "label": "Zabezpieczenia wydatków agentów"
+        },
+        {
+          "slug": "/research/retry-loop-hidden-spend",
+          "label": "Ukryte wydatki w pętlach ponowień"
+        }
+      ]
+    },
+    "ru": {
+      "title": "Прерванные стриминговые ответы всё равно стоят денег",
+      "titleCore": "Стриминговые ответы и прерванные генерации",
+      "description": "Прерванный стрим продолжает генерировать и платить. Измерьте прерванный вывод, отмените запрос на стороне провайдера и считайте стоимость завершённого ответа.",
+      "body": "<p>Стриминг делает AI-продукт быстрым на ощупь, но он же облегчает принять незавершённый ответ за отменённый запрос. Пользователь закрывает вкладку, теряет соединение или нажимает «стоп»; провайдер может продолжать генерацию до отмены запроса или до достижения лимита вывода. Видимый ответ стал короче, но счёт не обязательно стал меньше.</p><h2>Прерванный хвост — это реальная стоимость</h2><p>Отслеживайте три события отдельно: время до первого токена, токены, доставленные клиенту, и токены, сгенерированные на стороне провайдера. Разрыв между доставленным и сгенерированным выводом и есть прерванный хвост. Это работа, которую пользователь так и не получил, и на длинных ответах, программных агентах и workflow с инструментами она может быть большой.</p><p>Не измеряйте это только как процент запросов. Небольшое число прерванных генераций с большим количеством токенов может доминировать в потерях. Отчитывайтесь по прерванным выходным токенам и их стоимости в разрезе функции, модели, устройства, типа соединения и причины отмены.</p><h2>Отмена должна доходить до провайдера</h2><p>Остановка рендера в браузере — это не то же самое, что остановка запроса к модели. Передавайте разрыв клиента или явное действие «стоп» через шлюз до запроса к провайдеру. Задайте короткий период ожидания на переподключение, а затем отменяйте. Для агентных workflow отменяйте активную генерацию и всю поставленную в очередь работу с инструментами, у которой больше нет живой родительской задачи.</p><p>Используйте идемпотентный идентификатор запроса, чтобы гонка при отмене не приводила к двойному учёту. Фиксируйте, подтвердил ли провайдер отмену; иначе относите оставшиеся токены к спорным расходам, а не молча считайте их экономией.</p><h2>Используйте более точный KPI</h2><p>Стоимость на запрос вводит в заблуждение, когда много ответов прерывается. Используйте стоимость доставленного ответа и стоимость успешной задачи, а рядом показывайте долю прерываний. Изменение продукта, которое увеличивает время до первого токена, может повысить количество прерываний, даже если общее число токенов на запрос остаётся прежним.</p><h2>Практические меры контроля</h2><ul><li>Генерируйте событие отмены с запросом, функцией, моделью и счётчиками токенов.</li><li>Отменяйте работу на стороне провайдера при разрыве и при явном «стоп».</li><li>Ограничивайте максимальный вывод для интерактивных нагрузок.</li><li>Сверяйте сгенерированные, доставленные и оплаченные токены при сверке счетов.</li><li>Настройте оповещение, когда стоимость прерванных токенов растёт быстрее объёма успешных задач.</li></ul><h2>Связанное</h2><ul><li><a href=\"/research/llm-cost-attribution\">Атрибуция затрат на LLM</a></li><li><a href=\"/research/agent-spend-guardrails\">Ограничители расходов агентов</a></li><li><a href=\"/research/retry-loop-hidden-spend\">Скрытые расходы в циклах повторов</a></li></ul>",
+      "faq": [
+        {
+          "question": "Останавливает ли остановка стримингового ответа оплату модели?",
+          "answer": "Не обязательно. Закрытие вкладки или остановка рендера не гарантирует, что запрос к модели на стороне провайдера был отменён. Передавайте разрывы и явные остановки через шлюз, а затем сверяйте сгенерированные, доставленные и оплаченные токены."
+        },
+        {
+          "question": "Как измерять прерванный стриминговый вывод?",
+          "answer": "Считайте токены, сгенерированные на стороне провайдера, минус токены, доставленные клиенту, и отчитывайтесь о разнице по функции, модели, устройству и причине отмены. Также измеряйте её стоимость в долларах, потому что несколько длинных генераций могут доминировать в потерях."
+        },
+        {
+          "question": "Какой KPI лучше стоимости на запрос для стримингового AI?",
+          "answer": "Используйте стоимость доставленного ответа и стоимость успешной задачи вместе с долей прерываний. Стоимость на запрос скрывает, получил ли пользователь вывод и принёс ли результат работы бизнес-ценность."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/llm-cost-attribution",
+          "label": "Атрибуция затрат на LLM"
+        },
+        {
+          "slug": "/research/agent-spend-guardrails",
+          "label": "Ограничители расходов агентов"
+        },
+        {
+          "slug": "/research/retry-loop-hidden-spend",
+          "label": "Скрытые расходы в циклах повторов"
+        }
+      ]
+    },
+    "tr": {
+      "title": "Kesilen akış yanıtları yine de para harcar",
+      "titleCore": "Akış yanıtları ve tamamlanmayan üretimler",
+      "description": "Kullanıcı yanıtı kapatsa da model üretmeye devam edebilir. Kesilen çıktıyı ölçün, üst akış isteğini iptal edin, tamamlanan yanıt başına maliyeti raporlayın.",
+      "body": "<p>Akış, bir AI ürününü hızlı hissettirir; ama yarım kalan bir yanıtı iptal edilmiş bir istekle karıştırmayı da kolaylaştırır. Kullanıcı sekmeyi kapatır, bağlantı kopar ya da durdur'a basar; sağlayıcı, istek iptal edilene ya da çıktı sınırına ulaşana kadar üretmeye devam edebilir. Görünen yanıt kısalır, ama fatura mutlaka kısalmaz.</p><h2>Kesilen kuyruk gerçek bir maliyettir</h2><p>Üç olayı ayrı izleyin: ilk token'a kadar geçen süre, istemciye iletilen token sayısı ve üst akışta üretilen token sayısı. İletilen ve üretilen çıktı arasındaki fark, kesilen kuyruktur. Kullanıcının hiç almadığı bir işi temsil eder ve uzun biçimli yanıtlarda, kodlama ajanlarında ve araç kullanan iş akışlarında büyük olabilir.</p><p>Bunu yalnızca isteklerin yüzdesi olarak ölçmeyin. Az sayıda, yüksek token'lı kesilmiş üretim, israfın büyük kısmını oluşturabilir. Kesilen çıktı token'larını ve maliyetini özelliğe, modele, cihaza, bağlantı türüne ve iptal nedenine göre raporlayın.</p><h2>İptal yukarı akışa ulaşmalı</h2><p>Tarayıcı işleyicisini durdurmak, model isteğini durdurmakla aynı şey değildir. İstemci bağlantısının kopmasını ya da açık durdurma eylemini ağ geçidinizden sağlayıcı isteğine kadar iletin. Yeniden bağlanmalar için kısa bir bekleme süresi tanımlayın, sonra iptal edin. Ajan iş akışlarında, aktif üretimi ve artık canlı bir üst göreve sahip olmayan kuyruktaki araç işlerini iptal edin.</p><p>Bir iptal yarışının çift muhasebe üretmemesi için idempotent bir istek tanımlayıcısı tutun. Sağlayıcının iptali onaylayıp onaylamadığını kaydedin; aksi halde kalan token'ları sessizce tasarruf saymak yerine belirsiz harcama olarak sınıflandırın.</p><h2>Daha iyi bir KPI kullanın</h2><p>Birçok yanıt kesildiğinde istek başına maliyet yanıltıcıdır. Teslim edilen yanıt başına ve başarılı görev başına maliyeti kullanın; kesilme oranını ikisinin yanında gösterin. İlk token süresini uzatan bir ürün değişikliği, istek başına toplam token'lar sabit kalsa bile kesilmeyi artırabilir.</p><h2>Pratik kontroller</h2><ul><li>İstek, özellik, model ve token sayaçlarıyla birlikte bir iptal olayı üretin.</li><li>Bağlantı kopunca ve açık durdurmada üst akış işini iptal edin.</li><li>Etkileşimli iş yükleri için en fazla çıktıyı sınırlayın.</li><li>Fatura mutabakatında üretilen, iletilen ve faturalanan token'ları karşılaştırın.</li><li>Kesilen token maliyeti, başarılı görev hacminden daha hızlı artarsa uyarı verin.</li></ul><h2>İlgili</h2><ul><li><a href=\"/research/llm-cost-attribution\">LLM maliyet atfı</a></li><li><a href=\"/research/agent-spend-guardrails\">Ajan harcama korkulukları</a></li><li><a href=\"/research/retry-loop-hidden-spend\">Yeniden deneme döngülerinin gizli harcaması</a></li></ul>",
+      "faq": [
+        {
+          "question": "Akışlı bir yanıtı durdurmak model faturalandırmasını durdurur mu?",
+          "answer": "Mutlaka değil. Sekmeyi kapatmak ya da renderer'ı durdurmak, üst akış model isteğinin iptal edildiğini garanti etmez. Bağlantı kopmalarını ve açık durdurma eylemlerini ağ geçidinden iletin, sonra üretilen, iletilen ve faturalanan token'ları uzlaştırın."
+        },
+        {
+          "question": "Kesilen akış çıktısı nasıl ölçülmeli?",
+          "answer": "Üst akışta üretilen token'lardan istemciye iletilen token'ları çıkarın, farkı özelliğe, modele, cihaza ve iptal nedenine göre raporlayın. Birkaç uzun üretim israfın büyük kısmını oluşturabildiği için dolar maliyetini de ölçün."
+        },
+        {
+          "question": "Akışlı AI için istek başına maliyetten daha iyi KPI nedir?",
+          "answer": "Teslim edilen yanıt başına ve başarılı görev başına maliyet, yanlarında kesilme oranıyla birlikte. İstek başına maliyet, kullanıcının çıktıyı alıp almadığını ve işin iş değeri üretip üretmediğini gizler."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/llm-cost-attribution",
+          "label": "LLM maliyet atfı"
+        },
+        {
+          "slug": "/research/agent-spend-guardrails",
+          "label": "Ajan harcama korkulukları"
+        },
+        {
+          "slug": "/research/retry-loop-hidden-spend",
+          "label": "Yeniden deneme döngülerinin gizli harcaması"
+        }
+      ]
+    },
+    "vi": {
+      "title": "Phản hồi streaming bị bỏ dở vẫn tốn tiền",
+      "titleCore": "Phản hồi streaming và các lượt sinh bị bỏ dở",
+      "description": "Người dùng có thể bỏ phản hồi streaming khi mô hình vẫn đang sinh chữ. Đo phần đầu ra bị bỏ, hủy công việc phía upstream và báo cáo chi phí mỗi phản hồi hoàn tất.",
+      "body": "<p>Streaming làm sản phẩm AI cảm giác nhanh, nhưng cũng khiến một phản hồi chưa xong dễ bị nhầm với một yêu cầu đã hủy. Người dùng đóng tab, mất kết nối, hoặc bấm dừng; nhà cung cấp có thể vẫn tiếp tục sinh chữ cho đến khi yêu cầu bị hủy hoặc đầu ra chạm giới hạn. Phần phản hồi hiển thị ngắn hơn, nhưng hóa đơn không nhất thiết ngắn hơn.</p><h2>Phần đuôi bị bỏ là chi phí thật</h2><p>Theo dõi ba sự kiện riêng biệt: thời gian đến token đầu tiên, số token đã gửi tới client, và số token đã sinh phía upstream. Khoảng chênh giữa đầu ra đã gửi và đầu ra đã sinh chính là phần đuôi bị bỏ. Đó là công việc người dùng không bao giờ nhận được, và nó có thể lớn trong các câu trả lời dài, agent lập trình và quy trình dùng công cụ.</p><p>Đừng chỉ đo điều này như một tỷ lệ phần trăm trên số yêu cầu. Một số ít lượt sinh bị bỏ với số token lớn có thể chiếm phần lớn lãng phí. Hãy báo cáo số token đầu ra bị bỏ và chi phí của chúng theo tính năng, mô hình, thiết bị, loại kết nối và lý do hủy.</p><h2>Việc hủy phải truyền được lên upstream</h2><p>Dừng trình duyệt hiển thị không giống với dừng yêu cầu tới mô hình. Hãy truyền việc client ngắt kết nối hoặc hành động dừng tường minh qua gateway đến yêu cầu gửi nhà cung cấp. Đặt một khoảng chờ ngắn cho các lần kết nối lại, rồi mới hủy. Với quy trình agent, hãy hủy lượt sinh đang chạy và mọi công việc công cụ đang xếp hàng mà cha của nó không còn tồn tại.</p><p>Giữ một định danh yêu cầu có tính idempotent để một cuộc đua giữa các lệnh hủy không tạo ra ghi nhận kế toán bị trùng. Ghi lại việc nhà cung cấp có xác nhận đã hủy hay chưa; nếu không, hãy xếp số token còn lại vào chi tiêu chưa chắc chắn thay vì âm thầm coi đó là khoản tiết kiệm.</p><h2>Dùng một KPI tốt hơn</h2><p>Chi phí mỗi yêu cầu gây hiểu lầm khi nhiều phản hồi bị bỏ. Hãy dùng chi phí mỗi phản hồi đã gửi và chi phí mỗi tác vụ thành công, rồi hiển thị tỷ lệ bỏ dở bên cạnh cả hai. Một thay đổi sản phẩm làm tăng thời gian đến token đầu tiên có thể làm tăng tỷ lệ bỏ dở ngay cả khi tổng số token mỗi yêu cầu không đổi.</p><h2>Các kiểm soát thực tế</h2><ul><li>Phát một sự kiện hủy kèm yêu cầu, tính năng, mô hình và bộ đếm token.</li><li>Hủy công việc upstream khi ngắt kết nối và khi có lệnh dừng tường minh.</li><li>Giới hạn đầu ra tối đa cho khối lượng công việc tương tác.</li><li>So sánh token đã sinh, đã gửi và đã tính phí khi đối soát hóa đơn.</li><li>Cảnh báo khi chi phí token bị bỏ tăng nhanh hơn khối lượng tác vụ thành công.</li></ul><h2>Liên quan</h2><ul><li><a href=\"/research/llm-cost-attribution\">Phân bổ chi phí LLM</a></li><li><a href=\"/research/agent-spend-guardrails\">Rào chắn chi tiêu cho agent</a></li><li><a href=\"/research/retry-loop-hidden-spend\">Chi tiêu ẩn trong vòng lặp thử lại</a></li></ul>",
+      "faq": [
+        {
+          "question": "Dừng một phản hồi streaming có dừng việc tính phí mô hình không?",
+          "answer": "Không nhất thiết. Đóng tab hoặc dừng trình hiển thị không bảo đảm yêu cầu mô hình phía upstream đã bị hủy. Hãy truyền việc ngắt kết nối và lệnh dừng qua gateway, rồi đối soát token đã sinh, đã gửi và đã tính phí."
+        },
+        {
+          "question": "Nên đo đầu ra streaming bị bỏ dở như thế nào?",
+          "answer": "Theo dõi số token sinh phía upstream trừ đi số token đã gửi tới client, rồi báo cáo phần chênh lệch theo tính năng, mô hình, thiết bị và lý do hủy. Cũng đo chi phí bằng đô la, vì một vài lượt sinh dài có thể chiếm phần lớn lãng phí."
+        },
+        {
+          "question": "Chỉ số nào tốt hơn chi phí mỗi yêu cầu cho streaming AI?",
+          "answer": "Dùng chi phí mỗi phản hồi đã gửi và chi phí mỗi tác vụ thành công, đặt tỷ lệ bỏ dở bên cạnh. Chi phí mỗi yêu cầu che giấu việc người dùng có nhận được đầu ra hay không và công việc có tạo ra giá trị kinh doanh hay không."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/llm-cost-attribution",
+          "label": "Phân bổ chi phí LLM"
+        },
+        {
+          "slug": "/research/agent-spend-guardrails",
+          "label": "Rào chắn chi tiêu cho agent"
+        },
+        {
+          "slug": "/research/retry-loop-hidden-spend",
+          "label": "Chi tiêu ẩn trong vòng lặp thử lại"
         }
       ]
     }

@@ -259,6 +259,176 @@
           "label": "توزيع وتخصيص تكاليف الذكاء الاصطناعي"
         }
       ]
+    },
+    "id": {
+      "title": "Runbook produksi untuk lonjakan biaya LLM",
+      "titleCore": "Runbook produksi untuk lonjakan biaya LLM",
+      "description": "Runbook insiden langkah demi langkah untuk mengisolasi, menahan, dan menjelaskan lonjakan biaya LLM di produksi yang terjadi secara tiba-tiba.",
+      "body": "<p>Saat belanja LLM melonjak, jangan mulai dengan mengubah model. Pertama amankan bukti, pastikan sinyal penagihannya, dan tentukan apakah perubahannya berasal dari volume, tarif, komposisi, atau efisiensi. Respons yang baik menahan insiden sebelum insiden itu menghancurkan data yang dibutuhkan untuk menjelaskannya.</p><h2>15 menit pertama: pastikan dan amankan</h2><p>Simpan faktur atau ekspor penggunaan dari penyedia, lalu catat lalu lintas saat ini, komposisi model, jenis token, retry, dan deployment terbaru. Catat waktu mulai, akun yang terdampak, dan dasbor yang digunakan. Bandingkan tagihan penyedia dengan telemetri gateway agar bug pada dasbor tidak memicu perubahan produksi yang berisiko.</p><h2>30 menit berikutnya: tahan dengan aman</h2><p>Terapkan kontrol paling sempit yang menghentikan kerusakan lebih lanjut: jeda workflow yang tidak terkendali, batasi agen, alihkan pekerjaan latar belakang ke batch, atau nonaktifkan satu fitur baru yang baru dirilis. Pertahankan lalu lintas yang kritis untuk kualitas dan pendapatan. Setiap kontrol darurat harus punya pemilik, waktu kedaluwarsa, dan kondisi rollback.</p><h2>Temukan penyebabnya</h2><p>Periksa volume terlebih dahulu, lalu komposisi model, komposisi token, retry dan fallback, panjang konteks, jumlah pemanggilan alat, dan perubahan harga penyedia. Bandingkan biaya p50 dan p95 per tugas yang berhasil dengan periode sebelumnya. Kenaikan jumlah permintaan dengan biaya per tugas yang tetap berarti permintaan memang naik; kenaikan biaya per tugas berarti masalah efisiensi atau komposisi.</p><h2>Tutup insiden</h2><p>Hapus kontrol sementara hanya setelah metrik kembali di bawah ambangnya dan kualitas tetap dalam SLO. Tulis lini masa, dampak dalam dolar, akar penyebab, celah deteksi, dan tindakan permanen. Cocokkan dampak akhir dengan faktur penyedia dan beri tag pada fitur terdampak agar postmortem dapat diaudit.</p><p>Runbook ini berhasil jika tim bisa menjawab apa yang berubah, apa yang dilindungi, berapa biayanya, dan kontrol mana yang mencegah terulangnya.</p><h2>Terkait</h2><ul><li>Pemantauan biaya LLM</li><li>Pagar pengaman belanja agen</li><li>Analisis selisih belanja AI</li></ul>",
+      "faq": [
+        {
+          "question": "Apa langkah pertama saat terjadi lonjakan biaya LLM?",
+          "answer": "Amankan faktur penyedia, telemetri gateway, lalu lintas, komposisi model, jenis token, retry, dan bukti deployment sebelum melakukan perubahan apa pun."
+        },
+        {
+          "question": "Bagaimana tim menahan lonjakan biaya LLM?",
+          "answer": "Gunakan kontrol paling sempit yang menghentikan belanja baru, beri pemilik dan waktu kedaluwarsa, dan pertahankan lalu lintas yang kritis untuk kualitas dan pendapatan."
+        },
+        {
+          "question": "Bagaimana cara menemukan penyebab lonjakan biaya?",
+          "answer": "Periksa volume, komposisi model, komposisi token, retry, konteks, pemanggilan alat, dan tarif penyedia, lalu bandingkan biaya per tugas yang berhasil dengan baseline."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/llm-cost-monitoring",
+          "label": "Pemantauan biaya LLM"
+        },
+        {
+          "slug": "/research/agent-spend-guardrails",
+          "label": "Pagar pengaman belanja agen"
+        },
+        {
+          "slug": "/research/ai-cost-allocation",
+          "label": "Alokasi biaya AI"
+        }
+      ]
+    },
+    "pl": {
+      "title": "Runbook produkcyjny dla skoku kosztów LLM",
+      "titleCore": "Runbook produkcyjny dla skoku kosztów LLM",
+      "description": "Krok po kroku runbook incydentu do izolowania, ograniczania i wyjaśniania nagłego skoku kosztów LLM na produkcji.",
+      "body": "<p>Gdy wydatki na LLM gwałtownie rosną, nie zaczynaj od zmiany modelu. Najpierw zabezpiecz dowody, potwierdź sygnał z rozliczenia i ustal, czy zmiana wynika z wolumenu, stawki, miksu czy efektywności. Dobra reakcja zabezpiecza incydent, zanim zniszczy dane potrzebne do jego wyjaśnienia.</p><h2>Pierwsze 15 minut: potwierdź i zabezpiecz</h2><p>Zapisz fakturę dostawcy lub eksport zużycia, bieżący ruch, miks modeli, typy tokenów, ponowienia i ostatnie wdrożenia. Odnotuj czas rozpoczęcia, dotknięte konta i użyte pulpity. Porównaj rozliczenie dostawcy z telemetrią bramki, aby błąd pulpitu nie wywołał niebezpiecznej zmiany na produkcji.</p><h2>Kolejne 30 minut: bezpieczne ograniczenie</h2><p>Zastosuj najwęższą kontrolę, która zatrzyma dalsze straty: wstrzymaj niekontrolowany przepływ pracy, ogranicz agenta, przekieruj pracę w tle do wsadu albo wyłącz jedną świeżo wydaną funkcję. Zachowaj ruch krytyczny dla jakości i dla przychodów. Każda awaryjna kontrola potrzebuje właściciela, czasu wygaśnięcia i warunku wycofania.</p><h2>Znajdź przyczynę</h2><p>Sprawdź najpierw wolumen, potem miks modeli, skład tokenów, ponowienia i ścieżki zapasowe, długość kontekstu, rozgałęzienie wywołań narzędzi oraz zmiany cen dostawcy. Porównaj koszt na udane zadanie w p50 i p95 z poprzednim okresem. Wzrost liczby żądań przy stałym koszcie na zadanie oznacza popyt; wzrost kosztu na zadanie oznacza problem z efektywnością lub miksem.</p><h2>Zamknij incydent</h2><p>Usuń tymczasowe kontrole dopiero wtedy, gdy metryka wróci poniżej progu, a jakość mieści się w SLO. Spisz oś czasu, wpływ w dolarach, przyczynę główną, lukę w wykrywaniu i trwałe działanie. Uzgodnij końcowy wpływ z fakturami dostawców i oznacz dotknięte funkcje, aby przegląd po incydencie dało się audytować.</p><p>Runbook zadziałał, gdy zespół potrafi odpowiedzieć, co się zmieniło, co zostało ochronione, ile to kosztowało i która kontrola zapobiegnie powtórzeniu.</p><h2>Powiązane</h2><ul><li>Monitorowanie kosztów LLM</li><li>Zabezpieczenia wydatków agentów</li><li>Alokacja kosztów AI</li></ul>",
+      "faq": [
+        {
+          "question": "Jaki jest pierwszy krok podczas skoku kosztów LLM?",
+          "answer": "Zabezpiecz fakturę dostawcy, telemetrię bramki, ruch, miks modeli, typy tokenów, ponowienia i dowody wdrożeń przed wprowadzeniem zmian."
+        },
+        {
+          "question": "Jak zespoły powinny ograniczać skok kosztów LLM?",
+          "answer": "Użyj najwęższej kontroli, która zatrzymuje nowe wydatki, przypisz jej właściciela i termin wygaśnięcia, a ruch krytyczny dla jakości i przychodów zachowaj."
+        },
+        {
+          "question": "Jak ustalić przyczynę skoku kosztów?",
+          "answer": "Sprawdź wolumen, miks modeli, skład tokenów, ponowienia, kontekst, wywołania narzędzi i stawki dostawcy, a następnie porównaj koszt na udane zadanie z linią bazową."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/llm-cost-monitoring",
+          "label": "Monitorowanie kosztów LLM"
+        },
+        {
+          "slug": "/research/agent-spend-guardrails",
+          "label": "Zabezpieczenia wydatków agentów"
+        },
+        {
+          "slug": "/research/ai-cost-allocation",
+          "label": "Alokacja kosztów AI"
+        }
+      ]
+    },
+    "ru": {
+      "title": "Пошаговый runbook для скачка затрат на LLM",
+      "titleCore": "Runbook для внезапного роста затрат на LLM",
+      "description": "Пошаговый инцидент-runbook: как изолировать, сдержать и объяснить внезапный рост расходов на LLM в продакшене.",
+      "body": "<p>При росте расходов на LLM не начинайте с замены модели. Сначала сохраните доказательства, подтвердите сигнал биллинга и определите, что изменилось: объем, частота запросов, состав моделей или эффективность. Хороший ответ начинается с фиксации инцидента, пока не уничтожены данные, необходимые для его объяснения.</p><h2>Первые 15 минут: подтвердить и сохранить</h2><p>Зафиксируйте счет или выгрузку использования у провайдера, текущий трафик, состав моделей, типы токенов, повторные запросы и недавние деплои. Запишите время начала, затронутые аккаунты и использованные дашборды. Сравните биллинг провайдера с телеметрией шлюза, чтобы ошибка дашборда не привела к небезопасному изменению в продакшене.</p><h2>Следующие 30 минут: безопасно сдержать</h2><p>Примените самый узкий механизм, который останавливает дальнейший ущерб: приостановите вышедший из-под контроля workflow, ограничьте агента, направьте фоновые задачи в batch или отключите одну недавно выпущенную функцию. Сохраняйте трафик, критичный для качества и выручки. Каждая экстренная мера должна иметь владельца, время истечения и условие отката.</p><h2>Найти причину</h2><p>Сначала проверьте объем, затем состав моделей, структуру токенов, повторные запросы и фолбэки, длину контекста, количество вызовов инструментов и изменения цен провайдера. Сравните стоимость успешной задачи на p50 и p95 с предыдущим периодом. Рост числа запросов при неизменной стоимости задачи означает рост спроса; рост стоимости задачи означает проблему эффективности или состава моделей.</p><h2>Закрыть инцидент</h2><p>Снимайте временные меры только после того, как метрика вернется ниже порога, а качество останется в пределах SLO. Составьте хронологию, финансовый ущерб, первопричину, пробел в обнаружении и постоянное действие. Сверьте итоговый ущерб со счетами провайдера и пометьте затронутую функцию, чтобы постмортем можно было аудировать.</p><p>Runbook считается успешным, когда команда может ответить: что изменилось, что было защищено, во сколько это обошлось и какой контроль не даст повториться.</p><h2>Похожие материалы</h2><ul><li>Мониторинг затрат на LLM</li><li>Защитные ограничения расходов агентов</li><li>Анализ отклонений расходов на ИИ</li></ul>",
+      "faq": [
+        {
+          "question": "Какой первый шаг при скачке затрат на LLM?",
+          "answer": "Сохраните счета провайдера, телеметрию шлюза, трафик, состав моделей, типы токенов, повторные запросы и доказательства деплоя до внесения каких-либо изменений."
+        },
+        {
+          "question": "Как команды сдерживают скачок затрат на LLM?",
+          "answer": "Используйте самый узкий механизм, который останавливает новые расходы, назначьте владельца и срок действия и сохраняйте трафик, критичный для качества и выручки."
+        },
+        {
+          "question": "Как определить причину скачка затрат?",
+          "answer": "Проверьте объем, состав моделей, структуру токенов, повторные запросы, контекст, количество вызовов инструментов и тарифы провайдера, затем сравните стоимость успешной задачи с базовым уровнем."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/llm-cost-monitoring",
+          "label": "Мониторинг затрат на LLM"
+        },
+        {
+          "slug": "/research/agent-spend-guardrails",
+          "label": "Ограничения расходов агентов"
+        },
+        {
+          "slug": "/research/ai-cost-allocation",
+          "label": "Распределение затрат на ИИ"
+        }
+      ]
+    },
+    "tr": {
+      "title": "Üretimde LLM maliyet artışı için runbook",
+      "titleCore": "LLM maliyet artışı için üretim runbook rehberi",
+      "description": "Üretimde ani bir LLM maliyet artışını izole etmek, sınırlandırmak ve açıklamak için adım adım bir olay runbook'u.",
+      "body": "<p>LLM harcaması arttığında işe modeli değiştirerek başlamayın. Önce kanıtları koruyun, faturalama sinyalini doğrulayın ve değişikliğin hacim, oran, karışım ya da verimlilikten hangisi olduğunu belirleyin. İyi bir müdahale, olayı açıklamak için gereken veriyi yok etmeden olayı kontrol altına alır.</p><h2>İlk 15 dakika: doğrulayın ve koruyun</h2><p>Sağlayıcı faturasını ya da kullanım dökümünü, mevcut trafiği, model karışımını, token türlerini, yeniden denemeleri ve son dağıtımları kaydedin. Başlangıç saatini, etkilenen hesapları ve kullanılan panelleri not edin. Sağlayıcı faturalamasını gateway telemetrisiyle karşılaştırın; böylece bir panel hatası güvensiz bir üretim değişikliğini tetiklemez.</p><h2>Sonraki 30 dakika: güvenli şekilde sınırlandırın</h2><p>Daha fazla zararı durduracak en dar kontrolü uygulayın: kontrolden çıkmış bir iş akışını duraklatın, bir ajanı sınırlandırın, arka plan işlerini batch'e yönlendirin ya da yeni yayımlanmış tek bir özelliği devre dışı bırakın. Kalite ve gelir açısından kritik trafiği koruyun. Her acil kontrolün bir sahibi, bir bitiş zamanı ve bir geri alma koşulu olmalıdır.</p><h2>Sürücüyü bulun</h2><p>Önce hacmi, ardından model karışımını, token bileşimini, yeniden denemeleri ve yedek geçişleri, bağlam uzunluğunu, araç yayılımını ve sağlayıcı fiyat değişikliklerini kontrol edin. Başarılı görev başına p50 ve p95 maliyetini önceki dönemle karşılaştırın. Görev başına maliyet sabitken istek sayısının artması talep artışıdır; görev başına maliyetin artması ise verimlilik ya da karışım sorunudur.</p><h2>Olayı kapatın</h2><p>Geçici kontrolleri yalnızca metrik eşiğin altına döndükten ve kalite SLO içinde kaldıktan sonra kaldırın. Bir zaman çizelgesi, dolar cinsinden etki, kök neden, tespit açığı ve kalıcı önlemi yazın. Son etkiyi sağlayıcı faturalarıyla uzlaştırın ve post-mortem denetlenebilsin diye etkilenen özelliği etiketleyin.</p><p>Runbook, ekip şu soruları yanıtlayabildiğinde başarılıdır: neyin değiştiği, neyin korunduğu, bunun ne kadara mal olduğu ve hangi kontrolün tekrarı önlediği.</p><h2>İlgili konular</h2><ul><li>LLM maliyet izleme</li><li>Ajan harcama korkulukları</li><li>AI harcama sapması analizi</li></ul>",
+      "faq": [
+        {
+          "question": "Bir LLM maliyet artışında ilk adım nedir?",
+          "answer": "Değişiklik yapmadan önce sağlayıcı faturalarını, gateway telemetrisini, trafiği, model karışımını, token türlerini, yeniden denemeleri ve dağıtım kayıtlarını koruyun."
+        },
+        {
+          "question": "Ekipler bir LLM maliyet artışını nasıl sınırlandırmalı?",
+          "answer": "Yeni harcamayı durduran en dar kontrolü kullanın, ona bir sahip ve bir bitiş süresi verin, kalite ve gelir açısından kritik trafiği koruyun."
+        },
+        {
+          "question": "Maliyet artışının nedenini nasıl belirlersiniz?",
+          "answer": "Hacmi, model karışımını, token bileşimini, yeniden denemeleri, bağlamı, araç çağrısı yayılımını ve sağlayıcı oranlarını kontrol edin; ardından başarılı görev başına maliyeti temel değerle karşılaştırın."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/llm-cost-monitoring",
+          "label": "LLM maliyet izleme"
+        },
+        {
+          "slug": "/research/agent-spend-guardrails",
+          "label": "Ajan harcama korkulukları"
+        },
+        {
+          "slug": "/research/ai-cost-allocation",
+          "label": "AI maliyet tahsisi"
+        }
+      ]
+    },
+    "vi": {
+      "title": "Sổ tay vận hành khi chi phí LLM tăng đột biến",
+      "titleCore": "Sổ tay vận hành sản xuất khi chi phí LLM tăng đột biến",
+      "description": "Sổ tay xử lý sự cố từng bước để khoanh vùng, kiềm chế và giải thích một đợt tăng đột biến chi phí LLM trong sản xuất.",
+      "body": "<p>Khi chi tiêu LLM tăng đột biến, đừng bắt đầu bằng việc đổi mô hình. Trước hết hãy giữ lại bằng chứng, xác nhận tín hiệu từ hóa đơn, và xác định xem thay đổi đến từ khối lượng, tỷ giá, cơ cấu hay hiệu quả. Một phản ứng tốt là khoanh vùng sự cố trước khi nó làm mất dữ liệu cần thiết để giải thích.</p>\n<h2>15 phút đầu: xác nhận và giữ bằng chứng</h2>\n<p>Ghi lại hóa đơn hoặc tệp xuất sử dụng của nhà cung cấp, lưu lượng hiện tại, cơ cấu mô hình, loại token, số lần thử lại và các đợt triển khai gần đây. Ghi thời điểm bắt đầu, các tài khoản bị ảnh hưởng và bảng điều khiển đã dùng. So sánh hóa đơn của nhà cung cấp với telemetry của cổng để một lỗi bảng điều khiển không kích hoạt thay đổi production thiếu an toàn.</p>\n<h2>30 phút tiếp theo: kiềm chế an toàn</h2>\n<p>Áp dụng biện pháp kiểm soát hẹp nhất có thể ngăn thiệt hại thêm: tạm dừng một quy trình đang chạy mất kiểm soát, giới hạn một agent, chuyển công việc nền sang batch, hoặc tắt một tính năng vừa phát hành. Giữ lại lưu lượng quan trọng về chất lượng và doanh thu. Mọi biện pháp khẩn cấp cần có người phụ trách, thời điểm hết hạn và điều kiện hoàn tác.</p>\n<h2>Tìm nguyên nhân</h2>\n<p>Kiểm tra khối lượng trước, rồi đến cơ cấu mô hình, thành phần token, số lần thử lại và dự phòng, độ dài ngữ cảnh, số lệnh gọi công cụ lan ra, và thay đổi giá của nhà cung cấp. So sánh p50 và p95 của chi phí trên mỗi tác vụ thành công với kỳ trước. Lượng yêu cầu tăng trong khi chi phí mỗi tác vụ đứng yên là nhu cầu; chi phí mỗi tác vụ tăng là vấn đề hiệu quả hoặc cơ cấu.</p>\n<h2>Đóng sự cố</h2>\n<p>Chỉ gỡ bỏ các biện pháp tạm thời sau khi chỉ số quay về dưới ngưỡng và chất lượng vẫn nằm trong SLO. Viết một dòng thời gian, tác động bằng tiền, nguyên nhân gốc, khoảng trống phát hiện và hành động lâu dài. Đối chiếu tác động cuối cùng với hóa đơn nhà cung cấp và gắn thẻ tính năng bị ảnh hưởng để buổi rà soát hậu sự cố có thể kiểm toán.</p>\n<p>Sổ tay thành công khi đội có thể trả lời: điều gì đã thay đổi, cái gì được bảo vệ, nó tốn bao nhiêu, và biện pháp kiểm soát nào ngăn sự cố lặp lại.</p>\n<h2>Liên quan</h2>\n<ul>\n<li>Theo dõi chi phí LLM</li>\n<li>Lan can chi tiêu cho agent</li>\n<li>Phân tích phương sai chi tiêu AI</li>\n</ul>\n",
+      "faq": [
+        {
+          "question": "Bước đầu tiên khi chi phí LLM tăng đột biến là gì?",
+          "answer": "Giữ lại hóa đơn của nhà cung cấp, telemetry của cổng, lưu lượng, cơ cấu mô hình, loại token, số lần thử lại và bằng chứng triển khai trước khi thực hiện bất kỳ thay đổi nào."
+        },
+        {
+          "question": "Đội nên kiềm chế đợt tăng chi phí LLM như thế nào?",
+          "answer": "Dùng biện pháp kiểm soát hẹp nhất có thể ngăn chi tiêu mới, gán cho nó một người phụ trách và thời điểm hết hạn, đồng thời giữ lại lưu lượng quan trọng về chất lượng và doanh thu."
+        },
+        {
+          "question": "Làm sao để xác định nguyên nhân gây tăng chi phí?",
+          "answer": "Kiểm tra khối lượng, cơ cấu mô hình, thành phần token, số lần thử lại, ngữ cảnh, số lệnh gọi công cụ lan ra và giá của nhà cung cấp, sau đó so sánh chi phí trên mỗi tác vụ thành công với mức nền."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/llm-cost-monitoring",
+          "label": "Theo dõi chi phí LLM"
+        },
+        {
+          "slug": "/research/agent-spend-guardrails",
+          "label": "Lan can chi tiêu cho agent"
+        },
+        {
+          "slug": "/research/ai-cost-allocation",
+          "label": "Phân bổ chi phí AI"
+        }
+      ]
     }
   }
 }

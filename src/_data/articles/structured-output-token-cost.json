@@ -15,7 +15,7 @@
       "title": "Structured output is not free",
       "titleCore": "The token cost of JSON mode and schemas",
       "description": "JSON mode and tool schemas make output parseable and add tokens on both sides of every call. Here is where the overhead lands and how to cut it.",
-      "body": "<p>Asking a model for structured output looks like a formatting choice. On the bill it is a volume choice, and it lands in three places at once.</p><h2>The schema is an input cost on every request</h2><p>A response format or tool definition is serialised into the request. A modest schema &mdash; a dozen fields, descriptions on each, a couple of nested objects &mdash; is a few hundred tokens. That is small until you multiply it by every call, on every turn, for the life of the feature. A 400-token schema on a million calls is 400 million input tokens you are paying for in order to describe a shape that never changes.</p><p>Worse, schemas usually sit <em>after</em> the volatile part of the prompt in naive implementations, which breaks the cached prefix. The schema then costs full price every time <em>and</em> destroys the discount on everything before it.</p><h2>Syntax is an output cost</h2><p>Every brace, quote, comma and field name in the response is a generated token you are billed for at the output rate. Verbose field names are a recurring charge: <code>customer_shipping_address_line_one</code> costs more, forever, than <code>addr1</code>. Deeply nested objects pay for their own scaffolding. For short answers wrapped in a large envelope, the structure can genuinely exceed the content.</p><h2>Retries are the expensive part</h2><p>Constrained decoding on the major providers makes schema violations rare, but validation failures still happen &mdash; a field the model cannot fill honestly, an enum with no right answer, a schema that is ambiguous to a reader. Each failure costs a full retry: all input tokens again, all output tokens again, plus latency. A 2% invalid rate on a high-volume endpoint is a 2% cost increase with nothing to show for it.</p><h2>What to actually do</h2><p>Put the schema in the stable prefix so it caches, and keep it identical across calls. Ask only for fields you consume &mdash; extra fields are paid for twice, once in the schema and once in the response. Prefer short field names and flat structures. Where the output is a single value, do not wrap it in an object at all. And measure your validation failure rate: it is the one part of this that is pure waste.</p><h2>Related</h2><ul><li><a href=&quot;/research/prompt-caching-economics&quot;>Prompt caching economics</a></li><li><a href=&quot;/research/token-budget-implementation&quot;>Token budget implementation</a></li><li><a href=&quot;/research/retry-loop-hidden-spend&quot;>Retry loop hidden spend</a></li></ul>",
+      "body": "<p>Asking a model for structured output looks like a formatting choice. On the bill it is a volume choice, and it lands in three places at once.</p><h2>The schema is an input cost on every request</h2><p>A response format or tool definition is serialised into the request. A modest schema &mdash; a dozen fields, descriptions on each, a couple of nested objects &mdash; is a few hundred tokens. That is small until you multiply it by every call, on every turn, for the life of the feature. A 400-token schema on a million calls is 400 million input tokens you are paying for in order to describe a shape that never changes.</p><p>Worse, schemas usually sit <em>after</em> the volatile part of the prompt in naive implementations, which breaks the cached prefix. The schema then costs full price every time <em>and</em> destroys the discount on everything before it.</p><h2>Syntax is an output cost</h2><p>Every brace, quote, comma and field name in the response is a generated token you are billed for at the output rate. Verbose field names are a recurring charge: <code>customer_shipping_address_line_one</code> costs more, forever, than <code>addr1</code>. Deeply nested objects pay for their own scaffolding. For short answers wrapped in a large envelope, the structure can genuinely exceed the content.</p><h2>Retries are the expensive part</h2><p>Constrained decoding on the major providers makes schema violations rare, but validation failures still happen &mdash; a field the model cannot fill honestly, an enum with no right answer, a schema that is ambiguous to a reader. Each failure costs a full retry: all input tokens again, all output tokens again, plus latency. A 2% invalid rate on a high-volume endpoint is a 2% cost increase with nothing to show for it.</p><h2>What to actually do</h2><p>Put the schema in the stable prefix so it caches, and keep it identical across calls. Ask only for fields you consume &mdash; extra fields are paid for twice, once in the schema and once in the response. Prefer short field names and flat structures. Where the output is a single value, do not wrap it in an object at all. And measure your validation failure rate: it is the one part of this that is pure waste.</p><h2>Related</h2><ul><li><a href=\"/research/prompt-caching-economics\">Prompt caching economics</a></li><li><a href=\"/research/token-budget-implementation\">Token budget implementation</a></li><li><a href=\"/research/retry-loop-hidden-spend\">Retry loop hidden spend</a></li></ul>",
       "faq": [
         {
           "question": "Does JSON mode cost extra?",
@@ -132,6 +132,346 @@
         {
           "slug": "/research/prompt-caching-economics",
           "label": "プロンプトキャッシュの経済学"
+        }
+      ]
+    },
+    "id": {
+      "title": "Output terstruktur tidak gratis",
+      "titleCore": "Biaya token mode JSON dan skema",
+      "description": "Mode JSON dan skema tool membuat output bisa diurai, tetapi menambah token di kedua sisi setiap panggilan. Ini letak overhead-nya dan cara memangkasnya.",
+      "body": "<p>Meminta output terstruktur terlihat seperti pilihan format. Di tagihan, itu pilihan volume, dan dampaknya muncul di tiga tempat sekaligus.</p><h2>Skema adalah biaya input di setiap permintaan</h2><p>Format respons atau definisi tool diserialisasi ke dalam permintaan. Skema yang sederhana &mdash; belasan field, deskripsi di tiap field, beberapa objek bersarang &mdash; berukuran beberapa ratus token. Itu kecil sampai dikalikan setiap panggilan, di setiap giliran, sepanjang umur fitur. Skema 400 token pada satu juta panggilan berarti 400 juta token input yang Anda bayar hanya untuk mendeskripsikan bentuk yang tidak pernah berubah.</p><p>Lebih buruk lagi, dalam implementasi naif skema biasanya diletakkan <em>setelah</em> bagian prompt yang berubah-ubah, sehingga prefiks yang di-cache rusak. Skema kemudian dibayar harga penuh setiap kali <em>dan</em> menghilangkan diskon untuk semua yang ada sebelumnya.</p><h2>Sintaks adalah biaya output</h2><p>Setiap kurung kurawal, tanda kutip, koma, dan nama field dalam respons adalah token yang dihasilkan dan ditagih dengan tarif output. Nama field yang panjang adalah biaya berulang: <code>customer_shipping_address_line_one</code> selamanya lebih mahal daripada <code>addr1</code>. Objek yang sangat bersarang membayar untuk scaffolding-nya sendiri. Untuk jawaban pendek yang dibungkus amplop besar, strukturnya bisa benar-benar melebihi isinya.</p><h2>Retry adalah bagian yang mahal</h2><p>Constrained decoding di penyedia besar membuat pelanggaran skema jarang, tetapi kegagalan validasi tetap terjadi &mdash; field yang tidak bisa diisi model secara jujur, enum tanpa jawaban yang tepat, atau skema yang ambigu bagi pembaca. Setiap kegagalan menimbulkan retry penuh: seluruh token input lagi, seluruh token output lagi, ditambah latensi. Tingkat tidak valid 2% pada endpoint volume tinggi berarti kenaikan biaya 2% tanpa hasil apa pun.</p><h2>Yang sebenarnya harus dilakukan</h2><p>Letakkan skema di prefiks yang stabil agar ter-cache, dan jaga agar tetap identik di setiap panggilan. Minta hanya field yang benar-benar Anda pakai &mdash; field ekstra dibayar dua kali, sekali di skema dan sekali di respons. Utamakan nama field yang pendek dan struktur yang datar. Jika outputnya satu nilai saja, jangan bungkus dalam objek sama sekali. Dan ukur tingkat kegagalan validasi Anda: itulah satu-satunya bagian dari ini yang murni pemborosan.</p><h2>Terkait</h2><ul><li><a href=\"/research/prompt-caching-economics\">Ekonomi caching prompt</a></li><li><a href=\"/research/token-budget-implementation\">Implementasi anggaran token</a></li><li><a href=\"/research/retry-loop-hidden-spend\">Pengeluaran tersembunyi dari retry loop</a></li></ul>",
+      "faq": [
+        {
+          "question": "Apakah mode JSON menambah biaya?",
+          "answer": "Bukan sebagai biaya tambahan, tetapi sebagai token. Skema adalah token input di setiap panggilan, kurung kurawal, tanda kutip, dan nama field adalah token output yang ditagih, dan setiap kegagalan validasi memicu retry penuh di kedua sisi."
+        },
+        {
+          "question": "Bagaimana cara mengurangi overhead output terstruktur?",
+          "answer": "Cache skema dengan menyimpannya di prefiks prompt yang stabil, minta hanya field yang benar-benar Anda pakai, gunakan nama field pendek dan struktur datar, serta lacak tingkat kegagalan validasi Anda."
+        },
+        {
+          "question": "Apakah nama field yang panjang benar-benar penting?",
+          "answer": "Pada fitur volume rendah, tidak. Pada sejuta panggilan per hari, setiap token tambahan di nama field dihasilkan dan ditagih di setiap respons, sehingga penamaan yang bertele-tele menjadi biaya berulang permanen."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/prompt-caching-economics",
+          "label": "Ekonomi caching prompt"
+        },
+        {
+          "slug": "/research/token-budget-implementation",
+          "label": "Implementasi anggaran token"
+        },
+        {
+          "slug": "/research/retry-loop-hidden-spend",
+          "label": "Pengeluaran tersembunyi dari retry loop"
+        }
+      ]
+    },
+    "pl": {
+      "title": "Strukturalne wyjście nie jest darmowe",
+      "titleCore": "Koszt tokenów trybu JSON i schematów",
+      "description": "Tryb JSON i schematy narzędzi czynią wyjście parsowalnym, ale dodają tokeny po obu stronach każdego wywołania. Gdzie leży narzut i jak go ciąć.",
+      "body": "<p>Poproszenie modelu o strukturalne wyjście wygląda na wybór formatu. Na rachunku to wybór wolumenu, i pojawia się w trzech miejscach naraz.</p><h2>Schemat to koszt wejścia w każdym żądaniu</h2><p>Format odpowiedzi lub definicja narzędzia są serializowane do żądania. Skromny schemat &mdash; kilkanaście pól, opis każdego z nich, kilka zagnieżdżonych obiektów &mdash; to kilkaset tokenów. To niewiele, dopóki nie pomnożysz tego przez każde wywołanie, każdą turę, przez cały okres działania funkcji. Schemat z 400 tokenami przy milionie wywołań to 400 milionów tokenów wejścia, za które płacisz, żeby opisać kształt, który nigdy się nie zmienia.</p><p>Gorzej, że w naiwnych implementacjach schemat zwykle stoi <em>za</em> zmienną częścią promptu, co łamie zbuforowany prefiks. Wtedy schemat kosztuje pełną stawkę za każdym razem <em>i</em> niszczy zniżkę na wszystko, co jest przed nim.</p><h2>Składnia to koszt wyjścia</h2><p>Każdy nawias klamrowy, cudzysłów, przecinek i nazwa pola w odpowiedzi to wygenerowany token, za który płacisz stawką wyjścia. Rozwlekłe nazwy pól to stały, powtarzalny koszt: <code>customer_shipping_address_line_one</code> kosztuje na zawsze więcej niż <code>addr1</code>. Głęboko zagnieżdżone obiekty płacą za własne rusztowanie. Przy krótkich odpowiedziach owinietych w duży envelope struktura może realnie przewyższać treść.</p><h2>Ponowienia to najdroższa część</h2><p>Ograniczone dekodowanie u głównych dostawców sprawia, że naruszenia schematu są rzadkie, ale błędy walidacji wciąż się zdarzają &mdash; pole, którego model nie może uczciwie wypełnić, enum bez poprawnej odpowiedzi, schemat dwuznaczny dla czytelnika. Każda awaria to pełne ponowienie: znowu całe wejście, znowu całe wyjście, do tego opóźnienie. Wskaźnik 2% nieprawidłowych odpowiedzi na endpoincie o dużym wolumenie to 2% wyższy koszt bez żadnej korzyści.</p><h2>Co faktycznie zrobić</h2><p>Umieść schemat w stabilnym prefiksie, żeby się buforował, i trzymaj go identycznego między wywołaniami. Proś tylko o pola, które konsumujesz &mdash; dodatkowe pola są płacone dwa razy, raz w schemacie i raz w odpowiedzi. Preferuj krótkie nazwy pól i płaskie struktury. Jeśli wyjście to pojedyncza wartość, nie owijaj jej wcale w obiekt. I mierz wskaźnik błędów walidacji: to jedyna część tego wszystkiego, która jest czystą stratą.</p><h2>Powiązane</h2><ul><li><a href=\"/research/prompt-caching-economics\">Ekonomia cachowania promptów</a></li><li><a href=\"/research/token-budget-implementation\">Wdrożenie budżetu tokenów</a></li><li><a href=\"/research/retry-loop-hidden-spend\">Ukryte wydatki w pętlach ponowień</a></li></ul>",
+      "faq": [
+        {
+          "question": "Czy tryb JSON kosztuje więcej?",
+          "answer": "Nie jako dopłata, ale w tokenach. Schemat to tokeny wejścia przy każdym wywołaniu, nawiasy, cudzysłowy i nazwy pól to płatne tokeny wyjścia, a każdy błąd walidacji oznacza pełne ponowienie po obu stronach."
+        },
+        {
+          "question": "Jak ograniczyć narzut strukturalnego wyjścia?",
+          "answer": "Buforuj schemat, trzymając go w stabilnym prefiksie promptu, proś tylko o pola, które faktycznie konsumujesz, używaj krótkich nazw i płaskich struktur oraz śledź wskaźnik błędów walidacji."
+        },
+        {
+          "question": "Czy długie nazwy pól naprawdę mają znaczenie?",
+          "answer": "Przy małym wolumenie nie. Przy milionie wywołań dziennie każdy dodatkowy token w nazwie pola jest generowany i płacony w każdej odpowiedzi, więc rozwlekłe nazewnictwo staje się stałą, powtarzalną opłatą."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/prompt-caching-economics",
+          "label": "Ekonomia cachowania promptów"
+        },
+        {
+          "slug": "/research/token-budget-implementation",
+          "label": "Wdrożenie budżetu tokenów"
+        },
+        {
+          "slug": "/research/retry-loop-hidden-spend",
+          "label": "Ukryte wydatki w pętlach ponowień"
+        }
+      ]
+    },
+    "ru": {
+      "title": "Структурированный вывод не бесплатен",
+      "titleCore": "Стоимость токенов JSON-режима и схем",
+      "description": "JSON-режим и схемы инструментов делают ответ разбираемым, но добавляют токены с обеих сторон каждого вызова. Где лежат накладные расходы и как их срезать.",
+      "body": "<p>Просьба вернуть модели структурированный вывод выглядит как выбор формата. На счёте это выбор объёма, и он сказывается сразу в трёх местах.</p><h2>Схема — входная стоимость каждого запроса</h2><p>Описание формата ответа или определение инструмента сериализуются в запрос. Скромная схема — это дюжина полей, описание у каждого, пара вложенных объектов — несколько сотен токенов. Это немного, пока не умножить на каждый вызов, каждый ход и на всё время жизни функции. Схема в 400 токенов на миллион вызовов — это 400 миллионов входных токенов, которые вы платите за описание формы, которая никогда не меняется.</p><p>Хуже того, в наивных реализациях схема обычно стоит <em>после</em> изменчивой части промпта, что ломает закэшированный префикс. Тогда схема оплачивается полной ценой каждый раз <em>и</em> сводит на нет скидку на всё, что идёт перед ней.</p><h2>Синтаксис — выходная стоимость</h2><p>Каждая фигурная скобка, кавычка, запятая и имя поля в ответе — это сгенерированный токен, который оплачивается по тарифу вывода. Длинные имена полей — постоянная повторяющаяся плата: <code>customer_shipping_address_line_one</code> стоит больше, навсегда, чем <code>addr1</code>. Глубоко вложенные объекты платят за собственный каркас. Для коротких ответов, завёрнутых в большую оболочку, структура может реально превышать содержимое.</p><h2>Повторы — самая дорогая часть</h2><p>Constrained decoding у крупных провайдеров делает нарушения схемы редкими, но ошибки валидации всё равно случаются: поле, которое модель не может честно заполнить, перечисление без правильного ответа, схема, неоднозначная для читателя. Каждая ошибка стоит полного повтора: все входные токены снова, все выходные токены снова, плюс задержка. Доля невалидных ответов в 2% на высоконагруженном эндпоинте — это 2% роста стоимости без какой-либо отдачи.</p><h2>Что делать на практике</h2><p>Кладите схему в стабильный префикс, чтобы она кэшировалась, и держите её одинаковой между вызовами. Запрашивайте только поля, которые используете: лишние поля оплачиваются дважды — в схеме и в ответе. Предпочитайте короткие имена полей и плоские структуры. Если ответ — одно значение, не оборачивайте его в объект вообще. И измеряйте долю ошибок валидации: это единственная часть всего этого, которая — чистые потери.</p><h2>Связанные материалы</h2><ul><li><a href=\"/research/prompt-caching-economics\">Экономика кэширования промптов</a></li><li><a href=\"/research/token-budget-implementation\">Внедрение бюджета токенов</a></li><li><a href=\"/research/retry-loop-hidden-spend\">Скрытые траты на петли повторов</a></li></ul>",
+      "faq": [
+        {
+          "question": "JSON-режим стоит дороже?",
+          "answer": "Не как надбавка, а в токенах: схема — это входные токены на каждом вызове, скобки, кавычки и имена полей — оплачиваемые выходные токены, а каждая ошибка валидации стоит полного повтора с обеих сторон."
+        },
+        {
+          "question": "Как снизить накладные расходы структурированного вывода?",
+          "answer": "Кэшируйте схему, держа её в стабильном префиксе промпта, запрашивайте только реально используемые поля, применяйте короткие имена полей и плоские структуры и отслеживайте долю ошибок валидации."
+        },
+        {
+          "question": "Действительно ли важны длинные имена полей?",
+          "answer": "При малом объёме — нет. При миллионе вызовов в день каждый лишний токен в имени поля генерируется и оплачивается в каждом ответе, поэтому многословные имена превращаются в постоянный повторяющийся платёж."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/prompt-caching-economics",
+          "label": "Экономика кэширования промптов"
+        },
+        {
+          "slug": "/research/token-budget-implementation",
+          "label": "Внедрение бюджета токенов"
+        },
+        {
+          "slug": "/research/retry-loop-hidden-spend",
+          "label": "Скрытые траты на петли повторов"
+        }
+      ]
+    },
+    "tr": {
+      "title": "Yapılandırılmış çıktı bedava değildir",
+      "titleCore": "JSON modu ve şemaların token maliyeti",
+      "description": "JSON modu ve araç şemaları çıktıyı ayrıştırılabilir kılar, ama her çağrının iki tarafına token ekler. Ek yükün nereye bindiğini ve nasıl azaltılacağını anlatıyoruz.",
+      "body": "<p>Modelden yapılandırılmış çıktı istemek bir biçimlendirme tercihi gibi görünür. Faturada ise bu bir hacim tercihidir ve aynı anda üç yerde kendini gösterir.</p><h2>Şema, her istekte bir girdi maliyetidir</h2><p>Yanıt biçimi veya araç tanımı isteğin içine serileştirilir. Mütevazı bir şema &mdash; bir düzine alan, her birinde açıklama, birkaç iç içe nesne &mdash; birkaç yüz tokendir. Bu, her çağrıda, her turda, özelliğin ömrü boyunca çarpılana kadar küçük görünür. Bir milyon çağrıda 400 tokenlik bir şema, hiç değişmeyen bir yapıyı tarif etmek için ödediğiniz 400 milyon girdi tokenidir.</p><p>Daha kötüsü, saf uygulamalarda şema genellikle prompt'un değişken kısmından <em>sonra</em> gelir; bu da önbelleğe alınmış öneki bozar. Şema her seferinde tam fiyat ödetir <em>ve</em> önündeki her şeydeki indirimi yok eder.</p><h2>Söz dizimi, çıktı maliyetidir</h2><p>Yanıttaki her parantez, tırnak, virgül ve alan adı, çıktı oranından faturalandırılan üretilmiş bir tokendir. Uzun alan adları tekrarlayan bir ücrettir: <code>customer_shipping_address_line_one</code>, <code>addr1</code>'den sonsuza dek daha pahalıya gelir. Derin iç içe nesneler kendi iskeletlerinin bedelini öder. Büyük bir zarfa sarılmış kısa yanıtlarda yapı, içeriği gerçekten geçebilir.</p><h2>Yeniden denemeler pahalı kısımdır</h2><p>Büyük sağlayıcılarda kısıtlı kod çözme şema ihlallerini nadir kılar, ama doğrulama hataları yine olur &mdash; modelin dürüstçe dolduramayacağı bir alan, doğru cevabı olmayan bir enum, bir okuyucu için belirsiz bir şema. Her hata tam bir yeniden deneme maliyetine yol açar: tüm girdi tokenleri yeniden, tüm çıktı tokenleri yeniden, artı gecikme. Yüksek hacimli bir uç noktada %2 geçersiz oran, karşılığında hiçbir şey olmadan %2 maliyet artışıdır.</p><h2>Gerçekte ne yapmalı</h2><p>Şemayı önbelleğe alınabilmesi için sabit öneke koyun ve çağrılar arasında aynı tutun. Yalnızca tükettiğiniz alanları isteyin; fazla alanlar iki kez ödenir: bir kez şemada, bir kez yanıtta. Kısa alan adlarını ve düz yapıları tercih edin. Çıktı tek bir değerse, onu hiçbir nesneye sarmayın. Ve doğrulama hata oranınızı ölçün: bu, tamamen israf olan tek kısımdır.</p><h2>İlgili</h2><ul><li><a href=\"/research/prompt-caching-economics\">Prompt önbellekleme ekonomisi</a></li><li><a href=\"/research/token-budget-implementation\">Token bütçesi uygulaması</a></li><li><a href=\"/research/retry-loop-hidden-spend\">Yeniden deneme döngüsündeki gizli harcama</a></li></ul>",
+      "faq": [
+        {
+          "question": "JSON modu ek ücret getirir mi?",
+          "answer": "Ek bir ücret olarak değil, tokenler olarak getirir. Şema her çağrıda girdi tokenidir, parantezler, tırnaklar ve alan adları faturalanan çıktı tokenleridir ve her doğrulama hatası iki tarafta da tam bir yeniden deneme maliyeti yaratır."
+        },
+        {
+          "question": "Yapılandırılmış çıktının ek yükünü nasıl azaltırsınız?",
+          "answer": "Şemayı sabit bir prompt önekinde tutarak önbelleğe alın, yalnızca gerçekten tükettiğiniz alanları isteyin, kısa alan adları ve düz yapılar kullanın ve doğrulama hata oranınızı takip edin."
+        },
+        {
+          "question": "Uzun alan adları gerçekten önemli mi?",
+          "answer": "Düşük hacimli bir özellikte hayır. Günde bir milyon çağrıda, alan adındaki her ek token her yanıtta üretilir ve faturalandırılır; bu yüzden uzun adlandırma kalıcı, tekrarlayan bir ücrete dönüşür."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/prompt-caching-economics",
+          "label": "Prompt önbellekleme ekonomisi"
+        },
+        {
+          "slug": "/research/token-budget-implementation",
+          "label": "Token bütçesi uygulaması"
+        },
+        {
+          "slug": "/research/retry-loop-hidden-spend",
+          "label": "Yeniden deneme döngüsündeki gizli harcama"
+        }
+      ]
+    },
+    "vi": {
+      "title": "Đầu ra có cấu trúc không miễn phí",
+      "titleCore": "Chi phí token của JSON mode và schema",
+      "description": "JSON mode và schema công cụ giúp đầu ra dễ phân tích nhưng thêm token ở cả hai phía của mỗi lời gọi. Phần chi phí này nằm ở đâu và cách cắt giảm.",
+      "body": "<p>Yêu cầu mô hình trả về đầu ra có cấu trúc trông như một lựa chọn định dạng. Trên hóa đơn, đó là một lựa chọn về khối lượng, và nó xuất hiện ở ba chỗ cùng lúc.</p><h2>Schema là chi phí đầu vào ở mọi yêu cầu</h2><p>Response format hoặc định nghĩa công cụ được tuần tự hóa vào yêu cầu. Một schema vừa phải &mdash; chục trường, mỗi trường có mô tả, vài object lồng nhau &mdash; tốn vài trăm token. Con số này nhỏ cho đến khi nhân với mọi lời gọi, mọi lượt, suốt vòng đời của tính năng. Schema 400 token nhân với một triệu lời gọi là 400 triệu token đầu vào, bạn trả để mô tả một hình dạng không bao giờ thay đổi.</p><p>Tệ hơn, trong các triển khai ngây thơ, schema thường nằm <em>sau</em> phần biến động của prompt, làm vỡ tiền tố đã cache. Khi đó schema bị tính đủ giá mỗi lần <em>và</em> phá hỏng mức giảm giá của mọi thứ đứng trước nó.</p><h2>Cú pháp là chi phí đầu ra</h2><p>Mỗi dấu ngoặc nhọn, dấu ngoặc kép, dấu phẩy và tên trường trong phản hồi đều là một token được sinh ra và bị tính theo giá đầu ra. Tên trường dài là một khoản phí định kỳ: <code>customer_shipping_address_line_one</code> tốn nhiều hơn <code>addr1</code> mãi mãi. Object lồng sâu trả tiền cho chính khung sườn của chúng. Với câu trả lời ngắn được bọc trong một phong bì lớn, phần cấu trúc có thể vượt cả phần nội dung.</p><h2>Thử lại mới là phần đắt</h2><p>Giải mã có ràng buộc ở các nhà cung cấp lớn khiến vi phạm schema hiếm gặp, nhưng lỗi xác thực vẫn xảy ra &mdash; một trường mô hình không thể điền một cách trung thực, một enum không có đáp án đúng, hoặc một schema gây mơ hồ cho người đọc. Mỗi lỗi tốn một lần thử lại đầy đủ: toàn bộ token đầu vào và đầu ra được tính lại, cộng thêm độ trễ. Tỷ lệ không hợp lệ 2% trên một endpoint lưu lượng lớn là chi phí tăng 2% mà không mang lại gì.</p><h2>Việc nên làm</h2><p>Đặt schema vào tiền tố ổn định để nó được cache, và giữ nó giống nhau giữa các lời gọi. Chỉ yêu cầu những trường bạn thực sự dùng &mdash; trường thừa bị trả tiền hai lần, một lần trong schema và một lần trong phản hồi. Ưu tiên tên trường ngắn và cấu trúc phẳng. Nếu đầu ra chỉ là một giá trị đơn, đừng bọc nó trong object. Và hãy đo tỷ lệ lỗi xác thực: đây là phần duy nhất trong tất cả những thứ này hoàn toàn là lãng phí.</p><h2>Liên quan</h2><ul><li><a href=\"/research/prompt-caching-economics\">Kinh tế của prompt caching</a></li><li><a href=\"/research/token-budget-implementation\">Triển khai ngân sách token</a></li><li><a href=\"/research/retry-loop-hidden-spend\">Chi tiêu ẩn của vòng lặp thử lại</a></li></ul>",
+      "faq": [
+        {
+          "question": "JSON mode có tốn thêm phí không?",
+          "answer": "Không phải như một khoản phụ phí, mà là qua token. Schema là token đầu vào ở mọi lời gọi, dấu ngoặc, dấu ngoặc kép và tên trường là token đầu ra bị tính phí, và mỗi lỗi xác thực tốn một lần thử lại đầy đủ ở cả hai phía."
+        },
+        {
+          "question": "Làm sao giảm chi phí do đầu ra có cấu trúc?",
+          "answer": "Cache schema bằng cách giữ nó trong tiền tố prompt ổn định, chỉ yêu cầu các trường bạn thực sự dùng, dùng tên trường ngắn và cấu trúc phẳng, và theo dõi tỷ lệ lỗi xác thực."
+        },
+        {
+          "question": "Tên trường dài có thực sự quan trọng không?",
+          "answer": "Với tính năng lưu lượng thấp thì không. Với một triệu lời gọi mỗi ngày, mỗi token thừa trong tên trường được sinh ra và tính phí ở mọi phản hồi, nên đặt tên dài trở thành khoản phí định kỳ vĩnh viễn."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/prompt-caching-economics",
+          "label": "Kinh tế của prompt caching"
+        },
+        {
+          "slug": "/research/token-budget-implementation",
+          "label": "Triển khai ngân sách token"
+        },
+        {
+          "slug": "/research/retry-loop-hidden-spend",
+          "label": "Chi tiêu ẩn của vòng lặp thử lại"
+        }
+      ]
+    },
+    "ar": {
+      "title": "المخرجات المنظمة ليست مجانية",
+      "titleCore": "تكلفة الرموز في وضع JSON والمخططات",
+      "description": "وضع JSON ومخططات الأدوات يجعلان المخرجات قابلة للتحليل ويضيفان رموزاً على جانبي كل استدعاء. إليك أين تقع هذه الكلفة وكيف تخفضها.",
+      "body": "<p>يبدو طلب مخرجات منظمة من النموذج خياراً في التنسيق. لكنه على الفاتورة خيار في الحجم، ويظهر في ثلاثة أماكن في آن واحد.</p><h2>المخطط تكلفة إدخال في كل طلب</h2><p>يُسلسَل تنسيق الاستجابة أو تعريف الأداة ضمن الطلب. مخطط متواضع &mdash; اثنا عشر حقلاً مع وصف لكل منها وكائنان متداخلان &mdash; يبلغ بضع مئات من الرموز. وهذا صغير إلى أن تضربه في كل استدعاء وفي كل دورة طوال عمر الميزة. مخطط من 400 رمز على مليون استدعاء يعني 400 مليون رمز إدخال تدفع ثمنها لتصف شكلاً لا يتغير أبداً.</p><p>والأسوأ أن المخططات توضع عادةً <em>بعد</em> الجزء المتغير من المطالبة في التنفيذات الساذجة، مما يكسر البادئة المخزنة مؤقتاً. فيُحاسَب المخطط بالسعر الكامل في كل مرة <em>ويُهدر</em> الخصم على كل ما قبله.</p><h2>الصياغة تكلفة إخراج</h2><p>كل قوس وعلامة اقتباس وفاصلة واسم حقل في الاستجابة رمز مُولَّد تُحاسَب عليه بسعر الإخراج. أسماء الحقول المطولة رسم متكرر: <code>customer_shipping_address_line_one</code> يكلّف أكثر، إلى الأبد، من <code>addr1</code>. والكائنات المتداخلة بعمق تدفع ثمن هيكلها نفسه. وفي الإجابات القصيرة الملفوفة بغلاف كبير قد تتجاوز البنية المحتوى فعلاً.</p><h2>إعادة المحاولة هي الجزء المكلف</h2><p>فك الترميز المقيَّد لدى كبار المزودين يجعل مخالفات المخطط نادرة، لكن إخفاقات التحقق ما زالت تحدث &mdash; حقل لا يستطيع النموذج ملأه بأمانة، أو تعداد لا إجابة صحيحة له، أو مخطط غامض لأي قارئ. كل إخفاق يكلّف إعادة محاولة كاملة: كل رموز الإدخال مرة أخرى، وكل رموز الإخراج مرة أخرى، إضافة إلى الكمون. معدل غير صالح بنسبة 2% على نقطة نهاية عالية الحجم يعني زيادة 2% في التكلفة دون مقابل.</p><h2>ما الذي تفعله فعلاً</h2><p>ضع المخطط في البادئة الثابتة ليُخزَّن مؤقتاً، وأبقه متطابقاً بين الاستدعاءات. اطلب الحقول التي تستهلكها فقط &mdash; فالحقول الزائدة تُدفع مرتين، مرة في المخطط ومرة في الاستجابة. فضّل أسماء الحقول القصيرة والبنى المسطحة. وحيث يكون المخرج قيمة واحدة فلا تلفّه في كائن أصلاً. وقِس معدل إخفاق التحقق: فهو الجزء الوحيد هنا الذي يُعدّ هدراً خالصاً.</p><h2>ذات صلة</h2><ul><li><a href=\"/research/prompt-caching-economics\">اقتصاديات التخزين المؤقت للمطالبات</a></li><li><a href=\"/research/token-budget-implementation\">تنفيذ ميزانية الرموز</a></li><li><a href=\"/research/retry-loop-hidden-spend\">إنفاق حلقة إعادة المحاولة المخفي</a></li></ul>",
+      "faq": [
+        {
+          "question": "هل يكلّف وضع JSON مبلغاً إضافياً؟",
+          "answer": "ليس كرسم إضافي، بل كرموز. المخطط رموز إدخال في كل استدعاء، والأقواس وعلامات الاقتباس وأسماء الحقول رموز إخراج مُحاسَب عليها، وكل إخفاق تحقق يكلّف إعادة محاولة كاملة للجانبين."
+        },
+        {
+          "question": "كيف تقلل كلفة المخرجات المنظمة؟",
+          "answer": "خزّن المخطط مؤقتاً بإبقائه في بادئة مطالبة ثابتة، واطلب الحقول التي تستهلكها فعلاً فقط، واستخدم أسماء حقول قصيرة وبنى مسطحة، وتتبّع معدل إخفاق التحقق لديك."
+        },
+        {
+          "question": "هل تهم أسماء الحقول الطويلة فعلاً؟",
+          "answer": "في ميزة منخفضة الحجم، لا. أما عند مليون استدعاء يومياً فكل رمز زائد في اسم الحقل يُولَّد ويُحاسَب في كل استجابة، فتصبح التسمية المطولة رسماً دائماً متكرراً."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/prompt-caching-economics",
+          "label": "اقتصاديات التخزين المؤقت للمطالبات"
+        },
+        {
+          "slug": "/research/token-budget-implementation",
+          "label": "تنفيذ ميزانية الرموز"
+        },
+        {
+          "slug": "/research/retry-loop-hidden-spend",
+          "label": "إنفاق حلقة إعادة المحاولة المخفي"
+        }
+      ]
+    },
+    "it": {
+      "title": "L'output strutturato non è gratis",
+      "titleCore": "Il costo in token di JSON mode e schemi",
+      "description": "JSON mode e schemi di tool rendono l'output analizzabile ma aggiungono token su entrambi i lati di ogni chiamata. Dove cade il costo e come ridurlo.",
+      "body": "<p>Chiedere a un modello un output strutturato sembra una scelta di formato. In fattura è una scelta di volume, e incide in tre punti contemporaneamente.</p><h2>Lo schema è un costo di input su ogni richiesta</h2><p>Una response format o una definizione di tool viene serializzata nella richiesta. Uno schema modesto &mdash; una dozzina di campi, una descrizione per ciascuno, un paio di oggetti annidati &mdash; vale qualche centinaio di token. È poco finché lo moltiplichi per ogni chiamata, a ogni turno, per tutta la vita della funzionalità. Uno schema da 400 token su un milione di chiamate sono 400 milioni di token di input che paghi per descrivere una forma che non cambia mai.</p><p>Peggio ancora, nelle implementazioni ingenue lo schema finisce di solito <em>dopo</em> la parte volatile del prompt, e così si rompe il prefisso in cache. Lo schema allora costa il prezzo pieno ogni volta <em>e</em> distrugge lo sconto su tutto ciò che lo precede.</p><h2>La sintassi è un costo di output</h2><p>Ogni parentesi graffa, virgoletta, virgola e nome di campo nella risposta è un token generato, fatturato alla tariffa di output. I nomi di campo prolissi sono un addebito ricorrente: <code>customer_shipping_address_line_one</code> costa per sempre più di <code>addr1</code>. Gli oggetti molto annidati pagano la propria impalcatura. Per risposte brevi racchiuse in un involucro grande, la struttura può superare davvero il contenuto.</p><h2>I retry sono la parte cara</h2><p>La decodifica vincolata dei principali provider rende rare le violazioni dello schema, ma gli errori di validazione succedono comunque: un campo che il modello non può compilare onestamente, un enum senza una risposta giusta, uno schema ambiguo per chi lo legge. Ogni fallimento costa un retry completo: di nuovo tutti i token di input, di nuovo tutti i token di output, più latenza. Un tasso di invalidi del 2% su un endpoint ad alto volume è un aumento di costo del 2% senza nulla in cambio.</p><h2>Cosa fare davvero</h2><p>Metti lo schema nel prefisso stabile così viene messo in cache, e tienilo identico tra una chiamata e l'altra. Chiedi solo i campi che consumi &mdash; i campi extra si pagano due volte, una nello schema e una nella risposta. Preferisci nomi di campo brevi e strutture piatte. Se l'output è un singolo valore, non avvolgerlo affatto in un oggetto. E misura il tasso di fallimento della validazione: è l'unica parte di tutto questo che è puro spreco.</p><h2>Correlati</h2><ul><li><a href=\"/research/prompt-caching-economics\">Economia del prompt caching</a></li><li><a href=\"/research/token-budget-implementation\">Implementazione del budget di token</a></li><li><a href=\"/research/retry-loop-hidden-spend\">Spesa nascosta dei cicli di retry</a></li></ul>",
+      "faq": [
+        {
+          "question": "Il JSON mode costa di più?",
+          "answer": "Non come sovrapprezzo, ma in token. Lo schema sono token di input a ogni chiamata, le parentesi, le virgolette e i nomi di campo sono token di output fatturati, e ogni errore di validazione costa un retry completo su entrambi i lati."
+        },
+        {
+          "question": "Come si riduce il sovraccosto dell'output strutturato?",
+          "answer": "Metti lo schema in un prefisso di prompt stabile per la cache, chiedi solo i campi che usi davvero, usa nomi di campo brevi e strutture piatte, e tieni traccia del tasso di fallimento della validazione."
+        },
+        {
+          "question": "I nomi di campo lunghi contano davvero?",
+          "answer": "Su una funzionalità a basso volume, no. Su un milione di chiamate al giorno, ogni token in più nel nome di un campo viene generato e fatturato a ogni risposta, quindi i nomi prolissi diventano un addebito ricorrente permanente."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/prompt-caching-economics",
+          "label": "Economia del prompt caching"
+        },
+        {
+          "slug": "/research/token-budget-implementation",
+          "label": "Implementazione del budget di token"
+        },
+        {
+          "slug": "/research/retry-loop-hidden-spend",
+          "label": "Spesa nascosta dei cicli di retry"
+        }
+      ]
+    },
+    "ko": {
+      "title": "구조화된 출력은 공짜가 아니다",
+      "titleCore": "JSON 모드와 스키마의 토큰 비용",
+      "description": "JSON 모드와 도구 스키마는 출력을 파싱 가능하게 만들지만, 매 호출의 양쪽에 토큰을 더합니다. 이 오버헤드가 어디에 쌓이는지와 줄이는 방법을 정리합니다.",
+      "body": "<p>모델에 구조화된 출력을 요청하는 것은 형식을 고르는 일처럼 보입니다. 청구서에서는 분량을 고르는 일이며, 그 비용은 세 곳에 동시에 쌓입니다.</p><h2>스키마는 매 요청마다 입력 비용이다</h2><p>응답 형식이나 도구 정의는 요청에 직렬화되어 들어갑니다. 적당한 스키마도 필드 열두 개, 각 필드의 설명, 중첩 객체 몇 개면 수백 토큰입니다. 이는 모든 호출, 모든 턴, 기능의 수명 내내 곱해지기 전까지는 작아 보입니다. 백만 번 호출에 400토큰짜리 스키마를 붙이면, 결코 바뀌지 않는 형태를 설명하기 위해 400 million 입력 토큰을 내는 셈입니다.</p><p>더 나쁜 것은, 순진한 구현에서는 스키마가 프롬프트의 가변 부분<em>뒤</em>에 놓이는 경우가 많다는 점입니다. 그러면 캐시된 접두부가 깨집니다. 스키마는 매번 정가를 내고<em>동시에</em> 그 앞의 모든 내용에 대한 할인까지 없애 버립니다.</p><h2>문법은 출력 비용이다</h2><p>응답의 모든 중괄호, 따옴표, 쉼표, 필드 이름은 생성된 토큰이며 출력 단가로 청구됩니다. 긴 필드 이름은 반복되는 비용입니다. <code>customer_shipping_address_line_one</code>은 <code>addr1</code>보다 영원히 더 비쌉니다. 깊이 중첩된 객체는 자체 뼈대의 비용을 냅니다. 큰 봉투에 담긴 짧은 답변이라면, 구조가 실제 내용보다 더 커질 수 있습니다.</p><h2>재시도가 비싼 부분이다</h2><p>주요 제공업체의 제약 디코딩 덕분에 스키마 위반은 드물지만, 검증 실패는 여전히 일어납니다. 모델이 정직하게 채울 수 없는 필드, 정답이 없는 열거형, 읽는 사람에게 모호한 스키마 같은 경우입니다. 실패할 때마다 전체 재시도 비용이 듭니다. 입력 토큰이 다시 전부 들어가고 출력 토큰도 다시 전부 생성되며, 지연 시간도 늘어납니다. 트래픽이 많은 엔드포인트에서 2% 무효율은 아무 대가 없이 2% 비용이 늘어나는 것입니다.</p><h2>실제로 할 일</h2><p>스키마를 안정적인 접두부에 넣어 캐시되게 하고, 호출마다 동일하게 유지하세요. 실제로 소비하는 필드만 요청하세요. 여분의 필드는 스키마에서 한 번, 응답에서 한 번, 두 번 비용을 냅니다. 짧은 필드 이름과 평평한 구조를 선호하세요. 출력이 단일 값이라면 객체로 감싸지 마세요. 그리고 검증 실패율을 측정하세요. 이 중에서 순수한 낭비는 그 부분뿐입니다.</p><h2>관련 글</h2><ul><li><a href=\"/research/prompt-caching-economics\">프롬프트 캐싱의 경제성</a></li><li><a href=\"/research/token-budget-implementation\">토큰 예산 구현</a></li><li><a href=\"/research/retry-loop-hidden-spend\">재시도 루프에 숨은 지출</a></li></ul>",
+      "faq": [
+        {
+          "question": "JSON 모드는 추가 비용이 드나요?",
+          "answer": "할증 요금으로 붙지는 않지만 토큰으로 비용이 듭니다. 스키마는 매 호출의 입력 토큰이고, 중괄호와 필드 이름은 청구되는 출력 토큰이며, 검증 실패마다 양쪽 모두 전체 재시도 비용이 듭니다."
+        },
+        {
+          "question": "구조화된 출력의 오버헤드는 어떻게 줄이나요?",
+          "answer": "스키마를 안정적인 프롬프트 접두부에 두어 캐시되게 하고, 실제로 소비하는 필드만 요청하고, 짧은 필드 이름과 평평한 구조를 쓰고, 검증 실패율을 추적하세요."
+        },
+        {
+          "question": "긴 필드 이름이 정말 문제가 되나요?",
+          "answer": "호출량이 적은 기능이라면 아닙니다. 하루 백만 번 호출한다면 필드 이름의 추가 토큰 하나하나가 매 응답마다 생성되고 청구되므로, 장황한 이름은 영구적인 반복 비용이 됩니다."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/prompt-caching-economics",
+          "label": "프롬프트 캐싱의 경제성"
+        },
+        {
+          "slug": "/research/token-budget-implementation",
+          "label": "토큰 예산 구현"
+        },
+        {
+          "slug": "/research/retry-loop-hidden-spend",
+          "label": "재시도 루프에 숨은 지출"
+        }
+      ]
+    },
+    "nl": {
+      "title": "Gestructureerde output is niet gratis",
+      "titleCore": "De tokenkosten van JSON-modus en schema's",
+      "description": "JSON-modus en toolschema's maken output parseerbaar, maar kosten tokens aan beide kanten van elke aanroep. Zo verklein je die overhead.",
+      "body": "<p>Een model om gestructureerde output vragen lijkt een opmaakkeuze. Op de rekening is het een volumekeuze, en die landt op drie plekken tegelijk.</p><h2>Het schema is een inputkost bij elk verzoek</h2><p>Een responseformaat of tooldefinitie wordt in het verzoek geserialiseerd. Een bescheiden schema &mdash; een dozijn velden, beschrijvingen bij elk, een paar geneste objecten &mdash; is enkele honderden tokens. Dat is klein totdat je het vermenigvuldigt met elke aanroep, bij elke beurt, voor de hele levensduur van de feature. Een schema van 400 tokens bij een miljoen aanroepen is 400 miljoen inputtokens waarvoor je betaalt om een vorm te beschrijven die nooit verandert.</p><p>Erger nog: in naïeve implementaties staan schema's meestal <em>na</em> het vluchtige deel van de prompt, wat het gecachete prefix breekt. Het schema kost dan elke keer volle prijs <em>en</em> vernietigt de korting op alles ervoor.</p><h2>Syntaxis is een outputkost</h2><p>Elke accolade, aanhalingsteken, komma en veldnaam in het antwoord is een gegenereerd token waarvoor je tegen het outputtarief wordt gefactureerd. Uitgebreide veldnamen zijn een terugkerende kostenpost: <code>customer_shipping_address_line_one</code> kost voor altijd meer dan <code>addr1</code>. Diep geneste objecten betalen voor hun eigen steigerwerk. Bij korte antwoorden in een grote envelop kan de structuur de inhoud echt overtreffen.</p><h2>Retries zijn het dure deel</h2><p>Constrained decoding bij de grote providers maakt schemaschendingen zeldzaam, maar validatiefouten komen nog voor &mdash; een veld dat het model niet eerlijk kan invullen, een enum zonder juist antwoord, een schema dat voor een lezer dubbelzinnig is. Elke fout kost een volledige retry: alle inputtokens opnieuw, alle outputtokens opnieuw, plus latentie. Een ongeldigheidspercentage van 2% op een endpoint met hoog volume is 2% hogere kosten zonder dat daar iets tegenover staat.</p><h2>Wat je concreet moet doen</h2><p>Zet het schema in het stabiele prefix zodat het gecachet wordt en houd het identiek over aanroepen heen. Vraag alleen om velden die je gebruikt &mdash; extra velden betaal je dubbel, eenmaal in het schema en eenmaal in het antwoord. Geef de voorkeur aan korte veldnamen en vlakke structuren. Waar de output één waarde is, verpak die dan helemaal niet in een object. En meet je percentage validatiefouten: dat is het enige deel hiervan dat pure verspilling is.</p><h2>Gerelateerd</h2><ul><li><a href=\"/research/prompt-caching-economics\">Kosteneconomie van prompt-caching</a></li><li><a href=\"/research/token-budget-implementation\">Implementatie van tokenbudgetten</a></li><li><a href=\"/research/retry-loop-hidden-spend\">Verborgen uitgaven in retry-lussen</a></li></ul>",
+      "faq": [
+        {
+          "question": "Kost JSON-modus extra?",
+          "answer": "Niet als toeslag, maar als tokens. Het schema zijn inputtokens bij elke aanroep, de accolades, aanhalingstekens en veldnamen zijn gefactureerde outputtokens, en elke validatiefout kost een volledige retry van beide kanten."
+        },
+        {
+          "question": "Hoe verminder je de overhead van gestructureerde output?",
+          "answer": "Cache het schema door het in een stabiel promptprefix te houden, vraag alleen om velden die je echt gebruikt, gebruik korte veldnamen en vlakke structuren, en volg je percentage validatiefouten."
+        },
+        {
+          "question": "Maken lange veldnamen echt uit?",
+          "answer": "Bij een feature met laag volume niet. Bij een miljoen aanroepen per dag wordt elk extra token in een veldnaam bij elk antwoord gegenereerd en gefactureerd, dus uitgebreide naamgeving wordt een permanente terugkerende kostenpost."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/prompt-caching-economics",
+          "label": "Kosteneconomie van prompt-caching"
+        },
+        {
+          "slug": "/research/token-budget-implementation",
+          "label": "Implementatie van tokenbudgetten"
+        },
+        {
+          "slug": "/research/retry-loop-hidden-spend",
+          "label": "Verborgen uitgaven in retry-lussen"
+        }
+      ]
+    },
+    "zh": {
+      "title": "结构化输出并不免费",
+      "titleCore": "JSON 模式与模式定义的 token 成本",
+      "description": "JSON 模式和工具模式让输出可解析，同时在每次调用的两端都增加 token。本文说明开销出现在哪里，以及如何削减。",
+      "body": "<p>请求结构化输出看起来像是格式上的选择。在账单上，它却是一个用量选择，并且同时落在三个地方。</p><h2>模式是每次请求都要付的输入成本</h2><p>响应格式或工具定义会被序列化进请求。一个中等规模的模式（十几个字段、每个字段都有描述、若干嵌套对象）大约是几百个 token。每次调用、每一轮、在功能的整个生命周期里都要乘上去，这个数字就不小了。一个 400 token 的模式乘以一百万次调用（400 × 1,000,000），就是 4 亿个输入 token，只为描述一个从不变化的结构。</p><p>更糟的是，在朴素实现中，模式通常位于提示词易变部分<em>之后</em>，这会破坏缓存前缀。于是模式每次都按全价计费，<em>还</em>会抵消它前面所有内容的折扣。</p><h2>语法是输出成本</h2><p>响应中的每一个大括号、引号、逗号和字段名，都是按输出单价计费的生成 token。冗长的字段名是一笔持续的固定开销：<code>customer_shipping_address_line_one</code> 永远比 <code>addr1</code> 贵。深层嵌套对象自身的骨架也要付费。对于包在大信封里的短答案，结构部分甚至可能超过内容本身。</p><h2>重试才是真正昂贵的部分</h2><p>主流提供商的约束解码让模式违规变得罕见，但校验失败依然会发生：模型无法诚实填写的字段、没有正确答案的枚举、对读者来说有歧义的模式。每次失败都要付出一次完整重试：所有输入 token 再来一遍，所有输出 token 再来一遍，外加延迟。在高流量端点上，2% 的无效率就意味着成本增加 2%，却没有任何回报。</p><h2>实际该怎么做</h2><p>把模式放进稳定前缀以便缓存，并在各次调用之间保持完全一致。只请求你实际消费的字段，因为多余字段要付两次费：一次在模式里，一次在响应里。优先使用短字段名和扁平结构。如果输出只是单个值，就不要把它包进对象。最后，测量你的校验失败率，这是其中唯一纯粹的浪费。</p><h2>相关</h2><ul><li><a href=\"/research/prompt-caching-economics\">提示词缓存的经济学</a></li><li><a href=\"/research/token-budget-implementation\">Token 预算的实现</a></li><li><a href=\"/research/retry-loop-hidden-spend\">重试循环的隐性支出</a></li></ul>",
+      "faq": [
+        {
+          "question": "JSON 模式需要额外收费吗？",
+          "answer": "不以附加费的形式收取，而是以 token 计费：模式在每次调用中都作为输入 token 计费，大括号、引号和字段名作为输出 token 计费，每次校验失败都要把两端的内容完整重试一次。"
+        },
+        {
+          "question": "如何降低结构化输出的开销？",
+          "answer": "把模式放在稳定的提示词前缀中以便缓存，只请求你实际使用的字段，使用短字段名和扁平结构，并持续跟踪校验失败率。"
+        },
+        {
+          "question": "长字段名真的有影响吗？",
+          "answer": "在低流量功能上没有太大影响。但每天一百万次调用时，字段名中每多出一个 token，都会在每次响应中生成并计费，冗长的命名就变成了永久性的经常性开销。"
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/prompt-caching-economics",
+          "label": "提示词缓存的经济学"
+        },
+        {
+          "slug": "/research/token-budget-implementation",
+          "label": "Token 预算的实现"
+        },
+        {
+          "slug": "/research/retry-loop-hidden-spend",
+          "label": "重试循环的隐性支出"
         }
       ]
     }

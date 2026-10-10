@@ -272,6 +272,176 @@
           "label": "حواجز إنفاق الوكلاء المستقلين"
         }
       ]
+    },
+    "id": {
+      "title": "Kendalikan overhead token definisi tool MCP",
+      "titleCore": "Kendalikan overhead token definisi tool MCP dalam alur kerja agen",
+      "description": "Banyak server MCP menyuntikkan ribuan token skema per giliran. Cara memangkas skema, menyimpan definisi tool dalam cache, dan mengendalikan beban prompt.",
+      "body": "<p>Menghubungkan agen AI ke beberapa server Model Context Protocol (MCP) menyuntikkan ribuan token input di setiap giliran, sebelum model membaca satu kata pun dari maksud pengguna. Setiap tool yang terdaftar menambahkan skema JSON yang berisi nama fungsi, deskripsi parameter, definisi enum, dan batasan tipe. Di ruang kerja perusahaan dengan 6 server MCP yang terhubung (GitHub, Postgres, Slack, Jira, Brave Search, Filesystem), pembukaan tool ini memakan 4.500 hingga 12.000 token input per panggilan API. Pada 30 giliran dalam satu tugas, overhead statis itu menghabiskan $0,35 hingga $1,20 hanya untuk redundansi skema.</p><h2>Anatomi beban skema MCP</h2><p>Model Context Protocol menetapkan antarmuka JSON-RPC standar antara klien dan server untuk kemampuan LLM. Namun, model bahasa tidak bisa menyimpulkan ketersediaan tool tanpa penyuntikan skema yang eksplisit, baik di system prompt maupun di blok parameter definisi tool. Ketika engineer menghubungkan server MCP database dengan 24 tool inspeksi skema dan SQL, skema JSON lengkap harus disajikan ke model pada setiap giliran inferensi agar mekanisme attention dapat merutekan pemanggilan tool. Karena penagihan API standar menghitung seluruh token input di setiap permintaan, katalog tool yang tidak dikelola menciptakan beban dasar yang langsung dan linier di semua operasi agen.</p><h2>Mengapa definisi tool server MCP memakan begitu banyak token?</h2><p>Setiap definisi tool MCP membutuhkan metadata yang panjang: nama parameter, properti bertingkat, deskripsi yang bisa dibaca manusia, dan header spesifikasi JSON Schema. Satu tool kueri database yang terperinci sering memakan 350 hingga 600 token. Di puluhan tool yang tersebar di beberapa server MCP departemen, jendela konteks awal terisi oleh kontrak tool statis, bukan riwayat percakapan yang dinamis.</p><h2>Tiga arsitektur untuk menghilangkan overhead MCP</h2><p>Tim engineering yang menjalankan armada agen produksi menerapkan tiga strategi mitigasi untuk mengendalikan inflasi token tool:</p><ul><li><strong>Breakpoint prompt caching:</strong> Letakkan definisi tool MCP yang statis sebelum riwayat percakapan dinamis dalam struktur prompt, dan pasang breakpoint prompt caching secara eksplisit tepat setelah blok tool. Pada Anthropic, OpenAI, dan Google Gemini yang mendukung TTL cache 5 menit atau 1 jam, cache hit menurunkan biaya token input skema tool sebesar 75% hingga 90% setelah giliran pertama.</li><li><strong>Pendaftaran tool dua tahap dinamis:</strong> Hindari mengekspos semua tool MCP secara global. Gunakan model router ringan atau indeks semantik untuk mengidentifikasi domain tool spesifik yang dibutuhkan prompt pengguna, lalu injeksikan secara dinamis hanya 3 hingga 5 skema tool yang relevan ke payload agen eksekusi.</li><li><strong>Kompresi skema dan minifikasi deskripsi:</strong> Hapus format yang bertele-tele, hilangkan deskripsi markdown di dalam string JSON Schema, dan ganti penjelasan field yang panjang dengan definisi tipe yang ringkas. Minifikasi skema yang agresif biasanya memangkas volume payload definisi tool sebesar 35% hingga 50% tanpa menurunkan akurasi pemilihan tool.</li></ul><h2>Bagaimana tim engineering bisa mengurangi overhead token tool MCP?</h2><p>Tim mengurangi overhead MCP dengan memasang breakpoint prompt cache setelah deklarasi tool, menerapkan perutean tool semantik dua tahap, dan memperkecil deskripsi properti JSON Schema yang berlebihan.</p><h2>Bisakah prompt caching menghilangkan biaya token skema MCP?</h2><p>Prompt caching memang tidak sepenuhnya menghilangkan latensi pemrosesan token, tetapi biaya penagihan token definisi tool yang berulang bisa turun hingga 90% pada model yang mendukung prefix caching, selama blok definisi tool tetap sama di giliran-giliran berikutnya.</p>",
+      "faq": [
+        {
+          "question": "Mengapa definisi tool server MCP memakan begitu banyak token?",
+          "answer": "Setiap tool MCP membutuhkan deklarasi JSON Schema lengkap yang mencakup spesifikasi parameter, objek bertingkat, dan panduan deskriptif, sehingga terakumulasi 300 hingga 600 token per fungsi."
+        },
+        {
+          "question": "Bagaimana tim engineering bisa mengurangi overhead token tool MCP?",
+          "answer": "Dengan memasang breakpoint prompt cache setelah deklarasi tool, menerapkan perutean tool semantik dua tahap, dan memperkecil deskripsi properti JSON Schema yang berlebihan."
+        },
+        {
+          "question": "Bisakah prompt caching menghilangkan biaya token skema MCP?",
+          "answer": "Prompt caching tidak sepenuhnya menghilangkan latensi pemrosesan, tetapi biaya penagihan token tool yang berulang bisa turun hingga 90% pada model yang mendukung prefix caching, selama blok definisi tool tidak berubah antargiliran."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/server-tools-are-a-separate-invoice",
+          "label": "Server tools dan faktur terpisah"
+        },
+        {
+          "slug": "/research/prompt-caching-economics",
+          "label": "Ekonomi prompt caching"
+        },
+        {
+          "slug": "/research/agent-spend-guardrails",
+          "label": "Pagar pengaman belanja agen"
+        }
+      ]
+    },
+    "pl": {
+      "title": "Ograniczanie narzutu tokenów definicji narzędzi MCP",
+      "titleCore": "Ograniczanie narzutu tokenów definicji narzędzi MCP w workflow agentów",
+      "description": "Wiele serwerów MCP wstrzykuje tysiące tokenów schematu w każdej turze. Jak przycinać schematy, cachować definicje i kontrolować koszt promptów.",
+      "body": "<p>Podłączenie agenta AI do wielu serwerów Model Context Protocol (MCP) wstrzykuje tysiące tokenów wejściowych przy każdej turze, zanim model przeczyta choćby jedno słowo intencji użytkownika. Każde zarejestrowane narzędzie dokleja schemat JSON zawierający nazwy funkcji, opisy parametrów, definicje enumów i ograniczenia typów. W firmowym workspace z 6 podłączonymi serwerami MCP (GitHub, Postgres, Slack, Jira, Brave Search, Filesystem) ta preambuła narzędzi zużywa od 4,500 do 12,000 tokenów wejściowych na każde wywołanie API. Przy 30 turach w ramach jednego zadania ten statyczny narzut kosztuje od 0.35 do 1.20 USD czystej redundancji schematów.</p><h2>Anatomia podatku od schematów MCP</h2><p>Protokół Model Context Protocol definiuje standardowy interfejs klient-serwer oparty na JSON-RPC dla możliwości LLM. Modele językowe nie są jednak w stanie wywnioskować dostępności narzędzi bez jawnego wstrzyknięcia schematu do system promptu lub bloku definicji narzędzi. Gdy inżynier podłącza serwer MCP do bazy danych z 24 narzędziami do inspekcji schematu i zapytań SQL, pełny schemat JSON musi być przedstawiony modelowi przy każdej turze wnioskowania, aby mechanizm uwagi mógł kierować wywołania narzędzi. Ponieważ standardowe rozliczanie API liczy wszystkie tokeny wejściowe przy każdym żądaniu, niekontrolowany katalog narzędzi MCP tworzy natychmiastowy, liniowy podatek bazowy nałożony na wszystkie operacje agenta.</p><h2>Dlaczego definicje narzędzi MCP kosztują tyle tokenów?</h2><p>Każda definicja narzędzia MCP wymaga rozbudowanych metadanych: nazw parametrów, zagnieżdżonych właściwości, czytelnych dla człowieka opisów oraz nagłówków specyfikacji JSON Schema. Pojedyncze, szczegółowe narzędzie do zapytań do bazy danych często zużywa od 350 do 600 tokenów. Przy dziesiątkach narzędzi z wielu serwerów MCP okno kontekstowe jest zajmowane przez statyczne kontrakty narzędzi, a nie przez dynamiczną historię rozmowy.</p><h2>Trzy architektury eliminujące narzut MCP</h2><p>Zespoły inżynierskie utrzymujące produkcyjne floty agentów stosują trzy odrębne strategie ograniczania inflacji tokenów narzędzi:</p><ul><li><strong>Punkty przerwania prompt cachingu:</strong> Umieść statyczne definicje narzędzi MCP przed dynamiczną historią rozmowy w strukturze promptu i ustaw jawny breakpoint cachingu bezpośrednio po bloku narzędzi. W modelach Anthropic, OpenAI i Google Gemini, obsługujących cache o TTL 5 minut lub 1 godzina, trafienia w cache obniżają koszt wejściowy schematu narzędzi o 75% do 90% po pierwszej turze.</li><li><strong>Dwuetapowa dynamiczna rejestracja narzędzi:</strong> Unikaj udostępniania wszystkich narzędzi MCP globalnie. Użyj lekkiego modelu routującego lub indeksu semantycznego, aby określić domenę narzędzi potrzebną dla danego promptu użytkownika, i dynamicznie wstrzykuj do aktywnego payloadu agenta wykonawczego tylko odpowiednie 3–5 schematów narzędzi.</li><li><strong>Kompresja schematów i minifikacja opisów:</strong> Usuń zbędne formatowanie, wyeliminuj opisy w markdownie wewnątrz ciągów JSON Schema i zastąp długie objaśnienia pól zwartymi definicjami typów. Agresywna minifikacja schematów zwykle zmniejsza objętość definicji narzędzi o 35% do 50% bez pogorszenia trafności wyboru narzędzi.</li></ul><h2>Jak zespoły inżynierskie mogą ograniczyć narzut tokenów MCP?</h2><p>Zespoły ograniczają narzut MCP, ustawiając breakpointy prompt cachingu po deklaracjach narzędzi, stosując dwuetapowy semantyczny routing narzędzi i minifikując zbędne opisy właściwości w JSON Schema.</p><h2>Czy prompt caching może wyeliminować koszty schematów MCP?</h2><p>Prompt caching nie usuwa w pełni opóźnień związanych z przetwarzaniem tokenów, ale drastycznie obniża koszt rozliczeniowy powtarzających się tokenów definicji narzędzi, nawet o 90% na modelach obsługujących prefix caching, pod warunkiem że blok definicji narzędzi pozostaje identyczny w kolejnych turach.</p>",
+      "faq": [
+        {
+          "question": "Dlaczego definicje narzędzi serwerów MCP zużywają tak dużo tokenów?",
+          "answer": "Każde narzędzie MCP wymaga pełnej deklaracji JSON Schema z parametrami, zagnieżdżonymi obiektami i opisami, co sumuje się do 300–600 tokenów na funkcję."
+        },
+        {
+          "question": "Jak zespoły inżynierskie mogą ograniczyć narzut tokenów MCP?",
+          "answer": "Zespoły ograniczają narzut MCP, ustawiając breakpointy prompt cachingu po deklaracjach narzędzi, stosując dwuetapowy semantyczny routing narzędzi i minifikując zbędne opisy w JSON Schema."
+        },
+        {
+          "question": "Czy prompt caching może wyeliminować koszty tokenów schematów MCP?",
+          "answer": "Prompt caching nie eliminuje w pełni kosztów przetwarzania, ale może obniżyć koszt powtarzających się tokenów definicji narzędzi nawet o 90% na modelach obsługujących prefix caching, o ile blok narzędzi pozostaje identyczny między turami."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/server-tools-are-a-separate-invoice",
+          "label": "Narzędzia serwerowe i osobne faktury"
+        },
+        {
+          "slug": "/research/prompt-caching-economics",
+          "label": "Ekonomia prompt cachingu"
+        },
+        {
+          "slug": "/research/agent-spend-guardrails",
+          "label": "Limity wydatków agentów"
+        }
+      ]
+    },
+    "ru": {
+      "title": "Контроль токенов определений инструментов MCP",
+      "titleCore": "Контроль токенов определений MCP в агентах",
+      "description": "Подключение нескольких MCP-серверов добавляет тысячи токенов схем на каждый ход. Как сокращать схемы, кэшировать определения и снижать расходы.",
+      "body": "<p>Подключение ИИ-агента к нескольким серверам Model Context Protocol (MCP) добавляет тысячи входных токенов на каждом ходе еще до того, как модель прочитает хотя бы одно слово запроса пользователя. Каждый зарегистрированный инструмент добавляет JSON-схему с именами функций, описаниями параметров, перечислениями и ограничениями типов. В корпоративном рабочем пространстве с 6 подключенными MCP-серверами (GitHub, Postgres, Slack, Jira, Brave Search, Filesystem) эта вступительная часть занимает от 4,500 до 12,000 входных токенов на каждый вызов API. При 30 ходах в рамках одной задачи статичные накладные расходы составляют от $0,35 до $1,20 чистой избыточности схем.</p><h2>Анатомия налога на схемы MCP</h2><p>Model Context Protocol задает стандартный интерфейс JSON-RPC между клиентом и сервером для возможностей языковых моделей. Однако модели не могут узнать о доступности инструмента без явной передачи схемы в системном промпте или в блоке определений инструментов. Когда инженер подключает MCP-сервер для базы данных с 24 инструментами для изучения схемы и выполнения SQL, полная JSON-схема должна передаваться модели на каждом ходе вывода, чтобы она могла выбирать вызовы инструментов. Поскольку стандартная тарификация API учитывает все входные токены в каждом запросе, неуправляемый каталог инструментов MCP создает немедленный линейный базовый налог на все операции агента.</p><h2>Почему определения инструментов MCP стоят так много токенов?</h2><p>Каждое определение инструмента MCP требует подробных метаданных: имен параметров, вложенных свойств, описаний и заголовков спецификации JSON Schema. Один подробный инструмент запроса к базе данных часто занимает от 350 до 600 токенов. При десятках инструментов из нескольких ведомственных MCP-серверов начальное контекстное окно заполняется статичными контрактами инструментов, а не историей диалога.</p><h2>Три архитектуры для устранения накладных расходов MCP</h2><p>Инженерные команды, которые эксплуатируют парки продуктивных агентов, применяют три стратегии снижения раздутия токенов инструментов:</p><ul><li><strong>Точки кэширования промптов:</strong> размещайте статичные определения инструментов MCP перед любой динамической историей диалога и ставьте явную точку кэширования сразу после блока инструментов. На моделях Anthropic, OpenAI и Google Gemini с TTL кэша 5 минут или 1 час попадания в кэш снижают входную стоимость схемы инструментов на 75-90% начиная с первого хода.</li><li><strong>Двухэтапная динамическая регистрация инструментов:</strong> не открывайте все инструменты MCP глобально. Используйте легковесную модель-маршрутизатор или семантический индекс, чтобы определить нужный домен инструментов по запросу пользователя, и динамически добавляйте в полезную нагрузку агента выполнения только 3-5 релевантных схем.</li><li><strong>Сжатие схем и минификация описаний:</strong> удаляйте избыточное форматирование, убирайте markdown из строк JSON Schema и заменяйте длинные пояснения полей компактными определениями типов. Агрессивная минификация обычно уменьшает объем определений инструментов на 35-50% без ухудшения точности выбора инструмента.</li></ul><h2>Как инженерные команды могут снизить накладные расходы токенов MCP?</h2><p>Команды снижают накладные расходы MCP, ставя точки кэширования промптов после объявлений инструментов, применяя двухэтапную семантическую маршрутизацию инструментов и минифицируя избыточные описания свойств JSON-схемы.</p><h2>Может ли кэширование промптов устранить расходы на токены схем MCP?</h2><p>Кэширование промптов не устраняет задержку обработки токенов полностью, но оно снижает стоимость повторяющихся токенов определений инструментов до 90% на моделях, поддерживающих кэширование префикса, при условии что блок определений инструментов остается неизменным между последовательными ходами.</p>",
+      "faq": [
+        {
+          "question": "Почему определения инструментов MCP стоят так много токенов?",
+          "answer": "Каждому инструменту MCP нужна полная декларация JSON Schema с параметрами, вложенными объектами и описаниями; это дает 300-600 токенов на каждую функцию."
+        },
+        {
+          "question": "Как инженерные команды могут снизить накладные расходы токенов MCP?",
+          "answer": "Команды ставят точки кэширования промптов после объявлений инструментов, применяют двухэтапную семантическую маршрутизацию инструментов и минифицируют избыточные описания свойств JSON-схемы."
+        },
+        {
+          "question": "Может ли кэширование промптов полностью устранить расходы на токены схем MCP?",
+          "answer": "Кэширование не устраняет задержку обработки полностью, но на моделях с кэшированием префикса оно снижает стоимость повторяющихся определений инструментов до 90%, если блок остается неизменным."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/server-tools-are-a-separate-invoice",
+          "label": "Серверные инструменты и отдельные счета"
+        },
+        {
+          "slug": "/research/prompt-caching-economics",
+          "label": "Экономика кэширования промптов"
+        },
+        {
+          "slug": "/research/agent-spend-guardrails",
+          "label": "Ограничения расходов агентов"
+        }
+      ]
+    },
+    "tr": {
+      "title": "MCP araç tanımlarının token ek yükünü kontrol edin",
+      "titleCore": "Ajan iş akışlarında MCP araç tanımı token ek yükünü kontrol edin",
+      "description": "Birden çok MCP sunucusu her turda binlerce şema token'ı ekler. Şemaları budama, araç tanımlarını önbelleğe alma ve istem vergisini kontrol etme yolları.",
+      "body": "<p>Bir AI ajanını birden çok Model Context Protocol (MCP) sunucusuna bağlamak, model kullanıcı niyetinin tek bir kelimesini okumadan önce her turda binlerce girdi token'ı ekler. Kayıtlı her araç; fonksiyon adları, parametre açıklamaları, enum tanımları ve tür kısıtları içeren bir JSON şeması ekler. 6 bağlı MCP sunucusu (GitHub, Postgres, Slack, Jira, Brave Search, Filesystem) bulunan kurumsal bir çalışma alanında bu araç önsözü, API çağrısı başına 4,500 ile 12,000 arasında girdi token'ı tüketir. Bir görev boyunca 30 turda bu statik ek yük, saf şema fazlalığı olarak $0.35 ila $1.20 tüketir.</p><h2>MCP şema vergisinin yapısı</h2><p>Model Context Protocol, LLM yetenekleri için standart bir istemci-sunucu JSON-RPC arayüzü tanımlar. Ancak dil modelleri, sistem isteminde ya da araç tanımı parametre bloğunda açık şema enjeksiyonu olmadan araçların kullanılabilirliğini çıkaramaz. Bir mühendis 24 şema inceleme ve SQL aracı içeren bir veritabanı MCP sunucusu bağladığında, dikkat mekanizmasının araç çağrılarını yönlendirebilmesi için tam JSON şeması her çıkarım turunda modele sunulmalıdır. Standart API faturalandırması her istekte toplam girdi token'larını ölçtüğü için, yönetilmeyen MCP araç kataloğu tüm ajan işlemlerinde anında ve doğrusal bir taban vergisi yaratır.</p><h2>MCP araç tanımları neden bu kadar çok token harcar?</h2><p>Her MCP araç tanımı ayrıntılı meta veri gerektirir: parametre adları, iç içe özellikler, insan tarafından okunabilir açıklamalar ve JSON Schema belirtim başlıkları. Tek bir ayrıntılı veritabanı sorgu aracı çoğu zaman 350 ile 600 token tüketir. Birden çok departman MCP sunucusuna yayılan düzinelerce araçta, başlangıç bağlam penceresi dinamik konuşma geçmişi yerine statik araç sözleşmeleriyle dolar.</p><h2>MCP ek yükünü ortadan kaldırmanın üç mimarisi</h2><p>Üretimdeki ajan filolarını işleten mühendislik ekipleri, araç token enflasyonunu kontrol etmek için üç ayrı azaltma stratejisi uygular:</p><ul><li><strong>Prompt caching kesme noktaları:</strong> Statik MCP araç tanımlarını, istem yapısında dinamik konuşma geçmişinden önce yerleştirin ve araç bloğunun hemen ardına açık bir prompt caching kesme noktası koyun. 5 dakika ya da 1 saatlik önbellek TTL'lerini destekleyen Anthropic, OpenAI ve Google Gemini modellerinde, önbellek isabetleri ilk turdan sonra araç şemasının girdi token maliyetini %75 ila %90 azaltır.</li><li><strong>Dinamik iki aşamalı araç kaydı:</strong> Tüm MCP araçlarını genel olarak açmaktan kaçının. Hafif bir yönlendirici model ya da anlamsal dizin kullanarak kullanıcı isteminin gerektirdiği araç alanını belirleyin ve yalnızca ilgili 3–5 araç şemasını yürütme ajanının aktif yüküne dinamik olarak ekleyin.</li><li><strong>Şema sıkıştırma ve açıklama küçültme:</strong> Ayrıntılı biçimlendirmeyi kaldırın, JSON şema dizgileri içindeki markdown açıklamaları silin ve uzun alan açıklamalarını kompakt tür tanımlarıyla değiştirin. Agresif şema küçültme, araç seçim doğruluğunu düşürmeden araç tanımı yükünü genellikle %35 ila %50 azaltır.</li></ul><h2>Mühendislik ekipleri MCP araç token ek yükünü nasıl azaltabilir?</h2><p>Ekipler; araç bildirimlerinden sonra prompt cache kesme noktaları koyarak, iki aşamalı anlamsal araç yönlendirmesi uygulayarak ve gereksiz JSON şeması özellik açıklamalarını küçülterek MCP ek yükünü azaltır.</p><h2>Prompt caching MCP şema token maliyetini ortadan kaldırabilir mi?</h2><p>Prompt caching, token işleme gecikmesini tamamen ortadan kaldıramaz; ancak ön ek önbelleklemeyi destekleyen modellerde, araç tanımı bloğu ardışık turlar boyunca aynı kaldığı sürece, tekrar eden araç tanımı token'larının faturalama maliyetini %90'a varan oranda düşürür.</p>",
+      "faq": [
+        {
+          "question": "MCP araç tanımları neden bu kadar çok token harcar?",
+          "answer": "Her MCP aracı; parametre belirtimleri, iç içe nesneler ve ayrıntılı açıklamalar içeren tam bir JSON Schema bildirimi gerektirir ve fonksiyon başına 300 ile 600 token biriktirir."
+        },
+        {
+          "question": "Mühendislik ekipleri MCP araç token ek yükünü nasıl azaltabilir?",
+          "answer": "Araç bildirimlerinden sonra prompt cache kesme noktaları koyarak, iki aşamalı anlamsal araç yönlendirmesi uygulayarak ve gereksiz JSON şeması özellik açıklamalarını küçülterek."
+        },
+        {
+          "question": "Prompt caching MCP şema token maliyetlerini ortadan kaldırabilir mi?",
+          "answer": "Tamamen ortadan kaldıramaz; ancak araç tanımı bloğu ardışık turlarda aynı kaldığı sürece, ön ek önbellekleme destekleyen modellerde tekrar eden token maliyetini %90'a kadar düşürür."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/server-tools-are-a-separate-invoice",
+          "label": "Sunucu araçları ve ayrı faturalar"
+        },
+        {
+          "slug": "/research/prompt-caching-economics",
+          "label": "Prompt caching ekonomisi"
+        },
+        {
+          "slug": "/research/agent-spend-guardrails",
+          "label": "Ajan harcama korkulukları"
+        }
+      ]
+    },
+    "vi": {
+      "title": "Kiểm soát chi phí token của định nghĩa công cụ MCP",
+      "titleCore": "Kiểm soát chi phí token của định nghĩa công cụ MCP trong quy trình agent",
+      "description": "Kết nối nhiều máy chủ MCP đưa thêm hàng nghìn token schema vào mỗi lượt. Cách cắt tỉa schema, cache định nghĩa công cụ và kiểm soát chi phí prompt.",
+      "body": "<p>Kết nối một AI agent với nhiều máy chủ Model Context Protocol (MCP) đưa vào hàng nghìn token đầu vào ở mỗi lượt, trước khi model đọc được dù chỉ một từ về ý định của người dùng. Mỗi công cụ đã đăng ký thêm vào một JSON schema chứa tên hàm, mô tả tham số, định nghĩa enum và ràng buộc kiểu. Trong một không gian làm việc doanh nghiệp có 6 máy chủ MCP được kết nối (GitHub, Postgres, Slack, Jira, Brave Search, Filesystem), phần mở đầu công cụ này tiêu tốn 4.500 đến 12.000 token đầu vào cho mỗi lần gọi API. Với 30 lượt trong một tác vụ, phần chi phí tĩnh đó làm mất 0,35 đến 1,20 USD chỉ cho sự dư thừa của schema.</p><h2>Cấu trúc của \"thuế schema\" MCP</h2><p>Model Context Protocol thiết lập một giao diện JSON-RPC chuẩn giữa client và server cho các khả năng của LLM. Tuy nhiên, mô hình ngôn ngữ không thể suy ra công cụ nào khả dụng nếu không có schema được đưa tường minh vào system prompt hoặc khối tham số định nghĩa công cụ. Khi một kỹ sư kết nối một máy chủ MCP cơ sở dữ liệu với 24 công cụ kiểm tra schema và SQL, toàn bộ JSON schema phải được trình bày cho mô hình ở mọi lượt suy luận để cơ chế attention định tuyến các lệnh gọi công cụ. Vì billing API tính phí tổng số token đầu vào ở mọi yêu cầu, danh mục công cụ MCP không được quản lý sẽ tạo ra một khoản thuế cơ sở tuyến tính, tức thì trên mọi thao tác của agent.</p><h2>Vì sao định nghĩa công cụ MCP tốn nhiều token đến vậy?</h2><p>Mỗi định nghĩa công cụ MCP cần metadata chi tiết: tên tham số, thuộc tính lồng nhau, mô tả đọc được bằng người và phần đầu đặc tả JSON Schema. Một công cụ truy vấn cơ sở dữ liệu đơn lẻ thường tốn 350 đến 600 token. Với hàng chục công cụ trải qua nhiều máy chủ MCP của các phòng ban, cửa sổ ngữ cảnh ban đầu bị chiếm bởi các hợp đồng công cụ tĩnh thay vì lịch sử hội thoại động.</p><h2>Ba kiến trúc loại bỏ chi phí MCP</h2><p>Các đội kỹ thuật vận hành hạm đội agent trong môi trường production triển khai ba chiến lược giảm thiểu khác nhau để kiểm soát sự phình to token của công cụ:</p><ul><li><strong>Điểm ngắt prompt caching:</strong> Đặt các định nghĩa công cụ MCP tĩnh trước mọi lịch sử hội thoại động trong cấu trúc prompt, và đặt một điểm ngắt prompt caching tường minh ngay sau khối công cụ. Trên Anthropic, OpenAI và Google Gemini với các model hỗ trợ TTL cache 5 phút hoặc 1 giờ, cache hit giảm chi phí token đầu vào của schema công cụ 75% đến 90% kể từ lượt đầu tiên.</li><li><strong>Đăng ký công cụ động hai giai đoạn:</strong> Tránh phơi bày toàn bộ công cụ MCP ở phạm vi toàn cục. Dùng một model định tuyến nhẹ hoặc chỉ mục ngữ nghĩa để xác định miền công cụ cụ thể mà prompt người dùng cần, rồi đưa động chỉ 3 đến 5 schema công cụ liên quan vào payload đang hoạt động của agent thực thi.</li><li><strong>Nén schema và rút gọn mô tả:</strong> Bỏ định dạng dài dòng, loại bỏ mô tả markdown trong chuỗi JSON schema, và thay các giải thích trường dài bằng định nghĩa kiểu gọn. Việc rút gọn schema mạnh tay thường cắt khối lượng payload định nghĩa công cụ 35% đến 50% mà không làm giảm độ chính xác khi chọn công cụ.</li></ul><h2>Làm thế nào các đội kỹ thuật giảm chi phí token của MCP?</h2><p>Các đội giảm chi phí MCP bằng cách đặt điểm ngắt prompt cache sau các khai báo công cụ, áp dụng định tuyến công cụ ngữ nghĩa hai giai đoạn, và rút gọn các mô tả thuộc tính JSON schema thừa.</p><h2>Prompt caching có thể loại bỏ chi phí token của schema MCP không?</h2><p>Dù prompt caching không thể loại bỏ hoàn toàn độ trễ xử lý token, nó giảm mạnh chi phí tính phí của các token định nghĩa công cụ lặp lại, tới 90% trên các model hỗ trợ prefix caching, miễn là khối định nghĩa công cụ không thay đổi qua các lượt liên tiếp.</p>",
+      "faq": [
+        {
+          "question": "Vì sao định nghĩa công cụ MCP tốn nhiều token đến vậy?",
+          "answer": "Mỗi công cụ MCP cần một khai báo JSON Schema đầy đủ, gồm đặc tả tham số, đối tượng lồng nhau và hướng dẫn mô tả, tích lũy từ 300 đến 600 token cho mỗi hàm."
+        },
+        {
+          "question": "Làm thế nào các đội kỹ thuật giảm chi phí token của công cụ MCP?",
+          "answer": "Các đội giảm chi phí MCP bằng cách đặt điểm ngắt prompt cache sau các khai báo công cụ, áp dụng định tuyến công cụ ngữ nghĩa hai giai đoạn, và rút gọn các mô tả thuộc tính JSON schema thừa."
+        },
+        {
+          "question": "Prompt caching có loại bỏ được chi phí token của schema MCP không?",
+          "answer": "Prompt caching không thể loại bỏ hoàn toàn độ trễ xử lý token, nhưng có thể giảm chi phí tính phí của token định nghĩa công cụ lặp lại tới 90% trên các model hỗ trợ prefix caching, miễn là khối định nghĩa công cụ giữ nguyên qua các lượt liên tiếp."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/server-tools-are-a-separate-invoice",
+          "label": "Công cụ máy chủ và hóa đơn riêng"
+        },
+        {
+          "slug": "/research/prompt-caching-economics",
+          "label": "Kinh tế của prompt caching"
+        },
+        {
+          "slug": "/research/agent-spend-guardrails",
+          "label": "Rào chắn chi tiêu cho agent"
+        }
+      ]
     }
   }
 }

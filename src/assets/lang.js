@@ -2,7 +2,7 @@
    When a visitor clicks the EN/ES/FR/DE/JA switcher we drop a long-lived `lang`
    cookie; worker.js reads it and stops auto-redirecting by Accept-Language. */
 (function () {
-	var LANGS = ['en', 'es', 'fr', 'de', 'ja', 'pt', 'it', 'ko', 'zh', 'nl', 'ar'];
+	var LANGS = ['en', 'es', 'fr', 'de', 'ja', 'pt', 'it', 'ko', 'zh', 'nl', 'ar', 'ru', 'tr', 'pl', 'id', 'vi'];
 	document.addEventListener('click', function (e) {
 		var a = e.target.closest ? e.target.closest('.langsw a[hreflang]') : null;
 		if (!a) return;

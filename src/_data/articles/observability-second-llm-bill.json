@@ -15,7 +15,7 @@
       "title": "Your AI observability stack can become a second LLM bill",
       "titleCore": "When AI observability creates a second LLM bill",
       "description": "Tracing, evaluations, summaries, and LLM-as-judge checks improve visibility but can create secondary spend. Allocate it back to the workload being measured.",
-      "body": "<p>AI observability is supposed to explain what an application is spending and why. But many observability features call another model: traces are summarized, prompts are classified, outputs are scored, sessions are clustered, and alerts are generated. If those calls are not attributed, the visibility layer becomes a second LLM bill that looks like infrastructure overhead.</p><h2>Separate product work from measurement work</h2><p>Every model call should carry a purpose field. At minimum, distinguish customer-facing inference, agent tool planning, evaluation, redaction, trace summarization, quality scoring, and alerting. The provider invoice may only show a model and account; your gateway needs to preserve the reason the call existed.</p><p>Do not hide observability calls inside the feature that triggered them. Keep a parent request identifier so the cost can be rolled up to the measured feature without losing the fact that it was secondary spend.</p><h2>Sampling is a budget decision</h2><p>Tracing every request is not automatically the best control. Use full-fidelity capture for failures, new releases, high-value customer tiers, and statistically selected samples. For stable traffic, store compact metadata and retain full prompts or outputs only when policy allows it.</p><p>Sampling must be evaluated against the quality of the signal. A cheap sample that misses rare failures is not an optimization; it is an observability blind spot. Set a minimum detection target and spend budget for each monitoring job.</p><h2>Judge models need a quality bar too</h2><p>LLM-as-judge systems can spend more than the feature they evaluate when they run on every turn or use long context. Cache stable evaluation inputs, batch offline scoring, and route simple classification to a smaller model. Measure judge agreement against human labels before increasing coverage.</p><h2>Allocate the full cost</h2><p>Report direct inference cost and measurement cost separately, then show the combined cost per successful task. A feature that looks cheap before tracing may be expensive after evaluation, summarization, and retention are included. This is especially important when comparing experimentation environments with production.</p><h2>A simple control loop</h2><ul><li>Tag every secondary model call with purpose and parent request ID.</li><li>Set monthly budgets for tracing, evaluation, summarization, and alerting.</li><li>Sample by risk and value, not only by random percentage.</li><li>Batch offline jobs and cache repeatable judgments.</li><li>Review observability cost as a percentage of the workload it measures.</li></ul><h2>Related</h2><ul><li><a href=&quot;/research/llm-usage-metering&quot;>LLM usage metering</a></li><li><a href=&quot;/research/evals-cost-control&quot;>Evaluation cost control</a></li><li><a href=&quot;/research/llm-cost-dashboard&quot;>LLM cost dashboards</a></li></ul>",
+      "body": "<p>AI observability is supposed to explain what an application is spending and why. But many observability features call another model: traces are summarized, prompts are classified, outputs are scored, sessions are clustered, and alerts are generated. If those calls are not attributed, the visibility layer becomes a second LLM bill that looks like infrastructure overhead.</p><h2>Separate product work from measurement work</h2><p>Every model call should carry a purpose field. At minimum, distinguish customer-facing inference, agent tool planning, evaluation, redaction, trace summarization, quality scoring, and alerting. The provider invoice may only show a model and account; your gateway needs to preserve the reason the call existed.</p><p>Do not hide observability calls inside the feature that triggered them. Keep a parent request identifier so the cost can be rolled up to the measured feature without losing the fact that it was secondary spend.</p><h2>Sampling is a budget decision</h2><p>Tracing every request is not automatically the best control. Use full-fidelity capture for failures, new releases, high-value customer tiers, and statistically selected samples. For stable traffic, store compact metadata and retain full prompts or outputs only when policy allows it.</p><p>Sampling must be evaluated against the quality of the signal. A cheap sample that misses rare failures is not an optimization; it is an observability blind spot. Set a minimum detection target and spend budget for each monitoring job.</p><h2>Judge models need a quality bar too</h2><p>LLM-as-judge systems can spend more than the feature they evaluate when they run on every turn or use long context. Cache stable evaluation inputs, batch offline scoring, and route simple classification to a smaller model. Measure judge agreement against human labels before increasing coverage.</p><h2>Allocate the full cost</h2><p>Report direct inference cost and measurement cost separately, then show the combined cost per successful task. A feature that looks cheap before tracing may be expensive after evaluation, summarization, and retention are included. This is especially important when comparing experimentation environments with production.</p><h2>A simple control loop</h2><ul><li>Tag every secondary model call with purpose and parent request ID.</li><li>Set monthly budgets for tracing, evaluation, summarization, and alerting.</li><li>Sample by risk and value, not only by random percentage.</li><li>Batch offline jobs and cache repeatable judgments.</li><li>Review observability cost as a percentage of the workload it measures.</li></ul><h2>Related</h2><ul><li><a href=\"/research/llm-usage-metering\">LLM usage metering</a></li><li><a href=\"/research/evals-cost-control\">Evaluation cost control</a></li><li><a href=\"/research/llm-cost-dashboard\">LLM cost dashboards</a></li></ul>",
       "faq": [
         {
           "question": "Why can AI observability create another LLM bill?",
@@ -274,6 +274,176 @@
         {
           "slug": "/research/evals-cost-control",
           "label": "大模型评测成本控制策略"
+        }
+      ]
+    },
+    "id": {
+      "title": "Observabilitas AI bisa menjadi tagihan LLM kedua",
+      "titleCore": "Observabilitas AI sebagai tagihan LLM kedua",
+      "description": "Tracing, evaluasi, ringkasan, dan pemeriksaan LLM-as-judge menambah visibilitas tetapi memunculkan belanja sekunder. Bebankan ke workload yang diukur.",
+      "body": "<p>Observabilitas AI seharusnya menjelaskan apa yang dibelanjakan sebuah aplikasi dan alasannya. Namun banyak fitur observabilitas memanggil model lain: trace diringkas, prompt diklasifikasikan, output dinilai, sesi dikelompokkan, dan alert dibuat. Jika panggilan itu tidak diatribusikan, lapisan visibilitas berubah menjadi tagihan LLM kedua yang tampak seperti beban infrastruktur.</p><h2>Pisahkan pekerjaan produk dari pekerjaan pengukuran</h2><p>Setiap panggilan model sebaiknya membawa field tujuan. Minimal, bedakan inferensi untuk pengguna, perencanaan tool agent, evaluasi, redaksi, ringkasan trace, penilaian kualitas, dan alerting. Invoice penyedia mungkin hanya menampilkan model dan akun; gateway Anda perlu menyimpan alasan panggilan itu ada.</p><p>Jangan sembunyikan panggilan observabilitas di dalam fitur yang memicunya. Simpan identifier permintaan induk agar biaya dapat digabungkan ke fitur yang diukur tanpa kehilangan fakta bahwa itu belanja sekunder.</p><h2>Sampling adalah keputusan anggaran</h2><p>Melacak setiap permintaan tidak otomatis menjadi kontrol terbaik. Gunakan capture penuh untuk kegagalan, rilis baru, tier pelanggan bernilai tinggi, dan sampel yang dipilih secara statistik. Untuk trafik yang stabil, simpan metadata ringkas dan simpan prompt atau output lengkap hanya jika kebijakan mengizinkan.</p><p>Sampling harus dievaluasi terhadap kualitas sinyal. Sampel murah yang melewatkan kegagalan langka bukan optimasi; itu titik buta observabilitas. Tetapkan target deteksi minimum dan anggaran belanja untuk setiap pekerjaan pemantauan.</p><h2>Model juri juga membutuhkan standar kualitas</h2><p>Sistem LLM-as-judge bisa menghabiskan lebih dari fitur yang dievaluasinya ketika berjalan pada setiap giliran atau memakai konteks panjang. Simpan input evaluasi yang stabil di cache, lakukan penilaian offline secara batch, dan arahkan klasifikasi sederhana ke model yang lebih kecil. Ukur kesepakatan juri dengan label manusia sebelum menambah cakupan.</p><h2>Alokasikan seluruh biaya</h2><p>Laporkan biaya inferensi langsung dan biaya pengukuran secara terpisah, lalu tampilkan gabungan biaya per tugas yang berhasil. Fitur yang tampak murah sebelum tracing bisa menjadi mahal setelah evaluasi, ringkasan, dan retensi ikut dihitung. Ini penting terutama saat membandingkan lingkungan eksperimen dengan produksi.</p><h2>Loop kontrol sederhana</h2><ul><li>Beri tag setiap panggilan model sekunder dengan tujuan dan ID permintaan induk.</li><li>Tetapkan anggaran bulanan untuk tracing, evaluasi, ringkasan, dan alerting.</li><li>Sampel berdasarkan risiko dan nilai, bukan hanya persentase acak.</li><li>Jalankan pekerjaan offline secara batch dan simpan di cache penilaian yang berulang.</li><li>Tinjau biaya observabilitas sebagai persentase dari beban kerja yang diukurnya.</li></ul><h2>Terkait</h2><ul><li><a href=\"/research/llm-usage-metering\">Pengukuran pemakaian LLM</a></li><li><a href=\"/research/evals-cost-control\">Kontrol biaya evaluasi</a></li><li><a href=\"/research/llm-cost-dashboard\">Dashboard biaya LLM</a></li></ul>",
+      "faq": [
+        {
+          "question": "Mengapa observabilitas AI bisa menciptakan tagihan LLM lain?",
+          "answer": "Sistem observabilitas dapat memanggil model untuk merangkum trace, mengklasifikasikan prompt, menilai output, mengelompokkan sesi, dan membuat alert. Panggilan itu adalah pemakaian nyata dan perlu tag tujuan serta anggarannya sendiri."
+        },
+        {
+          "question": "Bagaimana biaya model observabilitas sebaiknya dialokasikan?",
+          "answer": "Beri tag pada setiap panggilan sekunder dengan tujuan dan ID permintaan induk. Laporkan terpisah dari inferensi langsung, lalu gabungkan ke fitur yang diukur agar tim melihat biaya pengukuran dan total biaya per tugas yang berhasil."
+        },
+        {
+          "question": "Bagaimana tim dapat memangkas biaya observabilitas LLM dengan aman?",
+          "answer": "Gunakan sampling berbasis risiko, jalankan evaluasi offline secara batch, simpan penilaian yang berulang di cache, arahkan pemeriksaan sederhana ke model lebih kecil, dan pertahankan target deteksi minimum agar pemangkasan biaya tidak menciptakan titik buta."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/llm-usage-metering",
+          "label": "Pengukuran pemakaian LLM"
+        },
+        {
+          "slug": "/research/evals-cost-control",
+          "label": "Kontrol biaya evaluasi"
+        },
+        {
+          "slug": "/research/llm-cost-dashboard",
+          "label": "Dashboard biaya LLM"
+        }
+      ]
+    },
+    "pl": {
+      "title": "Obserwowalność AI może stać się drugim rachunkiem za LLM",
+      "titleCore": "Gdy obserwowalność AI tworzy drugi rachunek za LLM",
+      "description": "Śledzenie, ewaluacje, podsumowania i kontrole LLM-as-a-judge zwiększają widoczność, ale mogą generować dodatkowe wydatki. Przypisz je do mierzonego obciążenia.",
+      "body": "<p>Obserwowalność AI ma wyjaśniać, ile i dlaczego aplikacja wydaje. Wiele jej funkcji samo wywołuje kolejny model: ślady są podsumowywane, prompty klasyfikowane, wyniki oceniane, sesje grupowane, a alerty generowane. Jeśli te wywołania nie są przypisane, warstwa widoczności staje się drugim rachunkiem za LLM, który wygląda jak narzut infrastruktury.</p><h2>Oddziel pracę produktową od pomiarów</h2><p>Każde wywołanie modelu powinno mieć pole z celem. Co najmniej rozróżnij wnioskowanie dla klienta, planowanie wywołań narzędzi przez agenta, ewaluację, redakcję, podsumowywanie śladów, ocenę jakości i alertowanie. Faktura dostawcy zwykle pokazuje tylko model i konto, więc bramka musi zachować powód, dla którego wywołanie istniało.</p><p>Nie chowaj wywołań obserwowalności w funkcji, która je wywołała. Zachowaj identyfikator żądania nadrzędnego, aby koszt dało się zsumować do mierzonej funkcji, nie tracąc informacji, że był to wydatek wtórny.</p><h2>Próbkowanie to decyzja budżetowa</h2><p>Śledzenie każdego żądania nie jest automatycznie najlepszą kontrolą. Pełny zapis stosuj dla błędów, nowych wydań, klientów o wysokiej wartości i statystycznie wybranych próbek. Przy stabilnym ruchu zapisuj zwięzłe metadane, a pełne prompty lub odpowiedzi zachowuj tylko wtedy, gdy pozwala na to polityka.</p><p>Próbkowanie należy oceniać przez pryzmat jakości sygnału. Tania próbka, która pomija rzadkie awarie, nie jest optymalizacją, lecz martwym polem obserwowalności. Ustal minimalny cel wykrywania i budżet wydatków dla każdego zadania monitorującego.</p><h2>Modele sędziowskie też potrzebują progu jakości</h2><p>Systemy LLM-as-a-judge mogą kosztować więcej niż ocenianą funkcję, jeśli działają przy każdej turze lub używają długiego kontekstu. Cachuj stabilne dane wejściowe ewaluacji, grupuj ocenę offline i kieruj proste klasyfikacje do mniejszego modelu. Przed zwiększeniem pokrycia zmierz zgodność sędziego z etykietami ludzi.</p><h2>Przypisz pełny koszt</h2><p>Raportuj osobno koszt bezpośredniego wnioskowania i koszt pomiaru, a potem pokaż łączny koszt udanego zadania. Funkcja, która przed śledzeniem wygląda tanio, po uwzględnieniu ewaluacji, podsumowań i retencji może być droga. Jest to szczególnie ważne przy porównywaniu środowisk eksperymentalnych z produkcją.</p><h2>Prosta pętla kontrolna</h2><ul><li>Oznaczaj każde wtórne wywołanie modelu celem i identyfikatorem żądania nadrzędnego.</li><li>Ustal miesięczne budżety na śledzenie, ewaluację, podsumowywanie i alertowanie.</li><li>Próbkuj według ryzyka i wartości, nie tylko według losowego procentu.</li><li>Grupuj zadania offline i cachuj powtarzalne oceny.</li><li>Oceniaj koszt obserwowalności jako procent obciążenia, które mierzy.</li></ul><h2>Powiązane</h2><ul><li><a href=\"/research/llm-usage-metering\">Pomiar zużycia LLM</a></li><li><a href=\"/research/evals-cost-control\">Kontrola kosztów ewaluacji</a></li><li><a href=\"/research/llm-cost-dashboard\">Pulpity kosztów LLM</a></li></ul>",
+      "faq": [
+        {
+          "question": "Dlaczego obserwowalność AI może tworzyć kolejny rachunek za LLM?",
+          "answer": "Systemy obserwowalności mogą wywoływać modele, aby podsumować ślady, klasyfikować prompty, oceniać wyniki, grupować sesje i generować alerty. Te wywołania są realnym zużyciem i wymagają własnych znaczników celu oraz budżetów."
+        },
+        {
+          "question": "Jak przypisywać koszty modeli używanych w obserwowalności?",
+          "answer": "Oznacz każde wtórne wywołanie jego celem i identyfikatorem żądania nadrzędnego. Raportuj je osobno od bezpośredniego wnioskowania, a potem zsumuj do mierzonej funkcji, aby zespoły widziały zarówno koszt pomiaru, jak i łączny koszt udanego zadania."
+        },
+        {
+          "question": "Jak zespoły mogą bezpiecznie obniżyć koszty obserwowalności LLM?",
+          "answer": "Stosuj próbkowanie oparte na ryzyku, grupuj ewaluacje offline, cachuj powtarzalne oceny, kieruj proste kontrole do mniejszych modeli i utrzymuj minimalny cel wykrywania, aby cięcia kosztów nie tworzyły martwych pól."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/llm-usage-metering",
+          "label": "Pomiar zużycia LLM"
+        },
+        {
+          "slug": "/research/evals-cost-control",
+          "label": "Kontrola kosztów ewaluacji"
+        },
+        {
+          "slug": "/research/llm-cost-dashboard",
+          "label": "Pulpity kosztów LLM"
+        }
+      ]
+    },
+    "ru": {
+      "title": "Observability для ИИ может стать вторым счётом за LLM",
+      "titleCore": "Когда observability для ИИ создаёт второй счёт за LLM",
+      "description": "Трассировка, оценки, резюме и проверки LLM-as-judge повышают видимость, но создают вторичные расходы. Относите их обратно к нагрузке, которую измеряете.",
+      "body": "<p>Observability для ИИ должна объяснять, на что тратит деньги приложение и почему. Но многие её функции сами вызывают другую модель: трассы резюмируются, промпты классифицируются, выходы оцениваются, сессии группируются, а алерты формируются. Если эти вызовы не атрибутированы, слой видимости превращается во второй счёт за LLM, который выглядит как накладные расходы инфраструктуры.</p><h2>Отделяйте продуктовую работу от измерений</h2><p>У каждого вызова модели должно быть поле с назначением. Как минимум различайте инференс для клиентов, планирование инструментов агентом, оценку, редактирование, резюмирование трасс, оценку качества и алертинг. Счёт провайдера может показывать только модель и аккаунт; ваш шлюз должен сохранять причину, по которой вызов существовал.</p><p>Не прячьте вызовы observability внутри функции, которая их запустила. Сохраняйте идентификатор родительского запроса, чтобы стоимость можно было свести к измеряемой функции и при этом не потерять факт, что это вторичные расходы.</p><h2>Сэмплирование — это бюджетное решение</h2><p>Трассировать каждый запрос — не обязательно лучший контроль. Полную детализацию сохраняйте для сбоев, новых релизов, клиентов высокой ценности и статистически отобранных выборок. Для стабильного трафика храните компактные метаданные и полные промпты или выходы только тогда, когда это разрешает политика.</p><p>Сэмплирование нужно оценивать по качеству сигнала. Дешёвая выборка, которая пропускает редкие сбои, — не оптимизация, а слепая зона наблюдаемости. Задайте минимальную цель обнаружения и бюджет расходов для каждой задачи мониторинга.</p><h2>Судейским моделям тоже нужна планка качества</h2><p>Системы LLM-as-judge могут стоить дороже оцениваемой функции, если работают на каждом ходе или используют длинный контекст. Кэшируйте стабильные входы для оценки, объединяйте офлайн-оценки в батчи и отправляйте простую классификацию на более компактную модель. Прежде чем расширять покрытие, измеряйте согласие судьи с человеческими метками.</p><h2>Относите на нагрузку полную стоимость</h2><p>Отдельно отчитывайтесь о прямой стоимости инференса и стоимости измерений, а затем показывайте совокупную стоимость успешной задачи. Функция, которая кажется дешёвой до трассировки, может стать дорогой, если учесть оценку, резюмирование и хранение. Это особенно важно при сравнении экспериментальных сред с продакшеном.</p><h2>Простой контур управления</h2><ul><li>Помечайте каждый вторичный вызов модели назначением и идентификатором родительского запроса.</li><li>Задайте месячные бюджеты на трассировку, оценку, резюмирование и алертинг.</li><li>Сэмплируйте по риску и ценности, а не только по случайному проценту.</li><li>Объединяйте офлайн-задачи в батчи и кэшируйте повторяющиеся оценки.</li><li>Смотрите на стоимость observability как на процент от нагрузки, которую она измеряет.</li></ul><h2>Связанное</h2><ul><li><a href=\"/research/llm-usage-metering\">Учёт использования LLM</a></li><li><a href=\"/research/evals-cost-control\">Контроль стоимости оценок</a></li><li><a href=\"/research/llm-cost-dashboard\">Дашборды стоимости LLM</a></li></ul>",
+      "faq": [
+        {
+          "question": "Почему observability для ИИ может создать ещё один счёт за LLM?",
+          "answer": "Системы observability могут вызывать модели, чтобы резюмировать трассы, классифицировать промпты, оценивать выходы, группировать сессии и формировать алерты. Это реальное использование, и у него должны быть собственные теги назначения и бюджеты."
+        },
+        {
+          "question": "Как распределять стоимость моделей для observability?",
+          "answer": "Помечайте каждый вторичный вызов назначением и идентификатором родительского запроса. Отчитывайтесь о нём отдельно от прямого инференса, затем сводите к измеряемой функции, чтобы команды видели и стоимость измерений, и общую стоимость успешной задачи."
+        },
+        {
+          "question": "Как безопасно снизить расходы на observability для LLM?",
+          "answer": "Используйте сэмплирование по риску, объединяйте офлайн-оценки в батчи, кэшируйте повторяющиеся суждения, отправляйте простые проверки на более компактные модели и поддерживайте минимальную цель обнаружения, чтобы снижение расходов не создавало слепых зон."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/llm-usage-metering",
+          "label": "Учёт использования LLM"
+        },
+        {
+          "slug": "/research/evals-cost-control",
+          "label": "Контроль стоимости оценок"
+        },
+        {
+          "slug": "/research/llm-cost-dashboard",
+          "label": "Дашборды стоимости LLM"
+        }
+      ]
+    },
+    "tr": {
+      "title": "Gözlemlenebilirlik ikinci bir LLM faturası yaratabilir",
+      "titleCore": "AI gözlemlenebilirliği ikinci bir LLM faturası yarattığında",
+      "description": "İzleme, değerlendirmeler, özetler ve LLM-as-judge kontrolleri görünürlüğü artırır ama ikincil harcama yaratabilir. Ölçülen iş yüküne geri tahsis edin.",
+      "body": "<p>AI gözlemlenebilirliği, bir uygulamanın neye ne kadar harcadığını ve nedenini açıklamak için vardır. Ama birçok gözlemlenebilirlik özelliği başka bir model çağırır: izler özetlenir, istemler sınıflandırılır, çıktılar puanlanır, oturumlar kümelenir ve uyarılar üretilir. Bu çağrılar atfedilmezse, görünürlük katmanı altyapı yükü gibi görünen ikinci bir LLM faturasına dönüşür.</p><h2>Ürün işini ölçüm işinden ayırın</h2><p>Her model çağrısı bir amaç alanı taşımalıdır. En azından müşteriye dönük çıkarımı, ajan araç planlamasını, değerlendirmeyi, gizlemeyi, iz özetlemeyi, kalite puanlamasını ve uyarıları birbirinden ayırın. Sağlayıcı faturası yalnızca bir model ve hesap gösterebilir; ağ geçidiniz çağrının neden var olduğunu korumalıdır.</p><p>Gözlemlenebilirlik çağrılarını, onları tetikleyen özelliğin içine gizlemeyin. Maliyetin ölçülen özelliğe toplanabilmesi için bir üst istek tanımlayıcısı tutun; böylece bunun ikincil harcama olduğu bilgisi kaybolmaz.</p><h2>Örnekleme bir bütçe kararıdır</h2><p>Her isteği izlemek, otomatik olarak en iyi kontrol değildir. Hatalar, yeni sürümler, yüksek değerli müşteri kademeleri ve istatistiksel olarak seçilmiş örnekler için tam ayrıntılı yakalama kullanın. İstikrarlı trafikte kompakt meta veriyi saklayın; tam istemleri ve çıktıları yalnızca politika izin verdiğinde tutun.</p><p>Örneklemeyi sinyalin kalitesine göre değerlendirin. Nadir hataları kaçıran ucuz bir örnek bir optimizasyon değildir; bir gözlemlenebilirlik kör noktasıdır. Her izleme işi için asgari bir tespit hedefi ve harcama bütçesi belirleyin.</p><h2>Hakem modellerin de bir kalite çıtası olmalı</h2><p>LLM-as-judge sistemleri, her turda çalıştıklarında ya da uzun bağlam kullandıklarında, değerlendirdikleri özellikten daha fazla harcayabilir. Sabit değerlendirme girdilerini önbelleğe alın, çevrimdışı puanlamayı toplulaştırın ve basit sınıflandırmayı daha küçük bir modele yönlendirin. Kapsamı artırmadan önce hakem uyumunu insan etiketlerine karşı ölçün.</p><h2>Tam maliyeti tahsis edin</h2><p>Doğrudan çıkarım maliyetini ve ölçüm maliyetini ayrı raporlayın, ardından birleşik başarılı görev başına maliyeti gösterin. Tracing öncesinde ucuz görünen bir özellik, değerlendirme, özetleme ve saklama dahil edildiğinde pahalı olabilir. Bu, deneme ortamlarını üretimle karşılaştırırken özellikle önemlidir.</p><h2>Basit bir kontrol döngüsü</h2><ul><li>Her ikincil model çağrısını amaç ve üst istek tanımlayıcısıyla etiketleyin.</li><li>İzleme, değerlendirme, özetleme ve uyarılar için aylık bütçeler belirleyin.</li><li>Yalnızca rastgele bir yüzdeye göre değil, risk ve değere göre örnekleyin.</li><li>Çevrimdışı işleri toplulaştırın ve tekrarlanabilir yargıları önbelleğe alın.</li><li>Gözlemlenebilirlik maliyetini, ölçtüğü iş yükünün yüzdesi olarak inceleyin.</li></ul><h2>İlgili</h2><ul><li><a href=\"/research/llm-usage-metering\">LLM kullanım ölçümü</a></li><li><a href=\"/research/evals-cost-control\">Değerlendirme maliyet kontrolü</a></li><li><a href=\"/research/llm-cost-dashboard\">LLM maliyet panoları</a></li></ul>",
+      "faq": [
+        {
+          "question": "AI gözlemlenebilirliği neden başka bir LLM faturası yaratabilir?",
+          "answer": "Gözlemlenebilirlik sistemleri izleri özetlemek, istemleri sınıflandırmak, çıktıları puanlamak, oturumları kümelemek ve uyarılar üretmek için model çağırabilir. Bu çağrılar gerçek kullanımdır ve kendi amaç etiketlerine ve bütçelerine ihtiyaç duyar."
+        },
+        {
+          "question": "Gözlemlenebilirlik model maliyetleri nasıl tahsis edilmeli?",
+          "answer": "Her ikincil çağrıyı amacı ve üst istek tanımlayıcısıyla etiketleyin. Doğrudan çıkarımdan ayrı raporlayın, sonra ölçülen özelliğe toplayın; böylece ekipler hem ölçüm maliyetini hem de başarılı görev başına toplam maliyeti görebilir."
+        },
+        {
+          "question": "Ekipler LLM gözlemlenebilirlik maliyetlerini güvenli biçimde nasıl düşürebilir?",
+          "answer": "Riske dayalı örnekleme kullanın, çevrimdışı değerlendirmeleri toplulaştırın, tekrarlanabilir yargıları önbelleğe alın, basit kontrolleri daha küçük modellere yönlendirin ve maliyet düşüşlerinin kör nokta yaratmaması için asgari bir tespit hedefi tutun."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/llm-usage-metering",
+          "label": "LLM kullanım ölçümü"
+        },
+        {
+          "slug": "/research/evals-cost-control",
+          "label": "Değerlendirme maliyet kontrolü"
+        },
+        {
+          "slug": "/research/llm-cost-dashboard",
+          "label": "LLM maliyet panoları"
+        }
+      ]
+    },
+    "vi": {
+      "title": "Observability AI có thể thành hóa đơn LLM thứ hai",
+      "titleCore": "Khi observability AI tạo ra hóa đơn LLM thứ hai",
+      "description": "Tracing, đánh giá, tóm tắt và chấm điểm kiểu LLM-as-judge tăng khả năng quan sát nhưng sinh chi tiêu phụ. Hãy phân bổ lại cho khối lượng công việc được đo.",
+      "body": "<p>Observability AI được kỳ vọng giải thích ứng dụng đang chi tiêu bao nhiêu và vì sao. Nhưng nhiều tính năng observability lại gọi thêm một mô hình: trace được tóm tắt, prompt được phân loại, đầu ra được chấm điểm, phiên được gom cụm và cảnh báo được tạo ra. Nếu các lời gọi này không được quy kết, lớp quan sát sẽ trở thành một hóa đơn LLM thứ hai trông như chi phí hạ tầng.</p><h2>Tách công việc sản phẩm khỏi công việc đo lường</h2><p>Mỗi lời gọi mô hình nên mang một trường mục đích. Tối thiểu cần phân biệt suy luận hướng khách hàng, lập kế hoạch công cụ của agent, đánh giá, che dữ liệu nhạy cảm, tóm tắt trace, chấm điểm chất lượng và cảnh báo. Hóa đơn của nhà cung cấp có thể chỉ hiện mô hình và tài khoản; gateway của bạn cần giữ lại lý do lời gọi tồn tại.</p><p>Đừng giấu các lời gọi observability bên trong tính năng đã kích hoạt chúng. Hãy giữ một định danh yêu cầu cha để chi phí có thể cộng dồn về tính năng được đo mà vẫn thấy rõ đó là chi tiêu phụ.</p><h2>Lấy mẫu là một quyết định ngân sách</h2><p>Theo dõi mọi yêu cầu không phải lúc nào cũng là biện pháp kiểm soát tốt nhất. Dùng ghi nhận đầy đủ cho lỗi, bản phát hành mới, nhóm khách hàng giá trị cao và các mẫu được chọn theo thống kê. Với lưu lượng ổn định, chỉ lưu metadata gọn và giữ prompt hoặc đầu ra đầy đủ khi chính sách cho phép.</p><p>Việc lấy mẫu phải được đánh giá theo chất lượng tín hiệu. Một mẫu rẻ bỏ sót các lỗi hiếm không phải là tối ưu hóa; đó là điểm mù của observability. Hãy đặt mục tiêu phát hiện tối thiểu và ngân sách chi tiêu cho từng công việc giám sát.</p><h2>Mô hình chấm điểm cũng cần chuẩn chất lượng</h2><p>Hệ thống LLM-as-judge có thể tốn hơn cả tính năng nó đánh giá khi chạy trên mọi lượt hoặc dùng ngữ cảnh dài. Hãy lưu đệm các đầu vào đánh giá ổn định, gom các chấm điểm offline thành lô, và định tuyến phân loại đơn giản sang mô hình nhỏ hơn. Đo mức đồng thuận của judge với nhãn người trước khi mở rộng độ phủ.</p><h2>Phân bổ toàn bộ chi phí</h2><p>Báo cáo chi phí suy luận trực tiếp và chi phí đo lường tách riêng, rồi cho thấy chi phí kết hợp trên mỗi tác vụ thành công. Một tính năng trông rẻ trước khi bật tracing có thể đắt sau khi tính đánh giá, tóm tắt và lưu trữ. Điều này đặc biệt quan trọng khi so sánh môi trường thử nghiệm với production.</p><h2>Một vòng kiểm soát đơn giản</h2><ul><li>Gắn nhãn mọi lời gọi mô hình phụ bằng mục đích và ID yêu cầu cha.</li><li>Đặt ngân sách hàng tháng cho tracing, đánh giá, tóm tắt và cảnh báo.</li><li>Lấy mẫu theo rủi ro và giá trị, không chỉ theo tỷ lệ ngẫu nhiên.</li><li>Gom công việc offline thành lô và lưu đệm các phán đoán có thể lặp lại.</li><li>Xem chi phí observability như một tỷ lệ phần trăm của khối lượng công việc nó đo.</li></ul><h2>Liên quan</h2><ul><li><a href=\"/research/llm-usage-metering\">Đo lường mức dùng LLM</a></li><li><a href=\"/research/evals-cost-control\">Kiểm soát chi phí đánh giá</a></li><li><a href=\"/research/llm-cost-dashboard\">Bảng điều khiển chi phí LLM</a></li></ul>",
+      "faq": [
+        {
+          "question": "Vì sao observability AI có thể tạo thêm một hóa đơn LLM?",
+          "answer": "Các hệ thống observability có thể gọi mô hình để tóm tắt trace, phân loại prompt, chấm điểm đầu ra, gom cụm phiên và tạo cảnh báo. Đó là mức dùng thật nên cần nhãn mục đích và ngân sách riêng."
+        },
+        {
+          "question": "Chi phí mô hình của observability nên được phân bổ thế nào?",
+          "answer": "Gắn nhãn từng lời gọi phụ với mục đích và ID yêu cầu cha. Báo cáo riêng khỏi suy luận trực tiếp, rồi cộng dồn về tính năng được đo để thấy cả chi phí đo lường lẫn tổng chi phí mỗi tác vụ thành công."
+        },
+        {
+          "question": "Làm sao giảm chi phí observability LLM mà vẫn an toàn?",
+          "answer": "Dùng lấy mẫu theo rủi ro, chạy đánh giá offline theo lô, lưu đệm phán đoán lặp lại, định tuyến kiểm tra đơn giản sang mô hình nhỏ hơn, và giữ mục tiêu phát hiện tối thiểu để cắt giảm không tạo ra điểm mù."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/llm-usage-metering",
+          "label": "Đo lường mức dùng LLM"
+        },
+        {
+          "slug": "/research/evals-cost-control",
+          "label": "Kiểm soát chi phí đánh giá"
+        },
+        {
+          "slug": "/research/llm-cost-dashboard",
+          "label": "Bảng điều khiển chi phí LLM"
         }
       ]
     }

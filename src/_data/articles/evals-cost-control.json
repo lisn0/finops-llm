@@ -263,6 +263,176 @@
           "label": "مراقبة تكاليف النماذج اللغوية"
         }
       ]
+    },
+    "id": {
+      "title": "Kontrol biaya di dalam pipeline evaluasi LLM",
+      "titleCore": "Kontrol biaya di dalam pipeline evaluasi LLM",
+      "description": "Cara menganggarkan, mengambil sampel, men-cache, dan menggerbang evaluasi LLM otomatis tanpa membiarkan pengujian kualitas menjadi tagihan tak terbatas.",
+      "body": "<p>Evaluasi LLM membutuhkan kebijakan biayanya sendiri. Job CI yang menjalankan 10.000 prompt di setiap perubahan bisa menjadi tagihan yang lebih besar daripada fitur yang dilindunginya. Kendalikan belanja evaluasi dengan anggaran per run, sampling yang representatif, fixture yang di-cache, dan quality gate yang berhenti lebih awal ketika perubahan jelas gagal.</p><h2>Anggarkan run-nya</h2><p>Tetapkan batas untuk prompt, kandidat model, retry, dan dolar sebelum evaluator mulai. Pisahkan smoke test pull request dari suite regresi malam hari dan sertifikasi rilis. Anggaran termasuk dalam rencana pengujian, bukan dashboard yang ditinjau setelah tagihan datang.</p><h2>Ambil sampel untuk sinyal</h2><p>Stratifikasi kumpulan uji berdasarkan alur kerja, dampak pelanggan, tingkat kesulitan, dan mode kegagalan yang diketahui. Sepuluh ribu prompt yang hampir identik memberi informasi lebih sedikit daripada kumpulan yang lebih kecil namun mencakup batas keputusan. Simpan versi sampel dan perkirakan tingkat kepercayaan hasilnya.</p><h2>Cache yang stabil</h2><p>Cache fixture yang tidak berubah, konteks yang diambil, dan penilaian referensi jika pengujian tidak bergantung pada generasi baru. Catat pembacaan dan penulisan cache sebagai biaya evaluasi. Pengujian yang di-cache tidak gratis; biayanya lebih murah dan tetap harus bisa diatribusikan.</p><h2>Gerbang berdasarkan kualitas dan biaya</h2><p>Hentikan run ketika kandidat tidak mencapai batas kualitas minimum atau melampaui batas biaya maksimum. Bandingkan biaya per tugas yang berhasil, bukan hanya token per pengujian. Simpan data model, kumpulan prompt, token, retry, dan hasil agar sebuah rilis bisa direproduksi dan ekonominya bisa dijelaskan.</p><p>Disiplin evaluasi bukan tentang menguji lebih sedikit. Ini tentang membelanjakan untuk bukti yang bisa mengubah keputusan rilis.</p><h2>Terkait</h2><ul><li>Biaya per tugas yang berhasil</li><li>Pemantauan biaya LLM</li><li>Analisis varians belanja AI</li></ul>",
+      "faq": [
+        {
+          "question": "Mengapa evaluasi LLM membutuhkan anggaran?",
+          "answer": "Run evaluasi otomatis melipatgandakan prompt, model, retry, dan pemanggilan alat, sehingga suite CI atau regresi tanpa batas bisa menciptakan tagihan produksi yang signifikan."
+        },
+        {
+          "question": "Bagaimana tim bisa menurunkan biaya evaluasi tanpa kehilangan sinyal?",
+          "answer": "Stratifikasi kasus yang representatif, cache fixture yang stabil, pisahkan suite smoke dan malam hari, dan hentikan run pada ambang kualitas atau dolar yang eksplisit."
+        },
+        {
+          "question": "Apa yang seharusnya dicatat oleh sebuah run evaluasi?",
+          "answer": "Catat versi dataset, model, kumpulan prompt, token, retry, penggunaan cache, biaya, hasil kualitas, dan keputusan rilis."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "Biaya per tugas yang berhasil"
+        },
+        {
+          "slug": "/research/llm-cost-monitoring",
+          "label": "Pemantauan biaya LLM"
+        },
+        {
+          "slug": "/research/ai-spend-variance-bridge",
+          "label": "Varians belanja AI"
+        }
+      ]
+    },
+    "pl": {
+      "title": "Wbuduj kontrolę kosztów w pipeline ewaluacji LLM",
+      "titleCore": "Wbuduj kontrolę kosztów w pipeline ewaluacji LLM",
+      "description": "Jak budżetować, próbkować, cache'ować i bramkować automatyczne ewaluacje LLM, aby testy jakości nie stały się rachunkiem bez limitu.",
+      "body": "<p>Ewaluacje LLM potrzebują własnej polityki kosztów. Job CI uruchamiający 10,000 promptów przy każdej zmianie może kosztować więcej niż funkcja, którą chroni. Kontroluj wydatki na ewaluacje za pomocą budżetu na uruchomienie, reprezentatywnego próbkowania, zbuforowanych fixtures i bramki jakości, która zatrzymuje test wcześnie, gdy zmiana wyraźnie nie przechodzi.</p><h2>Ustal budżet uruchomienia</h2><p>Zdefiniuj limity promptów, modeli kandydujących, ponowień i dolarów, zanim ewaluator wystartuje. Rozdziel szybkie testy dymne dla pull requestów, nocne testy regresji i certyfikację przed wydaniem. Budżet należy do planu testów, a nie do dashboardu sprawdzanego dopiero po otrzymaniu faktury.</p><h2>Próbkuj pod kątem sygnału</h2><p>Stratyfikuj zbiór testowy według procesu, wpływu na klienta, trudności i znanych trybów awarii. Dziesięć tysięcy niemal zduplikowanych promptów daje mniej informacji niż mniejszy zbiór obejmujący granicę decyzji. Zapisuj wersję próbki i oszacuj pewność wyniku.</p><h2>Buforuj to, co stabilne</h2><p>Cache'uj niezmienne fixtures, pobrany kontekst i referencyjne oceny tam, gdzie test nie zależy od świeżego generowania. Odczyty i zapisy cache licz jako koszt ewaluacji. Test z cache nie jest darmowy; jest tańszy, ale nadal powinien być przypisany do konkretnego kosztu.</p><h2>Bramkuj według jakości i kosztu</h2><p>Zatrzymaj uruchomienie, gdy kandydat nie osiąga progu jakości albo przekracza limit kosztu. Porównuj koszt na zakończone sukcesem zadanie, a nie tylko tokeny na test. Zapisuj model, zbiór promptów, tokeny, ponowienia i wyniki, aby wydanie dało się odtworzyć i wyjaśnić jego ekonomię.</p><p>Dyscyplina ewaluacji nie polega na testowaniu mniej. Polega na wydawaniu pieniędzy na dowody, które mogą zmienić decyzję o wydaniu.</p><h2>Powiązane</h2><ul><li>Koszt na zakończone sukcesem zadanie</li><li>Monitoring kosztów LLM</li><li>Odchylenia wydatków na AI</li></ul>",
+      "faq": [
+        {
+          "question": "Dlaczego ewaluacje LLM potrzebują budżetu?",
+          "answer": "Zautomatyzowane ewaluacje mnożą prompty, modele, ponowienia i wywołania narzędzi, więc nieograniczony zestaw testów CI lub regresji może wygenerować znaczący rachunek na produkcji."
+        },
+        {
+          "question": "Jak zespoły mogą obniżyć koszt ewaluacji bez utraty sygnału?",
+          "answer": "Stratyfikuj reprezentatywne przypadki, cache'uj stabilne fixtures, rozdziel testy dymne i nocne oraz zatrzymuj uruchomienia przy jawnych progach jakości lub kwot w dolarach."
+        },
+        {
+          "question": "Co powinno zapisywać uruchomienie ewaluacji?",
+          "answer": "Zapisz wersję zbioru danych, model, zestaw promptów, tokeny, ponowienia, użycie cache, koszt, wynik jakości oraz decyzję o wydaniu."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "Koszt na zakończone sukcesem zadanie"
+        },
+        {
+          "slug": "/research/llm-cost-monitoring",
+          "label": "Monitoring kosztów LLM"
+        },
+        {
+          "slug": "/research/ai-spend-variance-bridge",
+          "label": "Odchylenia wydatków na AI"
+        }
+      ]
+    },
+    "ru": {
+      "title": "Встройте контроль затрат в пайплайн оценки LLM",
+      "titleCore": "Встройте контроль затрат в пайплайн оценки LLM",
+      "description": "Как бюджетировать, сэмплировать, кэшировать и ограничивать автоматические оценки LLM, чтобы тестирование качества не превратилось в неограниченный счёт.",
+      "body": "<p>Оценкам LLM нужна собственная политика расходов. CI-задача, которая запускает 10,000 промптов при каждом изменении, может обойтись дороже защищаемой функции. Контролируйте расходы на оценку с помощью бюджета на запуск, репрезентативной выборки, кэшированных фикстур и гейта качества, который останавливает прогон, когда изменение явно не проходит.</p><h2>Бюджетируйте запуск</h2><p>Задайте лимиты на промпты, кандидатные модели, повторы и доллары до старта оценщика. Отделяйте дымовые тесты для pull request от ночных регрессионных наборов и сертификации релиза. Бюджет принадлежит плану тестирования, а не дашборду, который смотрят после получения счёта.</p><h2>Выбирайте выборку ради сигнала</h2><p>Стратифицируйте тестовый набор по сценарию, влиянию на клиента, сложности и известным типам ошибок. Десять тысяч почти одинаковых промптов дают меньше информации, чем меньший набор, покрывающий границу решения. Сохраняйте версию выборки и оценивайте доверительный интервал результата.</p><h2>Кэшируйте стабильное</h2><p>Кэшируйте неизменяемые фикстуры, извлечённый контекст и эталонные оценки там, где тест не зависит от свежей генерации. Учитывайте чтение и запись кэша как часть стоимости оценки. Кэшированный тест не бесплатен: он дешевле, но его расходы всё равно должны быть атрибутированы.</p><h2>Ограничивайте по качеству и стоимости</h2><p>Останавливайте прогон, когда кандидат не достигает порога качества или превышает потолок стоимости. Сравнивайте стоимость на успешно выполненную задачу, а не только токены на тест. Сохраняйте данные о модели, наборе промптов, токенах, повторах и результатах, чтобы релиз можно было воспроизвести и объяснить его экономику.</p><p>Дисциплина оценки не в том, чтобы тестировать меньше. Она в том, чтобы тратить деньги на доказательства, которые могут изменить решение о релизе.</p><h2>Связанное</h2><ul><li>Стоимость на успешно выполненную задачу</li><li>Мониторинг затрат на LLM</li><li>Анализ отклонений расходов на AI</li></ul>",
+      "faq": [
+        {
+          "question": "Зачем оценкам LLM нужен бюджет?",
+          "answer": "Автоматические оценки умножают промпты, модели, повторы и вызовы инструментов, поэтому неограниченный CI или регрессионный набор может создать существенный счёт в продакшене."
+        },
+        {
+          "question": "Как снизить стоимость оценки без потери сигнала?",
+          "answer": "Стратифицируйте репрезентативные кейсы, кэшируйте стабильные фикстуры, разделяйте дымовые и ночные наборы и останавливайте прогоны по явным порогам качества или стоимости в долларах."
+        },
+        {
+          "question": "Что должен фиксировать запуск оценки?",
+          "answer": "Версию датасета, модель, набор промптов, токены, повторы, использование кэша, стоимость, результат по качеству и решение о релизе."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "Стоимость на успешно выполненную задачу"
+        },
+        {
+          "slug": "/research/llm-cost-monitoring",
+          "label": "Мониторинг затрат на LLM"
+        },
+        {
+          "slug": "/research/ai-spend-variance-bridge",
+          "label": "Анализ отклонений расходов на AI"
+        }
+      ]
+    },
+    "tr": {
+      "title": "LLM değerlendirme hattına maliyet kontrolleri koyun",
+      "titleCore": "LLM değerlendirme hattına maliyet kontrolleri koyun",
+      "description": "Otomatik LLM değerlendirmelerini bütçeleyin, örnekleyin, önbelleğe alın ve kapılayın; kalite testi sınırsız bir faturaya dönüşmesin.",
+      "body": "<p>LLM değerlendirmelerinin kendi maliyet politikasına ihtiyacı vardır. Her değişiklikte 10.000 prompt çalıştıran bir CI işi, koruduğu özellikten daha büyük bir fatura çıkarabilir. Değerlendirme harcamasını çalıştırma başına bütçe, temsili örnekleme, önbelleğe alınmış test verileri ve bir değişiklik açıkça başarısız olduğunda erken duran bir kalite kapısıyla kontrol altında tutun.</p><h2>Çalıştırmayı bütçeleyin</h2><p>Değerlendirici başlamadan önce prompt, aday model, yeniden deneme ve dolar sınırlarını belirleyin. Pull request duman testlerini gece regresyon paketlerinden ve sürüm onayından ayırın. Bütçe, faturadan sonra incelenen bir panele değil, test planına aittir.</p><h2>Sinyal için örnekleyin</h2><p>Test setini iş akışına, müşteri etkisine, zorluk düzeyine ve bilinen hata modlarına göre katmanlara ayırın. On bin neredeyse aynı prompt, karar sınırını kapsayan daha küçük bir setten daha az bilgi üretir. Örnek sürümünü saklayın ve sonucun güven düzeyini tahmin edin.</p><h2>Stabil olanı önbelleğe alın</h2><p>Test taze üretime bağlı değilse, değişmez test verilerini, alınan bağlamı ve referans değerlendirmeleri önbelleğe alın. Önbellek okuma ve yazmalarını değerlendirme maliyeti olarak izleyin. Önbelleğe alınmış bir test ücretsiz değildir; daha ucuzdur ama yine de atfedilebilir olmalıdır.</p><h2>Kalite ve maliyete göre kapılayın</h2><p>Aday model kalite tabanını kaçırdığında ya da maliyet tavanını aştığında çalıştırmayı durdurun. Yalnızca test başına token değil, başarılı görev başına maliyeti karşılaştırın. Model, prompt seti, token, yeniden deneme ve sonuç verilerini kalıcı tutun; böylece bir sürüm yeniden üretilebilir ve ekonomisi açıklanabilir olsun.</p><p>Değerlendirme disiplini daha az test yapmak anlamına gelmez. Bir sürüm kararını değiştirebilecek kanıta harcama yapmak demektir.</p><h2>İlgili</h2><ul><li>Başarılı görev başına maliyet</li><li>LLM maliyet izleme</li><li>AI harcama varyans analizi</li></ul>",
+      "faq": [
+        {
+          "question": "LLM değerlendirmelerinin neden bütçeye ihtiyacı var?",
+          "answer": "Otomatik değerlendirme çalıştırmaları prompt, model, yeniden deneme ve araç çağrılarını çoğaltır; sınırsız bir CI veya regresyon paketi önemli bir üretim faturası oluşturabilir."
+        },
+        {
+          "question": "Ekipler sinyali kaybetmeden değerlendirme maliyetini nasıl düşürebilir?",
+          "answer": "Temsili durumları katmanlara ayırarak örnekleyin, stabil test verilerini önbelleğe alın, duman ve gece paketlerini ayırın ve çalıştırmaları açık kalite veya dolar eşiklerinde durdurun."
+        },
+        {
+          "question": "Bir değerlendirme çalıştırması neyi kaydetmeli?",
+          "answer": "Veri seti sürümü, model, prompt seti, token sayısı, yeniden denemeler, önbellek kullanımı, maliyet, kalite sonucu ve sürüm kararını kaydedin."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "Başarılı görev başına maliyet"
+        },
+        {
+          "slug": "/research/llm-cost-monitoring",
+          "label": "LLM maliyet izleme"
+        },
+        {
+          "slug": "/research/ai-spend-variance-bridge",
+          "label": "AI harcama varyansı"
+        }
+      ]
+    },
+    "vi": {
+      "title": "Đặt kiểm soát chi phí vào pipeline đánh giá LLM",
+      "titleCore": "Đặt kiểm soát chi phí vào pipeline đánh giá LLM",
+      "description": "Cách lập ngân sách, lấy mẫu, cache và kiểm soát các đợt đánh giá LLM tự động để kiểm thử chất lượng không trở thành một hóa đơn không giới hạn.",
+      "body": "<p>Đánh giá LLM cần một chính sách chi phí riêng. Một job CI chạy 10,000 prompt mỗi lần thay đổi mã có thể tốn kém hơn cả tính năng mà nó bảo vệ. Hãy kiểm soát chi tiêu cho đánh giá bằng ngân sách cho mỗi lần chạy, lấy mẫu đại diện, fixture được cache và một cổng chất lượng dừng sớm khi thay đổi rõ ràng đang thất bại.</p><h2>Lập ngân sách cho từng lần chạy</h2><p>Đặt giới hạn cho số prompt, mô hình ứng viên, lần thử lại và số đô la trước khi bộ đánh giá bắt đầu. Tách các bài kiểm thử nhanh trên pull request khỏi bộ hồi quy chạy ban đêm và bước chứng nhận phát hành. Ngân sách thuộc về kế hoạch kiểm thử, không phải một dashboard được xem lại sau khi hóa đơn đã về.</p><h2>Lấy mẫu để giữ tín hiệu</h2><p>Phân tầng bộ kiểm thử theo quy trình làm việc, tác động lên khách hàng, mức độ khó và các chế độ lỗi đã biết. Mười nghìn prompt gần như trùng lặp mang ít thông tin hơn một bộ nhỏ hơn nhưng bao phủ đúng ranh giới quyết định. Hãy lưu phiên bản bộ mẫu và ước lượng độ tin cậy của kết quả.</p><h2>Cache những gì ổn định</h2><p>Cache các fixture bất biến, ngữ cảnh đã truy xuất và các đánh giá tham chiếu ở những nơi kiểm thử không phụ thuộc vào việc sinh nội dung mới. Theo dõi số lần đọc và ghi cache như một phần của chi phí đánh giá. Một bài kiểm thử được cache không miễn phí; nó rẻ hơn và vẫn cần được ghi nhận vào chi phí.</p><h2>Chặn theo chất lượng và chi phí</h2><p>Dừng một lần chạy khi ứng viên không đạt ngưỡng chất lượng hoặc vượt trần chi phí. So sánh chi phí trên mỗi tác vụ thành công, không chỉ số token trên mỗi bài kiểm thử. Lưu dữ liệu về mô hình, bộ prompt, token, lần thử lại và kết quả để một quyết định phát hành có thể được tái lập và giải thích được về kinh tế.</p><p>Kỷ luật đánh giá không phải là kiểm thử ít hơn. Mà là chi tiêu cho những bằng chứng có thể thay đổi quyết định phát hành.</p><h2>Liên quan</h2><ul><li>Chi phí trên mỗi tác vụ thành công</li><li>Giám sát chi phí LLM</li><li>Phân tích chênh lệch chi tiêu AI</li></ul>",
+      "faq": [
+        {
+          "question": "Vì sao đánh giá LLM cần có ngân sách?",
+          "answer": "Đánh giá tự động nhân lên số prompt, mô hình, lần thử lại và lời gọi công cụ, nên một bộ CI hoặc hồi quy không giới hạn có thể tạo ra hóa đơn sản xuất đáng kể."
+        },
+        {
+          "question": "Làm sao giảm chi phí đánh giá mà vẫn giữ được tín hiệu?",
+          "answer": "Phân tầng các trường hợp đại diện, cache fixture ổn định, tách bộ kiểm thử nhanh và bộ ban đêm, rồi dừng chạy khi vượt ngưỡng chất lượng hoặc ngưỡng đô la đã đặt rõ ràng."
+        },
+        {
+          "question": "Một lần chạy đánh giá nên ghi lại những gì?",
+          "answer": "Ghi lại phiên bản bộ dữ liệu, mô hình, bộ prompt, token, số lần thử lại, mức dùng cache, chi phí, kết quả chất lượng và quyết định phát hành."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "Chi phí trên mỗi tác vụ thành công"
+        },
+        {
+          "slug": "/research/llm-cost-monitoring",
+          "label": "Giám sát chi phí LLM"
+        },
+        {
+          "slug": "/research/ai-spend-variance-bridge",
+          "label": "Chênh lệch chi tiêu AI"
+        }
+      ]
     }
   }
 }

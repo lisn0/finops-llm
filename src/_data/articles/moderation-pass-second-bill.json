@@ -15,7 +15,7 @@
       "title": "Safety checks are a second bill",
       "titleCore": "What guardrail and moderation passes cost",
       "description": "Every guardrail pass is another model call on the same content. Most teams budget for the main model and never price the ones checking it.",
-      "body": "<p>A production LLM feature rarely makes one model call. It makes the call you designed, and then one or more calls you added later for safety: an input classifier, an output check, a policy judge, sometimes a second model grading the first. Each of those is inference, and inference is billed.</p><h2>The multiplier is bigger than it looks</h2><p>Count the passes honestly. Input moderation reads the full user input. Output moderation reads the full generated response. A policy or groundedness judge usually reads <em>both</em>, plus the retrieved context, plus a rubric &mdash; which makes the judge call larger than the call it is judging. Add a jailbreak classifier and a PII scan and a single user request has become five inference calls.</p><p>The costs are not equal. Dedicated moderation endpoints are cheap or free on some providers. A general-purpose model used as a judge is not: it is priced like any other call, and judging a long answer against a long rubric is a long call.</p><h2>Where the spend actually accumulates</h2><p>Three patterns dominate. <strong>Judging with a frontier model</strong> because it was easiest to reuse the same client &mdash; classification is the one task where a small model is genuinely sufficient, and this is often the single largest saving available. <strong>Checking on every turn</strong> of a long conversation, re-scanning history that was already cleared. And <strong>guardrails on internal traffic</strong>, where an evaluation harness or an internal tool inherits the full consumer-facing safety stack it does not need.</p><h2>Budget it as a line, not a rounding error</h2><p>The point is not to remove the checks. It is that a safety stack can be 30&ndash;50% of a feature's inference cost while appearing nowhere in the plan, because everyone counted the model that answers and nobody counted the models that check.</p><p>Tag guardrail calls separately in telemetry so the ratio is visible. Then use the cheapest model that holds the required accuracy, run checks on new content rather than whole histories, and decide per surface which checks a given traffic class actually requires.</p><h2>Related</h2><ul><li><a href=&quot;/research/llm-cost-attribution&quot;>LLM cost attribution</a></li><li><a href=&quot;/research/evals-cost-control&quot;>Evals as cost control</a></li><li><a href=&quot;/research/model-routing&quot;>Model routing</a></li></ul>",
+      "body": "<p>A production LLM feature rarely makes one model call. It makes the call you designed, and then one or more calls you added later for safety: an input classifier, an output check, a policy judge, sometimes a second model grading the first. Each of those is inference, and inference is billed.</p><h2>The multiplier is bigger than it looks</h2><p>Count the passes honestly. Input moderation reads the full user input. Output moderation reads the full generated response. A policy or groundedness judge usually reads <em>both</em>, plus the retrieved context, plus a rubric &mdash; which makes the judge call larger than the call it is judging. Add a jailbreak classifier and a PII scan and a single user request has become five inference calls.</p><p>The costs are not equal. Dedicated moderation endpoints are cheap or free on some providers. A general-purpose model used as a judge is not: it is priced like any other call, and judging a long answer against a long rubric is a long call.</p><h2>Where the spend actually accumulates</h2><p>Three patterns dominate. <strong>Judging with a frontier model</strong> because it was easiest to reuse the same client &mdash; classification is the one task where a small model is genuinely sufficient, and this is often the single largest saving available. <strong>Checking on every turn</strong> of a long conversation, re-scanning history that was already cleared. And <strong>guardrails on internal traffic</strong>, where an evaluation harness or an internal tool inherits the full consumer-facing safety stack it does not need.</p><h2>Budget it as a line, not a rounding error</h2><p>The point is not to remove the checks. It is that a safety stack can be 30&ndash;50% of a feature's inference cost while appearing nowhere in the plan, because everyone counted the model that answers and nobody counted the models that check.</p><p>Tag guardrail calls separately in telemetry so the ratio is visible. Then use the cheapest model that holds the required accuracy, run checks on new content rather than whole histories, and decide per surface which checks a given traffic class actually requires.</p><h2>Related</h2><ul><li><a href=\"/research/llm-cost-attribution\">LLM cost attribution</a></li><li><a href=\"/research/evals-cost-control\">Evals as cost control</a></li><li><a href=\"/research/model-routing\">Model routing</a></li></ul>",
       "faq": [
         {
           "question": "How much do guardrails add to LLM cost?",
@@ -132,6 +132,346 @@
         {
           "slug": "/research/llm-cost-attribution",
           "label": "LLM コストの帰属"
+        }
+      ]
+    },
+    "id": {
+      "title": "Pemeriksaan keamanan adalah tagihan kedua",
+      "titleCore": "Biaya lapisan guardrail dan moderasi",
+      "description": "Setiap pemeriksaan guardrail adalah panggilan model lain untuk konten yang sama. Kebanyakan tim menganggarkan model utama, tetapi lupa menghitung model pemeriksanya.",
+      "body": "<p>Fitur LLM produksi jarang hanya melakukan satu panggilan model. Ia melakukan panggilan yang Anda rancang, lalu satu atau lebih panggilan tambahan untuk keamanan: pengklasifikasi input, pemeriksaan output, juri kebijakan, kadang model kedua yang menilai model pertama. Masing-masing adalah inferensi, dan inferensi ditagih.</p><h2>Pengali biayanya lebih besar dari yang terlihat</h2><p>Hitung pemeriksaannya secara jujur. Moderasi input membaca seluruh input pengguna. Moderasi output membaca seluruh respons yang dihasilkan. Juri kebijakan atau pemeriksa groundedness biasanya membaca <em>keduanya</em>, ditambah konteks yang diambil, ditambah rubrik &mdash; sehingga panggilan juri lebih besar daripada panggilan yang dinilainya. Tambahkan pengklasifikasi jailbreak dan pemindai PII, dan satu permintaan pengguna sudah menjadi lima panggilan inferensi.</p><p>Biayanya tidak setara. Endpoint moderasi khusus di beberapa penyedia murah atau gratis. Model serbaguna yang dipakai sebagai juri tidak begitu: ia dihargai seperti panggilan lain, dan menilai jawaban panjang terhadap rubrik panjang adalah panggilan yang panjang.</p><h2>Di mana pengeluaran sebenarnya menumpuk</h2><p>Tiga pola mendominasi. <strong>Menilai dengan model frontier</strong> karena paling mudah memakai ulang klien yang sama &mdash; klasifikasi adalah satu tugas di mana model kecil benar-benar memadai, dan ini sering menjadi penghematan terbesar yang tersedia. <strong>Memeriksa di setiap giliran</strong> percakapan panjang, memindai ulang riwayat yang sudah lolos pemeriksaan. Dan <strong>guardrail pada trafik internal</strong>, ketika harness evaluasi atau alat internal mewarisi seluruh tumpukan keamanan yang dibuat untuk konsumen, padahal tidak membutuhkannya.</p><h2>Anggarkan sebagai baris tersendiri, bukan selisih pembulatan</h2><p>Intinya bukan menghapus pemeriksaan. Masalahnya, tumpukan keamanan bisa mencapai 30&ndash;50% dari biaya inferensi sebuah fitur sambil tidak terlihat di rencana mana pun, karena semua orang menghitung model yang menjawab dan tidak ada yang menghitung model yang memeriksa.</p><p>Beri tag pada panggilan guardrail secara terpisah dalam telemetri agar rasionya terlihat. Lalu gunakan model termurah yang tetap memenuhi akurasi yang dibutuhkan, jalankan pemeriksaan pada konten baru alih-alih seluruh riwayat, dan tentukan per permukaan pemeriksaan mana yang benar-benar dibutuhkan oleh setiap kelas trafik.</p><h2>Terkait</h2><ul><li><a href=\"/research/llm-cost-attribution\">Atribusi biaya LLM</a></li><li><a href=\"/research/evals-cost-control\">Evaluasi sebagai kontrol biaya</a></li><li><a href=\"/research/model-routing\">Perutean model</a></li></ul>",
+      "faq": [
+        {
+          "question": "Seberapa besar guardrail menambah biaya LLM?",
+          "answer": "Bergantung pada tumpukannya, tetapi fitur dengan moderasi input, moderasi output, dan juri model frontier bisa menghabiskan 30 sampai 50 persen anggaran inferensinya untuk pemeriksaan, bukan untuk menjawab."
+        },
+        {
+          "question": "Kesalahan guardrail apa yang paling murah untuk diperbaiki?",
+          "answer": "Memakai model frontier sebagai juri. Klasifikasi dan pemeriksaan kebijakan adalah satu beban kerja di mana model kecil yang murah biasanya sudah cukup, jadi mengganti juri sering menjadi penghematan terbesar."
+        },
+        {
+          "question": "Apakah trafik internal perlu guardrail yang sama dengan produksi?",
+          "answer": "Biasanya tidak. Harness evaluasi dan alat internal sering mewarisi seluruh tumpukan keamanan konsumen secara default, sehingga membayar pemeriksaan yang tidak dibutuhkan kelas trafik tersebut."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/llm-cost-attribution",
+          "label": "Atribusi biaya LLM"
+        },
+        {
+          "slug": "/research/evals-cost-control",
+          "label": "Evaluasi sebagai kontrol biaya"
+        },
+        {
+          "slug": "/research/model-routing",
+          "label": "Perutean model"
+        }
+      ]
+    },
+    "pl": {
+      "title": "Kontrole bezpieczeństwa to drugi rachunek",
+      "titleCore": "Ile kosztują przebiegi guardrail i moderacji",
+      "description": "Każdy przebieg guardrail to kolejne wywołanie modelu na tej samej treści. Zespoły planują budżet pod model główny, a pomijają modele, które go sprawdzają.",
+      "body": "<p>Produkcyjna funkcja LLM rzadko wykonuje jedno wywołanie modelu. Wykonuje wywołanie, które zaprojektowano, a potem jedno lub więcej wywołań dodanych później dla bezpieczeństwa: klasyfikator wejścia, kontrolę wyjścia, sędziego zgodności z polityką, czasem drugi model oceniający pierwszy. Każde z nich to inferencja, a inferencja jest rozliczana.</p><h2>Mnożnik jest większy, niż wygląda</h2><p>Policzmy przebiegi uczciwie. Moderacja wejścia czyta pełne dane użytkownika. Moderacja wyjścia czyta całą wygenerowaną odpowiedź. Sędzia polityki lub zgodności z kontekstem zwykle czyta <em>obie</em> części, do tego pobrany kontekst i rubrykę &mdash; przez co wywołanie sędziego jest większe niż wywołanie, które ocenia. Dodajmy klasyfikator jailbreaków i skan danych osobowych, a pojedyncze żądanie użytkownika staje się pięcioma wywołaniami inferencji.</p><p>Koszty nie są równe. Dedykowane endpointy moderacji są u części dostawców tanie lub darmowe. Model ogólnego przeznaczenia użyty jako sędzia już taki nie jest: jest wyceniany jak każde inne wywołanie, a ocena długiej odpowiedzi według długiej rubryki to długie wywołanie.</p><h2>Gdzie tak naprawdę narasta wydatek</h2><p>Dominują trzy wzorce. <strong>Ocenianie modelem z najwyższej półki</strong>, bo najłatwiej było użyć tego samego klienta &mdash; klasyfikacja to zadanie, w którym mały model rzeczywiście wystarcza, i często jest to największa dostępna oszczędność. <strong>Sprawdzanie przy każdej turze</strong> długiej rozmowy, z ponownym skanowaniem historii, która już została przepuszczona. Oraz <strong>guardrail na ruchu wewnętrznym</strong>, gdzie harness ewaluacyjny lub narzędzie wewnętrzne dziedziczy pełny stos bezpieczeństwa dla klientów, którego nie potrzebuje.</p><h2>Ujmij to w budżecie jako osobną pozycję, a nie jako zaokrąglenie</h2><p>Chodzi nie o usunięcie kontroli. Chodzi o to, że stos bezpieczeństwa może stanowić 30&ndash;50% kosztu inferencji funkcji, a mimo to nie pojawia się w planie, bo wszyscy policzyli model, który odpowiada, a nikt nie policzył modeli, które sprawdzają.</p><p>Oznaczaj wywołania guardrail osobnym tagiem w telemetrii, żeby ten stosunek był widoczny. Następnie używaj najtańszego modelu, który zachowuje wymaganą dokładność, sprawdzaj nową treść zamiast całych historii i decyduj dla każdej powierzchni, które kontrole faktycznie wymaga dany rodzaj ruchu.</p><h2>Powiązane</h2><ul><li><a href=\"/research/llm-cost-attribution\">Przypisywanie kosztów LLM</a></li><li><a href=\"/research/evals-cost-control\">Ewaluacje jako kontrola kosztów</a></li><li><a href=\"/research/model-routing\">Routing modeli</a></li></ul>",
+      "faq": [
+        {
+          "question": "O ile guardrail zwiększa koszt LLM?",
+          "answer": "Zależy to od stosu, ale funkcja z moderacją wejścia, moderacją wyjścia i sędzią z modelu z najwyższej półki może wydawać 30 do 50 procent budżetu inferencji na sprawdzanie, a nie na odpowiadanie."
+        },
+        {
+          "question": "Jaki jest najtańszy błąd z guardrailami do naprawienia?",
+          "answer": "Użycie modelu z najwyższej półki jako sędziego. Klasyfikacja i kontrole polityk to jedyne obciążenie, w którym mały, tani model zwykle wystarcza, więc zmiana sędziego bywa największą pojedynczą oszczędnością."
+        },
+        {
+          "question": "Czy ruch wewnętrzny powinien mieć te same guardrail co produkcja?",
+          "answer": "Zwykle nie. Harnessy ewaluacyjne i narzędzia wewnętrzne często domyślnie dziedziczą pełny stos bezpieczeństwa dla klientów, płacąc za kontrole, których dany rodzaj ruchu nie wymaga."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/llm-cost-attribution",
+          "label": "Przypisywanie kosztów LLM"
+        },
+        {
+          "slug": "/research/evals-cost-control",
+          "label": "Ewaluacje jako kontrola kosztów"
+        },
+        {
+          "slug": "/research/model-routing",
+          "label": "Routing modeli"
+        }
+      ]
+    },
+    "ru": {
+      "title": "Проверки безопасности — это второй счёт",
+      "titleCore": "Сколько стоят проходы guardrail и модерации",
+      "description": "Каждый проход guardrail — это ещё один вызов модели на том же контенте. Большинство команд закладывают бюджет на основную модель и не считают те, что её проверяют.",
+      "body": "<p>Функция LLM в продакшене редко делает один вызов модели. Она делает тот вызов, который вы спроектировали, и затем один или несколько вызовов, которые вы добавили позже ради безопасности: классификатор входа, проверку выхода, судью политик, а иногда вторую модель, которая оценивает первую. Каждый из них — это инференс, а инференс тарифицируется.</p><h2>Множитель больше, чем кажется</h2><p>Посчитайте проходы честно. Модерация входа читает весь пользовательский ввод. Модерация выхода читает весь сгенерированный ответ. Судья по политикам или проверке обоснованности обычно читает <em>оба</em>, плюс извлечённый контекст, плюс рубрику &mdash; поэтому вызов судьи получается больше вызова, который он оценивает. Добавьте классификатор джейлбрейков и сканер персональных данных, и один запрос пользователя превращается в пять вызовов инференса.</p><p>Стоимость у них не одинаковая. Выделенные эндпоинты модерации у некоторых провайдеров дешёвые или бесплатные. Универсальная модель, используемая как судья, таковой не является: её тарифицируют как любой другой вызов, а оценка длинного ответа по длинной рубрике — это длинный вызов.</p><h2>Где на самом деле копятся расходы</h2><p>Доминируют три паттерна. <strong>Судейство фронтирной моделью</strong>, потому что проще переиспользовать тот же клиент: классификация — именно та задача, где маленькой модели действительно достаточно, и это часто самая большая доступная экономия. <strong>Проверка на каждом ходе</strong> длинного диалога с повторным сканированием истории, которая уже прошла проверку. И <strong>guardrails на внутреннем трафике</strong>, где евал-харнесс или внутренний инструмент наследуют весь стек безопасности для клиентов, который им не нужен.</p><h2>Закладывайте это отдельной статьёй, а не округлением</h2><p>Цель не в том, чтобы убрать проверки. Просто стек безопасности может составлять 30&ndash;50% стоимости инференса функции и при этом нигде не появляться в плане, потому что все посчитали модель, которая отвечает, и никто не посчитал модели, которые проверяют.</p><p>Помечайте вызовы guardrail отдельным тегом в телеметрии, чтобы соотношение было видно. Затем используйте самую дешёвую модель, которая обеспечивает нужную точность, проверяйте только новый контент, а не всю историю, и для каждой поверхности решайте, какие проверки действительно нужны данному классу трафика.</p><h2>Связанное</h2><ul><li><a href=\"/research/llm-cost-attribution\">Атрибуция затрат на LLM</a></li><li><a href=\"/research/evals-cost-control\">Евалы как контроль затрат</a></li><li><a href=\"/research/model-routing\">Маршрутизация моделей</a></li></ul>",
+      "faq": [
+        {
+          "question": "Насколько guardrails увеличивают стоимость LLM?",
+          "answer": "Зависит от стека, но функция с модерацией входа, модерацией выхода и судьёй на фронтирной модели может тратить 30–50 процентов бюджета инференса на проверку, а не на ответ."
+        },
+        {
+          "question": "Какую самую дешёвую ошибку guardrails исправить?",
+          "answer": "Использование фронтирной модели в роли судьи. Классификация и проверка политик — та нагрузка, где маленькой и дешёвой модели обычно достаточно, поэтому смена судьи часто даёт самую большую экономию."
+        },
+        {
+          "question": "Нужны ли внутреннему трафику те же guardrails, что и продакшену?",
+          "answer": "Обычно нет. Евал-харнесы и внутренние инструменты по умолчанию наследуют весь стек безопасности для пользователей, платя за проверки, которые данному классу трафика не нужны."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/llm-cost-attribution",
+          "label": "Атрибуция затрат на LLM"
+        },
+        {
+          "slug": "/research/evals-cost-control",
+          "label": "Евалы как контроль затрат"
+        },
+        {
+          "slug": "/research/model-routing",
+          "label": "Маршрутизация моделей"
+        }
+      ]
+    },
+    "tr": {
+      "title": "Güvenlik kontrolleri ikinci bir faturadır",
+      "titleCore": "Guardrail ve moderasyon geçişlerinin maliyeti",
+      "description": "Her guardrail geçişi, aynı içerik üzerinde bir model çağrısı daha demektir. Çoğu ekip ana modele bütçe ayırır, onu denetleyen modelleri hiç fiyatlandırmaz.",
+      "body": "<p>Üretimdeki bir LLM özelliği nadiren tek bir model çağrısı yapar. Tasarladığınız çağrıyı yapar, sonra güvenlik için sonradan eklediğiniz bir veya daha fazla çağrıyı da yapar: bir girdi sınıflandırıcısı, bir çıktı kontrolü, bir politika hakemi, bazen birinci modeli puanlayan ikinci bir model. Bunların hepsi çıkarımdır ve çıkarım faturalandırılır.</p><h2>Çarpan göründüğünden büyük</h2><p>Geçişleri dürüstçe sayın. Girdi moderasyonu kullanıcı girdisinin tamamını okur. Çıktı moderasyonu üretilen yanıtın tamamını okur. Bir politika veya temellendirme hakemi genellikle <em>her ikisini</em>, ayrıca getirilen bağlamı ve bir değerlendirme ölçütünü okur &mdash; bu da hakem çağrısını, değerlendirdiği çağrıdan daha büyük yapar. Bir jailbreak sınıflandırıcısı ve bir PII taraması eklediğinizde, tek bir kullanıcı isteği beş çıkarım çağrısına dönüşmüş olur.</p><p>Maliyetler eşit değildir. Özel moderasyon uç noktaları bazı sağlayıcılarda ucuz ya da ücretsizdir. Hakem olarak kullanılan genel amaçlı bir model öyle değildir: diğer her çağrı gibi fiyatlandırılır ve uzun bir yanıtı uzun bir ölçüte göre değerlendirmek uzun bir çağrıdır.</p><h2>Harcama asıl nerede birikir</h2><p>Üç örüntü öne çıkar. <strong>Bir sınır modeliyle değerlendirme</strong>, çünkü aynı istemciyi yeniden kullanmak en kolayıydı &mdash; sınıflandırma, küçük bir modelin gerçekten yeterli olduğu tek görevdir ve bu genellikle elde edilebilecek en büyük tek tasarruftur. <strong>Uzun bir konuşmanın her turunda kontrol</strong> yapmak, daha önce temizlenmiş geçmişi yeniden taramak. Ve <strong>dahili trafikte guardrail</strong> kullanmak; bir değerlendirme altyapısı ya da dahili bir araç, ihtiyacı olmayan tam tüketici güvenlik yığınını miras alır.</p><h2>Bunu bir satır olarak bütçeleyin, yuvarlama hatası olarak değil</h2><p>Amaç kontrolleri kaldırmak değil. Güvenlik yığını, bir özelliğin çıkarım maliyetinin %30&ndash;50'sini oluşturabilir ve planda hiçbir yerde görünmeyebilir; çünkü herkes yanıt veren modeli saymış, kontrol eden modelleri saymamıştır.</p><p>Oranın görünür olması için guardrail çağrılarını telemetride ayrı etiketleyin. Ardından gerekli doğruluğu sağlayan en ucuz modeli kullanın, kontrolleri tüm geçmiş yerine yeni içerik üzerinde çalıştırın ve her yüzey için hangi trafik sınıfının hangi kontrolleri gerçekten gerektirdiğine karar verin.</p><h2>İlgili</h2><ul><li><a href=\"/research/llm-cost-attribution\">LLM maliyet atfı</a></li><li><a href=\"/research/evals-cost-control\">Maliyet kontrolü olarak değerlendirmeler</a></li><li><a href=\"/research/model-routing\">Model yönlendirme</a></li></ul>",
+      "faq": [
+        {
+          "question": "Guardrail'ler LLM maliyetini ne kadar artırır?",
+          "answer": "Yığına göre değişir, ancak girdi moderasyonu, çıktı moderasyonu ve bir sınır modeli hakemi olan bir özellik, çıkarım bütçesinin yüzde 30 ila 50'sini yanıt vermek yerine kontrol etmeye harcayabilir."
+        },
+        {
+          "question": "Düzeltmesi en ucuz guardrail hatası nedir?",
+          "answer": "Hakem olarak bir sınır modeli kullanmak. Sınıflandırma ve politika kontrolleri, küçük ve ucuz bir modelin genellikle yettiği tek iş yüküdür; bu yüzden hakemi değiştirmek çoğu zaman en büyük tek tasarruftur."
+        },
+        {
+          "question": "Dahili trafik de üretimle aynı guardrail'leri almalı mı?",
+          "answer": "Genellikle hayır. Değerlendirme altyapıları ve dahili araçlar, varsayılan olarak tam tüketiciye dönük güvenlik yığınını miras alır ve trafik sınıfının gerektirmediği kontroller için ödeme yapar."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/llm-cost-attribution",
+          "label": "LLM maliyet atfı"
+        },
+        {
+          "slug": "/research/evals-cost-control",
+          "label": "Maliyet kontrolü olarak değerlendirmeler"
+        },
+        {
+          "slug": "/research/model-routing",
+          "label": "Model yönlendirme"
+        }
+      ]
+    },
+    "vi": {
+      "title": "Kiểm tra an toàn là hóa đơn thứ hai",
+      "titleCore": "Chi phí của các lượt guardrail và kiểm duyệt",
+      "description": "Mỗi lượt guardrail là thêm một lần gọi model trên cùng nội dung. Hầu hết đội ngũ chỉ lập ngân sách cho model chính, không bao giờ tính đến model kiểm tra nó.",
+      "body": "<p>Một tính năng LLM đưa vào production hiếm khi chỉ gọi model một lần. Nó thực hiện lời gọi bạn thiết kế, rồi thêm một hoặc nhiều lời gọi sau đó để đảm bảo an toàn: bộ phân loại đầu vào, kiểm tra đầu ra, bộ đánh giá chính sách, đôi khi là một model thứ hai chấm điểm model thứ nhất. Tất cả đều là suy luận, và suy luận được tính phí.</p><h2>Hệ số nhân lớn hơn vẻ bề ngoài</h2><p>Hãy đếm các lượt kiểm tra một cách trung thực. Kiểm duyệt đầu vào đọc toàn bộ đầu vào của người dùng. Kiểm duyệt đầu ra đọc toàn bộ phản hồi được sinh ra. Bộ đánh giá về tính đúng đắn hoặc chính sách thường đọc <em>cả hai</em>, cộng thêm ngữ cảnh được truy xuất và một bộ tiêu chí chấm điểm, khiến lời gọi đánh giá còn lớn hơn lời gọi nó đang đánh giá. Thêm bộ phát hiện jailbreak và quét PII, một yêu cầu của người dùng đã trở thành năm lời gọi suy luận.</p><p>Các chi phí không ngang nhau. Một số nhà cung cấp có endpoint kiểm duyệt chuyên dụng với giá rẻ hoặc miễn phí. Nhưng model đa dụng dùng làm bộ đánh giá thì không rẻ: nó được tính giá như mọi lời gọi khác, và đánh giá một câu trả lời dài theo một bộ tiêu chí dài là một lời gọi dài.</p><h2>Chi tiêu thực sự tích lũy ở đâu</h2><p>Ba kiểu chiếm ưu thế. <strong>Đánh giá bằng model biên</strong> vì tiện tái sử dụng cùng một client. Phân loại chính là tác vụ mà model nhỏ thực sự đủ dùng, và đây thường là khoản tiết kiệm lớn nhất có thể có. <strong>Kiểm tra ở mọi lượt</strong> của một cuộc hội thoại dài, quét lại lịch sử đã được duyệt rồi. Và <strong>guardrail cho lưu lượng nội bộ</strong>, nơi một harness đánh giá hoặc công cụ nội bộ thừa hưởng toàn bộ hệ thống an toàn hướng người dùng mà nó không cần.</p><h2>Ghi ngân sách thành một dòng riêng, đừng coi là sai số làm tròn</h2><p>Mục đích không phải là bỏ các lượt kiểm tra. Vấn đề là một hệ thống an toàn có thể chiếm 30&ndash;50% chi phí suy luận của một tính năng mà vẫn không xuất hiện ở đâu trong kế hoạch, vì mọi người đều đếm model trả lời còn không ai đếm các model kiểm tra.</p><p>Hãy gắn thẻ riêng cho các lời gọi guardrail trong telemetry để tỷ lệ này hiển thị rõ. Sau đó dùng model rẻ nhất vẫn đạt độ chính xác cần thiết, chỉ kiểm tra nội dung mới thay vì toàn bộ lịch sử, và quyết định cho từng bề mặt xem loại lưu lượng nào thực sự cần những kiểm tra nào.</p><h2>Liên quan</h2><ul><li><a href=\"/research/llm-cost-attribution\">Phân bổ chi phí LLM</a></li><li><a href=\"/research/evals-cost-control\">Đánh giá như công cụ kiểm soát chi phí</a></li><li><a href=\"/research/model-routing\">Định tuyến model</a></li></ul>",
+      "faq": [
+        {
+          "question": "Guardrail làm tăng chi phí LLM bao nhiêu?",
+          "answer": "Tùy thuộc vào hệ thống, nhưng một tính năng có kiểm duyệt đầu vào, kiểm duyệt đầu ra và bộ đánh giá dùng model biên có thể dùng 30 đến 50 phần trăm ngân sách suy luận để kiểm tra thay vì trả lời."
+        },
+        {
+          "question": "Lỗi guardrail nào rẻ nhất để sửa?",
+          "answer": "Dùng model biên làm bộ đánh giá. Phân loại và kiểm tra chính sách là khối lượng công việc mà một model nhỏ, rẻ thường là đủ, nên đổi bộ đánh giá thường là khoản tiết kiệm lớn nhất."
+        },
+        {
+          "question": "Lưu lượng nội bộ có nên dùng cùng guardrail với production không?",
+          "answer": "Thường là không. Các harness đánh giá và công cụ nội bộ thường mặc định thừa hưởng toàn bộ hệ thống an toàn hướng người dùng, trả tiền cho những kiểm tra mà loại lưu lượng đó không cần."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/llm-cost-attribution",
+          "label": "Phân bổ chi phí LLM"
+        },
+        {
+          "slug": "/research/evals-cost-control",
+          "label": "Đánh giá như công cụ kiểm soát chi phí"
+        },
+        {
+          "slug": "/research/model-routing",
+          "label": "Định tuyến model"
+        }
+      ]
+    },
+    "ar": {
+      "title": "فحوصات الأمان فاتورة ثانية",
+      "titleCore": "تكلفة حواجز الحماية والإشراف على المحتوى",
+      "description": "كل مرحلة فحص هي استدعاء نموذج إضافي على المحتوى نفسه. معظم الفرق تميّز ميزانية النموذج الرئيسي ولا تُسعّر النماذج التي تفحصه.",
+      "body": "<p>نادراً ما تُجري ميزة LLM في الإنتاج استدعاءً واحداً للنموذج. فهي تُجري الاستدعاء الذي صممته، ثم استدعاءً أو أكثر أضفتها لاحقاً لأسباب تتعلق بالسلامة: مصنّف للمدخلات، وفحص للمخرجات، وحَكَم للسياسات، وأحياناً نموذج ثانٍ يقيّم الأول. كل ذلك استدلال، والاستدلال يُفوتَر.</p><h2>المضاعف أكبر مما يبدو</h2><p>عُدّ مراحل الفحص بأمانة. يقرأ إشراف المدخلات الإدخال الكامل للمستخدم، ويقرأ إشراف المخرجات الرد المولّد كاملاً. ويقرأ حَكَم السياسة أو حَكَم الاستناد إلى المصادر <em>الاثنين</em> عادةً، إضافة إلى السياق المسترجع والمعيار، فيصبح استدعاء الحَكَم أكبر من الاستدعاء الذي يحكم عليه. أضف مصنّف كسر الحماية وفحص البيانات الشخصية، وسيتحول طلب واحد من المستخدم إلى خمسة استدعاءات استدلال.</p><p>التكاليف ليست متساوية. نقاط الإشراف المخصصة رخيصة أو مجانية لدى بعض المزودين. أما النموذج العام المستخدم حَكَماً فليس كذلك: يُسعَّر كأي استدعاء آخر، وتقييم إجابة طويلة بمعيار طويل هو استدعاء طويل.</p><h2>أين تتراكم النفقات فعلاً</h2><p>ثلاثة أنماط تهيمن. <strong>التقييم بنموذج متقدم</strong> لأن إعادة استخدام العميل نفسه كانت أسهل؛ التصنيف هو المهمة الوحيدة التي يكفيها نموذج صغير فعلاً، وغالباً ما يكون هذا أكبر توفير متاح منفرداً. <strong>الفحص في كل دور</strong> من محادثة طويلة، مع إعادة فحص سجل سبق اعتماده. و<strong>حواجز الحماية على الحركة الداخلية</strong>، حيث تورث أداة التقييم أو أداة داخلية كامل منظومة السلامة الموجهة للمستهلكين دون حاجة إليها.</p><h2>خصّصها كبند مستقل لا كفرق تقريب</h2><p>الهدف ليس إزالة الفحوصات. المشكلة أن منظومة السلامة قد تمثل 30&ndash;50% من تكلفة استدلال الميزة دون أن تظهر في أي خطة، لأن الجميع عدّ النموذج الذي يجيب ولم يعدّ النماذج التي تفحص.</p><p>صنّف استدعاءات الحماية بشكل منفصل في القياس عن بُعد حتى تظهر النسبة. ثم استخدم أرخص نموذج يحقق الدقة المطلوبة، وشغّل الفحوصات على المحتوى الجديد لا على السجل كاملاً، وقرر لكل سطح أي الفحوصات يتطلبها فعلاً كل نوع من حركة المرور.</p><h2>ذات صلة</h2><ul><li><a href=\"/research/llm-cost-attribution\">إسناد تكلفة LLM</a></li><li><a href=\"/research/evals-cost-control\">التقييمات كأداة للتحكم في التكلفة</a></li><li><a href=\"/research/model-routing\">توجيه النماذج</a></li></ul>",
+      "faq": [
+        {
+          "question": "كم تضيف حواجز الحماية إلى تكلفة LLM؟",
+          "answer": "يختلف ذلك بحسب المنظومة، لكن ميزة تتضمن إشراف مدخلات وإشراف مخرجات وحكماً بنموذج متقدم قد تنفق من 30 إلى 50 في المئة من ميزانية الاستدلال على الفحص بدلاً من الإجابة."
+        },
+        {
+          "question": "ما أرخص خطأ في حواجز الحماية يمكن إصلاحه؟",
+          "answer": "استخدام نموذج متقدم كحكم. التصنيف وفحوص السياسات هما العمل الوحيد الذي يكفيه عادةً نموذج صغير رخيص، لذلك فإن تغيير الحَكَم غالباً ما يكون أكبر توفير منفرد."
+        },
+        {
+          "question": "هل يجب أن تحصل حركة المرور الداخلية على حواجز الحماية نفسها المطبقة في الإنتاج؟",
+          "answer": "عادةً لا. تورث أدوات التقييم والأدوات الداخلية منظومة السلامة الكاملة الموجهة للمستهلك افتراضياً، فتدفع ثمن فحوص لا تتطلبها فئة حركة المرور تلك."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/llm-cost-attribution",
+          "label": "إسناد تكلفة LLM"
+        },
+        {
+          "slug": "/research/evals-cost-control",
+          "label": "التقييمات كأداة للتحكم في التكلفة"
+        },
+        {
+          "slug": "/research/model-routing",
+          "label": "توجيه النماذج"
+        }
+      ]
+    },
+    "it": {
+      "title": "I controlli di sicurezza sono una seconda fattura",
+      "titleCore": "Cosa costano guardrail e moderazione",
+      "description": "Ogni guardrail è una chiamata in più sullo stesso contenuto. Si mette a budget il modello principale, quasi mai quelli che lo verificano.",
+      "body": "<p>Una funzionalità LLM in produzione raramente fa una sola chiamata al modello. Fa quella che avete progettato, e poi una o più chiamate aggiunte in seguito per la sicurezza: un classificatore in ingresso, un controllo in uscita, un giudice di policy, a volte un secondo modello che valuta il primo. Ognuna di queste è inferenza, e l'inferenza viene fatturata.</p><h2>Il moltiplicatore è più grande di quanto sembri</h2><p>Contate i passaggi con onestà. La moderazione in ingresso legge tutto l'input dell'utente. La moderazione in uscita legge tutta la risposta generata. Un giudice di policy o di fondatezza di solito legge <em>entrambi</em>, più il contesto recuperato e una griglia di valutazione &mdash; il che rende la chiamata del giudice più grande della chiamata che sta giudicando. Aggiungete un classificatore di jailbreak e una scansione dei dati personali, e una singola richiesta dell'utente è diventata cinque chiamate di inferenza.</p><p>I costi non sono uguali. Gli endpoint di moderazione dedicati costano poco o niente su alcuni provider. Un modello generico usato come giudice non è così: viene prezzato come qualsiasi altra chiamata, e giudicare una risposta lunga con una griglia lunga è una chiamata lunga.</p><h2>Dove la spesa si accumula davvero</h2><p>Tre schemi dominano. <strong>Giudicare con un modello di frontiera</strong> perché era più semplice riusare lo stesso client &mdash; la classificazione è proprio il compito in cui un modello piccolo è davvero sufficiente, e spesso è il singolo risparmio più grande disponibile. <strong>Controllare a ogni turno</strong> di una conversazione lunga, riscansionando una cronologia già approvata. E <strong>guardrail sul traffico interno</strong>, dove un harness di valutazione o uno strumento interno eredita l'intero stack di sicurezza rivolto ai consumatori di cui non ha bisogno.</p><h2>Mettetelo a budget come voce, non come arrotondamento</h2><p>Il punto non è eliminare i controlli. È che uno stack di sicurezza può valere il 30&ndash;50% del costo di inferenza di una funzionalità restando invisibile nel piano, perché tutti hanno contato il modello che risponde e nessuno ha contato i modelli che controllano.</p><p>Etichettate separatamente le chiamate di guardrail nella telemetria, così il rapporto è visibile. Poi usate il modello più economico che mantiene l'accuratezza richiesta, eseguite i controlli sui contenuti nuovi invece che sulle cronologie intere, e decidete per ogni superficie quali controlli richiede davvero una certa classe di traffico.</p><h2>Correlati</h2><ul><li><a href=\"/research/llm-cost-attribution\">Attribuzione dei costi LLM</a></li><li><a href=\"/research/evals-cost-control\">Le valutazioni come controllo dei costi</a></li><li><a href=\"/research/model-routing\">Instradamento dei modelli</a></li></ul>",
+      "faq": [
+        {
+          "question": "Quanto aggiungono i guardrail al costo LLM?",
+          "answer": "Dipende dallo stack, ma una funzionalità con moderazione in ingresso, moderazione in uscita e un giudice su modello di frontiera può spendere dal 30 al 50 per cento del suo budget di inferenza per controllare invece che per rispondere."
+        },
+        {
+          "question": "Qual è l'errore sui guardrail più economico da correggere?",
+          "answer": "Usare un modello di frontiera come giudice. La classificazione e i controlli di policy sono l'unico carico di lavoro in cui un modello piccolo ed economico di solito basta, quindi cambiare giudice è spesso il singolo risparmio più grande."
+        },
+        {
+          "question": "Il traffico interno dovrebbe avere gli stessi guardrail della produzione?",
+          "answer": "Di solito no. Harness di valutazione e strumenti interni ereditano spesso per default l'intero stack di sicurezza rivolto ai consumatori, pagando controlli che quella classe di traffico non richiede."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/llm-cost-attribution",
+          "label": "Attribuzione dei costi LLM"
+        },
+        {
+          "slug": "/research/evals-cost-control",
+          "label": "Le valutazioni come controllo dei costi"
+        },
+        {
+          "slug": "/research/model-routing",
+          "label": "Instradamento dei modelli"
+        }
+      ]
+    },
+    "ko": {
+      "title": "안전 검사는 두 번째 청구서",
+      "titleCore": "가드레일과 모더레이션의 비용",
+      "description": "모든 가드레일 검사는 같은 콘텐츠에 대한 또 하나의 모델 호출입니다. 대부분의 팀은 본 모델만 예산에 넣고, 그 결과를 검사하는 모델은 빠뜨립니다.",
+      "body": "<p>실제 운영되는 LLM 기능이 설계한 호출 한 번만 하는 경우는 드뭅니다. 나중에 안전을 위해 추가한 호출이 하나 이상 더 붙습니다. 입력 분류기, 출력 검사, 정책 판정기, 때로는 첫 번째 모델을 채점하는 두 번째 모델까지 있습니다. 이들 모두 추론이고, 추론은 과금됩니다.</p><h2>배수는 보이는 것보다 큽니다</h2><p>검사 횟수를 정직하게 세어 보세요. 입력 모더레이션은 사용자 입력 전체를 읽고, 출력 모더레이션은 생성된 응답 전체를 읽습니다. 정책 또는 근거성 판정기는 보통 <em>둘 다</em>, 검색된 컨텍스트와 평가 기준까지 읽습니다. 그래서 판정기 호출은 판정 대상 호출보다 커집니다. 탈옥 분류기와 PII 스캔을 더하면 사용자 요청 하나가 추론 호출 다섯 개가 되어 있습니다.</p><p>비용이 같지 않습니다. 전용 모더레이션 엔드포인트는 일부 제공업체에서 싸거나 무료입니다. 범용 모델을 판정기로 쓰면 그렇지 않습니다. 일반 호출과 같은 가격이 붙고, 긴 답변을 긴 평가 기준에 맞춰 판정하는 호출은 길어집니다.</p><h2>지출이 실제로 쌓이는 곳</h2><p>세 가지 패턴이 지배적입니다. <strong>프런티어 모델로 판정하기</strong>는 같은 클라이언트를 재사용하기 쉽다는 이유에서 나옵니다. 분류는 작은 모델이 정말 충분한 유일한 작업이며, 가능한 가장 큰 절감인 경우가 많습니다. <strong>긴 대화의 매 턴마다 검사하기</strong>는 이미 통과한 기록을 다시 스캔합니다. 그리고 <strong>내부 트래픽에 가드레일 적용하기</strong>는 평가 하네스나 내부 도구가 필요 없는 대외용 안전 스택을 그대로 물려받습니다.</p><h2>반올림 오차가 아니라 한 항목으로 예산을 잡으세요</h2><p>핵심은 검사를 없애는 것이 아닙니다. 안전 스택이 기능 추론 비용의 30&ndash;50%를 차지할 수 있는데도 계획 어디에도 나타나지 않을 수 있다는 점입니다. 모두가 답하는 모델은 셌지만, 검사하는 모델은 아무도 세지 않았기 때문입니다.</p><p>가드레일 호출은 텔레메트리에서 따로 태그를 달아 비율이 보이게 하세요. 그다음 요구 정확도를 충족하는 가장 싼 모델을 쓰고, 전체 기록이 아니라 새 콘텐츠에만 검사를 돌리고, 트래픽 종류마다 어떤 검사가 실제로 필요한지 표면별로 정하세요.</p><h2>관련 글</h2><ul><li><a href=\"/research/llm-cost-attribution\">LLM 비용 귀속</a></li><li><a href=\"/research/evals-cost-control\">비용 통제 수단으로서의 평가</a></li><li><a href=\"/research/model-routing\">모델 라우팅</a></li></ul>",
+      "faq": [
+        {
+          "question": "가드레일은 LLM 비용을 얼마나 늘리나요?",
+          "answer": "스택에 따라 다르지만, 입력 모더레이션, 출력 모더레이션, 프런티어 모델 판정기를 쓰는 기능은 추론 예산의 30에서 50퍼센트를 답변이 아니라 검사에 쓸 수 있습니다."
+        },
+        {
+          "question": "가장 싸게 고칠 수 있는 가드레일 실수는 무엇인가요?",
+          "answer": "판정기로 프런티어 모델을 쓰는 것입니다. 분류와 정책 검사는 작고 저렴한 모델이면 대개 충분한 유일한 워크로드이므로, 판정기를 바꾸는 것이 가장 큰 절감인 경우가 많습니다."
+        },
+        {
+          "question": "내부 트래픽에도 운영 환경과 같은 가드레일을 적용해야 하나요?",
+          "answer": "대개 그렇지 않습니다. 평가 하네스와 내부 도구는 기본값으로 대외용 안전 스택을 통째로 물려받아, 트래픽 종류가 요구하지 않는 검사에 돈을 냅니다."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/llm-cost-attribution",
+          "label": "LLM 비용 귀속"
+        },
+        {
+          "slug": "/research/evals-cost-control",
+          "label": "비용 통제 수단으로서의 평가"
+        },
+        {
+          "slug": "/research/model-routing",
+          "label": "모델 라우팅"
+        }
+      ]
+    },
+    "nl": {
+      "title": "Veiligheidschecks zijn een tweede rekening",
+      "titleCore": "Wat guardrail- en moderatiepassen kosten",
+      "description": "Elke guardrailpas is nog een modelaanroep op dezelfde content. De meeste teams budgetteren voor het hoofdmodel en prijzen de modellen die het controleren nooit.",
+      "body": "<p>Een LLM-functie in productie doet zelden één modelaanroep. Ze doet de aanroep die je hebt ontworpen, en daarna één of meer aanroepen die je later om veiligheidsredenen toevoegde: een inputclassifier, een outputcheck, een beleidsrechter, soms een tweede model dat het eerste beoordeelt. Elk daarvan is inferentie, en inferentie wordt gefactureerd.</p><h2>De vermenigvuldiger is groter dan hij lijkt</h2><p>Tel de passen eerlijk. Inputmoderatie leest de volledige gebruikersinput. Outputmoderatie leest het volledige gegenereerde antwoord. Een beleids- of groundednessrechter leest meestal <em>beide</em>, plus de opgehaalde context, plus een rubric &mdash; waardoor de rechteraanroep groter is dan de aanroep die hij beoordeelt. Voeg een jailbreakclassifier en een PII-scan toe en één gebruikersverzoek is vijf inferentieaanroepen geworden.</p><p>De kosten zijn niet gelijk. Speciale moderatie-endpoints zijn bij sommige aanbieders goedkoop of gratis. Een algemeen model dat als rechter wordt gebruikt is dat niet: het wordt geprijsd als elke andere aanroep, en een lang antwoord beoordelen aan de hand van een lange rubric is een lange aanroep.</p><h2>Waar de uitgaven zich echt ophopen</h2><p>Drie patronen domineren. <strong>Beoordelen met een frontiermodel</strong> omdat het het makkelijkst was om dezelfde client te hergebruiken &mdash; classificatie is de ene taak waarvoor een klein model echt volstaat, en dit is vaak de grootste besparing die beschikbaar is. <strong>Checken bij elke beurt</strong> van een lang gesprek, waarbij een geschiedenis die al was vrijgegeven opnieuw wordt gescand. En <strong>guardrails op intern verkeer</strong>, waar een evaluatieharnas of een interne tool de volledige consumentgerichte veiligheidsstack erft die het niet nodig heeft.</p><h2>Budgetteer het als een post, niet als een afrondingsfout</h2><p>Het punt is niet om de checks te schrappen. Het punt is dat een veiligheidsstack 30&ndash;50% van de inferentiekosten van een functie kan zijn zonder in het plan voor te komen, omdat iedereen het model dat antwoordt telde en niemand de modellen die controleren.</p><p>Tag guardrailaanroepen apart in de telemetrie, zodat de verhouding zichtbaar wordt. Gebruik dan het goedkoopste model dat de vereiste nauwkeurigheid haalt, voer checks uit op nieuwe content in plaats van op hele geschiedenissen en bepaal per oppervlak welke checks een bepaalde verkeersklasse echt vereist.</p><h2>Gerelateerd</h2><ul><li><a href=\"/research/llm-cost-attribution\">Toerekening van LLM-kosten</a></li><li><a href=\"/research/evals-cost-control\">Evals als kostenbeheersing</a></li><li><a href=\"/research/model-routing\">Modelrouting</a></li></ul>",
+      "faq": [
+        {
+          "question": "Hoeveel voegen guardrails toe aan de LLM-kosten?",
+          "answer": "Het hangt af van de stack, maar een functie met inputmoderatie, outputmoderatie en een rechter op een frontiermodel kan 30 tot 50 procent van het inferentiebudget aan controleren besteden in plaats van aan antwoorden."
+        },
+        {
+          "question": "Wat is de goedkoopste guardrailfout om te herstellen?",
+          "answer": "Een frontiermodel als rechter gebruiken. Classificatie en beleidschecks zijn de ene workload waarvoor een klein, goedkoop model meestal volstaat, dus de rechter wisselen is vaak de grootste besparing."
+        },
+        {
+          "question": "Moet intern verkeer dezelfde guardrails krijgen als productie?",
+          "answer": "Meestal niet. Evaluatieharnassen en interne tools erven standaard vaak de volledige consumentgerichte veiligheidsstack en betalen voor checks die de verkeersklasse niet nodig heeft."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/llm-cost-attribution",
+          "label": "Toerekening van LLM-kosten"
+        },
+        {
+          "slug": "/research/evals-cost-control",
+          "label": "Evals als kostenbeheersing"
+        },
+        {
+          "slug": "/research/model-routing",
+          "label": "Modelrouting"
+        }
+      ]
+    },
+    "zh": {
+      "title": "安全检查是第二张账单",
+      "titleCore": "护栏与审核检查的成本",
+      "description": "每一次护栏检查，都是对同一内容的又一次模型调用。大多数团队只为主模型做预算，却从未为检查它的模型定价。",
+      "body": "<p>一个生产环境中的 LLM 功能很少只调用一次模型。它会做你设计的那次调用，然后再加上之后为安全而添加的一次或多次调用：输入分类器、输出检查、策略评判器，有时还有第二个模型来给第一个模型打分。每一项都是推理，而推理是要计费的。</p>\n\n<h2>倍数比看上去大</h2>\n<p>请诚实地统计这些检查。输入审核会读取完整的用户输入。输出审核会读取完整的生成结果。策略或事实依据评判器通常会<em>同时</em>读取两者，外加检索到的上下文和一份评分标准，这使得评判调用比它所评判的调用还要大。再加上越狱分类器和 PII 扫描，一次用户请求就变成了五次推理调用。</p>\n\n<p>这些成本并不相等。专用审核端点在某些供应商那里便宜甚至免费。但把通用模型用作评判器就不同了：它与其他调用的计价方式相同，而用一份长篇评分标准去评判一个长回答，本身就是一次长调用。</p>\n\n<h2>支出实际在哪里累积</h2>\n<p>有三种模式占主导。<strong>用前沿模型做评判</strong>，因为复用同一个客户端最省事。分类恰恰是小模型确实足够的任务，而这往往是可获得的最大单项节省。<strong>在长对话的每一轮都做检查</strong>，反复扫描本来已经通过审核的历史内容。还有<strong>对内部流量也启用护栏</strong>：评估框架或内部工具会继承整套面向消费者的安全栈，而它们其实并不需要。</p>\n\n<h2>把它作为一项预算，而不是四舍五入的误差</h2>\n<p>重点不是去掉这些检查。而是要认识到，一套安全栈可能占到某个功能推理成本的 30&ndash;50%，却没有出现在任何计划里，因为大家只计算了回答问题的模型，没有计算检查问题的模型。</p>\n\n<p>在遥测中单独标记护栏调用，使这一比例可见。然后使用满足所需准确率的最便宜模型，只对新内容运行检查，而不是对整段历史重复检查，并针对每个入口，决定特定流量类别实际需要哪些检查。</p>\n\n<h2>相关阅读</h2>\n<ul>\n<li>\n<a href=\"/research/llm-cost-attribution\">LLM 成本归因</a>\n</li>\n<li>\n<a href=\"/research/evals-cost-control\">把评估当作成本控制</a>\n</li>\n<li>\n<a href=\"/research/model-routing\">模型路由</a>\n</li>\n</ul>",
+      "faq": [
+        {
+          "question": "护栏会让 LLM 成本增加多少？",
+          "answer": "这取决于技术栈，但如果一个功能同时使用输入审核、输出审核和一个前沿模型评判器，它可能会把 30% 到 50% 的推理预算花在检查上，而不是回答上。"
+        },
+        {
+          "question": "最便宜、最容易修正的护栏错误是什么？",
+          "answer": "用前沿模型做评判器。分类和策略检查是小而便宜的模型通常就足够的工作负载，因此更换评判器往往是单项最大的节省。"
+        },
+        {
+          "question": "内部流量应该和生产环境使用相同的护栏吗？",
+          "answer": "通常不应该。评估框架和内部工具往往默认继承整套面向消费者的安全栈，为该流量类别并不需要的检查付费。"
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/llm-cost-attribution",
+          "label": "LLM 成本归因"
+        },
+        {
+          "slug": "/research/evals-cost-control",
+          "label": "把评估当作成本控制"
+        },
+        {
+          "slug": "/research/model-routing",
+          "label": "模型路由"
         }
       ]
     }

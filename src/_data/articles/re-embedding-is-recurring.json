@@ -15,7 +15,7 @@
       "title": "Re-embedding your corpus recurs",
       "titleCore": "The recurring cost of embeddings and vector stores",
       "description": "Embedding is budgeted as a one-off migration and behaves like a subscription. Model changes, chunking changes and content churn all re-bill the whole corpus.",
-      "body": "<p>Embedding cost gets approved as a project line: a corpus of a few million documents, a one-time run, a number that looks small next to generation spend. Then it never stops, because three separate forces re-embed things you already paid to embed.</p><h2>The three refresh drivers</h2><p><strong>Content churn</strong> is the honest one and the smallest. Documents change, new ones arrive, deleted ones need removing. It scales with your business and it is straightforwardly forecastable.</p><p><strong>Chunking and pipeline changes</strong> are the sneaky one. Every adjustment to chunk size, overlap, metadata or preprocessing invalidates <em>every vector in the store</em>. A retrieval-quality experiment that sounds like a config tweak is a full re-embed of the entire corpus, and teams run several of these in a good quarter.</p><p><strong>Model changes</strong> are the big one. Embedding spaces are not compatible across models, so adopting a better or cheaper embedding model means re-embedding everything before you can query anything. There is no incremental path and no partial migration &mdash; you run both stores in parallel or you take an outage.</p><h2>The store is its own line</h2><p>Vectors also cost to keep. Managed vector databases charge for storage and for the compute serving queries, and dimensionality drives both: a higher-dimensional model that is marginally better at retrieval can be materially more expensive to host forever. That tradeoff is usually made by whoever picked the model, on quality grounds alone, with no view of the hosting bill.</p><h2>Budget it as an annuity</h2><p>Forecast a full corpus re-embed at least once a year and treat it as scheduled, not exceptional. Price a candidate embedding model on <em>re-embed cost plus a year of storage and query serving</em>, not on the per-token rate. Keep the raw source content addressable so a re-embed is a batch job rather than a re-ingestion project &mdash; and run those jobs through a batch endpoint, since a full re-embed is the most latency-tolerant workload you own and therefore the one where batch pricing pays best.</p><h2>Related</h2><ul><li><a href=&quot;/research/rag-cost-optimization&quot;>RAG cost optimization</a></li><li><a href=&quot;/research/batch-api-finops&quot;>Batch API FinOps</a></li><li><a href=&quot;/research/long-context-vs-rag-cost&quot;>Long context vs RAG cost</a></li></ul>",
+      "body": "<p>Embedding cost gets approved as a project line: a corpus of a few million documents, a one-time run, a number that looks small next to generation spend. Then it never stops, because three separate forces re-embed things you already paid to embed.</p><h2>The three refresh drivers</h2><p><strong>Content churn</strong> is the honest one and the smallest. Documents change, new ones arrive, deleted ones need removing. It scales with your business and it is straightforwardly forecastable.</p><p><strong>Chunking and pipeline changes</strong> are the sneaky one. Every adjustment to chunk size, overlap, metadata or preprocessing invalidates <em>every vector in the store</em>. A retrieval-quality experiment that sounds like a config tweak is a full re-embed of the entire corpus, and teams run several of these in a good quarter.</p><p><strong>Model changes</strong> are the big one. Embedding spaces are not compatible across models, so adopting a better or cheaper embedding model means re-embedding everything before you can query anything. There is no incremental path and no partial migration &mdash; you run both stores in parallel or you take an outage.</p><h2>The store is its own line</h2><p>Vectors also cost to keep. Managed vector databases charge for storage and for the compute serving queries, and dimensionality drives both: a higher-dimensional model that is marginally better at retrieval can be materially more expensive to host forever. That tradeoff is usually made by whoever picked the model, on quality grounds alone, with no view of the hosting bill.</p><h2>Budget it as an annuity</h2><p>Forecast a full corpus re-embed at least once a year and treat it as scheduled, not exceptional. Price a candidate embedding model on <em>re-embed cost plus a year of storage and query serving</em>, not on the per-token rate. Keep the raw source content addressable so a re-embed is a batch job rather than a re-ingestion project &mdash; and run those jobs through a batch endpoint, since a full re-embed is the most latency-tolerant workload you own and therefore the one where batch pricing pays best.</p><h2>Related</h2><ul><li><a href=\"/research/rag-cost-optimization\">RAG cost optimization</a></li><li><a href=\"/research/batch-api-finops\">Batch API FinOps</a></li><li><a href=\"/research/long-context-vs-rag-cost\">Long context vs RAG cost</a></li></ul>",
       "faq": [
         {
           "question": "Why is embedding cost recurring rather than one-off?",
@@ -132,6 +132,346 @@
         {
           "slug": "/research/rag-cost-optimization",
           "label": "RAG のコスト最適化"
+        }
+      ]
+    },
+    "id": {
+      "title": "Penyematan ulang korpus terus berulang",
+      "titleCore": "Biaya berulang untuk embedding dan vector store",
+      "description": "Embedding dianggarkan sebagai migrasi satu kali, padahal perilakunya seperti langganan. Perubahan model, chunking, dan konten menagih ulang seluruh korpus.",
+      "body": "<p>Biaya embedding disetujui sebagai satu baris proyek: korpus berisi beberapa juta dokumen, dijalankan sekali, dan angkanya terlihat kecil dibandingkan belanja generasi. Setelah itu biayanya tidak pernah berhenti, karena tiga kekuatan terpisah terus menyematkan ulang hal-hal yang sudah pernah Anda bayar untuk disematkan.</p><h2>Tiga pemicu penyegaran</h2><p><strong>Perubahan konten</strong> adalah yang paling jujur dan paling kecil. Dokumen berubah, dokumen baru masuk, dokumen yang dihapus perlu dibuang. Besarnya mengikuti pertumbuhan bisnis Anda dan cukup mudah diperkirakan.</p><p><strong>Perubahan chunking dan pipeline</strong> adalah yang licik. Setiap penyesuaian ukuran chunk, overlap, metadata, atau preprocessing membuat <em>setiap vektor di store</em> tidak berlaku lagi. Eksperimen kualitas retrieval yang terdengar seperti perubahan konfigurasi kecil ternyata berarti embedding ulang untuk seluruh korpus, dan tim sering menjalankannya beberapa kali dalam satu kuartal yang baik.</p><p><strong>Perubahan model</strong> adalah yang paling besar. Ruang embedding tidak kompatibel antar model, jadi mengadopsi model embedding yang lebih baik atau lebih murah berarti menyematkan ulang semuanya sebelum Anda bisa melakukan query apa pun. Tidak ada jalur bertahap dan tidak ada migrasi parsial. Anda harus menjalankan dua store secara paralel atau menerima downtime.</p><h2>Store adalah pos biaya tersendiri</h2><p>Vektor juga memakan biaya untuk disimpan. Basis data vektor terkelola menagih penyimpanan dan komputasi untuk melayani query, dan dimensi model memengaruhi keduanya. Model berdimensi lebih tinggi yang sedikit lebih baik untuk retrieval bisa jauh lebih mahal untuk di-host selamanya. Keputusan ini biasanya dibuat oleh orang yang memilih model, berdasarkan kualitas saja, tanpa melihat tagihan hosting.</p><h2>Anggarkan sebagai anuitas</h2><p>Perkirakan embedding ulang seluruh korpus minimal sekali setahun dan perlakukan sebagai agenda rutin, bukan kejadian luar biasa. Hargai kandidat model embedding berdasarkan <em>biaya embedding ulang ditambah satu tahun penyimpanan dan layanan query</em>, bukan berdasarkan tarif per token. Simpan konten sumber mentah dengan cara yang bisa dialamatkan, supaya embedding ulang menjadi job batch dan bukan proyek ingest ulang. Jalankan job tersebut melalui batch endpoint, karena embedding ulang penuh adalah beban paling toleran terhadap latensi yang Anda miliki, sehingga harga batch paling menguntungkan di sini.</p><h2>Terkait</h2><ul><li><a href=\"/research/rag-cost-optimization\">Optimasi biaya RAG</a></li><li><a href=\"/research/batch-api-finops\">FinOps Batch API</a></li><li><a href=\"/research/long-context-vs-rag-cost\">Konteks panjang vs biaya RAG</a></li></ul>",
+      "faq": [
+        {
+          "question": "Mengapa biaya embedding bersifat berulang, bukan sekali bayar?",
+          "answer": "Perubahan konten, perubahan chunking atau pipeline, dan perubahan model embedding masing-masing memaksa embedding ulang. Dua yang terakhir membuat setiap vektor di store tidak berlaku, sehingga seluruh korpus ditagih ulang."
+        },
+        {
+          "question": "Bisakah model embedding dimigrasikan secara bertahap?",
+          "answer": "Tidak. Ruang embedding tidak kompatibel antar model, jadi seluruh korpus harus disematkan ulang sebelum query bisa berjalan. Dalam praktiknya Anda menjalankan dua store secara paralel atau menerima downtime."
+        },
+        {
+          "question": "Bagaimana sebaiknya harga model embedding dihitung?",
+          "answer": "Berdasarkan biaya embedding ulang ditambah satu tahun penyimpanan dan layanan query, bukan tarif per token. Dimensi model memengaruhi biaya hosting, jadi model yang sedikit lebih baik bisa jauh lebih mahal untuk dipertahankan."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/rag-cost-optimization",
+          "label": "Optimasi biaya RAG"
+        },
+        {
+          "slug": "/research/batch-api-finops",
+          "label": "FinOps Batch API"
+        },
+        {
+          "slug": "/research/long-context-vs-rag-cost",
+          "label": "Konteks panjang vs biaya RAG"
+        }
+      ]
+    },
+    "pl": {
+      "title": "Ponowne osadzanie korpusu wraca cyklicznie",
+      "titleCore": "Cykliczny koszt osadzeń i magazynów wektorów",
+      "description": "Osadzanie jest budżetowane jak jednorazowa migracja, a działa jak subskrypcja. Zmiany modelu, chunkingu i treści ponownie rozliczają cały korpus.",
+      "body": "<p>Koszt osadzania zatwierdza się jako pozycję projektu: korpus kilku milionów dokumentów, jednorazowe uruchomienie, liczba wyglądająca skromnie obok wydatków na generowanie. Potem to nigdy się nie kończy, bo trzy odrębne czynniki ponownie osadzają rzeczy, za które już zapłaciłeś.</p><h2>Trzy czynniki odświeżania</h2><p><strong>Rotacja treści</strong> jest uczciwa i najmniejsza. Dokumenty się zmieniają, pojawiają się nowe, usunięte trzeba wyrzucić. Rośnie razem z biznesem i da się ją prosto prognozować.</p><p><strong>Zmiany chunkingu i potoku</strong> są podstępne. Każda korekta rozmiaru fragmentu, nakładania lub metadanych bądź przetwarzania wstępnego unieważnia <em>każdy wektor w magazynie</em>. Eksperyment z jakością wyszukiwania, który brzmi jak zmiana konfiguracji, to pełne ponowne osadzenie całego korpusu, a zespoły w dobrym kwartale przeprowadzają ich kilka.</p><p><strong>Zmiany modelu</strong> są największe. Przestrzenie osadzeń nie są kompatybilne między modelami, więc przyjęcie lepszego lub tańszego modelu osadzania oznacza ponowne osadzenie wszystkiego, zanim cokolwiek da się przeszukać. Nie ma ścieżki przyrostowej ani częściowej migracji &mdash; albo utrzymujesz dwa magazyny równolegle, albo przyjmujesz przestój.</p><h2>Magazyn to osobna pozycja</h2><p>Wektory kosztują też w utrzymaniu. Zarządzane bazy wektorowe liczą opłatę za przechowywanie i za moc obliczeniową obsługującą zapytania, a wymiarowość napędza oba. Model o wyższym wymiarze, który jest nieco lepszy w wyszukiwaniu, może na stałe być znacząco droższy w hostingu. Ten kompromis zwykle podejmuje ktoś, kto wybrał model, kierując się wyłącznie jakością, bez wglądu w rachunek za hosting.</p><h2>Budżetuj to jak annuitet</h2><p>Prognozuj pełne ponowne osadzenie korpusu przynajmniej raz w roku i traktuj je jako zaplanowane, a nie wyjątkowe. Wyceniaj kandydacki model osadzania na podstawie <em>kosztu ponownego osadzenia plus roku przechowywania i obsługi zapytań</em>, a nie stawki za token. Utrzymuj surowe treści źródłowe adresowalne, tak aby ponowne osadzenie było zadaniem wsadowym, a nie projektem ponownego wczytywania &mdash; i uruchamiaj te zadania przez endpoint wsadowy, bo pełne ponowne osadzenie to najbardziej tolerancyjna na opóźnienia praca, jaką masz, a więc ta, na której cena wsadowa najbardziej się opłaca.</p><h2>Powiązane</h2><ul><li><a href=\"/research/rag-cost-optimization\">Optymalizacja kosztów RAG</a></li><li><a href=\"/research/batch-api-finops\">FinOps Batch API</a></li><li><a href=\"/research/long-context-vs-rag-cost\">Długi kontekst a koszt RAG</a></li></ul>",
+      "faq": [
+        {
+          "question": "Dlaczego koszt osadzania jest cykliczny, a nie jednorazowy?",
+          "answer": "Rotacja treści, zmiany chunkingu lub potoku oraz zmiany modelu osadzania wymuszają ponowne osadzenie. Dwa ostatnie unieważniają każdy wektor w magazynie, więc rozlicza się cały korpus."
+        },
+        {
+          "question": "Czy można migrować modele osadzania przyrostowo?",
+          "answer": "Nie. Przestrzenie osadzeń nie są kompatybilne między modelami, więc korpus musi zostać w całości ponownie osadzony, zanim zapytania zaczną działać. W praktyce utrzymujesz dwa magazyny równolegle albo akceptujesz przestój."
+        },
+        {
+          "question": "Jak wyceniać model osadzania?",
+          "answer": "Na podstawie kosztu ponownego osadzenia plus roku przechowywania i obsługi zapytań, a nie stawki za token. Wymiarowość napędza koszt hostingu, więc nieco lepszy model może na stałe być znacząco droższy."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/rag-cost-optimization",
+          "label": "Optymalizacja kosztów RAG"
+        },
+        {
+          "slug": "/research/batch-api-finops",
+          "label": "FinOps Batch API"
+        },
+        {
+          "slug": "/research/long-context-vs-rag-cost",
+          "label": "Długi kontekst a koszt RAG"
+        }
+      ]
+    },
+    "ru": {
+      "title": "Переэмбеддинг корпуса — постоянная статья расходов",
+      "titleCore": "Регулярная стоимость эмбеддингов и векторных хранилищ",
+      "description": "Эмбеддинг закладывают в бюджет как разовую миграцию, а ведет он себя как подписка. Смена модели, чанкинга и контента заново тарифицирует весь корпус.",
+      "body": "<p>Стоимость эмбеддингов утверждают как строку проекта: корпус из нескольких миллионов документов, однократный запуск, цифра, которая на фоне расходов на генерацию выглядит скромно. Потом это не прекращается, потому что три разные силы заново эмбеддят то, за что вы уже заплатили.</p><h2>Три драйвера обновления</h2><p><strong>Обновление контента</strong> — самый честный и самый маленький. Документы меняются, появляются новые, удаленные нужно убрать. Объем растет вместе с бизнесом, и его легко прогнозировать.</p><p><strong>Изменения чанкинга и пайплайна</strong> — коварный драйвер. Любая настройка размера чанка, перекрытия, метаданных или предобработки делает недействительными <em>все векторы в хранилище</em>. Эксперимент по качеству поиска, который звучит как правка конфига, на деле означает полный пересчет эмбеддингов всего корпуса, и в удачный квартал команды проводят таких экспериментов несколько.</p><p><strong>Смена модели</strong> — самый крупный драйвер. Пространства эмбеддингов несовместимы между моделями, поэтому переход на лучшую или более дешевую модель требует пересчета всего корпуса до того, как можно что-либо искать. Инкрементального пути и частичной миграции нет: либо работаете с двумя хранилищами параллельно, либо принимаете простой.</p><h2>Хранилище — отдельная статья</h2><p>Векторы стоят денег и просто за хранение. Управляемые векторные базы берут плату за объем данных и за вычисления на запросах, и на обе влияет размерность: модель с более высокой размерностью, которая лишь немного точнее в поиске, может оказаться существенно дороже в постоянном хостинге. Этот компромисс обычно принимает тот, кто выбрал модель, исключительно по качеству, не видя счета за хостинг.</p><h2>Закладывайте в бюджет как аннуитет</h2><p>Прогнозируйте полный пересчет корпуса не реже раза в год и относитесь к нему как к плановой операции, а не к исключению. Оценивайте кандидата на модель эмбеддингов по формуле <em>стоимость пересчета плюс год хранения и обслуживания запросов</em>, а не по цене за токен. Держите исходный контент адресуемым, чтобы пересчет был пакетным заданием, а не проектом повторного импорта. И запускайте такие задания через пакетный эндпоинт: полный пересчет — самая терпимая к задержкам нагрузка из всех, что у вас есть, поэтому именно здесь пакетные цены окупаются лучше всего.</p><h2>Связанное</h2><ul><li><a href=\"/research/rag-cost-optimization\">Оптимизация стоимости RAG</a></li><li><a href=\"/research/batch-api-finops\">FinOps Batch API</a></li><li><a href=\"/research/long-context-vs-rag-cost\">Длинный контекст против RAG: стоимость</a></li></ul>",
+      "faq": [
+        {
+          "question": "Почему стоимость эмбеддингов повторяется, а не разовая?",
+          "answer": "Обновление контента, изменения чанкинга или пайплайна и смена модели эмбеддингов каждый раз требуют пересчета. Последние два делают недействительными все векторы в хранилище, поэтому корпус тарифицируется заново целиком."
+        },
+        {
+          "question": "Можно ли мигрировать модели эмбеддингов постепенно?",
+          "answer": "Нет. Пространства эмбеддингов несовместимы между моделями, поэтому корпус нужно полностью пересчитать, прежде чем запросы начнут работать. На практике либо работают два хранилища параллельно, либо принимают простой."
+        },
+        {
+          "question": "Как оценивать модель эмбеддингов по стоимости?",
+          "answer": "По стоимости пересчета плюс год хранения и обслуживания запросов, а не по цене за токен. Размерность определяет стоимость хостинга, поэтому немного более точная модель может оказаться существенно дороже в поддержке."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/rag-cost-optimization",
+          "label": "Оптимизация стоимости RAG"
+        },
+        {
+          "slug": "/research/batch-api-finops",
+          "label": "FinOps Batch API"
+        },
+        {
+          "slug": "/research/long-context-vs-rag-cost",
+          "label": "Длинный контекст против RAG: стоимость"
+        }
+      ]
+    },
+    "tr": {
+      "title": "Korpusu yeniden embed etmek tekrarlayan bir maliyettir",
+      "titleCore": "Embedding ve vektör depolarının tekrarlayan maliyeti",
+      "description": "Embedding tek seferlik bir geçiş olarak bütçelenir, ama abonelik gibi davranır. Model, chunking ve içerik değişiklikleri tüm korpusu yeniden faturalandırır.",
+      "body": "<p>Embedding maliyeti tek seferlik bir proje kalemi olarak onaylanır: birkaç milyon belgelik bir korpus, tek bir çalıştırma, üretim harcamalarının yanında küçük görünen bir rakam. Sonra bu hiç durmaz, çünkü üç ayrı güç, zaten ödediğiniz şeyleri yeniden embed eder.</p><h2>Üç yenileme etkeni</h2><p><strong>İçerik değişimi</strong> en dürüst ve en küçük olanıdır. Belgeler değişir, yenileri gelir, silinenlerin kaldırılması gerekir. İşinizle birlikte ölçeklenir ve düz bir şekilde öngörülebilir.</p><p><strong>Chunking ve pipeline değişiklikleri</strong> sinsi olanıdır. Chunk boyutu, örtüşme, metadata ya da ön işlemedeki her ayar <em>depodaki her vektörü</em> geçersiz kılar. Bir config ayarı gibi görünen bir retrieval kalitesi denemesi, tüm korpusun tam bir yeniden embed edilmesi demektir ve iyi bir çeyrekte ekipler bunlardan birkaçını çalıştırır.</p><p><strong>Model değişiklikleri</strong> en büyük olanıdır. Embedding uzayları modeller arasında uyumlu değildir; dolayısıyla daha iyi ya da daha ucuz bir embedding modeline geçmek, sorgu yapabilmeden önce her şeyin yeniden embed edilmesi anlamına gelir. Artımlı bir yol ve kısmi bir geçiş yoktur &mdash; iki depoyu paralel işletirsiniz ya da kesinti yaşarsınız.</p><h2>Depo da ayrı bir kalemdir</h2><p>Vektörleri saklamak da maliyet getirir. Yönetilen vektör veritabanları depolama ve sorguları sunan işlem gücü için ücret alır; boyut sayısı ikisini de belirler. Retrieval'da marjinal olarak daha iyi ama daha yüksek boyutlu bir model, sonsuza dek barındırılması açısından önemli ölçüde pahalı olabilir. Bu denge genellikle modeli seçen kişi tarafından yalnızca kalite gerekçesiyle, barındırma faturasını görmeden yapılır.</p><h2>Bunu yıllık bir ödeme gibi bütçeleyin</h2><p>Tüm korpusun yeniden embed edilmesini yılda en az bir kez öngörün ve bunu istisnai değil, planlı bir iş olarak ele alın. Aday bir embedding modelini token başına fiyata göre değil, <em>yeniden embed maliyeti artı bir yıllık depolama ve sorgu sunumu</em> üzerinden fiyatlandırın. Ham kaynak içeriğini adreslenebilir tutun ki yeniden embed etmek bir yeniden alım projesi değil, bir batch işi olsun &mdash; ve bu işleri bir batch endpoint üzerinden çalıştırın, çünkü tam yeniden embed, sahip olduğunuz en gecikmeye toleranslı iş yüküdür ve bu yüzden batch fiyatlandırmasının en çok kazandırdığı iştir.</p><h2>İlgili</h2><ul><li><a href=\"/research/rag-cost-optimization\">RAG maliyet optimizasyonu</a></li><li><a href=\"/research/batch-api-finops\">Batch API FinOps</a></li><li><a href=\"/research/long-context-vs-rag-cost\">Uzun bağlam ile RAG maliyeti</a></li></ul>",
+      "faq": [
+        {
+          "question": "Embedding maliyeti neden tek seferlik değil de tekrarlayan?",
+          "answer": "İçerik değişimi, chunking ya da pipeline değişiklikleri ve embedding modeli değişiklikleri yeniden embed etmeyi zorunlu kılar. Son ikisi depodaki tüm vektörleri geçersiz kıldığı için korpusun tamamı yeniden faturalandırılır."
+        },
+        {
+          "question": "Embedding modellerini kademeli olarak geçirebilir misiniz?",
+          "answer": "Hayır. Embedding uzayları modeller arasında uyumlu değildir; bu yüzden sorgular çalışmadan önce korpusun tamamının yeniden embed edilmesi gerekir. Pratikte iki depoyu paralel işletirsiniz ya da bir kesintiyi kabul edersiniz."
+        },
+        {
+          "question": "Bir embedding modeli nasıl fiyatlandırılmalı?",
+          "answer": "Token başına oran yerine yeniden embed maliyeti artı bir yıllık depolama ve sorgu sunumu üzerinden. Boyut sayısı barındırma maliyetini belirler; dolayısıyla marjinal olarak daha iyi bir model, tutması önemli ölçüde pahalı olabilir."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/rag-cost-optimization",
+          "label": "RAG maliyet optimizasyonu"
+        },
+        {
+          "slug": "/research/batch-api-finops",
+          "label": "Batch API FinOps"
+        },
+        {
+          "slug": "/research/long-context-vs-rag-cost",
+          "label": "Uzun bağlam ile RAG maliyeti"
+        }
+      ]
+    },
+    "vi": {
+      "title": "Việc embed lại corpus diễn ra định kỳ",
+      "titleCore": "Chi phí định kỳ của embedding và vector store",
+      "description": "Embedding thường được lập ngân sách như một lần di chuyển nhưng lại vận hành như thuê bao. Đổi mô hình, chunking hay nội dung đều tính lại cả corpus.",
+      "body": "<p>Chi phí embedding thường được duyệt như một hạng mục dự án: vài triệu tài liệu, chạy một lần, con số trông nhỏ so với chi tiêu sinh nội dung. Nhưng nó không bao giờ dừng, vì ba lực khác nhau buộc bạn embed lại những thứ đã trả tiền để embed.</p><h2>Ba yếu tố làm mới</h2><p><strong>Nội dung thay đổi</strong> là yếu tố trung thực nhất và cũng nhỏ nhất. Tài liệu được sửa, tài liệu mới xuất hiện, tài liệu cũ cần xóa. Nó tăng theo quy mô kinh doanh và khá dễ dự báo.</p><p><strong>Thay đổi chunking hoặc pipeline</strong> là yếu tố khó thấy nhất. Mọi điều chỉnh kích thước chunk, phần chồng lấn, metadata hay bước tiền xử lý đều làm mất hiệu lực <em>mọi vector trong store</em>. Một thử nghiệm chất lượng truy xuất nghe như chỉnh cấu hình thực chất là embed lại toàn bộ corpus, và trong một quý tốt, các đội thường chạy nhiều thử nghiệm như vậy.</p><p><strong>Thay đổi mô hình</strong> là yếu tố lớn nhất. Không gian embedding không tương thích giữa các mô hình, nên muốn dùng mô hình tốt hơn hoặc rẻ hơn thì phải embed lại mọi thứ trước khi truy vấn được. Không có đường đi tăng dần và cũng không có di chuyển từng phần. Bạn hoặc chạy song song hai store, hoặc chấp nhận gián đoạn.</p><h2>Store là một dòng chi phí riêng</h2><p>Vector cũng tốn chi phí để lưu giữ. Các vector database được quản lý tính phí cho lưu trữ lẫn tài nguyên xử lý truy vấn, và số chiều (dimension) ảnh hưởng đến cả hai. Một mô hình số chiều cao hơn chỉ tốt hơn một chút về truy xuất có thể khiến chi phí lưu trữ lâu dài tăng đáng kể. Đánh đổi này thường do người chọn mô hình quyết định chỉ dựa trên chất lượng, không nhìn vào hóa đơn hosting.</p><h2>Lập ngân sách như một khoản niên kim</h2><p>Dự báo việc embed lại toàn bộ corpus ít nhất mỗi năm một lần và coi đó là việc đã lên lịch, không phải ngoại lệ. Đánh giá một mô hình embedding theo <em>chi phí embed lại cộng với một năm lưu trữ và phục vụ truy vấn</em>, không theo đơn giá trên mỗi token. Giữ nội dung gốc luôn có thể truy cập theo địa chỉ, để việc embed lại là một batch job thay vì một dự án nạp dữ liệu lại từ đầu. Và hãy chạy các job này qua batch endpoint, vì embed lại toàn bộ là khối việc chịu được độ trễ cao nhất bạn có, do đó cũng là nơi giá batch mang lại lợi ích lớn nhất.</p><h2>Liên quan</h2><ul><li><a href=\"/research/rag-cost-optimization\">Tối ưu chi phí RAG</a></li><li><a href=\"/research/batch-api-finops\">FinOps cho Batch API</a></li><li><a href=\"/research/long-context-vs-rag-cost\">Long context so với chi phí RAG</a></li></ul>",
+      "faq": [
+        {
+          "question": "Vì sao chi phí embedding là định kỳ chứ không phải một lần?",
+          "answer": "Nội dung thay đổi, thay đổi chunking hoặc pipeline, và thay đổi mô hình embedding đều buộc phải embed lại. Hai yếu tố sau làm mất hiệu lực mọi vector trong store, nên toàn bộ corpus bị tính phí lại."
+        },
+        {
+          "question": "Có thể di chuyển mô hình embedding từng phần không?",
+          "answer": "Không. Không gian embedding không tương thích giữa các mô hình, nên phải embed lại toàn bộ corpus trước khi truy vấn hoạt động. Trong thực tế bạn phải chạy song song hai store hoặc chấp nhận gián đoạn."
+        },
+        {
+          "question": "Nên định giá một mô hình embedding như thế nào?",
+          "answer": "Theo chi phí embed lại cộng với một năm lưu trữ và phục vụ truy vấn, không theo đơn giá trên mỗi token. Số chiều ảnh hưởng đến chi phí hosting, nên một mô hình tốt hơn một chút có thể đắt hơn đáng kể khi duy trì lâu dài."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/rag-cost-optimization",
+          "label": "Tối ưu chi phí RAG"
+        },
+        {
+          "slug": "/research/batch-api-finops",
+          "label": "FinOps cho Batch API"
+        },
+        {
+          "slug": "/research/long-context-vs-rag-cost",
+          "label": "Long context so với chi phí RAG"
+        }
+      ]
+    },
+    "ar": {
+      "title": "إعادة تضمين مدوّنتك تتكرر باستمرار",
+      "titleCore": "التكلفة المتكررة للتضمينات ومخازن المتجهات",
+      "description": "تُدرج التضمينات في الميزانية كترحيل لمرة واحدة، لكنها تتصرف كاشتراك. تغيّر النموذج والتقطيع وتجدد المحتوى كلها تعيد فوترة المدونة بأكملها.",
+      "body": "<p>تُعتمد تكلفة التضمين كبند مشروع: مدونة من بضعة ملايين وثيقة، وتشغيل لمرة واحدة، ورقم يبدو صغيراً بجانب إنفاق التوليد. ثم لا تتوقف أبداً، لأن ثلاث قوى منفصلة تعيد تضمين أشياء دفعت ثمن تضمينها من قبل.</p><h2>محركات التحديث الثلاثة</h2><p><strong>تجدد المحتوى</strong> هو الصادق والأصغر. الوثائق تتغير، وتصل وثائق جديدة، وتحتاج المحذوفة إلى إزالة. وهو ينمو مع عملك ويمكن توقعه بسهولة.</p><p><strong>تغييرات التقطيع وخط المعالجة</strong> هي الماكرة. كل تعديل في حجم المقطع أو التداخل أو البيانات الوصفية أو المعالجة المسبقة يُبطل <em>كل متجه في المخزن</em>. تجربة لجودة الاسترجاع تبدو كتعديل في الإعدادات هي في الحقيقة إعادة تضمين كاملة للمدونة بأكملها، والفرق تجري عدة تجارب من هذا النوع في ربع سنوي جيد.</p><p><strong>تغييرات النموذج</strong> هي الأكبر. فضاءات التضمين غير متوافقة بين النماذج، لذا فاعتماد نموذج تضمين أفضل أو أرخص يعني إعادة تضمين كل شيء قبل أن تتمكن من الاستعلام عن أي شيء. لا مسار تدريجياً ولا ترحيل جزئياً &mdash; إما أن تشغّل المخزنين بالتوازي أو تتحمل انقطاعاً في الخدمة.</p><h2>المخزن بند مستقل</h2><p>للاحتفاظ بالمتجهات تكلفة أيضاً. قواعد بيانات المتجهات المُدارة تحاسب على التخزين وعلى الحوسبة التي تخدم الاستعلامات، والأبعاد تتحكم في الاثنين: نموذج عالي الأبعاد أفضل قليلاً في الاسترجاع قد يكون أغلى بكثير في الاستضافة إلى الأبد. وغالباً ما يُتخذ هذا المقايضة على يد من اختار النموذج، على أساس الجودة وحدها، دون رؤية لفاتورة الاستضافة.</p><h2>ادرجه في الميزانية كدفعة سنوية دورية</h2><p>توقّع إعادة تضمين كاملة للمدونة مرة في السنة على الأقل، وعاملها كحدث مجدول لا استثنائي. سعّر نموذج التضمين المرشح على <em>تكلفة إعادة التضمين مضافاً إليها سنة من التخزين وخدمة الاستعلامات</em>، لا على سعر الرمز الواحد. وأبقِ المحتوى المصدري الخام قابلاً للعنونة لتكون إعادة التضمين مهمة دفعات لا مشروع إعادة استيعاب &mdash; وشغّل هذه المهام عبر نقطة نهاية الدفعات، لأن إعادة التضمين الكاملة هي أكثر أحمالك تحملاً للكمون، وبالتالي الحمل الذي يعطي فيه تسعير الدفعات أفضل عائد.</p><h2>ذات صلة</h2><ul><li><a href=\"/research/rag-cost-optimization\">تحسين تكلفة RAG</a></li><li><a href=\"/research/batch-api-finops\">FinOps لواجهة الدفعات</a></li><li><a href=\"/research/long-context-vs-rag-cost\">السياق الطويل مقابل تكلفة RAG</a></li></ul>",
+      "faq": [
+        {
+          "question": "لماذا تكون تكلفة التضمين متكررة لا لمرة واحدة؟",
+          "answer": "تجدد المحتوى وتغييرات التقطيع أو خط المعالجة وتغييرات نموذج التضمين، كل منها يفرض إعادة تضمين. والأخيران يُبطلان كل متجه في المخزن، فتُعاد فوترة المدونة كلها."
+        },
+        {
+          "question": "هل يمكن ترحيل نماذج التضمين تدريجياً؟",
+          "answer": "لا. فضاءات التضمين غير متوافقة بين النماذج، لذا يجب إعادة تضمين المدونة بالكامل قبل أن تعمل الاستعلامات. عملياً تشغّل المخزنين بالتوازي أو تقبل انقطاعاً في الخدمة."
+        },
+        {
+          "question": "كيف يُسعَّر نموذج التضمين؟",
+          "answer": "على أساس تكلفة إعادة التضمين مضافاً إليها سنة من التخزين وخدمة الاستعلامات، لا سعر الرمز الواحد. الأبعاد تحدد تكلفة الاستضافة، لذا قد يكون نموذج أفضل قليلاً أغلى بكثير في الإبقاء عليه."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/rag-cost-optimization",
+          "label": "تحسين تكلفة RAG"
+        },
+        {
+          "slug": "/research/batch-api-finops",
+          "label": "FinOps لواجهة الدفعات"
+        },
+        {
+          "slug": "/research/long-context-vs-rag-cost",
+          "label": "السياق الطويل مقابل تكلفة RAG"
+        }
+      ]
+    },
+    "it": {
+      "title": "Il re-embedding del corpus è ricorrente",
+      "titleCore": "Il costo ricorrente di embedding e vector store",
+      "description": "Gli embedding si budgettano come migrazione una tantum e si comportano come abbonamento. Cambi di modello, chunking e contenuti rifatturano tutto il corpus.",
+      "body": "<p>Il costo degli embedding viene approvato come voce di progetto: un corpus di qualche milione di documenti, una sola esecuzione, una cifra che sembra piccola accanto alla spesa per la generazione. Poi non si ferma mai, perché tre forze distinte rifanno l'embedding di cose per cui hai già pagato.</p><h2>I tre motori di aggiornamento</h2><p><strong>Il ricambio dei contenuti</strong> è quello più onesto e il più piccolo. Documenti che cambiano, nuovi che arrivano, vecchi da rimuovere. Cresce con il business ed è prevedibile.</p><p><strong>Le modifiche a chunking e pipeline</strong> sono quelle subdole. Ogni ritocco a dimensione del chunk, overlap, metadati o preprocessing invalida <em>ogni vettore nello store</em>. Un esperimento sulla qualità del retrieval che sembra un semplice ritocco di configurazione è un re-embedding completo dell'intero corpus, e in un buon trimestre i team ne fanno parecchi.</p><p><strong>I cambi di modello</strong> sono quelli grossi. Gli spazi di embedding non sono compatibili tra modelli, quindi adottare un modello migliore o più economico significa rifare l'embedding di tutto prima di poter interrogare qualsiasi cosa. Non esiste un percorso incrementale né una migrazione parziale &mdash; si tengono due store in parallelo oppure si accetta un'interruzione.</p><h2>Lo store è una voce a sé</h2><p>Anche tenere i vettori ha un costo. I database vettoriali gestiti addebitano lo storage e il calcolo per servire le query, e la dimensionalità incide su entrambi: un modello a dimensioni più alte, appena migliore nel retrieval, può costare molto di più da ospitare per sempre. Questo compromesso di solito lo fa chi ha scelto il modello, guardando solo la qualità, senza alcuna visibilità sulla bolletta dell'hosting.</p><h2>Budgetalo come un'annualità</h2><p>Prevedi un re-embedding completo del corpus almeno una volta all'anno e trattalo come un evento programmato, non come un'eccezione. Valuta un modello candidato su <em>costo del re-embedding più un anno di storage e di servizio delle query</em>, non sul prezzo per token. Mantieni il contenuto sorgente indirizzabile, così un re-embedding è un job batch e non un progetto di re-ingestione &mdash; e lancia quei job tramite un endpoint batch, perché il re-embedding completo è il carico più tollerante alla latenza che possiedi, quindi quello in cui il prezzo batch rende di più.</p><h2>Correlati</h2><ul><li><a href=\"/research/rag-cost-optimization\">Ottimizzazione dei costi RAG</a></li><li><a href=\"/research/batch-api-finops\">FinOps delle Batch API</a></li><li><a href=\"/research/long-context-vs-rag-cost\">Long context vs costo RAG</a></li></ul>",
+      "faq": [
+        {
+          "question": "Perché il costo degli embedding è ricorrente e non una tantum?",
+          "answer": "Il ricambio dei contenuti, le modifiche a chunking o pipeline e i cambi di modello costringono tutti a un re-embedding. Gli ultimi due invalidano ogni vettore dello store, quindi l'intero corpus viene rifatturato."
+        },
+        {
+          "question": "Si possono migrare i modelli di embedding in modo incrementale?",
+          "answer": "No. Gli spazi di embedding non sono compatibili tra modelli, quindi il corpus va rifatto completamente prima che le query funzionino. In pratica si tengono due store in parallelo oppure si accetta un'interruzione."
+        },
+        {
+          "question": "Come andrebbe valutato il prezzo di un modello di embedding?",
+          "answer": "Sul costo del re-embedding più un anno di storage e di servizio delle query, non sul prezzo per token. La dimensionalità guida il costo di hosting, quindi un modello appena migliore può costare molto di più da mantenere."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/rag-cost-optimization",
+          "label": "Ottimizzazione dei costi RAG"
+        },
+        {
+          "slug": "/research/batch-api-finops",
+          "label": "FinOps delle Batch API"
+        },
+        {
+          "slug": "/research/long-context-vs-rag-cost",
+          "label": "Long context vs costo RAG"
+        }
+      ]
+    },
+    "ko": {
+      "title": "코퍼스 재임베딩은 반복되는 비용이다",
+      "titleCore": "임베딩과 벡터 스토어의 반복 비용",
+      "description": "임베딩은 일회성 마이그레이션으로 예산이 잡히지만 실제로는 구독처럼 동작합니다. 모델, 청킹, 콘텐츠 변경이 모두 코퍼스 전체에 다시 과금됩니다.",
+      "body": "<p>임베딩 비용은 프로젝트 항목으로 승인됩니다. 수백만 건의 문서, 일회성 실행, 생성 비용에 비하면 작아 보이는 숫자입니다. 하지만 이 비용은 끝나지 않습니다. 이미 임베딩 비용을 치른 것을 세 가지 서로 다른 요인이 다시 임베딩하게 만들기 때문입니다.</p><h2>재임베딩을 일으키는 세 가지 요인</h2><p><strong>콘텐츠 변동</strong>은 가장 정직하고 가장 작은 요인입니다. 문서가 바뀌고, 새 문서가 들어오고, 삭제된 문서는 제거해야 합니다. 사업 규모에 비례하고 예측하기도 쉽습니다.</p><p><strong>청킹과 파이프라인 변경</strong>은 눈에 잘 띄지 않는 요인입니다. 청크 크기, 오버랩, 메타데이터, 전처리를 조금이라도 바꾸면 <em>저장소의 모든 벡터</em>가 무효가 됩니다. 설정 조정처럼 들리는 검색 품질 실험이 사실상 코퍼스 전체의 재임베딩입니다. 분기가 잘 풀리는 팀이라면 이런 실험을 여러 번 돌리곤 합니다.</p><p><strong>모델 변경</strong>은 가장 큰 요인입니다. 임베딩 공간은 모델마다 호환되지 않으므로, 더 좋거나 더 저렴한 임베딩 모델로 옮기려면 무엇이든 질의하기 전에 전부 다시 임베딩해야 합니다. 점진적인 경로도, 부분 마이그레이션도 없습니다. 저장소 두 개를 병행 운영하거나, 서비스 중단을 감수해야 합니다.</p><h2>저장소도 별도의 비용 항목이다</h2><p>벡터는 보관에도 비용이 듭니다. 관리형 벡터 데이터베이스는 저장 용량과 질의 처리 컴퓨팅에 요금을 매기고, 두 항목 모두 차원 수에 좌우됩니다. 검색 성능이 조금 더 나은 고차원 모델은 호스팅 비용을 영구히 크게 높일 수 있습니다. 이런 트레이드오프는 보통 모델을 고른 사람이 품질만 보고 결정하며, 호스팅 청구서는 고려하지 않습니다.</p><h2>연간 비용처럼 예산을 잡아라</h2><p>코퍼스 전체의 재임베딩을 최소 연 1회 예상하고, 예외가 아니라 정기 작업으로 다루세요. 후보 임베딩 모델의 가격은 토큰 단가가 아니라 <em>재임베딩 비용 + 1년치 저장 및 질의 처리 비용</em> 기준으로 평가해야 합니다. 원본 콘텐츠를 항상 참조할 수 있게 유지하면 재임베딩은 재수집 프로젝트가 아니라 배치 작업이 됩니다. 그리고 그 작업은 배치 엔드포인트로 돌리세요. 전체 재임베딩은 여러분이 가진 워크로드 중 지연 시간에 가장 관대한 작업이므로, 배치 요금이 가장 큰 효과를 내는 대상입니다.</p><h2>관련 글</h2><ul><li><a href=\"/research/rag-cost-optimization\">RAG 비용 최적화</a></li><li><a href=\"/research/batch-api-finops\">배치 API FinOps</a></li><li><a href=\"/research/long-context-vs-rag-cost\">긴 컨텍스트와 RAG 비용 비교</a></li></ul>",
+      "faq": [
+        {
+          "question": "임베딩 비용은 왜 일회성이 아니라 반복되나요?",
+          "answer": "콘텐츠 변동, 청킹 또는 파이프라인 변경, 임베딩 모델 변경이 각각 재임베딩을 강제합니다. 뒤의 두 가지는 저장소의 모든 벡터를 무효화하므로 코퍼스 전체가 다시 과금됩니다."
+        },
+        {
+          "question": "임베딩 모델을 점진적으로 마이그레이션할 수 있나요?",
+          "answer": "아닙니다. 임베딩 공간은 모델 간에 호환되지 않으므로 질의가 작동하려면 코퍼스 전체를 다시 임베딩해야 합니다. 실무에서는 두 저장소를 병행 운영하거나 서비스 중단을 감수하게 됩니다."
+        },
+        {
+          "question": "임베딩 모델은 어떤 기준으로 가격을 평가해야 하나요?",
+          "answer": "토큰 단가가 아니라 재임베딩 비용과 1년치 저장 및 질의 처리 비용을 합산해 평가해야 합니다. 차원 수가 호스팅 비용을 좌우하므로, 조금 더 나은 모델이 유지 비용 면에서는 크게 비쌀 수 있습니다."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/rag-cost-optimization",
+          "label": "RAG 비용 최적화"
+        },
+        {
+          "slug": "/research/batch-api-finops",
+          "label": "배치 API FinOps"
+        },
+        {
+          "slug": "/research/long-context-vs-rag-cost",
+          "label": "긴 컨텍스트 대비 RAG 비용"
+        }
+      ]
+    },
+    "nl": {
+      "title": "Je corpus opnieuw embedden komt terug",
+      "titleCore": "De terugkerende kosten van embeddings en vectoropslag",
+      "description": "Embedden wordt begroot als eenmalige migratie, maar het is een abonnement. Modelwissels factureren het hele corpus opnieuw.",
+      "body": "<p>Embeddingkosten worden goedgekeurd als een projectregel: een corpus van een paar miljoen documenten, een eenmalige run, een getal dat klein lijkt naast de uitgaven aan generatie. Daarna houdt het nooit op, omdat drie afzonderlijke krachten dingen opnieuw embedden waarvoor je al hebt betaald.</p><h2>De drie vernieuwingsfactoren</h2><p><strong>Contentverloop</strong> is de eerlijke en de kleinste. Documenten veranderen, nieuwe komen binnen, verwijderde moeten worden opgeruimd. Het schaalt mee met je bedrijf en is eenvoudig te voorspellen.</p><p><strong>Wijzigingen in chunking en pipeline</strong> zijn de verraderlijke. Elke aanpassing van chunkgrootte, overlap, metadata of preprocessing maakt <em>elke vector in de store</em> ongeldig. Een experiment met retrievalkwaliteit dat klinkt als een configuratiewijziging is een volledige re-embed van het hele corpus, en teams doen er in een goed kwartaal meerdere.</p><p><strong>Modelwissels</strong> zijn de grote. Embeddingruimtes zijn niet compatibel tussen modellen, dus een beter of goedkoper embeddingmodel gebruiken betekent alles opnieuw embedden voordat je iets kunt bevragen. Er is geen incrementeel pad en geen gedeeltelijke migratie &mdash; je draait beide stores parallel of je accepteert een storing.</p><h2>De store is een eigen regel</h2><p>Vectoren kosten ook om te bewaren. Beheerde vectordatabases rekenen voor opslag en voor de compute die queries bedient, en dimensionaliteit drijft beide: een model met meer dimensies dat marginaal beter is in retrieval kan voor altijd aanzienlijk duurder zijn om te hosten. Die afweging wordt meestal gemaakt door wie het model koos, uitsluitend op kwaliteit, zonder zicht op de hostingrekening.</p><h2>Begroot het als een annuïteit</h2><p>Voorspel minstens één keer per jaar een volledige re-embed van het corpus en behandel die als gepland, niet als uitzonderlijk. Prijs een kandidaat-embeddingmodel op <em>re-embedkosten plus een jaar opslag en queryserving</em>, niet op het tarief per token. Houd de ruwe broncontent adresseerbaar zodat een re-embed een batchjob is en geen herinname-project &mdash; en draai die jobs via een batch-endpoint, want een volledige re-embed is de meest latentietolerante workload die je hebt en dus die waarbij batchprijzen het best renderen.</p><h2>Gerelateerd</h2><ul><li><a href=\"/research/rag-cost-optimization\">RAG-kostenoptimalisatie</a></li><li><a href=\"/research/batch-api-finops\">Batch-API FinOps</a></li><li><a href=\"/research/long-context-vs-rag-cost\">Lange context versus RAG: kosten</a></li></ul>",
+      "faq": [
+        {
+          "question": "Waarom zijn embeddingkosten terugkerend en niet eenmalig?",
+          "answer": "Contentverloop, wijzigingen in chunking of pipeline en wissels van embeddingmodel dwingen elk een re-embed af. De laatste twee maken elke vector in de store ongeldig, dus het hele corpus wordt opnieuw gefactureerd."
+        },
+        {
+          "question": "Kun je incrementeel migreren naar een ander embeddingmodel?",
+          "answer": "Nee. Embeddingruimtes zijn niet compatibel tussen modellen, dus het corpus moet volledig opnieuw worden geëmbed voordat queries werken. In de praktijk draai je beide stores parallel of accepteer je een storing."
+        },
+        {
+          "question": "Hoe moet een embeddingmodel worden geprijsd?",
+          "answer": "Op re-embedkosten plus een jaar opslag en queryserving, niet op het tarief per token. Dimensionaliteit drijft de hostingkosten, dus een marginaal beter model kan aanzienlijk duurder zijn om te behouden."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/rag-cost-optimization",
+          "label": "RAG-kostenoptimalisatie"
+        },
+        {
+          "slug": "/research/batch-api-finops",
+          "label": "Batch-API FinOps"
+        },
+        {
+          "slug": "/research/long-context-vs-rag-cost",
+          "label": "Lange context versus RAG: kosten"
+        }
+      ]
+    },
+    "zh": {
+      "title": "重新嵌入语料是一项周期性成本",
+      "titleCore": "嵌入与向量存储的周期性成本",
+      "description": "嵌入通常被当作一次性迁移来做预算，实际却像订阅一样持续计费。模型变更、分块变更和内容更新都会让整个语料库重新计费。",
+      "body": "<p>嵌入成本通常作为项目条目获批：几百万份文档、一次性运行、与生成类支出相比似乎很小的数字。但它永远不会真正结束，因为有三种不同的力量会对你已经付过费的内容重新做嵌入。</p><h2>三种刷新驱动因素</h2><p><strong>内容更替</strong>是最诚实、也最小的一项。文档会变化，新文档会进来，已删除的文档需要移除。它随业务规模增长，而且很容易预测。</p><p><strong>分块与流水线变更</strong>则是隐蔽的一项。对分块大小、重叠、元数据或预处理的每一次调整，都会使<em>存储中的每一个向量</em>失效。一项听起来像配置微调的检索质量实验，实际上就是对整个语料库的完整重新嵌入，而好的季度里，团队可能会跑好几次这样的实验。</p><p><strong>模型变更</strong>是最大的一项。不同模型产生的嵌入空间互不兼容，因此要采用更好或更便宜的嵌入模型，就必须先把所有内容重新嵌入一遍，才能开始查询。没有增量路径，也没有部分迁移，你要么并行运行两套存储，要么承受停机。</p><h2>存储本身也是独立的一项成本</h2><p>向量的保存同样需要花钱。托管的向量数据库既对存储收费，也对处理查询的计算收费，而两者都受维度数影响：一个检索效果只略好一点、但维度更高的模型，长期托管成本可能会高出许多。这种权衡通常只由选择模型的人根据质量做出，而他们看不到托管账单。</p><h2>把它当作年金来做预算</h2><p>至少每年预测一次整个语料库的完整重新嵌入，并把它当作计划内事件，而不是例外。评估候选嵌入模型时，应以<em>重新嵌入成本加上一年的存储与查询服务费用</em>来定价，而不是按每个 token 的单价。保持原始内容可寻址，这样重新嵌入就是一个批处理任务，而不是一个重新摄取的项目。并且通过批量接口运行这些任务，因为完整的重新嵌入是你拥有的、对延迟最宽容的工作负载，因此批量定价在这里最划算。</p><h2>相关阅读</h2><ul><li><a href=\"/research/rag-cost-optimization\">RAG 成本优化</a></li><li><a href=\"/research/batch-api-finops\">Batch API 的 FinOps</a></li><li><a href=\"/research/long-context-vs-rag-cost\">长上下文与 RAG 的成本对比</a></li></ul>",
+      "faq": [
+        {
+          "question": "为什么嵌入成本是周期性的，而不是一次性的？",
+          "answer": "内容更替、分块或流水线变更，以及嵌入模型变更，都会迫使你重新嵌入。后两者会使存储中的所有向量失效，因此整个语料库都会被重新计费。"
+        },
+        {
+          "question": "能否逐步迁移嵌入模型？",
+          "answer": "不能。不同模型的嵌入空间互不兼容，因此在查询可用之前，必须对整个语料库完整地重新嵌入。实际上，你要么并行运行两套存储，要么接受停机。"
+        },
+        {
+          "question": "嵌入模型应该如何定价？",
+          "answer": "应以重新嵌入成本加上一年的存储与查询服务费用为准，而不是按每个 token 的单价。维度数会影响托管成本，因此一个只略好一点的模型，长期保有的成本可能高出许多。"
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/rag-cost-optimization",
+          "label": "RAG 成本优化"
+        },
+        {
+          "slug": "/research/batch-api-finops",
+          "label": "Batch API 的 FinOps"
+        },
+        {
+          "slug": "/research/long-context-vs-rag-cost",
+          "label": "长上下文与 RAG 的成本对比"
         }
       ]
     }

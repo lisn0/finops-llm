@@ -273,6 +273,176 @@
           "label": "حلقات إعادة المحاولة والإنفاق الخفي"
         }
       ]
+    },
+    "id": {
+      "title": "Hentikan fan-out subagen yang menguras anggaran token",
+      "titleCore": "Hentikan fan-out subagen dan delegasi rekursif",
+      "description": "Sistem multi-agen hierarkis bisa memunculkan subagen latar belakang yang tak terkendali. Pagar arsitektur, batas kedalaman, dan pool token bersama.",
+      "body": "<p>Kaskade fan-out subagen terjadi ketika orkestrator otonom memecah tugas tingkat tinggi menjadi sub-tugas paralel dan memberi agen pekerja izin untuk memunculkan pekerja khusus tambahan. Tanpa batas konkurensi yang ketat dan batas kedalaman, satu prompt pengguna yang ambigu bisa memicu ledakan eksponensial: 1 supervisor utama memunculkan 6 perencana domain, masing-masing meluncurkan 4 agen riset, yang kemudian memanggil sub-pekerja lagi. Dalam arsitektur produksi, delegasi rekursif yang tidak dibatasi rutin menghabiskan 2.000.000 hingga 8.000.000 token dalam 5 menit, menyebabkan lonjakan API tak terduga sebesar $15 hingga $80 untuk satu transaksi.</p><h2>Matematika delegasi agen rekursif</h2><p>Dalam framework agen berbasis pohon standar, delegasi tugas berkembang mengikuti faktor percabangan <code>B</code> yang dipangkatkan dengan kedalaman eksekusi <code>D</code>. Jika orkestrator bercabang pada <code>B = 4</code> dan subagen boleh rekursi hingga kedalaman <code>D = 3</code>, sistem menjadwalkan 64 loop agen independen. Setiap agen daun memelihara konteks percakapannya sendiri, melakukan panggilan tool berulang, dan melaporkan temuan naik ke hierarki. Karena agen induk mengagregasi dan meringkas output anak, akumulasi konteks bertambah secara kuadratik di seluruh pohon eksekusi.</p><h2>Apa itu kaskade fan-out subagen dalam AI otonom?</h2><p>Kaskade fan-out subagen adalah mode kegagalan ketika agen orkestrator secara rekursif memunculkan agen anak dan cucu tanpa batasan anggaran global, melipatgandakan konsumsi token secara eksponensial di berbagai thread eksekusi paralel.</p><h2>Empat pagar pengaman produksi untuk armada multi-agen</h2><p>Tim platform yang mengoperasikan sistem agen enterprise mencegah kaskade tak terkendali dengan menerapkan batas runtime yang ketat:</p><ul><li><strong>Kedalaman rekursi maksimum (Depth Caps):</strong> Terapkan batas tegas pada hierarki eksekusi. Dalam 95% kasus penggunaan enterprise, batas kedalaman <code>max_depth: 2</code> (Supervisor Utama &rarr; Agen Pekerja) sudah cukup untuk menyelesaikan tugas. Larang agen pekerja memunculkan subagen tingkat ketiga kecuali ada pengecualian kebijakan.</li><li><strong>Pool token thread bersama:</strong> Jangan beri subagen alokasi anggaran independen. Alokasikan jatah token bersama (misalnya 250.000 token total) ke konteks thread eksekusi utama. Teruskan sisa saldo token melalui header konteks trace. Saat agen anak mengonsumsi token, kurangi pool global; jika pool mencapai nol, semua cabang paralel langsung dihentikan.</li><li><strong>Circuit breaker konkurensi:</strong> Batasi instance proses anak paralel aktif hingga 3–5 proses bersamaan. Jika supervisor mencoba memunculkan pekerja konkuren melebihi kapasitas antrean, jalankan tugas secara berurutan atau tolak pemecahan tugas.</li><li><strong>Tracing terdistribusi dan propagasi biaya OTLP:</strong> Sisipkan trace ID dan header baggage OpenTelemetry di seluruh bus pesan antar-agen. Saat OpenLIT atau ClickHouse mengagregasi pengeluaran, setiap span anak harus tergabung ke ID sesi induk, sehingga anomali biaya per cabang langsung terlihat.</li></ul><h2>Bagaimana batas konkurensi mencegah kehabisan token multi-agen?</h2><p>Batas konkurensi membatasi jumlah loop pekerja yang berjalan bersamaan, mencegah banjir panggilan API paralel dan memungkinkan circuit breaker menghentikan loop agen yang bermasalah sebelum anggaran token habis.</p><h2>Berapa kedalaman rekursi yang direkomendasikan untuk delegasi agen?</h2><p>Kedalaman rekursi yang direkomendasikan adalah 2 level (Orkestrator Utama ke Pekerja Khusus). Hierarki yang lebih dalam menghasilkan imbal hasil penalaran yang semakin kecil, sementara overhead konteks dan amplifikasi kesalahan meningkat tajam.</p>",
+      "faq": [
+        {
+          "question": "Apa itu kaskade fan-out subagen dalam AI otonom?",
+          "answer": "Mode kegagalan ketika agen orkestrator secara rekursif memunculkan agen anak dan cucu tanpa batasan anggaran global, sehingga konsumsi token melonjak secara eksponensial di berbagai thread eksekusi paralel."
+        },
+        {
+          "question": "Bagaimana batas konkurensi mencegah kehabisan token multi-agen?",
+          "answer": "Batas konkurensi membatasi jumlah loop pekerja yang berjalan bersamaan, mencegah banjir panggilan API paralel dan memungkinkan circuit breaker menghentikan agen yang bermasalah sebelum anggaran token habis."
+        },
+        {
+          "question": "Berapa kedalaman rekursi yang direkomendasikan untuk delegasi agen?",
+          "answer": "Dua level: dari orkestrator utama ke pekerja khusus. Hierarki yang lebih dalam menghasilkan imbal hasil penalaran yang menurun, sementara overhead konteks dan amplifikasi kesalahan meningkat."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/three-agent-budgets",
+          "label": "Tiga anggaran untuk agen"
+        },
+        {
+          "slug": "/research/llm-cost-spike-runbook",
+          "label": "Runbook lonjakan biaya LLM"
+        },
+        {
+          "slug": "/research/retry-loop-hidden-spend",
+          "label": "Retry loop dan pengeluaran tersembunyi"
+        }
+      ]
+    },
+    "pl": {
+      "title": "Zatrzymaj rozrost subagentów i wyczerpanie budżetu",
+      "titleCore": "Zatrzymanie rozrostu subagentów i rekurencyjnej delegacji",
+      "description": "Hierarchiczne systemy wieloagentowe mogą uruchamiać niekontrolowane subagenty. Guardraile architektoniczne, limity głębokości i wspólne pule tokenów.",
+      "body": "<p>Kaskady rozrostu subagentów powstają, gdy autonomiczny orkiestrator rozbija zadanie wysokiego poziomu na równoległe podzadania i pozwala agentom roboczym tworzyć kolejnych wyspecjalizowanych pracowników. Bez twardych limitów współbieżności i głębokości jeden niejednoznaczny prompt użytkownika może wywołać wykładniczą eksplozję: 1 główny supervisor tworzy 6 planistów dziedzinowych, każdy uruchamia 4 agentów badawczych, które wywołują kolejnych podwykonawców. W produkcyjnych architekturach nieograniczona rekurencyjna delegacja regularnie spala od 2,000,000 do 8,000,000 tokenów w ciągu 5 minut, co daje nieoczekiwane skoki w rachunku API rzędu 15–80 $ za pojedynczą transakcję.</p><h2>Matematyka rekurencyjnej delegacji agentów</h2><p>W standardowym, drzewiastym układzie agentów delegacja rozrasta się zgodnie ze współczynnikiem rozgałęzienia <code>B</code> podniesionym do głębokości wykonania <code>D</code>. Jeśli orkiestrator rozgałęzia się przy <code>B = 4</code> i pozwala subagentom rekurować do głębokości <code>D = 3</code>, system uruchamia 64 niezależne pętle agentów. Każdy agent liść utrzymuje własny kontekst rozmowy, wykonuje iteracyjne wywołania narzędzi i przekazuje wyniki pośrednie w górę hierarchii. Ponieważ agenci nadrzędni agregują i streszczają wyjścia dzieci, akumulacja kontekstu narasta kwadratowo w całym drzewie wykonania.</p><h2>Czym jest kaskada rozrostu subagentów w autonomicznym AI?</h2><p>Kaskada rozrostu subagentów to tryb awarii, w którym agent orkiestrujący rekurencyjnie tworzy agentów potomnych i wnuków bez globalnych ograniczeń budżetowych, mnożąc zużycie tokenów wykładniczo w równoległych wątkach wykonania.</p><h2>Cztery produkcyjne guardraile dla flot wieloagentowych</h2><p>Zespoły platformowe, które prowadzą korporacyjne systemy agentowe, zapobiegają niekontrolowanym kaskadom, egzekwując ścisłe granice działania w czasie wykonania:</p><ul><li><strong>Maksymalna głębokość rekurencji (Depth Caps):</strong> Wymuś sztywny sufit hierarchii wykonania. W 95% zastosowań korporacyjnych limit głębokości <code>max_depth: 2</code> (Root Supervisor &rarr; Worker Agent) w pełni rozwiązuje zadanie. Zakaz tworzenia subagentów trzeciego rzędu przez agentów roboczych, chyba że polityka stanowi inaczej.</li><li><strong>Wspólne pule tokenów wątku (Shared Thread Token Pools):</strong> Nie przydzielaj subagentom niezależnych budżetów. Przydziel wspólny limit tokenów (np. 250,000 tokenów łącznie) do kontekstu wątku głównego. Przekazuj pozostały saldo przez nagłówki kontekstu śledzenia. Gdy subagenty zużywają tokeny, zmniejszaj globalną pulę; gdy pula dojdzie do zera, wszystkie równoległe gałęzie natychmiast się kończą.</li><li><strong>Wyłączniki współbieżności (Concurrency Circuit Breakers):</strong> Ogranicz liczbę aktywnych równoległych instancji subagentów do 3–5 procesów jednocześnie. Jeśli supervisor próbuje utworzyć więcej współbieżnych pracowników, niż pozwala pojemność kolejki, ustaw zadania w kolejce sekwencyjnie albo odrzuć podział.</li><li><strong>Rozproszone śledzenie i propagacja kosztów OTLP:</strong> Wstrzykuj identyfikatory śledzenia OpenTelemetry i nagłówki baggage do wszystkich magistrali komunikacji między agentami. Gdy OpenLIT lub ClickHouse agregują wydatki, każdy span potomny musi sumować się do identyfikatora sesji nadrzędnej, co daje natychmiastową widoczność anomalii kosztów na poziomie gałęzi.</li></ul><h2>Jak limity współbieżności zapobiegają wyczerpaniu tokenów przez wielu agentów?</h2><p>Limity współbieżności ograniczają liczbę jednocześnie wykonywanych pętli pracowników, zapobiegając zalewaniu API równoległymi wywołaniami i pozwalając wyłącznikom przerwać nieprawidłowo działające pętle agentów, zanim budżety tokenów się wyczerpią.</p><h2>Jaka jest zalecana głębokość rekurencji przy delegacji agentów?</h2><p>Zalecana głębokość rekurencji to 2 poziomy (Root Orchestrator do wyspecjalizowanego pracownika). Głębsze hierarchie dają malejące zyski z rozumowania, a jednocześnie gwałtownie zwiększają narzut kontekstu i wzmacnianie błędów.</p>",
+      "faq": [
+        {
+          "question": "Czym jest kaskada rozrostu subagentów w autonomicznym AI?",
+          "answer": "Kaskada rozrostu subagentów to tryb awarii, w którym agent orkiestrujący rekurencyjnie tworzy agentów potomnych i wnuków bez globalnych ograniczeń budżetowych, mnożąc zużycie tokenów wykładniczo w równoległych wątkach wykonania."
+        },
+        {
+          "question": "Jak limity współbieżności zapobiegają wyczerpaniu tokenów przez wielu agentów?",
+          "answer": "Limity współbieżności ograniczają liczbę jednocześnie działających pętli pracowników, zapobiegają zalewaniu API równoległymi wywołaniami i pozwalają wyłącznikom przerwać wadliwe pętle agentów, zanim budżety tokenów się wyczerpią."
+        },
+        {
+          "question": "Jaka jest zalecana głębokość rekurencji przy delegacji agentów?",
+          "answer": "Zalecana głębokość rekurencji to 2 poziomy (Root Orchestrator do wyspecjalizowanego pracownika). Głębsze hierarchie dają malejące zyski z rozumowania, a jednocześnie gwałtownie zwiększają narzut kontekstu i wzmacnianie błędów."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/three-agent-budgets",
+          "label": "Trzy budżety agentów"
+        },
+        {
+          "slug": "/research/llm-cost-spike-runbook",
+          "label": "Runbook skoku kosztów LLM"
+        },
+        {
+          "slug": "/research/retry-loop-hidden-spend",
+          "label": "Pętle ponowień i ukryte wydatki"
+        }
+      ]
+    },
+    "ru": {
+      "title": "Разрастание субагентов съедает бюджет токенов",
+      "titleCore": "Остановить каскад субагентов и рекурсивное делегирование",
+      "description": "Иерархические мультиагентные системы могут породить неконтролируемых фоновых субагентов. Архитектурные ограничения, лимиты глубины и общие пулы токенов.",
+      "body": "<p>Каскады разрастания субагентов возникают, когда автономный оркестратор разбивает высокоуровневую задачу на параллельные подзадачи и даёт рабочим агентам право порождать новых специализированных исполнителей. Без жёстких ограничений параллелизма и глубины один неоднозначный пользовательский запрос может вызвать экспоненциальный взрыв: 1 корневой супервайзер порождает 6 доменных планировщиков, каждый запускает 4 исследовательских агента, которые в свою очередь вызывают дальнейших субисполнителей. В продуктовых архитектурах неограниченное рекурсивное делегирование регулярно сжигает от 2,000,000 до 8,000,000 токенов за 5 минут, что даёт неожиданные всплески API-счёта в $15–80 за одну транзакцию.</p><h2>Математика рекурсивного делегирования агентов</h2><p>В стандартной древовидной схеме агентов делегирование растёт по формуле: коэффициент ветвления <code>B</code> в степени глубины выполнения <code>D</code>. Если оркестратор ветвится с <code>B = 4</code> и позволяет субагентам рекурсию до глубины <code>D = 3</code>, система запускает 64 независимых цикла агентов. Каждый листовой агент ведёт собственный контекст диалога, выполняет итеративные вызовы инструментов и передаёт промежуточные результаты вверх по иерархии. Поскольку родительские агенты агрегируют и суммируют выходы потомков, накопление контекста квадратично растёт по всему дереву выполнения.</p><h2>Что такое каскад разрастания субагентов в автономном ИИ?</h2><p>Каскад разрастания субагентов — это режим отказа, при котором агент-оркестратор рекурсивно порождает дочерних и внучатых агентов без глобальных бюджетных ограничений, экспоненциально умножая потребление токенов в параллельных потоках выполнения.</p><h2>Четыре продуктовых ограничения для мультиагентных систем</h2><p>Платформенные команды, управляющие корпоративными агентными системами, предотвращают неконтролируемые каскады, задавая жёсткие границы времени выполнения:</p><ul><li><strong>Максимальная глубина рекурсии (Depth Caps):</strong> установите строгий потолок иерархии выполнения. В 95% корпоративных сценариев ограничения <code>max_depth: 2</code> (корневой супервайзер &rarr; рабочий агент) достаточно для полного решения задачи. Запретите рабочим агентам порождать субагентов третьего уровня, если это не разрешено политикой.</li><li><strong>Общие пулы токенов на поток:</strong> не выдавайте субагентам независимые бюджеты. Выделите общий лимит токенов (например, 250,000 токенов) корневому контексту выполнения и передавайте остаток баланса через заголовки контекста трассировки. Когда дочерние агенты тратят токены, уменьшайте глобальный пул; если он исчерпан, все параллельные ветви немедленно завершаются.</li><li><strong>Автоматические выключатели параллелизма (Concurrency Circuit Breakers):</strong> ограничьте число одновременно активных дочерних агентов 3–5 процессами. Если супервайзер пытается запустить больше параллельных рабочих агентов, чем позволяет очередь, ставьте задачи в очередь последовательно или отклоняйте разбиение.</li><li><strong>Распределённая трассировка и передача стоимости по OTLP:</strong> внедряйте идентификаторы трассировки OpenTelemetry и baggage-заголовки во все шины сообщений между агентами. Когда OpenLIT или ClickHouse агрегируют расходы, каждый дочерний span должен входить в идентификатор родительской сессии, что даёт мгновенную видимость аномалий стоимости на уровне ветвей.</li></ul><h2>Как ограничения параллелизма предотвращают исчерпание токенов в мультиагентных системах?</h2><p>Ограничения параллелизма регулируют число одновременно выполняющихся рабочих циклов, предотвращая параллельный наплыв API-запросов и позволяя выключателям прерывать сбоящие циклы агентов до исчерпания бюджета токенов.</p><h2>Какая глубина рекурсии рекомендуется для делегирования агентов?</h2><p>Рекомендуемая глубина рекурсии — 2 уровня (корневой оркестратор &rarr; специализированный рабочий агент). Более глубокие иерархии дают убывающую отдачу в рассуждениях, одновременно резко увеличивая накладные расходы на контекст и усиление ошибок.</p>",
+      "faq": [
+        {
+          "question": "Что такое каскад разрастания субагентов в автономном ИИ?",
+          "answer": "Это режим отказа, при котором агент-оркестратор рекурсивно порождает дочерних и внучатых агентов без глобальных бюджетных ограничений, экспоненциально умножая потребление токенов в параллельных потоках выполнения."
+        },
+        {
+          "question": "Как ограничения параллелизма предотвращают исчерпание токенов в мультиагентных системах?",
+          "answer": "Они ограничивают число одновременно работающих рабочих циклов, предотвращают параллельный наплыв API-запросов и позволяют выключателям прерывать сбоящие агентные циклы до того, как бюджет токенов будет исчерпан."
+        },
+        {
+          "question": "Какая глубина рекурсии рекомендуется для делегирования агентов?",
+          "answer": "Рекомендуется 2 уровня: корневой оркестратор и специализированный рабочий агент. Более глубокие иерархии дают убывающую отдачу в рассуждениях и резко увеличивают накладные расходы на контекст и усиление ошибок."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/three-agent-budgets",
+          "label": "Три бюджета агентов"
+        },
+        {
+          "slug": "/research/llm-cost-spike-runbook",
+          "label": "Регламент при всплеске стоимости LLM"
+        },
+        {
+          "slug": "/research/retry-loop-hidden-spend",
+          "label": "Циклы повторов и скрытые расходы"
+        }
+      ]
+    },
+    "tr": {
+      "title": "Alt ajan yayılması token bütçesini tüketmesin",
+      "titleCore": "Alt ajan yayılımı ve özyinelemeli devri token bütçelerini tüketmekten nasıl durdurursunuz",
+      "description": "Hiyerarşik çoklu ajan sistemleri kontrolsüz arka plan alt ajanları üretebilir. Mimari korumalar, derinlik sınırları ve paylaşılan token havuzları.",
+      "body": "<p>Alt ajan yayılım kaskadları, otonom bir orkestratör üst düzey bir görevi paralel alt görevlere böldüğünde ve işçi ajanlara kendi uzmanlaşmış işçilerini üretme izni verdiğinde ortaya çıkar. Sert eşzamanlılık sınırları ve derinlik kısıtları olmadan, tek belirsiz bir kullanıcı isteği üssel bir patlamaya yol açabilir: 1 kök süpervizör 6 alan planlayıcısı üretir, her biri 4 araştırma ajanı başlatır, bunlar da daha fazla alt işçi çağırır. Üretim mimarilerinde kontrolsüz özyinelemeli devir, 5 dakika içinde 2.000.000 ila 8.000.000 token harcar ve tek bir işlem için beklenmedik 15 ila 80 dolarlık API sıçramasına neden olur.</p><h2>Özyinelemeli ajan devrinin matematiği</h2><p>Ağaç tabanlı standart bir ajan çerçevesinde görev devri, dallanma faktörü <code>B</code>'nin yürütme derinliği <code>D</code>'ye yükseltilmiş haliyle genişler. Orkestratör <code>B = 4</code> ile dallanır ve alt ajanların <code>D = 3</code> derinliğine kadar özyinelemesine izin verilirse, sistem 64 bağımsız ajan döngüsü planlar. Her yaprak ajan kendi konuşma bağlamını tutar, yinelemeli araç çağrıları yapar ve ara bulguları hiyerarşiden yukarı bildirir. Üst ajanlar alt çıktıları topladığı ve özetlediği için, bağlam birikimi yürütme ağacı boyunca ikinci dereceden bileşik büyür.</p><h2>Otonom AI'da alt ajan yayılım kaskadı nedir?</h2><p>Alt ajan yayılım kaskadı, bir orkestratör ajanın küresel bütçe kısıtı olmadan alt ve torun ajanları özyinelemeli olarak üretmesiyle ortaya çıkan, paralel yürütme iş parçacıkları boyunca token tüketimini üssel olarak çoğaltan bir arıza modudur.</p><h2>Çoklu ajan filoları için dört üretim koruması</h2><p>Kurumsal ajan sistemlerini işleten platform ekipleri, katı çalışma zamanı sınırları uygulayarak kaskadları önler:</p><ul><li><strong>Maksimum özyineleme derinliği (derinlik sınırları):</strong> Yürütme hiyerarşisine sert bir tavan koyun. Kurumsal kullanım senaryolarının %95'inde <code>max_depth: 2</code> (Kök süpervizör &rarr; İşçi ajan) görevi tamamen çözer. Politika ile istisna tanınmadıkça işçi ajanların üçüncül alt ajan üretmesini yasaklayın.</li><li><strong>Paylaşılan iş parçacığı token havuzları:</strong> Alt ajanlara bağımsız bütçe vermeyin. Kök yürütme iş parçacığı bağlamına paylaşılan bir token payı (örneğin toplam 250.000 token) atayın. Kalan bakiyeyi izleme bağlamı başlıkları üzerinden aktarın. Alt ajanlar token harcadıkça küresel havuzdan düşün; havuz sıfıra ulaşırsa tüm paralel dallar hemen sonlansın.</li><li><strong>Eşzamanlılık devre kesicileri:</strong> Aktif paralel alt ajan örneklerini 3 ila 5 eşzamanlı işlemle sınırlayın. Bir süpervizör kuyruk kapasitesini aşan sayıda işçi başlatmaya çalışırsa, görevleri sırayla kuyruğa alın ya da bölmeyi reddedin.</li><li><strong>Dağıtık izleme ve OTLP maliyet yayılımı:</strong> Tüm ajanlar arası mesaj yollarına OpenTelemetry iz kimliklerini ve baggage başlıklarını ekleyin. OpenLIT veya ClickHouse harcamayı topladığında, her alt span üst oturum kimliğine bağlanmalı; böylece dal düzeyindeki maliyet anomalileri anında görünür olur.</li></ul><h2>Eşzamanlılık sınırları token tükenmesini nasıl önler?</h2><p>Eşzamanlılık sınırları, aynı anda çalışan işçi döngülerinin sayısını kısarak paralel API seline engel olur ve devre kesicilerin, token bütçesi tükenmeden arızalı ajan döngülerini durdurmasını sağlar.</p><h2>Ajan devri için önerilen özyineleme derinliği nedir?</h2><p>Önerilen özyineleme derinliği 2 seviyedir (Kök orkestratörden uzmanlaşmış işçiye). Daha derin hiyerarşiler, bağlam yükünü ve hata büyümesini ciddi biçimde artırırken akıl yürütme kazancını azaltır.</p>",
+      "faq": [
+        {
+          "question": "Otonom AI'da alt ajan yayılım kaskadı nedir?",
+          "answer": "Bir orkestratör ajanın küresel bütçe kısıtı olmadan alt ve torun ajanları özyinelemeli olarak üretmesiyle ortaya çıkan bir arıza modudur; token tüketimi paralel iş parçacıkları boyunca üssel olarak artar."
+        },
+        {
+          "question": "Eşzamanlılık sınırları çoklu ajan token tükenmesini nasıl önler?",
+          "answer": "Aynı anda çalışan işçi döngülerini sınırlayarak paralel API seline engel olur ve devre kesicilerin token bütçesi bitmeden arızalı ajan döngülerini durdurmasını sağlar."
+        },
+        {
+          "question": "Ajan devri için önerilen özyineleme derinliği nedir?",
+          "answer": "Önerilen derinlik 2 seviyedir (Kök orkestratörden uzmanlaşmış işçiye). Daha derin hiyerarşiler azalan akıl yürütme kazancı sağlarken bağlam yükünü ve hata büyümesini artırır."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/three-agent-budgets",
+          "label": "Üç ajan bütçesi"
+        },
+        {
+          "slug": "/research/llm-cost-spike-runbook",
+          "label": "LLM maliyet sıçraması runbook'u"
+        },
+        {
+          "slug": "/research/retry-loop-hidden-spend",
+          "label": "Yeniden deneme döngüleri ve gizli harcama"
+        }
+      ]
+    },
+    "vi": {
+      "title": "Chặn subagent nhân rộng làm cạn ngân sách token",
+      "titleCore": "Chặn nhân rộng subagent và ủy quyền đệ quy làm cạn ngân sách token",
+      "description": "Hệ thống đa agent phân cấp có thể sinh subagent chạy nền ngoài tầm kiểm soát. Rào chắn kiến trúc, giới hạn độ sâu và pool token dùng chung.",
+      "body": "<p>Nhân rộng subagent xảy ra khi một orchestrator tự động chia nhỏ tác vụ cấp cao thành các subtask song song và cho phép các worker sinh thêm worker chuyên biệt. Nếu không có giới hạn đồng thời cứng và giới hạn độ sâu, một prompt mơ hồ của người dùng có thể kích hoạt bùng nổ theo cấp số nhân: 1 supervisor gốc sinh 6 planner theo miền, mỗi planner khởi chạy 4 agent nghiên cứu, và các agent này gọi thêm worker con. Trong kiến trúc production, việc ủy quyền đệ quy không kiểm soát thường đốt 2,000,000 đến 8,000,000 token trong 5 phút, tạo khoản chi API đột biến từ $15 đến $80 cho chỉ một giao dịch.</p><h2>Toán học của ủy quyền đệ quy agent</h2><p>Trong một framework agent dạng cây, việc ủy quyền mở rộng theo hệ số nhánh <code>B</code> lũy thừa với độ sâu thực thi <code>D</code>. Nếu orchestrator phân nhánh với <code>B = 4</code> và cho subagent đệ quy đến độ sâu <code>D = 3</code>, hệ thống lên lịch 64 vòng lặp agent độc lập. Mỗi agent lá giữ ngữ cảnh hội thoại riêng, thực hiện các lệnh gọi công cụ lặp và báo cáo kết quả trung gian lên cấp trên. Vì agent cha tổng hợp và tóm tắt đầu ra của con, việc tích lũy ngữ cảnh tăng theo cấp số bình phương trên toàn bộ cây thực thi.</p><h2>Nhân rộng subagent trong AI tự động là gì?</h2><p>Nhân rộng subagent là một kiểu lỗi trong đó agent orchestrator sinh đệ quy các agent con và cháu mà không có ràng buộc ngân sách toàn cục, làm tăng mức tiêu thụ token theo cấp số nhân trên các luồng thực thi song song.</p><h2>Bốn rào chắn production cho đội multi-agent</h2><p>Các đội nền tảng vận hành hệ thống agent doanh nghiệp ngăn thác nhân rộng mất kiểm soát bằng cách áp đặt ranh giới runtime nghiêm ngặt:</p><ul><li><strong>Giới hạn độ sâu đệ quy (Depth Caps):</strong> Đặt trần cứng cho cấp bậc thực thi. Trong 95% trường hợp sử dụng doanh nghiệp, giới hạn <code>max_depth: 2</code> (Supervisor gốc &rarr; Worker Agent) là đủ để hoàn thành tác vụ. Cấm worker sinh subagent cấp ba trừ khi được miễn trừ theo chính sách.</li><li><strong>Pool token dùng chung theo luồng:</strong> Không cấp cho subagent ngân sách độc lập. Phân bổ một hạn mức token chung (ví dụ 250,000 token tổng) cho ngữ cảnh luồng gốc. Truyền số dư token còn lại qua header ngữ cảnh trace. Khi agent con tiêu token, trừ vào pool toàn cục; nếu pool về 0, mọi nhánh song song dừng ngay lập tức.</li><li><strong>Cầu dao đồng thời:</strong> Giới hạn số tiến trình con đang chạy song song ở mức 3–5. Nếu supervisor cố sinh nhiều worker đồng thời hơn sức chứa hàng đợi cho phép, hãy xếp các tác vụ vào hàng đợi tuần tự hoặc từ chối việc tách nhỏ.</li><li><strong>Tracing phân tán và lan truyền chi phí OTLP:</strong> Đưa trace ID và baggage header OpenTelemetry vào mọi bus tin nhắn giữa các agent. Khi OpenLIT hoặc ClickHouse tổng hợp chi tiêu, mọi span con phải gộp vào session ID cha, giúp thấy ngay chi phí bất thường theo từng nhánh.</li></ul><h2>Giới hạn đồng thời ngăn cạn kiệt token multi-agent như thế nào?</h2><p>Giới hạn đồng thời điều tiết số vòng lặp worker đang chạy cùng lúc, ngăn lượng gọi API song song tràn ngập và cho phép cầu dao ngắt các vòng lặp agent lỗi trước khi ngân sách token cạn.</p><h2>Độ sâu đệ quy khuyến nghị cho ủy quyền agent là bao nhiêu?</h2><p>Độ sâu đệ quy khuyến nghị là 2 cấp, từ Orchestrator gốc đến Worker chuyên biệt. Hệ thống sâu hơn cho lợi ích lập luận giảm dần, trong khi làm tăng mạnh chi phí ngữ cảnh và khuếch đại lỗi.</p>",
+      "faq": [
+        {
+          "question": "Nhân rộng subagent trong AI tự động là gì?",
+          "answer": "Đó là kiểu lỗi trong đó agent orchestrator sinh đệ quy các agent con và cháu mà không có ràng buộc ngân sách toàn cục, làm tăng mức tiêu thụ token theo cấp số nhân trên các luồng thực thi song song."
+        },
+        {
+          "question": "Giới hạn đồng thời ngăn cạn kiệt token multi-agent như thế nào?",
+          "answer": "Giới hạn đồng thời điều tiết số vòng lặp worker chạy cùng lúc, ngăn lượng gọi API song song tràn ngập và cho phép cầu dao ngắt các vòng lặp lỗi trước khi ngân sách token cạn."
+        },
+        {
+          "question": "Độ sâu đệ quy khuyến nghị cho ủy quyền agent là bao nhiêu?",
+          "answer": "Khuyến nghị dùng 2 cấp, từ Orchestrator gốc đến Worker chuyên biệt. Hệ thống sâu hơn cho lợi ích lập luận giảm dần, trong khi làm tăng mạnh chi phí ngữ cảnh và khuếch đại lỗi."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/three-agent-budgets",
+          "label": "Ba loại ngân sách agent"
+        },
+        {
+          "slug": "/research/llm-cost-spike-runbook",
+          "label": "Runbook đột biến chi phí LLM"
+        },
+        {
+          "slug": "/research/retry-loop-hidden-spend",
+          "label": "Vòng lặp thử lại và chi phí ẩn"
+        }
+      ]
     }
   }
 }

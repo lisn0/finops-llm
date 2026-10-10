@@ -285,6 +285,466 @@
           "label": "Custo de trocar de provedor de LLM"
         }
       ]
+    },
+    "id": {
+      "title": "MiMo v2.6 dan Batas Harga Bobot Terbuka",
+      "titleCore": "MiMo v2.6 dan batas harga bobot terbuka",
+      "description": "MiMo v2.6 rilis 21 September dengan 1,130 poin HN. Mengapa model bobot terbuka peringkat teratas membatasi harga setiap penyedia API.",
+      "body": "<p>MiMo v2.6 dari Xiaomi dipublikasikan pada 21 September 2026 dan meraih 1,130 poin serta 479 komentar di Hacker News &mdash; peluncuran tunggal paling ramai bulan ini. Dalam beberapa hari, Xiaomi melaporkan varian Pro sebagai model open source dengan skor tertinggi di Artificial Analysis, dan sebuah repositori benchmark komunitas menerbitkan angka Terminal-Bench 2.1 untuk tingkat Flash sebesar 87.6%, GPQA Diamond 83.7, AIME 2025 94.1, dan CyberGym 95.1.</p><h2>Mengapa peluncuran seperti ini penting bagi tagihan</h2><p>Model bobot terbuka di puncak peringkat kualitas adalah batasan harga, bukan sekadar pilihan. Penyedia API tidak bisa mempertahankan harga kelas menengah untuk model yang bisa digantikan oleh alternatif bobot terbuka yang mumpuni dan di-self-host. Setiap rilis bobot terbuka yang kredibel menekan margin tingkat tepat di bawah frontier. Inilah sebabnya pemangkasan harga September terjadi saat itu, dan mengapa putaran berikutnya sudah bisa diperkirakan.</p><h2>Hitungan self-host</h2><p>Self-host tidak otomatis lebih murah. Perbandingan lengkapnya:</p><ul><li><strong>Biaya setara token:</strong> biaya GPU dibagi token yang bisa dicapai per jam GPU, termasuk kehilangan utilisasi akibat batching dan waktu idle. Pada utilisasi 35%, model bobot terbuka yang di-self-host sering kalah dari tingkat API dengan diskon besar.</li><li><strong>Beban operasional:</strong> perencanaan kapasitas, on-call, pembaruan image, dan beban evaluasi untuk melacak rilis hulu. Ini adalah overhead yang sama yang membuat fine-tuning gagal bagi satu tim pada bulan September.</li><li><strong>Batas kemampuan:</strong> untuk jumlah insinyur yang tetap, self-host model yang mendekati frontier adalah pertukaran yang buruk. Ini pertukaran yang baik ketika modelnya cukup bagus dan volumenya stabil.</li></ul><p>Titik impas hampir selalu berada pada volume tinggi, stabil, dan bervariansi rendah untuk tugas yang benar-benar dikuasai model. Model bobot terbuka 27B untuk penulisan kreatif yang dilaporkan bulan ini setara Fable 5 dengan harga sekitar 40x lebih murah menunjukkan bentuk pertukaran ini ketika modelnya cocok dengan tugasnya.</p><h2>Paket gratis adalah kanal akuisisi</h2><p>Tingkat Flash juga muncul sebagai varian gratis dalam daftar penyedia komunitas, berdampingan dengan tingkat berbayar. Karena itu, preview gratis Minimax M3.1 Flash dan penawaran serupa layak dirutekan. Perlakukan setiap tingkat gratis sebagai kanal akuisisi yang bersifat sementara dan berbatas waktu, dan bangun failover sejak hari Anda mengadopsinya.</p><h2>Yang perlu dilakukan kuartal ini</h2><ol><li><strong>Periksa papan peringkat bobot terbuka setiap bulan.</strong> Pada kasus penulisan kreatif, selisihnya menyempit 40% dalam sebulan. Anggap itu akan menyempit lagi.</li><li><strong>Hitung titik impas self-host secara eksplisit.</strong> Asumsi utilisasi yang menentukan, bukan harga daftar.</li><li><strong>Perlakukan setiap tingkat gratis sebagai sesuatu yang akan berakhir.</strong> Failover router adalah kebutuhan hari pertama, bukan tiket untuk nanti.</li><li><strong>Jaga pemilihan model tetap fleksibel.</strong> Nilai pemimpin bobot terbuka terletak pada opsi yang diberikannya saat perpanjangan kontrak, bukan pada harga token hari ini.</li></ol><h2>Kesimpulan</h2><p>MiMo v2.6 penting sebagai tekanan harga. Model bobot terbuka yang mumpuni di puncak peringkat berarti harga API kelas menengah memiliki batas atas yang ditentukan oleh biaya komputasi, bukan oleh strategi vendor. Ini adalah pengungkit biaya paling tahan lama yang tersedia bagi tim FinOps saat ini.</p>",
+      "faq": [
+        {
+          "question": "Berapa skor benchmark MiMo v2.6 yang dipublikasikan?",
+          "answer": "Data benchmark komunitas untuk mimo-v2.6-flash mencatat Terminal-Bench 2.1 sebesar 87.6%, GPQA Diamond 83.7, AIME 2025 94.1, dan CyberGym 95.1. Xiaomi melaporkan varian Pro sebagai model open source dengan skor tertinggi di Artificial Analysis."
+        },
+        {
+          "question": "Bagaimana rilis bobot terbuka memengaruhi tagihan API saya?",
+          "answer": "Rilis itu menetapkan batas atas harga. Alternatif bobot terbuka yang mumpuni menekan margin tingkat API di bawah frontier, dan inilah tekanan di balik pemangkasan harga berulang sepanjang 2026. Nilainya terletak pada opsi saat perpanjangan sama besarnya dengan harga token hari ini."
+        },
+        {
+          "question": "Kapan self-host model bobot terbuka benar-benar lebih murah?",
+          "answer": "Pada volume tinggi, stabil, dan bervariansi rendah untuk tugas yang dikuasai model. Utilisasi yang menentukan: pada utilisasi GPU 35%, self-host biasanya kalah dari tingkat API berdiskon. Tambahkan beban operasional sebelum menarik kesimpulan."
+        },
+        {
+          "question": "Apakah trafik produksi sebaiknya dirutekan ke tingkat model gratis?",
+          "answer": "Ya, dengan failover yang sudah dibangun sejak hari pertama. Perlakukan setiap tingkat gratis sebagai kanal akuisisi yang berbatas waktu, dan rutekan hanya beban kerja yang sudah lolos evaluasi Anda."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/pricing-an-open-weight-model",
+          "label": "Menetapkan harga model bobot terbuka"
+        },
+        {
+          "slug": "/research/ox-alpha-was-glm-5-3",
+          "label": "Ox Alpha ternyata GLM 5.3"
+        },
+        {
+          "slug": "/research/free-tier-is-an-acquisition-cost",
+          "label": "Tingkat gratis adalah biaya akuisisi"
+        },
+        {
+          "slug": "/research/stealth-model-free-tokens-playbook",
+          "label": "Panduan token gratis model stealth"
+        },
+        {
+          "slug": "/research/cost-switching-llm-providers",
+          "label": "Biaya berpindah penyedia LLM"
+        }
+      ]
+    },
+    "pl": {
+      "title": "MiMo v2.6 i sufit cenowy modeli o otwartych wagach",
+      "titleCore": "MiMo v2.6 i sufit cenowy modeli o otwartych wagach",
+      "description": "MiMo v2.6 pojawił się 21 września z 1,130 punktami na HN. Dlaczego czołowy model o otwartych wagach ogranicza ceny każdego dostawcy API.",
+      "body": "<p>MiMo v2.6 od Xiaomi trafił 21 września 2026 roku na Hacker News, zebrał 1,130 punktów i 479 komentarzy &mdash; to najgłośniejszy pojedynczy premierowy wpis tego miesiąca. W ciągu kilku dni Xiaomi zgłosiło, że wariant Pro ma najwyższy wynik wśród modeli open source na Artificial Analysis, a społecznościowe repozytorium benchmarków opublikowało wyniki wariantu Flash: 87.6% w Terminal-Bench 2.1, 83.7 w GPQA Diamond, 94.1 w AIME 2025 i 95.1 w CyberGym.</p><h2>Dlaczego taka premiera ma znaczenie dla rachunku</h2><p>Model o otwartych wagach na szczycie rankingu jakości to ograniczenie cenowe, a nie tylko kolejna opcja. Dostawcy API nie są w stanie utrzymać średniej ceny za model, skoro porównywalną alternatywę o otwartych wagach można uruchomić na własnej infrastrukturze. Każda wiarygodna publikacja modelu o otwartych wagach ściska marżę na poziomie tuż poniżej czołówki. Dlatego wrześniowe obniżki cen nastąpiły właśnie wtedy, a kolejna runda jest już przewidywalna.</p><h2>Arytmetyka self-hostingu</h2><p>Self-hosting nie jest automatycznie tańszy. Pełne porównanie wygląda następująco:</p><ul><li><strong>Koszt w przeliczeniu na token:</strong> koszt GPU podzielony przez liczbę tokenów osiągalnych w ciągu godziny pracy GPU, z uwzględnieniem utraty wykorzystania wynikającej z batchingu i czasu bezczynności. Przy 35% wykorzystania self-hostowany model o otwartych wagach często przegrywa z mocno przecenionym poziomem API.</li><li><strong>Narzut operacyjny:</strong> planowanie pojemności, dyżury, aktualizacje obrazów oraz nakład pracy na ewaluacje przy śledzeniu nowych wydań. To ten sam narzut, który w tym miesiącu zniweczył fine-tuning w jednym z zespołów.</li><li><strong>Sufit możliwości:</strong> przy stałej liczbie inżynierów self-hosting modelu zbliżonego do czołówki jest słabą wymianą. Jest dobrą, gdy model jest wystarczająco dobry, a wolumen stabilny.</li></ul><p>Punkt opłacalności leży niemal zawsze przy wysokim, stabilnym wolumenie o niskiej zmienności, w zadaniach, w których model jest naprawdę dobry. Model o otwartych wagach 27B do pisania kreatywnego, zgłoszony w tym miesiącu na poziomie Fable 5 i z ceną około 40x niższą, pokazuje kształt takiej wymiany, gdy model pasuje do zadania.</p><h2>Darmowe poziomy to kanał pozyskiwania klientów</h2><p>Poziom Flash pojawia się na społecznościowych listach dostawców także jako bezpłatny wariant obok płatnego &mdash; dlatego warto kierować ruch na bezpłatny podgląd Minimax M3.1 Flash i podobne oferty. Każdy darmowy poziom traktuj jak datowany, tymczasowy kanał pozyskiwania i buduj failover już od dnia, w którym go przyjmujesz.</p><h2>Co zrobić w tym kwartale</h2><ol><li><strong>Sprawdzaj ranking modeli o otwartych wagach co miesiąc.</strong> W przypadku pisania kreatywnego luka zmniejszyła się o 40% w ciągu miesiąca. Zakładaj, że zmniejszy się ponownie.</li><li><strong>Policz jawnie punkt opłacalności self-hostingu.</strong> Decyduje założenie o wykorzystaniu, a nie cena katalogowa.</li><li><strong>Traktuj każdy darmowy poziom jako wygasający.</strong> Failover w routerze to wymóg z pierwszego dnia, a nie zadanie na później.</li><li><strong>Utrzymuj wybór modelu jako wymienny.</strong> Wartość lidera o otwartych wagach to opcjonalność przy odnowieniu umowy, a nie cena tokena dzisiaj.</li></ol><h2>Podsumowanie</h2><p>MiMo v2.6 ma znaczenie jako presja cenowa. Zdolny model o otwartych wagach na szczycie rankingu oznacza, że średnie ceny API mają sufit wyznaczony kosztem obliczeń, a nie strategią dostawcy. To najtrwalsza dźwignia kosztowa, jaka dziś stoi do dyspozycji zespołu FinOps.</p>",
+      "faq": [
+        {
+          "question": "Jakie są opublikowane wyniki benchmarków MiMo v2.6?",
+          "answer": "Społecznościowe dane benchmarków dla mimo-v2.6-flash podają: Terminal-Bench 2.1 na poziomie 87.6%, GPQA Diamond 83.7, AIME 2025 94.1 i CyberGym 95.1. Xiaomi zgłosiło, że wariant Pro ma najwyższy wynik wśród modeli open source na Artificial Analysis."
+        },
+        {
+          "question": "Jak publikacja modelu o otwartych wagach wpływa na mój rachunek za API?",
+          "answer": "Wyznacza sufit cenowy. Zdolna alternatywa o otwartych wagach ściska marżę poziomu API poniżej czołówki, co stoi za powtarzającymi się w 2026 roku obniżkami cen. Wartość tkwi w opcjonalności przy odnowieniu tyle samo co w cenie tokena dzisiaj."
+        },
+        {
+          "question": "Kiedy self-hosting modelu o otwartych wagach jest naprawdę tańszy?",
+          "answer": "Przy wysokim, stabilnym wolumenie o niskiej zmienności, w zadaniach, w których model jest dobry. Decyduje wykorzystanie: przy 35% wykorzystania GPU self-hosting zwykle przegrywa z przecenionym poziomem API. Przed wnioskiem dolicz narzut operacyjny."
+        },
+        {
+          "question": "Czy powinienem kierować ruch produkcyjny na darmowe poziomy modeli?",
+          "answer": "Tak, z wbudowanym failoverem od pierwszego dnia. Traktuj każdy darmowy poziom jako datowany kanał pozyskiwania i kieruj tylko te obciążenia, które przeszły twoje ewaluacje."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/pricing-an-open-weight-model",
+          "label": "Wycena modelu o otwartych wagach"
+        },
+        {
+          "slug": "/research/ox-alpha-was-glm-5-3",
+          "label": "Ox Alpha był GLM 5.3"
+        },
+        {
+          "slug": "/research/free-tier-is-an-acquisition-cost",
+          "label": "Darmowy poziom to koszt pozyskania"
+        },
+        {
+          "slug": "/research/stealth-model-free-tokens-playbook",
+          "label": "Playbook darmowych tokenów modeli stealth"
+        },
+        {
+          "slug": "/research/cost-switching-llm-providers",
+          "label": "Koszt zmiany dostawcy LLM"
+        }
+      ]
+    },
+    "ru": {
+      "title": "MiMo v2.6 и потолок цен на открытые веса",
+      "titleCore": "MiMo v2.6 и потолок цен на открытые веса",
+      "description": "MiMo v2.6 вышла 21 сентября с 1,130 баллами на HN. Почему топовая открытая модель становится ценовым ограничением для каждого API-провайдера.",
+      "body": "<p>MiMo v2.6 от Xiaomi появилась 21 сентября 2026 года и набрала 1,130 баллов и 479 комментариев на Hacker News &mdash; самый громкий запуск месяца. Через несколько дней Xiaomi сообщила, что вариант Pro стал самой результативной открытой моделью по рейтингу Artificial Analysis, а репозиторий с community-бенчмарками опубликовал цифры Terminal-Bench 2.1 для тарифа Flash: 87.6%, GPQA Diamond 83.7, AIME 2025 94.1 и CyberGym 95.1.</p><h2>Почему такой запуск важен для счёта</h2><p>Открытая модель на вершине рейтинга качества — это ценовое ограничение, а не просто опция. API-провайдеры не могут удерживать среднюю цену за модель, которую можно развернуть у себя на базе способной открытой альтернативы. Каждый достоверный релиз открытых весов сжимает маржу на ярусе прямо под фронтиром. Именно поэтому сентябрьские снижения цен произошли именно тогда, и именно поэтому следующий раунд уже предсказуем.</p><h2>Арифметика собственного развёртывания</h2><p>Собственное развёртывание не обязательно дешевле. Полное сравнение выглядит так:</p><ul><li><strong>Стоимость в эквиваленте токенов:</strong> стоимость GPU, делённая на достижимое число токенов за час работы GPU, с учётом потерь утилизации из-за батчинга и простоя. При загрузке 35% самостоятельно развёрнутая открытая модель часто проигрывает сильно дисконтированному API-тарифу.</li><li><strong>Операционный налог:</strong> планирование мощностей, дежурства, обновление образов и нагрузка на оценку при отслеживании upstream-релизов. Именно эти накладные расходы в сентябре сорвали дообучение в одной команде.</li><li><strong>Потолок возможностей:</strong> при фиксированном числе инженеров собственное развёртывание модели, близкой к фронтиру, — плохая сделка. Это хорошая сделка, когда модели достаточно и объём стабилен.</li></ul><p>Точка перехода почти всегда находится при высоком, стабильном объёме с низкой дисперсией на задачах, с которыми модель действительно хорошо справляется. Открытая модель на 27B для креативного письма, о которой в этом месяце сообщили на уровне Fable 5 при цене примерно в 40 раз ниже, — пример такой сделки, когда модель подходит под задачу.</p><h2>Бесплатные тарифы — это канал привлечения</h2><p>Тариф Flash также появляется как бесплатный вариант в community-списках провайдеров рядом с платным тарифом, поэтому бесплатное превью Minimax M3.1 Flash и похожие предложения стоит учитывать при маршрутизации. Относитесь к каждому бесплатному тарифу как к датированному и временному каналу привлечения и постройте failover в день, когда начинаете его использовать.</p><h2>Что делать в этом квартале</h2><ol><li><strong>Перепроверяйте рейтинг открытых весов каждый месяц.</strong> В случае с креативным письмом разрыв сократился на 40% за месяц. Исходите из того, что он сократится снова.</li><li><strong>Явно посчитайте точку перехода на собственное развёртывание.</strong> Решает допущение об утилизации, а не прайсовая цена.</li><li><strong>Считайте каждый бесплатный тариф истекающим.</strong> Failover в роутере — требование первого дня, а не задача на потом.</li><li><strong>Держите выбор модели взаимозаменяемым.</strong> Ценность лидера среди открытых весов — в свободе выбора на момент продления, а не в цене токена сегодня.</li></ol><h2>Итог</h2><p>MiMo v2.6 важна как ценовое давление. Способная открытая модель на вершине рейтинга означает, что средние API-цены имеют потолок, заданный стоимостью вычислений, а не стратегией вендора. Это самый устойчивый рычаг стоимости, доступный сейчас команде FinOps.</p>",
+      "faq": [
+        {
+          "question": "Какие опубликованные бенчмарки у MiMo v2.6?",
+          "answer": "Community-данные по mimo-v2.6-flash дают Terminal-Bench 2.1 на уровне 87.6%, GPQA Diamond 83.7, AIME 2025 94.1 и CyberGym 95.1. Xiaomi сообщила, что вариант Pro стал самой результативной открытой моделью по рейтингу Artificial Analysis."
+        },
+        {
+          "question": "Как выпуск открытых весов влияет на мой счёт за API?",
+          "answer": "Он задаёт ценовой потолок. Способная открытая альтернатива сжимает маржу на API-ярусе ниже фронтира, и именно это давление стоит за повторными снижениями цен в 2026 году. Ценность здесь в опционах при продлении не меньше, чем в сегодняшней цене токена."
+        },
+        {
+          "question": "Когда собственное развёртывание открытой модели действительно дешевле?",
+          "answer": "При высоком, стабильном объёме с низкой дисперсией на задачах, с которыми модель хорошо справляется. Решает утилизация: при загрузке GPU 35% собственное развёртывание обычно проигрывает дисконтированному API-тарифу. Перед выводом учтите операционный налог."
+        },
+        {
+          "question": "Стоит ли направлять продакшен-трафик на бесплатные тарифы моделей?",
+          "answer": "Да, но со встроенным failover с первого дня. Считайте каждый бесплатный тариф датированным каналом привлечения и направляйте только те нагрузки, которые прошли ваши оценки."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/pricing-an-open-weight-model",
+          "label": "Ценообразование открытой модели"
+        },
+        {
+          "slug": "/research/ox-alpha-was-glm-5-3",
+          "label": "Ox Alpha был GLM 5.3"
+        },
+        {
+          "slug": "/research/free-tier-is-an-acquisition-cost",
+          "label": "Бесплатный тариф — это стоимость привлечения"
+        },
+        {
+          "slug": "/research/stealth-model-free-tokens-playbook",
+          "label": "Плейбук бесплатных токенов скрытых моделей"
+        },
+        {
+          "slug": "/research/cost-switching-llm-providers",
+          "label": "Стоимость смены провайдера LLM"
+        }
+      ]
+    },
+    "tr": {
+      "title": "MiMo v2.6 ve açık ağırlıklı fiyat tavanı",
+      "titleCore": "MiMo v2.6 ve açık ağırlıklı fiyat tavanı",
+      "description": "MiMo v2.6, 21 Eylül'de 1,130 HN puanıyla yayımlandı. Sıralamanın başındaki açık ağırlıklı bir model, her API sağlayıcısı için bir fiyat kısıtıdır.",
+      "body": "<p>MiMo v2.6, Xiaomi'den 21 Eylül 2026'da yayımlandı ve Hacker News'te 1,130 puan ile 479 yorum aldı &mdash; bu ay yapılan en yüksek sesli tekil lansman. Birkaç gün içinde Xiaomi, Pro varyantını Artificial Analysis'te en yüksek puanlı açık kaynaklı model olarak raporladı; bir topluluk benchmark deposu da Flash katmanı için Terminal-Bench 2.1 değerini 87.6%, GPQA Diamond'ı 83.7, AIME 2025'i 94.1 ve CyberGym'i 95.1 olarak yayımladı.</p><h2>Bu lansmanın faturayla neden ilgili olduğu</h2><p>Kalite sıralamasının başındaki bir açık ağırlıklı model, yalnızca bir seçenek değil, bir fiyat kısıtıdır. API sağlayıcıları, yetkin bir açık ağırlıklı alternatifin kendi sunucularında çalıştırılabildiği bir model için orta kademe fiyatı koruyamaz. Her güvenilir açık ağırlıklı sürüm, hemen altındaki kademenin marjını doğrudan sıkıştırır. Eylül'deki fiyat indirimlerinin tam o zamanda gelmesinin ve bir sonraki turun şimdiden öngörülebilir olmasının nedeni budur.</p><h2>Kendi sunucunuzda çalıştırmanın aritmetiği</h2><p>Kendi sunucunuzda çalıştırmak otomatik olarak daha ucuz değildir. Tam karşılaştırma şöyledir:</p><ul><li><strong>Token eşdeğeri maliyeti:</strong> GPU maliyeti, GPU saati başına ulaşılabilir token sayısına bölünür; toplu işlemeden ve boşta kalma süresinden doğan kullanım kaybı dahil. 35% kullanımda, kendi sunucunuzdaki açık ağırlıklı bir model çoğu zaman yoğun indirimli bir API katmanına yenilir.</li><li><strong>Operasyon vergisi:</strong> kapasite planlaması, nöbet, imaj güncellemeleri ve üst akış sürümlerini izlemenin değerlendirme yükü. Eylül ayında bir ekip için ince ayarın başarısız olmasına yol açan aynı ek yük budur.</li><li><strong>Yetenek tavanı:</strong> sabit sayıda mühendis için, sınıra yakın bir modelin kendi sunucuda çalıştırılması kötü bir takastır. Model yeterince iyi olduğunda ve hacim istikrarlı olduğunda iyi bir takastır.</li></ul><p>Geçiş noktası neredeyse her zaman, modelin gerçekten iyi olduğu görevlerde yüksek, istikrarlı ve düşük değişkenli hacimde bulunur. Bu ay Fable 5 seviyesinde bildirilen ve yaklaşık 40x daha ucuz fiyatlandırılan 27B açık ağırlıklı yaratıcı yazarlık modeli, model göreve uyduğunda takasın nasıl göründüğünü gösteriyor.</p><h2>Ücretsiz katmanlar edinme kanalıdır</h2><p>Flash katmanı, topluluk sağlayıcı listelerinde ücretli bir katmanın yanında ücretsiz bir varyant olarak da görünüyor; bu yüzden Minimax M3.1 Flash'ın ücretsiz önizlemesi ve benzeri teklifler yönlendirmeye değer. Her ücretsiz katmanı tarihli, geçici bir edinme kanalı olarak görün ve benimsediğiniz gün yedeğini kurun.</p><h2>Bu çeyrekte ne yapılmalı</h2><ol><li><strong>Açık ağırlıklı liderlik tablosunu her ay yeniden kontrol edin.</strong> Yaratıcı yazarlık örneğinde fark bir ayda 40% kapandı. Yine kapanacağını varsayın.</li><li><strong>Kendi sunucu geçiş noktanızı açıkça hesaplayın.</strong> Liste fiyatı değil, kullanım varsayımı karar verir.</li><li><strong>Her ücretsiz katmanı süresi dolacakmış gibi ele alın.</strong> Yönlendirici yedeği ilk günün gereksinimidir, sonraki bir bilet değil.</li><li><strong>Model seçimini değiştirilebilir tutun.</strong> Açık ağırlıklı bir liderin değeri, bugünkü token fiyatı değil, yenileme anında verdiği seçenektir.</li></ol><h2>Sonuç</h2><p>MiMo v2.6, bir fiyat baskısı olarak önemlidir. Sıralamanın başında yetkin bir açık ağırlıklı model olması, orta kademe API fiyatlarının bir tavanı olduğu anlamına gelir; bu tavanı satıcı stratejisi değil, hesaplama maliyeti belirler. Bu, bir FinOps ekibinin şu anda sahip olabileceği en kalıcı maliyet kaldıracıdır.</p>",
+      "faq": [
+        {
+          "question": "MiMo v2.6'nın yayımlanmış benchmark puanları nedir?",
+          "answer": "mimo-v2.6-flash için topluluk benchmark verileri Terminal-Bench 2.1 değerini 87.6%, GPQA Diamond'ı 83.7, AIME 2025'i 94.1 ve CyberGym'i 95.1 olarak listeliyor. Xiaomi, Pro varyantını Artificial Analysis'te en yüksek puanlı açık kaynaklı model olarak raporladı."
+        },
+        {
+          "question": "Bir açık ağırlıklı sürüm API faturamı nasıl etkiler?",
+          "answer": "Bir fiyat tavanı belirler. Yetkin bir açık ağırlıklı alternatif, sınırın altındaki API katmanının marjını sıkıştırır; 2026'daki tekrarlayan fiyat indirimlerinin arkasındaki baskı budur. Değer, bugünkü token fiyatı kadar yenileme seçeneğidir."
+        },
+        {
+          "question": "Açık ağırlıklı bir modeli kendi sunucunuzda çalıştırmak ne zaman gerçekten daha ucuzdur?",
+          "answer": "Modelin iyi olduğu görevlerde yüksek, istikrarlı ve düşük değişkenli hacimde. Kullanım belirleyici: 35% GPU kullanımında kendi sunucu çoğu zaman indirimli bir API katmanına yenilir. Sonuca varmadan önce operasyon vergisini ekleyin."
+        },
+        {
+          "question": "Üretim trafiğimi ücretsiz model katmanlarına yönlendirmeli miyim?",
+          "answer": "Evet, ilk günden yerleşik yedeklemeyle. Her ücretsiz katmanı tarihli bir edinme kanalı olarak görün ve yalnızca değerlendirmelerinizin nitelendirdiği iş yüklerini yönlendirin."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/pricing-an-open-weight-model",
+          "label": "Açık ağırlıklı bir modelin fiyatlandırması"
+        },
+        {
+          "slug": "/research/ox-alpha-was-glm-5-3",
+          "label": "Ox Alpha, GLM 5.3 idi"
+        },
+        {
+          "slug": "/research/free-tier-is-an-acquisition-cost",
+          "label": "Ücretsiz katman bir edinme maliyetidir"
+        },
+        {
+          "slug": "/research/stealth-model-free-tokens-playbook",
+          "label": "Gizli model ücretsiz token oyun kitabı"
+        },
+        {
+          "slug": "/research/cost-switching-llm-providers",
+          "label": "LLM sağlayıcısı değiştirmenin maliyeti"
+        }
+      ]
+    },
+    "vi": {
+      "title": "MiMo v2.6 và trần giá của trọng số mở",
+      "titleCore": "MiMo v2.6 và trần giá của trọng số mở",
+      "description": "MiMo v2.6 ra mắt ngày 21 tháng Chín với 1,130 điểm trên HN. Vì sao một mô hình trọng số mở đứng đầu là ràng buộc giá đối với mọi nhà cung cấp API.",
+      "body": "<p>MiMo v2.6 của Xiaomi được đăng ngày 21 tháng Chín năm 2026, đạt 1,130 điểm và 479 bình luận trên Hacker News &mdash; đợt ra mắt gây chú ý nhất trong tháng. Chỉ vài ngày sau, Xiaomi báo cáo biến thể Pro là mô hình mã nguồn mở có điểm cao nhất trên Artificial Analysis, và một kho benchmark cộng đồng công bố số liệu cho tầng Flash: Terminal-Bench 2.1 đạt 87.6%, GPQA Diamond 83.7, AIME 2025 94.1 và CyberGym 95.1.</p><h2>Vì sao một đợt ra mắt như vậy ảnh hưởng đến hóa đơn</h2><p>Một mô hình trọng số mở đứng đầu bảng xếp hạng chất lượng là một ràng buộc về giá, không chỉ là một lựa chọn. Các nhà cung cấp API không thể giữ mức giá tầm trung cho một mô hình khi có một lựa chọn trọng số mở đủ mạnh có thể tự host. Mỗi bản phát hành trọng số mở đáng tin cậy đều làm mỏng biên lợi nhuận của tầng ngay dưới biên giới công nghệ. Đó là lý do các đợt giảm giá tháng Chín đến đúng lúc đó, và vì sao vòng tiếp theo đã có thể đoán trước.</p><h2>Phép tính của việc tự host</h2><p>Tự host không tự động rẻ hơn. So sánh đầy đủ:</p><ul><li><strong>Chi phí tương đương token:</strong> chi phí GPU chia cho số token đạt được mỗi giờ GPU, đã tính phần hao hụt sử dụng do batching và thời gian rảnh. Ở mức sử dụng 35%, một mô hình trọng số mở tự host thường thua một tầng API giảm giá mạnh.</li><li><strong>Chi phí vận hành:</strong> lập kế hoạch dung lượng, trực ca, cập nhật image, và gánh nặng đánh giá để theo dõi các bản phát hành upstream. Đây cũng là chi phí quản lý đã khiến việc fine-tuning của một đội thất bại vào tháng Chín.</li><li><strong>Trần năng lực:</strong> với một số kỹ sư cố định, tự host một mô hình gần biên giới là một đánh đổi kém. Nó chỉ tốt khi mô hình đủ tốt và khối lượng ổn định.</li></ul><p>Điểm giao nhau gần như luôn nằm ở khối lượng cao, ổn định, ít biến động, trên các tác vụ mà mô hình thật sự giỏi. Một mô hình trọng số mở 27B cho viết sáng tạo được báo cáo trong tháng này ngang mức Fable 5 và giá rẻ hơn khoảng 40x, cho thấy hình dạng của đánh đổi này khi mô hình phù hợp với tác vụ.</p><h2>Gói miễn phí là kênh thu hút khách hàng</h2><p>Tầng Flash cũng xuất hiện như một biến thể miễn phí trong danh sách nhà cung cấp cộng đồng, bên cạnh một tầng trả phí &mdash; đó là lý do đáng định tuyến sang bản xem trước miễn phí của Minimax M3.1 Flash và các ưu đãi tương tự. Hãy coi mọi gói miễn phí là một kênh thu hút khách hàng tạm thời, có hạn, và xây dựng cơ chế dự phòng ngay từ ngày bạn áp dụng.</p><h2>Việc cần làm trong quý này</h2><ol><li><strong>Kiểm tra bảng xếp hạng trọng số mở mỗi tháng.</strong> Khoảng cách đã thu hẹp 40% trong một tháng ở trường hợp viết sáng tạo. Hãy giả định nó sẽ lại thu hẹp.</li><li><strong>Tính điểm giao nhau khi tự host một cách rõ ràng.</strong> Giả định về mức sử dụng quyết định chứ không phải giá niêm yết.</li><li><strong>Coi mọi gói miễn phí là sẽ hết hạn.</strong> Failover của router là yêu cầu ngay từ ngày đầu, không phải một ticket để sau.</li><li><strong>Giữ việc lựa chọn mô hình ở trạng thái có thể thay thế.</strong> Giá trị của một mô hình trọng số mở dẫn đầu là khả năng lựa chọn nó mang lại khi gia hạn, không phải giá token hôm nay.</li></ol><h2>Kết luận</h2><p>MiMo v2.6 đáng chú ý như một áp lực giá. Một mô hình trọng số mở mạnh ở đầu bảng xếp hạng nghĩa là giá API tầm trung có trần do chi phí tính toán quyết định, không phải do chiến lược của nhà cung cấp. Đây là đòn bẩy chi phí bền vững nhất mà một đội FinOps có thể dùng lúc này.</p>",
+      "faq": [
+        {
+          "question": "MiMo v2.6 có những điểm benchmark công bố nào?",
+          "answer": "Dữ liệu benchmark cộng đồng cho mimo-v2.6-flash ghi Terminal-Bench 2.1 đạt 87.6%, GPQA Diamond 83.7, AIME 2025 đạt 94.1 và CyberGym đạt 95.1. Xiaomi báo cáo biến thể Pro là mô hình mã nguồn mở có điểm cao nhất trên Artificial Analysis."
+        },
+        {
+          "question": "Một bản phát hành trọng số mở ảnh hưởng thế nào đến hóa đơn API của tôi?",
+          "answer": "Nó đặt ra một trần giá. Một lựa chọn trọng số mở đủ mạnh làm mỏng biên lợi nhuận của tầng API ngay dưới biên giới công nghệ, đó là áp lực đứng sau các đợt giảm giá lặp lại năm 2026. Giá trị nằm ở khả năng lựa chọn khi gia hạn cũng nhiều như giá token hôm nay."
+        },
+        {
+          "question": "Khi nào tự host mô hình trọng số mở thực sự rẻ hơn?",
+          "answer": "Khi khối lượng cao, ổn định, ít biến động và tác vụ nằm trong thế mạnh của mô hình. Mức sử dụng quyết định: ở 35% sử dụng GPU, tự host thường thua một tầng API giảm giá. Hãy cộng chi phí vận hành trước khi kết luận."
+        },
+        {
+          "question": "Có nên định tuyến lưu lượng production sang các tầng mô hình miễn phí không?",
+          "answer": "Có, nhưng phải có failover ngay từ ngày đầu. Coi mọi gói miễn phí là một kênh thu hút khách hàng có hạn và chỉ định tuyến những khối lượng công việc mà bộ đánh giá của bạn đã đạt yêu cầu."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/pricing-an-open-weight-model",
+          "label": "Định giá một mô hình trọng số mở"
+        },
+        {
+          "slug": "/research/ox-alpha-was-glm-5-3",
+          "label": "Ox Alpha là GLM 5.3"
+        },
+        {
+          "slug": "/research/free-tier-is-an-acquisition-cost",
+          "label": "Gói miễn phí là chi phí thu hút khách hàng"
+        },
+        {
+          "slug": "/research/stealth-model-free-tokens-playbook",
+          "label": "Sổ tay token miễn phí của mô hình ẩn"
+        },
+        {
+          "slug": "/research/cost-switching-llm-providers",
+          "label": "Chi phí chuyển đổi nhà cung cấp LLM"
+        }
+      ]
+    },
+    "ar": {
+      "title": "MiMo v2.6 وسقف سعر النماذج مفتوحة الأوزان",
+      "titleCore": "MiMo v2.6 وسقف سعر النماذج مفتوحة الأوزان",
+      "description": "صدر MiMo v2.6 في 21 سبتمبر وحصد 1,130 نقطة على HN. لماذا يشكّل نموذج مفتوح الأوزان في صدارة الترتيب قيداً على تسعير كل مزود واجهة برمجية.",
+      "body": "<p>نُشر MiMo v2.6 من Xiaomi في 21 سبتمبر 2026 وحصد 1,130 نقطة و479 تعليقاً على Hacker News &mdash; أكثر إطلاق ضجيجاً في الشهر. وخلال أيام أبلغت Xiaomi أن النسخة Pro هي أعلى نموذج مفتوح المصدر تسجيلاً على Artificial Analysis، ونشر مستودع معايير مجتمعي أرقام Terminal-Bench 2.1 لفئة Flash عند 87.6%، وGPQA Diamond عند 83.7، وAIME 2025 عند 94.1، وCyberGym عند 95.1.</p><h2>لماذا يهم إطلاق كهذا الفاتورة</h2><p>النموذج مفتوح الأوزان في صدارة ترتيب الجودة قيد على التسعير، لا مجرد خيار. فلا يستطيع مزودو الواجهات البرمجية الحفاظ على سعر متوسط لنموذج يتوفر له بديل مفتوح الأوزان قادر يمكن استضافته ذاتياً. وكل إصدار مفتوح الأوزان موثوق يضغط هامش الفئة التي تلي النماذج المتقدمة مباشرة. ولهذا حدثت تخفيضات الأسعار في سبتمبر حين حدثت، ولهذا فالجولة التالية قابلة للتوقع أصلاً.</p><h2>حسابات الاستضافة الذاتية</h2><p>الاستضافة الذاتية ليست أرخص تلقائياً. والمقارنة الكاملة:</p><ul><li><strong>التكلفة المكافئة بالرموز:</strong> تكلفة وحدة المعالجة الرسومية مقسومة على الرموز الممكنة لكل ساعة GPU، مع احتساب خسارة الاستخدام الناتجة عن التجميع في دفعات ووقت الخمول. عند استخدام 35% كثيراً ما يخسر نموذج مفتوح الأوزان مستضاف ذاتياً أمام فئة واجهة برمجية مخفّضة بشدة.</li><li><strong>ضريبة التشغيل:</strong> تخطيط السعة والمناوبة وتحديثات الصور وعبء التقييم لمتابعة الإصدارات الأصلية. وهو العبء نفسه الذي أفشل الضبط الدقيق لدى فريق واحد في سبتمبر.</li><li><strong>سقف القدرة:</strong> بعدد ثابت من المهندسين، استضافة نموذج قريب من الحدود المتقدمة صفقة ضعيفة. وهي صفقة جيدة حين يكون النموذج جيداً بما يكفي ويكون الحجم ثابتاً.</li></ul><p>نقطة التقاطع تكون في الغالب عند حجم مرتفع وثابت وقليل التباين على مهام يجيدها النموذج فعلاً. ونموذج كتابة إبداعية مفتوح الأوزان بحجم 27B أُبلغ هذا الشهر أنه بمستوى Fable 5 وبتسعير أرخص بنحو 40 مرة هو شكل الصفقة حين يناسب النموذج المهمة.</p><h2>الفئات المجانية قناة اكتساب</h2><p>تظهر فئة Flash أيضاً بنسخة مجانية في قوائم المزودين المجتمعية، إلى جانب فئة مدفوعة &mdash; ولهذا يستحق التوجيه إلى المعاينة المجانية لـ Minimax M3.1 Flash وعروض مماثلة. تعامل مع كل فئة مجانية بوصفها قناة اكتساب مؤقتة ومؤرخة، وابنِ التحويل الاحتياطي منذ يوم اعتمادها.</p><h2>ماذا تفعل هذا الربع</h2><ol><li><strong>أعد فحص لوحة صدارة النماذج مفتوحة الأوزان شهرياً.</strong> ضاقت الفجوة 40% في شهر في حالة الكتابة الإبداعية. افترض أنها ستضيق مجدداً.</li><li><strong>احسب نقطة تقاطع الاستضافة الذاتية صراحةً.</strong> افتراض الاستخدام هو الذي يحسمها، لا سعر القائمة.</li><li><strong>تعامل مع كل فئة مجانية على أنها منتهية الصلاحية.</strong> التحويل الاحتياطي في الموجّه شرط من اليوم الأول، لا تذكرة لاحقة.</li><li><strong>أبقِ اختيار النموذج قابلاً للاستبدال.</strong> قيمة صدارة مفتوحة الأوزان هي المرونة التي تمنحك إياها عند التجديد، لا سعر الرمز اليوم.</li></ol><h2>الخلاصة</h2><p>يهم MiMo v2.6 بوصفه ضغطاً على الأسعار. فنموذج مفتوح الأوزان قادر في صدارة الترتيب يعني أن لأسعار الواجهات البرمجية المتوسطة سقفاً تحدده تكلفة الحوسبة، لا استراتيجية المورد. وهذه أكثر رافعات التكلفة ديمومة المتاحة لفريق FinOps الآن.</p>",
+      "faq": [
+        {
+          "question": "ما درجات المعايير المنشورة لـ MiMo v2.6؟",
+          "answer": "تسرد بيانات المعايير المجتمعية لـ mimo-v2.6-flash نتيجة Terminal-Bench 2.1 عند 87.6%، وGPQA Diamond عند 83.7، وAIME 2025 عند 94.1، وCyberGym عند 95.1. وأبلغت Xiaomi أن النسخة Pro أعلى نموذج مفتوح المصدر تسجيلاً على Artificial Analysis."
+        },
+        {
+          "question": "كيف يؤثر إصدار مفتوح الأوزان في فاتورة الواجهة البرمجية؟",
+          "answer": "يضع سقفاً للسعر. فالبديل مفتوح الأوزان القادر يضغط هامش فئة الواجهة التي تلي النماذج المتقدمة، وهو الضغط وراء تخفيضات الأسعار المتكررة في 2026. وقيمته مرونة التجديد بقدر ما هي سعر الرمز اليوم."
+        },
+        {
+          "question": "متى تكون استضافة نموذج مفتوح الأوزان ذاتياً أرخص فعلاً؟",
+          "answer": "عند حجم مرتفع وثابت وقليل التباين على مهام يجيدها النموذج. الاستخدام هو الحاسم: فعند استخدام GPU بنسبة 35% تخسر الاستضافة الذاتية عادةً أمام فئة واجهة مخفّضة. أضف ضريبة التشغيل قبل الاستنتاج."
+        },
+        {
+          "question": "هل ينبغي توجيه حركة الإنتاج إلى الفئات المجانية للنماذج؟",
+          "answer": "نعم، مع بناء تحويل احتياطي من اليوم الأول. تعامل مع كل فئة مجانية بوصفها قناة اكتساب مؤرخة، ووجّه إليها فقط الأحمال التي أهّلتها تقييماتك."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/pricing-an-open-weight-model",
+          "label": "تسعير نموذج مفتوح الأوزان"
+        },
+        {
+          "slug": "/research/ox-alpha-was-glm-5-3",
+          "label": "Ox Alpha كان GLM 5.3"
+        },
+        {
+          "slug": "/research/free-tier-is-an-acquisition-cost",
+          "label": "الفئة المجانية تكلفة اكتساب"
+        },
+        {
+          "slug": "/research/stealth-model-free-tokens-playbook",
+          "label": "دليل الرموز المجانية للنماذج الخفية"
+        },
+        {
+          "slug": "/research/cost-switching-llm-providers",
+          "label": "تكلفة التحول بين مزودي LLM"
+        }
+      ]
+    },
+    "it": {
+      "title": "MiMo v2.6 e il tetto di prezzo dei pesi aperti",
+      "titleCore": "MiMo v2.6 e il tetto di prezzo dei pesi aperti",
+      "description": "MiMo v2.6 è uscito il 21 settembre con 1,130 punti su HN. Perché un modello a pesi aperti in cima alla classifica vincola i prezzi di ogni fornitore API.",
+      "body": "<p>MiMo v2.6 di Xiaomi è stato pubblicato il 21 settembre 2026 e ha raccolto 1,130 punti e 479 commenti su Hacker News &mdash; il lancio singolo più rumoroso del mese. In pochi giorni Xiaomi ha presentato la variante Pro come il modello open source con il punteggio più alto su Artificial Analysis, e un repository comunitario di benchmark ha pubblicato per il livello Flash questi valori: Terminal-Bench 2.1 al 87.6%, GPQA Diamond a 83.7, AIME 2025 a 94.1 e CyberGym a 95.1.</p><h2>Perché un lancio così conta sulla fattura</h2><p>Un modello a pesi aperti in cima alla classifica di qualità è un vincolo sul prezzo, non solo un'opzione. I fornitori di API non possono mantenere un prezzo di fascia media per un modello quando esiste un'alternativa a pesi aperti capace che si può installare in autonomia. Ogni rilascio credibile a pesi aperti comprime il margine del livello immediatamente sotto la frontiera. Per questo i tagli di prezzo di settembre sono arrivati quando sono arrivati, ed è per questo che il prossimo giro è già prevedibile.</p><h2>L'aritmetica dell'auto-hosting</h2><p>L'auto-hosting non è automaticamente più economico. Il confronto completo:</p><ul><li><strong>Costo equivalente per token:</strong> costo della GPU diviso per i token ottenibili per ora di GPU, includendo la perdita di utilizzo dovuta al batching e ai tempi morti. Con un utilizzo del 35% un modello a pesi aperti self-hosted spesso perde contro un livello API fortemente scontato.</li><li><strong>Costo operativo:</strong> pianificazione della capacità, reperibilità, aggiornamenti delle immagini e carico di valutazione per tenere traccia dei rilasci upstream. È lo stesso sovraccarico che a settembre ha fatto fallire il fine-tuning di un team.</li><li><strong>Tetto di capacità:</strong> con un numero fisso di ingegneri, l'auto-hosting di un modello vicino alla frontiera è uno scambio sfavorevole. È uno scambio buono quando il modello è abbastanza valido e il volume è stabile.</li></ul><p>Il punto di equilibrio sta quasi sempre in un volume alto, costante e a bassa varianza, su compiti in cui il modello è davvero bravo. Un modello a pesi aperti da 27B per la scrittura creativa, riportato questo mese al livello di Fable 5 con prezzi circa 40x inferiori, mostra la forma di questo scambio quando il modello si adatta al compito.</p><h2>I piani gratuiti sono il canale di acquisizione</h2><p>Il livello Flash compare anche come variante gratuita nelle liste dei provider della comunità, accanto a un livello a pagamento &mdash; ed è per questo che vale la pena instradare verso l'anteprima gratuita di Minimax M3.1 Flash e offerte simili. Trattate ogni piano gratuito come un canale di acquisizione temporaneo e datato, e costruite il failover dal giorno in cui lo adottate.</p><h2>Cosa fare questo trimestre</h2><ol><li><strong>Ricontrollate la classifica dei pesi aperti ogni mese.</strong> Nel caso della scrittura creativa il divario si è ridotto del 40% in un mese. Presumete che si riduca di nuovo.</li><li><strong>Calcolate esplicitamente il vostro punto di equilibrio dell'auto-hosting.</strong> A decidere è l'ipotesi di utilizzo, non il prezzo di listino.</li><li><strong>Trattate ogni piano gratuito come se fosse in scadenza.</strong> Il failover del router è un requisito del primo giorno, non un ticket per dopo.</li><li><strong>Tenete la selezione dei modelli intercambiabile.</strong> Il valore di un leader a pesi aperti è l'opzionalità che vi dà al rinnovo, non il prezzo del token di oggi.</li></ol><h2>Conclusione</h2><p>MiMo v2.6 conta come pressione sui prezzi. Un modello capace a pesi aperti in cima alla classifica significa che i prezzi API di fascia media hanno un tetto fissato dal costo di calcolo, non dalla strategia del fornitore. È la leva di costo più duratura oggi a disposizione di un team FinOps.</p>",
+      "faq": [
+        {
+          "question": "Quali sono i punteggi di benchmark pubblicati di MiMo v2.6?",
+          "answer": "I dati di benchmark della comunità per mimo-v2.6-flash indicano Terminal-Bench 2.1 al 87.6%, GPQA Diamond a 83.7, AIME 2025 a 94.1 e CyberGym a 95.1. Xiaomi ha presentato la variante Pro come il modello open source con il punteggio più alto su Artificial Analysis."
+        },
+        {
+          "question": "Come incide un rilascio a pesi aperti sulla mia fattura API?",
+          "answer": "Fissa un tetto di prezzo. Un'alternativa capace a pesi aperti comprime il margine del livello API sotto la frontiera, che è la pressione dietro i ripetuti tagli di prezzo del 2026. Il valore sta tanto nell'opzionalità al rinnovo quanto nel prezzo del token di oggi."
+        },
+        {
+          "question": "Quando l'auto-hosting di un modello a pesi aperti è davvero più economico?",
+          "answer": "Con volume alto, costante e a bassa varianza su compiti in cui il modello è bravo. A decidere è l'utilizzo: con un utilizzo GPU del 35% l'auto-hosting di solito perde contro un livello API scontato. Aggiungete il costo operativo prima di concludere."
+        },
+        {
+          "question": "Devo instradare il traffico di produzione verso livelli gratuiti?",
+          "answer": "Sì, con il failover integrato dal primo giorno. Trattate ogni piano gratuito come un canale di acquisizione datato e instradate solo i carichi di lavoro che le vostre valutazioni hanno qualificato."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/pricing-an-open-weight-model",
+          "label": "Prezzare un modello a pesi aperti"
+        },
+        {
+          "slug": "/research/ox-alpha-was-glm-5-3",
+          "label": "Ox Alpha era GLM 5.3"
+        },
+        {
+          "slug": "/research/free-tier-is-an-acquisition-cost",
+          "label": "Il piano gratuito è un costo di acquisizione"
+        },
+        {
+          "slug": "/research/stealth-model-free-tokens-playbook",
+          "label": "Playbook dei token gratuiti dei modelli stealth"
+        },
+        {
+          "slug": "/research/cost-switching-llm-providers",
+          "label": "Costo del cambio di fornitore LLM"
+        }
+      ]
+    },
+    "ko": {
+      "title": "MiMo v2.6과 오픈 웨이트 가격 상한",
+      "titleCore": "MiMo v2.6과 오픈 웨이트 가격 상한",
+      "description": "MiMo v2.6은 9월 21일 HN에서 1,130포인트로 출시되었습니다. 상위권 오픈 웨이트 모델이 모든 API 제공업체의 가격을 어떻게 제약하는지 설명합니다.",
+      "body": "<p>Xiaomi의 MiMo v2.6은 2026년 9월 21일에 공개되어 Hacker News에서 1,130포인트와 479개의 댓글을 얻었습니다 &mdash; 이번 달 가장 시끄러웠던 단일 출시입니다. 며칠 사이 Xiaomi는 Pro 변형이 Artificial Analysis에서 가장 높은 점수를 받은 오픈소스 모델이라고 보고했고, 커뮤니티 벤치마크 저장소는 Flash 등급에 대해 Terminal-Bench 2.1 87.6%, GPQA Diamond 83.7, AIME 2025 94.1, CyberGym 95.1이라는 수치를 공개했습니다.</p><h2>이런 출시가 청구서에 중요한 이유</h2><p>품질 순위 상단에 있는 오픈 웨이트 모델은 선택지일 뿐 아니라 가격의 제약입니다. 유능한 오픈 웨이트 대안을 직접 호스팅할 수 있다면 API 제공업체는 그 모델에 대해 중간 가격대를 유지할 수 없습니다. 신뢰할 만한 오픈 웨이트 출시마다 최전선 바로 아래 등급의 마진이 직접 줄어듭니다. 9월에 가격 인하가 그 시점에 일어난 이유, 그리고 다음 라운드가 이미 예측 가능한 이유도 여기에 있습니다.</p><h2>자체 호스팅의 계산</h2><p>자체 호스팅이 자동으로 더 저렴하지는 않습니다. 전체 비교는 다음과 같습니다.</p><ul><li><strong>토큰 환산 비용:</strong> GPU 비용을 GPU 시간당 달성 가능한 토큰 수로 나눕니다. 여기에는 배칭과 유휴 시간으로 인한 가동률 손실이 포함됩니다. 가동률이 35%일 때 자체 호스팅한 오픈 웨이트 모델은 대폭 할인된 API 등급에 지는 경우가 많습니다.</li><li><strong>운영 부담:</strong> 용량 계획, 온콜, 이미지 업데이트, 상류 릴리스를 추적하는 데 드는 평가 작업입니다. 9월에 한 팀의 파인튜닝을 실패로 이끈 것과 같은 오버헤드입니다.</li><li><strong>능력의 한계:</strong> 엔지니어 수가 정해져 있다면 최전선에 가까운 모델을 자체 호스팅하는 것은 나쁜 거래입니다. 모델이 충분히 좋고 볼륨이 안정적일 때에만 좋은 거래가 됩니다.</li></ul><p>손익분기점은 거의 항상 모델이 정말 잘하는 작업에서, 볼륨이 높고 안정적이며 변동이 작은 지점에 있습니다. 이번 달 Fable 5 수준으로 보고되고 가격은 약 40x 저렴한 창작 글쓰기용 27B 오픈 웨이트 모델은 모델이 작업에 맞을 때 이런 거래가 어떤 모습인지 보여 줍니다.</p><h2>무료 등급은 확보 채널입니다</h2><p>Flash 등급은 커뮤니티 제공업체 목록에서 유료 등급과 함께 무료 변형으로도 나타납니다 &mdash; 그래서 Minimax M3.1 Flash의 무료 프리뷰와 비슷한 제안을 라우팅할 가치가 있습니다. 모든 무료 등급을 날짜가 정해진 임시 확보 채널로 취급하고, 채택한 날부터 페일오버를 구축하세요.</p><h2>이번 분기에 할 일</h2><ol><li><strong>오픈 웨이트 리더보드를 매달 다시 확인하세요.</strong> 창작 글쓰기 사례에서는 한 달 만에 격차가 40% 줄었습니다. 다시 줄어들 것으로 가정하세요.</li><li><strong>자체 호스팅 손익분기점을 명시적으로 계산하세요.</strong> 결정하는 것은 정가가 아니라 가동률 가정입니다.</li><li><strong>모든 무료 등급을 만료될 것으로 취급하세요.</strong> 라우터 페일오버는 나중에 처리할 티켓이 아니라 첫날부터 필요한 요건입니다.</li><li><strong>모델 선택을 교체 가능하게 유지하세요.</strong> 오픈 웨이트 선두 모델의 가치는 오늘의 토큰 가격이 아니라 계약 갱신 때 주는 선택권입니다.</li></ol><h2>결론</h2><p>MiMo v2.6은 가격 압력으로서 중요합니다. 순위 상단에 유능한 오픈 웨이트 모델이 있다는 것은 중간 등급 API 가격의 상한이 공급업체 전략이 아니라 컴퓨팅 비용으로 정해진다는 뜻입니다. 이것이 지금 FinOps 팀이 쓸 수 있는 가장 지속적인 비용 레버입니다.</p>",
+      "faq": [
+        {
+          "question": "MiMo v2.6의 공개된 벤치마크 점수는 얼마인가요?",
+          "answer": "mimo-v2.6-flash의 커뮤니티 벤치마크 데이터에는 Terminal-Bench 2.1 87.6%, GPQA Diamond 83.7, AIME 2025 94.1, CyberGym 95.1이 기록되어 있습니다. Xiaomi는 Pro 변형이 Artificial Analysis에서 가장 높은 점수를 받은 오픈소스 모델이라고 보고했습니다."
+        },
+        {
+          "question": "오픈 웨이트 출시가 제 API 청구서에 어떤 영향을 주나요?",
+          "answer": "가격 상한을 설정합니다. 유능한 오픈 웨이트 대안이 최전선 아래 API 등급의 마진을 줄이는데, 이것이 2026년에 반복된 가격 인하의 배경이 된 압력입니다. 가치는 오늘의 토큰 가격만큼이나 계약 갱신 때의 선택권에 있습니다."
+        },
+        {
+          "question": "오픈 웨이트 모델을 자체 호스팅하는 것이 실제로 언제 더 저렴한가요?",
+          "answer": "모델이 잘하는 작업에서 볼륨이 높고 안정적이며 변동이 작을 때입니다. 가동률이 결정합니다. GPU 가동률이 35%이면 자체 호스팅은 보통 할인된 API 등급에 집니다. 결론을 내리기 전에 운영 부담을 더하세요."
+        },
+        {
+          "question": "프로덕션 트래픽을 무료 모델 등급으로 라우팅해야 하나요?",
+          "answer": "예, 첫날부터 페일오버를 갖춘다면 그렇습니다. 모든 무료 등급을 날짜가 정해진 확보 채널로 취급하고, 평가를 통과한 워크로드만 라우팅하세요."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/pricing-an-open-weight-model",
+          "label": "오픈 웨이트 모델의 가격 책정"
+        },
+        {
+          "slug": "/research/ox-alpha-was-glm-5-3",
+          "label": "Ox Alpha는 GLM 5.3이었다"
+        },
+        {
+          "slug": "/research/free-tier-is-an-acquisition-cost",
+          "label": "무료 등급은 확보 비용이다"
+        },
+        {
+          "slug": "/research/stealth-model-free-tokens-playbook",
+          "label": "스텔스 모델 무료 토큰 플레이북"
+        },
+        {
+          "slug": "/research/cost-switching-llm-providers",
+          "label": "LLM 제공업체 전환 비용"
+        }
+      ]
+    },
+    "nl": {
+      "title": "MiMo v2.6 en het prijsplafond van open weights",
+      "titleCore": "MiMo v2.6 en het prijsplafond van open weights",
+      "description": "MiMo v2.6 verscheen op 21 september met 1,130 HN-punten. Waarom een topgerangschikt open-weightmodel een prijsbeperking is voor elke API-aanbieder.",
+      "body": "<p>MiMo v2.6 van Xiaomi verscheen op 21 september 2026 en kreeg 1,130 punten en 479 reacties op Hacker News &mdash; de luidruchtigste lancering van de maand. Binnen enkele dagen meldde Xiaomi dat de Pro-variant het hoogst scorende open-sourcemodel op Artificial Analysis was, en een community-benchmarkrepo publiceerde cijfers voor de Flash-tier: Terminal-Bench 2.1 op 87.6%, GPQA Diamond op 83.7, AIME 2025 op 94.1 en CyberGym op 95.1.</p><h2>Waarom zo'n lancering ertoe doet voor een rekening</h2><p>Een open-weightmodel bovenaan de kwaliteitsranglijst is een prijsbeperking, niet alleen een optie. API-aanbieders kunnen geen middenprijs aanhouden voor een model waarvoor een capabel open-weightalternatief zelf gehost kan worden. Elke geloofwaardige open-weightrelease drukt de marge op de tier direct onder het frontier. Daarom vonden de prijsverlagingen van september plaats wanneer ze plaatsvonden, en daarom is de volgende ronde al voorspelbaar.</p><h2>De rekensom van zelf hosten</h2><p>Zelf hosten is niet automatisch goedkoper. De volledige vergelijking:</p><ul><li><strong>Tokenequivalente kosten:</strong> GPU-kosten gedeeld door haalbare tokens per GPU-uur, inclusief het benuttingsverlies door batching en stilstand. Bij 35% benutting verliest een zelf gehost open-weightmodel vaak van een flink gekorte API-tier.</li><li><strong>Ops-heffing:</strong> capaciteitsplanning, bereikbaarheidsdienst, image-updates en de evaluatielast van het volgen van upstream-releases. Dit is dezelfde overhead waardoor finetunen in september voor één team mislukte.</li><li><strong>Capaciteitsplafond:</strong> voor een vast aantal engineers is zelf een bijna-frontiermodel hosten een slechte ruil. Het is een goede ruil als het model goed genoeg is en het volume stabiel.</li></ul><p>Het kantelpunt ligt bijna altijd bij hoog, stabiel volume met weinig variatie op taken waar het model echt goed in is. Een open-weightmodel van 27B voor creatief schrijven, deze maand gemeld op Fable 5-niveau en tegen een prijs die ruwweg 40x lager ligt, is de vorm van de ruil wanneer het model bij de taak past.</p><h2>Gratis tiers zijn het acquisitiekanaal</h2><p>De Flash-tier verschijnt in lijsten van communityaanbieders ook als gratis variant, naast een betaalde tier &mdash; en daarom zijn de gratis preview van Minimax M3.1 Flash en vergelijkbare aanbiedingen het waard om naartoe te routeren. Behandel elke gratis tier als een gedateerd, tijdelijk acquisitiekanaal en bouw de failover vanaf de dag dat je hem gaat gebruiken.</p><h2>Wat je dit kwartaal moet doen</h2><ol><li><strong>Controleer de open-weightranglijst maandelijks.</strong> In het geval van creatief schrijven kromp de kloof in een maand met 40%. Ga ervan uit dat hij weer krimpt.</li><li><strong>Bereken je kantelpunt voor zelf hosten expliciet.</strong> De aanname over benutting bepaalt het, niet de listprijs.</li><li><strong>Behandel elke gratis tier als aflopend.</strong> Routerfailover is een eis vanaf dag één, geen ticket voor later.</li><li><strong>Houd modelkeuze uitwisselbaar.</strong> De waarde van een open-weightleider is de optionaliteit die je bij verlenging krijgt, niet de tokenprijs van vandaag.</li></ol><h2>Conclusie</h2><p>MiMo v2.6 is van belang als prijsdruk. Een capabel open-weightmodel bovenaan de ranglijst betekent dat prijzen van mid-tier API's een plafond hebben dat wordt bepaald door computekosten, niet door de strategie van de leverancier. Dat is op dit moment de meest duurzame kostenhefboom voor een FinOps-team.</p>",
+      "faq": [
+        {
+          "question": "Wat zijn de gepubliceerde benchmarkscores van MiMo v2.6?",
+          "answer": "Communitybenchmarkdata voor mimo-v2.6-flash vermelden Terminal-Bench 2.1 op 87.6%, GPQA Diamond op 83.7, AIME 2025 op 94.1 en CyberGym op 95.1. Xiaomi meldde dat de Pro-variant het hoogst scorende open-sourcemodel op Artificial Analysis was."
+        },
+        {
+          "question": "Hoe beïnvloedt een open-weightrelease mijn API-rekening?",
+          "answer": "Het stelt een prijsplafond. Een capabel open-weightalternatief drukt de marge op de API-tier onder het frontier, wat de druk is achter de herhaalde prijsverlagingen van 2026. De waarde zit evengoed in optionaliteit bij verlenging als in de tokenprijs van vandaag."
+        },
+        {
+          "question": "Wanneer is zelf hosten van een open-weightmodel echt goedkoper?",
+          "answer": "Bij hoog, stabiel volume met weinig variatie op taken waar het model goed in is. Benutting beslist: bij 35% GPU-benutting verliest zelf hosten meestal van een gekorte API-tier. Tel de ops-heffing mee voordat je een conclusie trekt."
+        },
+        {
+          "question": "Moet ik productieverkeer naar gratis modeltiers routeren?",
+          "answer": "Ja, met failover vanaf dag één. Behandel elke gratis tier als een gedateerd acquisitiekanaal en routeer alleen workloads die je evaluaties hebben gekwalificeerd."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/pricing-an-open-weight-model",
+          "label": "Een open-weightmodel prijzen"
+        },
+        {
+          "slug": "/research/ox-alpha-was-glm-5-3",
+          "label": "Ox Alpha was GLM 5.3"
+        },
+        {
+          "slug": "/research/free-tier-is-an-acquisition-cost",
+          "label": "Een gratis tier is acquisitiekosten"
+        },
+        {
+          "slug": "/research/stealth-model-free-tokens-playbook",
+          "label": "Draaiboek voor gratis tokens van stealthmodellen"
+        },
+        {
+          "slug": "/research/cost-switching-llm-providers",
+          "label": "Kosten van het wisselen van LLM-aanbieder"
+        }
+      ]
+    },
+    "zh": {
+      "title": "MiMo v2.6 与开源权重的价格天花板",
+      "titleCore": "MiMo v2.6 与开源权重价格上限",
+      "description": "MiMo v2.6 于 9 月 21 日发布，在 Hacker News 获得 1,130 分。顶尖开源权重模型如何成为每家 API 供应商的定价约束。",
+      "body": "<p>小米的 MiMo v2.6 于 2026 年 9 月 21 日发布，在 Hacker News 上获得 1,130 分和 479 条评论，是本月声量最大的单次发布。数日之内，小米就宣称其 Pro 版本是 Artificial Analysis 上得分最高的开源模型；一个社区基准仓库也公布了 Flash 档位的数据：Terminal-Bench 2.1 为 87.6%，GPQA Diamond 为 83.7，AIME 2025 为 94.1，CyberGym 为 95.1。</p>\n\n<h2>这类发布为什么与账单有关</h2>\n<p>质量排名首位的开源权重模型，是一种定价约束，而不只是一个选项。当一个有能力的开源权重替代品可以自行部署时，API 供应商就无法维持同类模型的中档价格。每一次可信的开源权重发布，都会直接压缩紧邻前沿档位之下那一档的利润空间。这正是 9 月降价发生在此时的原因，也是下一轮降价已经可以预见的原因。</p>\n\n<h2>自托管的算术</h2>\n<p>自托管并不会自动更便宜。完整的比较包括：</p>\n\n<ul>\n<li>\n<strong>等效 token 成本：</strong>GPU 成本除以每 GPU 小时可实现的 token 数，并计入批处理和空闲造成的利用率损失。在 35% 利用率下，自托管的开源权重模型往往输给大幅打折的 API 档位。</li>\n<li>\n<strong>运维税：</strong>容量规划、值班、镜像更新，以及跟踪上游发布所需的评估负担。这正是 9 月某个团队的微调项目失败的同类开销。</li>\n<li>\n<strong>能力上限：</strong>对于人手固定的团队，自托管一个接近前沿的模型是个糟糕的交易。当模型已经足够好、且用量稳定时，它才是好交易。</li>\n</ul>\n<p>盈亏平衡点几乎总是出现在模型确实擅长的任务上，且用量高、稳定、波动小的时候。本月有报告称，一个 27B 的开源权重创意写作模型达到了 Fable 5 的水平，价格约便宜 40 倍。当模型与任务匹配时，这就是这类交易的典型形态。</p>\n\n<h2>免费档位是获客渠道</h2>\n<p>社区供应商列表中，Flash 档位也以免费变体的形式出现，并与付费档位并列，这就是为什么 Minimax M3.1 Flash 的免费预览以及类似的优惠值得纳入路由。应把每一个免费档位都视为有日期、会过期的临时获客渠道，并从采用的第一天起就搭建故障转移。</p>\n\n<h2>本季度该做什么</h2>\n<ol>\n<li>\n<strong>每月重新检查开源权重排行榜。</strong>在创意写作的案例中，差距一个月内缩小了 40%。应假设它还会再次缩小。</li>\n<li>\n<strong>明确计算你的自托管盈亏平衡点。</strong>决定它的是利用率假设，而不是标价。</li>\n<li>\n<strong>把每个免费档位都当作会到期处理。</strong>路由故障转移是第一天就需要的功能，不是以后再处理的工单。</li>\n<li>\n<strong>保持模型选择的可替换性。</strong>开源权重领先者的价值，在于续约时给你的选择余地，而不是今天的 token 价格。</li>\n</ol>\n\n<h2>结论</h2>\n<p>MiMo v2.6 的意义在于定价压力。排行榜首位有一个有能力的开源权重模型，意味着中档 API 价格的上限由计算成本决定，而不是由供应商的策略决定。这是目前 FinOps 团队能掌握的、最持久的成本杠杆。</p>",
+      "faq": [
+        {
+          "question": "MiMo v2.6 公布的基准分数是多少？",
+          "answer": "mimo-v2.6-flash 的社区基准数据显示：Terminal-Bench 2.1 为 87.6%，GPQA Diamond 为 83.7，AIME 2025 为 94.1，CyberGym 为 95.1。小米称 Pro 版本是 Artificial Analysis 上得分最高的开源模型。"
+        },
+        {
+          "question": "开源权重发布如何影响我的 API 账单？",
+          "answer": "它设定了价格上限。一个有能力的开源权重替代品会压缩前沿之下那一档 API 的利润空间，这正是 2026 年多次降价背后的压力。它的价值既在于今天的 token 价格，也在于续约时的选择余地。"
+        },
+        {
+          "question": "什么时候自托管开源权重模型真正更便宜？",
+          "answer": "在模型擅长的任务上，用量高、稳定、波动小的时候。利用率决定了结果：GPU 利用率为 35% 时，自托管通常输给打折的 API 档位。下结论前，请先计入运维税。"
+        },
+        {
+          "question": "生产流量应该路由到免费模型档位吗？",
+          "answer": "可以，但必须从第一天就内置故障转移。把每个免费档位都视为有日期的获客渠道，并且只路由通过评估认证的工作负载。"
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/pricing-an-open-weight-model",
+          "label": "为开源权重模型定价"
+        },
+        {
+          "slug": "/research/ox-alpha-was-glm-5-3",
+          "label": "Ox Alpha 就是 GLM 5.3"
+        },
+        {
+          "slug": "/research/free-tier-is-an-acquisition-cost",
+          "label": "免费层是一笔获客成本"
+        },
+        {
+          "slug": "/research/stealth-model-free-tokens-playbook",
+          "label": "隐身模型免费 token 操作手册"
+        },
+        {
+          "slug": "/research/cost-switching-llm-providers",
+          "label": "切换 LLM 供应商的成本"
+        }
+      ]
     }
   }
 }

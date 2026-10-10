@@ -214,6 +214,346 @@
           "label": "Alocação de custos de IA"
         }
       ]
+    },
+    "id": {
+      "title": "Lembar kerja biaya penuh agen terkelola",
+      "titleCore": "Lembar kerja biaya penuh agen AI",
+      "description": "Susun biaya agen yang bisa diaudit per eksekusi dari penggunaan model, alat, komputasi, percobaan ulang, verifikasi, dan biaya platform bersama.",
+      "body": "<p>Total token model bukan biaya penuh agen. Eksekusi di produksi juga bisa memakai pencarian hosted, eksekusi kode, penyimpanan, percobaan ulang, model cadangan, dan tinjauan manusia. Lembar kerja yang berguna menghubungkan setiap tagihan ke ID eksekusi dan memisahkan tagihan penyedia yang terukur dari alokasi overhead dan estimasi tenaga kerja.</p><p>Lembar kerja ini melengkapi <a href=\"/research/cost-per-successful-task\">biaya per tugas yang berhasil</a>: pertama susun buku besar biaya lengkap, lalu bagi dengan hasil yang lolos uji keberhasilan yang ditetapkan. Lembar ini juga memperluas <a href=\"/research/server-tools-are-a-separate-invoice\">penagihan alat yang terpisah</a> menjadi catatan keuangan yang bisa diulang.</p><h2>Mulai dengan satu baris per peristiwa</h2><p>Gunakan ID alur kerja yang stabil untuk maksud pengguna dan ID eksekusi untuk setiap percobaan. Catat cap waktu, lingkungan, tim atau tenant, alur kerja, eksekusi, penyedia, layanan, ID sumber daya, kuantitas, satuan, versi tarif, mata uang, serta sumber faktur atau pengukuran. Simpan satu peristiwa untuk setiap panggilan model, panggilan alat, tugas komputasi, atau item tinjauan. Dengan begitu percobaan ulang terlihat dan keuangan dapat merekonsiliasi total tanpa menebak operasi bersarang mana yang menimbulkannya.</p><h2>Kolom lembar kerja</h2><ul><li><strong>Model:</strong> penyedia, model, satuan input/output/cache/penalaran bila tersedia, tarif terukur, dan biaya langsung.</li><li><strong>Alat:</strong> pencarian, retrieval, browser, eksekusi kode, dan layanan terukur lainnya, dengan jumlah panggilan atau waktu jalan serta biaya langsung.</li><li><strong>Komputasi dan penyimpanan:</strong> waktu jalan sandbox atau kontainer, waktu akselerator atau CPU, penyimpanan persisten, dan biaya jaringan jika ditagih.</li><li><strong>Pekerjaan keandalan:</strong> percobaan ulang, panggilan cadangan, cabang yang ditinggalkan, dan eksekusi perbaikan. Tetap masukkan ke total biaya eksekusi meskipun tidak menghasilkan keluaran yang berguna.</li><li><strong>Verifikasi:</strong> panggilan evaluator dan menit tinjauan manusia, dengan biaya tenaga kerja ditandai sebagai estimasi internal, bukan tagihan faktur penyedia.</li><li><strong>Platform bersama:</strong> alokasi orkestrasi, observabilitas, kapasitas yang dipesan, atau penyimpanan bersama, masing-masing dengan pemicu alokasi dan periodenya.</li></ul><h2>Hitung biaya langsung dan biaya penuh secara terpisah</h2><p>Biaya langsung eksekusi adalah jumlah tagihan model, alat, komputasi, dan penyimpanan terukur yang dikaitkan dengan eksekusi tersebut. Biaya penuh menambahkan bagian overhead platform dan tenaga kerja tinjauan yang sudah dinyatakan. Gunakan pemicu yang stabil untuk biaya bersama, seperti waktu jalan terukur, kapasitas yang dipesan, atau alokasi per eksekusi yang terdokumentasi. Publikasikan pemicu beserta jendela waktunya; jangan membagi biaya tetap berdasarkan jumlah token kecuali token benar-benar menjelaskan konsumsi sumber daya.</p><p>Contoh kecil hipotetis membuat rumusnya jelas: jika satu eksekusi punya biaya model $0,40, alat $0,10, komputasi sandbox $0,20, dan biaya tinjauan serta platform yang dialokasikan $0,30, laporkan $0,70 sebagai biaya langsung dan $1,00 sebagai biaya penuh. Angka ini hanya mengilustrasikan perhitungan; bukan harga pasar atau tolok ukur.</p><h2>Pisahkan percobaan dan hasil</h2><p>Hitung setiap percobaan dalam pengeluaran, lalu beri label alur kerja akhir sebagai berhasil, gagal, ditinggalkan, atau perlu diselesaikan manusia berdasarkan aturan yang eksplisit. Laporkan biaya per alur kerja yang selesai bersama tingkat keberhasilan, tingkat percobaan ulang, dan usaha tinjauan. Untuk metrik tugas yang berhasil, gunakan total pengeluaran yang memenuhi syarat dalam periode dibagi jumlah alur kerja yang lolos uji keberhasilan. Jangan mengeluarkan eksekusi gagal dari pembilang atau menghitung langkah agen perantara sebagai keberhasilan terpisah.</p><h2>Rekonsiliasi dan atur lembar kerja</h2><p>Rekonsiliasikan total peristiwa dengan faktur penyedia dan ekspor tagihan cloud setelah data penggunaan final. Jelaskan secara terpisah kredit, diskon, minimum, peristiwa yang terlambat, dan konversi mata uang. Simpan sumber harga dan tanggal berlakunya agar biaya historis bisa dihitung ulang tanpa menerapkan tarif hari ini pada penggunaan bulan lalu.</p><p>Tetapkan penanggung jawab untuk setiap alur kerja dan tentukan anggaran per eksekusi, anggaran agregat per periode, serta jalur eskalasi. Saat alur kerja melampaui anggarannya, catat alasannya dan apakah ia diizinkan melanjutkan. Untuk pola penegakan saat runtime, lihat <a href=\"/research/three-agent-budgets\">tiga anggaran untuk agen otonom</a>.</p><h2>FAQ</h2><h3>Apa yang seharusnya ada dalam lembar kerja biaya agen?</h3><p>Catat penggunaan model, alat yang ditagih, komputasi, penyimpanan, percobaan ulang, panggilan cadangan, verifikasi, serta alokasi platform bersama dan estimasi tenaga kerja yang diidentifikasi secara terpisah.</p><h3>Apakah eksekusi agen yang gagal perlu dimasukkan ke biaya per tugas?</h3><p>Masukkan pengeluarannya ke total. Laporkan jumlah alur kerja yang berhasil dengan aturan keberhasilan yang dinyatakan, agar kegagalan tetap terlihat dalam ekonomi unit.</p><h3>Bagaimana cara menghindari penghitungan ganda biaya platform bersama?</h3><p>Biarkan tagihan langsung melekat pada peristiwanya, alokasikan biaya bersama dalam buku besar terpisah menggunakan satu pemicu yang dipublikasikan, dan rekonsiliasi total yang dialokasikan dengan kumpulan biaya platform.</p><h2>Terkait</h2><ul><li><a href=\"/research/cost-per-successful-task\">Biaya per tugas yang berhasil</a></li><li><a href=\"/research/agent-total-cost-of-ownership\">Total biaya kepemilikan agen</a></li><li><a href=\"/research/ai-research-cost-allocation\">Alokasi biaya AI</a></li></ul>",
+      "faq": [
+        {
+          "question": "Apa yang seharusnya ada dalam lembar kerja biaya agen?",
+          "answer": "Catat penggunaan model, alat yang ditagih, komputasi, penyimpanan, percobaan ulang, panggilan cadangan, verifikasi, serta alokasi platform bersama dan estimasi tenaga kerja yang diidentifikasi secara terpisah."
+        },
+        {
+          "question": "Apakah eksekusi agen yang gagal perlu dimasukkan ke biaya per tugas?",
+          "answer": "Masukkan pengeluarannya ke total. Laporkan jumlah alur kerja yang berhasil dengan aturan keberhasilan yang dinyatakan, agar kegagalan tetap terlihat dalam ekonomi unit."
+        },
+        {
+          "question": "Bagaimana cara menghindari penghitungan ganda biaya platform bersama?",
+          "answer": "Biarkan tagihan langsung melekat pada peristiwanya, alokasikan biaya bersama dalam buku besar terpisah menggunakan satu pemicu yang dipublikasikan, dan rekonsiliasi total yang dialokasikan dengan kumpulan biaya platform."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "Biaya per tugas yang berhasil"
+        },
+        {
+          "slug": "/research/agent-total-cost-of-ownership",
+          "label": "Total biaya kepemilikan agen"
+        },
+        {
+          "slug": "/research/ai-research-cost-allocation",
+          "label": "Alokasi biaya AI"
+        }
+      ]
+    },
+    "pl": {
+      "title": "Arkusz pełnego kosztu agenta AI",
+      "titleCore": "Arkusz pełnego kosztu agenta AI",
+      "description": "Zbuduj audytowalny koszt agenta na uruchomienie z użycia modeli, narzędzi, obliczeń, ponowień, weryfikacji i wspólnych kosztów platformy.",
+      "body": "<p>Suma tokenów modelu nie jest pełnym kosztem agenta. Uruchomienie produkcyjne może zużyć także hostowane wyszukiwanie, wykonanie kodu, pamięć, ponowienia, modele zapasowe i ludzką weryfikację. Przydatny arkusz łączy każdą pozycję z identyfikatorem uruchomienia i trzyma zmierzone opłaty dostawcy osobno od przydzielonych kosztów ogólnych i szacunków pracy.</p><p>Ten arkusz uzupełnia <a href=\"/research/cost-per-successful-task\">koszt na udane zadanie</a>: najpierw zestaw pełną księgę kosztów, a potem podziel ją przez wyniki, które przeszły zdefiniowany test sukcesu. Rozszerza też <a href=\"/research/server-tools-are-a-separate-invoice\">osobne rozliczanie narzędzi</a> do powtarzalnego zapisu finansowego.</p><h2>Zacznij od jednego wiersza na zdarzenie</h2><p>Użyj stabilnego identyfikatora przepływu pracy dla intencji użytkownika i identyfikatora uruchomienia dla każdej próby. Zapisuj znacznik czasu, środowisko, zespół lub najemcę, przepływ pracy, uruchomienie, dostawcę, usługę, identyfikator zasobu, ilość, jednostkę, wersję cennika, walutę oraz źródło faktury lub pomiaru. Trzymaj jedno zdarzenie na każde wywołanie modelu, wywołanie narzędzia, zadanie obliczeniowe lub element przeglądu. Dzięki temu ponowienia są widoczne, a finanse mogą uzgodnić sumy bez zgadywania, która zagnieżdżona operacja je wygenerowała.</p><h2>Kolumny arkusza</h2><ul><li><strong>Model:</strong> dostawca, model, jednostki wejścia, wyjścia, cache i rozumowania, jeśli są udostępnione, zmierzona stawka i bezpośredni koszt.</li><li><strong>Narzędzia:</strong> wyszukiwanie, pobieranie danych, przeglądarka, wykonanie kodu i inne mierzone usługi, z liczbą wywołań lub czasem działania oraz bezpośrednim kosztem.</li><li><strong>Obliczenia i pamięć:</strong> czas działania sandboksa lub kontenera, czas akceleratora lub CPU, trwała pamięć oraz opłaty za sieć, jeśli są naliczane.</li><li><strong>Praca niezawodnościowa:</strong> ponowienia, wywołania zapasowe, porzucone gałęzie i uruchomienia naprawcze. Zachowaj je w łącznym koszcie uruchomienia, nawet gdy nie dały użytecznego wyniku.</li><li><strong>Weryfikacja:</strong> wywołania ewaluatorów i minuty ludzkiego przeglądu, przy czym koszt pracy oznaczony jest jako wewnętrzny szacunek, a nie pozycja faktury dostawcy.</li><li><strong>Wspólna platforma:</strong> przydziały orkiestracji, obserwowalności, zarezerwowanej pojemności lub wspólnej pamięci, każdy z kluczem przydziału i okresem.</li></ul><h2>Licz koszt bezpośredni i pełny osobno</h2><p>Bezpośredni koszt uruchomienia to suma zmierzonych opłat za model, narzędzia, obliczenia i pamięć przypisanych do tego uruchomienia. Pełny koszt dodaje zadeklarowaną część kosztów ogólnych platformy i pracy przeglądu. Do kosztów wspólnych używaj stabilnego klucza, na przykład zmierzonego czasu działania, zarezerwowanej pojemności lub udokumentowanego przydziału na uruchomienie. Publikuj klucz i jego okno czasowe; nie rozkładaj kosztów stałych według liczby tokenów, chyba że tokeny rzeczywiście wyjaśniają zużycie zasobów.</p><p>Mały hipotetyczny przykład wyjaśnia wzór: jeśli jedno uruchomienie ma 0,40 USD opłat za model, 0,10 USD za narzędzia, 0,20 USD za obliczenia w sandboksie i 0,30 USD przydzielonych kosztów przeglądu i platformy, raportuj 0,70 USD bezpośrednio i 1,00 USD pełnego kosztu. Te liczby ilustrują tylko arytmetykę; nie są ceną rynkową ani benchmarkiem.</p><h2>Oddziel próby od wyników</h2><p>Zlicz każdą próbę w wydatkach, a następnie oznacz końcowy przepływ pracy jako udany, nieudany, porzucony lub wymagający dokończenia przez człowieka, według jawnej reguły. Raportuj koszt na zakończony przepływ razem z odsetkiem sukcesów, odsetkiem ponowień i nakładem na przegląd. Dla metryki udanego zadania użyj łącznych kwalifikujących się wydatków z okresu podzielonych przez liczbę przepływów, które przeszły test sukcesu. Nie usuwaj nieudanych uruchomień z licznika i nie licz pośrednich kroków agenta jako odrębnych sukcesów.</p><h2>Uzgadniaj i zarządzaj arkuszem</h2><p>Uzgadniaj sumy zdarzeń z fakturami dostawców i eksportami rozliczeń chmury, gdy dane o zużyciu się ustabilizują. Osobno wyjaśniaj kredyty, rabaty, minimalne opłaty, późno zarejestrowane zdarzenia i przeliczenia walut. Zapisuj źródło ceny i datę jej obowiązywania, aby historyczne koszty można było przeliczyć bez stosowania dzisiejszej stawki do zeszłomiesięcznego zużycia.</p><p>Przypisz właściciela do każdego przepływu pracy i ustal budżet na uruchomienie, zagregowany budżet okresowy oraz ścieżkę eskalacji. Gdy przepływ przekroczy budżet, zapisz powód i to, czy pozwolono mu kontynuować. Wzorce egzekwowania w czasie działania opisuje artykuł <a href=\"/research/three-agent-budgets\">trzy budżety dla autonomicznych agentów</a>.</p><h2>FAQ</h2><h3>Co powinno znaleźć się w arkuszu kosztów agenta?</h3><p>Zapisz użycie modeli, rozliczane narzędzia, obliczenia, pamięć, ponowienia, wywołania zapasowe, weryfikację oraz osobno oznaczone przydziały wspólnej platformy i szacunki pracy.</p><h3>Czy nieudane uruchomienia agenta powinny wchodzić do kosztu na zadanie?</h3><p>Ich wydatki wchodzą do sumy. Liczbę udanych przepływów raportuj według zadeklarowanej reguły sukcesu, aby porażki pozostały widoczne w ekonomii jednostkowej.</p><h3>Jak uniknąć podwójnego liczenia wspólnych kosztów platformy?</h3><p>Zachowaj bezpośrednie opłaty przypisane do ich zdarzenia, przydzielaj koszty wspólne w osobnej księdze według jednego opublikowanego klucza i uzgadniaj sumę przydziałów z pulą kosztów platformy.</p><h2>Powiązane</h2><ul><li><a href=\"/research/cost-per-successful-task\">Koszt na udane zadanie</a></li><li><a href=\"/research/agent-total-cost-of-ownership\">Całkowity koszt posiadania agenta</a></li><li><a href=\"/research/ai-research-cost-allocation\">Alokacja kosztów AI</a></li></ul>",
+      "faq": [
+        {
+          "question": "Co powinno znaleźć się w arkuszu kosztów agenta?",
+          "answer": "Zapisz użycie modeli, rozliczane narzędzia, obliczenia, pamięć, ponowienia, wywołania zapasowe, weryfikację oraz osobno oznaczone przydziały wspólnej platformy i szacunki pracy."
+        },
+        {
+          "question": "Czy nieudane uruchomienia agenta powinny wchodzić do kosztu na zadanie?",
+          "answer": "Ich wydatki wchodzą do sumy. Liczbę udanych przepływów raportuj według zadeklarowanej reguły sukcesu, aby porażki pozostały widoczne w ekonomii jednostkowej."
+        },
+        {
+          "question": "Jak uniknąć podwójnego liczenia wspólnych kosztów platformy?",
+          "answer": "Zachowaj bezpośrednie opłaty przypisane do ich zdarzenia, przydzielaj koszty wspólne w osobnej księdze według jednego opublikowanego klucza i uzgadniaj sumę przydziałów z pulą kosztów platformy."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "Koszt na udane zadanie"
+        },
+        {
+          "slug": "/research/agent-total-cost-of-ownership",
+          "label": "Całkowity koszt posiadania agenta"
+        },
+        {
+          "slug": "/research/ai-research-cost-allocation",
+          "label": "Alokacja kosztów AI"
+        }
+      ]
+    },
+    "ru": {
+      "title": "Таблица полной стоимости работы агентов",
+      "titleCore": "Таблица полной стоимости работы агентов",
+      "description": "Считайте прозрачную стоимость одного запуска агента: модель, инструменты, вычисления, повторы, проверка и общие расходы платформы.",
+      "body": "<p>Сумма токенов модели не равна полной стоимости агента. Продуктивный запуск может также потреблять хостед-поиск, выполнение кода, хранилище, повторные попытки, резервные модели и проверку человеком. Полезная таблица связывает каждое списание с идентификатором запуска и отделяет измеренные платежи провайдера от распределенных накладных расходов и оценок трудозатрат.</p><p>Эта таблица дополняет <a href=\"/research/cost-per-successful-task\">стоимость успешной задачи</a>: сначала собирается полный реестр затрат, затем он делится на результаты, прошедшие заявленный критерий успеха. Она также развивает <a href=\"/research/server-tools-are-a-separate-invoice\">отдельную тарификацию инструментов</a> в повторяемую финансовую запись.</p><h2>Начните с одной строки на событие</h2><p>Используйте стабильный идентификатор рабочего процесса для намерения пользователя и идентификатор запуска для каждой попытки. Записывайте временную метку, окружение, команду или арендатора, рабочий процесс, запуск, провайдера, сервис, идентификатор ресурса, количество, единицу измерения, версию тарифа, валюту и источник счета или учета. Ведите одно событие на каждый вызов модели, вызов инструмента, задание вычисления или элемент проверки. Так повторные попытки становятся видимыми, и финансы могут сверять итоги, не гадая, какая вложенная операция их создала.</p><h2>Колонки таблицы</h2><ul><li><strong>Модель:</strong> провайдер, модель, единицы входа, выхода, кэша и рассуждений, если они доступны, измеренный тариф и прямые расходы.</li><li><strong>Инструменты:</strong> поиск, извлечение данных, браузер, выполнение кода и другие тарифицируемые сервисы с количеством вызовов или временем работы и прямыми расходами.</li><li><strong>Вычисления и хранилище:</strong> время работы песочницы или контейнера, время ускорителя или CPU, постоянное хранилище и сетевые расходы, если они тарифицируются.</li><li><strong>Работа по надежности:</strong> повторные попытки, резервные вызовы, брошенные ветки и запуски исправления. Учитывайте их в полной стоимости запуска, даже если они не дали полезного результата.</li><li><strong>Проверка:</strong> вызовы оценщиков и минуты проверки человеком; стоимость труда отмечается как внутренняя оценка, а не как счет провайдера.</li><li><strong>Общая платформа:</strong> распределения на оркестрацию, наблюдаемость, зарезервированную мощность или общее хранилище; для каждого указывается база распределения и период.</li></ul><h2>Считайте прямую и полную стоимость отдельно</h2><p>Прямая стоимость запуска - это сумма измеренных расходов на модель, инструменты, вычисления и хранилище, отнесенных к этому запуску. Полная стоимость (fully loaded) добавляет заявленную долю накладных расходов платформы и трудозатрат на проверку. Для общих затрат используйте стабильную базу распределения, например измеренное время работы, зарезервированную мощность или задокументированное распределение на запуск. Публикуйте базу и ее временное окно; не распределяйте постоянные затраты по количеству токенов, если токены действительно не объясняют потребление ресурсов.</p><p>Небольшой гипотетический пример проясняет формулу: если у одного запуска расходы на модель составили $0,40, на инструменты $0,10, на вычисления в песочнице $0,20, а распределенные расходы на проверку и платформу - $0,30, сообщайте $0,70 прямых и $1,00 полных расходов. Эти цифры иллюстрируют только арифметику; это не рыночная цена и не эталон.</p><h2>Разделяйте попытки и результаты</h2><p>Учитывайте каждую попытку в расходах, затем присваивайте финальному рабочему процессу статус: успешный, неудачный, брошенный или требующий завершения человеком, по явно заданному правилу. Сообщайте стоимость завершенного рабочего процесса вместе с долей успешных, долей повторов и трудозатратами на проверку. Для метрики успешной задачи берите общие допустимые расходы за период и делите их на число рабочих процессов, прошедших критерий успеха. Не исключайте неудачные запуски из числителя и не считайте промежуточные шаги агента отдельными успехами.</p><h2>Сверяйте и управляйте таблицей</h2><p>Сверяйте итоги событий со счетами провайдеров и выгрузками облачной тарификации после того, как данные об использовании устоятся. Отдельно объясняйте кредиты, скидки, минимальные платежи, поздние события и пересчет валют. Сохраняйте источник цены и дату ее вступления в силу, чтобы можно было пересчитать исторические затраты, не применяя сегодняшний тариф к использованию прошлого месяца.</p><p>Назначьте ответственного за каждый рабочий процесс и задайте бюджет на запуск, совокупный бюджет за период и путь эскалации. Когда рабочий процесс превышает бюджет, фиксируйте причину и то, было ли разрешено продолжение. Шаблоны принудительного соблюдения в рантайме см. в статье <a href=\"/research/three-agent-budgets\">три бюджета для автономных агентов</a>.</p><h2>Частые вопросы</h2><h3>Что должно входить в таблицу стоимости агентов?</h3><p>Учитывайте использование модели, оплачиваемые инструменты, вычисления, хранилище, повторные попытки, резервные вызовы, проверку, а также отдельно выделенные распределения общей платформы и оценки трудозатрат.</p><h3>Нужно ли включать неудачные запуски агентов в стоимость задачи?</h3><p>Включайте их расходы в итог. Сообщайте количество успешных рабочих процессов по заявленному правилу успеха, чтобы неудачи оставались видимыми в юнит-экономике.</p><h3>Как не посчитать общие расходы платформы дважды?</h3><p>Прямые списания храните привязанными к своему событию, общие затраты распределяйте в отдельном реестре по одной опубликованной базе и сверяйте распределенный итог с общим пулом затрат платформы.</p><h2>Похожие материалы</h2><ul><li><a href=\"/research/cost-per-successful-task\">Стоимость успешной задачи</a></li><li><a href=\"/research/agent-total-cost-of-ownership\">Совокупная стоимость владения агентом</a></li><li><a href=\"/research/ai-research-cost-allocation\">Распределение затрат на ИИ</a></li></ul>",
+      "faq": [
+        {
+          "question": "Что должно входить в таблицу стоимости агентов?",
+          "answer": "Учитывайте использование модели, оплачиваемые инструменты, вычисления, хранилище, повторные попытки, резервные вызовы, проверку, а также отдельно выделенные распределения общей платформы и оценки трудозатрат."
+        },
+        {
+          "question": "Нужно ли включать неудачные запуски агентов в стоимость задачи?",
+          "answer": "Включайте их расходы в итог. Сообщайте количество успешных рабочих процессов по заявленному правилу успеха, чтобы неудачи оставались видимыми в юнит-экономике."
+        },
+        {
+          "question": "Как не посчитать общие расходы платформы дважды?",
+          "answer": "Храните прямые списания привязанными к своему событию, распределяйте общие затраты в отдельном реестре по одной опубликованной базе и сверяйте распределенный итог с общим пулом затрат платформы."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "Стоимость успешной задачи"
+        },
+        {
+          "slug": "/research/agent-total-cost-of-ownership",
+          "label": "Совокупная стоимость владения агентом"
+        },
+        {
+          "slug": "/research/ai-research-cost-allocation",
+          "label": "Распределение затрат на ИИ"
+        }
+      ]
+    },
+    "tr": {
+      "title": "Tam yüklü ajan maliyetleri için bir çalışma sayfası",
+      "titleCore": "Tam yüklü ajan maliyetleri için bir çalışma sayfası",
+      "description": "Model, araç, hesaplama, yeniden deneme, doğrulama ve ortak platform maliyetlerinden çalışma başına denetlenebilir bir ajan maliyeti çıkarın.",
+      "body": "<p>Model token toplamı, tam yüklü bir ajan maliyeti değildir. Üretimdeki bir çalışma; barındırılan arama, kod çalıştırma, depolama, yeniden denemeler, yedek modeller ve insan incelemesi de tüketebilir. Kullanışlı bir çalışma sayfası her ücreti bir çalışma kimliğine bağlar ve sağlayıcının ölçülmüş ücretlerini, tahsis edilen genel giderlerden ve işçilik tahminlerinden ayrı tutar.</p><p>Bu çalışma sayfası <a href=\"/research/cost-per-successful-task\">başarılı görev başına maliyet</a> yazısını tamamlar: önce eksiksiz maliyet defterini oluşturun, sonra bunu tanımlanmış başarı testini geçen sonuçlara bölün. Ayrıca <a href=\"/research/server-tools-are-a-separate-invoice\">ayrı araç faturalandırmasını</a> tekrarlanabilir bir finans kaydına dönüştürür.</p><h2>Her olay için bir satırla başlayın</h2><p>Kullanıcı niyeti için sabit bir iş akışı kimliği, her deneme için bir çalışma kimliği kullanın. Zaman damgası, ortam, ekip veya kiracı, iş akışı, çalışma, sağlayıcı, hizmet, kaynak kimliği, miktar, birim, fiyat listesi sürümü, para birimi ve fatura ya da ölçüm kaynağını kaydedin. Her model çağrısı, araç çağrısı, hesaplama işi veya inceleme öğesi için bir olay tutun. Böylece yeniden denemeler görünür olur ve finans, toplamları hangi iç içe işlemin oluşturduğunu tahmin etmeden uzlaştırabilir.</p><h2>Çalışma sayfası sütunları</h2><ul><li><strong>Model:</strong> sağlayıcı, model, sunulduğunda girdi, çıktı, önbellek ve akıl yürütme birimleri, ölçülen tarife ve doğrudan ücret.</li><li><strong>Araçlar:</strong> arama, geri getirme, tarayıcı, kod çalıştırma ve diğer ölçülen hizmetler; çağrı sayısı veya çalışma süresi ile doğrudan ücret.</li><li><strong>Hesaplama ve depolama:</strong> sandbox veya konteyner çalışma süresi, hızlandırıcı veya CPU zamanı, kalıcı depolama ve faturalanıyorsa ağ ücretleri.</li><li><strong>Güvenilirlik işi:</strong> yeniden denemeler, yedek çağrılar, terk edilmiş dallar ve onarım çalışmaları. Faydalı bir çıktı üretmeseler bile çalışmanın toplam maliyetinde tutun.</li><li><strong>Doğrulama:</strong> değerlendirici çağrıları ve insan inceleme dakikaları; işçilik maliyeti sağlayıcı faturası kalemi değil, dahili bir tahmin olarak işaretlenir.</li><li><strong>Ortak platform:</strong> orkestrasyon, gözlemlenebilirlik, ayrılmış kapasite veya ortak depolama tahsisleri; her biri tahsis kriteri ve dönemiyle birlikte.</li></ul><h2>Doğrudan ve tam yüklü maliyeti ayrı hesaplayın</h2><p>Bir çalışmanın doğrudan maliyeti, o çalışmaya atfedilen ölçülmüş model, araç, hesaplama ve depolama ücretlerinin toplamıdır. Tam yüklü maliyet ise beyan edilen platform genel gider ve inceleme işçiliği payını ekler. Ortak maliyetler için ölçülmüş çalışma süresi, ayrılmış kapasite veya belgelenmiş çalışma başına tahsis gibi sabit bir kriter kullanın. Kriteri ve zaman penceresini yayımlayın; token'lar kaynak tüketimini gerçekten açıklamıyorsa sabit maliyetleri token sayısına göre dağıtmayın.</p><p>Küçük ve varsayımsal bir örnek formülü netleştirebilir: bir çalışmanın model ücreti $0.40, araç ücreti $0.10, sandbox hesaplama ücreti $0.20 ve tahsis edilen inceleme ve platform maliyeti $0.30 ise, doğrudan maliyeti $0.70, tam yüklü maliyeti $1.00 olarak raporlayın. Bu rakamlar yalnızca aritmetiği gösterir; piyasa fiyatı ya da bir kıyaslama değildir.</p><h2>Denemeleri ve sonuçları ayrı tutun</h2><p>Her denemeyi harcamaya dahil edin, ardından son iş akışını açık bir kurala göre başarılı, başarısız, terk edilmiş veya insan tamamlaması gerekli olarak etiketleyin. Tamamlanan iş akışı başına maliyeti; başarı oranı, yeniden deneme oranı ve inceleme çabasıyla birlikte raporlayın. Başarılı görev metriği için, dönemdeki uygun toplam harcamayı başarı testini geçen iş akışı sayısına bölün. Başarısız çalışmaları paydan çıkarmayın ve ajanın ara adımlarını ayrı başarılar olarak saymayın.</p><h2>Çalışma sayfasını uzlaştırın ve yönetin</h2><p>Kullanım verileri yerleştikten sonra olay toplamlarını sağlayıcı faturaları ve bulut faturalama dışa aktarımlarıyla uzlaştırın. Kredileri, indirimleri, asgari tutarları, geç gelen olayları ve para birimi dönüşümünü ayrı ayrı açıklayın. Fiyat kaynağını ve yürürlük tarihini saklayın; böylece geçmiş maliyetler, bugünkü tarifenin geçen ayın kullanımına uygulanmadan yeniden hesaplanabilir.</p><p>Her iş akışına bir sahip atayın; çalışma başına bütçe, toplam dönem bütçesi ve yükseltme yolu tanımlayın. Bir iş akışı bütçesini aştığında nedenini ve devam etmesine izin verilip verilmediğini kaydedin. Çalışma zamanı uygulama kalıpları için <a href=\"/research/three-agent-budgets\">otonom ajanlar için üç bütçe</a> yazısına bakın.</p><h2>SSS</h2><h3>Bir ajan maliyet çalışma sayfasında neler olmalı?</h3><p>Model kullanımını, faturalanan araçları, hesaplamayı, depolamayı, yeniden denemeleri, yedek çağrıları, doğrulamayı ve ayrıca tanımlanmış ortak platform tahsislerini ve işçilik tahminlerini kaydedin.</p><h3>Başarısız ajan çalışmaları görev başına maliyete dahil edilmeli mi?</h3><p>Harcamalarını toplama dahil edin. Başarısızlıklar birim ekonomisinde görünür kalsın diye, başarılı iş akışı sayısını beyan edilmiş bir başarı kuralıyla raporlayın.</p><h3>Ortak platform maliyetlerinin çift sayılmasını nasıl önlerim?</h3><p>Doğrudan ücretleri olaylarına bağlı tutun, ortak maliyetleri tek bir yayımlanmış kriterle ayrı bir defterde tahsis edin ve tahsis edilen toplamı platform maliyet havuzuyla uzlaştırın.</p><h2>İlgili konular</h2><ul><li><a href=\"/research/cost-per-successful-task\">Başarılı görev başına maliyet</a></li><li><a href=\"/research/agent-total-cost-of-ownership\">Ajanın toplam sahiplik maliyeti</a></li><li><a href=\"/research/ai-research-cost-allocation\">AI maliyet tahsisi</a></li></ul>",
+      "faq": [
+        {
+          "question": "Bir ajan maliyet çalışma sayfasında neler olmalı?",
+          "answer": "Model kullanımını, faturalanan araçları, hesaplamayı, depolamayı, yeniden denemeleri, yedek çağrıları, doğrulamayı ve ayrıca tanımlanmış ortak platform tahsislerini ve işçilik tahminlerini kaydedin."
+        },
+        {
+          "question": "Başarısız ajan çalışmaları görev başına maliyete dahil edilmeli mi?",
+          "answer": "Harcamalarını toplama dahil edin. Başarısızlıklar birim ekonomisinde görünür kalsın diye, başarılı iş akışı sayısını beyan edilmiş bir başarı kuralıyla raporlayın."
+        },
+        {
+          "question": "Ortak platform maliyetlerinin çift sayılmasını nasıl önlerim?",
+          "answer": "Doğrudan ücretleri olaylarına bağlı tutun, ortak maliyetleri tek bir yayımlanmış kriterle ayrı bir defterde tahsis edin ve tahsis edilen toplamı platform maliyet havuzuyla uzlaştırın."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "Başarılı görev başına maliyet"
+        },
+        {
+          "slug": "/research/agent-total-cost-of-ownership",
+          "label": "Ajanın toplam sahiplik maliyeti"
+        },
+        {
+          "slug": "/research/ai-research-cost-allocation",
+          "label": "AI maliyet tahsisi"
+        }
+      ]
+    },
+    "vi": {
+      "title": "Bảng tính chi phí đầy đủ của agent",
+      "titleCore": "Bảng tính chi phí đầy đủ của agent",
+      "description": "Lập chi phí agent có thể kiểm toán cho mỗi lần chạy từ mức dùng mô hình, công cụ, tính toán, thử lại, kiểm chứng và chi phí nền tảng dùng chung.",
+      "body": "<p>Tổng số token của mô hình không phải là chi phí đầy đủ của một agent. Một lần chạy trong production còn có thể tiêu tốn tìm kiếm hosted, thực thi mã, lưu trữ, thử lại, mô hình dự phòng và rà soát của con người. Một bảng tính hữu ích gắn mỗi khoản phí với một ID lần chạy, đồng thời tách các khoản phí nhà cung cấp đã đo lường khỏi chi phí chung được phân bổ và ước tính nhân công.</p><p>Bảng tính này bổ sung cho <a href=\"/research/cost-per-successful-task\">chi phí mỗi tác vụ thành công</a>: trước tiên tổng hợp sổ cái chi phí đầy đủ, sau đó chia cho các kết quả đã vượt qua bài kiểm tra thành công đã nêu. Nó cũng mở rộng <a href=\"/research/server-tools-are-a-separate-invoice\">việc tính phí công cụ tách riêng</a> thành một bản ghi tài chính có thể lặp lại.</p><h2>Bắt đầu với một dòng cho mỗi sự kiện</h2><p>Dùng một ID quy trình ổn định cho ý định của người dùng và một ID lần chạy cho mỗi lần thử. Ghi lại dấu thời gian, môi trường, nhóm hoặc tenant, quy trình, lần chạy, nhà cung cấp, dịch vụ, ID tài nguyên, số lượng, đơn vị, phiên bản bảng giá, tiền tệ và nguồn hóa đơn hoặc đo lường. Giữ một sự kiện cho mỗi lần gọi mô hình, lần gọi công cụ, tác vụ tính toán hoặc mục rà soát. Nhờ vậy các lần thử lại trở nên dễ thấy, và bộ phận tài chính có thể đối soát tổng mà không phải đoán thao tác lồng nhau nào đã tạo ra chúng.</p><h2>Các cột của bảng tính</h2><ul><li><strong>Mô hình:</strong> nhà cung cấp, mô hình, đơn vị đầu vào, đầu ra, cache và suy luận khi có công bố, đơn giá đo được và chi phí trực tiếp.</li><li><strong>Công cụ:</strong> tìm kiếm, truy xuất, trình duyệt, thực thi mã và các dịch vụ đo đếm khác, kèm số lần gọi hoặc thời gian chạy và chi phí trực tiếp.</li><li><strong>Tính toán và lưu trữ:</strong> thời gian chạy sandbox hoặc container, thời gian bộ tăng tốc hoặc CPU, lưu trữ bền vững và phí mạng nếu có tính phí.</li><li><strong>Công việc đảm bảo độ tin cậy:</strong> thử lại, lần gọi dự phòng, nhánh bị bỏ dở và các lần chạy sửa lỗi. Giữ chúng trong tổng chi phí lần chạy ngay cả khi không tạo ra đầu ra hữu ích.</li><li><strong>Kiểm chứng:</strong> lần gọi bộ đánh giá và số phút rà soát của con người, với chi phí nhân công được đánh dấu là ước tính nội bộ chứ không phải khoản phí trên hóa đơn nhà cung cấp.</li><li><strong>Nền tảng dùng chung:</strong> phân bổ cho điều phối, khả năng quan sát, dung lượng đặt trước hoặc lưu trữ dùng chung, mỗi khoản kèm yếu tố phân bổ và kỳ tương ứng.</li></ul><h2>Tính chi phí trực tiếp và chi phí đầy đủ riêng biệt</h2><p>Chi phí trực tiếp của một lần chạy là tổng các khoản phí mô hình, công cụ, tính toán và lưu trữ đo đếm được gán cho lần chạy đó. Chi phí đầy đủ cộng thêm phần chi phí nền tảng và nhân công rà soát đã khai báo. Với chi phí chung, hãy dùng một yếu tố phân bổ ổn định như thời gian chạy đo được, dung lượng đặt trước, hoặc một phân bổ theo lần chạy đã được ghi lại. Công bố yếu tố phân bổ và khoảng thời gian áp dụng; không chia chi phí cố định theo số token trừ khi token thực sự giải thích mức tiêu thụ tài nguyên.</p><p>Một ví dụ giả định nhỏ giúp làm rõ công thức: nếu một lần chạy có $0.40 phí mô hình, $0.10 công cụ, $0.20 tính toán sandbox và $0.30 chi phí rà soát và nền tảng được phân bổ, hãy báo cáo $0.70 trực tiếp và $1.00 đầy đủ. Các con số này chỉ minh họa phép tính; chúng không phải giá thị trường hay chuẩn mực.</p><h2>Tách riêng số lần thử và kết quả</h2><p>Tính mọi lần thử vào chi phí, rồi gắn nhãn quy trình cuối cùng là thành công, thất bại, bị bỏ dở hoặc cần người hoàn thành theo một quy tắc rõ ràng. Báo cáo chi phí cho mỗi quy trình đã hoàn thành cùng với tỷ lệ thành công, tỷ lệ thử lại và công sức rà soát. Với chỉ số tác vụ thành công, dùng tổng chi phí đủ điều kiện trong kỳ chia cho số quy trình vượt qua bài kiểm tra thành công. Không loại các lần chạy thất bại khỏi tử số và không đếm các bước trung gian của agent như những thành công riêng lẻ.</p><h2>Đối soát và quản trị bảng tính</h2><p>Đối soát tổng sự kiện với hóa đơn nhà cung cấp và xuất dữ liệu thanh toán đám mây sau khi dữ liệu sử dụng ổn định. Giải thích riêng các khoản tín dụng, chiết khấu, mức tối thiểu, sự kiện đến muộn và quy đổi tiền tệ. Lưu nguồn giá và ngày có hiệu lực để có thể tính lại chi phí lịch sử mà không áp giá hôm nay cho mức dùng của tháng trước.</p><p>Gán một người phụ trách cho mỗi quy trình và xác định ngân sách cho mỗi lần chạy, ngân sách tổng theo kỳ, cùng đường leo thang. Khi một quy trình vượt ngân sách, ghi lại lý do và việc nó có được phép tiếp tục hay không. Về các mẫu thực thi lúc chạy, xem <a href=\"/research/three-agent-budgets\">ba ngân sách cho agent tự động</a>.</p><h2>Câu hỏi thường gặp</h2><h3>Bảng tính chi phí agent cần có những gì?</h3><p>Ghi lại mức dùng mô hình, các công cụ được tính phí, tính toán, lưu trữ, thử lại, lần gọi dự phòng, kiểm chứng, cùng các phân bổ nền tảng dùng chung và ước tính nhân công được nhận diện riêng.</p><h3>Có nên tính các lần chạy agent thất bại vào chi phí mỗi tác vụ không?</h3><p>Có, hãy đưa chi phí của chúng vào tổng. Báo cáo số quy trình thành công theo một quy tắc thành công đã khai báo để các thất bại vẫn hiển thị trong kinh tế đơn vị.</p><h3>Làm sao tránh tính trùng chi phí nền tảng dùng chung?</h3><p>Gắn các khoản phí trực tiếp vào sự kiện của chúng, phân bổ chi phí dùng chung trong một sổ riêng theo một yếu tố phân bổ đã công bố, và đối soát tổng đã phân bổ với nhóm chi phí nền tảng.</p><h2>Liên quan</h2><ul><li><a href=\"/research/cost-per-successful-task\">Chi phí mỗi tác vụ thành công</a></li><li><a href=\"/research/agent-total-cost-of-ownership\">Tổng chi phí sở hữu agent</a></li><li><a href=\"/research/ai-research-cost-allocation\">Phân bổ chi phí AI</a></li></ul>",
+      "faq": [
+        {
+          "question": "Bảng tính chi phí agent cần có những gì?",
+          "answer": "Ghi lại mức dùng mô hình, các công cụ được tính phí, tính toán, lưu trữ, thử lại, lần gọi dự phòng, kiểm chứng, cùng các phân bổ nền tảng dùng chung và ước tính nhân công được nhận diện riêng."
+        },
+        {
+          "question": "Có nên tính các lần chạy agent thất bại vào chi phí mỗi tác vụ không?",
+          "answer": "Có, hãy đưa chi phí của chúng vào tổng. Báo cáo số quy trình thành công theo một quy tắc thành công đã khai báo để các thất bại vẫn hiển thị trong kinh tế đơn vị."
+        },
+        {
+          "question": "Làm sao tránh tính trùng chi phí nền tảng dùng chung?",
+          "answer": "Gắn các khoản phí trực tiếp vào sự kiện của chúng, phân bổ chi phí dùng chung trong một sổ riêng theo một yếu tố phân bổ đã công bố, và đối soát tổng đã phân bổ với nhóm chi phí nền tảng."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "Chi phí mỗi tác vụ thành công"
+        },
+        {
+          "slug": "/research/agent-total-cost-of-ownership",
+          "label": "Tổng chi phí sở hữu agent"
+        },
+        {
+          "slug": "/research/ai-research-cost-allocation",
+          "label": "Phân bổ chi phí AI"
+        }
+      ]
+    },
+    "ar": {
+      "title": "ورقة عمل لتكاليف الوكلاء المحمّلة بالكامل",
+      "titleCore": "ورقة عمل لتكاليف الوكلاء المحمّلة بالكامل",
+      "description": "ابنِ تكلفة تشغيل وكيل قابلة للتدقيق من استخدام النموذج والأدوات والحوسبة وإعادة المحاولات والتحقق وتكاليف المنصة المشتركة.",
+      "body": "<p>إجمالي رموز النموذج ليس تكلفة وكيل محمّلة بالكامل. فقد يستهلك تشغيل إنتاجي أيضاً بحثاً مستضافاً وتنفيذ كود وتخزيناً وإعادة محاولات ونماذج احتياطية ومراجعة بشرية. وورقة العمل المفيدة تربط كل رسم بمعرّف تشغيل وتفصل رسوم المزود المقيسة عن النفقات العامة الموزعة وتقديرات العمالة.</p><p>تكمّل ورقة العمل هذه <a href=\"/research/cost-per-successful-task\">التكلفة لكل مهمة ناجحة</a>: اجمع أولاً دفتر التكلفة الكامل، ثم اقسمه على النتائج التي اجتازت اختبار النجاح المعلن. كما توسّع <a href=\"/research/server-tools-are-a-separate-invoice\">فوترة الأدوات المنفصلة</a> إلى سجل مالي قابل للتكرار.</p><h2>ابدأ بصف واحد لكل حدث</h2><p>استخدم معرّف سير عمل ثابتاً لقصد المستخدم ومعرّف تشغيل لكل محاولة. سجّل الطابع الزمني والبيئة والفريق أو المستأجر وسير العمل والتشغيل والمزود والخدمة ومعرّف المورد والكمية والوحدة وإصدار بطاقة الأسعار والعملة ومصدر الفاتورة أو القياس. احتفظ بحدث واحد لكل استدعاء نموذج أو استدعاء أداة أو مهمة حوسبة أو بند مراجعة. وهذا يجعل إعادة المحاولات مرئية ويتيح للمالية مطابقة الإجماليات دون تخمين أي عملية متداخلة أنشأتها.</p><h2>أعمدة ورقة العمل</h2><ul><li><strong>النموذج:</strong> المزود والنموذج ووحدات الإدخال/الإخراج/المخزَّن مؤقتاً/الاستدلال حيث تُكشف، والسعر المقيس، والرسم المباشر.</li><li><strong>الأدوات:</strong> البحث والاسترجاع والمتصفح وتنفيذ الكود وغيرها من الخدمات المقيسة، مع عدد الاستدعاءات أو زمن التشغيل والرسم المباشر.</li><li><strong>الحوسبة والتخزين:</strong> زمن تشغيل البيئة المعزولة أو الحاوية، ووقت المسرّع أو المعالج، والتخزين الدائم، ورسوم الشبكة إن فُوترت.</li><li><strong>عمل الموثوقية:</strong> إعادة المحاولات والاستدعاءات الاحتياطية والفروع المتروكة وتشغيلات الإصلاح. أبقها في إجمالي تكلفة التشغيل حتى لو لم تنتج مخرجاً مفيداً.</li><li><strong>التحقق:</strong> استدعاءات المقيّم ودقائق المراجعة البشرية، مع وسم تكلفة العمالة بأنها تقدير داخلي لا رسم فاتورة من المزود.</li><li><strong>المنصة المشتركة:</strong> مخصصات التنسيق والرصد والسعة المحجوزة أو التخزين المشترك، لكل منها محرّك التوزيع والفترة.</li></ul><h2>احسب التكلفة المباشرة والمحمّلة بالكامل منفصلتين</h2><p>التكلفة المباشرة للتشغيل هي مجموع رسوم النموذج والأدوات والحوسبة والتخزين المقيسة المنسوبة إلى ذلك التشغيل. أما التكلفة المحمّلة بالكامل فتضيف الحصة المعلنة من النفقات العامة للمنصة وعمالة المراجعة. استخدم محركاً ثابتاً للتكاليف المشتركة، مثل زمن التشغيل المقيس أو السعة المحجوزة أو مخصص موثق لكل تشغيل. انشر المحرك ونافذته الزمنية؛ ولا توزع التكاليف الثابتة بحسب عدد الرموز إلا إذا كانت الرموز تفسر فعلاً استهلاك المورد.</p><p>مثال افتراضي صغير يوضح الصيغة: إن كان لتشغيل واحد $0.40 رسوم نموذج و$0.10 أدوات و$0.20 حوسبة بيئة معزولة و$0.30 من تكلفة المراجعة والمنصة الموزعة، فأبلغ عن $0.70 مباشرة و$1.00 محمّلة بالكامل. هذه الأرقام توضح الحساب فقط؛ وليست سعر سوق ولا معياراً.</p><h2>أبقِ المحاولات والنتائج متمايزة</h2><p>احسب كل محاولة في الإنفاق، ثم صنّف سير العمل النهائي ناجحاً أو فاشلاً أو متروكاً أو يتطلب إكمالاً بشرياً بموجب قاعدة صريحة. أبلغ عن التكلفة لكل سير عمل مكتمل إلى جانب معدل النجاح ومعدل إعادة المحاولة وجهد المراجعة. ولمقياس المهمة الناجحة، استخدم إجمالي الإنفاق المؤهل في الفترة مقسوماً على عدد سير العمل التي اجتازت اختبار النجاح. لا تُسقط التشغيلات الفاشلة من البسط ولا تحسب خطوات الوكيل الوسيطة نجاحات منفصلة.</p><h2>طابِق ورقة العمل وأخضعها للحوكمة</h2><p>طابق إجماليات الأحداث مع فواتير المزودين وتصديرات الفوترة السحابية بعد استقرار بيانات الاستخدام. اشرح الأرصدة والخصومات والحدود الدنيا والأحداث المتأخرة وتحويل العملات كلاً على حدة. خزّن مصدر السعر وتاريخ سريانه ليمكن إعادة حساب التكاليف التاريخية دون تطبيق سعر اليوم على استخدام الشهر الماضي.</p><p>عيّن مالكاً لكل سير عمل وعرّف ميزانية لكل تشغيل وميزانية إجمالية للفترة ومسار تصعيد. وحين يتجاوز سير عمل ميزانيته، سجّل السبب وما إذا سُمح له بالمتابعة. ولأنماط الإنفاذ وقت التشغيل، راجع <a href=\"/research/three-agent-budgets\">الميزانيات الثلاث للوكلاء المستقلين</a>.</p><h2>الأسئلة الشائعة</h2><h3>ما الذي ينتمي إلى ورقة عمل تكلفة الوكيل؟</h3><p>سجّل استخدام النموذج والأدوات المفوترة والحوسبة والتخزين وإعادة المحاولات والاستدعاءات الاحتياطية والتحقق، ومخصصات المنصة المشتركة وتقديرات العمالة المحددة بشكل منفصل.</p><h3>هل ينبغي تضمين تشغيلات الوكيل الفاشلة في التكلفة لكل مهمة؟</h3><p>أدرج إنفاقها في الإجمالي. وأبلغ عن عدد سير العمل الناجحة وفق قاعدة نجاح معلنة لتبقى الإخفاقات مرئية في اقتصاديات الوحدة.</p><h3>كيف أتجنب الحساب المزدوج لتكاليف المنصة المشتركة؟</h3><p>أبقِ الرسوم المباشرة مرتبطة بحدثها، ووزّع التكاليف المشتركة في دفتر منفصل باستخدام محرك منشور واحد، وطابق الإجمالي الموزع مع مجمع تكلفة المنصة.</p><h2>ذات صلة</h2><ul><li><a href=\"/research/cost-per-successful-task\">التكلفة لكل مهمة ناجحة</a></li><li><a href=\"/research/agent-total-cost-of-ownership\">التكلفة الإجمالية لملكية الوكيل</a></li><li><a href=\"/research/ai-research-cost-allocation\">توزيع تكلفة الذكاء الاصطناعي</a></li></ul>",
+      "faq": [
+        {
+          "question": "ما الذي ينتمي إلى ورقة عمل تكلفة الوكيل؟",
+          "answer": "سجّل استخدام النموذج والأدوات المفوترة والحوسبة والتخزين وإعادة المحاولات والاستدعاءات الاحتياطية والتحقق، ومخصصات المنصة المشتركة وتقديرات العمالة المحددة بشكل منفصل."
+        },
+        {
+          "question": "هل ينبغي تضمين تشغيلات الوكيل الفاشلة في التكلفة لكل مهمة؟",
+          "answer": "أدرج إنفاقها في الإجمالي. وأبلغ عن عدد سير العمل الناجحة وفق قاعدة نجاح معلنة لتبقى الإخفاقات مرئية في اقتصاديات الوحدة."
+        },
+        {
+          "question": "كيف أتجنب الحساب المزدوج لتكاليف المنصة المشتركة؟",
+          "answer": "أبقِ الرسوم المباشرة مرتبطة بحدثها، ووزّع التكاليف المشتركة في دفتر منفصل باستخدام محرك منشور واحد، وطابق الإجمالي الموزع مع مجمع تكلفة المنصة."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "التكلفة لكل مهمة ناجحة"
+        },
+        {
+          "slug": "/research/agent-total-cost-of-ownership",
+          "label": "التكلفة الإجمالية لملكية الوكيل"
+        },
+        {
+          "slug": "/research/ai-research-cost-allocation",
+          "label": "توزيع تكلفة الذكاء الاصطناعي"
+        }
+      ]
+    },
+    "it": {
+      "title": "Foglio di lavoro per il costo completo di un agente",
+      "titleCore": "Foglio di lavoro per il costo completo di un agente",
+      "description": "Costo verificabile per esecuzione di un agente da utilizzo del modello, strumenti, calcolo, nuovi tentativi, verifica e costi condivisi di piattaforma.",
+      "body": "<p>Un totale di token del modello non è un costo completo di un agente. Un'esecuzione in produzione può consumare anche ricerca ospitata, esecuzione di codice, archiviazione, nuovi tentativi, modelli di riserva e revisione umana. Un foglio di lavoro utile collega ogni addebito a un ID di esecuzione e tiene separati gli addebiti misurati del fornitore dai costi generali allocati e dalle stime di manodopera.</p><p>Questo foglio integra il <a href=\"/research/cost-per-successful-task\">costo per attività riuscita</a>: prima si compone il registro dei costi completo, poi lo si divide per i risultati che hanno superato il test di successo dichiarato. Estende anche la <a href=\"/research/server-tools-are-a-separate-invoice\">fatturazione separata degli strumenti</a> fino a trasformarla in un registro finanziario ripetibile.</p><h2>Partite da una riga per evento</h2><p>Usate un ID di flusso di lavoro stabile per l'intenzione dell'utente e un ID di esecuzione per ogni tentativo. Registrate timestamp, ambiente, team o tenant, flusso di lavoro, esecuzione, fornitore, servizio, ID della risorsa, quantità, unità, versione della tariffa, valuta e fonte della fattura o della misurazione. Tenete un evento per ogni chiamata al modello, chiamata a strumento, job di calcolo o voce di revisione. In questo modo i nuovi tentativi diventano visibili e la finanza può riconciliare i totali senza indovinare quale operazione annidata li ha generati.</p><h2>Colonne del foglio</h2><ul><li><strong>Modello:</strong> fornitore, modello, unità di input, output, cache e ragionamento dove esposte, tariffa misurata e addebito diretto.</li><li><strong>Strumenti:</strong> ricerca, recupero, browser, esecuzione di codice e altri servizi a consumo, con numero di chiamate o tempo di esecuzione e addebito diretto.</li><li><strong>Calcolo e archiviazione:</strong> tempo di esecuzione di sandbox o container, tempo di acceleratore o CPU, archiviazione persistente e costi di rete se fatturati.</li><li><strong>Lavoro di affidabilità:</strong> nuovi tentativi, chiamate di riserva, rami abbandonati ed esecuzioni di riparazione. Teneteli nel costo totale dell'esecuzione anche quando non hanno prodotto un risultato utile.</li><li><strong>Verifica:</strong> chiamate ai valutatori e minuti di revisione umana, con il costo della manodopera indicato come stima interna e non come addebito in fattura del fornitore.</li><li><strong>Piattaforma condivisa:</strong> allocazioni di orchestrazione, osservabilità, capacità riservata o archiviazione condivisa, ciascuna con il proprio criterio di allocazione e periodo.</li></ul><h2>Calcolate separatamente il costo diretto e il costo completo</h2><p>Il costo diretto di un'esecuzione è la somma degli addebiti misurati di modello, strumenti, calcolo e archiviazione attribuiti a quell'esecuzione. Il costo completo aggiunge la quota dichiarata dei costi generali di piattaforma e della manodopera di revisione. Per i costi condivisi usate un criterio stabile, come il tempo di esecuzione misurato, la capacità riservata o un'allocazione documentata per esecuzione. Pubblicate il criterio e la sua finestra temporale; non distribuite i costi fissi in base al numero di token, a meno che i token non spieghino davvero il consumo di risorse.</p><p>Un piccolo esempio ipotetico chiarisce la formula: se un'esecuzione ha $0.40 di addebiti del modello, $0.10 per gli strumenti, $0.20 di calcolo in sandbox e $0.30 di revisione e costi di piattaforma allocati, riportate $0.70 diretti e $1.00 completi. Questi numeri illustrano solo l'aritmetica; non sono un prezzo di mercato né un benchmark.</p><h2>Tenete distinti tentativi e risultati</h2><p>Contate ogni tentativo nella spesa, poi classificate il flusso di lavoro finale come riuscito, fallito, abbandonato o da completare manualmente, secondo una regola esplicita. Riportate il costo per flusso completato insieme al tasso di successo, al tasso di nuovi tentativi e allo sforzo di revisione. Per la metrica di attività riuscita, usate la spesa ammissibile totale del periodo divisa per il numero di flussi che hanno superato il test di successo. Non escludete le esecuzioni fallite dal numeratore e non contate i passaggi intermedi dell'agente come successi separati.</p><h2>Riconciliate e governate il foglio</h2><p>Riconciliate i totali degli eventi con le fatture dei fornitori e con gli export di fatturazione cloud, una volta che i dati di utilizzo si sono assestati. Spiegate separatamente crediti, sconti, minimi, eventi in ritardo e conversione valutaria. Conservate la fonte del prezzo e la data di decorrenza, così i costi storici possono essere ricalcolati senza applicare la tariffa di oggi all'utilizzo del mese scorso.</p><p>Assegnate un responsabile a ogni flusso di lavoro e definite un budget per esecuzione, un budget aggregato per periodo e un percorso di escalation. Quando un flusso supera il suo budget, registrate il motivo e se gli è stato permesso di proseguire. Per i meccanismi di applicazione a runtime, vedete <a href=\"/research/three-agent-budgets\">i tre budget per agenti autonomi</a>.</p><h2>FAQ</h2><h3>Che cosa deve contenere un foglio di lavoro dei costi di un agente?</h3><p>Registrate utilizzo del modello, strumenti fatturati, calcolo, archiviazione, nuovi tentativi, chiamate di riserva, verifica e, identificate separatamente, le allocazioni di piattaforma condivisa e le stime di manodopera.</p><h3>Le esecuzioni fallite dell'agente vanno incluse nel costo per attività?</h3><p>Sì, la loro spesa va inclusa nel totale. Riportate il numero di flussi riusciti con una regola di successo dichiarata, così i fallimenti restano visibili nell'economia unitaria.</p><h3>Come evito di contare due volte i costi di piattaforma condivisa?</h3><p>Tenete gli addebiti diretti collegati al proprio evento, allocate i costi condivisi in un registro separato con un unico criterio pubblicato e riconciliate il totale allocato con il pool dei costi della piattaforma.</p><h2>Correlati</h2><ul><li><a href=\"/research/cost-per-successful-task\">Costo per attività riuscita</a></li><li><a href=\"/research/agent-total-cost-of-ownership\">Costo totale di proprietà di un agente</a></li><li><a href=\"/research/ai-research-cost-allocation\">Allocazione dei costi IA</a></li></ul>",
+      "faq": [
+        {
+          "question": "Che cosa deve contenere un foglio di lavoro dei costi di un agente?",
+          "answer": "Registrate utilizzo del modello, strumenti fatturati, calcolo, archiviazione, nuovi tentativi, chiamate di riserva, verifica e, identificate separatamente, le allocazioni di piattaforma condivisa e le stime di manodopera."
+        },
+        {
+          "question": "Le esecuzioni fallite dell'agente vanno incluse nel costo per attività?",
+          "answer": "Sì, la loro spesa va inclusa nel totale. Riportate il numero di flussi riusciti con una regola di successo dichiarata, così i fallimenti restano visibili nell'economia unitaria."
+        },
+        {
+          "question": "Come evito di contare due volte i costi di piattaforma condivisa?",
+          "answer": "Tenete gli addebiti diretti collegati al proprio evento, allocate i costi condivisi in un registro separato con un unico criterio pubblicato e riconciliate il totale allocato con il pool dei costi della piattaforma."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "Costo per attività riuscita"
+        },
+        {
+          "slug": "/research/agent-total-cost-of-ownership",
+          "label": "Costo totale di proprietà di un agente"
+        },
+        {
+          "slug": "/research/ai-research-cost-allocation",
+          "label": "Allocazione dei costi IA"
+        }
+      ]
+    },
+    "ko": {
+      "title": "에이전트 완전 부담 비용을 계산하는 워크시트",
+      "titleCore": "에이전트 완전 부담 비용 워크시트",
+      "description": "모델 사용량, 도구, 컴퓨팅, 재시도, 검증, 공유 플랫폼 비용으로 실행 한 건당 감사 가능한 에이전트 비용을 만드세요.",
+      "body": "<p>모델 토큰 합계는 에이전트의 완전 부담 비용이 아닙니다. 프로덕션 실행에는 호스팅 검색, 코드 실행, 스토리지, 재시도, 대체 모델, 사람의 검토도 함께 소비될 수 있습니다. 유용한 워크시트는 모든 요금을 실행 ID에 연결하고, 측정된 공급자 요금과 배분된 간접비 및 인건비 추정치를 분리해 둡니다.</p><p>이 워크시트는 <a href=\"/research/cost-per-successful-task\">성공 작업당 비용</a>을 보완합니다. 먼저 완전한 비용 원장을 만든 다음, 정의된 성공 기준을 통과한 결과로 나누세요. 또한 <a href=\"/research/server-tools-are-a-separate-invoice\">도구의 별도 청구</a>를 반복 가능한 재무 기록으로 확장합니다.</p><h2>이벤트마다 한 행으로 시작하세요</h2><p>사용자의 의도에는 안정적인 워크플로 ID를, 각 시도에는 실행 ID를 사용하세요. 타임스탬프, 환경, 팀 또는 테넌트, 워크플로, 실행, 공급자, 서비스, 리소스 ID, 수량, 단위, 요금표 버전, 통화, 청구 또는 계량 출처를 기록합니다. 모델 호출, 도구 호출, 컴퓨팅 작업, 검토 항목마다 이벤트 하나를 유지하세요. 그래야 재시도가 드러나고, 재무팀이 어떤 중첩 작업이 합계를 만들었는지 추측하지 않고 합계를 맞출 수 있습니다.</p><h2>워크시트 열</h2><ul><li><strong>모델:</strong> 공급자, 모델, 노출된 경우 입력, 출력, 캐시, 추론 단위, 측정된 요율, 직접 요금.</li><li><strong>도구:</strong> 검색, 검색 증강, 브라우저, 코드 실행 및 기타 계량 서비스의 호출 횟수 또는 실행 시간과 직접 요금.</li><li><strong>컴퓨팅과 스토리지:</strong> 샌드박스 또는 컨테이너 실행 시간, 가속기 또는 CPU 시간, 영구 스토리지, 청구되는 경우 네트워크 요금.</li><li><strong>신뢰성 작업:</strong> 재시도, 대체 호출, 중단된 분기, 복구 실행. 유용한 결과가 없더라도 실행의 총비용에 포함하세요.</li><li><strong>검증:</strong> 평가자 호출과 사람의 검토 시간. 인건비는 공급자 청구 요금이 아니라 내부 추정치로 표시하세요.</li><li><strong>공유 플랫폼:</strong> 오케스트레이션, 관측성, 예약 용량, 공유 스토리지 배분. 각각 배분 기준과 기간을 함께 적으세요.</li></ul><h2>직접 비용과 완전 부담 비용을 따로 계산하세요</h2><p>실행의 직접 비용은 그 실행에 귀속된 모델, 도구, 컴퓨팅, 스토리지의 계량 요금을 합한 값입니다. 완전 부담 비용은 여기에 신고된 플랫폼 간접비와 검토 인건비 몫을 더합니다. 공유 비용에는 측정된 실행 시간, 예약 용량, 문서화된 실행당 배분처럼 안정적인 기준을 사용하세요. 배분 기준과 그 시간 범위를 공개합니다. 토큰이 실제로 자원 소비를 설명하지 않는 한 고정 비용을 토큰 수로 나누지 마세요.</p><p>작은 가상 예시로 공식을 확인해 봅시다. 한 실행에서 모델 요금이 $0.40, 도구가 $0.10, 샌드박스 컴퓨팅이 $0.20, 배분된 검토 및 플랫폼 비용이 $0.30이라면, 직접 비용은 $0.70, 완전 부담 비용은 $1.00로 보고합니다. 이 수치는 계산 방법을 보여 줄 뿐이며, 시장 가격이나 벤치마크가 아닙니다.</p><h2>시도와 결과를 구분해 유지하세요</h2><p>모든 시도를 지출에 포함한 다음, 명시된 규칙에 따라 최종 워크플로를 성공, 실패, 중단, 사람의 완료 필요 중 하나로 표시하세요. 완료된 워크플로당 비용은 성공률, 재시도율, 검토 노력과 함께 보고합니다. 성공 작업 지표에는 기간의 전체 대상 지출을 성공 기준을 통과한 워크플로 수로 나눈 값을 사용하세요. 실패한 실행을 분자에서 빼거나, 에이전트의 중간 단계를 별개의 성공으로 세지 마세요.</p><h2>워크시트를 대조하고 관리하세요</h2><p>사용 데이터가 확정되면 이벤트 합계를 공급자 청구서와 클라우드 청구 내보내기와 대조하세요. 크레딧, 할인, 최소 약정, 지연 이벤트, 통화 환산은 따로 설명합니다. 가격 출처와 적용 시작일을 저장해 두면, 오늘의 요금을 지난달 사용량에 적용하지 않고도 과거 비용을 다시 계산할 수 있습니다.</p><p>각 워크플로에 책임자를 지정하고, 실행당 예산, 기간 합계 예산, 에스컬레이션 경로를 정의하세요. 워크플로가 예산을 넘으면 그 이유와 계속 실행을 허용했는지 기록합니다. 실행 중 적용 방식은 <a href=\"/research/three-agent-budgets\">자율 에이전트의 세 가지 예산</a>을 참고하세요.</p><h2>FAQ</h2><h3>에이전트 비용 워크시트에는 무엇이 들어가야 하나요?</h3><p>모델 사용량, 청구되는 도구, 컴퓨팅, 스토리지, 재시도, 대체 호출, 검증, 그리고 따로 식별된 공유 플랫폼 배분과 인건비 추정치를 기록하세요.</p><h3>실패한 에이전트 실행을 작업당 비용에 포함해야 하나요?</h3><p>지출은 합계에 포함하세요. 성공한 워크플로 수는 신고된 성공 규칙에 따라 보고해서, 실패가 단위 경제성에서 계속 보이도록 합니다.</p><h3>공유 플랫폼 비용의 이중 계산은 어떻게 피하나요?</h3><p>직접 요금은 해당 이벤트에 붙여 두고, 공유 비용은 공개한 배분 기준 하나를 써서 별도 원장에서 배분하세요. 배분된 합계는 플랫폼 비용 풀과 대조합니다.</p><h2>관련 글</h2><ul><li><a href=\"/research/cost-per-successful-task\">성공 작업당 비용</a></li><li><a href=\"/research/agent-total-cost-of-ownership\">에이전트의 총소유비용</a></li><li><a href=\"/research/ai-research-cost-allocation\">AI 비용 배분</a></li></ul>",
+      "faq": [
+        {
+          "question": "에이전트 비용 워크시트에는 무엇이 들어가야 하나요?",
+          "answer": "모델 사용량, 청구되는 도구, 컴퓨팅, 스토리지, 재시도, 대체 호출, 검증, 그리고 따로 식별된 공유 플랫폼 배분과 인건비 추정치를 기록하세요."
+        },
+        {
+          "question": "실패한 에이전트 실행을 작업당 비용에 포함해야 하나요?",
+          "answer": "지출은 합계에 포함하세요. 성공한 워크플로 수는 신고된 성공 규칙에 따라 보고해서, 실패가 단위 경제성에서 계속 보이도록 합니다."
+        },
+        {
+          "question": "공유 플랫폼 비용의 이중 계산은 어떻게 피하나요?",
+          "answer": "직접 요금은 해당 이벤트에 붙여 두고, 공유 비용은 공개한 배분 기준 하나를 써서 별도 원장에서 배분하세요. 배분된 합계는 플랫폼 비용 풀과 대조합니다."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "성공 작업당 비용"
+        },
+        {
+          "slug": "/research/agent-total-cost-of-ownership",
+          "label": "에이전트의 총소유비용"
+        },
+        {
+          "slug": "/research/ai-research-cost-allocation",
+          "label": "AI 비용 배분"
+        }
+      ]
+    },
+    "nl": {
+      "title": "Een werkblad voor volledig belaste agentkosten",
+      "titleCore": "Een werkblad voor volledig belaste agentkosten",
+      "description": "Bouw een controleerbare agentkost per run op uit modelgebruik, tools, compute, nieuwe pogingen, verificatie en gedeelde platformkosten.",
+      "body": "<p>Een totaal aan modeltokens is geen volledig belaste agentkost. Een productierun kan ook gehoste zoekdiensten, code-uitvoering, opslag, nieuwe pogingen, terugvalmodellen en menselijke review verbruiken. Een bruikbaar werkblad koppelt elke kostenpost aan een run-ID en houdt gemeten aanbiederkosten gescheiden van toegerekende overhead en arbeidsschattingen.</p><p>Dit werkblad vult <a href=\"/research/cost-per-successful-task\">kosten per geslaagde taak</a> aan: stel eerst het volledige kostengrootboek samen en deel het dan door de uitkomsten die de vermelde succestest hebben doorstaan. Het breidt ook <a href=\"/research/server-tools-are-a-separate-invoice\">aparte toolfacturering</a> uit tot een herhaalbare financiële registratie.</p><h2>Begin met één rij per gebeurtenis</h2><p>Gebruik een stabiel workflow-ID voor de gebruikersintentie en een run-ID voor elke poging. Leg tijdstempel, omgeving, team of tenant, workflow, run, aanbieder, dienst, resource-ID, hoeveelheid, eenheid, versie van de tarievenkaart, valuta en factuur- of meterbron vast. Houd één gebeurtenis per modelaanroep, toolaanroep, computejob of reviewitem aan. Zo worden nieuwe pogingen zichtbaar en kan finance totalen afstemmen zonder te raden welke geneste bewerking ze veroorzaakte.</p><h2>Kolommen van het werkblad</h2><ul><li><strong>Model:</strong> aanbieder, model, input-/output-/gecachete/redeneereenheden waar beschikbaar, gemeten tarief en directe kosten.</li><li><strong>Tools:</strong> zoeken, retrieval, browser, code-uitvoering en andere gemeterde diensten, met aantal aanroepen of looptijd en directe kosten.</li><li><strong>Compute en opslag:</strong> looptijd van sandbox of container, accelerator- of CPU-tijd, persistente opslag en eventueel gefactureerde netwerkkosten.</li><li><strong>Betrouwbaarheidswerk:</strong> nieuwe pogingen, terugvalaanroepen, verlaten vertakkingen en herstelruns. Houd ze in de totale runkosten, ook als ze geen bruikbare output opleverden.</li><li><strong>Verificatie:</strong> evaluatoraanroepen en minuten menselijke review, waarbij arbeidskosten als interne schatting worden gemarkeerd en niet als factuurpost van een aanbieder.</li><li><strong>Gedeeld platform:</strong> toerekeningen voor orkestratie, observability, gereserveerde capaciteit of gedeelde opslag, elk met de toerekeningsdriver en periode.</li></ul><h2>Bereken directe en volledig belaste kosten apart</h2><p>Directe runkosten zijn de som van de gemeten model-, tool-, compute- en opslagkosten die aan die run zijn toegeschreven. Volledig belaste kosten voegen het vermelde aandeel platformoverhead en reviewarbeid toe. Gebruik een stabiele driver voor gedeelde kosten, zoals gemeten looptijd, gereserveerde capaciteit of een gedocumenteerde toerekening per run. Publiceer de driver en het tijdvenster; verdeel vaste kosten niet naar tokenaantal tenzij tokens het resourceverbruik echt verklaren.</p><p>Een klein hypothetisch voorbeeld maakt de formule duidelijk: heeft één run $0.40 aan modelkosten, $0.10 aan tools, $0.20 aan sandbox-compute en $0.30 aan toegerekende review- en platformkosten, rapporteer dan $0.70 direct en $1.00 volledig belast. Deze cijfers illustreren alleen de rekensom; het zijn geen marktprijs of benchmark.</p><h2>Houd pogingen en uitkomsten gescheiden</h2><p>Tel elke poging mee in de uitgaven en label de uiteindelijke workflow daarna als geslaagd, mislukt, verlaten of vereist menselijke afronding, onder een expliciete regel. Rapporteer kosten per afgeronde workflow naast succespercentage, percentage nieuwe pogingen en reviewinspanning. Gebruik voor een metriek voor geslaagde taken de totale in aanmerking komende uitgaven in de periode gedeeld door het aantal workflows dat de succestest doorstond. Laat mislukte runs niet uit de teller vallen en tel tussenstappen van de agent niet als aparte successen.</p><h2>Stem het werkblad af en beheer het</h2><p>Stem de gebeurtenistotalen af op aanbiederfacturen en cloudbillingexports nadat de gebruiksdata zijn uitgekristalliseerd. Verklaar tegoeden, kortingen, minimumbedragen, late gebeurtenissen en valutaomrekening apart. Sla de prijsbron en ingangsdatum op, zodat historische kosten opnieuw kunnen worden berekend zonder het huidige tarief op het gebruik van vorige maand toe te passen.</p><p>Wijs aan elke workflow een eigenaar toe en definieer een budget per run, een totaalbudget per periode en een escalatiepad. Als een workflow zijn budget overschrijdt, leg dan de reden vast en of hij mocht doorgaan. Voor patronen om dit tijdens de uitvoering af te dwingen, zie <a href=\"/research/three-agent-budgets\">de drie budgetten voor autonome agents</a>.</p><h2>FAQ</h2><h3>Wat hoort er in een kostenwerkblad voor agents?</h3><p>Leg modelgebruik, gefactureerde tools, compute, opslag, nieuwe pogingen, terugvalaanroepen, verificatie en apart geïdentificeerde toerekeningen van het gedeelde platform en arbeidsschattingen vast.</p><h3>Moeten mislukte agentruns worden meegeteld in de kosten per taak?</h3><p>Neem hun uitgaven op in het totaal. Rapporteer het aantal geslaagde workflows volgens een vermelde succesregel, zodat mislukkingen zichtbaar blijven in de unit economics.</p><h3>Hoe voorkom ik dubbeltelling van gedeelde platformkosten?</h3><p>Houd directe kosten gekoppeld aan hun gebeurtenis, reken gedeelde kosten toe in een apart grootboek met één gepubliceerde driver en stem het toegerekende totaal af op de platformkostenpool.</p><h2>Gerelateerd</h2><ul><li><a href=\"/research/cost-per-successful-task\">Kosten per geslaagde taak</a></li><li><a href=\"/research/agent-total-cost-of-ownership\">Total cost of ownership van agents</a></li><li><a href=\"/research/ai-research-cost-allocation\">Toerekening van AI-kosten</a></li></ul>",
+      "faq": [
+        {
+          "question": "Wat hoort er in een kostenwerkblad voor agents?",
+          "answer": "Leg modelgebruik, gefactureerde tools, compute, opslag, nieuwe pogingen, terugvalaanroepen, verificatie en apart geïdentificeerde toerekeningen van het gedeelde platform en arbeidsschattingen vast."
+        },
+        {
+          "question": "Moeten mislukte agentruns worden meegeteld in de kosten per taak?",
+          "answer": "Neem hun uitgaven op in het totaal. Rapporteer het aantal geslaagde workflows volgens een vermelde succesregel, zodat mislukkingen zichtbaar blijven in de unit economics."
+        },
+        {
+          "question": "Hoe voorkom ik dubbeltelling van gedeelde platformkosten?",
+          "answer": "Houd directe kosten gekoppeld aan hun gebeurtenis, reken gedeelde kosten toe in een apart grootboek met één gepubliceerde driver en stem het toegerekende totaal af op de platformkostenpool."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "Kosten per geslaagde taak"
+        },
+        {
+          "slug": "/research/agent-total-cost-of-ownership",
+          "label": "Total cost of ownership van agents"
+        },
+        {
+          "slug": "/research/ai-research-cost-allocation",
+          "label": "Toerekening van AI-kosten"
+        }
+      ]
+    },
+    "zh": {
+      "title": "完全负载智能体成本工作表",
+      "titleCore": "完全负载智能体成本工作表",
+      "description": "从模型用量、工具、计算、重试、验证和共享平台成本出发，建立可审计的每次运行智能体成本。",
+      "body": "<p>模型 token 总量并不等于完全负载的智能体成本。一次生产运行还可能消耗托管搜索、代码执行、存储、重试、备用模型以及人工审核。一份有用的工作表会把每一笔费用关联到运行 ID，并把已计量的供应商费用与分摊的管理费用和人工估算分开。</p>\n\n<p>这份工作表是对<a href=\"/research/cost-per-successful-task\">单个成功任务的成本</a>的补充：先汇总完整的成本台账，再把它除以通过既定成功标准的结果。它也把<a href=\"/research/server-tools-are-a-separate-invoice\">独立的工具计费</a>扩展为可重复使用的财务记录。</p>\n\n<h2>从每个事件一行开始</h2>\n<p>为用户意图使用稳定的工作流 ID，为每次尝试使用运行 ID。记录时间戳、环境、团队或租户、工作流、运行、供应商、服务、资源 ID、数量、单位、费率卡版本、货币，以及发票或计量来源。每次模型调用、工具调用、计算任务或审核项各占一个事件。这样重试行为可见，财务无需猜测是哪个嵌套操作产生了这些费用，也能对账总额。</p>\n\n<h2>工作表各列</h2>\n<ul>\n<li>\n<strong>模型：</strong>供应商、模型、可获取的输入/输出/缓存/推理单位、实测费率，以及直接费用。</li>\n<li>\n<strong>工具：</strong>搜索、检索、浏览器、代码执行以及其他按量计费的服务，附调用次数或运行时长，以及直接费用。</li>\n<li>\n<strong>计算与存储：</strong>沙箱或容器运行时、加速器或 CPU 时间、持久化存储，以及（如果计费）网络费用。</li>\n<li>\n<strong>可靠性工作：</strong>重试、备用调用、被放弃的分支以及修复运行。即使它们没有产生有用的输出，也要计入运行总成本。</li>\n<li>\n<strong>验证：</strong>评估器调用和人工审核分钟数，人工成本需标注为内部估算，而不是供应商发票上的费用。</li>\n<li>\n<strong>共享平台：</strong>编排、可观测性、预留容量或共享存储的分摊，每项都注明其分摊依据和周期。</li>\n</ul>\n<h2>分别计算直接成本与完全负载成本</h2>\n<p>直接运行成本是归属于该次运行的已计量模型、工具、计算和存储费用之和。完全负载成本再加上平台管理费用和审核人工中的既定份额。共享成本应使用稳定的分摊依据，例如实测运行时长、预留容量或有文档记录的每次运行分摊。请公布分摊依据及其时间窗口；除非 token 确实能解释资源消耗，否则不要按 token 数量分摊固定成本。</p>\n\n<p>一个小型假设示例可以让公式更清楚：如果某次运行有 $0.40 的模型费用、$0.10 的工具费用、$0.20 的沙箱计算费用，以及 $0.30 的分摊审核与平台成本，那么直接成本报告为 $0.70，完全负载成本为 $1.00。这些数字只用于说明算术，并非市场价格或基准。</p>\n\n<h2>区分尝试与结果</h2>\n<p>所有尝试都计入支出，然后根据一条明确的规则，将最终工作流标记为成功、失败、被放弃，或需要人工完成。报告每个已完成工作流的成本时，应同时给出成功率、重试率和审核工作量。对于成功任务指标，使用该期间内符合条件的总支出，除以通过成功测试的工作流数量。不要把失败的运行从分子中剔除，也不要把中间的智能体步骤算作单独的成功。</p>\n\n<h2>对账与治理工作表</h2>\n<p>在用量数据结算之后，将事件总额与供应商发票和云计费导出数据对账。单独说明积分、折扣、最低消费、延迟事件和货币换算。保存价格来源和生效日期，以便历史成本可以被重新计算，而不是用今天的费率去计算上个月的用量。</p>\n\n<p>为每个工作流指定负责人，并设定单次运行预算、总体周期预算和升级路径。当某个工作流超出预算时，记录原因以及它是否被允许继续运行。运行时强制执行的模式，请参阅<a href=\"/research/three-agent-budgets\">自主智能体的三类预算</a>。</p>\n\n<h2>常见问题</h2>\n<h3>智能体成本工作表应包含什么？</h3>\n<p>记录模型用量、计费工具、计算、存储、重试、备用调用、验证，以及单独标识的共享平台分摊和人工估算。</p>\n\n<h3>失败的智能体运行是否应计入单个任务成本？</h3>\n<p>应将其支出计入总额。使用既定的成功规则报告成功工作流的数量，使失败在单位经济性中保持可见。</p>\n\n<h3>如何避免重复计算共享平台成本？</h3>\n<p>让直接费用保留在其所属事件上，用一个公布的分摊依据在独立台账中分摊共享成本，并将分摊总额与平台成本池对账。</p>\n\n<h2>相关阅读</h2>\n<ul>\n<li>\n<a href=\"/research/cost-per-successful-task\">单个成功任务的成本</a>\n</li>\n<li>\n<a href=\"/research/agent-total-cost-of-ownership\">智能体总拥有成本</a>\n</li>\n<li>\n<a href=\"/research/ai-research-cost-allocation\">AI 成本分摊</a>\n</li>\n</ul>",
+      "faq": [
+        {
+          "question": "智能体成本工作表应包含什么？",
+          "answer": "记录模型用量、计费工具、计算、存储、重试、备用调用、验证，以及单独标识的共享平台分摊和人工估算。"
+        },
+        {
+          "question": "失败的智能体运行是否应计入单个任务成本？",
+          "answer": "应将其支出计入总额。使用既定的成功规则报告成功工作流的数量，使失败在单位经济性中保持可见。"
+        },
+        {
+          "question": "如何避免重复计算共享平台成本？",
+          "answer": "让直接费用保留在其所属事件上，用一个公布的分摊依据在独立台账中分摊共享成本，并将分摊总额与平台成本池对账。"
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "单个成功任务的成本"
+        },
+        {
+          "slug": "/research/agent-total-cost-of-ownership",
+          "label": "智能体总拥有成本"
+        },
+        {
+          "slug": "/research/ai-research-cost-allocation",
+          "label": "AI 成本分摊"
+        }
+      ]
     }
   }
 }

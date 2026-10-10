@@ -15,7 +15,7 @@
       "title": "You pay for the context window twice",
       "titleCore": "Paying for the context window twice",
       "description": "Once to put the context in, and again on every turn it stays there. Long conversations are the most common unbudgeted line item in an LLM bill.",
-      "body": "<p>A context window is advertised as capacity: 200,000 tokens, a million tokens, room for whatever you need. Capacity is not the billing unit. You are charged for what you <em>send</em>, and in a multi-turn conversation you send most of it again every single turn.</p><p>That is the second payment. A 30,000-token document loaded at the start of a twenty-turn conversation is not 30,000 input tokens. It is closer to 600,000, because turn two re-sends it, and so does turn twenty.</p><h2>The arithmetic nobody runs</h2><p>Cost scales with the square of conversation length, not linearly. Doubling the number of turns roughly quadruples the input tokens, assuming context keeps accumulating. Teams that model &quot;cost per message&quot; and multiply by message count under-forecast long sessions badly, and the error grows with exactly the users you most want to keep.</p><p>There is often a third charge on top: many providers price requests above a long-context threshold at a premium rate. One extra attachment can push a request across that line and reprice the entire call, input and output, not just the tokens that crossed it.</p><h2>What to measure</h2><p>Track <strong>context utilisation</strong>: tokens sent versus tokens the model actually needed. It is the closest thing to a waste metric this domain has. Track input tokens per <em>conversation</em>, not per request, and watch the p99 &mdash; that is where the sessions live that cost twenty times the median.</p><p>Alert on requests crossing the long-context price threshold. It is a step change, not a gradient, and it will not look like anything in a daily total.</p><h2>Three fixes, cheapest first</h2><p><strong>Cache the stable prefix.</strong> If the system prompt and loaded documents do not change during a conversation, prompt caching turns the repeated cost into a fraction of it. This is the single highest-return change for any multi-turn product.</p><p><strong>Trim history deliberately.</strong> Older turns rarely earn their re-send price. Summarise the earlier part of a long conversation and drop the raw turns; you keep the thread and stop paying full freight for it.</p><p><strong>Send the excerpt, not the corpus.</strong> Retrieval exists for exactly this. The window being large enough to hold a whole document is not an argument for putting a whole document in it.</p><h2>Related</h2><ul><li><a href=&quot;/research/prompt-caching-economics&quot;>Prompt caching economics</a></li><li><a href=&quot;/research/long-context-vs-rag-cost&quot;>Long context vs RAG cost</a></li><li><a href=&quot;/research/cost-per-request-kpi&quot;>Cost per request as a KPI</a></li></ul>",
+      "body": "<p>A context window is advertised as capacity: 200,000 tokens, a million tokens, room for whatever you need. Capacity is not the billing unit. You are charged for what you <em>send</em>, and in a multi-turn conversation you send most of it again every single turn.</p><p>That is the second payment. A 30,000-token document loaded at the start of a twenty-turn conversation is not 30,000 input tokens. It is closer to 600,000, because turn two re-sends it, and so does turn twenty.</p><h2>The arithmetic nobody runs</h2><p>Cost scales with the square of conversation length, not linearly. Doubling the number of turns roughly quadruples the input tokens, assuming context keeps accumulating. Teams that model &quot;cost per message&quot; and multiply by message count under-forecast long sessions badly, and the error grows with exactly the users you most want to keep.</p><p>There is often a third charge on top: many providers price requests above a long-context threshold at a premium rate. One extra attachment can push a request across that line and reprice the entire call, input and output, not just the tokens that crossed it.</p><h2>What to measure</h2><p>Track <strong>context utilisation</strong>: tokens sent versus tokens the model actually needed. It is the closest thing to a waste metric this domain has. Track input tokens per <em>conversation</em>, not per request, and watch the p99 &mdash; that is where the sessions live that cost twenty times the median.</p><p>Alert on requests crossing the long-context price threshold. It is a step change, not a gradient, and it will not look like anything in a daily total.</p><h2>Three fixes, cheapest first</h2><p><strong>Cache the stable prefix.</strong> If the system prompt and loaded documents do not change during a conversation, prompt caching turns the repeated cost into a fraction of it. This is the single highest-return change for any multi-turn product.</p><p><strong>Trim history deliberately.</strong> Older turns rarely earn their re-send price. Summarise the earlier part of a long conversation and drop the raw turns; you keep the thread and stop paying full freight for it.</p><p><strong>Send the excerpt, not the corpus.</strong> Retrieval exists for exactly this. The window being large enough to hold a whole document is not an argument for putting a whole document in it.</p><h2>Related</h2><ul><li><a href=\"/research/prompt-caching-economics\">Prompt caching economics</a></li><li><a href=\"/research/long-context-vs-rag-cost\">Long context vs RAG cost</a></li><li><a href=\"/research/cost-per-request-kpi\">Cost per request as a KPI</a></li></ul>",
       "faq": [
         {
           "question": "Why does a long conversation cost more than the token count suggests?",
@@ -132,6 +132,346 @@
         {
           "slug": "/research/prompt-caching-economics",
           "label": "プロンプトキャッシュの経済性"
+        }
+      ]
+    },
+    "id": {
+      "title": "Anda membayar jendela konteks dua kali",
+      "titleCore": "Membayar jendela konteks dua kali",
+      "description": "Sekali saat konteks dimasukkan, lalu lagi di setiap giliran selama tetap ada. Percakapan panjang adalah pos tagihan LLM yang paling sering tak dianggarkan.",
+      "body": "<p>Jendela konteks diiklankan sebagai kapasitas: 200.000 token, satu juta token, ruang untuk apa pun yang Anda butuhkan. Kapasitas bukan satuan penagihan. Anda ditagih untuk apa yang Anda <em>kirim</em>, dan dalam percakapan multi-giliran Anda mengirim hampir semuanya lagi di setiap giliran.</p><p>Itu pembayaran kedua. Dokumen 30.000 token yang dimuat di awal percakapan dua puluh giliran bukan 30.000 token input. Jumlahnya mendekati 600.000, karena giliran kedua mengirimnya ulang, begitu juga giliran kedua puluh.</p><h2>Perhitungan yang tidak pernah dilakukan siapa pun</h2><p>Biaya tumbuh sebanding dengan kuadrat panjang percakapan, bukan linear. Menggandakan jumlah giliran kira-kira melipatgandakan empat kali token input, dengan asumsi konteks terus menumpuk. Tim yang memodelkan &quot;biaya per pesan&quot; lalu mengalikannya dengan jumlah pesan sangat meremehkan sesi panjang, dan kesalahannya membesar justru pada pengguna yang paling ingin Anda pertahankan.</p><p>Sering ada biaya ketiga di atasnya: banyak penyedia menetapkan tarif premium untuk permintaan di atas ambang konteks panjang. Satu lampiran tambahan bisa mendorong permintaan melewati batas itu dan menaikkan harga seluruh panggilan, input dan output, bukan hanya token yang melewati batas.</p><h2>Apa yang perlu diukur</h2><p>Lacak <strong>utilisasi konteks</strong>: token yang dikirim dibandingkan token yang benar-benar dibutuhkan model. Ini metrik pemborosan terdekat yang dimiliki domain ini. Lacak token input per <em>percakapan</em>, bukan per permintaan, dan pantau p99 &mdash; di situlah sesi yang biayanya dua puluh kali median berada.</p><p>Beri peringatan untuk permintaan yang melewati ambang harga konteks panjang. Ini perubahan tangga, bukan gradien, dan tidak akan terlihat seperti apa pun di total harian.</p><h2>Tiga perbaikan, dari yang termurah</h2><p><strong>Cache awalan yang stabil.</strong> Jika system prompt dan dokumen yang dimuat tidak berubah selama percakapan, prompt caching mengubah biaya berulang menjadi sebagian kecil darinya. Ini perubahan dengan imbal hasil tertinggi untuk produk multi-giliran mana pun.</p><p><strong>Pangkas riwayat dengan sengaja.</strong> Giliran lama jarang layak dikirim ulang dengan harga penuh. Ringkas bagian awal percakapan panjang dan buang giliran mentahnya; alur percakapan tetap terjaga dan Anda berhenti membayar penuh untuknya.</p><p><strong>Kirim kutipannya, bukan korpusnya.</strong> Retrieval ada justru untuk ini. Jendela yang cukup besar untuk menampung seluruh dokumen bukan alasan untuk memasukkan seluruh dokumen ke dalamnya.</p><h2>Terkait</h2><ul><li><a href=\"/research/prompt-caching-economics\">Ekonomi prompt caching</a></li><li><a href=\"/research/long-context-vs-rag-cost\">Konteks panjang vs biaya RAG</a></li><li><a href=\"/research/cost-per-request-kpi\">Biaya per permintaan sebagai KPI</a></li></ul>",
+      "faq": [
+        {
+          "question": "Mengapa percakapan panjang lebih mahal daripada jumlah token-nya?",
+          "answer": "Karena konteks dikirim ulang. Setiap giliran menyertakan seluruh percakapan sebelumnya sebagai input, jadi dokumen yang dimuat di awal ditagih lagi di setiap giliran berikutnya. Biaya tumbuh kira-kira sebanding dengan kuadrat panjang percakapan, bukan linear."
+        },
+        {
+          "question": "Apa itu utilisasi konteks?",
+          "answer": "Token yang dikirim dibandingkan token yang benar-benar dibutuhkan model untuk menjawab. Ini metrik pemborosan terdekat dalam kerja biaya LLM, dan ini yang memberi tahu apakah Anda membayar untuk mengirim ulang materi yang tidak memengaruhi output."
+        },
+        {
+          "question": "Apa perbaikan dengan imbal hasil tertinggi?",
+          "answer": "Prompt caching pada awalan yang stabil. Jika system prompt dan dokumen yang dimuat tidak berubah selama percakapan, caching mengubah tagihan berulang terbesar menjadi sebagian kecil darinya tanpa mengubah kualitas output."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/prompt-caching-economics",
+          "label": "Ekonomi prompt caching"
+        },
+        {
+          "slug": "/research/long-context-vs-rag-cost",
+          "label": "Konteks panjang vs biaya RAG"
+        },
+        {
+          "slug": "/research/cost-per-request-kpi",
+          "label": "Biaya per permintaan sebagai KPI"
+        }
+      ]
+    },
+    "pl": {
+      "title": "Płacisz za okno kontekstu dwa razy",
+      "titleCore": "Płacenie dwa razy za okno kontekstu",
+      "description": "Raz za wprowadzenie kontekstu i znowu w każdej turze, w której on zostaje. Długie rozmowy to najczęstsza nieuwzględniona pozycja na rachunku za LLM.",
+      "body": "<p>Okno kontekstu jest reklamowane jako pojemność: 200,000 tokenów, milion tokenów, miejsce na wszystko, czego potrzebujesz. Pojemność nie jest jednostką rozliczeniową. Płacisz za to, co <em>wysyłasz</em>, a w rozmowie wieloturowej wysyłasz prawie wszystko ponownie w każdej turze.</p><p>To jest druga płatność. Dokument o długości 30,000 tokenów załadowany na początku dwudziestoturowej rozmowy to nie 30,000 tokenów wejścia. To bliżej 600,000, bo tura druga wysyła go ponownie, podobnie jak tura dwudziesta.</p><h2>Rachunek, którego nikt nie robi</h2><p>Koszt rośnie z kwadratem długości rozmowy, a nie liniowo. Podwojenie liczby tur mniej więcej poczterokrotnia tokeny wejścia, o ile kontekst ciągle się narasta. Zespoły, które modelują &quot;koszt na wiadomość&quot; i mnożą przez liczbę wiadomości, bardzo nie doszacowują długich sesji, a błąd rośnie właśnie u tych użytkowników, których najbardziej chcesz zatrzymać.</p><p>Często dochodzi trzecia opłata: wielu dostawców liczy wyższą stawkę za żądania powyżej progu długiego kontekstu. Jeden dodatkowy załącznik może przekroczyć tę granicę i przeliczyć cały wywołanie, zarówno wejście, jak i wyjście, a nie tylko tokeny, które ją przekroczyły.</p><h2>Co mierzyć</h2><p>Śledź <strong>wykorzystanie kontekstu</strong>: tokeny wysłane kontra tokeny, których model faktycznie potrzebował. To najbliższa rzecz do metryki marnotrawstwa w tej dziedzinie. Śledź tokeny wejścia na <em>rozmowę</em>, a nie na żądanie, i obserwuj p99 — tam znajdują się sesje, które kosztują dwadzieścia razy więcej niż mediana.</p><p>Ustaw alerty dla żądań przekraczających próg cenowy długiego kontekstu. To skok, a nie gradient, i w dziennej sumie nie będzie wyglądał na nic szczególnego.</p><h2>Trzy poprawki, od najtańszej</h2><p><strong>Keszuj stabilny prefiks.</strong> Jeśli prompt systemowy i załadowane dokumenty nie zmieniają się w trakcie rozmowy, cache promptów zamienia powtarzany koszt w jego ułamek. To pojedyncza zmiana o największym zwrocie w każdym produkcie wieloturowym.</p><p><strong>Przycinaj historię celowo.</strong> Starsze tury rzadko zarabiają na swoją ponowną wysyłkę. Podsumuj wcześniejszą część długiej rozmowy i usuń surowe tury; zachowujesz wątek i przestajesz płacić pełną stawkę za resztę.</p><p><strong>Wysyłaj fragment, a nie cały korpus.</strong> Do tego właśnie służy wyszukiwanie. To, że okno jest na tyle duże, by pomieścić cały dokument, nie jest argumentem za wkładaniem tam całego dokumentu.</p><h2>Powiązane</h2><ul><li><a href=\"/research/prompt-caching-economics\">Ekonomia cache promptów</a></li><li><a href=\"/research/long-context-vs-rag-cost\">Długi kontekst kontra RAG: koszt</a></li><li><a href=\"/research/cost-per-request-kpi\">Koszt na żądanie jako KPI</a></li></ul>",
+      "faq": [
+        {
+          "question": "Dlaczego długa rozmowa kosztuje więcej, niż sugeruje liczba tokenów?",
+          "answer": "Bo kontekst jest wysyłany ponownie. Każda tura zawiera całą dotychczasową rozmowę jako wejście, więc dokument załadowany na początku jest rozliczany ponownie w każdej kolejnej turze. Koszt rośnie mniej więcej z kwadratem długości rozmowy, a nie liniowo."
+        },
+        {
+          "question": "Czym jest wykorzystanie kontekstu?",
+          "answer": "To tokeny wysłane kontra tokeny, których model faktycznie potrzebował do odpowiedzi. To najbliższa rzecz do metryki marnotrawstwa w pracy nad kosztami LLM i pokazuje, czy płacisz za ponowne wysyłanie materiału, który nigdy nie wpływa na wynik."
+        },
+        {
+          "question": "Jaka poprawka daje najwyższy zwrot?",
+          "answer": "Cache promptów na stabilnym prefiksie. Jeśli prompt systemowy i załadowane dokumenty nie zmieniają się w trakcie rozmowy, cache zamienia największą powtarzaną opłatę w jej ułamek bez zmiany jakości wyniku."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/prompt-caching-economics",
+          "label": "Ekonomia cache promptów"
+        },
+        {
+          "slug": "/research/long-context-vs-rag-cost",
+          "label": "Długi kontekst kontra RAG: koszt"
+        },
+        {
+          "slug": "/research/cost-per-request-kpi",
+          "label": "Koszt na żądanie jako KPI"
+        }
+      ]
+    },
+    "ru": {
+      "title": "Контекстное окно оплачивается дважды",
+      "titleCore": "Оплата контекстного окна дважды",
+      "description": "Один раз, чтобы загрузить контекст, и снова на каждом ходе, пока он там остаётся. Длинные диалоги — самая частая незапланированная статья в счёте за LLM.",
+      "body": "<p>Контекстное окно рекламируют как ёмкость: 200,000 токенов, миллион токенов, место под всё, что нужно. Ёмкость не является единицей оплаты. Вам выставляют счёт за то, что вы <em>отправляете</em>, а в многоходовом диалоге вы отправляете большую часть этого заново на каждом ходе.</p><p>Это и есть вторая оплата. Документ в 30,000 токенов, загруженный в начале диалога из двадцати ходов, — это не 30,000 входных токенов. Выходит ближе к 600,000, потому что второй ход отправляет его снова, и двадцатый тоже.</p><h2>Арифметика, которую никто не делает</h2><p>Стоимость растёт пропорционально квадрату длины диалога, а не линейно. Удвоение числа ходов примерно учетверяет входные токены, если контекст продолжает накапливаться. Команды, которые считают &quot;стоимость одного сообщения&quot; и умножают её на число сообщений, сильно недооценивают длинные сессии, и ошибка растёт именно у тех пользователей, которых вы больше всего хотите удержать.</p><p>Часто сверху добавляется и третья плата: многие провайдеры считают запросы выше порога длинного контекста по повышенной ставке. Одно лишнее вложение может перевести запрос через эту черту и пересчитать весь вызов, и вход, и выход, а не только токены, которые перешли порог.</p><h2>Что измерять</h2><p>Отслеживайте <strong>использование контекста</strong>: сколько токенов отправлено и сколько модели действительно нужно было. Это ближайшая к метрике потерь величина в этой области. Отслеживайте входные токены на <em>диалог</em>, а не на запрос, и следите за p99 &mdash; именно там живут сессии, которые стоят в двадцать раз дороже медианы.</p><p>Настройте оповещения на запросы, пересекающие порог цены за длинный контекст. Это скачок, а не градиент, и в дневном итоге он ничем не будет выделяться.</p><h2>Три исправления, от самого дешёвого</h2><p><strong>Кэшируйте стабильный префикс.</strong> Если системный промпт и загруженные документы не меняются в ходе диалога, кэширование промпта превращает повторяющуюся стоимость в долю от неё. Это самое отдачное изменение для любого многоходового продукта.</p><p><strong>Обрезайте историю осознанно.</strong> Старые ходы редко окупают свою повторную отправку. Суммируйте начало длинного диалога и отбрасывайте сырые ходы: нить сохраняется, а полную плату за неё вы больше не платите.</p><p><strong>Отправляйте фрагмент, а не корпус.</strong> Для этого и существует retrieval. То, что окно достаточно большое, чтобы вместить целый документ, не является аргументом для того, чтобы вкладывать в него целый документ.</p><h2>Связанное</h2><ul><li><a href=\"/research/prompt-caching-economics\">Экономика кэширования промптов</a></li><li><a href=\"/research/long-context-vs-rag-cost\">Длинный контекст против RAG: стоимость</a></li><li><a href=\"/research/cost-per-request-kpi\">Стоимость запроса как KPI</a></li></ul>",
+      "faq": [
+        {
+          "question": "Почему длинный диалог стоит дороже, чем подсказывает число токенов?",
+          "answer": "Потому что контекст отправляется повторно. Каждый ход включает весь диалог до этого момента как вход, поэтому документ, загруженный в начале, оплачивается снова на каждом следующем ходе. Стоимость растёт примерно пропорционально квадрату длины диалога, а не линейно."
+        },
+        {
+          "question": "Что такое использование контекста?",
+          "answer": "Сколько токенов отправлено против того, сколько модели реально понадобилось для ответа. Это ближайшая к метрике потерь величина в работе с затратами на LLM, и она показывает, платите ли вы за повторную отправку материала, который не влияет на результат."
+        },
+        {
+          "question": "Какое исправление даёт наибольшую отдачу?",
+          "answer": "Кэширование промпта на стабильном префиксе. Если системный промпт и загруженные документы не меняются в ходе диалога, кэширование превращает самую большую повторяющуюся плату в долю от неё без изменения качества результата."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/prompt-caching-economics",
+          "label": "Экономика кэширования промптов"
+        },
+        {
+          "slug": "/research/long-context-vs-rag-cost",
+          "label": "Длинный контекст против RAG: стоимость"
+        },
+        {
+          "slug": "/research/cost-per-request-kpi",
+          "label": "Стоимость запроса как KPI"
+        }
+      ]
+    },
+    "tr": {
+      "title": "Bağlam penceresi için iki kez ödersiniz",
+      "titleCore": "Bağlam penceresi için iki kez ödemek",
+      "description": "Bir kez bağlamı içeri koymak için, bir kez de her turda orada kaldığında. Uzun konuşmalar bir LLM faturasındaki en sık bütçelenmemiş kalemdir.",
+      "body": "<p>Bağlam penceresi kapasite olarak ilan edilir: 200,000 token, bir milyon token, ihtiyacınız olan her şeye yer. Ama kapasite faturalama birimi değildir. <em>Gönderdiğiniz</em> şey için ücretlendirilirsiniz ve çok turlu bir konuşmada her turda neredeyse hepsini yeniden gönderirsiniz.</p><p>Bu ikinci ödeme. Yirmi turluk bir konuşmanın başında yüklenen 30,000 tokenlık bir belge 30,000 girdi token değildir. Yaklaşık 600,000 eder, çünkü ikinci tur de onu yeniden gönderir, yirmincisi de.</p><h2>Kimsenin yapmadığı hesap</h2><p>Maliyet, konuşma uzunluğunun doğrusal olarak değil, karesiyle ölçeklenir. Tur sayısını ikiye katlamak, bağlam birikmeye devam ettiği varsayılırsa girdi token sayısını kabaca dörde katlar. &quot;Mesaj başına maliyet&quot; modelleyip mesaj sayısıyla çarpan ekipler uzun oturumları ciddi biçimde düşük tahmin eder ve hata, tam da tutmak istediğiniz kullanıcılarla birlikte büyür.</p><p>Genellikle üçüncü bir ücret de vardır: birçok sağlayıcı, uzun bağlam eşiğinin üzerindeki istekleri prim bir oranla fiyatlandırır. Tek bir ek dosya isteği bu çizgiyi aşırtabilir ve yalnızca çizgiyi geçen token'ları değil, tüm çağrıyı, girdi ve çıktı dahil, yeniden fiyatlandırabilir.</p><h2>Neyi ölçmeli</h2><p><strong>Bağlam kullanımını</strong> izleyin: gönderilen token'lar ile modelin gerçekten ihtiyaç duyduğu token'lar. Bu alanın atık metriğine en yakın şey budur. Girdi token'larını istek başına değil <em>konuşma</em> başına izleyin ve p99'a bakın — medyanın yirmi katı maliyet gösteren oturumlar tam da orada yaşar.</p><p>Uzun bağlam fiyat eşiğini aşan isteklerde uyarı kurun. Bu bir eğim değil bir basamaktır ve günlük toplamda hiçbir şey gibi görünmez.</p><h2>En ucuzdan başlayarak üç düzeltme</h2><p><strong>Sabit öneki önbelleğe alın.</strong> Sistem istemi ve yüklenen belgeler bir konuşma sırasında değişmiyorsa, istem önbelleği tekrarlanan maliyetin küçük bir kısmına inmesini sağlar. Herhangi bir çok turlu ürün için tek başına en yüksek getirili değişikliktir.</p><p><strong>Geçmişi bilerek kırpın.</strong> Eski turlar nadiren yeniden gönderim fiyatını hak eder. Uzun bir konuşmanın önceki kısmını özetleyin ve ham turları atın; konuşmanın akışını korur, bunun için tam bedel ödemeyi bırakırsınız.</p><p><strong>Derlemi değil, alıntıyı gönderin.</strong> Geri getirme tam olarak bunun için var. Pencerenin bir belgenin tamamını tutacak kadar büyük olması, belgenin tamamını oraya koymak için bir gerekçe değildir.</p><h2>İlgili</h2><ul><li><a href=\"/research/prompt-caching-economics\">İstem önbelleğinin ekonomisi</a></li><li><a href=\"/research/long-context-vs-rag-cost\">Uzun bağlam ve RAG maliyeti</a></li><li><a href=\"/research/cost-per-request-kpi\">KPI olarak istek başına maliyet</a></li></ul>",
+      "faq": [
+        {
+          "question": "Uzun bir konuşma neden token sayısının gösterdiğinden pahalıya gelir?",
+          "answer": "Çünkü bağlam yeniden gönderilir. Her tur, şimdiye kadarki tüm konuşmayı girdi olarak içerir; bu yüzden başta yüklenen bir belge sonraki her turda yeniden faturalanır. Maliyet kabaca konuşma uzunluğunun karesiyle büyür, doğrusal olarak değil."
+        },
+        {
+          "question": "Bağlam kullanımı nedir?",
+          "answer": "Gönderilen token'lar ile modelin yanıt vermek için gerçekten ihtiyaç duyduğu token'lar. LLM maliyet çalışmasındaki atık metriğine en yakın şeydir ve çıktıyı hiç etkilemeyen malzemeyi yeniden gönderip göndermediğinizi size söyler."
+        },
+        {
+          "question": "En yüksek getirili düzeltme hangisi?",
+          "answer": "Sabit öneki önbelleğe almak. Sistem istemi ve yüklenen belgeler bir konuşma sırasında değişmiyorsa, önbellek en büyük tekrarlanan ücreti çıktı kalitesinde hiçbir değişiklik olmadan küçük bir kısmına indirir."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/prompt-caching-economics",
+          "label": "Prompt caching ekonomisi"
+        },
+        {
+          "slug": "/research/long-context-vs-rag-cost",
+          "label": "Uzun bağlam ve RAG maliyeti"
+        },
+        {
+          "slug": "/research/cost-per-request-kpi",
+          "label": "KPI olarak istek başına maliyet"
+        }
+      ]
+    },
+    "vi": {
+      "title": "Bạn trả cho cửa sổ ngữ cảnh hai lần",
+      "titleCore": "Trả cho cửa sổ ngữ cảnh hai lần",
+      "description": "Một lần để đưa ngữ cảnh vào, và thêm lần nữa ở mỗi lượt nó còn nằm đó. Hội thoại dài là khoản chi chưa có ngân sách phổ biến nhất trong hóa đơn LLM.",
+      "body": "<p>Cửa sổ ngữ cảnh được quảng cáo như một năng lực: 200,000 token, một triệu token, đủ chỗ cho bất cứ thứ gì bạn cần. Năng lực không phải là đơn vị tính tiền. Bạn bị tính tiền cho những gì bạn <em>gửi đi</em>, và trong một cuộc hội thoại nhiều lượt, bạn gửi lại gần như toàn bộ nội dung đó ở mỗi lượt.</p>\n<p>Đó là lần trả tiền thứ hai. Một tài liệu 30,000 token được nạp ở đầu một cuộc hội thoại hai mươi lượt không phải là 30,000 token đầu vào. Nó gần bằng 600,000, vì lượt hai gửi lại nó, và lượt hai mươi cũng vậy.</p>\n<h2>Phép tính không ai làm</h2>\n<p>Chi phí tăng theo bình phương độ dài cuộc hội thoại, không tuyến tính. Tăng gấp đôi số lượt xấp xỉ làm số token đầu vào tăng gấp bốn, với điều kiện ngữ cảnh tiếp tục tích lũy. Các nhóm mô hình hóa &quot;chi phí mỗi tin nhắn&quot; rồi nhân với số tin nhắn sẽ dự báo thấp hơn nhiều so với thực tế các phiên dài, và sai số tăng đúng ở nhóm người dùng bạn muốn giữ lại nhất.</p>\n<p>Thường còn có khoản phí thứ ba: nhiều nhà cung cấp tính giá cao hơn cho các yêu cầu vượt ngưỡng ngữ cảnh dài. Chỉ một tệp đính kèm thêm cũng có thể đẩy yêu cầu vượt ngưỡng đó và tính lại giá cho toàn bộ lệnh gọi, cả đầu vào lẫn đầu ra, chứ không chỉ phần token vượt ngưỡng.</p>\n<h2>Cần đo gì</h2>\n<p>Theo dõi <strong>mức sử dụng ngữ cảnh</strong>: số token đã gửi so với số token mô hình thực sự cần. Đây là thứ gần nhất với một chỉ số lãng phí trong lĩnh vực này. Theo dõi số token đầu vào theo <em>cuộc hội thoại</em>, không theo yêu cầu, và chú ý đến p99 &mdash; đó là nơi các phiên tốn gấp hai mươi lần mức trung vị sinh ra.</p>\n<p>Đặt cảnh báo cho các yêu cầu vượt ngưỡng giá ngữ cảnh dài. Đây là bước nhảy, không phải độ dốc, và nó sẽ không trông giống gì trong tổng số hằng ngày.</p>\n<h2>Ba cách sửa, rẻ nhất trước</h2>\n<p>\n<strong>Cache phần tiền tố ổn định.</strong> Nếu system prompt và các tài liệu đã nạp không thay đổi trong suốt cuộc hội thoại, prompt caching biến khoản chi lặp lại thành một phần nhỏ của nó. Đây là thay đổi có lợi suất cao nhất cho mọi sản phẩm nhiều lượt.</p>\n<p>\n<strong>Cắt lịch sử có chủ đích.</strong> Các lượt cũ hiếm khi xứng đáng với giá gửi lại. Hãy tóm tắt phần đầu của cuộc hội thoại dài và bỏ các lượt thô; bạn vẫn giữ được mạch chuyện và không phải trả đủ giá cho nó nữa.</p>\n<p>\n<strong>Gửi đoạn trích, không gửi toàn bộ kho tài liệu.</strong> Truy xuất tồn tại chính vì việc này. Việc cửa sổ đủ lớn để chứa cả một tài liệu không phải là lý do để nhét cả tài liệu vào đó.</p>\n<h2>Liên quan</h2>\n<ul>\n<li>\n<a href=\"/research/prompt-caching-economics\">Kinh tế của prompt caching</a>\n</li>\n<li>\n<a href=\"/research/long-context-vs-rag-cost\">Ngữ cảnh dài so với RAG: chi phí</a>\n</li>\n<li>\n<a href=\"/research/cost-per-request-kpi\">Chi phí mỗi yêu cầu như một KPI</a>\n</li>\n</ul>\n",
+      "faq": [
+        {
+          "question": "Vì sao một cuộc hội thoại dài tốn nhiều hơn số token đếm được?",
+          "answer": "Vì ngữ cảnh được gửi lại. Mỗi lượt bao gồm toàn bộ cuộc hội thoại cho đến nay làm đầu vào, nên tài liệu nạp ở đầu bị tính tiền lại ở mọi lượt sau đó. Chi phí tăng xấp xỉ theo bình phương độ dài cuộc hội thoại, không tuyến tính."
+        },
+        {
+          "question": "Mức sử dụng ngữ cảnh là gì?",
+          "answer": "Số token đã gửi so với số token mô hình thực sự cần để trả lời. Đây là thứ gần nhất với một chỉ số lãng phí trong công việc tối ưu chi phí LLM, và nó cho bạn biết liệu bạn có đang trả tiền để gửi lại những nội dung không ảnh hưởng đến đầu ra hay không."
+        },
+        {
+          "question": "Cách sửa có lợi suất cao nhất là gì?",
+          "answer": "Prompt caching cho phần tiền tố ổn định. Nếu system prompt và các tài liệu đã nạp không đổi trong suốt cuộc hội thoại, caching biến khoản chi lặp lại lớn nhất thành một phần nhỏ của chính nó mà không làm thay đổi chất lượng đầu ra."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/prompt-caching-economics",
+          "label": "Kinh tế của prompt caching"
+        },
+        {
+          "slug": "/research/long-context-vs-rag-cost",
+          "label": "Ngữ cảnh dài so với RAG: chi phí"
+        },
+        {
+          "slug": "/research/cost-per-request-kpi",
+          "label": "Chi phí mỗi yêu cầu như một KPI"
+        }
+      ]
+    },
+    "ar": {
+      "title": "تدفع ثمن نافذة السياق مرتين",
+      "titleCore": "دفع ثمن نافذة السياق مرتين",
+      "description": "مرة لإدخال السياق، ومرة أخرى في كل دورة يبقى فيها. المحادثات الطويلة هي أكثر بنود فاتورة LLM شيوعاً دون ميزانية.",
+      "body": "<p>يُعلَن عن نافذة السياق بوصفها سعة: 200,000 رمز، أو مليون رمز، مساحة لكل ما تحتاجه. لكن السعة ليست وحدة الفوترة. أنت تُحاسَب على ما <em>ترسله</em>، وفي المحادثة متعددة الدورات ترسل معظمه من جديد في كل دورة.</p><p>هذه هي الدفعة الثانية. مستند من 30,000 رمز يُحمَّل في بداية محادثة من عشرين دورة لا يساوي 30,000 رمز إدخال، بل يقارب 600,000، لأن الدورة الثانية تعيد إرساله، وكذلك الدورة العشرون.</p><h2>الحساب الذي لا يجريه أحد</h2><p>تتناسب التكلفة مع مربع طول المحادثة لا مع طولها خطياً. مضاعفة عدد الدورات تضاعف رموز الإدخال أربع مرات تقريباً، بافتراض استمرار تراكم السياق. الفرق التي تنمذج &ldquo;التكلفة لكل رسالة&rdquo; وتضربها في عدد الرسائل تقلّل كثيراً من توقع الجلسات الطويلة، ويكبر الخطأ مع المستخدمين الذين تريد الاحتفاظ بهم أكثر من غيرهم.</p><p>وكثيراً ما يضاف رسم ثالث: يسعّر عدد من المزودين الطلبات التي تتجاوز عتبة السياق الطويل بسعر مرتفع. قد يدفع مرفق إضافي واحد الطلب عبر هذا الخط فيُعاد تسعير الاستدعاء بأكمله، إدخالاً وإخراجاً، لا الرموز التي تجاوزت العتبة فقط.</p><h2>ما الذي يجب قياسه</h2><p>تتبّع <strong>استخدام السياق</strong>: الرموز المرسلة مقابل الرموز التي احتاجها النموذج فعلاً. وهو أقرب ما في هذا المجال إلى مقياس للهدر. تتبّع رموز الإدخال لكل <em>محادثة</em> لا لكل طلب، وراقب المئين 99 &mdash; فهناك تعيش الجلسات التي تكلّف عشرين ضعف الوسيط.</p><p>نبّه عند تجاوز الطلبات عتبة سعر السياق الطويل. فهي قفزة مفاجئة لا انحدار تدريجي، ولن تبدو كشيء في الإجمالي اليومي.</p><h2>ثلاثة حلول، من الأرخص أولاً</h2><p><strong>خزّن البادئة الثابتة مؤقتاً.</strong> إذا لم تتغير موجّهات النظام والمستندات المحمّلة أثناء المحادثة، فإن التخزين المؤقت للموجّه يحوّل التكلفة المتكررة إلى جزء يسير منها. هذا هو التغيير الأعلى عائداً لأي منتج متعدد الدورات.</p><p><strong>قلّم السجل عن قصد.</strong> نادراً ما تستحق الدورات الأقدم سعر إعادة إرسالها. لخّص الجزء المبكر من المحادثة الطويلة وأسقط الدورات الخام؛ تحتفظ بالخيط وتتوقف عن دفع كامل الكلفة عنه.</p><p><strong>أرسل المقتطف لا المدونة كلها.</strong> الاسترجاع (retrieval) موجود لهذا بالضبط. كون النافذة كبيرة بما يكفي لاستيعاب مستند كامل ليس حجة لوضع مستند كامل فيها.</p><h2>ذات صلة</h2><ul><li><a href=\"/research/prompt-caching-economics\">اقتصاديات التخزين المؤقت للموجّه</a></li><li><a href=\"/research/long-context-vs-rag-cost\">السياق الطويل مقابل تكلفة RAG</a></li><li><a href=\"/research/cost-per-request-kpi\">التكلفة لكل طلب كمؤشر أداء</a></li></ul>",
+      "faq": [
+        {
+          "question": "لماذا تكلّف المحادثة الطويلة أكثر مما يوحي به عدد الرموز؟",
+          "answer": "لأن السياق يُعاد إرساله. كل دورة تتضمن المحادثة كلها حتى تلك اللحظة كإدخال، فيُفوتر المستند المحمّل في البداية من جديد في كل دورة لاحقة. وتنمو التكلفة تقريباً مع مربع طول المحادثة لا خطياً."
+        },
+        {
+          "question": "ما استخدام السياق؟",
+          "answer": "الرموز المرسلة مقابل الرموز التي احتاجها النموذج فعلاً للإجابة. وهو أقرب ما في عمل تكلفة LLM إلى مقياس للهدر، ويخبرك إن كنت تدفع لإعادة إرسال مادة لا تؤثر في المخرجات أبداً."
+        },
+        {
+          "question": "ما الحل الأعلى عائداً؟",
+          "answer": "التخزين المؤقت للموجّه على البادئة الثابتة. إذا لم تتغير موجّهات النظام والمستندات المحمّلة أثناء المحادثة، فإن التخزين المؤقت يحوّل أكبر رسم متكرر إلى جزء منه دون أي تغيير في جودة المخرجات."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/prompt-caching-economics",
+          "label": "اقتصاديات التخزين المؤقت للموجّه"
+        },
+        {
+          "slug": "/research/long-context-vs-rag-cost",
+          "label": "السياق الطويل مقابل تكلفة RAG"
+        },
+        {
+          "slug": "/research/cost-per-request-kpi",
+          "label": "التكلفة لكل طلب كمؤشر أداء"
+        }
+      ]
+    },
+    "it": {
+      "title": "Paghi due volte la finestra di contesto",
+      "titleCore": "Pagare due volte la finestra di contesto",
+      "description": "Una volta per inserire il contesto, poi a ogni turno in cui resta lì. Le conversazioni lunghe sono la voce non budgetata più comune in una fattura LLM.",
+      "body": "<p>Una finestra di contesto viene pubblicizzata come capacità: 200.000 token, un milione, spazio per ciò che serve. La capacità però non è l'unità di fatturazione. Ti viene addebitato ciò che <em>invii</em>, e in una conversazione a più turni invii di nuovo quasi tutto a ogni singolo turno.</p><p>Questo è il secondo pagamento. Un documento di 30.000 token caricato all'inizio di una conversazione di venti turni non equivale a 30.000 token di input: ne vale circa 600.000, perché il turno due lo reinvia, e così anche il turno venti.</p><h2>Il calcolo che nessuno fa</h2><p>Il costo cresce con il quadrato della lunghezza della conversazione, non linearmente. Raddoppiare il numero di turni moltiplica per circa quattro i token di input, supponendo che il contesto continui ad accumularsi. I team che modellano il &quot;costo per messaggio&quot; e lo moltiplicano per il numero di messaggi sottostimano gravemente le sessioni lunghe, e l'errore cresce proprio con gli utenti che vorresti trattenere.</p><p>Spesso c'è anche un terzo addebito: molti provider applicano una tariffa maggiorata alle richieste che superano una soglia di contesto lungo. Un solo allegato in più può far superare quella soglia e riprezzare l'intera chiamata, input e output compresi, non solo i token che l'hanno superata.</p><h2>Cosa misurare</h2><p>Tieni traccia dell'<strong>utilizzo del contesto</strong>: token inviati rispetto ai token che il modello ha effettivamente richiesto. È la cosa più vicina a una metrica di spreco in questo ambito. Tieni traccia dei token di input per <em>conversazione</em>, non per richiesta, e osserva il p99: lì si trovano le sessioni che costano venti volte la mediana.</p><p>Imposta un avviso sulle richieste che superano la soglia di prezzo del contesto lungo. È un salto a gradino, non un gradiente, e non si noterà in alcun totale giornaliero.</p><h2>Tre correzioni, dalla più economica</h2><p><strong>Metti in cache il prefisso stabile.</strong> Se il system prompt e i documenti caricati non cambiano durante una conversazione, il prompt caching trasforma il costo ripetuto in una frazione di sé. È il cambiamento con il ritorno più alto per qualsiasi prodotto multi-turno.</p><p><strong>Riduci la cronologia in modo deliberato.</strong> I turni più vecchi raramente giustificano il prezzo della loro ripetizione. Riassumi la parte iniziale di una conversazione lunga e scarta i turni grezzi: mantieni il filo e smetti di pagare per intero.</p><p><strong>Invia l'estratto, non il corpus.</strong> Il retrieval esiste proprio per questo. Il fatto che la finestra sia abbastanza grande da contenere un intero documento non è un motivo per inserirvelo interamente.</p><h2>Correlati</h2><ul><li><a href=\"/research/prompt-caching-economics\">Economia del prompt caching</a></li><li><a href=\"/research/long-context-vs-rag-cost\">Contesto lungo vs costo del RAG</a></li><li><a href=\"/research/cost-per-request-kpi\">Costo per richiesta come KPI</a></li></ul>",
+      "faq": [
+        {
+          "question": "Perché una conversazione lunga costa più di quanto suggerisca il conteggio dei token?",
+          "answer": "Perché il contesto viene reinviato. Ogni turno include tutta la conversazione precedente come input, quindi un documento caricato all'inizio viene fatturato di nuovo a ogni turno successivo. Il costo cresce circa con il quadrato della lunghezza, non linearmente."
+        },
+        {
+          "question": "Cos'è l'utilizzo del contesto?",
+          "answer": "I token inviati rispetto ai token che il modello ha effettivamente richiesto per rispondere. È la cosa più vicina a una metrica di spreco nell'analisi dei costi LLM, e indica se stai pagando per reinviare materiale che non influenza mai l'output."
+        },
+        {
+          "question": "Qual è la correzione con il ritorno più alto?",
+          "answer": "Il prompt caching sul prefisso stabile. Se il system prompt e i documenti caricati non cambiano durante una conversazione, la cache riduce l'addebito ripetuto più grande a una frazione di sé, senza alcuna modifica alla qualità dell'output."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/prompt-caching-economics",
+          "label": "Economia del prompt caching"
+        },
+        {
+          "slug": "/research/long-context-vs-rag-cost",
+          "label": "Contesto lungo vs costo del RAG"
+        },
+        {
+          "slug": "/research/cost-per-request-kpi",
+          "label": "Costo per richiesta come KPI"
+        }
+      ]
+    },
+    "ko": {
+      "title": "컨텍스트 윈도우 비용을 두 번 내는 셈",
+      "titleCore": "컨텍스트 윈도우에 두 번 지불하기",
+      "description": "한 번은 컨텍스트를 넣을 때, 그다음에는 그 컨텍스트가 남아 있는 매 턴마다 또 냅니다. 긴 대화는 LLM 청구서에서 예산에 잡히지 않는 항목 중 가장 흔합니다.",
+      "body": "<p>컨텍스트 윈도우는 용량으로 광고됩니다. 200,000 토큰, 백만 토큰, 필요한 만큼 담을 수 있다는 식입니다. 하지만 용량은 과금 단위가 아닙니다. 과금되는 것은 <em>보내는</em> 양이며, 여러 턴으로 이어지는 대화에서는 매 턴마다 거의 전부를 다시 보냅니다.</p><p>이것이 두 번째 지불입니다. 20턴짜리 대화의 시작에 올린 30,000 토큰 문서는 입력 30,000 토큰이 아니라 600,000 토큰에 가깝습니다. 두 번째 턴도, 스무 번째 턴도 그 문서를 다시 보내기 때문입니다.</p><h2>아무도 계산하지 않는 산술</h2><p>비용은 대화 길이에 선형으로 늘지 않고 제곱에 비례해 늘어납니다. 턴 수가 두 배가 되면 컨텍스트가 계속 쌓인다고 가정할 때 입력 토큰은 대략 네 배가 됩니다. &quot;메시지당 비용&quot;을 모델링하고 메시지 수를 곱하는 팀은 긴 세션을 크게 과소 예측하며, 그 오차는 바로 여러분이 붙잡고 싶은 사용자에게서 가장 크게 나타납니다.</p><p>여기에 세 번째 비용이 붙는 경우도 많습니다. 여러 제공업체는 긴 컨텍스트 임계값을 넘는 요청에 할증 요율을 적용합니다. 첨부 파일 하나가 그 선을 넘기면, 초과한 토큰만이 아니라 입력과 출력을 포함한 호출 전체가 다시 가격이 매겨질 수 있습니다.</p><h2>무엇을 측정할 것인가</h2><p><strong>컨텍스트 활용률</strong>을 추적하세요. 보낸 토큰 대비 모델이 실제로 필요로 한 토큰의 비율입니다. 이 분야에서 낭비 지표에 가장 가까운 값입니다. 입력 토큰은 요청이 아니라 <em>대화</em> 단위로 집계하고 p99를 지켜보세요 &mdash; 중앙값보다 스무 배 비싼 세션이 바로 그 구간에 있습니다.</p><p>장문 컨텍스트 가격 임계값을 넘는 요청에 대해 알림을 설정하세요. 이것은 점진적인 변화가 아니라 계단식 변화이므로, 일별 합계에서는 아무것도 눈에 띄지 않습니다.</p><h2>가장 저렴한 것부터, 세 가지 해결책</h2><p><strong>안정적인 접두부를 캐시하세요.</strong> 대화 중에 시스템 프롬프트와 로드된 문서가 바뀌지 않는다면, 프롬프트 캐싱으로 반복되는 비용을 극히 일부로 줄일 수 있습니다. 여러 턴으로 이루어진 제품이라면 이것이 가장 수익률이 높은 단일 변경입니다.</p><p><strong>기록을 의도적으로 줄이세요.</strong> 오래된 턴은 다시 보내는 값만큼의 가치를 거의 하지 못합니다. 긴 대화의 앞부분을 요약하고 원시 턴은 버리세요. 흐름은 유지하면서 그 부분에 대해 전액을 계속 내는 일은 멈출 수 있습니다.</p><p><strong>코퍼스가 아니라 발췌문을 보내세요.</strong> 검색(retrieval)이 바로 이런 용도입니다. 창이 문서 전체를 담을 만큼 크다고 해서 문서 전체를 넣어야 하는 이유가 되지는 않습니다.</p><h2>관련 글</h2><ul><li><a href=\"/research/prompt-caching-economics\">프롬프트 캐싱의 경제성</a></li><li><a href=\"/research/long-context-vs-rag-cost\">장문 컨텍스트 vs RAG 비용</a></li><li><a href=\"/research/cost-per-request-kpi\">KPI로서의 요청당 비용</a></li></ul>",
+      "faq": [
+        {
+          "question": "긴 대화는 토큰 수에서 보이는 것보다 왜 더 비쌀까요?",
+          "answer": "컨텍스트가 다시 전송되기 때문입니다. 각 턴은 지금까지의 대화 전체를 입력으로 포함하므로, 처음에 올린 문서도 이후 모든 턴마다 다시 과금됩니다. 비용은 대화 길이에 선형이 아니라 대략 그 제곱에 비례해 늘어납니다."
+        },
+        {
+          "question": "컨텍스트 활용률이란 무엇인가요?",
+          "answer": "모델이 답변하는 데 실제로 필요했던 토큰 대비 보낸 토큰의 비율입니다. LLM 비용 분석에서 낭비 지표에 가장 가까운 값이며, 결과에 영향을 주지 않는 자료를 다시 보내는 데 돈을 쓰고 있는지 알려 줍니다."
+        },
+        {
+          "question": "수익률이 가장 높은 해결책은 무엇인가요?",
+          "answer": "안정적인 접두부에 대한 프롬프트 캐싱입니다. 대화 중 시스템 프롬프트와 로드된 문서가 바뀌지 않는다면, 캐싱으로 가장 큰 반복 비용을 출력 품질 변화 없이 극히 일부로 줄일 수 있습니다."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/prompt-caching-economics",
+          "label": "프롬프트 캐싱의 경제성"
+        },
+        {
+          "slug": "/research/long-context-vs-rag-cost",
+          "label": "장문 컨텍스트 vs RAG 비용"
+        },
+        {
+          "slug": "/research/cost-per-request-kpi",
+          "label": "KPI로서의 요청당 비용"
+        }
+      ]
+    },
+    "nl": {
+      "title": "Je betaalt twee keer voor het contextvenster",
+      "titleCore": "Twee keer betalen voor het contextvenster",
+      "description": "Eén keer om de context erin te zetten, en nog eens bij elke beurt dat hij blijft staan. Lange gesprekken zijn de grootste niet-begrote LLM-post.",
+      "body": "<p>Een contextvenster wordt aangeprezen als capaciteit: 200,000 tokens, een miljoen tokens, ruimte voor alles wat je nodig hebt. Capaciteit is niet de factureringseenheid. Je betaalt voor wat je <em>verstuurt</em>, en in een gesprek met meerdere beurten stuur je het grootste deel elke beurt opnieuw.</p><p>Dat is de tweede betaling. Een document van 30,000 tokens dat aan het begin van een gesprek van twintig beurten wordt geladen, is niet 30,000 input-tokens. Het is dichter bij 600,000, want beurt twee stuurt het opnieuw mee, en beurt twintig ook.</p><h2>De rekensom die niemand maakt</h2><p>De kosten schalen met het kwadraat van de gesprekslengte, niet lineair. Een verdubbeling van het aantal beurten vervierdubbelt ruwweg de input-tokens, als de context zich blijft opstapelen. Teams die &quot;kosten per bericht&quot; modelleren en met het aantal berichten vermenigvuldigen, onderschatten lange sessies zwaar, en de fout groeit juist bij de gebruikers die je het liefst behoudt.</p><p>Er komt vaak nog een derde kostenpost bij: veel aanbieders rekenen voor verzoeken boven een long-contextdrempel een hoger tarief. Eén extra bijlage kan een verzoek over die grens duwen en de hele aanroep herprijzen, input en output, niet alleen de tokens die over de grens gingen.</p><h2>Wat je moet meten</h2><p>Volg de <strong>contextbenutting</strong>: verstuurde tokens ten opzichte van tokens die het model echt nodig had. Het is het dichtstbijzijnde wat dit vakgebied heeft aan een verspillingsmetriek. Volg input-tokens per <em>gesprek</em>, niet per verzoek, en kijk naar de p99 &mdash; daar zitten de sessies die twintig keer zoveel kosten als de mediaan.</p><p>Stel alerts in op verzoeken die de long-contextprijsdrempel overschrijden. Het is een sprong, geen glijdende schaal, en het ziet er in een dagtotaal nergens naar uit.</p><h2>Drie oplossingen, de goedkoopste eerst</h2><p><strong>Cache het stabiele prefix.</strong> Als de systeemprompt en de geladen documenten tijdens een gesprek niet veranderen, maakt prompt-caching van de herhaalde kosten een fractie. Dit is de enige wijziging met het hoogste rendement voor elk product met meerdere beurten.</p><p><strong>Kort de geschiedenis bewust in.</strong> Oudere beurten verdienen zelden hun herverzendprijs. Vat het eerdere deel van een lang gesprek samen en laat de ruwe beurten vallen; je houdt de draad en stopt met het betalen van de volle prijs ervoor.</p><p><strong>Stuur het fragment, niet het corpus.</strong> Retrieval bestaat precies hiervoor. Dat het venster groot genoeg is voor een heel document, is geen argument om een heel document erin te stoppen.</p><h2>Gerelateerd</h2><ul><li><a href=\"/research/prompt-caching-economics\">Kosteneconomie van prompt-caching</a></li><li><a href=\"/research/long-context-vs-rag-cost\">Kosten van lange context versus RAG</a></li><li><a href=\"/research/cost-per-request-kpi\">Kosten per verzoek als KPI</a></li></ul>",
+      "faq": [
+        {
+          "question": "Waarom kost een lang gesprek meer dan het aantal tokens doet vermoeden?",
+          "answer": "Omdat de context opnieuw wordt verstuurd. Elke beurt bevat het hele gesprek tot dan toe als input, dus een document dat aan het begin is geladen, wordt bij elke volgende beurt opnieuw gefactureerd. De kosten groeien ruwweg met het kwadraat van de gesprekslengte, niet lineair."
+        },
+        {
+          "question": "Wat is contextbenutting?",
+          "answer": "Verstuurde tokens ten opzichte van tokens die het model echt nodig had om te antwoorden. Het is het dichtstbijzijnde wat er is aan een verspillingsmetriek in LLM-kostenwerk, en het laat zien of je betaalt voor het opnieuw versturen van materiaal dat de output nooit beïnvloedt."
+        },
+        {
+          "question": "Wat is de oplossing met het hoogste rendement?",
+          "answer": "Prompt-caching op het stabiele prefix. Als de systeemprompt en de geladen documenten tijdens een gesprek niet veranderen, maakt caching van de grootste herhaalde kostenpost een fractie van zichzelf, zonder dat de outputkwaliteit verandert."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/prompt-caching-economics",
+          "label": "Kosteneconomie van prompt-caching"
+        },
+        {
+          "slug": "/research/long-context-vs-rag-cost",
+          "label": "Kosten van lange context versus RAG"
+        },
+        {
+          "slug": "/research/cost-per-request-kpi",
+          "label": "Kosten per verzoek als KPI"
+        }
+      ]
+    },
+    "zh": {
+      "title": "你为上下文窗口付了两次钱",
+      "titleCore": "为上下文窗口付两次钱",
+      "description": "第一次是把上下文放进去，之后每一轮它留在那里，又要付一次。长对话是 LLM 账单里最常见的无预算项。",
+      "body": "<p>上下文窗口被宣传为容量：200,000 个 token，一百万个 token，足够装下你需要的一切。但容量不是计费单位。你付的是你<em>发送</em>的部分，而在多轮对话里，每一轮你几乎都要把它再发送一遍。</p>\n\n<p>这就是第二次付款。在二十轮对话开始时加载的一份 30,000 token 文档，并不是 30,000 个输入 token。它更接近 600,000，因为第二轮会重新发送它，第二十轮也会。</p>\n\n<h2>没人去算的那笔账</h2>\n<p>成本随对话长度的平方增长，而不是线性增长。假设上下文持续累积，轮数翻倍，输入 token 大约翻两番。那些用&quot;每条消息成本&quot;乘以消息数来估算的团队，会严重低估长会话，而误差恰恰会落在你最想留住的用户身上。</p>\n\n<p>往往还有第三笔费用：许多供应商对超过长上下文阈值的请求收取溢价。一个额外的附件就可能让一次请求越过这条线，从而重新定价整个调用，包括输入和输出，而不只是越线的那部分 token。</p>\n\n<h2>应该测量什么</h2>\n<p>跟踪<strong>上下文利用率</strong>：发送的 token 与模型真正需要的 token 之比。它是这个领域最接近浪费指标的东西。按<em>对话</em>而不是按请求跟踪输入 token，并关注 p99 &mdash; 花费达到中位数二十倍的会话，正是在那里出现的。</p>\n\n<p>对超过长上下文价格阈值的请求设置告警。它是阶跃变化，不是渐变，而且在每日总量里看不出任何异常。</p>\n\n<h2>三种修复，按成本从低到高</h2>\n<p>\n<strong>缓存稳定的前缀。</strong>如果系统提示和已加载的文档在对话期间不变，提示缓存可以把重复的成本降到其中一小部分。对任何多轮产品来说，这都是回报最高的改动。</p>\n\n<p>\n<strong>有意识地裁剪历史。</strong>较早的轮次很少值得它们的重发价格。把长对话的前半部分总结成摘要，丢弃原始轮次；你保住了上下文脉络，也不再为它付全额运费。</p>\n\n<p>\n<strong>发送片段，而不是整个语料。</strong>检索正是为此而存在的。窗口大到能装下整份文档，并不是把整份文档塞进去的理由。</p>\n\n<h2>相关阅读</h2>\n<ul>\n<li>\n<a href=\"/research/prompt-caching-economics\">提示缓存的经济学</a>\n</li>\n<li>\n<a href=\"/research/long-context-vs-rag-cost\">长上下文与 RAG 的成本对比</a>\n</li>\n<li>\n<a href=\"/research/cost-per-request-kpi\">把每次请求成本作为 KPI</a>\n</li>\n</ul>",
+      "faq": [
+        {
+          "question": "为什么长对话的成本高于 token 数量所显示的？",
+          "answer": "因为上下文会被重复发送。每一轮都把到目前为止的整个对话作为输入，因此开头加载的文档会在之后的每一轮被再次计费。成本大致随对话长度的平方增长，而不是线性增长。"
+        },
+        {
+          "question": "什么是上下文利用率？",
+          "answer": "发送的 token 数与模型回答实际需要的 token 数之比。它是 LLM 成本工作中最接近浪费指标的东西，能告诉你是否在为那些从未影响输出的材料重复付费。"
+        },
+        {
+          "question": "回报最高的修复是什么？",
+          "answer": "对稳定前缀使用提示缓存。如果系统提示和已加载的文档在对话期间不变，缓存可以把最大的重复性费用降到其中一小部分，而输出质量不受影响。"
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/prompt-caching-economics",
+          "label": "提示缓存的经济学"
+        },
+        {
+          "slug": "/research/long-context-vs-rag-cost",
+          "label": "长上下文与 RAG 的成本对比"
+        },
+        {
+          "slug": "/research/cost-per-request-kpi",
+          "label": "把每次请求成本作为 KPI"
         }
       ]
     }

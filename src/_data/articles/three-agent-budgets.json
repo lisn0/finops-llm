@@ -263,6 +263,176 @@
           "label": "التكلفة لكل مهمة ناجحة"
         }
       ]
+    },
+    "id": {
+      "title": "Tiga anggaran yang dibutuhkan setiap agen otonom",
+      "titleCore": "Tiga anggaran yang dibutuhkan setiap agen otonom",
+      "description": "Desain runtime untuk anggaran permintaan, alur kerja, dan harian yang membatasi belanja agen otonom tanpa menyembunyikan kegagalan kualitas.",
+      "body": "<p>Agen otonom membutuhkan lebih dari sekadar peringatan pengeluaran bulanan. Ia membutuhkan tiga anggaran yang ditegakkan di dalam loop-nya: <strong>anggaran permintaan</strong> untuk satu panggilan model, <strong>anggaran alur kerja</strong> untuk seluruh tugas, dan <strong>anggaran harian</strong> untuk pemilik atau tenant. Masing-masing menangkap mode kegagalan yang berbeda.</p><h2>1. Anggaran permintaan</h2><p>Anggaran permintaan membatasi token, fan-out alat, latensi, atau dolar untuk satu percobaan. Anggaran ini melindungi dari konteks yang terlalu besar, output yang tidak terduga panjangnya, atau alat yang memicu panggilan bersarang. Terapkan sebelum permintaan ke penyedia dan sebelum setiap pengiriman alat. Batas lunak dapat menurunkan model; batas keras menolak percobaan dengan alasan yang eksplisit.</p><h2>2. Anggaran alur kerja</h2><p>Anggaran alur kerja mengikuti satu intensi pengguna melintasi giliran, percobaan ulang, fallback, dan subagen. Anggaran ini membutuhkan ID korelasi dan buku besar yang berjalan, bukan penghitung lokal di satu proses. Hentikan ketika buku besar melewati batasnya, meskipun setiap permintaan individual tetap di bawah limitnya. Inilah kontrol yang menangkap kedalaman delegasi dan loop yang tidak konvergen.</p><h2>3. Anggaran harian</h2><p>Anggaran harian membatasi total pengeluaran untuk tim, tenant, fitur, atau akun layanan. Ini adalah kontrol keadilan dan radius dampak. Ketika hampir habis, alihkan pekerjaan yang memenuhi syarat ke batch atau model yang lebih kecil, dan sisihkan kapasitas untuk alur kerja bernilai tinggi. Atur ulang sesuai zona waktu yang ditetapkan dan catat pengaturan ulang tersebut di buku besar.</p><h2>Buat penolakan anggaran berguna</h2><p>Penolakan anggaran harus menyebutkan anggaran mana yang terpicu, berapa yang sudah terpakai, dan pemulihan apa yang diizinkan. Kembalikan status yang bisa dilanjutkan, bukan jawaban kosong yang diam-diam. Keluarkan event yang tidak dapat diubah untuk setiap reservasi, pengeluaran, pelepasan, dan penolakan agar tim finance dapat mencocokkan buku besar dengan faktur penyedia.</p><h2>Pasangkan anggaran dengan kualitas</h2><p>Anggaran bukan izin untuk menurunkan kualitas setiap respons. Pantau biaya per tugas yang berhasil, tingkat penyelesaian, latensi, serta kualitas dari pengguna atau evaluator bersama data penolakan. Kebijakan anggaran dianggap sehat ketika ia menghentikan pekerjaan yang lepas kendali sambil tetap menjaga SLO kualitas untuk alur kerja yang diizinkan.</p><p>Tiga anggaran menciptakan tiga batas: satu percobaan, satu hasil, dan satu periode. Bersama-sama, ketiganya mengubah agen tanpa batas menjadi sistem yang bisa dioperasikan dan diaudit.</p><h2>Terkait</h2><ul><li>Pagar pembatas belanja agen</li><li>Tata kelola anggaran LLM</li><li>Biaya per tugas yang berhasil</li></ul>",
+      "faq": [
+        {
+          "question": "Apa saja tiga anggaran yang dibutuhkan agen otonom?",
+          "answer": "Anggaran permintaan membatasi satu percobaan model, anggaran alur kerja membatasi keseluruhan tugas, dan anggaran harian membatasi total pengeluaran untuk pemilik, tenant, atau layanan."
+        },
+        {
+          "question": "Di mana anggaran agen sebaiknya ditegakkan?",
+          "answer": "Batas permintaan ditegakkan sebelum panggilan penyedia dan pengiriman alat, batas alur kerja di seluruh buku besar korelasi, dan batas harian di batas layanan bersama atau tenant."
+        },
+        {
+          "question": "Apa yang harus terjadi ketika agen mencapai batas anggaran?",
+          "answer": "Kembalikan penolakan eksplisit yang menyebutkan anggaran dan jumlahnya, keluarkan event yang bisa diaudit, dan sediakan pemulihan yang jelas seperti melanjutkan, menurunkan model, atau eskalasi ke manusia."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/agent-spend-guardrails",
+          "label": "Pagar pembatas belanja agen"
+        },
+        {
+          "slug": "/research/llm-budget-governance",
+          "label": "Tata kelola anggaran LLM"
+        },
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "Biaya per tugas yang berhasil"
+        }
+      ]
+    },
+    "pl": {
+      "title": "Trzy budżety każdego autonomicznego agenta",
+      "titleCore": "Trzy budżety wymuszane w pętli autonomicznego agenta",
+      "description": "Projekt środowiska uruchomieniowego dla budżetów żądania, workflow i dziennego, który ogranicza wydatki agentów bez ukrywania błędów jakości.",
+      "body": "<p>Autonomiczny agent potrzebuje czegoś więcej niż miesięcznego alertu o wydatkach. Potrzebuje trzech budżetów egzekwowanych wewnątrz swojej pętli: <strong>budżetu żądania</strong> na jedno wywołanie modelu, <strong>budżetu workflow</strong> na całe zadanie i <strong>budżetu dziennego</strong> dla właściciela lub tenanta. Każdy wychwytuje inny tryb awarii.</p><h2>1. Budżet żądania</h2><p>Budżet żądania ogranicza tokeny, liczbę wywołań narzędzi, opóźnienie lub dolary dla jednej próby. Chroni przed przerośniętym kontekstem, nieoczekiwanie długim wyjściem albo narzędziem wywołującym zagnieżdżone żądanie. Egzekwuj go przed żądaniem do dostawcy i przed każdym wywołaniem narzędzia. Miękki limit może obniżyć model; twardy limit odrzuca próbę z jawnym powodem.</p><h2>2. Budżet workflow</h2><p>Budżet workflow śledzi jedną intencję użytkownika przez tury, ponowienia, fallbacki i subagenty. Potrzebuje identyfikatora korelacji i bieżącego rejestru, a nie licznika lokalnego dla jednego procesu. Zatrzymaj pracę, gdy rejestr przekroczy limit, nawet jeśli każde pojedyncze żądanie mieściło się w swoim. To kontrola, która wychwytuje zbyt głęboką delegację i pętle, które nie zbiegają się do wyniku.</p><h2>3. Budżet dzienny</h2><p>Budżet dzienny ogranicza zagregowane wydatki zespołu, tenanta, funkcji lub konta serwisowego. To kontrola uczciwego podziału i promienia rażenia. Gdy jest prawie wyczerpany, kieruj uprawnioną pracę do batchy lub mniejszych modeli, a zarezerwowaną pojemność zachowaj dla workflow o wysokiej wartości. Resetuj go w zadeklarowanej strefie czasowej i zapisuj reset w rejestrze.</p><h2>Niech odmowy będą użyteczne</h2><p>Odmowa budżetu powinna wskazać, który budżet się wyczerpał, ile zużyto i jakie odzyskanie jest dozwolone. Zwracaj stan, który można wznowić, a nie ciche puste odpowiedzi. Emituj niezmienne zdarzenie dla każdej rezerwacji, wydatku, zwolnienia i odmowy, aby finanse mogły uzgodnić rejestr z fakturami dostawców.</p><h2>Połącz budżety z jakością</h2><p>Budżety nie dają zgody na pogorszenie każdej odpowiedzi. Śledź koszt zakończonych z sukcesem zadań, wskaźnik ukończeń, opóźnienie oraz jakość oceniany przez użytkownika lub ewaluatora, obok odmów. Polityka budżetowa jest zdrowa, gdy zatrzymuje niekontrolowaną pracę, a jednocześnie utrzymuje SLO jakości dla dozwolonych workflow.</p><p>Trzy budżety tworzą trzy granice: jedną próbę, jeden wynik i jeden okres. Razem zamieniają nieograniczonego agenta w system, który da się obsługiwać i audytować.</p><h2>Powiązane</h2><ul><li>Zabezpieczenia wydatków agentów</li><li>Zarządzanie budżetem LLM</li><li>Koszt na zakończone zadanie</li></ul>",
+      "faq": [
+        {
+          "question": "Jakie trzy budżety potrzebuje autonomiczny agent?",
+          "answer": "Budżet żądania ogranicza jedną próbę modelu, budżet workflow ogranicza całe zadanie, a budżet dzienny ogranicza zagregowane wydatki właściciela, tenanta lub usługi."
+        },
+        {
+          "question": "Gdzie należy egzekwować budżety agentów?",
+          "answer": "Limity żądań egzekwuj przed wywołaniami modelu i narzędzi, limity workflow w rejestrze korelacji, a dzienne na granicy wspólnej usługi lub tenanta."
+        },
+        {
+          "question": "Co powinno się stać, gdy agent osiągnie budżet?",
+          "answer": "Zwróć jawną odmowę z budżetem i kwotą, wyemituj zdarzenie możliwe do audytu i zapewnij określone odzyskanie, np. wznowienie, obniżenie modelu lub eskalację do człowieka."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/agent-spend-guardrails",
+          "label": "Zabezpieczenia wydatków agentów"
+        },
+        {
+          "slug": "/research/llm-budget-governance",
+          "label": "Zarządzanie budżetem LLM"
+        },
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "Koszt na zakończone zadanie"
+        }
+      ]
+    },
+    "ru": {
+      "title": "Три бюджета, которые нужны каждому автономному агенту",
+      "titleCore": "Три бюджета, которые нужны каждому автономному агенту",
+      "description": "Схема времени выполнения для бюджетов запроса, рабочего процесса и дня, которая ограничивает расходы агентов и не скрывает сбои качества.",
+      "body": "<p>Автономному агенту нужно больше, чем оповещение о месячных расходах. Ему нужны три бюджета, которые соблюдаются внутри его цикла: <strong>бюджет запроса</strong> на один вызов модели, <strong>бюджет рабочего процесса</strong> на всю задачу и <strong>дневной бюджет</strong> для владельца или арендатора. Каждый ловит свой режим сбоя.</p><h2>1. Бюджет запроса</h2><p>Бюджет запроса ограничивает токены, количество вызовов инструментов, задержку или доллары на одну попытку. Он защищает от чрезмерно большого контекста, неожиданно длинного вывода или инструмента, который вызывает вложенный запрос. Применяйте его до запроса к провайдеру и перед каждым вызовом инструмента. Мягкий лимит может переключить модель на более лёгкую; жёсткий лимит отклоняет попытку с явной причиной.</p><h2>2. Бюджет рабочего процесса</h2><p>Бюджет рабочего процесса отслеживает одно намерение пользователя через ходы, повторы, запасные варианты и субагентов. Ему нужны идентификатор корреляции и накопительный реестр, а не счётчик внутри одного процесса. Останавливайтесь, когда реестр пересекает потолок, даже если каждый отдельный запрос уложился в свой лимит. Именно этот контроль ловит глубину делегирования и циклы, которые не сходятся.</p><h2>3. Дневной бюджет</h2><p>Дневной бюджет ограничивает совокупные расходы команды, арендатора, функции или сервисного аккаунта. Это контроль справедливости и радиуса поражения. Когда бюджет почти исчерпан, направляйте подходящую работу в пакетную обработку или на более мелкие модели и сохраняйте зарезервированную мощность для ценных рабочих процессов. Сбрасывайте его по объявленному часовому поясу и фиксируйте сброс в реестре.</p><h2>Сделайте отказы полезными</h2><p>Отказ по бюджету должен сообщать, какой бюджет сработал, сколько израсходовано и какое восстановление разрешено. Возвращайте возобновляемое состояние, а не молчаливый пустой ответ. Публикуйте неизменяемое событие для каждого резервирования, расхода, освобождения и отказа, чтобы финансовый отдел мог сверить реестр со счетами провайдеров.</p><h2>Связывайте бюджеты с качеством</h2><p>Бюджеты не дают права ухудшать каждый ответ. Отслеживайте стоимость успешной задачи, долю завершённых задач, задержку и оценку качества пользователем или оценщиком наряду с отказами. Политика бюджета здорова, когда она останавливает неконтролируемую работу и сохраняет SLO качества для рабочих процессов, которые она разрешает.</p><p>Три бюджета создают три границы: одна попытка, один результат и один период. Вместе они превращают неограниченного агента в систему, которой можно управлять и которую можно аудировать.</p><h2>Связанное</h2><ul><li>Ограничители расходов агентов</li><li>Управление бюджетом LLM</li><li>Стоимость успешной задачи</li></ul>",
+      "faq": [
+        {
+          "question": "Какие три бюджета нужны автономному агенту?",
+          "answer": "Бюджет запроса ограничивает одну попытку вызова модели, бюджет рабочего процесса ограничивает всю задачу целиком, а дневной бюджет ограничивает совокупные расходы владельца, арендатора или сервиса."
+        },
+        {
+          "question": "Где должны применяться бюджеты агента?",
+          "answer": "Лимиты запроса применяются до вызовов провайдера и инструментов, лимиты рабочего процесса считаются по реестру корреляции, а дневные лимиты действуют на границе общего сервиса или арендатора."
+        },
+        {
+          "question": "Что должно происходить, когда агент достигает бюджета?",
+          "answer": "Вернуть явный отказ с указанием бюджета и суммы, записать проверяемое событие и предложить определённое восстановление: возобновление, переход на более лёгкую модель или эскалацию человеку."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/agent-spend-guardrails",
+          "label": "Ограничители расходов агентов"
+        },
+        {
+          "slug": "/research/llm-budget-governance",
+          "label": "Управление бюджетом LLM"
+        },
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "Стоимость успешной задачи"
+        }
+      ]
+    },
+    "tr": {
+      "title": "Otonom ajanın ihtiyaç duyduğu üç bütçe",
+      "titleCore": "Otonom ajanlar için istek, iş akışı ve günlük bütçeler",
+      "description": "Otonom ajan harcamasını istek, iş akışı ve günlük bütçelerle sınırlayın; kalite hatalarını gizlemeyin. Çalışma zamanı tasarımı.",
+      "body": "<p>Otonom bir ajanın aylık harcama uyarısından fazlasına ihtiyacı var. Döngüsünün içinde zorunlu kılınan üç bütçeye ihtiyacı var: tek bir model çağrısı için <strong>istek bütçesi</strong>, tüm görev için <strong>iş akışı bütçesi</strong> ve sahibi ya da kiracısı için <strong>günlük bütçe</strong>. Her biri farklı bir hata modunu yakalar.</p><h2>1. İstek bütçesi</h2><p>İstek bütçesi tek bir denemenin token, araç çağrısı, gecikme ya da dolar tutarını sınırlar. Aşırı büyük bağlamlara, beklenmedik uzunlukta çıktılara ya da iç içe çağrı üreten bir araca karşı korur. Sağlayıcı isteğinden önce ve her araç çağrısından önce uygulayın. Yumuşak bir sınır modeli daha küçük bir modele indirebilir; sert bir sınır denemeyi açık bir nedenle reddeder.</p><h2>2. İş akışı bütçesi</h2><p>İş akışı bütçesi tek bir kullanıcı niyetini turlar, yeniden denemeler, yedek modeller ve alt ajanlar boyunca takip eder. Tek bir süreçteki yerel sayaç değil, bir korelasyon kimliği ve çalışan bir defter gerekir. Her istek kendi sınırının altında kalsa bile defter tavanı aştığında durdurun. Yetki devri derinliğini ve yakınsamayan döngüleri yakalayan kontrol budur.</p><h2>3. Günlük bütçe</h2><p>Günlük bütçe, bir ekibin, kiracının, özelliğin ya da servis hesabının toplam harcamasını sınırlar. Adalet ve etki alanı kontrolüdür. Neredeyse tükendiğinde, uygun işleri toplu işlere ya da daha küçük modellere yönlendirin ve yüksek değerli iş akışları için ayrılmış kapasiteyi koruyun. Bütçeyi bildirilen bir saat diliminde sıfırlayın ve sıfırlamayı deftere kaydedin.</p><h2>Reddetmeleri faydalı kılın</h2><p>Bütçe reddi, hangi bütçenin tetiklendiğini, ne kadarının tüketildiğini ve hangi kurtarmanın izinli olduğunu söylemelidir. Sessiz boş bir yanıt yerine devam ettirilebilir bir durum döndürün. Her rezervasyon, harcama, serbest bırakma ve red için değiştirilemez bir olay yayınlayın; böylece finans ekibi defteri sağlayıcı faturalarıyla uzlaştırabilir.</p><h2>Bütçeleri kaliteyle eşleştirin</h2><p>Bütçeler her yanıtı kötüleştirme izni değildir. Reddelerin yanında başarılı görev maliyetini, tamamlanma oranını, gecikmeyi ve kullanıcı ya da değerlendirici kalitesini izleyin. Bir bütçe politikası, kontrolsüz işleri durdururken izin verdiği iş akışları için kalite hedefini koruduğunda sağlıklıdır.</p><p>Üç bütçe üç sınır oluşturur: bir deneme, bir sonuç ve bir dönem. Birlikte, sınırsız bir ajanı işletilebilen ve denetlenebilen bir sisteme dönüştürürler.</p><h2>İlgili</h2><ul><li>Ajan harcama koruma önlemleri</li><li>LLM bütçe yönetişimi</li><li>Başarılı görev başına maliyet</li></ul>",
+      "faq": [
+        {
+          "question": "Otonom bir ajanın ihtiyaç duyduğu üç bütçe nedir?",
+          "answer": "Tek bir model denemesini sınırlayan istek bütçesi, tüm görevi sınırlayan iş akışı bütçesi ve sahibin, kiracının ya da servisin toplam harcamasını sınırlayan günlük bütçedir."
+        },
+        {
+          "question": "Ajan bütçeleri nerede uygulanmalı?",
+          "answer": "İstek sınırları model ve araç çağrılarından önce, iş akışı sınırları korelasyon defteri üzerinden, günlük sınırlar ise paylaşılan servis ya da kiracı sınırında uygulanmalıdır."
+        },
+        {
+          "question": "Bir ajan bütçesine ulaştığında ne olmalı?",
+          "answer": "Bütçeyi ve tutarı içeren açık bir red döndürülmeli, denetlenebilir bir olay yazılmalı ve devam ettirme, daha küçük modele indirme ya da insan devri gibi tanımlı bir kurtarma sunulmalıdır."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/agent-spend-guardrails",
+          "label": "Ajan harcama koruma önlemleri"
+        },
+        {
+          "slug": "/research/llm-budget-governance",
+          "label": "LLM bütçe yönetişimi"
+        },
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "Başarılı görev başına maliyet"
+        }
+      ]
+    },
+    "vi": {
+      "title": "Ba ngân sách mà mọi agent tự động cần",
+      "titleCore": "Ba ngân sách vận hành để kiểm soát agent tự động",
+      "description": "Thiết kế runtime cho ngân sách theo yêu cầu, quy trình và ngày, giúp giới hạn chi tiêu của agent tự động mà không che giấu lỗi chất lượng.",
+      "body": "<p>Một agent tự động cần nhiều hơn một cảnh báo chi tiêu hằng tháng. Nó cần ba ngân sách được thi hành ngay trong vòng lặp: một <strong>ngân sách yêu cầu</strong> cho mỗi lần gọi model, một <strong>ngân sách quy trình</strong> cho toàn bộ tác vụ, và một <strong>ngân sách ngày</strong> cho chủ sở hữu hoặc tenant. Mỗi ngân sách bắt một kiểu lỗi khác nhau.</p><h2>1. Ngân sách yêu cầu</h2><p>Ngân sách yêu cầu giới hạn token, số lượng lời gọi tool, độ trễ hoặc số tiền cho một lần thử. Nó bảo vệ trước ngữ cảnh quá lớn, đầu ra dài bất thường, hoặc một tool gây ra lời gọi lồng nhau. Hãy áp dụng trước khi gửi yêu cầu tới nhà cung cấp và trước mỗi lần dispatch tool. Ngưỡng mềm có thể hạ cấp model; ngưỡng cứng sẽ từ chối lần thử kèm lý do rõ ràng.</p><h2>2. Ngân sách quy trình</h2><p>Ngân sách quy trình theo dõi một ý định của người dùng xuyên suốt các lượt hội thoại, lần thử lại, phương án dự phòng và subagent. Nó cần một correlation ID và một sổ cái cộng dồn, không phải một bộ đếm cục bộ trong một tiến trình. Hãy dừng khi sổ cái vượt trần, ngay cả khi từng yêu cầu riêng lẻ vẫn nằm dưới giới hạn. Đây là cơ chế bắt được độ sâu ủy quyền quá lớn và các vòng lặp không hội tụ.</p><h2>3. Ngân sách ngày</h2><p>Ngân sách ngày giới hạn tổng chi tiêu của một nhóm, tenant, tính năng hoặc tài khoản dịch vụ. Đây là công cụ kiểm soát tính công bằng và phạm vi ảnh hưởng khi có sự cố. Khi gần cạn, hãy chuyển công việc đủ điều kiện sang batch hoặc model nhỏ hơn, và dành riêng dung lượng cho các quy trình có giá trị cao. Đặt lại theo một múi giờ đã khai báo và ghi nhận việc reset vào sổ cái.</p><h2>Làm cho việc từ chối có ích</h2><p>Một lần từ chối vì ngân sách phải cho biết ngân sách nào đã kích hoạt, đã tiêu bao nhiêu và được phép khôi phục bằng cách nào. Hãy trả về trạng thái có thể tiếp tục, không phải một câu trả lời rỗng im lặng. Ghi một sự kiện bất biến cho mỗi lần đặt chỗ, chi tiêu, giải phóng và từ chối để bộ phận tài chính có thể đối chiếu sổ cái với hóa đơn nhà cung cấp.</p><h2>Đi cùng ngân sách là chất lượng</h2><p>Ngân sách không phải là lý do để làm giảm chất lượng mọi phản hồi. Hãy theo dõi chi phí cho mỗi tác vụ thành công, tỷ lệ hoàn thành, độ trễ và điểm đánh giá từ người dùng hoặc evaluator, song song với số lần từ chối. Một chính sách ngân sách được coi là lành mạnh khi nó chặn được công việc chạy mất kiểm soát, đồng thời giữ được SLO chất lượng cho các quy trình được phép chạy.</p><p>Ba ngân sách tạo ra ba ranh giới: một lần thử, một kết quả và một kỳ. Cùng nhau, chúng biến một agent không giới hạn thành một hệ thống có thể vận hành và kiểm toán.</p><h2>Liên quan</h2><ul><li>Lan can kiểm soát chi tiêu agent</li><li>Quản trị ngân sách LLM</li><li>Chi phí mỗi tác vụ thành công</li></ul>",
+      "faq": [
+        {
+          "question": "Ba ngân sách mà một agent tự động cần là gì?",
+          "answer": "Ngân sách yêu cầu giới hạn một lần thử của model, ngân sách quy trình giới hạn toàn bộ tác vụ, và ngân sách ngày giới hạn tổng chi tiêu cho chủ sở hữu, tenant hoặc dịch vụ."
+        },
+        {
+          "question": "Ngân sách của agent nên được áp dụng ở đâu?",
+          "answer": "Áp dụng giới hạn yêu cầu trước các lời gọi nhà cung cấp và dispatch tool, giới hạn quy trình qua sổ cái correlation, và giới hạn ngày ở ranh giới dịch vụ hoặc tenant dùng chung."
+        },
+        {
+          "question": "Điều gì nên xảy ra khi agent chạm tới một ngân sách?",
+          "answer": "Trả về một lần từ chối rõ ràng kèm ngân sách và số tiền, ghi một sự kiện có thể kiểm toán, và cung cấp một cách khôi phục xác định như tiếp tục, hạ cấp model hoặc chuyển cho con người xử lý."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/agent-spend-guardrails",
+          "label": "Lan can kiểm soát chi tiêu agent"
+        },
+        {
+          "slug": "/research/llm-budget-governance",
+          "label": "Quản trị ngân sách LLM"
+        },
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "Chi phí mỗi tác vụ thành công"
+        }
+      ]
     }
   }
 }

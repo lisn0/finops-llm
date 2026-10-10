@@ -15,7 +15,7 @@
       "title": "Adaptive thinking broke your cost forecast",
       "titleCore": "Adaptive thinking and cost forecasting",
       "description": "budget_tokens is gone on the newest models and returns a 400. The knob you used to forecast reasoning spend no longer exists. Forecast the distribution instead.",
-      "body": "<p>The reasoning budget used to be a number you set. You passed <code>thinking: {type: &quot;enabled&quot;, budget_tokens: N}</code>, and N was both a control and a forecast: worst case, every request cost you N reasoning tokens, and finance could multiply.</p><p>That parameter is deprecated on Opus 4.6 and Sonnet 4.6, and on the newest models &mdash; Fable 5 and 5.1, Sonnet 5, Opus 5, 4.8 and 4.7 &mdash; sending it returns a <strong>400</strong>. The replacement is <code>thinking: {type: &quot;adaptive&quot;}</code>, where the model decides how much to think based on the difficulty of the request.</p><p>This is better output per dollar on average. It is also the removal of a ceiling, and if your forecast was built on that ceiling, the forecast is now wrong in a way that will not show up until the month closes.</p><h2>What changes in the numbers</h2><p>Mean cost per request usually goes down, because easy requests stop paying for reasoning they never needed. <strong>Variance goes up</strong>, because hard requests are no longer truncated at your cap. The two move in opposite directions, and a budget expressed as a per-request maximum has nothing left to attach to.</p><p>The practical failure is not the average. It is the tail: a prompt change, a new document type, or a user who starts asking harder questions moves a slice of your traffic into deeper reasoning, and nothing in your configuration limits it.</p><h2>Forecast the distribution, not the cap</h2><p>Three changes, in order of how much they buy you.</p><p><strong>Track reasoning tokens as their own series.</strong> They are already in the usage object on every response. Separate them from input and output in your telemetry, and you can see the shift the day it happens instead of at month end.</p><p><strong>Budget on percentiles.</strong> Replace &quot;N tokens per request&quot; with a p50 and a p99 per route. The p50 tells you what the workload costs; the gap between p50 and p99 tells you how exposed you are to a bad week.</p><p><strong>Alert on the ratio, not the total.</strong> Reasoning tokens as a share of total tokens per route is the single number that moves first when a prompt change makes the model work harder. A total-spend alert fires days later, once the volume has accumulated.</p><h2>Where a cap still belongs</h2><p>Removing the per-request knob does not mean removing all limits. Route-level and tenant-level spend limits still work, still catch runaway loops, and are where the guardrail belongs now &mdash; at the boundary you own, not inside a request parameter that no longer exists. For latency-sensitive paths where deep reasoning is never worth it, the lever is model choice, not a token budget.</p><h2>Related</h2><ul><li><a href=&quot;/research/reasoning-token-attribution&quot;>Reasoning token attribution</a></li><li><a href=&quot;/research/reasoning-model-cost-guide&quot;>Reasoning model cost guide</a></li><li><a href=&quot;/research/llm-budget-governance&quot;>LLM budget governance</a></li></ul>",
+      "body": "<p>The reasoning budget used to be a number you set. You passed <code>thinking: {type: &quot;enabled&quot;, budget_tokens: N}</code>, and N was both a control and a forecast: worst case, every request cost you N reasoning tokens, and finance could multiply.</p><p>That parameter is deprecated on Opus 4.6 and Sonnet 4.6, and on the newest models &mdash; Fable 5 and 5.1, Sonnet 5, Opus 5, 4.8 and 4.7 &mdash; sending it returns a <strong>400</strong>. The replacement is <code>thinking: {type: &quot;adaptive&quot;}</code>, where the model decides how much to think based on the difficulty of the request.</p><p>This is better output per dollar on average. It is also the removal of a ceiling, and if your forecast was built on that ceiling, the forecast is now wrong in a way that will not show up until the month closes.</p><h2>What changes in the numbers</h2><p>Mean cost per request usually goes down, because easy requests stop paying for reasoning they never needed. <strong>Variance goes up</strong>, because hard requests are no longer truncated at your cap. The two move in opposite directions, and a budget expressed as a per-request maximum has nothing left to attach to.</p><p>The practical failure is not the average. It is the tail: a prompt change, a new document type, or a user who starts asking harder questions moves a slice of your traffic into deeper reasoning, and nothing in your configuration limits it.</p><h2>Forecast the distribution, not the cap</h2><p>Three changes, in order of how much they buy you.</p><p><strong>Track reasoning tokens as their own series.</strong> They are already in the usage object on every response. Separate them from input and output in your telemetry, and you can see the shift the day it happens instead of at month end.</p><p><strong>Budget on percentiles.</strong> Replace &quot;N tokens per request&quot; with a p50 and a p99 per route. The p50 tells you what the workload costs; the gap between p50 and p99 tells you how exposed you are to a bad week.</p><p><strong>Alert on the ratio, not the total.</strong> Reasoning tokens as a share of total tokens per route is the single number that moves first when a prompt change makes the model work harder. A total-spend alert fires days later, once the volume has accumulated.</p><h2>Where a cap still belongs</h2><p>Removing the per-request knob does not mean removing all limits. Route-level and tenant-level spend limits still work, still catch runaway loops, and are where the guardrail belongs now &mdash; at the boundary you own, not inside a request parameter that no longer exists. For latency-sensitive paths where deep reasoning is never worth it, the lever is model choice, not a token budget.</p><h2>Related</h2><ul><li><a href=\"/research/reasoning-token-attribution\">Reasoning token attribution</a></li><li><a href=\"/research/reasoning-model-cost-guide\">Reasoning model cost guide</a></li><li><a href=\"/research/llm-budget-governance\">LLM budget governance</a></li></ul>",
       "faq": [
         {
           "question": "Why does budget_tokens return a 400 now?",
@@ -132,6 +132,346 @@
         {
           "slug": "/research/reasoning-token-attribution",
           "label": "推論トークンの按分"
+        }
+      ]
+    },
+    "id": {
+      "title": "Pemikiran adaptif merusak prakiraan biaya Anda",
+      "titleCore": "Pemikiran adaptif dan prakiraan biaya",
+      "description": "budget_tokens tidak ada lagi di model terbaru dan mengembalikan 400. Prakiraan biaya penalaran perlu beralih ke distribusi, bukan batas tetap.",
+      "body": "<p>Anggaran penalaran dulu berupa angka yang Anda tetapkan sendiri. Anda mengirim <code>thinking: {type: &quot;enabled&quot;, budget_tokens: N}</code>, dan N sekaligus berfungsi sebagai kendali dan prakiraan: dalam skenario terburuk, setiap permintaan menghabiskan N token penalaran, sehingga tim keuangan bisa mengalikannya.</p><p>Parameter itu sudah usang di Opus 4.6 dan Sonnet 4.6, dan di model terbaru &mdash; Fable 5 dan 5.1, Sonnet 5, Opus 5, 4.8 dan 4.7 &mdash; mengirimkannya mengembalikan <strong>400</strong>. Penggantinya adalah <code>thinking: {type: &quot;adaptive&quot;}</code>, di mana model memutuskan sendiri seberapa dalam berpikir berdasarkan tingkat kesulitan permintaan.</p><p>Secara rata-rata, ini menghasilkan output yang lebih baik per dolar. Namun ini juga berarti batas atas dihapus, dan jika prakiraan Anda dibangun di atas batas itu, prakiraan tersebut kini keliru dengan cara yang baru terlihat setelah bulan ditutup.</p><h2>Apa yang berubah pada angka</h2><p>Rata-rata biaya per permintaan biasanya turun, karena permintaan yang mudah tidak lagi membayar penalaran yang tidak mereka butuhkan. <strong>Varians naik</strong>, karena permintaan yang sulit tidak lagi terpotong di batas Anda. Keduanya bergerak berlawanan arah, dan anggaran yang dinyatakan sebagai maksimum per permintaan tidak lagi punya pijakan.</p><p>Kegagalan yang nyata bukan pada rata-rata, melainkan pada ekor distribusi: perubahan prompt, jenis dokumen baru, atau pengguna yang mulai mengajukan pertanyaan lebih sulit akan menggeser sebagian trafik ke penalaran yang lebih dalam, dan tidak ada yang di konfigurasi Anda membatasinya.</p><h2>Perkirakan distribusinya, bukan batasnya</h2><p>Tiga perubahan, diurutkan dari manfaat terbesar.</p><p><strong>Lacak token penalaran sebagai seri tersendiri.</strong> Token itu sudah ada di objek usage pada setiap respons. Pisahkan dari input dan output di telemetri Anda, maka Anda bisa melihat pergeseran pada hari terjadinya, bukan pada akhir bulan.</p><p><strong>Anggarkan berdasarkan persentil.</strong> Ganti &quot;N token per permintaan&quot; dengan p50 dan p99 per rute. P50 memberi tahu berapa biaya beban kerja Anda; selisih antara p50 dan p99 memberi tahu seberapa rentan Anda terhadap minggu yang buruk.</p><p><strong>Beri peringatan pada rasio, bukan total.</strong> Token penalaran sebagai porsi dari total token per rute adalah angka tunggal yang bergerak paling awal ketika perubahan prompt membuat model bekerja lebih keras. Peringatan total biaya baru berbunyi berhari-hari kemudian, setelah volume menumpuk.</p><h2>Di mana batas masih perlu ada</h2><p>Menghapus kendali per permintaan tidak berarti menghapus semua batasan. Batas pengeluaran di tingkat rute dan tenant tetap berfungsi, tetap menangkap loop yang lepas kendali, dan kini di sanalah pagar pengaman seharusnya berada &mdash; di batas yang Anda miliki, bukan di dalam parameter permintaan yang sudah tidak ada. Untuk jalur yang sensitif terhadap latensi, di mana penalaran mendalam tidak pernah sepadan, tuasnya adalah pemilihan model, bukan batas token.</p><h2>Terkait</h2><ul><li><a href=\"/research/reasoning-token-attribution\">Atribusi token penalaran</a></li><li><a href=\"/research/reasoning-model-cost-guide\">Panduan biaya model penalaran</a></li><li><a href=\"/research/llm-budget-governance\">Tata kelola anggaran LLM</a></li></ul>",
+      "faq": [
+        {
+          "question": "Mengapa budget_tokens sekarang mengembalikan 400?",
+          "answer": "Parameter ini usang di Opus 4.6 dan Sonnet 4.6, dan langsung ditolak di Fable 5 dan 5.1, Sonnet 5, serta Opus 5, 4.8 dan 4.7. Model-model itu memakai thinking: {type: \"adaptive\"}, di mana model menentukan sendiri seberapa banyak penalaran yang dibutuhkan permintaan."
+        },
+        {
+          "question": "Apakah adaptive thinking lebih mahal atau lebih murah?",
+          "answer": "Biaya rata-rata per permintaan biasanya turun, karena permintaan yang mudah berhenti membayar penalaran yang tidak mereka butuhkan. Varians naik, karena permintaan sulit tidak lagi terpotong di batas Anda. Anggarkan berdasarkan persentil, bukan rata-rata."
+        },
+        {
+          "question": "Bagaimana kami mengendalikan biaya penalaran tanpa budget_tokens?",
+          "answer": "Lacak token penalaran sebagai seri telemetri tersendiri, anggarkan berdasarkan p50 dan p99 per rute, bukan maksimum per permintaan, dan beri peringatan pada token penalaran sebagai porsi dari total token. Batas keras sebaiknya ada di batas pengeluaran rute atau tenant."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/reasoning-token-attribution",
+          "label": "Atribusi token penalaran"
+        },
+        {
+          "slug": "/research/reasoning-model-cost-guide",
+          "label": "Panduan biaya model penalaran"
+        },
+        {
+          "slug": "/research/llm-budget-governance",
+          "label": "Tata kelola anggaran LLM"
+        }
+      ]
+    },
+    "pl": {
+      "title": "Adaptacyjne myślenie zepsuło Twoją prognozę kosztów",
+      "titleCore": "Adaptacyjne myślenie i prognozowanie kosztów",
+      "description": "budget_tokens zniknął z najnowszych modeli i zwraca 400. Pokrętło do prognozowania wydatków na rozumowanie już nie istnieje. Prognozuj rozkład.",
+      "body": "<p>Budżet na rozumowanie był kiedyś liczbą, którą ustawiało się samemu. Przekazywało się <code>thinking: {type: &quot;enabled&quot;, budget_tokens: N}</code>, a N było jednocześnie limitem i prognozą: w najgorszym przypadku każde zapytanie kosztowało N tokenów rozumowania, więc dział finansów mógł po prostu to pomnożyć.</p><p>Ten parametr jest wycofany w Opus 4.6 i Sonnet 4.6, a w najnowszych modelach &mdash; Fable 5 i 5.1, Sonnet 5, Opus 5, 4.8 i 4.7 &mdash; jego wysłanie zwraca <strong>400</strong>. Zastępuje go <code>thinking: {type: &quot;adaptive&quot;}</code>, w którym model sam decyduje, ile myśleć, w zależności od trudności zapytania.</p><p>Średnio daje to lepszy wynik na dolara. To jednak także usunięcie sufitu, a jeśli prognoza była oparta na tym suficie, jest teraz błędna w sposób, który ujawni się dopiero po zamknięciu miesiąca.</p><h2>Co zmienia się w liczbach</h2><p>Średni koszt na zapytanie zwykle spada, bo proste zapytania przestają płacić za rozumowanie, którego nie potrzebowały. <strong>Wariancja rośnie</strong>, bo trudne zapytania nie są już ucinane na Twoim limicie. Te dwa efekty idą w przeciwnych kierunkach, a budżet wyrażony jako maksimum na zapytanie nie ma już do czego się odnieść.</p><p>Praktyczny problem to nie średnia, tylko ogon: zmiana promptu, nowy typ dokumentu albo użytkownicy zadający trudniejsze pytania przenoszą część ruchu na głębsze rozumowanie, a w konfiguracji nic tego nie ogranicza.</p><h2>Prognozuj rozkład, nie limit</h2><p>Trzy zmiany, od tej, która daje najwięcej.</p><p><strong>Śledź tokeny rozumowania jako osobną serię.</strong> Są już w obiekcie usage każdej odpowiedzi. Oddziel je od wejścia i wyjścia w telemetrii, a zobaczysz przesunięcie tego samego dnia, zamiast na koniec miesiąca.</p><p><strong>Buduj budżet na percentylach.</strong> Zamiast &quot;N tokenów na zapytanie&quot; ustaw p50 i p99 dla każdej trasy. p50 pokazuje, ile kosztuje obciążenie; różnica między p50 a p99 pokazuje, jak bardzo jesteś narażony na zły tydzień.</p><p><strong>Alarmuj na proporcję, nie na sumę.</strong> Udział tokenów rozumowania w łącznej liczbie tokenów dla danej trasy to liczba, która rusza się jako pierwsza, gdy zmiana promptu sprawia, że model pracuje mocniej. Alert na łączne wydatki odpala dni później, gdy wolumen już się nawarstwi.</p><h2>Gdzie nadal potrzebny jest limit</h2><p>Usunięcie pokrętła na zapytanie nie oznacza usunięcia wszystkich limitów. Limity wydatków na poziomie trasy i najemcy nadal działają, nadal łapią niekontrolowane pętle i to tam powinna teraz być bariera &mdash; na granicy, którą posiadasz, a nie w parametrze żądania, którego już nie ma. W ścieżkach wrażliwych na opóźnienia, gdzie głębokie rozumowanie nigdy się nie opłaca, dźwignią jest wybór modelu, a nie budżet tokenów.</p><h2>Powiązane</h2><ul><li><a href=\"/research/reasoning-token-attribution\">Atrybucja tokenów rozumowania</a></li><li><a href=\"/research/reasoning-model-cost-guide\">Przewodnik po kosztach modeli rozumujących</a></li><li><a href=\"/research/llm-budget-governance\">Zarządzanie budżetem LLM</a></li></ul>",
+      "faq": [
+        {
+          "question": "Dlaczego budget_tokens zwraca teraz 400?",
+          "answer": "Jest wycofany w Opus 4.6 i Sonnet 4.6, a w Fable 5 i 5.1, Sonnet 5 oraz Opus 5, 4.8 i 4.7 jest odrzucany wprost. Te modele używają thinking: {type: \"adaptive\"}, w którym model sam decyduje, ile rozumowania wymaga zapytanie."
+        },
+        {
+          "question": "Czy adaptacyjne myślenie kosztuje więcej, czy mniej?",
+          "answer": "Średni koszt na zapytanie zwykle spada, bo proste zapytania przestają płacić za zbędne rozumowanie. Wariancja rośnie, bo trudne zapytania nie są już ucinane na limicie. Buduj budżet na percentylach, a nie na średniej."
+        },
+        {
+          "question": "Jak kontrolować wydatki na rozumowanie bez budget_tokens?",
+          "answer": "Śledź tokeny rozumowania jako osobną serię telemetrii, buduj budżet na p50 i p99 dla każdej trasy zamiast maksimum na zapytanie i alarmuj na udział tokenów rozumowania w łącznej liczbie tokenów. Twarde limity należą na granicę trasy lub najemcy."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/reasoning-token-attribution",
+          "label": "Atrybucja tokenów rozumowania"
+        },
+        {
+          "slug": "/research/reasoning-model-cost-guide",
+          "label": "Przewodnik po kosztach modeli rozumujących"
+        },
+        {
+          "slug": "/research/llm-budget-governance",
+          "label": "Zarządzanie budżetem LLM"
+        }
+      ]
+    },
+    "ru": {
+      "title": "Адаптивное мышление сломало прогноз стоимости",
+      "titleCore": "Адаптивное мышление и прогноз стоимости",
+      "description": "budget_tokens удалён из новых моделей и возвращает 400. Ручка, которой вы прогнозировали расходы на рассуждения, больше не существует. Прогнозируйте распределение.",
+      "body": "<p>Бюджет рассуждений раньше был числом, которое вы задавали сами. Вы передавали <code>thinking: {type: &quot;enabled&quot;, budget_tokens: N}</code>, и N было одновременно и ограничением, и прогнозом: в худшем случае каждый запрос стоил N токенов рассуждений, и финансовая команда могла умножить это на объём.</p><p>Этот параметр устарел на Opus 4.6 и Sonnet 4.6, а на самых новых моделях &mdash; Fable 5 и 5.1, Sonnet 5, Opus 5, 4.8 и 4.7 &mdash; его отправка возвращает <strong>400</strong>. Заменяет его <code>thinking: {type: &quot;adaptive&quot;}</code>, где модель сама решает, сколько думать, исходя из сложности запроса.</p><p>В среднем это даёт больше результата на доллар. Но это также снятие потолка, и если ваш прогноз строился на этом потолке, он теперь неверен таким образом, что проявится только по закрытии месяца.</p><h2>Что меняется в цифрах</h2><p>Средняя стоимость запроса обычно снижается, потому что простые запросы перестают платить за рассуждения, которые им не нужны. <strong>Дисперсия растёт</strong>, потому что трудные запросы больше не обрезаются по вашему лимиту. Эти величины движутся в противоположных направлениях, и бюджет, выраженный как максимум на запрос, опереться уже не на что.</p><p>Практический сбой происходит не в среднем, а в хвосте: изменение промпта, новый тип документа или пользователи, которые начинают задавать более сложные вопросы, переводят часть трафика на более глубокие рассуждения, и ничто в вашей конфигурации этого не ограничивает.</p><h2>Прогнозируйте распределение, а не потолок</h2><p>Три изменения, в порядке того, сколько они дают.</p><p><strong>Ведите токены рассуждений как отдельный ряд.</strong> Они уже есть в объекте usage каждого ответа. Выделите их из входных и выходных токенов в телеметрии, и вы увидите сдвиг в день, когда он произошёл, а не в конце месяца.</p><p><strong>Бюджетируйте по перцентилям.</strong> Замените «N токенов на запрос» на p50 и p99 для каждого маршрута. p50 показывает, сколько стоит нагрузка; разрыв между p50 и p99 показывает, насколько вы уязвимы для плохой недели.</p><p><strong>Настраивайте алерты на долю, а не на итог.</strong> Доля токенов рассуждений в общем объёме по каждому маршруту &mdash; единственный показатель, который первым меняется, когда изменение промпта заставляет модель работать усерднее. Алерт по общим расходам срабатывает через несколько дней, когда объём уже накопился.</p><h2>Где лимит всё ещё нужен</h2><p>Удаление поручного лимита на запрос не означает отказа от всех ограничений. Лимиты расходов на уровне маршрута и арендатора по-прежнему работают, по-прежнему ловят неконтролируемые циклы и теперь должны стоять там, где проходит граница, которой вы владеете, а не внутри параметра запроса, которого больше нет. Для путей, чувствительных к задержке, где глубокие рассуждения никогда не стоят затрат, рычаг &mdash; выбор модели, а не бюджет токенов.</p><h2>Связанное</h2><ul><li><a href=\"/research/reasoning-token-attribution\">Атрибуция токенов рассуждений</a></li><li><a href=\"/research/reasoning-model-cost-guide\">Руководство по стоимости моделей рассуждений</a></li><li><a href=\"/research/llm-budget-governance\">Управление бюджетом LLM</a></li></ul>",
+      "faq": [
+        {
+          "question": "Почему budget_tokens теперь возвращает 400?",
+          "answer": "Он устарел на Opus 4.6 и Sonnet 4.6 и отклоняется напрямую на Fable 5 и 5.1, Sonnet 5, а также Opus 5, 4.8 и 4.7. Эти модели используют thinking: {type: \"adaptive\"}, где сама модель решает, сколько рассуждений нужно запросу."
+        },
+        {
+          "question": "Адаптивное мышление стоит дороже или дешевле?",
+          "answer": "Средняя стоимость запроса обычно падает, потому что простые запросы перестают платить за ненужные рассуждения. Дисперсия растёт, потому что трудные запросы больше не обрезаются по лимиту. Бюджетируйте по перцентилям, а не по среднему."
+        },
+        {
+          "question": "Как контролировать расходы на рассуждения без budget_tokens?",
+          "answer": "Ведите токены рассуждений как отдельный ряд телеметрии, бюджетируйте по p50 и p99 на маршрут вместо максимума на запрос и настраивайте алерты на долю токенов рассуждений в общем объёме. Жёсткие лимиты должны стоять на границе маршрута или арендатора."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/reasoning-token-attribution",
+          "label": "Атрибуция токенов рассуждений"
+        },
+        {
+          "slug": "/research/reasoning-model-cost-guide",
+          "label": "Руководство по стоимости моделей рассуждений"
+        },
+        {
+          "slug": "/research/llm-budget-governance",
+          "label": "Управление бюджетом LLM"
+        }
+      ]
+    },
+    "tr": {
+      "title": "Uyarlanabilir düşünme maliyet tahminini bozdu",
+      "titleCore": "Uyarlanabilir düşünme ve maliyet tahmini",
+      "description": "budget_tokens en yeni modellerde kaldırıldı ve 400 döndürüyor. Akıl yürütme harcamasını tahmin ettiğiniz ayar artık yok. Dağılımı tahmin edin.",
+      "body": "<p>Akıl yürütme bütçesi eskiden sizin belirlediğiniz bir sayıydı. <code>thinking: {type: &quot;enabled&quot;, budget_tokens: N}</code> gönderiyordunuz ve N hem bir kontrol hem de bir tahmindi: en kötü durumda her istek N akıl yürütme tokenına mal oluyordu ve finans ekibi bunu çarpabilirdi.</p><p>Bu parametre Opus 4.6 ve Sonnet 4.6 üzerinde kullanımdan kaldırıldı. En yeni modellerde &mdash; Fable 5 ve 5.1, Sonnet 5, Opus 5, 4.8 ve 4.7 &mdash; gönderildiğinde <strong>400</strong> döndürüyor. Yerine <code>thinking: {type: &quot;adaptive&quot;}</code> geliyor; model isteğin zorluğuna göre ne kadar düşüneceğine kendisi karar veriyor.</p><p>Bu, ortalamada dolar başına daha iyi çıktı demek. Ancak bir tavanın kaldırılması anlamına da geliyor. Tahmininiz o tavana dayanıyorduysa, tahmin ay kapanana kadar görünmeyecek bir biçimde yanlış.</p><h2>Sayılarda ne değişiyor</h2><p>İstek başına ortalama maliyet genellikle düşer; çünkü kolay istekler artık ihtiyaç duymadıkları akıl yürütmenin bedelini ödemez. <strong>Varyans artar</strong>, çünkü zor istekler artık tavanınızda kesilmez. Bu iki değer ters yönde hareket eder ve istek başına maksimum olarak ifade edilen bir bütçenin tutunacak bir yeri kalmaz.</p><p>Pratik hata ortalamada değil, kuyruktadır: bir prompt değişikliği, yeni bir belge türü ya da daha zor sorular sormaya başlayan bir kullanıcı, trafiğinizin bir dilimini daha derin akıl yürütmeye taşır ve yapılandırmanızda bunu sınırlayan hiçbir şey yoktur.</p><h2>Tavanı değil, dağılımı tahmin edin</h2><p>Üç değişiklik var; size sağladıkları değere göre sıralı.</p><p><strong>Akıl yürütme tokenlarını ayrı bir seri olarak izleyin.</strong> Zaten her yanıttaki usage nesnesinde bulunuyorlar. Bunları telemetride girdi ve çıktıdan ayırın; kaymayı ay sonunda değil, olduğu gün görebilirsiniz.</p><p><strong>Bütçeyi yüzdelik dilimlere göre yapın.</strong> &quot;İstek başına N token&quot; yerine route başına bir p50 ve bir p99 koyun. p50 iş yükünün maliyetini gösterir; p50 ile p99 arasındaki fark ise kötü bir haftaya ne kadar açık olduğunuzu gösterir.</p><p><strong>Toplam yerine orana göre uyarı kurun.</strong> Route başına toplam tokenlar içindeki akıl yürütme tokenlarının payı, bir prompt değişikliği modeli daha fazla çalıştırdığında ilk hareket eden tek sayıdır. Toplam harcama uyarısı ise hacim birikip günler sonra tetiklenir.</p><h2>Limitin hâlâ yeri olduğu yer</h2><p>İstek başına ayarı kaldırmak, tüm limitleri kaldırmak anlamına gelmez. Route düzeyindeki ve kiracı düzeyindeki harcama limitleri hâlâ çalışır, kontrolden çıkan döngüleri yakalar ve güvenlik sınırı artık orada olmalı &mdash; sahip olduğunuz sınırda, artık var olmayan bir istek parametresinin içinde değil. Derin akıl yürütmenin hiçbir zaman değmediği gecikmeye duyarlı yollarda kaldıraç token bütçesi değil, model seçimidir.</p><h2>İlgili</h2><ul><li><a href=\"/research/reasoning-token-attribution\">Akıl yürütme tokenlarının atfedilmesi</a></li><li><a href=\"/research/reasoning-model-cost-guide\">Akıl yürütme modelleri maliyet rehberi</a></li><li><a href=\"/research/llm-budget-governance\">LLM bütçe yönetişimi</a></li></ul>",
+      "faq": [
+        {
+          "question": "budget_tokens neden artık 400 döndürüyor?",
+          "answer": "Opus 4.6 ve Sonnet 4.6 üzerinde kullanımdan kaldırıldı; Fable 5 ve 5.1, Sonnet 5, Opus 5, 4.8 ve 4.7 üzerinde ise doğrudan reddediliyor. Bu modeller bunun yerine thinking: {type: \"adaptive\"} kullanıyor; model isteğin ne kadar akıl yürütme gerektirdiğine kendisi karar veriyor."
+        },
+        {
+          "question": "Uyarlanabilir düşünme daha mı pahalı yoksa daha mı ucuz?",
+          "answer": "İstek başına ortalama maliyet genellikle düşer, çünkü kolay istekler gereksiz akıl yürütme için ödeme yapmaz. Varyans ise artar, çünkü zor istekler artık tavanınızda kesilmez. Ortalama yerine yüzdelik dilimlere göre bütçe yapın."
+        },
+        {
+          "question": "budget_tokens olmadan akıl yürütme harcamasını nasıl kontrol ederiz?",
+          "answer": "Akıl yürütme tokenlarını ayrı bir telemetri serisi olarak izleyin, istek başına maksimum yerine route başına p50 ve p99 değerlerine göre bütçe yapın ve akıl yürütme tokenlarının toplam tokenlar içindeki payına uyarı kurun. Sert limitler route veya kiracı harcama sınırında olmalı."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/reasoning-token-attribution",
+          "label": "Akıl yürütme tokenlarının atfedilmesi"
+        },
+        {
+          "slug": "/research/reasoning-model-cost-guide",
+          "label": "Akıl yürütme modelleri maliyet rehberi"
+        },
+        {
+          "slug": "/research/llm-budget-governance",
+          "label": "LLM bütçe yönetişimi"
+        }
+      ]
+    },
+    "vi": {
+      "title": "Adaptive thinking làm hỏng dự báo chi phí của bạn",
+      "titleCore": "Adaptive thinking và dự báo chi phí",
+      "description": "budget_tokens đã bị bỏ trên các mô hình mới nhất và trả về lỗi 400. Núm điều chỉnh bạn dùng để dự báo chi phí suy luận không còn tồn tại. Hãy dự báo theo phân phối.",
+      "body": "<p>Ngân sách suy luận từng là một con số bạn tự đặt. Bạn truyền <code>thinking: {type: &quot;enabled&quot;, budget_tokens: N}</code>, và N vừa là công cụ kiểm soát vừa là dự báo: trường hợp xấu nhất, mỗi yêu cầu tốn N token suy luận, và tài chính có thể nhân lên.</p>\n<p>Tham số đó đã bị loại bỏ trên Opus 4.6 và Sonnet 4.6, và trên các mô hình mới nhất &mdash; Fable 5 và 5.1, Sonnet 5, Opus 5, 4.8 và 4.7 &mdash; việc gửi nó sẽ trả về <strong>400</strong>. Thay thế là <code>thinking: {type: &quot;adaptive&quot;}</code>, khi đó mô hình tự quyết định mức suy nghĩ dựa trên độ khó của yêu cầu.</p>\n<p>Trung bình, đây là đầu ra tốt hơn trên mỗi đô la. Nhưng đó cũng là việc gỡ bỏ một trần giới hạn; nếu dự báo của bạn được xây dựng trên trần đó, dự báo giờ đã sai theo một cách sẽ không lộ ra cho đến khi tháng kết thúc.</p>\n<h2>Điều gì thay đổi trong các con số</h2>\n<p>Chi phí trung bình trên mỗi yêu cầu thường giảm, vì các yêu cầu dễ không còn phải trả tiền cho phần suy luận mà chúng không cần. <strong>Phương sai tăng</strong>, vì các yêu cầu khó không còn bị cắt ngắn ở trần của bạn. Hai xu hướng này đi ngược chiều nhau, và một ngân sách được biểu diễn bằng mức tối đa trên mỗi yêu cầu sẽ không còn gì để bám vào.</p>\n<p>Thất bại thực tế không nằm ở trung bình. Mà nằm ở phần đuôi: một thay đổi prompt, một loại tài liệu mới, hoặc một người dùng bắt đầu hỏi những câu khó hơn sẽ đẩy một phần lưu lượng sang suy luận sâu hơn, và không có gì trong cấu hình của bạn giới hạn điều đó.</p>\n<h2>Dự báo phân phối, không dự báo trần</h2>\n<p>Ba thay đổi, theo thứ tự chúng mang lại giá trị lớn đến đâu.</p>\n<p>\n<strong>Theo dõi token suy luận như một chuỗi riêng.</strong> Chúng đã có sẵn trong đối tượng usage của mọi phản hồi. Tách chúng khỏi token đầu vào và đầu ra trong telemetry, và bạn sẽ thấy sự dịch chuyển ngay trong ngày nó xảy ra thay vì vào cuối tháng.</p>\n<p>\n<strong>Lập ngân sách theo phân vị.</strong> Thay &quot;N token mỗi yêu cầu&quot; bằng p50 và p99 cho từng tuyến. p50 cho bạn biết khối lượng công việc tốn bao nhiêu; khoảng cách giữa p50 và p99 cho bạn biết bạn dễ bị tổn thương đến đâu trước một tuần xấu.</p>\n<p>\n<strong>Cảnh báo theo tỷ lệ, không theo tổng.</strong> Tỷ trọng token suy luận trên tổng token theo từng tuyến là con số duy nhất thay đổi đầu tiên khi một thay đổi prompt khiến mô hình làm việc vất vả hơn. Cảnh báo theo tổng chi tiêu chỉ kích hoạt sau nhiều ngày, khi khối lượng đã tích lũy.</p>\n<h2>Nơi vẫn cần một trần</h2>\n<p>Bỏ núm điều chỉnh theo từng yêu cầu không có nghĩa là bỏ mọi giới hạn. Giới hạn chi tiêu ở cấp tuyến và cấp khách thuê vẫn hoạt động, vẫn bắt được các vòng lặp mất kiểm soát, và giờ đây đó là nơi đặt lan can bảo vệ &mdash; ở ranh giới bạn sở hữu, không nằm trong một tham số yêu cầu không còn tồn tại. Với các đường đi nhạy cảm về độ trễ, nơi suy luận sâu không bao giờ đáng giá, đòn bẩy là lựa chọn mô hình, không phải ngân sách token.</p>\n<h2>Liên quan</h2>\n<ul>\n<li>\n<a href=\"/research/reasoning-token-attribution\">Phân bổ token suy luận</a>\n</li>\n<li>\n<a href=\"/research/reasoning-model-cost-guide\">Hướng dẫn chi phí mô hình suy luận</a>\n</li>\n<li>\n<a href=\"/research/llm-budget-governance\">Quản trị ngân sách LLM</a>\n</li>\n</ul>\n",
+      "faq": [
+        {
+          "question": "Vì sao budget_tokens giờ trả về lỗi 400?",
+          "answer": "Nó đã bị loại bỏ trên Opus 4.6 và Sonnet 4.6, và bị từ chối hoàn toàn trên Fable 5 và 5.1, Sonnet 5, Opus 5, 4.8 và 4.7. Những mô hình đó dùng thinking: {type: \"adaptive\"} thay thế, khi mô hình tự quyết định mức suy luận cần cho yêu cầu."
+        },
+        {
+          "question": "Adaptive thinking tốn nhiều hơn hay ít hơn?",
+          "answer": "Chi phí trung bình trên mỗi yêu cầu thường giảm, vì các yêu cầu dễ không còn phải trả tiền cho phần suy luận không cần. Phương sai tăng, vì các yêu cầu khó không còn bị cắt ở trần của bạn. Hãy lập ngân sách theo phân vị thay vì theo trung bình."
+        },
+        {
+          "question": "Làm sao kiểm soát chi tiêu suy luận khi không có budget_tokens?",
+          "answer": "Theo dõi token suy luận như một chuỗi telemetry riêng, lập ngân sách theo p50 và p99 cho mỗi tuyến thay vì mức tối đa trên mỗi yêu cầu, và cảnh báo theo tỷ lệ token suy luận trên tổng token. Giới hạn cứng nên đặt ở ranh giới chi tiêu của tuyến hoặc khách thuê."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/reasoning-token-attribution",
+          "label": "Phân bổ token suy luận"
+        },
+        {
+          "slug": "/research/reasoning-model-cost-guide",
+          "label": "Hướng dẫn chi phí mô hình suy luận"
+        },
+        {
+          "slug": "/research/llm-budget-governance",
+          "label": "Quản trị ngân sách LLM"
+        }
+      ]
+    },
+    "ar": {
+      "title": "التفكير التكيفي أفسد توقعات تكلفتك",
+      "titleCore": "التفكير التكيفي وتوقع التكلفة",
+      "description": "لم يعد budget_tokens موجوداً في أحدث النماذج ويعيد الخطأ 400. المقبض الذي كنت تتوقع به إنفاق الاستدلال اختفى، فتوقّع التوزيع بدلاً منه.",
+      "body": "<p>كانت ميزانية الاستدلال رقماً تحدده بنفسك. كنت تمرر <code>thinking: {type: &quot;enabled&quot;, budget_tokens: N}</code>، وكان N أداة تحكم وتوقعاً في آن واحد: في أسوأ الحالات يكلّفك كل طلب N من رموز الاستدلال، وبإمكان المالية أن تضرب وتحسب.</p><p>هذا المعامل مُهمَل في Opus 4.6 وSonnet 4.6، وفي أحدث النماذج &mdash; Fable 5 و5.1 وSonnet 5 وOpus 5 و4.8 و4.7 &mdash; يؤدي إرساله إلى الخطأ <strong>400</strong>. البديل هو <code>thinking: {type: &quot;adaptive&quot;}</code>، حيث يقرر النموذج مقدار التفكير بحسب صعوبة الطلب.</p><p>هذا يعني مخرجات أفضل مقابل كل دولار في المتوسط. لكنه أيضاً إزالة لسقف، وإذا كان توقعك مبنياً على ذلك السقف فقد أصبح خاطئاً بطريقة لن تظهر إلا عند إقفال الشهر.</p><h2>ما الذي يتغير في الأرقام</h2><p>ينخفض متوسط التكلفة لكل طلب عادةً، لأن الطلبات السهلة لم تعد تدفع ثمن استدلال لم تكن بحاجة إليه. أما <strong>التباين فيرتفع</strong>، لأن الطلبات الصعبة لم تعد تُقتطع عند سقفك. يتحرك الاثنان في اتجاهين متعاكسين، والميزانية المعبَّر عنها كحد أقصى لكل طلب لم يعد لها ما تستند إليه.</p><p>الإخفاق العملي لا يكمن في المتوسط بل في الذيل: تغيير في الموجِّه، أو نوع مستندات جديد، أو مستخدم يبدأ بطرح أسئلة أصعب، يدفع شريحة من حركتك إلى استدلال أعمق، ولا شيء في إعداداتك يحدّ من ذلك.</p><h2>توقّع التوزيع لا السقف</h2><p>ثلاثة تغييرات، مرتبة بحسب ما تحققه لك.</p><p><strong>تتبّع رموز الاستدلال كسلسلة مستقلة.</strong> هي موجودة أصلاً في كائن الاستخدام ضمن كل استجابة. افصلها عن المدخلات والمخرجات في القياس عن بُعد، فترى التحول في يوم حدوثه لا في نهاية الشهر.</p><p><strong>ضع الميزانية على النسب المئوية.</strong> استبدل عبارة &quot;N رمزاً لكل طلب&quot; بقيمتي p50 وp99 لكل مسار. يخبرك p50 بتكلفة حمل العمل، وتخبرك الفجوة بين p50 وp99 بمدى تعرّضك لأسبوع سيئ.</p><p><strong>نبّه على النسبة لا على الإجمالي.</strong> حصة رموز الاستدلال من إجمالي الرموز لكل مسار هي الرقم الوحيد الذي يتحرك أولاً حين يجعل تغيير في الموجِّه النموذجَ يعمل بجهد أكبر. أما تنبيه الإنفاق الإجمالي فيُطلق بعد أيام، حين يتراكم الحجم.</p><h2>أين يظل للسقف مكان</h2><p>إزالة المقبض على مستوى الطلب لا تعني إزالة كل الحدود. ما زالت حدود الإنفاق على مستوى المسار والمستأجر تعمل، وما زالت تلتقط الحلقات المنفلتة، وهي الآن موضع حاجز الحماية &mdash; عند الحد الذي تملكه أنت، لا داخل معامل طلب لم يعد موجوداً. أما المسارات الحساسة للزمن التي لا يستحق الاستدلال العميق فيها كلفته أبداً، فالرافعة هي اختيار النموذج لا ميزانية الرموز.</p><h2>ذات صلة</h2><ul><li><a href=\"/research/reasoning-token-attribution\">إسناد رموز الاستدلال</a></li><li><a href=\"/research/reasoning-model-cost-guide\">دليل تكلفة نماذج الاستدلال</a></li><li><a href=\"/research/llm-budget-governance\">حوكمة ميزانية LLM</a></li></ul>",
+      "faq": [
+        {
+          "question": "لماذا يعيد budget_tokens الخطأ 400 الآن؟",
+          "answer": "هو مُهمَل في Opus 4.6 وSonnet 4.6 ومرفوض صراحةً في Fable 5 و5.1 وSonnet 5 وOpus 5 و4.8 و4.7. تستخدم هذه النماذج بدلاً منه thinking: {type: “adaptive”}، حيث يقرر النموذج مقدار الاستدلال الذي يحتاجه الطلب."
+        },
+        {
+          "question": "هل التفكير التكيفي أغلى أم أرخص؟",
+          "answer": "ينخفض متوسط التكلفة لكل طلب عادةً، لأن الطلبات السهلة لم تعد تدفع ثمن استدلال لم تحتجه. ويرتفع التباين، لأن الطلبات الصعبة لم تعد تُقتطع عند سقفك. ضع الميزانية على النسب المئوية لا على المتوسط."
+        },
+        {
+          "question": "كيف نتحكم في إنفاق الاستدلال بدون budget_tokens؟",
+          "answer": "تتبّع رموز الاستدلال كسلسلة قياس مستقلة، وضع الميزانية على p50 وp99 لكل مسار بدلاً من حد أقصى لكل طلب، ونبّه على حصة رموز الاستدلال من إجمالي الرموز. الحدود الصارمة مكانها حد الإنفاق على المسار أو المستأجر."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/reasoning-token-attribution",
+          "label": "إسناد رموز الاستدلال"
+        },
+        {
+          "slug": "/research/reasoning-model-cost-guide",
+          "label": "دليل تكلفة نماذج الاستدلال"
+        },
+        {
+          "slug": "/research/llm-budget-governance",
+          "label": "حوكمة ميزانية LLM"
+        }
+      ]
+    },
+    "it": {
+      "title": "Il pensiero adattivo ha rotto la tua previsione",
+      "titleCore": "Pensiero adattivo e previsione dei costi",
+      "description": "budget_tokens non esiste più sui modelli recenti e restituisce un 400. Il tetto con cui prevedevi il costo del ragionamento è sparito: prevedi la distribuzione.",
+      "body": "<p>Il budget di ragionamento era un numero che fissavi tu. Passavi <code>thinking: {type: &quot;enabled&quot;, budget_tokens: N}</code> e N era insieme controllo e previsione: nel caso peggiore, ogni richiesta ti costava N token di ragionamento, e la finanza poteva moltiplicare.</p><p>Quel parametro è deprecato su Opus 4.6 e Sonnet 4.6, e sui modelli più recenti &mdash; Fable 5 e 5.1, Sonnet 5, Opus 5, 4.8 e 4.7 &mdash; inviarlo restituisce un <strong>400</strong>. Il sostituto è <code>thinking: {type: &quot;adaptive&quot;}</code>, con cui è il modello a decidere quanto ragionare in base alla difficoltà della richiesta.</p><p>In media è un output migliore per dollaro. Ma è anche la rimozione di un tetto: se la tua previsione era costruita su quel tetto, ora è sbagliata in un modo che non emerge finché il mese non si chiude.</p><h2>Cosa cambia nei numeri</h2><p>Il costo medio per richiesta di solito scende, perché le richieste facili smettono di pagare un ragionamento che non serviva. <strong>La varianza sale</strong>, perché le richieste difficili non vengono più troncate al tuo limite. I due movimenti vanno in direzioni opposte, e un budget espresso come massimo per richiesta non ha più nulla a cui agganciarsi.</p><p>Il problema pratico non è la media, è la coda: una modifica al prompt, un nuovo tipo di documento o un utente che fa domande più difficili spostano una fetta del traffico verso un ragionamento più profondo, e nulla nella tua configurazione lo limita.</p><h2>Prevedi la distribuzione, non il tetto</h2><p>Tre cambiamenti, in ordine di valore.</p><p><strong>Traccia i token di ragionamento come serie a sé.</strong> Sono già nell'oggetto di utilizzo di ogni risposta. Separali da input e output nella telemetria e vedrai lo spostamento il giorno stesso in cui avviene, non a fine mese.</p><p><strong>Fai il budget sui percentili.</strong> Sostituisci &quot;N token per richiesta&quot; con un p50 e un p99 per rotta. Il p50 ti dice quanto costa il carico di lavoro; la distanza tra p50 e p99 ti dice quanto sei esposto a una settimana storta.</p><p><strong>Allerta sul rapporto, non sul totale.</strong> I token di ragionamento come quota dei token totali per rotta sono il numero che si muove per primo quando una modifica al prompt fa lavorare di più il modello. Un allarme sulla spesa totale scatta giorni dopo, quando il volume si è già accumulato.</p><h2>Dove serve ancora un tetto</h2><p>Eliminare la manopola per richiesta non significa eliminare ogni limite. I limiti di spesa a livello di rotta e di tenant funzionano ancora, intercettano i cicli fuori controllo e ora sono il posto giusto per il guardrail: al confine che controlli tu, non dentro un parametro di richiesta che non esiste più. Sui percorsi sensibili alla latenza, dove un ragionamento profondo non vale mai la pena, la leva è la scelta del modello, non un budget di token.</p><h2>Correlati</h2><ul><li><a href=\"/research/reasoning-token-attribution\">Attribuzione dei token di ragionamento</a></li><li><a href=\"/research/reasoning-model-cost-guide\">Guida ai costi dei modelli di ragionamento</a></li><li><a href=\"/research/llm-budget-governance\">Governance del budget LLM</a></li></ul>",
+      "faq": [
+        {
+          "question": "Perché budget_tokens restituisce ora un 400?",
+          "answer": "È deprecato su Opus 4.6 e Sonnet 4.6 e viene rifiutato del tutto su Fable 5 e 5.1, Sonnet 5, Opus 5, 4.8 e 4.7. Questi modelli usano thinking: {type: \"adaptive\"}, dove è il modello a decidere quanto ragionamento serve alla richiesta."
+        },
+        {
+          "question": "Il pensiero adattivo costa di più o di meno?",
+          "answer": "Il costo medio per richiesta di solito scende, perché le richieste facili smettono di pagare un ragionamento inutile. La varianza sale, perché le richieste difficili non vengono più troncate al tuo tetto. Fai il budget sui percentili, non su una media."
+        },
+        {
+          "question": "Come si controlla la spesa di ragionamento senza budget_tokens?",
+          "answer": "Traccia i token di ragionamento come serie telemetrica autonoma, fai il budget su p50 e p99 per rotta invece che su un massimo per richiesta, e allerta sulla quota dei token di ragionamento rispetto al totale. I limiti rigidi vanno al confine di rotta o di tenant."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/reasoning-token-attribution",
+          "label": "Attribuzione dei token di ragionamento"
+        },
+        {
+          "slug": "/research/reasoning-model-cost-guide",
+          "label": "Guida ai costi dei modelli di ragionamento"
+        },
+        {
+          "slug": "/research/llm-budget-governance",
+          "label": "Governance del budget LLM"
+        }
+      ]
+    },
+    "ko": {
+      "title": "적응형 사고가 비용 예측을 무너뜨렸습니다",
+      "titleCore": "적응형 사고와 비용 예측",
+      "description": "budget_tokens는 최신 모델에서 사라졌고 400 오류를 반환합니다. 추론 비용을 예측하던 조절 장치가 더 이상 없으니, 이제는 비용의 분포를 예측해야 합니다.",
+      "body": "<p>추론 예산은 예전에는 직접 설정하는 숫자였습니다. <code>thinking: {type: &quot;enabled&quot;, budget_tokens: N}</code>처럼 넘기면 N은 제어 수단인 동시에 예측값이었습니다. 최악의 경우 요청마다 N개의 추론 토큰이 들었고, 재무팀은 이 값에 요청 수를 곱하면 됐습니다.</p><p>이 파라미터는 Opus 4.6과 Sonnet 4.6에서 지원이 중단되었고, Fable 5와 5.1, Sonnet 5, Opus 5, 4.8, 4.7 같은 최신 모델에서는 보내면 <strong>400</strong>이 반환됩니다. 대체재는 <code>thinking: {type: &quot;adaptive&quot;}</code>이며, 모델이 요청의 난이도를 보고 얼마나 생각할지 스스로 정합니다.</p><p>평균적으로는 달러당 얻는 결과물이 더 좋아집니다. 하지만 이것은 상한선이 사라졌다는 뜻이기도 합니다. 예측이 그 상한선을 기준으로 세워졌다면, 그 예측은 월말이 되어서야 드러나는 방식으로 틀려 있게 됩니다.</p><h2>숫자에서 무엇이 바뀌는가</h2><p>요청당 평균 비용은 보통 내려갑니다. 쉬운 요청이 필요 없었던 추론 비용을 더 이상 내지 않기 때문입니다. 하지만 <strong>분산은 올라갑니다</strong>. 어려운 요청이 더 이상 상한선에서 잘리지 않기 때문입니다. 두 값은 서로 반대 방향으로 움직이며, 요청당 최대값으로 표현된 예산은 붙잡을 것이 남지 않습니다.</p><p>실제로 문제가 되는 것은 평균이 아니라 꼬리 부분입니다. 프롬프트 변경, 새로운 문서 유형, 더 어려운 질문을 하기 시작한 사용자 한 명이 트래픽의 일부를 더 깊은 추론으로 밀어 넣어도, 설정 어디에도 이를 막는 장치는 없습니다.</p><h2>상한선이 아니라 분포를 예측하십시오</h2><p>효과가 큰 순서대로 세 가지 변경이 있습니다.</p><p><strong>추론 토큰을 별도의 시계열로 추적하십시오.</strong> 이 값은 이미 모든 응답의 usage 객체에 들어 있습니다. 텔레메트리에서 입력 토큰, 출력 토큰과 분리해 두면, 월말이 아니라 변화가 생긴 날 그 이동을 볼 수 있습니다.</p><p><strong>백분위수로 예산을 세우십시오.</strong> &quot;요청당 N 토큰&quot;이라는 표현 대신 라우트별 p50과 p99를 쓰십시오. p50은 워크로드가 얼마나 드는지 알려 주고, p50과 p99의 차이는 나쁜 한 주에 얼마나 노출되어 있는지 알려 줍니다.</p><p><strong>총액이 아니라 비율에 대해 경고를 설정하십시오.</strong> 라우트별로 전체 토큰 중 추론 토큰이 차지하는 비율은, 프롬프트 변경으로 모델이 더 힘들게 일하기 시작할 때 가장 먼저 움직이는 단일 지표입니다. 총지출 경고는 볼륨이 쌓인 뒤 며칠이 지나서야 울립니다.</p><h2>상한선이 여전히 필요한 곳</h2><p>요청별 조절 장치를 없앤다고 모든 제한을 없애는 것은 아닙니다. 라우트 단위와 테넌트 단위의 지출 한도는 여전히 작동하고, 여전히 폭주하는 루프를 잡아냅니다. 가드레일이 있어야 할 곳은 이제 바로 그 자리, 즉 여러분이 소유한 경계입니다. 더 이상 존재하지 않는 요청 파라미터 안이 아닙니다. 깊은 추론이 결코 가치가 없는 지연 민감 경로에서는, 지렛대는 토큰 예산이 아니라 모델 선택입니다.</p><h2>관련 글</h2><ul><li><a href=\"/research/reasoning-token-attribution\">추론 토큰 귀속</a></li><li><a href=\"/research/reasoning-model-cost-guide\">추론 모델 비용 가이드</a></li><li><a href=\"/research/llm-budget-governance\">LLM 예산 거버넌스</a></li></ul>",
+      "faq": [
+        {
+          "question": "budget_tokens는 이제 왜 400을 반환합니까?",
+          "answer": "Opus 4.6과 Sonnet 4.6에서는 지원이 중단되었고, Fable 5와 5.1, Sonnet 5, Opus 5, 4.8, 4.7에서는 거부됩니다. 이 모델들은 대신 thinking: {type: \"adaptive\"}를 사용하며, 요청에 필요한 추론량은 모델이 스스로 결정합니다."
+        },
+        {
+          "question": "적응형 사고는 비용이 더 듭니까, 덜 듭니까?",
+          "answer": "요청당 평균 비용은 보통 내려갑니다. 쉬운 요청이 필요 없었던 추론 비용을 내지 않기 때문입니다. 반면 분산은 올라갑니다. 어려운 요청이 더 이상 상한선에서 잘리지 않기 때문입니다. 평균이 아니라 백분위수로 예산을 세우십시오."
+        },
+        {
+          "question": "budget_tokens 없이 추론 지출은 어떻게 통제합니까?",
+          "answer": "추론 토큰을 별도의 텔레메트리 시계열로 추적하고, 요청별 최대값 대신 라우트별 p50과 p99로 예산을 세우며, 전체 토큰 중 추론 토큰의 비율에 대해 경고를 설정하십시오. 강한 제한은 라우트나 테넌트의 지출 경계에 두어야 합니다."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/reasoning-token-attribution",
+          "label": "추론 토큰 귀속"
+        },
+        {
+          "slug": "/research/reasoning-model-cost-guide",
+          "label": "추론 모델 비용 가이드"
+        },
+        {
+          "slug": "/research/llm-budget-governance",
+          "label": "LLM 예산 거버넌스"
+        }
+      ]
+    },
+    "nl": {
+      "title": "Adaptief denken brak je kostenvoorspelling",
+      "titleCore": "Adaptief denken en kostenvoorspelling",
+      "description": "budget_tokens is op de nieuwste modellen weg en geeft een 400. De knop waarmee je redeneerkosten voorspelde bestaat niet meer. Voorspel de verdeling.",
+      "body": "<p>Het redeneerbudget was vroeger een getal dat je zelf instelde. Je stuurde <code>thinking: {type: &quot;enabled&quot;, budget_tokens: N}</code>, en N was tegelijk een rem en een voorspelling: in het slechtste geval kostte elk verzoek N redeneertokens, en finance kon vermenigvuldigen.</p><p>Die parameter is verouderd op Opus 4.6 en Sonnet 4.6, en op de nieuwste modellen &mdash; Fable 5 en 5.1, Sonnet 5, Opus 5, 4.8 en 4.7 &mdash; geeft meesturen een <strong>400</strong>. De vervanging is <code>thinking: {type: &quot;adaptive&quot;}</code>, waarbij het model zelf bepaalt hoeveel het nadenkt op basis van de moeilijkheid van het verzoek.</p><p>Gemiddeld is dat meer output per euro. Maar het haalt ook een plafond weg, en als je voorspelling op dat plafond was gebouwd, klopt hij nu niet meer. Dat merk je pas als de maand dicht is.</p><h2>Wat er in de cijfers verandert</h2><p>De gemiddelde kost per verzoek daalt meestal, omdat makkelijke verzoeken niet langer betalen voor redeneren dat ze niet nodig hadden. <strong>De variantie stijgt</strong>, omdat zware verzoeken niet langer worden afgekapt op je plafond. Die twee bewegen tegenovergesteld, en een budget dat als maximum per verzoek is uitgedrukt heeft dan niets meer om zich aan vast te houden.</p><p>Het praktische probleem zit niet in het gemiddelde maar in de staart: een promptwijziging, een nieuw documenttype of gebruikers die moeilijkere vragen stellen, schuiven een deel van je verkeer naar dieper redeneren, en niets in je configuratie houdt dat tegen.</p><h2>Voorspel de verdeling, niet het plafond</h2><p>Drie wijzigingen, in volgorde van wat ze opleveren.</p><p><strong>Volg redeneertokens als aparte reeks.</strong> Ze staan al in het usage-object van elke respons. Scheid ze van input- en outputtokens in je telemetrie, dan zie je de verschuiving op de dag dat hij gebeurt, niet pas aan het einde van de maand.</p><p><strong>Budgetteer op percentielen.</strong> Vervang &quot;N tokens per verzoek&quot; door een p50 en een p99 per route. De p50 vertelt wat de workload kost; het verschil tussen p50 en p99 vertelt hoe blootgesteld je bent aan een slechte week.</p><p><strong>Alarmeer op de verhouding, niet op het totaal.</strong> Redeneertokens als aandeel van het totaal per route is het ene getal dat het eerst beweegt wanneer een promptwijziging het model harder laat werken. Een alarm op het totale uitgavenbedrag gaat dagen later af, als het volume zich al heeft opgestapeld.</p><h2>Waar een plafond nog wel hoort</h2><p>Het per-verzoek-instelpunt weghalen betekent niet dat alle limieten verdwijnen. Uitgavenlimieten per route en per tenant werken nog steeds, vangen nog steeds runaway-loops op, en daar hoort de rem nu te zitten &mdash; op de grens die van jou is, niet in een requestparameter die niet meer bestaat. Voor latency-gevoelige paden waar diep redeneren nooit de moeite waard is, is de hefboom de modelkeuze, niet een tokenbudget.</p><h2>Gerelateerd</h2><ul><li><a href=\"/research/reasoning-token-attribution\">Toerekening van redeneertokens</a></li><li><a href=\"/research/reasoning-model-cost-guide\">Kostengids voor redeneermodellen</a></li><li><a href=\"/research/llm-budget-governance\">Budgetgovernance voor LLM's</a></li></ul>",
+      "faq": [
+        {
+          "question": "Waarom geeft budget_tokens nu een 400?",
+          "answer": "Het is verouderd op Opus 4.6 en Sonnet 4.6 en wordt op Fable 5 en 5.1, Sonnet 5, en Opus 5, 4.8 en 4.7 direct geweigerd. Die modellen gebruiken thinking: {type: \"adaptive\"}, waarbij het model zelf bepaalt hoeveel redeneren het verzoek nodig heeft."
+        },
+        {
+          "question": "Kost adaptief denken meer of minder?",
+          "answer": "De gemiddelde kost per verzoek daalt meestal, omdat makkelijke verzoeken niet langer betalen voor onnodig redeneren. De variantie stijgt, omdat zware verzoeken niet meer worden afgekapt op je plafond. Budgetteer op percentielen in plaats van op een gemiddelde."
+        },
+        {
+          "question": "Hoe houden we redeneerkosten onder controle zonder budget_tokens?",
+          "answer": "Volg redeneertokens als aparte telemetriereeks, budgetteer op p50 en p99 per route in plaats van een maximum per verzoek, en alarmeer op redeneertokens als aandeel van het totaal. Harde limieten horen op de grens van de route of tenant."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/reasoning-token-attribution",
+          "label": "Toerekening van redeneertokens"
+        },
+        {
+          "slug": "/research/reasoning-model-cost-guide",
+          "label": "Kostengids voor redeneermodellen"
+        },
+        {
+          "slug": "/research/llm-budget-governance",
+          "label": "Budgetgovernance voor LLM's"
+        }
+      ]
+    },
+    "zh": {
+      "title": "自适应思考让成本预测失效了",
+      "titleCore": "自适应思考与成本预测",
+      "description": "最新模型已不再支持 budget_tokens，传入会直接返回 400。过去用来预测推理开销的旋钮没了，改为预测分布。",
+      "body": "<p>推理预算过去是你自己设定的一个数字。你传入 <code>thinking: {type: &quot;enabled&quot;, budget_tokens: N}</code>，N 既是控制手段，也是预测依据：最坏情况下，每次请求都消耗 N 个推理 Token，财务只需把次数乘上去。</p><p>该参数在 Opus 4.6 和 Sonnet 4.6 上已被弃用；在最新模型上——Fable 5 和 5.1、Sonnet 5、Opus 5、4.8 和 4.7——传入它会直接返回 <strong>400</strong>。替代方案是 <code>thinking: {type: &quot;adaptive&quot;}</code>，由模型根据请求难度自行决定思考多少。</p><p>平均而言，这样每美元的输出质量更高。但它也取消了一道上限。如果你的预测是基于这道上限建立的，那么预测现在已经错了，只是要等到月底结账时才会暴露出来。</p><h2>数字层面的变化</h2><p>单次请求的平均成本通常会下降，因为简单请求不再为用不上的推理付费。<strong>方差会上升</strong>，因为困难请求不再被上限截断。两者走向相反，而以单次最大值表达的预算也就无处可依。</p><p>实际出问题的不是平均值，而是尾部：一次提示词修改、一种新的文档类型，或者用户开始问更难的问题，都会把一部分流量推入更深的推理，而你的配置里没有任何东西能限制它。</p><h2>按分布预测，而不是按上限</h2><p>三项改动，按收益大小排序。</p><p><strong>把推理 Token 作为独立序列追踪。</strong>它们已经包含在每次响应的 usage 对象里。把它们与输入、输出分开记入遥测，就能在变化发生的当天看到，而不是等到月末。</p><p><strong>按百分位做预算。</strong>把“每次请求 N 个 Token”替换为每条路由的 p50 和 p99。p50 告诉你工作负载的常规成本；p50 与 p99 之间的差距，则说明一个糟糕的星期会让你暴露多少。</p><p><strong>对比例而非总量设告警。</strong>每条路由中推理 Token 占总 Token 的比例，是提示词变化让模型更费劲时最先移动的数字。总支出告警通常要等用量累积到一定程度才会触发，往往晚好几天。</p><h2>上限仍应设在哪里</h2><p>去掉单次请求的旋钮，并不等于取消所有限制。路由级和租户级的支出上限依然有效，依然能拦住失控的循环，护栏现在应该放在这里——放在你自己掌控的边界上，而不是放在一个已经不存在的请求参数里。对于延迟敏感、深度推理永远不值得的路径，手段应该是选模型，而不是设 Token 预算。</p><h2>相关阅读</h2><ul><li><a href=\"/research/reasoning-token-attribution\">推理 Token 归因</a></li><li><a href=\"/research/reasoning-model-cost-guide\">推理模型成本指南</a></li><li><a href=\"/research/llm-budget-governance\">LLM 预算治理</a></li></ul>",
+      "faq": [
+        {
+          "question": "为什么 budget_tokens 现在会返回 400？",
+          "answer": "它在 Opus 4.6 和 Sonnet 4.6 上已被弃用，在 Fable 5 和 5.1、Sonnet 5、Opus 5、4.8 和 4.7 上会被直接拒绝。这些模型改用 thinking: {type: \"adaptive\"}，由模型自行判断请求需要多少推理。"
+        },
+        {
+          "question": "自适应思考会让成本更高还是更低？",
+          "answer": "单次请求的平均成本通常会下降，因为简单请求不再为用不上的推理付费。方差则会上升，因为困难请求不再被上限截断。应按百分位做预算，而不是按平均值。"
+        },
+        {
+          "question": "没有 budget_tokens，怎样控制推理支出？",
+          "answer": "把推理 Token 作为独立遥测序列追踪，按每条路由的 p50 和 p99 做预算而非单次最大值，并对推理 Token 占总量的比例设告警。硬性限制应放在路由或租户的支出边界上。"
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/reasoning-token-attribution",
+          "label": "推理 Token 归因"
+        },
+        {
+          "slug": "/research/reasoning-model-cost-guide",
+          "label": "推理模型成本指南"
+        },
+        {
+          "slug": "/research/llm-budget-governance",
+          "label": "LLM 预算治理"
         }
       ]
     }
