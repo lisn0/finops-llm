@@ -3,15 +3,15 @@
   "permalink": "telemetry.html",
   "lang": "en",
   "head": {
-    "title": "Tidal Telemetry · LLM observability, free in beta · FinOps LLM",
-    "description": "Tidal Telemetry is our LLM observability product: one line of code, plain OpenTelemetry, isolated per-project storage. Free in beta, no engagement required.",
+    "title": "Tidal Telemetry · Live LLM cost and savings evidence · FinOps LLM",
+    "description": "Tidal Telemetry shows live LLM cost by provider, model, feature, team and workflow, and is the evidence behind the monthly savings statement. Live trial.",
     "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
     "canonical": "https://finopsllm.com/telemetry",
     "openGraph": [
       { "property": "og:type", "content": "website" },
       { "property": "og:url", "content": "https://finopsllm.com/telemetry" },
-      { "property": "og:title", "content": "Tidal Telemetry · LLM observability, free in beta · FinOps LLM" },
-      { "property": "og:description", "content": "Tidal Telemetry is our LLM observability product: one line of code, plain OpenTelemetry, isolated per-project storage. Free in beta, no engagement required." },
+      { "property": "og:title", "content": "Tidal Telemetry · Live LLM cost and savings evidence · FinOps LLM" },
+      { "property": "og:description", "content": "Tidal Telemetry shows live LLM cost by provider, model, feature, team and workflow, and is the evidence behind the monthly savings statement. Live trial." },
       { "property": "og:image", "content": "https://finopsllm.com/og.png" },
       { "property": "og:site_name", "content": "FinOps LLM" },
       { "property": "og:locale", "content": "en_US" }
@@ -19,8 +19,8 @@
     "twitter": [
       { "name": "twitter:card", "content": "summary_large_image" },
       { "name": "twitter:site", "content": "@finopsllm" },
-      { "name": "twitter:title", "content": "Tidal Telemetry · LLM observability, free in beta · FinOps LLM" },
-      { "name": "twitter:description", "content": "Tidal Telemetry is our LLM observability product: one line of code, plain OpenTelemetry, isolated per-project storage. Free in beta, no engagement required." },
+      { "name": "twitter:title", "content": "Tidal Telemetry · Live LLM cost and savings evidence · FinOps LLM" },
+      { "name": "twitter:description", "content": "Tidal Telemetry shows live LLM cost by provider, model, feature, team and workflow, and is the evidence behind the monthly savings statement. Live trial." },
       { "name": "twitter:image", "content": "https://finopsllm.com/og.png" }
     ],
     "style": "body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.65}.wrap{max-width:760px;margin:0 auto;padding:56px 24px}a{color:#7AAFFF}p,li{color:#B6C0D2}",
@@ -31,15 +31,15 @@
     "faq": [
       {
         "q": "What is Tidal Telemetry?",
-        "a": "A hosted LLM observability product from the same team as FinOps LLM. You install an SDK, call one init function, and every model call arrives as a trace with model, token counts, estimated cost, latency and errors attached."
+        "a": "Live LLM cost by provider, model, feature, team and workflow, from the same team as FinOps LLM. Every model call arrives as a trace with model, token counts, estimated cost, latency and errors attached. It is the evidence behind the monthly savings statement."
       },
       {
-        "q": "Do I have to use Tidal Telemetry to work with FinOps LLM?",
-        "a": "No, and the reverse is also true. Engagements are measured against your raw provider invoices and whatever tooling you already run. You can request Tidal access without a managed engagement; our team will explain the current onboarding process."
+        "q": "Is Tidal Telemetry part of the FinOps LLM engagement?",
+        "a": "Yes. Tidal Telemetry measures the savings from Tidal Gateway and is included in the flat 20%. The baseline and the monthly reconciliation still come from your raw provider invoices, not from our own dashboard."
       },
       {
         "q": "What does Tidal Telemetry cost?",
-        "a": "It is free during the beta with no credit card. Paid tiers are planned, and beta users keep a free plan when they arrive."
+        "a": "Nothing on top of the engagement. Tidal Telemetry operations are included in the flat 20% of verified savings. It is a live trial at telemetry.llmcfo.com."
       },
       {
         "q": "Do I have to install your SDK to send data?",
@@ -51,29 +51,29 @@
 ---
 {% extends "shell.njk" %}{% block body %}<h1>Tidal Telemetry</h1>
 
-<p>Everything else on this site is people doing work on your bill. <a href="https://telemetry.llmcfo.com">Tidal Telemetry</a> is software you run yourself. It is free during beta and requires no managed engagement. Contact us to request access while company enrollment is being rolled out.</p>
+<p><a href="https://telemetry.llmcfo.com">Tidal Telemetry</a> is the live cost view in the Tidal suite, next to Tidal Audit and Tidal Gateway. It is a live trial, it is how you and we see the same numbers, and it is included in the engagement.</p>
 
 <h2>What it is</h2>
-<p>Hosted LLM observability. Install the SDK, call the init function, and every model call your application makes starts arriving as a trace: model, tokens in and out, an estimated cost per call, latency, errors.</p>
+<p>Live cost by provider, model, feature, team and workflow, and the evidence behind the monthly savings statement. Install the SDK, call the init function, and every model call your application makes starts arriving as a trace: model, tokens in and out, an estimated cost per call, latency, errors.</p>
 <ul>
-<li><strong>Instrumentation for common AI libraries.</strong> The Python SDK supports OpenAI, Anthropic and popular agent frameworks. Node applications can send standard OTLP traces without a Tidal-specific npm package.</li>
+<li><strong>Instrumentation for common AI libraries.</strong> The Python SDK supports OpenAI, Anthropic and popular agent frameworks. Other languages can send standard OTLP traces.</li>
 <li><strong>Plain OpenTelemetry, so the SDK is optional.</strong> Ingest is OTLP over HTTPS with a bearer token. Point any OpenTelemetry exporter at your project endpoint and it behaves identically. The SDK is a thin wrapper over the Apache-licensed OpenLIT SDK.</li>
 <li><strong>Isolated per-project storage.</strong> Each project gets its own database and its own ingest key, enforced at the storage layer rather than by a filter in a query.</li>
 <li><strong>A built-in MCP server.</strong> Agents can verify the setup, send a test trace and pull usage reports directly, which is a faster loop than reading a dashboard.</li>
 </ul>
 
 <h2>What it costs</h2>
-<p>Nothing, currently. It is in beta and free with no credit card, paid tiers are planned, and beta users keep a free plan when those arrive. That is the actual state of it rather than a launch offer with a countdown attached.</p>
+<p>Nothing on top of the engagement. Tidal Telemetry operations are included in the flat 20% of verified savings, with no licence fee. It is a live trial today.</p>
 
 <h2>How it relates to the engagement</h2>
-<p>Telemetry shows you what your LLMs spend. The <a href="/">FinOps LLM engagement</a> is the work that reduces it, priced on <a href="/pricing">verified savings</a>. The two are cross-promoted and deliberately not bundled.</p>
+<p>Telemetry shows what your LLMs spend. The <a href="/">FinOps LLM engagement</a> is the work that reduces it, priced on <a href="/pricing">verified savings</a>.</p>
 <ul>
-<li><strong>Use Telemetry without a managed engagement.</strong> Request access, and our team will explain the current onboarding process.</li>
-<li><strong>Hire us and never use Telemetry.</strong> Audits run against provider billing data - the <a href="/audit/openai">OpenAI</a> Costs endpoint, the <a href="/audit/bedrock">Bedrock</a> CUR, the <a href="/audit/vertex-ai">Vertex</a> BigQuery export - not against our own product.</li>
-<li><strong>If your bill is small or you prefer to do the work yourself, this is the better answer.</strong> Instrument it yourself, read your own numbers, and use the <a href="/templates">free templates</a> to allocate them.</li>
+<li><strong>Tidal Audit</strong> is the free, read-only review of your invoices and usage logs, run by our team. Audits run against provider billing data - the <a href="/audit/openai">OpenAI</a> Costs endpoint, the <a href="/audit/bedrock">Bedrock</a> CUR, the <a href="/audit/vertex-ai">Vertex</a> BigQuery export.</li>
+<li><strong>Tidal Gateway</strong> is the LiteLLM gateway we deploy and operate in your cloud, where the changes ship.</li>
+<li><strong>Tidal Telemetry</strong> measures what the gateway saves and is the evidence behind the monthly statement. It is included in the 20%.</li>
 </ul>
-<p>Keeping the two apart is a constraint we put on ourselves for a reason. A cost consultant who also owns the meter has an obvious problem, so every baseline behind every fee comes from raw provider invoices.</p>
+<p>A cost consultant who also owns the meter has an obvious problem, so every baseline behind every fee comes from raw provider invoices, and Telemetry is used to reconcile against them.</p>
 
-<p>Existing users can <a href="https://openlit.llmcfo.com/login">sign in to Tidal</a>. For a new company account, <a href="/contact">request access</a>. Issued enrollment links are being prepared for rollout. The <a href="https://telemetry.llmcfo.com/docs">setup docs</a> cover Python and plain OpenTelemetry. If you want someone to read your invoice and tell you where the money went, request the <a href="/book">free audit</a>.</p>
+<p>Existing users can <a href="https://openlit.llmcfo.com/login">sign in to Tidal</a>. To try it on your own traffic, <a href="/contact">request access</a>. The <a href="https://telemetry.llmcfo.com/docs">setup docs</a> cover Python and plain OpenTelemetry. If you want someone to read your invoice and tell you where the money went, request the <a href="/book">free audit</a>.</p>
 
 <p><a href="/">Back to FinOps LLM</a></p>{% endblock %}
