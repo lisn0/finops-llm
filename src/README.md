@@ -25,7 +25,7 @@ Built with [Eleventy](https://www.11ty.dev/) and [Nunjucks](https://mozilla.gith
 
 - `src/*.njk`, `src/research/*.njk`, `src/<locale>/**/*.njk` — page source
 - `src/_includes/shell.njk` — data-driven layout for research/guides (inline head from JSON front matter)
-- `src/_includes/home-shell.njk` — legacy-style wrapper for the 6 localized homepages
+- `src/_data/homeUi/<lang>.json` — per-locale strings for the homepage (`en`, `es`, `fr`, `de`, `pt`, `ja`); `src/index.njk` paginates over them
 - `_headers`, `_redirects`, `worker.js` — Cloudflare: security headers, `/book` redirect, edge Markdown-for-agents
 - `robots.txt`, `sitemap.xml`, `llms.txt`, `.well-known/` — crawler + agent discovery
 - `assets/consent.js` — Google Consent Mode v2 + cookie banner (GA4 `G-5BB5KVZCL3`)
@@ -77,7 +77,7 @@ Research articles and guide pages use the shared `shell.njk` layout. Create a `-
 
 Supported `head` fields mirror the tags emitted by the old hand-written pages: `title`, `description`, `keywords`, `robots`, `themeColor`, `verification`, `canonical`, `hreflang`, `openGraph`, `twitter`, `links`, `fontStylesheet`, `style`, `scripts`, `jsonLd`.
 
-The 6 localized homepages (`index.njk`, `de/index.njk`, `es/index.njk`, `fr/index.njk`, `ja/index.njk`, `pt/index.njk`) keep their original full-HTML skeleton and extend `home-shell.njk` instead, because they carry custom headers, footers, and `<main id="main">` markup.
+The 6 localized homepages are one paginated template, `src/index.njk` (full-HTML skeleton, custom header/footer/`<main>`), rendered once per key of `src/_data/homeUi/<lang>.json` (`en` at `/`, others at `/<lang>/`). To add or edit homepage copy, change the JSON; `eleventy.config.js` fails the build if any locale is missing a key, has an empty string, or has an array of a different length than `en.json`.
 
 ## Booking attribution
 

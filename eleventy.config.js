@@ -14,6 +14,27 @@ const SITEMAP_SKIP = new Set(["/404.html"]);
 const articlePages = require("./src/_data/articlePages.js")();
 const articles = require("./src/_data/articles.js")();
 
+// Homepage strings, one JSON per locale (src/_data/homeUi/<lang>.json), rendered by
+// the paginated src/index.njk. Fail the build if a locale drifts from en.
+const homeUi = Object.fromEntries(
+  fs.readdirSync(__dirname + "/src/_data/homeUi").filter((f) => f.endsWith(".json")).map((f) => [f.slice(0, -5), require("./src/_data/homeUi/" + f)])
+);
+const checkHomeUi = (ref, got, path, lang) => {
+  if (Array.isArray(ref)) {
+    if (!Array.isArray(got) || got.length !== ref.length) throw new Error(`homeUi/${lang}.json: ${path} must be an array of length ${ref.length}`);
+    ref.forEach((r, i) => checkHomeUi(r, got[i], `${path}[${i}]`, lang));
+  } else if (ref && typeof ref === "object") {
+    if (!got || typeof got !== "object") throw new Error(`homeUi/${lang}.json: ${path} must be an object`);
+    for (const k of Object.keys(ref)) {
+      if (!(k in got)) throw new Error(`homeUi/${lang}.json: missing key ${path}.${k}`);
+      checkHomeUi(ref[k], got[k], `${path}.${k}`, lang);
+    }
+  } else if (typeof got !== "string" || !got.trim()) {
+    throw new Error(`homeUi/${lang}.json: ${path} must be a non-empty string`);
+  }
+};
+for (const lang of Object.keys(homeUi)) if (lang !== "en") checkHomeUi(homeUi.en, homeUi[lang], "$", lang);
+
 // Strip the .html and any trailing index so the sitemap advertises the same
 // extensionless URLs the site links internally.
 const cleanUrl = (url) => url.replace(/index\.html$/, "").replace(/\.html$/, "");
@@ -203,6 +224,13 @@ module.exports = function (eleventyConfig) {
       lang: p.lang,
       priority: "0.9",
     }));
+    // Only page 1 of the paginated homepage reaches getAll(), so list every locale here.
+    const fromHome = Object.keys(homeUi).map((lang) => ({
+      loc: SITE_URL + (lang === "en" ? "/" : "/" + lang + "/"),
+      lastmod: fs.statSync(__dirname + "/src/index.njk").mtime.toISOString().slice(0, 10),
+      lang,
+      priority: "1.0",
+    }));
     return api
       .getAll()
       .filter((item) => {
@@ -225,7 +253,7 @@ module.exports = function (eleventyConfig) {
         // The homepages get crawled most; research beats the rest of the site.
         priority: cleanUrl(item.url).replace(/\/$/, "").split("/").filter(Boolean).length === 0 ? "1.0" : item.url.includes("/research/") ? "0.9" : "0.7",
       }))
-      .concat(fromData)
+      .concat(fromData, fromHome)
       // A/B variants canonical to their control, so listing them asks crawlers to
       // index a URL that disclaims itself. They reach the sitemap from both
       // sources above, hence the filter here rather than in either one.
