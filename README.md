@@ -5,7 +5,7 @@
 ## What this site is
 
 - **Research & education hub**: 150+ articles on LLM cost attribution, budgeting, anomaly detection, and FinOps practice.
-- **Multi-language**: EN (primary, ~174 pages), plus ES, JA, DE, FR, PT at ~70 pages each. ~517 pages total.
+- **Multi-language**: locale support is declared in `src/_data/langs.js` (currently EN, DE, ES, FR, JA, PT, IT, KO, ZH, NL, AR). Each article emits only its declared translations; built page totals are source-driven.
 - **AI-crawler friendly**: Markdown export via `Accept: text/markdown`, FAQPage JSON-LD for Bing AI, robots.txt AI signals.
 - **Managed cost optimization service pitch**: Free audit booking at `/book`.
 
@@ -23,13 +23,14 @@ npm run serve
 
 Starts at `http://localhost:8080` with live reload.
 
-## Build
+## Build and checks
 
 ```bash
 npm run build
+npm test
 ```
 
-Outputs to `_site/` (gitignored). Eleventy builds ~123 pages in ~0.3s.
+Outputs to `_site/` (gitignored). The prebuild topic-gap check and postbuild generated Markdown/link checks run as part of `npm run build`; page totals vary with source and declared translations.
 
 ## Deployment
 
@@ -43,17 +44,31 @@ The repo is connected to Cloudflare Workers git-triggered builds. Pushing to the
 
 Single source of truth: the git repo. No manual CLI deployments.
 
-## Post-deploy: IndexNow submission
+## Post-publish search submission
 
-New pages and content changes require manual IndexNow submission to notify Bing, Google, and other AI search engines. **Run this AFTER the deploy is live** (allow ~1–2 minutes for Cloudflare to finish):
+Use the workspace's shared runner after committing article or site changes:
 
 ```bash
-INDEXNOW_HOST=finopsllm.com INDEXNOW_KEY=$(cat src/indexnow-key.txt) node scripts/indexnow-submit.mjs
+node ~/projects/ai/portfolio/scripts/publish-search.mjs \
+  --site finops-llm --push https://finopsllm.com/research/example
 ```
 
-The script reads the live sitemap (from the deployed domain), verifies HTTP 200 on each URL, and submits to IndexNow. The key file (`src/indexnow-key.txt`) contains the secret used in the `/?key=<key>` submission endpoint.
+`--push` verifies this repo's `main` branch and GitHub remote, pushes all
+outgoing commits, then waits until each supplied URL returns successfully and
+appears in the live sitemap. Review the printed commit and file list first.
+Existing uncommitted changes stay local. Omit `--push` when Cloudflare has
+already deployed the commit.
 
-**Why manual?** The GitHub Action was removed because it couldn't reliably poll Cloudflare's deploy status. Until Cloudflare exposes a deploy-complete webhook or API, post-deploy notification must be run locally after confirming the site is live.
+The runner submits `/sitemap-index.xml` to Google Search Console, inspects each
+URL, verifies the live IndexNow ownership file, and submits the URLs to Bing and
+other IndexNow engines. The public key source is
+`src/9f7a91c496064b7e96137c3326d9b895.txt`; the key is public by design and
+must be served from the site root. Google inspection reports current index
+status; neither it nor a sitemap submission guarantees indexing.
+
+FinOps' GitHub Actions workflow also runs weekly and after article/research
+content pushes. A GitHub billing lock currently prevents Actions from starting
+(Frontier #3753), so use the local workspace runner for on-demand submissions.
 
 ## Architecture
 
@@ -63,8 +78,8 @@ The script reads the live sitemap (from the deployed domain), verifies HTTP 200 
     into pages. Dropping a file in here publishes it in every locale it declares
     and it appears in the research A–Z and the sitemap automatically — no stub
     `.njk`, no registration. See "Adding an article" below.
-  - **`src/research/*.njk`** — older hand-written English research pages (106).
-  - **`src/{es,ja,de,fr}/research/*.njk`** — older hand-written translated pages.
+  - **`src/research/*.njk`** and translated `src/<locale>/research/*.njk` — hand-authored legacy research pages.
+  - **`src/_data/langs.js`** — supported sitemap locales; article JSON declares which locales actually have content.
   - **`src/worker.js`** — Cloudflare Worker (www→apex redirect, language routing, markdown export for agents).
   - **`src/robots.txt`** — AI crawler allow-list and signals.
 - **`wrangler.jsonc`** — Cloudflare Workers config (git-triggered build, asset serving).
@@ -126,7 +141,7 @@ The Worker (`src/worker.js`) implements client-side language negotiation:
 ### GEO metrics
 
 - **Bing AI Performance** (via Microsoft Bing Webmaster Tools): tracks Copilot citations by page and query.
-- **IndexNow** (manual submission): notifies search engines of new/updated URLs.
+- **IndexNow** (manual submission): notifies participating engines of new/updated URLs; Google discovery follows the sitemap and Search Console path.
 
 ### SEO signals
 
@@ -134,7 +149,7 @@ The Worker (`src/worker.js`) implements client-side language negotiation:
 - hreflang: every translated page lists alternates in EN/ES/FR/DE/JA/PT, plus x-default.
 - FAQPage JSON-LD: research pages with a `faq` block emit structured Q&A for AI extraction.
 - Breadcrumb JSON-LD: every page includes hierarchical navigation.
-- Sitemap: generated at build time from the `sitemap` collection in `eleventy.config.js` (~517 pages). It was seven hand-maintained XML files and drifted; do not reintroduce one.
+- Sitemap: generated at build time from the `sitemap` collection in `eleventy.config.js`; its page set follows the current source and available translations. Do not reintroduce hand-maintained locale sitemaps.
 
 ## Getting help
 
