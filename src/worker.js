@@ -131,51 +131,6 @@ async function serveContact(request, env) {
 	return contactResult(request, { ok: true });
 }
 
-/* ------------------------------------------------------------------ */
-/* A/B test: English homepage variant (control vs v2 mockup)          */
-/* ------------------------------------------------------------------ */
-
-const AB_COOKIE = 'ab_test';
-const AB_PATHS = new Set(['/', '/index.html']);
-
-// Only real browser UAs get experimented on. Anything unrecognised (curl, a new
-// AI crawler not yet in the list, empty UA) falls through to control.
-const BROWSER_RE = /Mozilla\/5\.0 .*(Chrome|Safari|Firefox|Edg|OPR)\//i;
-
-function isBotForAb(request) {
-	const ua = request.headers.get('User-Agent') || '';
-	return (
-		/bot|crawl|spider|slurp|mediapartners|facebookexternalhit|embedly|quora|pinterest|whatsapp|telegram|googlebot|bingbot|duckduckbot|yandex|baidu|applebot|amazonbot|gptbot|claudebot|claude-|oai-searchbot|chatgpt-user|perplexity|mistralai|meta-externalagent|google-extended|preview|lighthouse/i.test(ua) ||
-		!BROWSER_RE.test(ua)
-	);
-}
-
-function abCookieValue(request) {
-	const c = request.headers.get('Cookie') || '';
-	const m = c.match(/(?:^|;\s*)ab_test=(control|v2)\b/);
-	return m ? m[1] : null;
-}
-
-function pickVariant(request) {
-	const existing = abCookieValue(request);
-	if (existing) return existing;
-	return Math.random() < 0.5 ? 'control' : 'v2';
-}
-
-function abTargetUrl(url, variant) {
-	if (variant === 'v2') {
-		const u = new URL(url.toString());
-		u.pathname = '/index-v2.html';
-		return u;
-	}
-	return url;
-}
-
-function abCookieHeader(variant) {
-	const maxAge = 60 * 60 * 24 * 30;
-	return `ab_test=${variant}; Max-Age=${maxAge}; Path=/; SameSite=Lax; Secure`;
-}
-
 // Languages with a full published translation mirror. Order is not significant.
 const LANGS = ['es', 'fr', 'de', 'ja', 'pt'];
 
@@ -811,37 +766,9 @@ export default {
 		const langHop = languageRedirect(request, url);
 		if (langHop) return langHop;
 
-		// 3. English homepage A/B test: humans only, crawlers always see control.
-		let abVariant = null;
-		let abRequest = request;
-		if (!isBotForAb(request) && request.method === 'GET' && AB_PATHS.has(url.pathname)) {
-			abVariant = pickVariant(request);
-			const targetUrl = abTargetUrl(url, abVariant);
-			if (targetUrl.toString() !== url.toString()) {
-				abRequest = new Request(targetUrl, request);
-			}
-		}
-
-		// 4. Fetch whatever the static host would serve (also applies _redirects/_headers).
-		const assetResponse = await env.ASSETS.fetch(abRequest);
-
-		// 5. Attach A/B cookie/headers if we ran the experiment on this request.
-		let response = assetResponse;
-		if (abVariant) {
-			const headers = new Headers(assetResponse.headers);
-			headers.set('X-AB-Variant', abVariant);
-			// Response body depends on the ab_test cookie — without this the CDN
-			// can serve one variant's cached HTML to the other bucket.
-			headers.append('Vary', 'Cookie');
-			if (!abCookieValue(request)) {
-				headers.append('Set-Cookie', abCookieHeader(abVariant));
-			}
-			response = new Response(assetResponse.body, {
-				status: assetResponse.status,
-				statusText: assetResponse.statusText,
-				headers,
-			});
-		}
+		// 3. Fetch whatever the static host would serve (also applies _redirects/_headers).
+		const assetResponse = await env.ASSETS.fetch(request);
+		const response = assetResponse;
 
 		// 6. Only transform GET requests that explicitly negotiate markdown.
 		const accept = request.headers.get('Accept') || '';

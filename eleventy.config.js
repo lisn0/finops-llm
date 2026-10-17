@@ -6,7 +6,7 @@ const SITE_URL = "https://finopsllm.com";
 const LANGS = require("./src/_data/langs.js").filter((l) => l !== "en");
 // Pages that exist but must never be advertised: the error page and the A/B
 // variant of the homepage (it canonicals to "/").
-const SITEMAP_SKIP = new Set(["/404.html", "/index-v2.html"]);
+const SITEMAP_SKIP = new Set(["/404.html"]);
 
 // Collections only ever contain the first page of a paginated template, so the
 // data-driven article pages (src/articles.njk) are invisible to getAll(). Read
