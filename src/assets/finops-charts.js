@@ -71,14 +71,9 @@
       <div class="finops-chart-card" style="position:relative;background:${BRAND.cardBg};border:1px solid ${BRAND.border};border-radius:10px;padding:18px 20px;margin:24px 0;font-family:Inter,system-ui,sans-serif;box-shadow:0 10px 30px -10px rgba(0,0,0,0.5);">
         
         <!-- Header -->
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;gap:12px;">
-          <div>
-            <h3 style="margin:0;font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:700;color:${BRAND.textWhite};letter-spacing:-0.01em;">${title}</h3>
-            <p style="margin:3px 0 0;font-size:12px;color:${BRAND.textMuted};">${subtitle}</p>
-          </div>
-          <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:${BRAND.crosshair};background:${BRAND.wellBg};padding:3px 8px;border-radius:4px;border:1px solid #2B3D5B;white-space:nowrap;">
-            Hover columns
-          </span>
+        <div style="margin-bottom:12px;">
+          <h3 style="margin:0;font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:700;color:${BRAND.textWhite};letter-spacing:-0.01em;">${title}</h3>
+          <p style="margin:3px 0 0;font-size:12px;color:${BRAND.textMuted};">${subtitle}</p>
         </div>
 
         <!-- Dedicated Non-Obstructing Telemetry Readout Deck (Never covers the graph) -->
@@ -221,14 +216,9 @@
       <div class="finops-chart-card" style="position:relative;background:${BRAND.cardBg};border:1px solid ${BRAND.border};border-radius:10px;padding:18px 20px;margin:24px 0;font-family:Inter,system-ui,sans-serif;box-shadow:0 10px 30px -10px rgba(0,0,0,0.5);">
         
         <!-- Header -->
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;gap:12px;">
-          <div>
-            <h3 style="margin:0;font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:700;color:${BRAND.textWhite};letter-spacing:-0.01em;">${title}</h3>
-            <p style="margin:3px 0 0;font-size:12px;color:${BRAND.textMuted};">${subtitle}</p>
-          </div>
-          <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:${BRAND.crosshair};background:${BRAND.wellBg};padding:3px 8px;border-radius:4px;border:1px solid #2B3D5B;white-space:nowrap;">
-            Continuous tracker
-          </span>
+        <div style="margin-bottom:12px;">
+          <h3 style="margin:0;font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:700;color:${BRAND.textWhite};letter-spacing:-0.01em;">${title}</h3>
+          <p style="margin:3px 0 0;font-size:12px;color:${BRAND.textMuted};">${subtitle}</p>
         </div>
 
         <!-- Dedicated Non-Obstructing Telemetry Readout Deck -->
@@ -394,14 +384,9 @@
       <div class="finops-chart-card" style="position:relative;background:${BRAND.cardBg};border:1px solid ${BRAND.border};border-radius:10px;padding:18px 20px;margin:24px 0;font-family:Inter,system-ui,sans-serif;box-shadow:0 10px 30px -10px rgba(0,0,0,0.5);">
         
         <!-- Header -->
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;gap:12px;">
-          <div>
-            <h3 style="margin:0;font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:700;color:${BRAND.textWhite};letter-spacing:-0.01em;">${title}</h3>
-            <p style="margin:3px 0 0;font-size:12px;color:${BRAND.textMuted};">${subtitle}</p>
-          </div>
-          <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:${BRAND.crosshair};background:${BRAND.wellBg};padding:3px 8px;border-radius:4px;border:1px solid #2B3D5B;white-space:nowrap;">
-            Bi-directional hover
-          </span>
+        <div style="margin-bottom:12px;">
+          <h3 style="margin:0;font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:700;color:${BRAND.textWhite};letter-spacing:-0.01em;">${title}</h3>
+          <p style="margin:3px 0 0;font-size:12px;color:${BRAND.textMuted};">${subtitle}</p>
         </div>
 
         <!-- Dedicated Non-Obstructing Telemetry Readout Deck -->
@@ -585,14 +570,9 @@
       <div class="finops-chart-card" style="position:relative;background:${BRAND.cardBg};border:1px solid ${BRAND.border};border-radius:10px;padding:18px 20px;margin:24px 0;font-family:Inter,system-ui,sans-serif;box-shadow:0 10px 30px -10px rgba(0,0,0,0.5);">
         
         <!-- Header -->
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;gap:12px;">
-          <div>
-            <h3 style="margin:0;font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:700;color:${BRAND.textWhite};letter-spacing:-0.01em;">${title}</h3>
-            <p style="margin:3px 0 0;font-size:12px;color:${BRAND.textMuted};">${subtitle}</p>
-          </div>
-          <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:${BRAND.crosshair};background:${BRAND.wellBg};padding:3px 8px;border-radius:4px;border:1px solid #2B3D5B;white-space:nowrap;">
-            Hover rows
-          </span>
+        <div style="margin-bottom:12px;">
+          <h3 style="margin:0;font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:700;color:${BRAND.textWhite};letter-spacing:-0.01em;">${title}</h3>
+          <p style="margin:3px 0 0;font-size:12px;color:${BRAND.textMuted};">${subtitle}</p>
         </div>
 
         <!-- Dedicated Non-Obstructing Telemetry Readout Deck -->
@@ -717,14 +697,9 @@
       <div class="finops-chart-card" style="position:relative;background:${BRAND.cardBg};border:1px solid ${BRAND.border};border-radius:10px;padding:18px 20px;margin:24px 0;font-family:Inter,system-ui,sans-serif;box-shadow:0 10px 30px -10px rgba(0,0,0,0.5);">
         
         <!-- Header -->
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;gap:12px;">
-          <div>
-            <h3 style="margin:0;font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:700;color:${BRAND.textWhite};letter-spacing:-0.01em;">${title}</h3>
-            <p style="margin:3px 0 0;font-size:12px;color:${BRAND.textMuted};">${subtitle}</p>
-          </div>
-          <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:${BRAND.crosshair};background:${BRAND.wellBg};padding:3px 8px;border-radius:4px;border:1px solid #2B3D5B;white-space:nowrap;">
-            Turn snapping
-          </span>
+        <div style="margin-bottom:12px;">
+          <h3 style="margin:0;font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:700;color:${BRAND.textWhite};letter-spacing:-0.01em;">${title}</h3>
+          <p style="margin:3px 0 0;font-size:12px;color:${BRAND.textMuted};">${subtitle}</p>
         </div>
 
         <!-- Dedicated Non-Obstructing Telemetry Readout Deck -->
