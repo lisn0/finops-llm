@@ -1540,8 +1540,14 @@
       { label: t(dict, 'tdGeneration'), percent: 10, cost: 31.20, tokens: "100k", color: BRAND.warningAmber, desc: "Final code/response returned to the developer", tip: "Output generation is the highest per-token unit rate." }
     ];
 
+    const totalCost = options.totalCost !== undefined ? options.totalCost : data.reduce((acc, d) => acc + (Number(d.cost) || 0), 0);
+    const totalTokensText = options.totalTokens || '1.0M Tokens';
+    const totalSummaryText = 'Total: $' + totalCost.toFixed(2) + ' / ' + totalTokensText;
+
     const title = resolveText(options.title, lang, t(dict, 'tdTitle'));
     const subtitle = resolveText(options.subtitle, lang, t(dict, 'tdSubtitle'));
+
+    const legendHtml = data.map(d => `<span style="display:flex;align-items:center;gap:6px;"><span style="width:8px;height:8px;border-radius:50%;background:${d.color};"></span> ${resolveText(d.label, lang, d.label)} (${d.percent}%)</span>`).join('');
 
     container.innerHTML = `
       <div class="finops-chart-card" dir="${isRtl ? 'rtl' : 'ltr'}" style="position:relative;background:${BRAND.cardBg};border:1px solid ${BRAND.border};border-radius:10px;padding:18px 20px;margin:24px 0;font-family:Inter,system-ui,sans-serif;box-shadow:0 10px 30px -10px rgba(0,0,0,0.5);">
@@ -1558,7 +1564,7 @@
             <span class="readout-tag" style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:${BRAND.crosshair};background:${BRAND.cardBg};padding:2px 8px;border-radius:4px;border:1px solid #2B3D5B;">${t(dict, 'tdSessionSpendTag')}</span>
             <span class="readout-text" style="font-size:12px;color:${BRAND.textMain};">${t(dict, 'tdSessionSpendDesc')}</span>
           </div>
-          <div class="readout-delta" style="font-family:'JetBrains Mono',monospace;font-size:11.5px;color:${BRAND.savingsMint};font-weight:600;">${t(dict, 'tdTotalTokens')}</div>
+          <div class="readout-delta" style="font-family:'JetBrains Mono',monospace;font-size:11.5px;color:${BRAND.savingsMint};font-weight:600;">${totalSummaryText}</div>
         </div>
 
         <!-- Unobstructed Donut + Side Panel Layout -->
@@ -1566,10 +1572,7 @@
 
         <!-- Legend -->
         <div dir="${isRtl ? 'rtl' : 'ltr'}" style="padding-top:12px;margin-top:10px;border-top:1px solid ${BRAND.border};display:flex;align-items:center;flex-wrap:wrap;gap:14px;font-size:12px;color:${BRAND.textMuted};justify-content:${isRtl ? 'flex-end' : 'flex-start'};">
-          <span style="display:flex;align-items:center;gap:6px;"><span style="width:8px;height:8px;border-radius:50%;background:${BRAND.savingsMint};"></span> ${t(dict, 'tdSystemCache')}</span>
-          <span style="display:flex;align-items:center;gap:6px;"><span style="width:8px;height:8px;border-radius:50%;background:${BRAND.tokenSky};"></span> ${t(dict, 'tdToolContext')}</span>
-          <span style="display:flex;align-items:center;gap:6px;"><span style="width:8px;height:8px;border-radius:50%;background:${BRAND.outputViolet};"></span> ${t(dict, 'tdReasoning')}</span>
-          <span style="display:flex;align-items:center;gap:6px;"><span style="width:8px;height:8px;border-radius:50%;background:${BRAND.warningAmber};"></span> ${t(dict, 'tdGeneration')}</span>
+          ${legendHtml}
         </div>
       </div>
     `;
@@ -1623,14 +1626,14 @@
         <svg viewBox="0 0 360 240" style="width:260px;height:auto;overflow:visible;user-select:none;">
           ${slicesSvg}
           <circle cx="${cx}" cy="${cy}" r="${innerR - 2}" fill="${BRAND.cardBg}" />
-          <text id="d-cost" x="${cx}" y="${cy - 6}" fill="${BRAND.crosshair}" font-size="20" font-weight="700" font-family="'JetBrains Mono', monospace" text-anchor="middle">$134.50</text>
+          <text id="d-cost" x="${cx}" y="${cy - 6}" fill="${BRAND.crosshair}" font-size="20" font-weight="700" font-family="'JetBrains Mono', monospace" text-anchor="middle">$${totalCost.toFixed(2)}</text>
           <text id="d-sub" x="${cx}" y="${cy + 12}" fill="${BRAND.textMuted}" font-size="11" text-anchor="middle">${t(dict, 'totalSpend')}</text>
           <text id="d-pct" x="${cx}" y="${cy + 26}" fill="${BRAND.textDim}" font-size="10" font-family="'JetBrains Mono', monospace" text-anchor="middle">${t(dict, 'tokensAll')}</text>
         </svg>
         <div style="flex:1;max-width:380px;min-width:260px;background:${BRAND.wellBg};padding:12px;border-radius:8px;border:1px solid ${BRAND.border};">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;padding:0 4px;">
             <h4 style="margin:0;font-size:11px;font-weight:600;color:${BRAND.crosshair};text-transform:uppercase;letter-spacing:0.05em;">${t(dict, 'tokenDist')}</h4>
-            <span style="font-size:11px;font-family:'JetBrains Mono',monospace;color:${BRAND.textMuted};">${t(dict, 'catCount')}</span>
+            <span style="font-size:11px;font-family:'JetBrains Mono',monospace;color:${BRAND.textMuted};">${data.length} ${dict.catCount ? dict.catCount.replace(/^\d+\s*/, '') : 'Categories'}</span>
           </div>
           <div style="display:flex;flex-direction:column;gap:4px;">${listHtml}</div>
         </div>
@@ -1700,7 +1703,7 @@
           if (os) os.style.opacity = '1';
           if (or) or.style.opacity = '1';
         });
-        if (costEl) { costEl.innerText = '$134.50'; costEl.setAttribute('fill', BRAND.crosshair); }
+        if (costEl) { costEl.innerText = '$' + totalCost.toFixed(2); costEl.setAttribute('fill', BRAND.crosshair); }
         if (subEl) { subEl.innerText = t(dict, 'totalSpend'); subEl.setAttribute('fill', BRAND.textMuted); }
         if (pctEl) { pctEl.innerText = t(dict, 'tokensAll'); pctEl.setAttribute('fill', BRAND.textDim); }
         readoutMain.innerHTML = defaultMain;
@@ -1760,10 +1763,7 @@
 
         <!-- Legend -->
         <div dir="${isRtl ? 'rtl' : 'ltr'}" style="padding-top:12px;margin-top:10px;border-top:1px solid ${BRAND.border};display:flex;align-items:center;flex-wrap:wrap;gap:14px;font-size:12px;color:${BRAND.textMuted};justify-content:${isRtl ? 'flex-end' : 'flex-start'};">
-          <span style="display:flex;align-items:center;gap:6px;"><span style="width:10px;height:10px;border-radius:2px;background:${BRAND.savingsMint};"></span> ${t(dict, 'hdParity')}</span>
-          <span style="display:flex;align-items:center;gap:6px;"><span style="width:10px;height:10px;border-radius:2px;background:${BRAND.tokenSky};"></span> ${t(dict, 'hdDataZone')}</span>
-          <span style="display:flex;align-items:center;gap:6px;"><span style="width:10px;height:10px;border-radius:2px;background:${BRAND.warningAmber};"></span> ${t(dict, 'hdSingleRegion')}</span>
-          <span style="display:flex;align-items:center;gap:6px;"><span style="width:10px;height:10px;border-radius:2px;background:${BRAND.burnOrange};"></span> ${t(dict, 'hdSovereign')}</span>
+          ${data.map(d => `<span style="display:flex;align-items:center;gap:6px;"><span style="width:10px;height:10px;border-radius:2px;background:${d.color};"></span> ${resolveText(d.tag, lang, d.tag)}</span>`).join('')}
         </div>
       </div>
     `;
