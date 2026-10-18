@@ -3,6 +3,15 @@
 Drop any of these blocks directly into article HTML (`src/_data/articles/*.json` or `src/research/*.njk`).
 `finops-charts.js` is loaded automatically and initializes all `[data-finops-chart]` blocks on page load.
 
+> **Full 16-Language Support (Zero-Config):**
+> Every chart automatically detects the active page language (`document.documentElement.lang`) and translates all headers, telemetry decks, axis metrics, legends, and hover tooltips into the viewer's language:
+> `en` (English), `de` (German), `es` (Spanish), `fr` (French), `ja` (Japanese), `pt` (Portuguese), `it` (Italian), `ko` (Korean), `zh` (Chinese), `nl` (Dutch), `ar` (Arabic, RTL), `ru` (Russian), `tr` (Turkish), `pl` (Polish), `id` (Indonesian), `vi` (Vietnamese).
+>
+> **Style Guardrails:**
+> - Strictly NO emoji glyphs or icons (no ⚡, 🎯, 💡) in templates or chart readouts.
+> - No `100% Graph Visibility` badge.
+> - Telemetry decks sit in a dedicated top container so popups NEVER obscure data curves.
+
 ---
 
 ## Template 1: Grouped Bar (Direct vs Cloud Rate Parity)

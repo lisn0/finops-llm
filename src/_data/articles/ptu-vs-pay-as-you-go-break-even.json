@@ -224,6 +224,346 @@
           "label": "Por que as tarifas não são comparáveis"
         }
       ]
+    },
+    "it": {
+      "title": "PTU vs. On-Demand: Il vero punto di pareggio",
+      "titleCore": "PTU vs. On-Demand: Quando conviene prenotare capacità su Azure e Bedrock",
+      "description": "Analisi empirica del pareggio tra Azure PTU e on-demand. Formule esatte, curve di utilizzo, costi di inattività e architetture di routing ibrido.",
+      "body": "<p>Quando la spesa aziendale per l'intelligenza artificiale supera i 25.000 dollari al mese, i team di ingegneria e approvvigionamento si trovano di fronte alla stessa domanda: <strong>conviene riservare capacità dedicata tramite le Provisioned Throughput Units (PTU su Azure OpenAI) o continuare a pagare a consumo per singolo token?</strong></p>\n\n<p>I fornitori cloud promuovono le PTU con sconti <strong>fino all'82%</strong> rispetto alle tariffe orarie on-demand. Tuttavia, molti team FinOps scoprono che il costo effettivo per milione di token è aumentato dopo il passaggio a PTU. La causa principale risiede nel <strong>tasso di utilizzo effettivo (duty cycle)</strong>.</p>\n\n<h2>1. Tariffe base: API Diretta vs Cloud Gestito</h2>\n\n<p>Per le chiamate standard, i prezzi di listino tra OpenAI e Azure sono identici. Tuttavia, per contesti estesi (>272K token) o requisiti di sovranità dei dati, il cloud gestito applica una maggiorazione del <strong>25% - 43%</strong> sui token standard.</p>\n\n<div data-finops-chart=\"grouped-bar\"></div>\n\n<h2>2. Il modello matematico del punto di pareggio</h2>\n\n<p>Una PTU per GPT-5.4 costa circa <strong>$260 al mese</strong> con impegno mensile. Con un costo marginale di $3,20/M e una tariffa on-demand mista di $12,50/M, la soglia di convenienza si calcola come segue:</p>\n\n<blockquote>\n<p><strong>Volume di pareggio</strong> = <code>$260 / ($12,50 - $3,20) = 27,96 milioni di token al mese per PTU</code></p>\n</blockquote>\n\n<div data-finops-chart=\"break-even\"></div>\n\n<p>A <strong>28,0 milioni di token al mese</strong>, entrambi i modelli hanno un costo identico ($350). Al di sotto di questa soglia, la capacità non utilizzata genera sprechi; al di sopra, la riserva PTU offre risparmi netti superiori al 60%.</p>\n\n<h2>3. La trappola degli orari d'ufficio</h2>\n\n<p>Se un'applicazione interna viene utilizzata solo dal lunedì al venerdì dalle 9:00 alle 17:00, il sistema è attivo solo per il <strong>24% delle ore totali</strong> del mese. Durante il restante 76% del tempo la riserva PTU rimane inutilizzata, facendo salire il costo effettivo a oltre $18 per milione di token.</p>\n\n<h2>4. Architettura di instradamento ibrido</h2>\n\n<p>I team FinOps più efficienti riservano le PTU unicamente per il carico base continuo (saturazione >85%) e reindirizzano automaticamente i picchi diurni verso endpoint on-demand tramite un AI Gateway.</p>",
+      "faq": [
+        {
+          "question": "Qual è la soglia di token per il pareggio di una PTU Azure OpenAI?",
+          "answer": "Con una base fissa di $260 al mese, tariffa on-demand di $12,50/M e tariffa marginale di $3,20/M, il pareggio matematico si colloca a 27,96 milioni di token mensili per PTU."
+        },
+        {
+          "question": "Perché le PTU possono risultare più costose durante l'orario di lavoro?",
+          "answer": "Perché durante la notte e nei fine settimana l'infrastruttura riservata rimane inattiva per il 76% del mese, aumentando drasticamente il costo medio per token elaborato."
+        },
+        {
+          "question": "Come gestire i picchi improvvisi di traffico con le PTU?",
+          "answer": "Adottando un instradamento ibrido: dimensionare le PTU sul traffico continuo minimo e deviare i picchi diurni verso endpoint on-demand a consumo."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/azure-openai-vs-direct-cost",
+          "label": "Confronto costi Azure OpenAI vs OpenAI Diretto"
+        },
+        {
+          "slug": "/research/committed-spend-discounts",
+          "label": "Sconti per spesa impegnata e contratti enterprise"
+        },
+        {
+          "slug": "/research/provider-prices-not-comparable",
+          "label": "Perché i listini dei fornitori non sono confrontabili"
+        }
+      ]
+    },
+    "ko": {
+      "title": "PTU vs 온디맨드: 진정한 손익분기점 분석 가이드",
+      "titleCore": "PTU vs 온디맨드: Azure 및 Bedrock 예약 용량이 경제적인 분기점",
+      "description": "Azure OpenAI PTU 예약과 온디맨드 종량제 간의 실증적 손익분기점 분석. 정확한 계산 공식, 가동률 함정, 유휴 비용 및 하이브리드 라우팅 전략.",
+      "body": "<p>월간 엔터프라이즈 AI 지출이 25,000달러를 넘어서면 모든 엔지니어링 및 재무팀은 핵심적인 의사결정에 직면합니다. <strong>Azure OpenAI의 프로비저닝 처리량 단위(PTU)로 전용 용량을 예약해야 할까요, 아니면 온디맨드 종량제 방식을 유지해야 할까요?</strong></p>\n\n<p>클라우드 공급업체는 PTU를 통해 시간당 온디맨드 대비 <strong>최대 82% 할인</strong>을 제공한다고 홍보합니다. 그러나 많은 FinOps 팀은 PTU 도입 후 100만 토큰당 실효 비용이 오히려 증가했음을 발견합니다. 주된 원인은 <strong>실제 가동률(듀티 사이클)</strong>에 있습니다.</p>\n\n<h2>1. 직접 API vs 관리형 클라우드 기준 가격</h2>\n\n<p>표준 글로벌 배포 환경에서 OpenAI와 Azure의 100만 토큰당 기준 정가는 동일합니다. 그러나 대규모 컨텍스트(272K 초과) 또는 데이터 주권 요건이 적용되면 관리형 클라우드 환경에서는 <strong>25%~43%의 추가 요율</strong>이 발생합니다.</p>\n\n<div data-finops-chart=\"grouped-bar\"></div>\n\n<h2>2. 수학적 손익분기점 분석 모델</h2>\n\n<p>GPT-5.4용 1개 PTU의 월간 예약 비용은 1개월 약정 기준 약 <strong>월 260달러</strong>입니다. 한계 처리량 수수료 3.20달러/M과 혼합 온디맨드 요율 12.50달러/M을 기준으로 손익분기점은 다음과 같이 계산됩니다:</p>\n\n<blockquote>\n<p><strong>손익분기 토큰량</strong> = <code>$260 / ($12.50 - $3.20) = PTU당 월 2,796만 토큰</code></p>\n</blockquote>\n\n<div data-finops-chart=\"break-even\"></div>\n\n<p>월간 <strong>2,800만 토큰</strong>에서 두 모델의 총 지출은 350달러로 일치합니다. 2,800만 토큰 미만에서는 미사용 유휴 비용이 손실을 유발하며, 7,500만 토큰 이상에서는 PTU를 통해 62% 이상의 순절감 효과를 거둘 수 있습니다.</p>\n\n<h2>3. 영업시간 워크로드의 가동률 함정</h2>\n\n<p>평일 오전 9시부터 오후 5시까지만 사내 어시스턴트가 작동하는 경우, 주당 168시간 중 40시간(<strong>가동률 약 24%</strong>)만 시스템을 사용합니다. 나머지 76% 시간 동안 PTU 장비가 유휴 상태로 방치되어 실효 토큰 단가가 18달러/M 이상으로 급증합니다.</p>\n\n<h2>4. 고효율 하이브리드 게이트웨이 라우팅</h2>\n\n<p>선도적인 FinOps 조직은 PTU를 지속적인 기저 부하(포화도 85% 이상)에만 할당하고, 주간 최대 스파이크 부하는 AI Gateway를 통해 온디맨드 엔드포인트로 자동 유출시키는 하이브리드 아키텍처를 채택합니다.</p>",
+      "faq": [
+        {
+          "question": "Azure OpenAI PTU의 손익분기점 토큰량은 얼마인가요?",
+          "answer": "PTU당 월 $260 기본 요금, 온디맨드 $12.50/M 및 한계 수수료 $3.20/M 기준으로 정확한 손익분기점은 월 2,796만 토큰입니다."
+        },
+        {
+          "question": "영업시간 워크로드에서 PTU 비용이 더 비싸지는 이유는 무엇인가요?",
+          "answer": "야간 및 주말 동안 전용 예약 인프라가 76% 이상 유휴 상태로 대기하여 실제 소비된 토큰당 유효 비용이 급격히 증가하기 때문입니다."
+        },
+        {
+          "question": "주간 트래픽 급증을 PTU로 어떻게 효과적으로 관리하나요?",
+          "answer": "하이브리드 AI 게이트웨이 전략을 적용하여 PTU는 지속 기저 부하에 맞추고 주간 순간 피크 트래픽은 온디맨드 종량제 엔드포인트로 흘려보냅니다."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/azure-openai-vs-direct-cost",
+          "label": "Azure OpenAI 대 직접 API 비용 비교 가이드"
+        },
+        {
+          "slug": "/research/committed-spend-discounts",
+          "label": "약정 지출 할인 및 엔터프라이즈 계약"
+        },
+        {
+          "slug": "/research/provider-prices-not-comparable",
+          "label": "공급업체 정가 단순 비교의 한계점"
+        }
+      ]
+    },
+    "zh": {
+      "title": "PTU与按量付费：真正的损益平衡点分析",
+      "titleCore": "PTU与按量付费：何时在Azure与Bedrock上预留算力更划算",
+      "description": "Azure OpenAI PTU预留与按量付费的实证损益平衡分析。精准公式、利用率陷阱、闲置成本与混合网关路由策略。",
+      "body": "<p>当企业每月在AI模型上的开销突破25,000美元时，工程与采购团队必然面临相同的资金配置抉择：<strong>我们应该通过预留吞吐单位（Azure OpenAI上的PTU）锁定专用算力，还是继续完全按量按Token付费？</strong></p>\n\n<p>云厂商通常宣传PTU相比小时级按需付费可享受<strong>最高82%的折扣</strong>。然而，许多FinOps团队在月末核算时发现，迁移至PTU后每百万Token的实际有效成本反而上升了。其根源在于<strong>硬件持续利用率（Duty Cycle）</strong>。</p>\n\n<h2>1. 直接API与云托管基准定价对比</h2>\n\n<p>对于标准上下文调用，OpenAI与Azure的目录价格一致。然而，当工作负载超出标准窗口（>272K Token）或受到合规驻留约束时，云托管环境会收取<strong>25%至43%的溢价</strong>。</p>\n\n<div data-finops-chart=\"grouped-bar\"></div>\n\n<h2>2. 损益平衡数学计算模型</h2>\n\n<p>一台用于GPT-5.4的PTU在单月承诺下每月基准成本约为<strong>260美元</strong>。结合约3.20美元/M的边际吞吐成本以及12.50美元/M的混合按需费率，损益平衡计算如下：</p>\n\n<blockquote>\n<p><strong>平衡消耗量</strong> = <code>$260 / ($12.50 - $3.20) = 每台PTU每月2796万Tokens</code></p>\n</blockquote>\n\n<div data-finops-chart=\"break-even\"></div>\n\n<p>在月消耗<strong>2800万Tokens</strong>时，两种模式的花费完全一致（350美元）。低于该数值，预留算力闲置将导致单位成本激增；而在7500万Token时，PTU可带来超62%的净成本节约。</p>\n\n<h2>3. 朝九晚五工作负载的利用率陷阱</h2>\n\n<p>若企业内部应用仅在周一至周五的9:00至17:00使用，系统每周仅在168小时中的40小时活跃（<strong>利用率仅23.8%</strong>）。剩余76%的时间设备完全空转，将每百万Token的有效成本推高至18美元以上。</p>\n\n<h2>4. 高收益混合网关路由架构</h2>\n\n<p>成熟的企业FinOps团队采用混合路由策略：PTU仅覆盖持续的基线负载（保持利用率>85%），并在日间高峰突发时，通过AI网关将超额请求实时溢出到按需计费节点。</p>",
+      "faq": [
+        {
+          "question": "Azure OpenAI PTU的月度损益平衡Token消耗量是多少？",
+          "answer": "在月基础费260美元、按需12.50美元/M和边际费3.20美元/M的基准下，精确的数学平衡点为每台PTU每月2796万Tokens。"
+        },
+        {
+          "question": "为何仅在工作时间运行的系统采用PTU反而更贵？",
+          "answer": "因为夜间与周末长达76%的空闲时间推高了综合摊销成本，导致实际处理每个Token的有效单价大幅超过按量计费目录价。"
+        },
+        {
+          "question": "如何解决PTU在日间高峰期的容量不足问题？",
+          "answer": "采用AI网关混合路由架构：PTU仅承担持续稳定的基线流量，将日间突发请求动态溢出至全局按需付费端点处理。"
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/azure-openai-vs-direct-cost",
+          "label": "Azure OpenAI与直接API综合成本对比"
+        },
+        {
+          "slug": "/research/committed-spend-discounts",
+          "label": "预承诺消费折扣与企业协议解析"
+        },
+        {
+          "slug": "/research/provider-prices-not-comparable",
+          "label": "为何不同厂商的目录价格缺乏可比性"
+        }
+      ]
+    },
+    "nl": {
+      "title": "PTU vs. On-Demand: Het werkelijke break-evenpunt",
+      "titleCore": "PTU vs. On-Demand: Wanneer Azure en Bedrock-reserveringen renderen",
+      "description": "Empirische break-evenanalyse voor Azure OpenAI PTU's vs. On-Demand PayGo. Exacte formules, bezettingscurves, leegstandskosten en hybride routering.",
+      "body": "<p>Wanneer de maandelijkse AI-uitgaven van een onderneming de $25.000 overschrijden, staan engineering- en inkoopteams voor dezelfde vraag: <strong>moeten we gereserveerde capaciteit inkopen via Provisioned Throughput Units (PTU op Azure OpenAI) of blijven we per token op afroep betalen?</strong></p>\n\n<p>Cloudleveranciers adverteren met kortingen <strong>tot 82%</strong> ten opzichte van uurtarieven. Toch ontdekken veel FinOps-teams dat hun effectieve kosten per miljoen tokens na PTU-migratie juist stegen. De oorzaak ligt in de <strong>werkelijke bezettingsgraad (duty cycle)</strong>.</p>\n\n<h2>1. Tariefbasis: Directe API vs Beheerde Cloud</h2>\n\n<p>Voor standaard contextaanroepen zijn de catalogusprijzen tussen OpenAI en Azure gelijk. Voor workloads met lange contexten (>272K tokens) of soevereine datagrenzen rekenen cloudaanbieders echter een opslag van <strong>25% tot 43%</strong>.</p>\n\n<div data-finops-chart=\"grouped-bar\"></div>\n\n<h2>2. Het mathematische break-evenmodel</h2>\n\n<p>Eén PTU voor GPT-5.4 kost circa <strong>$260 per maand</strong> met een maandcommitment. Met een marginale doorvoervergoeding van $3,20/M en een blended on-demand tarief van $12,50/M luidt de formule:</p>\n\n<blockquote>\n<p><strong>Break-evenvolume</strong> = <code>$260 / ($12,50 - $3,20) = 27,96 miljoen tokens per maand per PTU</code></p>\n</blockquote>\n\n<div data-finops-chart=\"break-even\"></div>\n\n<p>Bij <strong>28,0 miljoen tokens per maand</strong> zijn beide modellen exact even duur ($350). Onder dit volume ontstaat dure leegstand; daarboven levert PTU meer dan 60% netto besparing op.</p>\n\n<h2>3. De kantoortijden-valkuil</h2>\n\n<p>Draait een interne bedrijfsapplicatie alleen tijdens kantooruren (maandag t/m vrijdag, 9:00 tot 17:00), dan is het systeem slechts <strong>24% van de totale tijd</strong> actief. De overige 76% staat de PTU stil, waardoor de effectieve prijs oploopt tot boven de $18 per miljoen tokens.</p>\n\n<h2>4. Hybride routeringsarchitectuur</h2>\n\n<p>Toonaangevende FinOps-teams dimensioneren PTU's uitsluitend voor de continue basislast (bezetting >85%) en leiden piekmomenten via een AI Gateway automatisch om naar on-demand endpoints.</p>",
+      "faq": [
+        {
+          "question": "Wat is het break-eventokenvolume voor een Azure OpenAI PTU?",
+          "answer": "Bij standaardtarieven ($260 vaste basis per maand, $12,50/M on-demand en $3,20/M marginaal) ligt het wiskundige break-evenpunt op 27,96 miljoen tokens per maand per PTU."
+        },
+        {
+          "question": "Waarom zijn PTU-reserveringen voor kantoorapplicaties vaak duurder?",
+          "answer": "Omdat de gereserveerde servercapaciteit 's nachts en in het weekend 76% van de tijd onbenut blijft, wat de effectieve kostprijs per verwerkte token sterk opdrijft."
+        },
+        {
+          "question": "Hoe vang je overdag verkeerspieken op met PTU?",
+          "answer": "Gebruik een hybride AI gateway-strategie: dimensioner PTU's op de continue basislast en leid tijdelijke pieken direct door naar on-demand endpoints."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/azure-openai-vs-direct-cost",
+          "label": "Azure OpenAI vs Direct OpenAI kostenvergelijking"
+        },
+        {
+          "slug": "/research/committed-spend-discounts",
+          "label": "Kortingen voor gecommitteerde uitgaven"
+        },
+        {
+          "slug": "/research/provider-prices-not-comparable",
+          "label": "Waarom catalogusprijzen niet vergelijkbaar zijn"
+        }
+      ]
+    },
+    "ar": {
+      "title": "حجز PTU مقابل الدفع حسب الاستخدام: نقطة التعادل",
+      "titleCore": "حجز PTU مقابل الدفع حسب الاستخدام: متى تتفوق السعة المحجوزة في أزور وبدروك؟",
+      "description": "تحليل تجريبي لنقطة التعادل بين حجز Azure PTU والدفع عند الطلب. الصيغ الرياضية، فخ دورة التشغيل، تكاليف الخمول، واستراتيجيات التوجيه الهجين.",
+      "body": "<p>عندما تتجاوز نفقات الذكاء الاصطناعي للمؤسسة 25,000 دولار شهرياً، يواجه مهندسو المنظومة السؤال المحوري نفسه: <strong>هل يجب حجز سعة مخصصة عبر وحدات السعة المحجوزة (PTU على Azure OpenAI) أم الاستمرار في الدفع حسب الاستخدام لكل رمز؟</strong></p>\n\n<p>يروّج مزودو السحابة لـ PTU بخصومات تصل إلى <strong>82%</strong> مقارنة بأسعار الطلب الفوري. ومع ذلك، يكتشف العديد من مديري التكلفة أن التكلفة الفعلية لكل مليون رمز ارتفعت بعد الانتقال، بسبب <strong>معدل تشغيل الخوادم الفعلي (Duty Cycle)</strong>.</p>\n\n<h2>1. مقارنة الأسعار الأساسية: الواجهة المباشرة مقابل السحابة المدارة</h2>\n\n<p>تتطابق أسعار OpenAI وAzure في استدعاءات السياق العادي. ولكن في السياقات الكبيرة (أكثر من 272 ألف رمز) أو بيئات السيادة المحلية، تفرض السحابة المدارة هامشاً إضافياً يتراوح بين <strong>25% و43%</strong>.</p>\n\n<div data-finops-chart=\"grouped-bar\"></div>\n\n<h2>2. النموذج الرياضي لحساب نقطة التعادل</h2>\n\n<p>تبلغ تكلفة وحدة PTU الشهرية لنموذج GPT-5.4 حوالي <strong>260 دولاراً شهرياً</strong> مع التزام لمدة شهر. وبإضافة رسوم الإرسال الهامشية (3.20 دولار/مليون) مقابل سعر الطلب (12.50 دولار/مليون)، تكون المعادلة:</p>\n\n<blockquote>\n<p><strong>حجم التعادل</strong> = <code>260$ / (12.50$ - 3.20$) = 27.96 مليون رمز شهرياً لكل وحدة PTU</code></p>\n</blockquote>\n\n<div data-finops-chart=\"break-even\"></div>\n\n<p>عند <strong>28.0 مليون رمز شهرياً</strong>، تتطابق التكلفة في كلا النموذجين عند 350 دولاراً. تحت هذا الحجم تكون السعة الخاملة مكلفة، وفوقه يحقق حجز PTU وفراً يتجاوز 60%.</p>\n\n<h2>3. فخ ساعات العمل المكتبية</h2>\n\n<p>إذا كان المساعد الآلي الداخلي يعمل فقط أثناء ساعات الدوام (من 9 صباحاً حتى 5 مساءً في أيام العمل)، فإن النظام يعمل <strong>24% فقط من إجمالي ساعات الأسبوع</strong>. وخلال 76% المتبقية تظل السعة معطلة، مما يرفع السعر الفعلي لأكثر من 18 دولاراً لكل مليون رمز.</p>\n\n<h2>4. بنية التوجيه الهجين الذكي</h2>\n\n<p>تعتمد الفرق المتطورة استراتيجية التوجيه الهجين: تخصيص PTU فقط لتغطية الحمل المستمر طوال الوقت (بنسبة إشغال >85%)، وتوجيه ذروات النهار الزائدة تلقائياً إلى نقاط الدفع حسب الاستخدام.</p>",
+      "faq": [
+        {
+          "question": "ما هو حجم الرموز اللازم لتحقيق نقطة التعادل في حجز Azure PTU؟",
+          "answer": "عند تكلفة ثابتة تبلغ 260 دولاراً شهرياً وسعر طلب 12.50 دولاراً/مليون ورسم هامشي 3.20 دولاراً/مليون، تكون نقطة التعادل الرياضية 27.96 مليون رمز شهرياً."
+        },
+        {
+          "question": "لماذا تصبح وحدات PTU أعلى تكلفة في أوقات العمل الرسمية؟",
+          "answer": "لأن الخوادم المحجوزة تظل خاملة دون معالجة خلال 76% من الشهر في الليل وعطلات نهاية الأسبوع، مما يضخم التكلفة الإجمالية الموزعة على كل رمز."
+        },
+        {
+          "question": "كيف يمكن التعامل مع طفرات الحركة النهارية باستخدام PTU؟",
+          "answer": "من خلال بنية التوجيه الهجين: حجز PTU لتغطية الحمل الأدنى المستمر وتحويل ذروات الاستخدام الفائضة إلى نقاط الدفع الفوري عند الطلب."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/azure-openai-vs-direct-cost",
+          "label": "مقارنة تكاليف Azure OpenAI مع الواجهة المباشرة"
+        },
+        {
+          "slug": "/research/committed-spend-discounts",
+          "label": "خصومات الإنفاق الملتزم به واتفاقيات المؤسسات"
+        },
+        {
+          "slug": "/research/provider-prices-not-comparable",
+          "label": "لماذا لا يمكن مقارنة أسعار المزودين المعلنة مباشرة"
+        }
+      ]
+    },
+    "ru": {
+      "title": "PTU против On-Demand: Реальная точка окупаемости",
+      "titleCore": "PTU против On-Demand: Когда бронь емкости в Azure и Bedrock выгоднее тарифов",
+      "description": "Эмпирический анализ окупаемости бронирования Azure OpenAI PTU против On-Demand. Точные формулы, кривые утилизации, издержки простоя и гибридный роутинг.",
+      "body": "<p>Когда ежемесячные затраты компании на большие языковые модели превышают 25 000 долларов, руководство неизбежно сталкивается с выбором: <strong>следует ли бронировать гарантированную емкость (PTU в Azure OpenAI) или оставаться на гибкой оплате по потреблению (On-Demand PayGo)?</strong></p>\n\n<p>Облачные провайдеры обещают скидки <strong>до 82%</strong> по сравнению с почасовым тарифом. Однако многие FinOps-команды обнаруживают, что их фактическая цена за миллион токенов после перехода на PTU выросла. Причина кроется в <strong>коэффициенте полезного использования оборудования (Duty Cycle)</strong>.</p>\n\n<h2>1. Базовые тарифы: Direct API против Управляемого облака</h2>\n\n<p>При стандартной длине контекста прайс-листы OpenAI и Azure совпадают. Однако для длинных контекстов (>272K токенов) или изолированных корпоративных контуров управляемое облако добавляет наценку от <strong>25% до 43%</strong>.</p>\n\n<div data-finops-chart=\"grouped-bar\"></div>\n\n<h2>2. Математическая модель точки окупаемости</h2>\n\n<p>Одна единица PTU для модели GPT-5.4 обходится примерно в <strong>$260 в месяц</strong> при месячном контракте. С учетом маржинального тарифа за пропускную способность ($3.20/M) и ставки On-Demand ($12.50/M) порог окупаемости рассчитывается так:</p>\n\n<blockquote>\n<p><strong>Порог окупаемости</strong> = <code>$260 / ($12.50 - $3.20) = 27.96 млн токенов в месяц на 1 PTU</code></p>\n</blockquote>\n\n<div data-finops-chart=\"break-even\"></div>\n\n<p>При объеме в <strong>28.0 млн токенов в месяц</strong> расходы на оба варианта абсолютно одинаковы ($350). При меньшем объеме фиксированная плата за простой приносит убытки, а при 75 млн токенов экономия превышает 62%.</p>\n\n<h2>3. Ловушка офисного графика (9–18)</h2>\n\n<p>Если корпоративный ассистент используется сотрудниками только по будням в рабочие часы, система активно задействована всего <strong>40 из 168 часов в неделю (около 24%)</strong>. В оставшиеся 76% времени PTU работает вхолостую, поднимая реальную стоимость выше $18 за миллион токенов.</p>\n\n<h2>4. Архитектура гибридной маршрутизации</h2>\n\n<p>Эффективные FinOps-инженеры бронируют PTU строго под непрерывную базовую нагрузку (с утилизацией >85%), а дневные пиковые всплески автоматически сбрасывают на обычные On-Demand эндпоинты через AI Gateway.</p>",
+      "faq": [
+        {
+          "question": "Каков объем токенов для достижения точки окупаемости Azure PTU?",
+          "answer": "При фиксированной ставке $260 в месяц, тарифе On-Demand $12.50/M и маржинальной плате $3.20/M порог окупаемости составляет 27.96 млн токенов в месяц на единицу PTU."
+        },
+        {
+          "question": "Почему PTU может оказаться дороже для приложений офисного графика?",
+          "answer": "Потому что ночью и по выходным зарезервированные серверы простаивают 76% времени, существенно увеличивая средневзвешенную стоимость каждого обработанного токена."
+        },
+        {
+          "question": "Как эффективно гасить пиковые дневные всплески нагрузки на PTU?",
+          "answer": "Используя гибридный AI Gateway: рассчитать PTU под круглосуточную базовую нагрузку, а дневные всплески перенаправлять на стандартные On-Demand эндпоинты."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/azure-openai-vs-direct-cost",
+          "label": "Сравнение затрат Azure OpenAI и прямого API OpenAI"
+        },
+        {
+          "slug": "/research/committed-spend-discounts",
+          "label": "Скидки за гарантированный объем расходов"
+        },
+        {
+          "slug": "/research/provider-prices-not-comparable",
+          "label": "Почему каталожные цены провайдеров несопоставимы"
+        }
+      ]
+    },
+    "tr": {
+      "title": "PTU ve Kullandıkça Öde: Gerçek Başabaş Noktası",
+      "titleCore": "PTU ve Kullandıkça Öde: Azure ve Bedrock Rezervasyonları Ne Zaman Avantajlıdır",
+      "description": "Azure OpenAI PTU rezervasyonları ile kullandıkça öde modeli arasında ampirik başabaş analizi. Kesin formüller, kullanım eğrileri ve hibrit yönlendirme.",
+      "body": "<p>Kurumsal yapay zeka harcamaları aylık 25.000 doları aştığında, mühendislik ve satın alma ekipleri kritik bir soruyla karşılaşır: <strong>Azure OpenAI üzerindeki PTU (Tahsis Edilmiş Verim Birimleri) ile kapasite rezervasyonu mu yapmalıyız, yoksa token başına kullandıkça öde modelinde mi kalmalıyız?</strong></p>\n\n<p>Bulut sağlayıcıları, PTU modellerinde saatlik ücretlere kıyasla <strong>%82'ye varan indirimler</strong> vadeder. Ancak birçok FinOps ekibi, PTU geçişinden sonra milyon token başına efektif maliyetin arttığını görür. Bunun temel nedeni <strong>gerçek kapasite kullanım oranıdır (duty cycle)</strong>.</p>\n\n<h2>1. Temel Fiyat Karşılaştırması: Doğrudan API ve Yönetilen Bulut</h2>\n\n<p>Standart bağlam çağrılarında OpenAI ile Azure liste fiyatları aynıdır. Ancak 272K token üzerindeki uzun bağlamlarda veya veri egemenliği zorunluluklarında yönetilen bulut ortamları <strong>%25 ila %43 oranında ek prim</strong> uygular.</p>\n\n<div data-finops-chart=\"grouped-bar\"></div>\n\n<h2>2. Matematiksel Başabaş Noktası Modeli</h2>\n\n<p>GPT-5.4 için tek bir PTU'nun aylık taban ücreti 1 aylık taahhütte yaklaşık <strong>260 dolardır</strong>. 3,20 $/M marjinal verim ücreti ve 12,50 $/M kullandıkça öde tarifesiyle başabaş eşiği şu şekilde hesaplanır:</p>\n\n<blockquote>\n<p><strong>Başabaş Token Hacmi</strong> = <code>260 $ / (12,50 $ - 3,20 $) = PTU başına aylık 27,96 milyon token</code></p>\n</blockquote>\n\n<div data-finops-chart=\"break-even\"></div>\n\n<p>Aylık <strong>28,0 milyon tokende</strong> her iki modelin toplam harcaması eşitlenir (350 $). Bu hacmin altında atıl kapasite maliyet yaratırken, 75 milyon tokende PTU %62'den fazla net tasarruf sağlar.</p>\n\n<h2>3. Mesai Saatleri Tuzağı (09:00 - 17:00)</h2>\n\n<p>Dahili bir kurumsal uygulama yalnızca hafta içi mesai saatlerinde kullanılıyorsa, haftalık 168 saatin yalnızca 40 saatinde (<strong>yaklaşık %24 doluluk</strong>) aktiftir. Kalan %76'lık sürede PTU boş yatar ve efektif maliyeti 18 $/M seviyesinin üzerine çıkarır.</p>\n\n<h2>4. Hibrit Ağ Geçidi Yönlendirme Mimarisi</h2>\n\n<p>En başarılı FinOps ekipleri, PTU rezervasyonlarını sadece kesintisiz taban yük için (%85 üzeri doygunluk) boyutlandırır ve gündüz saatlerindeki ani tepe yükleri bir AI Gateway aracılığıyla kullandıkça öde uç noktalarına yönlendirir.</p>",
+      "faq": [
+        {
+          "question": "Azure OpenAI PTU için başabaş token hacmi nedir?",
+          "answer": "Aylık 260 $ taban ücret, 12,50 $/M kullandıkça öde ve 3,20 $/M marjinal ücret parametrelerinde matematiksel başabaş noktası PTU başına aylık 27,96 milyon tokendir."
+        },
+        {
+          "question": "PTU rezervasyonları mesai saatlerine dayalı işlerde neden daha pahalıya mal olur?",
+          "answer": "Çünkü ayrılmış sunucular geceleri ve hafta sonlarında ayın %76'sı boyunca tamamen boş bekler ve işlenen token başına düşen birim maliyeti yükseltir."
+        },
+        {
+          "question": "Gündüz saatlerindeki ani trafik artışları PTU ile nasıl yönetilir?",
+          "answer": "Hibrit bir AI Gateway kullanarak: PTU'yu sabit taban yük için boyutlandırın ve anlık tepe noktalarını kullandıkça öde uç noktalarına aktarın."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/azure-openai-vs-direct-cost",
+          "label": "Azure OpenAI ve Doğrudan OpenAI Maliyet Karşılaştırması"
+        },
+        {
+          "slug": "/research/committed-spend-discounts",
+          "label": "Taahhüt Edilen Harcama İndirimleri ve Anlaşmalar"
+        },
+        {
+          "slug": "/research/provider-prices-not-comparable",
+          "label": "Bulut Sağlayıcı Liste Fiyatları Neden Kıyaslanamaz"
+        }
+      ]
+    },
+    "pl": {
+      "title": "PTU vs Na żądanie: Prawdziwy próg opłacalności",
+      "titleCore": "PTU vs Na żądanie: Kiedy rezerwacje mocy Azure i Bedrock są opłacalne",
+      "description": "Empiryczna analiza progu opłacalności Azure PTU vs model na żądanie. Dokładne wzory, krzywe utylizacji, pułapki bezczynności i routing hybrydowy.",
+      "body": "<p>Kiedy miesięczne wydatki przedsiębiorstwa na sztuczną inteligencję przekraczają 25 000 USD, zespoły inżynieryjne stają przed dylematem: <strong>czy rezerwować dedykowaną moc obliczeniową poprzez Provisioned Throughput Units (PTU w Azure OpenAI), czy pozostać przy płatności za faktyczne zużycie tokenów?</strong></p>\n\n<p>Dostawcy chmury kuszą rabatami sięgającymi <strong>nawet 82%</strong> w porównaniu ze stawkami godzinowymi. Jednak wiele zespołów FinOps zauważa, że efektywny koszt za milion tokenów po wdrożeniu PTU paradoksalnie wzrósł. Przyczyną jest <strong>rzeczywisty współczynnik wykorzystania (duty cycle)</strong>.</p>\n\n<h2>1. Porównanie bazowe: Direct API vs Chmura Zarządzana</h2>\n\n<p>W przypadku standardowego kontekstu ceny katalogowe OpenAI i Azure są jednakowe. Przy oknach kontekstowych powyżej 272K tokenów lub w strefach suwerenności danych chmura zarządzana dolicza <strong>od 25% do 43% narzutu</strong>.</p>\n\n<div data-finops-chart=\"grouped-bar\"></div>\n\n<h2>2. Matematyczny model progu opłacalności</h2>\n\n<p>Jednostka PTU dla modelu GPT-5.4 kosztuje około <strong>260 USD miesięcznie</strong> przy zobowiązaniu 1-miesięcznym. Przy marginalnej opłacie 3,20 USD/M i stawce na żądanie 12,50 USD/M próg opłacalności wynosi:</p>\n\n<blockquote>\n<p><strong>Próg opłacalności</strong> = <code>260 USD / (12,50 USD - 3,20 USD) = 27,96 mln tokenów / miesięcznie na PTU</code></p>\n</blockquote>\n\n<div data-finops-chart=\"break-even\"></div>\n\n<p>Przy wolumenie <strong>28,0 mln tokenów miesięcznie</strong> koszty obu modeli są równe (350 USD). Poniżej tej wartości rezerwacja generuje straty z powodu bezczynności, powyżej zapewnia ponad 60% oszczędności netto.</p>\n\n<h2>3. Pułapka godzin pracy biurowej (9:00 - 17:00)</h2>\n\n<p>Jeżeli aplikacja wewnętrzna działa tylko w dni robocze od 9:00 do 17:00, infrastruktura pracuje zaledwie przez <strong>24% godzin w tygodniu</strong>. Przez pozostałe 76% czasu dedykowany sprzęt stoi bezczynnie, podnosząc realny koszt do ponad 18 USD za milion tokenów.</p>\n\n<h2>4. Architektura hybrydowego routingu AI Gateway</h2>\n\n<p>Najbardziej efektywne zespoły FinOps rezerwują jednostki PTU wyłącznie pod stałe obciążenie bazowe (nasycenie >85%), a dzienne skoki ruchu przekierowują za pomocą bramy AI Gateway do elastycznych punktów końcowych na żądanie.</p>",
+      "faq": [
+        {
+          "question": "Jaki jest wolumen tokenów dla progu opłacalności Azure PTU?",
+          "answer": "Przy opłacie bazowej 260 USD/mies., stawce na żądanie 12,50 USD/M i marginalnej 3,20 USD/M próg rentowności wynosi 27,96 miliona tokenów miesięcznie na PTU."
+        },
+        {
+          "question": "Dlaczego PTU bywa droższe dla aplikacji biurowych?",
+          "answer": "Ponieważ w nocy i w weekendy zarezerwowana infrastruktura stoi bezczynnie przez 76% miesiąca, drastycznie zawyżając średni koszt każdego przetworzonego tokena."
+        },
+        {
+          "question": "Jak radzić sobie ze szczytami ruchu przy rezerwacji PTU?",
+          "answer": "Stosując hybrydowy routing AI Gateway: zwymiarować PTU pod stałe obciążenie bazowe, a nagłe skoki dzienne przekierowywać do punktów na żądanie."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/azure-openai-vs-direct-cost",
+          "label": "Porównanie kosztów Azure OpenAI vs Direct OpenAI"
+        },
+        {
+          "slug": "/research/committed-spend-discounts",
+          "label": "Rabaty za zobowiązania finansowe i umowy Enterprise"
+        },
+        {
+          "slug": "/research/provider-prices-not-comparable",
+          "label": "Dlaczego ceny katalogowe dostawców są nieporównywalne"
+        }
+      ]
+    },
+    "id": {
+      "title": "PTU vs Bayar Sesuai Pakai: Titik Impas Sebenarnya",
+      "titleCore": "PTU vs Bayar Sesuai Pakai: Kapan Reservasi Kapasitas Cloud Lebih Menguntungkan",
+      "description": "Analisis impas empiris antara Azure OpenAI PTU dan model bayar sesuai pakai. Rumus akurat, kurva utilisasi, jebakan waktu menganggur, dan perutean hibrida.",
+      "body": "<p>Ketika belanja kecerdasan buatan perusahaan melampaui $25.000 per bulan, tim engineering dan pengadaan menghadapi pilihan penting: <strong>haruskah kita memesan kapasitas khusus melalui Provisioned Throughput Units (PTU di Azure OpenAI) atau tetap membayar per token sesuai pemakaian?</strong></p>\n\n<p>Penyedia cloud mempromosikan PTU dengan diskon <strong>hingga 82%</strong> dibandingkan tarif per jam. Namun, banyak tim FinOps mendapati bahwa biaya efektif per juta token justru meningkat setelah migrasi ke PTU. Penyebab utamanya adalah <strong>tingkat utilisasi waktu kerja nyata (duty cycle)</strong>.</p>\n\n<h2>1. Perbandingan Tarif Dasar: API Langsung vs Cloud Terkelola</h2>\n\n<p>Untuk panggilan konteks standar, harga katalog antara OpenAI dan Azure identik. Namun, untuk konteks panjang (>272K token) atau persyaratan kedaulatan data regional, cloud terkelola mengenakan premi tambahan <strong>25% hingga 43%</strong>.</p>\n\n<div data-finops-chart=\"grouped-bar\"></div>\n\n<h2>2. Model Matematika Titik Impas</h2>\n\n<p>Satu unit PTU untuk GPT-5.4 berbiaya sekitar <strong>$260 per bulan</strong> dengan komitmen 1 bulan. Dengan biaya throughput marjinal $3,20/M dan tarif on-demand rata-rata $12,50/M, ambang batas impas dihitung:</p>\n\n<blockquote>\n<p><strong>Volume Titik Impas</strong> = <code>$260 / ($12,50 - $3,20) = 27,96 juta token / bulan per PTU</code></p>\n</blockquote>\n\n<div data-finops-chart=\"break-even\"></div>\n\n<p>Pada angka <strong>28,0 juta token per bulan</strong>, pengeluaran kedua model persis sama ($350). Di bawah volume ini kapasitas menganggur menjadi pemborosan; di atasnya, PTU memberikan penghematan bersih lebih dari 60%.</p>\n\n<h2>3. Jebakan Jam Kerja Kantor (09.00 - 17.00)</h2>\n\n<p>Jika aplikasi internal hanya digunakan pada hari kerja pukul 09.00 hingga 17.00, sistem hanya aktif selama <strong>40 dari 168 jam per minggu (utilisasi 24%)</strong>. Selama 76% sisa waktu, kapasitas PTU menganggur, melipatgandakan biaya efektif menjadi lebih dari $18 per juta token.</p>\n\n<h2>4. Arsitektur Perutean Hibrida Berkinerja Tinggi</h2>\n\n<p>Praktik FinOps terbaik mengalokasikan PTU hanya untuk beban dasar stabil yang terus-menerus (utilisasi >85%), dan mengalirkan lonjakan beban siang hari secara otomatis ke endpoint bayar sesuai pemakaian melalui AI Gateway.</p>",
+      "faq": [
+        {
+          "question": "Berapa volume token impas untuk reservasi Azure OpenAI PTU?",
+          "answer": "Dengan biaya dasar tetap $260/bulan, tarif on-demand $12,50/M, dan biaya marjinal $3,20/M, titik impas matematisnya adalah 27,96 juta token per bulan per PTU."
+        },
+        {
+          "question": "Mengapa reservasi PTU bisa lebih mahal untuk beban kerja jam kantor?",
+          "answer": "Karena server reservasi menganggur tanpa komputasi selama 76% waktu di malam hari dan akhir pekan, melipatgandakan biaya per token yang diproses."
+        },
+        {
+          "question": "Bagaimana cara menangani lonjakan lalu lintas siang hari dengan PTU?",
+          "answer": "Gunakan arsitektur AI gateway hibrida: sesuaikan PTU untuk beban dasar terendah dan alihkan lonjakan siang hari ke endpoint bayar sesuai pemakaian."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/azure-openai-vs-direct-cost",
+          "label": "Perbandingan Biaya Azure OpenAI vs OpenAI Langsung"
+        },
+        {
+          "slug": "/research/committed-spend-discounts",
+          "label": "Diskon Komitmen Belanja dan Perjanjian Perusahaan"
+        },
+        {
+          "slug": "/research/provider-prices-not-comparable",
+          "label": "Mengapa Harga Katalog Penyedia Tidak Dapat Dibandingkan"
+        }
+      ]
+    },
+    "vi": {
+      "title": "PTU vs Trả theo mức dùng: Điểm hòa vốn thực tế",
+      "titleCore": "PTU vs Trả theo mức dùng: Khi nào đặt trước dung lượng đám mây tiết kiệm hơn",
+      "description": "Phân tích điểm hòa vốn thực nghiệm giữa Azure OpenAI PTU và trả theo mức dùng. Công thức chuẩn xác, đường cong khai thác và định tuyến hỗn hợp thông minh.",
+      "body": "<p>Khi chi phí AI của doanh nghiệp vượt mốc 25.000 USD mỗi tháng, đội ngũ kỹ thuật và tài chính luôn đối mặt với một quyết định phân bổ vốn: <strong>nên đặt trước dung lượng chuyên dụng thông qua Provisioned Throughput Units (PTU trên Azure OpenAI) hay tiếp tục trả theo mức dùng cho từng token?</strong></p>\n\n<p>Các nhà cung cấp đám mây quảng bá PTU với mức giảm giá <strong>lên tới 82%</strong> so với giá theo giờ. Tuy nhiên, nhiều nhóm FinOps nhận thấy chi phí thực tế trên mỗi triệu token lại tăng lên sau khi chuyển đổi. Nguyên nhân cốt lõi nằm ở <strong>tỷ lệ khai thác thời gian thực (duty cycle)</strong>.</p>\n\n<h2>1. Mức giá cơ sở: API Trực tiếp vs Đám mây Quản lý</h2>\n\n<p>Với các lệnh gọi ngữ cảnh tiêu chuẩn, giá niêm yết giữa OpenAI và Azure hoàn toàn như nhau. Tuy nhiên, với ngữ cảnh dài (>272K token) hoặc yêu cầu lưu trữ dữ liệu nội địa, đám mây quản lý tính thêm phụ phí từ <strong>25% đến 43%</strong>.</p>\n\n<div data-finops-chart=\"grouped-bar\"></div>\n\n<h2>2. Mô hình toán học xác định điểm hòa vốn</h2>\n\n<p>Một đơn vị PTU cho GPT-5.4 có chi phí cơ sở khoảng <strong>260 USD mỗi tháng</strong> theo cam kết 1 tháng. Với phí xử lý biên 3,20 USD/M và giá trả theo mức dùng 12,50 USD/M, ngưỡng hòa vốn được tính như sau:</p>\n\n<blockquote>\n<p><strong>Sản lượng hòa vốn</strong> = <code>260 USD / (12,50 USD - 3,20 USD) = 27,96 triệu token / tháng cho mỗi PTU</code></p>\n</blockquote>\n\n<div data-finops-chart=\"break-even\"></div>\n\n<p>Tại mức <strong>28,0 triệu token mỗi tháng</strong>, chi phí của cả hai mô hình hoàn toàn bằng nhau (350 USD). Dưới mức này, dung lượng nhàn rỗi gây lãng phí; trên mức này, PTU mang lại tỷ suất tiết kiệm ròng trên 60%.</p>\n\n<h2>3. Bẫy giờ hành chính (9h00 - 17h00)</h2>\n\n<p>Nếu ứng dụng nội bộ chỉ phục vụ nhân viên từ 9h đến 17h các ngày trong tuần, hệ thống chỉ hoạt động <strong>40 trên 168 giờ mỗi tuần (khoảng 24% thời gian)</strong>. Trong 76% thời gian còn lại, máy chủ PTU chạy không tải, đẩy chi phí thực tế lên trên 18 USD cho mỗi triệu token.</p>\n\n<h2>4. Kiến trúc định tuyến hỗn hợp hiệu năng cao</h2>\n\n<p>Các tổ chức FinOps hàng đầu áp dụng chiến lược định tuyến hỗn hợp: chỉ đặt trước PTU cho tải nền liên tục (độ bão hòa >85%), và chuyển các đợt tăng đột biến ban ngày sang các điểm cuối trả theo mức dùng thông qua AI Gateway.</p>",
+      "faq": [
+        {
+          "question": "Khối lượng token để đạt điểm hòa vốn của Azure PTU là bao nhiêu?",
+          "answer": "Với phí cơ sở 260 USD/tháng, giá theo nhu cầu 12,50 USD/M và phụ phí biên 3,20 USD/M, điểm hòa vốn chuẩn xác là 27,96 triệu token mỗi tháng cho mỗi PTU."
+        },
+        {
+          "question": "Tại sao đặt trước PTU có thể tốn kém hơn đối với khối lượng công việc giờ hành chính?",
+          "answer": "Vì trong 76% thời gian ban đêm và cuối tuần máy chủ hoàn toàn nhàn rỗi, khiến chi phí bình quân chia trên mỗi token được xử lý tăng vọt."
+        },
+        {
+          "question": "Làm thế nào để xử lý lưu lượng tăng đột biến ban ngày với PTU?",
+          "answer": "Sử dụng kiến trúc AI Gateway hỗn hợp: đặt PTU theo tải nền liên tục và điều hướng các đỉnh lưu lượng tạm thời sang điểm cuối trả theo mức dùng."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/azure-openai-vs-direct-cost",
+          "label": "So sánh chi phí Azure OpenAI và API Trực tiếp"
+        },
+        {
+          "slug": "/research/committed-spend-discounts",
+          "label": "Chiết khấu cam kết chi tiêu và thỏa thuận doanh nghiệp"
+        },
+        {
+          "slug": "/research/provider-prices-not-comparable",
+          "label": "Tại sao bảng giá nhà cung cấp không thể so sánh trực tiếp"
+        }
+      ]
     }
   }
 }
