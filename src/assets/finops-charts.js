@@ -87,7 +87,7 @@
             <span class="readout-tag" style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:${BRAND.crosshair};background:${BRAND.cardBg};padding:2px 8px;border-radius:4px;border:1px solid #2B3D5B;">Summary</span>
             <span class="readout-text" style="font-size:12px;color:${BRAND.textMain};">Hover any model column below to inspect exact input/output rate parity and percentage differentials.</span>
           </div>
-          <div class="readout-delta" style="font-family:'JetBrains Mono',monospace;font-size:11.5px;color:${BRAND.savingsMint};font-weight:600;">⚡ 4-Metric Comparison</div>
+          <div class="readout-delta" style="font-family:'JetBrains Mono',monospace;font-size:11.5px;color:${BRAND.savingsMint};font-weight:600;">4-Metric Comparison</div>
         </div>
 
         <!-- Unobstructed SVG Stage -->
@@ -347,12 +347,12 @@
 
       let verdict = '';
       if (isExact) {
-        verdict = `<span style="color:${BRAND.savingsMint};font-weight:700;">🎯 Exact Break-Even: Spend ~$${breakEvenCost}/mo identical</span>`;
+        verdict = `<span style="color:${BRAND.savingsMint};font-weight:700;">Exact Break-Even: Spend ~$${breakEvenCost}/mo identical</span>`;
       } else if (isPtu) {
         const pct = Math.round((delta / pt.onDemandCost) * 100);
-        verdict = `<span style="color:${BRAND.savingsMint};font-weight:700;">⚡ PTU saves $${delta.toFixed(0)}/mo (${pct}% discount)</span>`;
+        verdict = `<span style="color:${BRAND.savingsMint};font-weight:700;">PTU saves $${delta.toFixed(0)}/mo (${pct}% discount)</span>`;
       } else {
-        verdict = `<span style="color:${BRAND.warningAmber};font-weight:700;">⚡ PayGo is $${delta.toFixed(0)}/mo cheaper</span>`;
+        verdict = `<span style="color:${BRAND.warningAmber};font-weight:700;">PayGo is $${delta.toFixed(0)}/mo cheaper</span>`;
       }
 
       readoutMain.innerHTML = `
@@ -410,7 +410,7 @@
             <span class="readout-tag" style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:${BRAND.crosshair};background:${BRAND.cardBg};padding:2px 8px;border-radius:4px;border:1px solid #2B3D5B;">Session Spend</span>
             <span class="readout-text" style="font-size:12px;color:${BRAND.textMain};">Hover any slice or list row to isolate category cost and inspect architectural optimization levers.</span>
           </div>
-          <div class="readout-delta" style="font-family:'JetBrains Mono',monospace;font-size:11.5px;color:${BRAND.savingsMint};font-weight:600;">⚡ Total: $134.50 / 1.0M Tokens</div>
+          <div class="readout-delta" style="font-family:'JetBrains Mono',monospace;font-size:11.5px;color:${BRAND.savingsMint};font-weight:600;">Total: $134.50 / 1.0M Tokens</div>
         </div>
 
         <!-- Unobstructed Donut + Side Panel Layout -->
@@ -530,7 +530,7 @@
             <span><strong style="color:#FFFFFF">Tokens:</strong> ${d.tokens}</span>
           </div>
         `;
-        readoutDelta.innerHTML = `<span style="color:${BRAND.savingsMint};font-weight:600;font-size:11px;">💡 ${d.tip}</span>`;
+        readoutDelta.innerHTML = `<span style="color:${BRAND.savingsMint};font-weight:600;font-size:11px;">${d.tip}</span>`;
       } else {
         if (slice) {
           slice.setAttribute('stroke', BRAND.canvasBg);
@@ -601,7 +601,7 @@
             <span class="readout-tag" style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:${BRAND.crosshair};background:${BRAND.cardBg};padding:2px 8px;border-radius:4px;border:1px solid #2B3D5B;">Residency Benchmark</span>
             <span class="readout-text" style="font-size:12px;color:${BRAND.textMain};">Hover any deployment tier below to inspect data sovereignty premiums and normalized 10M token spend.</span>
           </div>
-          <div class="readout-delta" style="font-family:'JetBrains Mono',monospace;font-size:11.5px;color:${BRAND.savingsMint};font-weight:600;">⚡ 0% Baseline = Direct API</div>
+          <div class="readout-delta" style="font-family:'JetBrains Mono',monospace;font-size:11.5px;color:${BRAND.savingsMint};font-weight:600;">0% Baseline = Direct API</div>
         </div>
 
         <!-- Unobstructed SVG Stage -->
@@ -733,7 +733,7 @@
             <span class="readout-tag" style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:${BRAND.savingsMint};background:${BRAND.cardBg};padding:2px 8px;border-radius:4px;border:1px solid ${BRAND.savingsMint};">Compounding Audit</span>
             <span class="readout-text" style="font-size:12px;color:${BRAND.textMain};">Glide cursor across turns T1–T8 below to compare uncached quadratic burn vs flat cached execution.</span>
           </div>
-          <div class="readout-delta" style="font-family:'JetBrains Mono',monospace;font-size:11.5px;color:${BRAND.savingsMint};font-weight:600;">⚡ 85% Total Session Yield</div>
+          <div class="readout-delta" style="font-family:'JetBrains Mono',monospace;font-size:11.5px;color:${BRAND.savingsMint};font-weight:600;">85% Total Session Yield</div>
         </div>
 
         <!-- Unobstructed SVG Stage -->
@@ -856,7 +856,7 @@
           <span style="color:${BRAND.textMuted}">${t.tokens} in context</span>
         </div>
       `;
-      readoutDelta.innerHTML = `<span style="color:${BRAND.savingsMint};font-weight:700;">⚡ Saved $${saved.toFixed(2)} (${disc}% discount)</span>`;
+      readoutDelta.innerHTML = `<span style="color:${BRAND.savingsMint};font-weight:700;">Saved $${saved.toFixed(2)} (${disc}% discount)</span>`;
     });
 
     hitbox.addEventListener('mouseleave', () => {
