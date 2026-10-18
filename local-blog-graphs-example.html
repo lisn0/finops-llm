@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Enterprise LLM Cost Attribution Guide (2026) · FinOps LLM</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap');
+
+    :root {
+      --bg: #0A0F1A;
+      --panel: #101726;
+      --well: #0B1437;
+      --border: #1E2A3F;
+      --border-hover: #2B3D5B;
+      --accent: #7AAFFF;
+      --mint: #4ADE80;
+      --sky: #38BDF8;
+      --royal: #1D4ED8;
+      --violet: #818CF8;
+      --orange: #EA580C;
+      --amber: #F59E0B;
+      --text: #E6EAF2;
+      --text-muted: #8C98AC;
+      --text-dim: #647289;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      font-size: 16px;
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+      padding: 0;
+      margin: 0;
+    }
+
+    .mono { font-family: 'JetBrains Mono', monospace; }
+    .grotesk { font-family: 'Space Grotesk', sans-serif; }
+
+    /* Top Navigation Banner */
+    .site-header {
+      border-bottom: 1px solid var(--border);
+      background: rgba(10, 15, 26, 0.95);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(10px);
+    }
+    .header-inner {
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 14px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: #FFFFFF;
+      font-weight: 700;
+      font-size: 17px;
+    }
+    .brand-badge {
+      font-size: 11px;
+      padding: 2px 7px;
+      border-radius: 4px;
+      background: var(--well);
+      color: var(--mint);
+      border: 1px solid rgba(74, 222, 128, 0.3);
+    }
+    .nav-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 13.5px;
+      margin-left: 20px;
+      transition: color 0.15s ease;
+    }
+    .nav-links a:hover { color: var(--accent); }
+
+    /* Main Article Container */
+    .article-wrap {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 48px 24px 80px;
+    }
+
+    .breadcrumbs {
+      font-size: 12.5px;
+      color: var(--text-dim);
+      margin-bottom: 20px;
+    }
+    .breadcrumbs a { color: var(--text-muted); text-decoration: none; }
+    .breadcrumbs a:hover { color: var(--accent); }
+
+    h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(30px, 4.2vw, 42px);
+      font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      color: #FFFFFF;
+      margin-bottom: 12px;
+    }
+
+    .meta {
+      font-size: 13px;
+      color: var(--text-dim);
+      margin-bottom: 28px;
+    }
+
+    .agent-summary {
+      background: rgba(122, 175, 255, 0.08);
+      border-left: 3px solid var(--accent);
+      padding: 16px 20px;
+      border-radius: 0 8px 8px 0;
+      margin-bottom: 36px;
+      font-size: 14.5px;
+      color: #D2DCED;
+    }
+    .agent-summary strong { color: #FFFFFF; }
+
+    h2 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 24px;
+      font-weight: 700;
+      color: #FFFFFF;
+      margin: 44px 0 16px;
+      letter-spacing: -0.01em;
+    }
+
+    p {
+      margin-bottom: 20px;
+      color: #CBD5E1;
+    }
+
+    /* Comparison Tables */
+    .table-container {
+      overflow-x: auto;
+      margin: 24px 0 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--panel);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.5px;
+      text-align: left;
+    }
+    th, td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+    }
+    th {
+      background: #0E1524;
+      color: #FFFFFF;
+      font-weight: 600;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(122, 175, 255, 0.03); }
+    td.num {
+      font-family: 'JetBrains Mono', monospace;
+      text-align: right;
+    }
+    .tag-badge {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 600;
+    }
+    .tag-green { background: rgba(74, 222, 128, 0.15); color: var(--mint); }
+    .tag-sky { background: rgba(56, 189, 248, 0.15); color: var(--sky); }
+    .tag-orange { background: rgba(234, 88, 12, 0.15); color: var(--orange); }
+    .tag-amber { background: rgba(245, 158, 11, 0.15); color: var(--amber); }
+
+    /* Chart Container Placement */
+    .chart-embed {
+      margin: 16px 0 44px;
+    }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 0 60px;
+      font-size: 13px;
+      color: var(--text-dim);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Topbar -->
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="https://finopsllm.com" class="brand">
+        <span>FinOps LLM</span>
+        <span class="brand-badge mono">Visual Guide</span>
+      </a>
+      <div class="nav-links">
+        <a href="https://finopsllm.com/research">Research</a>
+        <a href="https://finopsllm.com/pricing">Pricing Matrix</a>
+        <a href="https://finopsllm.com/book" style="color:var(--mint);font-weight:600;">Book Free Audit &rarr;</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Article Body -->
+  <main class="article-wrap">
+    
+    <div class="breadcrumbs">
+      <a href="https://finopsllm.com">Home</a> &gt; <a href="https://finopsllm.com/research">Research</a> &gt; <span>Enterprise LLM Cost Attribution</span>
+    </div>
+
+    <h1>Enterprise LLM Cost Attribution: The 2026 Architectural Guide</h1>
+    <p class="meta">Published: October 18, 2026 · 12 min read · By FinOps LLM Engineering Team</p>
+
+    <div class="agent-summary">
+      <strong>Executive Brief:</strong> As GenAI spending transitions from experimental R&D corporate cards to line-of-business COGS, engineering teams face significant pricing disparities between direct foundational APIs and managed cloud endpoints. This interactive guide examines token parity, reservation break-evens, token anatomical burns, regional sovereign markups, and multi-turn prompt caching yields.
+    </div>
+
+    <p>
+      Managing multi-million dollar model consumption requires moving beyond blended invoice totals. Engineering leaders must model the interplay between input context caching, provisioned capacity throughput, and regional compliance premiums. Below are five real-world scenarios analyzed with live interactive telemetry models.
+    </p>
+
+    <!-- SECTION 1 -->
+    <h2>1. Input vs. Output Parity: OpenAI Direct vs. Azure Global</h2>
+    <p>
+      While standard tier pricing is identical on direct OpenAI and Azure Global endpoints, long-context models (>272K) and dedicated reasoning models exhibit unexpected enterprise surcharges. The table below outlines published list rates per million tokens.
+    </p>
+
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Model Deployment</th>
+            <th class="num">Direct Input / 1M</th>
+            <th class="num">Azure Input / 1M</th>
+            <th class="num">Direct Output / 1M</th>
+            <th class="num">Azure Output / 1M</th>
+            <th>Delta Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>GPT-5.4 Standard</strong></td>
+            <td class="num">$2.50</td>
+            <td class="num">$2.50</td>
+            <td class="num">$15.00</td>
+            <td class="num">$15.00</td>
+            <td><span class="tag-badge tag-green">0% Parity</span></td>
+          </tr>
+          <tr>
+            <td><strong>GPT-5.4 >272K Window</strong></td>
+            <td class="num">$3.50</td>
+            <td class="num">$5.00</td>
+            <td class="num">$18.00</td>
+            <td class="num">$22.50</td>
+            <td><span class="tag-badge tag-orange">+43% Input / +25% Output</span></td>
+          </tr>
+          <tr>
+            <td><strong>GPT-5.4 Pro Tier</strong></td>
+            <td class="num">$25.00</td>
+            <td class="num">$30.00</td>
+            <td class="num">$150.00</td>
+            <td class="num">$180.00</td>
+            <td><span class="tag-badge tag-orange">+20% Surcharge</span></td>
+          </tr>
+          <tr>
+            <td><strong>o3-mini Fast Reasoning</strong></td>
+            <td class="num">$1.10</td>
+            <td class="num">$1.10</td>
+            <td class="num">$4.40</td>
+            <td class="num">$4.40</td>
+            <td><span class="tag-badge tag-green">0% Parity</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Chart 1: Grouped Bar -->
+    <div class="chart-embed">
+      <div data-finops-chart="grouped-bar"></div>
+    </div>
+
+
+    <!-- SECTION 2 -->
+    <h2>2. Capacity Planning: Pay-As-You-Go vs. PTU Reservation</h2>
+    <p>
+      Provisioned Throughput Units (PTU) offer guaranteed tail latency and cost stabilization, but introduce fixed monthly commitments. If your volume falls short of the break-even threshold, Pay-As-You-Go is strictly more economical.
+    </p>
+
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Commitment Model</th>
+            <th class="num">Fixed Base / Month</th>
+            <th class="num">Marginal Rate / 1M</th>
+            <th class="num">Spend at 20M Tokens</th>
+            <th class="num">Spend at 60M Tokens</th>
+            <th>Optimal Volume</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>On-Demand (PayGo)</strong></td>
+            <td class="num">$0</td>
+            <td class="num">$12.50</td>
+            <td class="num">$250.00</td>
+            <td class="num">$750.00</td>
+            <td><span class="tag-badge tag-amber">&lt; 28M Tokens/mo</span></td>
+          </tr>
+          <tr>
+            <td><strong>1x Monthly PTU Block</strong></td>
+            <td class="num">$260.00</td>
+            <td class="num">$3.20</td>
+            <td class="num">$324.00</td>
+            <td class="num">$452.00</td>
+            <td><span class="tag-badge tag-green">&ge; 28M Tokens/mo</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Chart 2: Break-Even -->
+    <div class="chart-embed">
+      <div data-finops-chart="break-even"></div>
+    </div>
+
+
+    <!-- SECTION 3 -->
+    <h2>3. Token Anatomical Breakdown in Autonomous Agent Sessions</h2>
+    <p>
+      Autonomous coding agents and tool-calling loops execute high turn volumes where prompt cache hits dominate token count, while internal chain-of-thought reasoning commands the highest per-token cost.
+    </p>
+
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Token Category</th>
+            <th class="num">Volume</th>
+            <th class="num">Share %</th>
+            <th class="num">Incurred Cost</th>
+            <th>FinOps Optimization Lever</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Cached System Prompts</strong></td>
+            <td class="num">480,000</td>
+            <td class="num">48%</td>
+            <td class="num">$24.50</td>
+            <td><span class="tag-badge tag-green">90% Cache Yield</span></td>
+          </tr>
+          <tr>
+            <td><strong>Tool Schemas & Context</strong></td>
+            <td class="num">240,000</td>
+            <td class="num">24%</td>
+            <td class="num">$36.80</td>
+            <td><span class="tag-badge tag-sky">Dynamic Pruning</span></td>
+          </tr>
+          <tr>
+            <td><strong>Reasoning (CoT Thinking)</strong></td>
+            <td class="num">180,000</td>
+            <td class="num">18%</td>
+            <td class="num">$42.00</td>
+            <td><span class="tag-badge tag-amber">Effort Level Capping</span></td>
+          </tr>
+          <tr>
+            <td><strong>User Output Generation</strong></td>
+            <td class="num">100,000</td>
+            <td class="num">10%</td>
+            <td class="num">$31.20</td>
+            <td><span class="tag-badge tag-orange">Top-p / Max Tokens</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Chart 3: Token Donut -->
+    <div class="chart-embed">
+      <div data-finops-chart="token-donut"></div>
+    </div>
+
+
+    <!-- SECTION 4 -->
+    <h2>4. The Data Sovereignty Tax: Regional Cloud Deployment Surcharges</h2>
+    <p>
+      Statutory privacy regimes (GDPR, HIPAA, FedRAMP High) enforce stringent physical compute boundaries. Pinned DC regions and sovereign enclaves apply predictable markup multipliers over the multi-tenant baseline.
+    </p>
+
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Deployment Tier</th>
+            <th>Residency Guarantee</th>
+            <th class="num">Normalized Cost (10M)</th>
+            <th class="num">Markup %</th>
+            <th>Primary Compliance Target</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>OpenAI Direct Global</strong></td>
+            <td>Multi-tenant global routing</td>
+            <td class="num">$25.00</td>
+            <td class="num">0%</td>
+            <td><span class="tag-badge tag-green">Global Baseline</span></td>
+          </tr>
+          <tr>
+            <td><strong>Azure Data Zone (EU/US)</strong></td>
+            <td>Continental boundary guarantee</td>
+            <td class="num">$28.00</td>
+            <td class="num">+12%</td>
+            <td><span class="tag-badge tag-sky">GDPR Standard</span></td>
+          </tr>
+          <tr>
+            <td><strong>Azure Pinned (Sweden Central)</strong></td>
+            <td>Single physical datacenter</td>
+            <td class="num">$29.50</td>
+            <td class="num">+18%</td>
+            <td><span class="tag-badge tag-amber">National Audits</span></td>
+          </tr>
+          <tr>
+            <td><strong>Azure Sovereign FedRAMP</strong></td>
+            <td>US Gov Secret / Cleared facility</td>
+            <td class="num">$33.75</td>
+            <td class="num">+35%</td>
+            <td><span class="tag-badge tag-orange">DoD / Sovereign Cloud</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Chart 4: Horizontal Delta -->
+    <div class="chart-embed">
+      <div data-finops-chart="horizontal-delta"></div>
+    </div>
+
+
+    <!-- SECTION 5 -->
+    <h2>5. Multi-Turn Context Compounding: The Prompt Caching Dividend</h2>
+    <p>
+      In multi-turn chat and coding sessions, token costs grow quadratically without caching ($O(n^2)$) as past conversation history is resent on every exchange. Prefix caching turns conversation accumulation into a flat incremental cost.
+    </p>
+
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Turn Sequence</th>
+            <th>Session Action</th>
+            <th class="num">Cumulative Tokens</th>
+            <th class="num">Uncached Burn</th>
+            <th class="num">Prompt Cached</th>
+            <th class="num">Turn Savings</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Turn 1</strong></td>
+            <td>System init + Cold prompt</td>
+            <td class="num">4,000</td>
+            <td class="num">$0.04</td>
+            <td class="num">$0.04</td>
+            <td class="num"><span class="tag-badge tag-green">0% (Write)</span></td>
+          </tr>
+          <tr>
+            <td><strong>Turn 3</strong></td>
+            <td>Code diff review</td>
+            <td class="num">22,000</td>
+            <td class="num">$0.22</td>
+            <td class="num">$0.07</td>
+            <td class="num"><span class="tag-badge tag-green">68% Savings</span></td>
+          </tr>
+          <tr>
+            <td><strong>Turn 5</strong></td>
+            <td>Test logs & trace loops</td>
+            <td class="num">52,000</td>
+            <td class="num">$0.52</td>
+            <td class="num">$0.11</td>
+            <td class="num"><span class="tag-badge tag-green">79% Savings</span></td>
+          </tr>
+          <tr>
+            <td><strong>Turn 8</strong></td>
+            <td>PR Generation & Summary</td>
+            <td class="num">135,000</td>
+            <td class="num">$1.35</td>
+            <td class="num">$0.20</td>
+            <td class="num"><span class="tag-badge tag-green">85% Total Savings</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Chart 5: Cumulative Waterfall -->
+    <div class="chart-embed">
+      <div data-finops-chart="waterfall"></div>
+    </div>
+
+    <!-- Conclusion & Recommendations -->
+    <h2>Recommended FinOps Implementation Checklist</h2>
+    <p>
+      To prevent unexpected cloud budget overruns when deploying frontier models at scale, implement these three controls:
+    </p>
+    <ul style="margin: 0 0 32px 24px; color: #CBD5E1; line-height: 1.8;">
+      <li><strong>Enforce Strict Prompt Prefix Stability:</strong> Keep static tool schemas and instructions anchored at the top of the prompt payload to guarantee >80% prompt cache hit rates.</li>
+      <li><strong>Trigger Automated PTU Threshold Alerts:</strong> Set telemetry watchers at 25M tokens/month to evaluate switching to provisioned throughput blocks before crossing the break-even curve.</li>
+      <li><strong>Audit Multi-Turn Conversation Truncation:</strong> Implement automated sliding context windows or summary checkpoints at turn 5 to cap quadratic context growth.</li>
+    </ul>
+
+    <!-- Footer -->
+    <footer>
+      <span>&copy; 2026 FinOps LLM · All data visualizations rendered with native SVG & FinOps brand tokens.</span>
+      <span><a href="https://finopsllm.com/book" style="color:var(--mint);text-decoration:none;">Book Managed Cost Audit &rarr;</a></span>
+    </footer>
+
+  </main>
+
+  <!-- Load the Reusable FinOpsCharts Library -->
+  <script src="src/assets/finops-charts.js"></script>
+
+</body>
+</html>
