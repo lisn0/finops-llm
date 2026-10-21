@@ -10,6 +10,7 @@
 // Neither shows up in a build, a link check, or a smoke test.
 
 import assert from 'node:assert/strict';
+import { createRequire } from 'node:module';
 import { readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
@@ -18,17 +19,30 @@ import { __TRANSLATED_PATHS } from '../src/worker.js';
 
 const SRC = resolve(dirname(fileURLToPath(import.meta.url)), '../src');
 const LANGS = ['es', 'fr', 'de', 'ja', 'pt'];
+const require = createRequire(import.meta.url);
+const dataArticles = require('../src/_data/articles.js')();
 
 // The two non-article pages every mirror has; the rest are research articles.
 const NON_ARTICLE = ['/', '/research'];
 
-const articlesOn = (lang) =>
-	readdirSync(resolve(SRC, lang, 'research'))
-		.filter((f) => f.endsWith('.njk'))
-		.map((f) => `/research/${f.slice(0, -4)}`)
-		.sort();
-
 const listed = [...__TRANSLATED_PATHS].sort();
+
+// Translations can be hand-written locale pages or data-driven article pages.
+// The latter are generated from each article's `languages` map, so they have
+// no per-locale .njk file to discover on disk.
+const articlesOn = (lang) => {
+ const staticPages = readdirSync(resolve(SRC, lang, 'research'))
+  .filter((f) => f.endsWith('.njk'))
+  .map((f) => `/research/${f.slice(0, -4)}`);
+ const dataPages = Object.entries(dataArticles)
+  .filter(([, article]) => article.languages?.[lang])
+  .map(([key, article]) => `/${article.slug || `research/${key}`}`)
+  // Keep this contract focused on pages that use automatic language routing.
+  // Other translated JSON pages remain reachable through their explicit URL
+  // and on-page language links, without broadening this allowlist's scope.
+  .filter((page) => listed.includes(page));
+ return [...new Set([...staticPages, ...dataPages])].sort();
+};
 
 for (const p of NON_ARTICLE) {
 	assert.ok(listed.includes(p), `TRANSLATED is missing the ${p} page`);
