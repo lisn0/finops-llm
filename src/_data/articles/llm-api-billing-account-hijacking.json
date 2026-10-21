@@ -1,0 +1,219 @@
+{
+  "slug": "research/llm-api-billing-account-hijacking",
+  "tags": [
+    "llm-security",
+    "cloud-billing",
+    "llmjacking",
+    "finops"
+  ],
+  "datePublished": "2026-10-21",
+  "dateModified": "2026-10-21",
+  "image": "https://finopsllm.com/og.png",
+  "agentMode": true,
+  "languages": {
+    "en": {
+      "title": "When LLMjacking Becomes a Cloud Billing Breach",
+      "titleCore": "When LLMjacking Becomes a Cloud Billing Breach",
+      "description": "A phishing-led GCP billing takeover funded unauthorized Gemini API use. Learn the attack path, audit signals, and FinOps controls.",
+      "body": "<p>A compromised cloud administrator can turn your billing account into a funding source for someone else’s AI workloads. Wiz reported incidents on October 20, 2026 in which attackers phished privileged Google Cloud users, attached attacker-controlled projects to victims’ billing accounts, and drove tens to hundreds of thousands of dollars in Gemini API charges within 24–48 hours. Calls ran in external projects, leaving victims with the bill but no visibility into prompts or outputs.</p><figure style=\"margin:28px 0\"><svg viewBox=\"0 0 760 150\" width=\"100%\" role=\"img\" aria-labelledby=\"cash-flow-title\" style=\"display:block;max-width:100%;height:auto;font-family:inherit\"><title id=\"cash-flow-title\">Cloud billing abuse attack path</title><rect x=\"10\" y=\"20\" width=\"165\" height=\"90\" rx=\"9\" fill=\"#172338\" stroke=\"#E8895C\"/><text x=\"92\" y=\"58\" fill=\"#F4F5F7\" font-size=\"16\" text-anchor=\"middle\">1 · Identity</text><text x=\"92\" y=\"83\" fill=\"#AEB8C9\" font-size=\"12\" text-anchor=\"middle\">phished admin</text><path d=\"M180 65h35m-8-8 8 8-8 8\" fill=\"none\" stroke=\"#E8895C\" stroke-width=\"3\"/><rect x=\"222\" y=\"20\" width=\"165\" height=\"90\" rx=\"9\" fill=\"#172338\" stroke=\"#E8895C\"/><text x=\"304\" y=\"58\" fill=\"#F4F5F7\" font-size=\"16\" text-anchor=\"middle\">2 · Billing</text><text x=\"304\" y=\"83\" fill=\"#AEB8C9\" font-size=\"12\" text-anchor=\"middle\">project linked</text><path d=\"M392 65h35m-8-8 8 8-8 8\" fill=\"none\" stroke=\"#E8895C\" stroke-width=\"3\"/><rect x=\"434\" y=\"20\" width=\"165\" height=\"90\" rx=\"9\" fill=\"#172338\" stroke=\"#E8895C\"/><text x=\"516\" y=\"58\" fill=\"#F4F5F7\" font-size=\"16\" text-anchor=\"middle\">3 · AI usage</text><text x=\"516\" y=\"83\" fill=\"#AEB8C9\" font-size=\"12\" text-anchor=\"middle\">victim pays</text><path d=\"M604 65h35m-8-8 8 8-8 8\" fill=\"none\" stroke=\"#E8895C\" stroke-width=\"3\"/><rect x=\"645\" y=\"32\" width=\"105\" height=\"66\" rx=\"9\" fill=\"#532B35\" stroke=\"#E8895C\"/><text x=\"697\" y=\"59\" fill=\"#F4F5F7\" font-size=\"13\" text-anchor=\"middle\"Spend</text><text x=\"697\" y=\"79\" fill=\"#F4F5F7\" font-size=\"13\" text-anchor=\"middle\"spike</text></svg><figcaption style=\"font-size:13px;color:#7F8BA0;margin-top:8px\">Billing abuse can cross identity, organization policy, project linkage, and model usage. A cost alert sees only the last stage.</figcaption></figure><h2>The attack crossed four control planes</h2><p>The lure was a sponsored search ad for Google Cloud administration. A fake login captured credentials and MFA codes, then redirected the user to the real sign-in flow. Attackers enabled Gemini API, created service accounts and keys, weakened organization policies, added external identities, granted billing administration, and linked their projects to the victim’s billing account. Treat the sequence as one incident; each change can look routine alone.</p><h2>Why cost dashboards alone are not enough</h2><p>API calls, keys, prompts, and outputs lived in foreign projects. The victim’s bill could spike while its workload logs offered no explanation. Wiz says charges reached tens to hundreds of thousands of dollars within one or two days. This is an identity compromise with a billing consequence, not just a token anomaly. A spend alert can limit the financial blast radius; it cannot revoke a stolen administrator or remove an attacker’s access.</p><h2>Hunt for the control-plane changes</h2><p>Correlate Google Workspace login events, GCP Admin Activity, and Cloud Billing audit logs. Prioritize suspicious sign-ins followed by changes to <code>iam.allowedPolicyMemberDomains</code>, external principals, billing-account IAM, project-to-billing links, Gemini API enablement, and new service-account keys in dormant projects. Put identity, timestamp, source network, project, and billing account into one timeline. Watch for unexpected <code>roles/billing.admin</code> grants.</p><h2>Make containment and cost controls work together</h2><p>Separate billing administration from routine project administration. Require phishing-resistant MFA and just-in-time elevation; alert on external principals and organization-policy changes. Restrict which projects can attach to billing where possible. Set AI-usage and billing alerts, use spend caps where eligible, and name an on-call owner who can revoke access and pause workloads. A cap is a circuit breaker, not a guaranteed invoice ceiling; see the <a href=\"/research/google-cloud-ai-spend-caps-finops\">Google Cloud spend-cap guide</a>. Preserve logs, revoke compromised sessions and keys, remove unauthorized principals, restore policies, and then detach attacker-controlled projects after checking service impact. Add credential containment to the <a href=\"/research/llm-cost-spike-runbook\">LLM spend-spike runbook</a>.</p><h2>FAQ</h2><h3>Can attackers charge Gemini API usage to another company’s bill?</h3><p>Wiz documented cases where attackers linked their own Google Cloud projects to victims’ billing accounts. The victim paid while workload activity stayed in external projects.</p><h3>Will a billing alert stop LLMjacking?</h3><p>No. It signals unusual spend but does not revoke identities or stop requests. Pair it with identity controls, scoped billing permissions, and a rehearsed containment runbook.</p><h3>Which logs should we check first?</h3><p>Correlate privileged sign-ins with organization-policy changes, external IAM principals, billing-role changes, new project links, Gemini API enablement, service-account keys, and the resulting cost spike.</p><h2>Sources</h2><ul><li><a href=\"https://www.wiz.io/blog/from-phishing-to-llmjacking\">Wiz CIRT: LLMjacking via cloud billing</a></li><li><a href=\"https://cloud.google.com/logging/docs/audit\">Google Cloud: Audit logs</a></li><li><a href=\"https://docs.cloud.google.com/billing/docs/how-to/budgets-spend-caps\">Google Cloud: Spend caps</a></li></ul><h2>Related</h2><ul><li><a href=\"/research/google-cloud-ai-spend-caps-finops\">Google Cloud spend caps</a></li><li><a href=\"/research/llm-cost-spike-runbook\">LLM spend-spike runbook</a></li><li><a href=\"/research/three-agent-budgets\">Agent budgets</a></li></ul>",
+      "faq": [
+        {
+          "question": "Can attackers charge Gemini API usage to another company’s bill?",
+          "answer": "Wiz documented cases where attackers linked their own Google Cloud projects to victims’ billing accounts. The victim paid while workload activity stayed in external projects."
+        },
+        {
+          "question": "Will a billing alert stop LLMjacking?",
+          "answer": "No. It signals unusual spend but does not revoke identities or stop requests. Pair it with identity controls, scoped billing permissions, and a rehearsed containment runbook."
+        },
+        {
+          "question": "Which logs should we check first?",
+          "answer": "Correlate privileged sign-ins with organization-policy changes, external IAM principals, billing-role changes, new project links, Gemini API enablement, service-account keys, and the resulting cost spike."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/google-cloud-ai-spend-caps-finops",
+          "label": "Google Cloud spend caps"
+        },
+        {
+          "slug": "/research/llm-cost-spike-runbook",
+          "label": "LLM spend-spike runbook"
+        },
+        {
+          "slug": "/research/three-agent-budgets",
+          "label": "Agent budgets"
+        }
+      ]
+    },
+    "es": {
+      "title": "LLMjacking: fraude de facturación cloud",
+      "titleCore": "Cuando LLMjacking se convierte en fraude de facturación cloud",
+      "description": "El phishing secuestró la facturación de GCP para pagar uso no autorizado de Gemini API. Ataque, auditoría y controles FinOps.",
+      "body": "<p>Una cuenta de administrador cloud comprometida puede financiar cargas de IA ajenas con la factura de su empresa. Wiz informó el 20 de octubre de 2026 de ataques que robaron credenciales privilegiadas de Google Cloud, vincularon proyectos de los atacantes a cuentas de facturación de las víctimas y generaron decenas o cientos de miles de dólares en cargos de Gemini API en 24–48 horas. Las víctimas pagaban, pero no veían prompts ni respuestas porque las llamadas se ejecutaban en proyectos externos.</p><figure style=\"margin:28px 0\"><svg viewBox=\"0 0 760 150\" width=\"100%\" role=\"img\" aria-labelledby=\"cash-flow-title\" style=\"display:block;max-width:100%;height:auto;font-family:inherit\"><title id=\"cash-flow-title\">Cloud billing abuse attack path</title><rect x=\"10\" y=\"20\" width=\"165\" height=\"90\" rx=\"9\" fill=\"#172338\" stroke=\"#E8895C\"/><text x=\"92\" y=\"58\" fill=\"#F4F5F7\" font-size=\"16\" text-anchor=\"middle\">1 · Identidad</text><text x=\"92\" y=\"83\" fill=\"#AEB8C9\" font-size=\"12\" text-anchor=\"middle\">admin suplantado</text><path d=\"M180 65h35m-8-8 8 8-8 8\" fill=\"none\" stroke=\"#E8895C\" stroke-width=\"3\"/><rect x=\"222\" y=\"20\" width=\"165\" height=\"90\" rx=\"9\" fill=\"#172338\" stroke=\"#E8895C\"/><text x=\"304\" y=\"58\" fill=\"#F4F5F7\" font-size=\"16\" text-anchor=\"middle\">2 · Facturación</text><text x=\"304\" y=\"83\" fill=\"#AEB8C9\" font-size=\"12\" text-anchor=\"middle\">proyecto vinculado</text><path d=\"M392 65h35m-8-8 8 8-8 8\" fill=\"none\" stroke=\"#E8895C\" stroke-width=\"3\"/><rect x=\"434\" y=\"20\" width=\"165\" height=\"90\" rx=\"9\" fill=\"#172338\" stroke=\"#E8895C\"/><text x=\"516\" y=\"58\" fill=\"#F4F5F7\" font-size=\"16\" text-anchor=\"middle\">3 · uso de IA</text><text x=\"516\" y=\"83\" fill=\"#AEB8C9\" font-size=\"12\" text-anchor=\"middle\">la víctima paga</text><path d=\"M604 65h35m-8-8 8 8-8 8\" fill=\"none\" stroke=\"#E8895C\" stroke-width=\"3\"/><rect x=\"645\" y=\"32\" width=\"105\" height=\"66\" rx=\"9\" fill=\"#532B35\" stroke=\"#E8895C\"/><text x=\"697\" y=\"59\" fill=\"#F4F5F7\" font-size=\"13\" text-anchor=\"middle\"Gasto</text><text x=\"697\" y=\"79\" fill=\"#F4F5F7\" font-size=\"13\" text-anchor=\"middle\"alza</text></svg><figcaption style=\"font-size:13px;color:#7F8BA0;margin-top:8px\">El fraude puede cruzar identidad, políticas, vínculos de proyectos y uso de modelos. Una alerta de coste solo ve la última fase.</figcaption></figure><h2>Una cadena que atraviesa cuatro controles</h2><p>El señuelo fue un anuncio patrocinado para tareas administrativas de Google Cloud. La página falsa capturó credenciales y códigos MFA y redirigió al inicio de sesión legítimo. Después, los atacantes habilitaron Gemini API, crearon cuentas y claves de servicio, debilitaron políticas, añadieron identidades externas, elevaron permisos de facturación y vincularon sus proyectos a la cuenta de la víctima. La secuencia es la señal; cada cambio aislado puede parecer rutinario.</p><h2>Por qué los paneles de costes no bastan</h2><p>Las llamadas, claves y prompts estaban en proyectos externos. La factura podía aumentar sin que los registros de la víctima explicaran el uso. Es una intrusión de identidad con consecuencias financieras, no solo una anomalía de tokens. Una alerta limita el impacto económico, pero no revoca al administrador comprometido ni elimina el acceso.</p><h2>Busque cambios del plano de control</h2><p>Correlacione inicios de sesión de Google Workspace, GCP Admin Activity y auditoría de Cloud Billing. Revise cambios en <code>iam.allowedPolicyMemberDomains</code>, principales externos, IAM de facturación, vínculos de proyectos, activación de Gemini API y claves nuevas en proyectos inactivos. Una los usuarios, horarios, redes, proyectos y cuentas en una cronología; vigile concesiones inesperadas de <code>roles/billing.admin</code>.</p><h2>Combine contención y controles de gasto</h2><p>Separe la administración de facturación de la gestión diaria de proyectos. Exija MFA resistente al phishing y elevación temporal; alerte sobre identidades externas y cambios de políticas. Configure alertas de gasto y un responsable para revocar accesos y pausar cargas. Un límite es un cortacircuitos, no un techo garantizado; consulte la <a href=\"/research/google-cloud-ai-spend-caps-finops\">guía de límites de gasto</a>. Preserve registros y adapte el <a href=\"/research/llm-cost-spike-runbook\">runbook de picos de gasto</a> para contener credenciales.</p><h2>FAQ</h2><h3>¿Puede un atacante cargar Gemini API a otra empresa?</h3><p>Wiz documentó proyectos de los atacantes vinculados a la facturación de las víctimas. La víctima pagaba mientras la actividad ocurría en proyectos externos.</p><h3>¿Una alerta detiene el LLMjacking?</h3><p>No. Detecta gasto, pero no revoca identidades ni detiene solicitudes. Combínela con controles de identidad y un procedimiento de contención probado.</p><h3>¿Qué registros revisar primero?</h3><p>Correlacione accesos privilegiados con cambios de políticas, identidades externas, permisos de facturación, vínculos de proyectos, Gemini API, claves de servicio y costes.</p><h2>Sources</h2><ul><li><a href=\"https://www.wiz.io/blog/from-phishing-to-llmjacking\">Wiz CIRT: secuestro de facturación cloud para uso de LLM</a></li><li><a href=\"https://cloud.google.com/logging/docs/audit\">Google Cloud: registros de auditoría</a></li><li><a href=\"https://docs.cloud.google.com/billing/docs/how-to/budgets-spend-caps\">Google Cloud: límites de gasto</a></li></ul><h2>Related</h2><ul><li><a href=\"/research/google-cloud-ai-spend-caps-finops\">Límites de gasto cloud</a></li><li><a href=\"/research/llm-cost-spike-runbook\">Runbook de picos LLM</a></li><li><a href=\"/research/three-agent-budgets\">Presupuestos para agentes</a></li></ul>",
+      "faq": [
+        {
+          "question": "¿Puede un atacante cargar Gemini API a otra empresa?",
+          "answer": "Wiz documentó proyectos de los atacantes vinculados a la facturación de las víctimas. La víctima pagaba mientras la actividad ocurría en proyectos externos."
+        },
+        {
+          "question": "¿Una alerta detiene el LLMjacking?",
+          "answer": "No. Detecta gasto, pero no revoca identidades ni detiene solicitudes. Combínela con controles de identidad y un procedimiento de contención probado."
+        },
+        {
+          "question": "¿Qué registros revisar primero?",
+          "answer": "Correlacione accesos privilegiados con cambios de políticas, identidades externas, permisos de facturación, vínculos de proyectos, Gemini API, claves de servicio y costes."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/google-cloud-ai-spend-caps-finops",
+          "label": "Límites de gasto cloud"
+        },
+        {
+          "slug": "/research/llm-cost-spike-runbook",
+          "label": "Runbook de picos LLM"
+        },
+        {
+          "slug": "/research/three-agent-budgets",
+          "label": "Presupuestos para agentes"
+        }
+      ]
+    },
+    "fr": {
+      "title": "LLMjacking : fraude de facturation cloud",
+      "titleCore": "Quand le LLMjacking devient une fraude de facturation cloud",
+      "description": "Le phishing a détourné la facturation GCP pour financer Gemini API. Parcours d’attaque, traces d’audit et contrôles FinOps.",
+      "body": "<p>Un compte administrateur cloud compromis peut financer les charges IA d’un tiers avec la facture de votre entreprise. Wiz a décrit le 20 octobre 2026 des attaques où des identifiants Google Cloud privilégiés ont été hameçonnés, des projets contrôlés par l’attaquant rattachés aux comptes des victimes et des dizaines à centaines de milliers de dollars de frais Gemini API générés en 24–48 heures. Les victimes payaient sans voir les prompts ni les réponses, exécutés dans des projets externes.</p><figure style=\"margin:28px 0\"><svg viewBox=\"0 0 760 150\" width=\"100%\" role=\"img\" aria-labelledby=\"cash-flow-title\" style=\"display:block;max-width:100%;height:auto;font-family:inherit\"><title id=\"cash-flow-title\">Cloud billing abuse attack path</title><rect x=\"10\" y=\"20\" width=\"165\" height=\"90\" rx=\"9\" fill=\"#172338\" stroke=\"#E8895C\"/><text x=\"92\" y=\"58\" fill=\"#F4F5F7\" font-size=\"16\" text-anchor=\"middle\">1 · Identité</text><text x=\"92\" y=\"83\" fill=\"#AEB8C9\" font-size=\"12\" text-anchor=\"middle\">admin hameçonné</text><path d=\"M180 65h35m-8-8 8 8-8 8\" fill=\"none\" stroke=\"#E8895C\" stroke-width=\"3\"/><rect x=\"222\" y=\"20\" width=\"165\" height=\"90\" rx=\"9\" fill=\"#172338\" stroke=\"#E8895C\"/><text x=\"304\" y=\"58\" fill=\"#F4F5F7\" font-size=\"16\" text-anchor=\"middle\">2 · Facturation</text><text x=\"304\" y=\"83\" fill=\"#AEB8C9\" font-size=\"12\" text-anchor=\"middle\">projet lié</text><path d=\"M392 65h35m-8-8 8 8-8 8\" fill=\"none\" stroke=\"#E8895C\" stroke-width=\"3\"/><rect x=\"434\" y=\"20\" width=\"165\" height=\"90\" rx=\"9\" fill=\"#172338\" stroke=\"#E8895C\"/><text x=\"516\" y=\"58\" fill=\"#F4F5F7\" font-size=\"16\" text-anchor=\"middle\">3 · usage IA</text><text x=\"516\" y=\"83\" fill=\"#AEB8C9\" font-size=\"12\" text-anchor=\"middle\">victime paie</text><path d=\"M604 65h35m-8-8 8 8-8 8\" fill=\"none\" stroke=\"#E8895C\" stroke-width=\"3\"/><rect x=\"645\" y=\"32\" width=\"105\" height=\"66\" rx=\"9\" fill=\"#532B35\" stroke=\"#E8895C\"/><text x=\"697\" y=\"59\" fill=\"#F4F5F7\" font-size=\"13\" text-anchor=\"middle\"Dépenses</text><text x=\"697\" y=\"79\" fill=\"#F4F5F7\" font-size=\"13\" text-anchor=\"middle\"en hausse</text></svg><figcaption style=\"font-size:13px;color:#7F8BA0;margin-top:8px\">La fraude traverse identité, politique, rattachement de projet et usage des modèles. Une alerte ne voit que la dernière étape.</figcaption></figure><h2>Une chaîne qui traverse quatre plans</h2><p>Une annonce sponsorisée pour l’administration Google Cloud menait à une fausse page qui capturait identifiants et MFA, puis redirigeait vers le vrai login. Les attaquants ont ensuite activé Gemini API, créé comptes et clés, affaibli les politiques, ajouté des identités externes, élevé les droits de facturation et rattaché leurs projets au compte de la victime. La séquence est le signal : chaque changement isolé peut sembler normal.</p><h2>Pourquoi les tableaux de coûts ne suffisent pas</h2><p>Les appels, clés et prompts se trouvaient dans des projets externes. La facture pouvait bondir sans que les journaux habituels l’expliquent. C’est une compromission d’identité aux conséquences financières, pas une simple anomalie de tokens. Une alerte limite les coûts, mais ne révoque pas l’administrateur compromis ni l’accès de l’attaquant.</p><h2>Recherchez les changements du plan de contrôle</h2><p>Corrélez connexions Google Workspace, GCP Admin Activity et journaux Cloud Billing. Examinez <code>iam.allowedPolicyMemberDomains</code>, principaux externes, droits IAM de facturation, rattachements de projets, activation Gemini API et clés de service dans les projets inactifs. Réunissez identité, heure, réseau, projet et compte dans une chronologie ; surveillez les attributions inattendues de <code>roles/billing.admin</code>.</p><h2>Associez confinement et contrôles de coûts</h2><p>Séparez administration de facturation et gestion des projets. Exigez MFA résistante au phishing, élévation temporaire et alertes sur les identités externes. Configurez des alertes de dépenses et un responsable d’astreinte. Un plafond est un disjoncteur, pas une facture maximale garantie ; consultez le <a href=\"/research/google-cloud-ai-spend-caps-finops\">guide Google Cloud</a>. Préservez les journaux, révoquez les accès et complétez le <a href=\"/research/llm-cost-spike-runbook\">runbook de dépenses LLM</a>.</p><h2>FAQ</h2><h3>Un attaquant peut-il faire payer Gemini API par une autre entreprise ?</h3><p>Wiz a documenté des projets contrôlés par les attaquants rattachés aux comptes de facturation des victimes.</p><h3>Une alerte arrête-t-elle le LLMjacking ?</h3><p>Non. Elle signale les dépenses, sans révoquer les identités ni arrêter les requêtes. Ajoutez contrôles d’identité et procédure de confinement.</p><h3>Quels journaux examiner d’abord ?</h3><p>Corrélez connexions privilégiées, changements de politiques, principaux externes, droits de facturation, projets liés, Gemini API et hausse des coûts.</p><h2>Sources</h2><ul><li><a href=\"https://www.wiz.io/blog/from-phishing-to-llmjacking\">Wiz CIRT : détournement de facturation cloud pour les LLM</a></li><li><a href=\"https://cloud.google.com/logging/docs/audit\">Google Cloud : journaux d’audit</a></li><li><a href=\"https://docs.cloud.google.com/billing/docs/how-to/budgets-spend-caps\">Google Cloud : plafonds de dépenses</a></li></ul><h2>Related</h2><ul><li><a href=\"/research/google-cloud-ai-spend-caps-finops\">Plafonds cloud</a></li><li><a href=\"/research/llm-cost-spike-runbook\">Runbook de dépenses LLM</a></li><li><a href=\"/research/three-agent-budgets\">Budgets d’agents</a></li></ul>",
+      "faq": [
+        {
+          "question": "Un attaquant peut-il faire payer Gemini API par une autre entreprise ?",
+          "answer": "Wiz a documenté des projets contrôlés par les attaquants rattachés aux comptes de facturation des victimes."
+        },
+        {
+          "question": "Une alerte arrête-t-elle le LLMjacking ?",
+          "answer": "Non. Elle signale les dépenses, sans révoquer les identités ni arrêter les requêtes. Ajoutez contrôles d’identité et procédure de confinement."
+        },
+        {
+          "question": "Quels journaux examiner d’abord ?",
+          "answer": "Corrélez connexions privilégiées, changements de politiques, principaux externes, droits de facturation, projets liés, Gemini API et hausse des coûts."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/google-cloud-ai-spend-caps-finops",
+          "label": "Plafonds cloud"
+        },
+        {
+          "slug": "/research/llm-cost-spike-runbook",
+          "label": "Runbook de dépenses LLM"
+        },
+        {
+          "slug": "/research/three-agent-budgets",
+          "label": "Budgets d’agents"
+        }
+      ]
+    },
+    "de": {
+      "title": "Wenn LLMjacking zum Cloud-Abrechnungsbetrug wird",
+      "titleCore": "Wenn LLMjacking zum Cloud-Abrechnungsbetrug wird",
+      "description": "Phishing missbrauchte die GCP-Abrechnung für unerlaubte Gemini-API-Nutzung. Angriffspfad, Audit-Signale und FinOps-Kontrollen.",
+      "body": "<p>Ein kompromittiertes Cloud-Administratorkonto kann fremde KI-Workloads über die Unternehmensabrechnung finanzieren. Wiz beschrieb am 20. Oktober 2026 Angriffe, bei denen privilegierte Google-Cloud-Zugangsdaten gestohlen, Angreiferprojekte mit Opferkonten verknüpft und binnen 24–48 Stunden Zehntausende bis Hunderttausende Dollar Gemini-API-Kosten verursacht wurden. Die Aufrufe liefen extern; die Opfer zahlten, sahen aber keine Prompts oder Antworten.</p><figure style=\"margin:28px 0\"><svg viewBox=\"0 0 760 150\" width=\"100%\" role=\"img\" aria-labelledby=\"cash-flow-title\" style=\"display:block;max-width:100%;height:auto;font-family:inherit\"><title id=\"cash-flow-title\">Cloud billing abuse attack path</title><rect x=\"10\" y=\"20\" width=\"165\" height=\"90\" rx=\"9\" fill=\"#172338\" stroke=\"#E8895C\"/><text x=\"92\" y=\"58\" fill=\"#F4F5F7\" font-size=\"16\" text-anchor=\"middle\">1 · Identität</text><text x=\"92\" y=\"83\" fill=\"#AEB8C9\" font-size=\"12\" text-anchor=\"middle\">gephishter Admin</text><path d=\"M180 65h35m-8-8 8 8-8 8\" fill=\"none\" stroke=\"#E8895C\" stroke-width=\"3\"/><rect x=\"222\" y=\"20\" width=\"165\" height=\"90\" rx=\"9\" fill=\"#172338\" stroke=\"#E8895C\"/><text x=\"304\" y=\"58\" fill=\"#F4F5F7\" font-size=\"16\" text-anchor=\"middle\">2 · Abrechnung</text><text x=\"304\" y=\"83\" fill=\"#AEB8C9\" font-size=\"12\" text-anchor=\"middle\">Projekt verknüpft</text><path d=\"M392 65h35m-8-8 8 8-8 8\" fill=\"none\" stroke=\"#E8895C\" stroke-width=\"3\"/><rect x=\"434\" y=\"20\" width=\"165\" height=\"90\" rx=\"9\" fill=\"#172338\" stroke=\"#E8895C\"/><text x=\"516\" y=\"58\" fill=\"#F4F5F7\" font-size=\"16\" text-anchor=\"middle\">3 · KI-Nutzung</text><text x=\"516\" y=\"83\" fill=\"#AEB8C9\" font-size=\"12\" text-anchor=\"middle\">Opfer zahlt</text><path d=\"M604 65h35m-8-8 8 8-8 8\" fill=\"none\" stroke=\"#E8895C\" stroke-width=\"3\"/><rect x=\"645\" y=\"32\" width=\"105\" height=\"66\" rx=\"9\" fill=\"#532B35\" stroke=\"#E8895C\"/><text x=\"697\" y=\"59\" fill=\"#F4F5F7\" font-size=\"13\" text-anchor=\"middle\"Kosten</text><text x=\"697\" y=\"79\" fill=\"#F4F5F7\" font-size=\"13\" text-anchor=\"middle\"steigen</text></svg><figcaption style=\"font-size:13px;color:#7F8BA0;margin-top:8px\">Abrechnungsbetrug verbindet Identität, Richtlinien, Projektverknüpfung und Modellnutzung. Ein Kostenalarm sieht nur die letzte Phase.</figcaption></figure><h2>Der Angriff verbindet vier Steuerungsebenen</h2><p>Eine gesponserte Anzeige führte zu einer Phishing-Seite, die Zugangsdaten und MFA erfasste und zum echten Login weiterleitete. Angreifer aktivierten Gemini API, erstellten Dienstkonten und Schlüssel, lockerten Richtlinien, fügten externe Identitäten hinzu, erhöhten Abrechnungsrechte und verknüpften eigene Projekte mit dem Opferkonto. Die Abfolge ist entscheidend; einzeln können Änderungen normal wirken.</p><h2>Warum Kostendashboards nicht genügen</h2><p>API-Aufrufe und Prompts lagen in externen Projekten. Die Rechnung konnte steigen, während normale Logs keine Erklärung boten. Das ist ein Identitätsvorfall mit finanziellen Folgen, nicht bloß eine Token-Anomalie. Warnungen begrenzen Kosten, widerrufen aber keine kompromittierten Administratoren oder Angreiferzugriffe.</p><h2>Änderungen an der Steuerungsebene suchen</h2><p>Korrelieren Sie Google-Workspace-Logins, GCP Admin Activity und Cloud-Billing-Auditlogs. Prüfen Sie <code>iam.allowedPolicyMemberDomains</code>, externe Principals, Billing-IAM, Projektlinks, Gemini-Aktivierung und neue Dienstkontoschlüssel in alten Projekten. Führen Sie Identität, Zeit, Quellnetz, Projekt und Rechnungskonto in einer Zeitleiste zusammen; achten Sie auf unerwartete <code>roles/billing.admin</code>-Zuweisungen.</p><h2>Eindämmung und Kostenkontrollen kombinieren</h2><p>Trennen Sie Abrechnungsadministration von Projektverwaltung. Erzwingen Sie phishing-resistente MFA, zeitlich begrenzte Rechte und Warnungen bei externen Principals. Richten Sie Ausgabenalarme und eine Bereitschaftsrolle ein. Limits sind Schutzschalter, keine garantierten Rechnungsobergrenzen; siehe den <a href=\"/research/google-cloud-ai-spend-caps-finops\">Google-Cloud-Leitfaden</a>. Sichern Sie Logs, widerrufen Sie Schlüssel und ergänzen Sie das <a href=\"/research/llm-cost-spike-runbook\">Runbook für Ausgabenspitzen</a>.</p><h2>FAQ</h2><h3>Kann ein Angreifer Gemini-Kosten einem anderen Unternehmen belasten?</h3><p>Wiz dokumentierte Angreiferprojekte, die mit Opfer-Abrechnungskonten verknüpft waren.</p><h3>Stoppt ein Abrechnungsalarm LLMjacking?</h3><p>Nein. Er meldet Ausgaben, widerruft aber keine Identitäten und stoppt keine Anfragen. Kombinieren Sie ihn mit Identitätskontrollen und Eindämmung.</p><h3>Welche Logs zuerst prüfen?</h3><p>Korrelieren Sie privilegierte Logins, Richtlinienänderungen, externe Principals, Billing-Rechte, Projektlinks, Gemini-Aktivierung und Kostenanstiege.</p><h2>Sources</h2><ul><li><a href=\"https://www.wiz.io/blog/from-phishing-to-llmjacking\">Wiz CIRT: Missbrauch von Cloud-Abrechnung für LLM-Nutzung</a></li><li><a href=\"https://cloud.google.com/logging/docs/audit\">Google Cloud: Auditlogs</a></li><li><a href=\"https://docs.cloud.google.com/billing/docs/how-to/budgets-spend-caps\">Google Cloud: Ausgabenlimits</a></li></ul><h2>Related</h2><ul><li><a href=\"/research/google-cloud-ai-spend-caps-finops\">Cloud-Ausgabenlimits</a></li><li><a href=\"/research/llm-cost-spike-runbook\">LLM-Ausgaben-Runbook</a></li><li><a href=\"/research/three-agent-budgets\">Agentenbudgets</a></li></ul>",
+      "faq": [
+        {
+          "question": "Kann ein Angreifer Gemini-Kosten einem anderen Unternehmen belasten?",
+          "answer": "Wiz dokumentierte Angreiferprojekte, die mit Opfer-Abrechnungskonten verknüpft waren."
+        },
+        {
+          "question": "Stoppt ein Abrechnungsalarm LLMjacking?",
+          "answer": "Nein. Er meldet Ausgaben, widerruft aber keine Identitäten und stoppt keine Anfragen. Kombinieren Sie ihn mit Identitätskontrollen und Eindämmung."
+        },
+        {
+          "question": "Welche Logs zuerst prüfen?",
+          "answer": "Korrelieren Sie privilegierte Logins, Richtlinienänderungen, externe Principals, Billing-Rechte, Projektlinks, Gemini-Aktivierung und Kostenanstiege."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/google-cloud-ai-spend-caps-finops",
+          "label": "Cloud-Ausgabenlimits"
+        },
+        {
+          "slug": "/research/llm-cost-spike-runbook",
+          "label": "LLM-Ausgaben-Runbook"
+        },
+        {
+          "slug": "/research/three-agent-budgets",
+          "label": "Agentenbudgets"
+        }
+      ]
+    },
+    "ja": {
+      "title": "LLMjackingがクラウド請求の不正利用に変わるとき",
+      "titleCore": "LLMjackingがクラウド請求の不正利用に変わるとき",
+      "description": "フィッシングでGCP請求を乗っ取り、Gemini APIを不正利用。攻撃経路、監査ログ、FinOps対策を解説します。",
+      "body": "<p>クラウド管理者アカウントが侵害されると、自社の請求が第三者のAI利用を支払う手段になります。Wizは2026年10月20日、Google Cloudの特権ユーザーをフィッシングし、攻撃者のプロジェクトを被害企業の請求先に接続する攻撃を報告しました。24〜48時間でGemini API料金が数万〜数十万ドルに達し、処理は外部プロジェクトで実行されていました。</p><figure style=\"margin:28px 0\"><svg viewBox=\"0 0 760 150\" width=\"100%\" role=\"img\" aria-labelledby=\"cash-flow-title\" style=\"display:block;max-width:100%;height:auto;font-family:inherit\"><title id=\"cash-flow-title\">Cloud billing abuse attack path</title><rect x=\"10\" y=\"20\" width=\"165\" height=\"90\" rx=\"9\" fill=\"#172338\" stroke=\"#E8895C\"/><text x=\"92\" y=\"58\" fill=\"#F4F5F7\" font-size=\"16\" text-anchor=\"middle\">1 · ID</text><text x=\"92\" y=\"83\" fill=\"#AEB8C9\" font-size=\"12\" text-anchor=\"middle\">管理者を詐取</text><path d=\"M180 65h35m-8-8 8 8-8 8\" fill=\"none\" stroke=\"#E8895C\" stroke-width=\"3\"/><rect x=\"222\" y=\"20\" width=\"165\" height=\"90\" rx=\"9\" fill=\"#172338\" stroke=\"#E8895C\"/><text x=\"304\" y=\"58\" fill=\"#F4F5F7\" font-size=\"16\" text-anchor=\"middle\">2 · 請求</text><text x=\"304\" y=\"83\" fill=\"#AEB8C9\" font-size=\"12\" text-anchor=\"middle\">プロジェクト接続</text><path d=\"M392 65h35m-8-8 8 8-8 8\" fill=\"none\" stroke=\"#E8895C\" stroke-width=\"3\"/><rect x=\"434\" y=\"20\" width=\"165\" height=\"90\" rx=\"9\" fill=\"#172338\" stroke=\"#E8895C\"/><text x=\"516\" y=\"58\" fill=\"#F4F5F7\" font-size=\"16\" text-anchor=\"middle\">3 · AI利用</text><text x=\"516\" y=\"83\" fill=\"#AEB8C9\" font-size=\"12\" text-anchor=\"middle\">被害者が負担</text><path d=\"M604 65h35m-8-8 8 8-8 8\" fill=\"none\" stroke=\"#E8895C\" stroke-width=\"3\"/><rect x=\"645\" y=\"32\" width=\"105\" height=\"66\" rx=\"9\" fill=\"#532B35\" stroke=\"#E8895C\"/><text x=\"697\" y=\"59\" fill=\"#F4F5F7\" font-size=\"13\" text-anchor=\"middle\"支出</text><text x=\"697\" y=\"79\" fill=\"#F4F5F7\" font-size=\"13\" text-anchor=\"middle\"急増</text></svg><figcaption style=\"font-size:13px;color:#7F8BA0;margin-top:8px\">不正請求はID、組織ポリシー、プロジェクト接続、モデル利用を横断します。コストアラートだけでは最後の段階しか見えません。</figcaption></figure><h2>攻撃は4つの管理面をまたぐ</h2><p>検索広告から偽ログインへ誘導し、認証情報とMFAコードを取得。その後Gemini APIを有効化し、サービスアカウントとキーを作成、組織ポリシーを弱め、外部IDを追加し、請求権限を昇格して自分たちのプロジェクトを接続しました。個別操作は通常に見えても、連続した順序が兆候です。</p><h2>コスト画面だけでは検知が遅れる</h2><p>API呼び出しやプロンプトは外部プロジェクトにありました。請求額が急増しても、通常ログからモデル利用の理由は分かりません。これはトークン異常だけでなく、財務影響を伴うID侵害です。支出アラートは損失を抑えますが、侵害された管理者やアクセス権を無効化しません。</p><h2>コントロールプレーンの変更を調査</h2><p>Google Workspace、GCP Admin Activity、Cloud Billing監査ログを相関させます。<code>iam.allowedPolicyMemberDomains</code>、外部プリンシパル、請求IAM、プロジェクト接続、Gemini API有効化、休眠プロジェクトのサービスキーを確認。ID、時刻、ネットワーク、プロジェクト、請求先を一つのタイムラインにまとめ、予期しない<code>roles/billing.admin</code>付与も監視します。</p><h2>封じ込めとコスト管理を併用</h2><p>請求管理とプロジェクト管理を分離し、フィッシング耐性MFA、一時的な権限昇格、外部IDのアラートを導入します。AI利用アラートと対応担当者も設定してください。上限は安全弁で請求保証ではありません。<a href=\"/research/google-cloud-ai-spend-caps-finops\">支出上限ガイド</a>を参照し、ログ保全やキー失効を<a href=\"/research/llm-cost-spike-runbook\">支出急増手順書</a>に追加します。</p><h2>FAQ</h2><h3>他社の請求先にGemini API料金を付けられますか？</h3><p>Wizは攻撃者のプロジェクトが被害企業の請求先に接続された事例を報告しました。</p><h3>請求アラートで攻撃を止められますか？</h3><p>いいえ。支出を検知しますがIDやAPI呼び出しは止めません。ID管理と封じ込め手順を組み合わせます。</p><h3>最初にどのログを見ますか？</h3><p>特権ログインとポリシー変更、外部ID、請求権限、プロジェクト接続、Gemini API、サービスキー、費用急増を相関します。</p><h2>Sources</h2><ul><li><a href=\"https://www.wiz.io/blog/from-phishing-to-llmjacking\">Wiz CIRT：LLM利用目的のクラウド請求乗っ取り</a></li><li><a href=\"https://cloud.google.com/logging/docs/audit\">Google Cloud：監査ログ</a></li><li><a href=\"https://docs.cloud.google.com/billing/docs/how-to/budgets-spend-caps\">Google Cloud：支出上限</a></li></ul><h2>Related</h2><ul><li><a href=\"/research/google-cloud-ai-spend-caps-finops\">クラウド支出上限</a></li><li><a href=\"/research/llm-cost-spike-runbook\">LLM支出急増手順</a></li><li><a href=\"/research/three-agent-budgets\">エージェント予算</a></li></ul>",
+      "faq": [
+        {
+          "question": "他社の請求先にGemini API料金を付けられますか？",
+          "answer": "Wizは攻撃者のプロジェクトが被害企業の請求先に接続された事例を報告しました。"
+        },
+        {
+          "question": "請求アラートで攻撃を止められますか？",
+          "answer": "いいえ。支出を検知しますがIDやAPI呼び出しは止めません。ID管理と封じ込め手順を組み合わせます。"
+        },
+        {
+          "question": "最初にどのログを見ますか？",
+          "answer": "特権ログインとポリシー変更、外部ID、請求権限、プロジェクト接続、Gemini API、サービスキー、費用急増を相関します。"
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/google-cloud-ai-spend-caps-finops",
+          "label": "クラウド支出上限"
+        },
+        {
+          "slug": "/research/llm-cost-spike-runbook",
+          "label": "LLM支出急増手順"
+        },
+        {
+          "slug": "/research/three-agent-budgets",
+          "label": "エージェント予算"
+        }
+      ]
+    },
+    "pt": {
+      "title": "Quando LLMjacking vira fraude na cobrança de cloud",
+      "titleCore": "Quando LLMjacking vira fraude na cobrança de cloud",
+      "description": "Phishing sequestrou a cobrança GCP para financiar uso não autorizado da Gemini API. Ataque, auditoria e controles FinOps.",
+      "body": "<p>Uma conta de administrador comprometida pode financiar a IA de terceiros com a cobrança da sua empresa. A Wiz relatou em 20 de outubro de 2026 ataques que roubaram credenciais privilegiadas do Google Cloud, vincularam projetos dos invasores às contas das vítimas e geraram dezenas ou centenas de milhares de dólares em custos da Gemini API em 24–48 horas. As chamadas ocorreram em projetos externos, deixando a vítima com a conta e sem acesso aos prompts.</p><figure style=\"margin:28px 0\"><svg viewBox=\"0 0 760 150\" width=\"100%\" role=\"img\" aria-labelledby=\"cash-flow-title\" style=\"display:block;max-width:100%;height:auto;font-family:inherit\"><title id=\"cash-flow-title\">Cloud billing abuse attack path</title><rect x=\"10\" y=\"20\" width=\"165\" height=\"90\" rx=\"9\" fill=\"#172338\" stroke=\"#E8895C\"/><text x=\"92\" y=\"58\" fill=\"#F4F5F7\" font-size=\"16\" text-anchor=\"middle\">1 · Identidade</text><text x=\"92\" y=\"83\" fill=\"#AEB8C9\" font-size=\"12\" text-anchor=\"middle\">admin fraudado</text><path d=\"M180 65h35m-8-8 8 8-8 8\" fill=\"none\" stroke=\"#E8895C\" stroke-width=\"3\"/><rect x=\"222\" y=\"20\" width=\"165\" height=\"90\" rx=\"9\" fill=\"#172338\" stroke=\"#E8895C\"/><text x=\"304\" y=\"58\" fill=\"#F4F5F7\" font-size=\"16\" text-anchor=\"middle\">2 · Cobrança</text><text x=\"304\" y=\"83\" fill=\"#AEB8C9\" font-size=\"12\" text-anchor=\"middle\">projeto vinculado</text><path d=\"M392 65h35m-8-8 8 8-8 8\" fill=\"none\" stroke=\"#E8895C\" stroke-width=\"3\"/><rect x=\"434\" y=\"20\" width=\"165\" height=\"90\" rx=\"9\" fill=\"#172338\" stroke=\"#E8895C\"/><text x=\"516\" y=\"58\" fill=\"#F4F5F7\" font-size=\"16\" text-anchor=\"middle\">3 · uso de IA</text><text x=\"516\" y=\"83\" fill=\"#AEB8C9\" font-size=\"12\" text-anchor=\"middle\">vítima paga</text><path d=\"M604 65h35m-8-8 8 8-8 8\" fill=\"none\" stroke=\"#E8895C\" stroke-width=\"3\"/><rect x=\"645\" y=\"32\" width=\"105\" height=\"66\" rx=\"9\" fill=\"#532B35\" stroke=\"#E8895C\"/><text x=\"697\" y=\"59\" fill=\"#F4F5F7\" font-size=\"13\" text-anchor=\"middle\"Gasto</text><text x=\"697\" y=\"79\" fill=\"#F4F5F7\" font-size=\"13\" text-anchor=\"middle\"em alta</text></svg><figcaption style=\"font-size:13px;color:#7F8BA0;margin-top:8px\">A fraude cruza identidade, política, vínculo de projeto e uso de modelos. O alerta de custo vê apenas a última etapa.</figcaption></figure><h2>O ataque cruzou quatro planos de controle</h2><p>Um anúncio patrocinado levou a uma página falsa que capturou credenciais e MFA antes de redirecionar ao login legítimo. Os invasores habilitaram Gemini API, criaram contas e chaves, enfraqueceram políticas, adicionaram identidades externas, elevaram permissões de cobrança e vincularam seus projetos à conta da vítima. A sequência importa: cada mudança isolada pode parecer normal.</p><h2>Por que painéis de custo não bastam</h2><p>Chamadas, chaves e prompts estavam em projetos externos. A fatura podia subir sem que os logs da vítima explicassem o uso. É uma invasão de identidade com consequência financeira, não apenas anomalia de tokens. Alertas limitam o impacto, mas não revogam o administrador comprometido nem removem o acesso.</p><h2>Investigue mudanças no plano de controle</h2><p>Correlacione logins do Google Workspace, GCP Admin Activity e auditoria do Cloud Billing. Procure mudanças em <code>iam.allowedPolicyMemberDomains</code>, principais externos, IAM de cobrança, vínculos de projetos, ativação da Gemini API e novas chaves em projetos inativos. Una identidade, horário, rede, projeto e conta numa linha do tempo e verifique concessões inesperadas de <code>roles/billing.admin</code>.</p><h2>Combine contenção e controles de custo</h2><p>Separe administração de cobrança da gestão de projetos. Exija MFA resistente a phishing, elevação temporária e alertas de identidade externa. Configure alertas de gasto e um responsável de plantão. Limites são disjuntores, não tetos garantidos; veja o <a href=\"/research/google-cloud-ai-spend-caps-finops\">guia Google Cloud</a>. Preserve logs, revogue sessões e chaves e acrescente contenção de credenciais ao <a href=\"/research/llm-cost-spike-runbook\">runbook de picos de gasto</a>.</p><h2>FAQ</h2><h3>Um invasor pode cobrar Gemini API de outra empresa?</h3><p>A Wiz documentou projetos dos invasores vinculados às contas de cobrança das vítimas.</p><h3>Um alerta interrompe o LLMjacking?</h3><p>Não. Detecta gasto, mas não revoga identidades nem interrompe solicitações. Combine-o com controles de identidade e contenção testada.</p><h3>Quais logs verificar primeiro?</h3><p>Correlacione logins privilegiados com políticas, identidades externas, permissões de cobrança, vínculos, Gemini API, chaves e aumento de custos.</p><h2>Sources</h2><ul><li><a href=\"https://www.wiz.io/blog/from-phishing-to-llmjacking\">Wiz CIRT: sequestro da cobrança cloud para uso de LLM</a></li><li><a href=\"https://cloud.google.com/logging/docs/audit\">Google Cloud: logs de auditoria</a></li><li><a href=\"https://docs.cloud.google.com/billing/docs/how-to/budgets-spend-caps\">Google Cloud: limites de gasto</a></li></ul><h2>Related</h2><ul><li><a href=\"/research/google-cloud-ai-spend-caps-finops\">Limites de gasto cloud</a></li><li><a href=\"/research/llm-cost-spike-runbook\">Runbook de picos LLM</a></li><li><a href=\"/research/three-agent-budgets\">Orçamento de agentes</a></li></ul>",
+      "faq": [
+        {
+          "question": "Um invasor pode cobrar Gemini API de outra empresa?",
+          "answer": "A Wiz documentou projetos dos invasores vinculados às contas de cobrança das vítimas."
+        },
+        {
+          "question": "Um alerta interrompe o LLMjacking?",
+          "answer": "Não. Detecta gasto, mas não revoga identidades nem interrompe solicitações. Combine-o com controles de identidade e contenção testada."
+        },
+        {
+          "question": "Quais logs verificar primeiro?",
+          "answer": "Correlacione logins privilegiados com políticas, identidades externas, permissões de cobrança, vínculos, Gemini API, chaves e aumento de custos."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/google-cloud-ai-spend-caps-finops",
+          "label": "Limites de gasto cloud"
+        },
+        {
+          "slug": "/research/llm-cost-spike-runbook",
+          "label": "Runbook de picos LLM"
+        },
+        {
+          "slug": "/research/three-agent-budgets",
+          "label": "Orçamento de agentes"
+        }
+      ]
+    }
+  }
+}
