@@ -3,30 +3,31 @@
   "permalink": "research/mcp-server-cost-impact.html",
   "lang": "en",
   "head": {
-    "title": "MCP Server Cost Impact: Tool Calls and Tokens · FinOps LLM",
-    "description": "How MCP tool calls multiply token usage and what that costs you, plus strategies to measure, attribute, and reduce MCP-related token overhead in production.",
+    "title": "MCP Server Costs: Tokens, Hosting and Tool Calls · FinOps LLM",
+    "description": "What an MCP server does, which costs come from hosting versus model tokens, and how to measure tool overhead with a worked example.",
     "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
     "canonical": "https://finopsllm.com/research/mcp-server-cost-impact",
     "article": {
       "datePublished": "2026-07-04",
-      "breadcrumb": "MCP Server Cost Impact"
+      "breadcrumb": "MCP Server Cost Impact",
+      "dateModified": "2026-10-22"
     },
     "faq": [
       {
-        "q": "How MCP consumes tokens?",
-        "a": "There are three token cost layers in every MCP interaction: Layer 1: Tool definitions. Each MCP server registers tools with the model. A tool definition includes the function name, parameter schema, and a description of what the tool does."
+        "q": "What is an MCP server?",
+        "a": "An MCP server exposes tools, resources, or prompts to an AI application through the Model Context Protocol. The application connects through an MCP client and decides what information reaches the model."
       },
       {
-        "q": "What is the compounding effect?",
-        "a": "MCP costs compound because tool definitions are sent with every request. If you have 20 tools defined (10K–40K tokens of definitions) and make 5 requests in a conversation, the tool definitions alone cost 50K–200K input tokens."
+        "q": "Does every MCP tool call incur a model API charge?",
+        "a": "An MCP protocol request is not itself a model inference request. Costs arise from server execution, paid downstream services, and any model calls that select tools or consume their results."
       },
       {
-        "q": "How to measure MCP overhead?",
-        "a": "The simplest way to measure MCP cost is to run the same prompt twice: once with MCP tools loaded and once without. The difference in input tokens is your tool definition overhead. Then count tool call tokens separately - most providers label them distinctly in their billing dashboards."
+        "q": "Are all MCP tool definitions billed on every turn?",
+        "a": "Only definitions included in the model input contribute to that input. The host may filter tools or discover them on demand. Cache reads and writes can also change the billed rate."
       },
       {
-        "q": "What is the hidden cost of MCP servers?",
-        "a": "Beyond token costs, MCP servers introduce latency and reliability overhead. A tool call that takes 3 seconds to respond adds latency to every turn. A tool that fails intermittently causes retries. Both increase effective cost per task."
+        "q": "How do you measure MCP server costs?",
+        "a": "Track model usage by request, tool execution by server, and downstream service charges under one workflow ID. Compare matched runs and calculate cost per successful task."
       }
     ],
     "style": "body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.68}.wrap{max-width:840px;margin:0 auto;padding:56px 24px}a{color:#7AAFFF}p,li{color:#B6C0D2}h1{line-height:1.08}h2{margin-top:34px}table{border-collapse:collapse;width:100%;margin:24px 0;font-size:.95em}th,td{border:1px solid #1E2A3F;padding:10px 12px;text-align:left;color:#B6C0D2}th{color:#E6EAF2;background:#101726}.langsw{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;color:#647289;margin:0 0 26px}.langsw a{text-decoration:none}.langsw a[aria-current]{color:#E6EAF2;font-weight:600}",
@@ -47,39 +48,43 @@
   }
 }
 ---
-{% extends "shell.njk" %}{% block body %}<nav class="langsw" aria-label="Language / Idioma"><a href="/research/mcp-server-cost-impact" hreflang="en" aria-current="page">EN</a> · <a href="/es/research/mcp-server-cost-impact" hreflang="es">ES</a> · <a href="/fr/research/mcp-server-cost-impact" hreflang="fr">FR</a> · <a href="/de/research/mcp-server-cost-impact" hreflang="de">DE</a> · <a href="/pt/research/mcp-server-cost-impact" hreflang="pt">PT</a> · <a href="/ja/research/mcp-server-cost-impact" hreflang="ja">JA</a></nav><h1>MCP server cost impact</h1><p class="updated" style="color:#6B7689;font-size:14px;margin-top:-6px">Updated 4 July 2026 · first published 4 July 2026</p>
-<p>The Model Context Protocol (MCP) lets LLMs call external tools - databases, APIs, file systems, search engines. It is powerful. It is also expensive. Every MCP tool definition consumes context window space, every tool call is a separate API round trip, and every tool result gets fed back into the model as additional input tokens. For teams running MCP-heavy agent workflows, tool-related overhead can account for 30–60% of total token spend.</p>
-<p>This article explains how MCP drives costs up, how to measure the overhead, and what to do about it.</p>
-<h2>How MCP consumes tokens</h2>
-<p>There are three token cost layers in every MCP interaction:</p>
-<p><strong>Layer 1: Tool definitions.</strong> Each MCP server registers tools with the model. A tool definition includes the function name, parameter schema, and a description of what the tool does. A single tool definition typically consumes 500–2,000 tokens. A server with 15 tools adds 7.5K–30K tokens to every request - even if none of those tools are called.</p>
-<p><strong>Layer 2: Tool call requests.</strong> When the model decides to call a tool, it generates a tool call output (function name + arguments). This is billed as output tokens. Then the tool result comes back as input tokens. A single tool call round trip typically costs 1K–5K tokens depending on result size.</p>
-<p><strong>Layer 3: Tool results in context.</strong> Tool results stay in the conversation context for all subsequent turns. If you call 10 tools in a session, those results accumulate. A database query returning 50 rows of JSON might add 8K–15K tokens that persist for the rest of the conversation.</p>
-<h2>The compounding effect</h2>
-<p>MCP costs compound because tool definitions are sent with every request. If you have 20 tools defined (10K–40K tokens of definitions) and make 5 requests in a conversation, the tool definitions alone cost 50K–200K input tokens. Add the tool call results and you can easily double your baseline token consumption.</p>
-<table>
-<thead><tr><th>MCP Pattern</th><th>Token overhead</th><th>Frequency</th><th>Monthly cost impact (estimate)</th></tr></thead>
-<tbody>
-<tr><td>Tool definitions (10 tools)</td><td>5K–20K tokens per request</td><td>Every request</td><td>$15–$60 per user</td></tr>
-<tr><td>Single tool call round trip</td><td>1K–5K tokens</td><td>3–10 per session</td><td>$5–$25 per user</td></tr>
-<tr><td>Large tool result (DB query, code search)</td><td>5K–20K tokens</td><td>1–5 per session</td><td>$10–$50 per user</td></tr>
-<tr><td>Accumulated results in long session</td><td>20K–100K tokens</td><td>1–3 sessions/day</td><td>$30–$120 per user</td></tr>
-<tr><td>Unused tool definitions loaded</td><td>5K–30K tokens per request</td><td>Every request</td><td>$15–$90 per user</td></tr>
-</tbody>
-</table>
-<h2>How to measure MCP overhead</h2>
-<p>The simplest way to measure MCP cost is to run the same prompt twice: once with MCP tools loaded and once without. The difference in input tokens is your tool definition overhead. Then count tool call tokens separately - most providers label them distinctly in their billing dashboards.</p>
-<p>For a more precise measurement, instrument your MCP client to log: number of tools registered, tokens consumed by tool definitions per request, number of tool calls per session, tokens per tool result, and total session tokens attributed to tool activity.</p>
-<h2>Strategies to reduce MCP costs</h2>
-<p><strong>1. Load tools selectively.</strong> Do not register all tools for every request. If the user is asking a code question, they do not need database or deployment tools loaded. Many MCP clients support dynamic tool loading based on context or explicit user activation.</p>
-<p><strong>2. Minimize tool descriptions.</strong> Tool descriptions are the largest token consumer in definitions. A verbose description might be 500 tokens; a concise one might be 100 tokens. Across 20 tools, that is an 8K-token difference per request.</p>
-<p><strong>3. Truncate tool results.</strong> Return only the fields the model actually needs. If a database query returns 20 columns but the model only needs 3, project the result. Cap result size at a reasonable limit - 2K–4K tokens is usually enough for the model to make a decision.</p>
-<p><strong>4. Cache repeated calls.</strong> If the same tool is called with the same arguments in a session, return the cached result instead of executing again. This is especially valuable for reference lookups, schema queries, and documentation fetches.</p>
-<p><strong>5. Summarize before injecting.</strong> For large tool results (full file contents, long API responses), summarize before adding to context. Return a summary plus the option to fetch the full result if the model needs it.</p>
-<p><strong>6. Use tool-result budget limits.</strong> Set a per-session budget for tool result tokens. When the budget is reached, refuse further tool calls or switch to a cheaper model for the remainder of the session.</p>
-<h2>The hidden cost of MCP servers</h2>
-<p>Beyond token costs, MCP servers introduce latency and reliability overhead. A tool call that takes 3 seconds to respond adds latency to every turn. A tool that fails intermittently causes retries. Both increase effective cost per task.</p>
-<p>For teams scaling MCP usage across an organization, tracking these costs at the server level is essential. Route MCP-heavy workloads to models with lower per-token costs, and keep MCP-light workflows on premium models where latency matters.</p>
-<h2>Related</h2>
-<ul><li><a href="/research/agent-economics">Agent economics</a> - how coding agents price out in practice.</li><li><a href="/research/agent-spend-attribution">Agent spend attribution</a> - tracking agent costs by project.</li><li><a href="/research/llm-token-tracking">LLM token tracking</a> - measuring what you spend.</li><li><a href="/research/finops-for-llm">FinOps for LLM</a> - the broader framework.</li></ul>
-<hr style="margin:48px 0 24px;border:none;border-top:1px solid #1E2A3F" /><p>Want this applied to your own LLM spend? FinOps LLM runs a free audit of your AI costs and shows where the savings are. <a href="/book">Book free audit &rarr;</a></p><p><a href="/research">Back to research</a></p>{% endblock %}
+{% extends "shell.njk" %}{% block body %}
+<nav class="langsw" aria-label="Language / Idioma"><a href="/research/mcp-server-cost-impact" hreflang="en" aria-current="page">EN</a> · <a href="/es/research/mcp-server-cost-impact" hreflang="es">ES</a> · <a href="/fr/research/mcp-server-cost-impact" hreflang="fr">FR</a> · <a href="/de/research/mcp-server-cost-impact" hreflang="de">DE</a> · <a href="/pt/research/mcp-server-cost-impact" hreflang="pt">PT</a> · <a href="/ja/research/mcp-server-cost-impact" hreflang="ja">JA</a></nav>
+<h1>MCP server costs: tokens, hosting and tool calls</h1>
+<p class="updated" style="color:#6B7689;font-size:14px">Updated 22 October 2026 · first published 4 July 2026</p>
+<p><strong>An MCP server connects an AI application to tools and data. Its total cost can include server hosting, paid services behind the tools, and model tokens used to select tools and read their results.</strong> Connecting a server does not create a fixed token charge. What the host sends to the model, how many steps it runs, and how the provider bills caching determine the model portion.</p>
+<h2>What is an MCP server?</h2>
+<p>The <a href="https://modelcontextprotocol.io/docs/learn/architecture">Model Context Protocol architecture</a> separates the host application, its MCP clients, and MCP servers. A server exposes capabilities such as a database query or document search. The host manages the model interaction. A client discovers tools with <code>tools/list</code> and invokes a selected tool with <code>tools/call</code>.</p>
+<p>A local server can run as a subprocess using standard input/output. A remote server can run as a separate HTTP service. Neither arrangement determines which model you use or how many tokens it consumes.</p>
+<h2>What do you actually pay for?</h2>
+<table><thead><tr><th>Cost layer</th><th>What to measure</th><th>Who bills it?</th></tr></thead><tbody>
+<tr><td>Server operation</td><td>Compute, memory, storage, networking and operations</td><td>Your infrastructure provider or managed MCP vendor</td></tr>
+<tr><td>Services behind tools</td><td>Search requests, database queries, external APIs and any nested model calls</td><td>The relevant service provider</td></tr>
+<tr><td>Model inference</td><td>Input, cache reads/writes, output and billable reasoning</td><td>Your model provider or gateway</td></tr>
+</tbody></table>
+<p>A locally installed open-source server can have no subscription fee while still consuming machine resources and paid API calls. A hosted server may charge a subscription or per request. Count bundled services once: if a managed fee includes search or hosting, do not add the same charge again.</p>
+<h2>How do MCP tools increase token usage?</h2>
+<ul><li><strong>Tool definitions:</strong> names, descriptions and schemas add input when the host includes them in a model request.</li><li><strong>Tool selection:</strong> the model may generate tool names and arguments as output.</li><li><strong>Tool results:</strong> returned data adds input when the host passes it to the model, and can remain in later context.</li><li><strong>Extra steps:</strong> retries, planning and follow-up model calls can repeat existing context and generate more output.</li></ul>
+<p>MCP discovery and model inference are different operations. The protocol does not require every connected tool definition to be sent on every model turn. A host can select a subset or discover tools on demand. Parallel tool execution can also share a model turn; one <code>tools/call</code> is not necessarily one additional model API request.</p>
+<p>Prompt caching changes the price of repeated input, not the amount of useful work completed. Use the provider's actual cache fields rather than assuming all repeated tokens are cache hits. Our <a href="/research/mcp-tool-definition-overhead">tool-definition overhead guide</a> focuses on reducing the schemas your application exposes.</p>
+<h2>A worked MCP token-cost example</h2>
+<p><strong>Illustrative assumptions, not a benchmark or a provider quote:</strong> a host includes 4,000 tool-definition tokens on each of six model calls. Those calls also consume 6,000 additional input tokens in total from tool results, including any repeated results. Tool names and arguments add 1,000 output tokens. Assume uncached input costs $2 per million tokens and output costs $10 per million.</p>
+<table><thead><tr><th>Component</th><th>Calculation</th><th>Cost per workflow</th></tr></thead><tbody>
+<tr><td>Tool definitions</td><td>4,000 × 6 × $2 / 1,000,000</td><td>$0.048</td></tr>
+<tr><td>Tool-result input</td><td>6,000 × $2 / 1,000,000</td><td>$0.012</td></tr>
+<tr><td>Tool-call output</td><td>1,000 × $10 / 1,000,000</td><td>$0.010</td></tr>
+<tr><td>Total modeled token overhead</td><td>$0.048 + $0.012 + $0.010</td><td>$0.070</td></tr>
+</tbody></table>
+<p>At 10,000 workflows, those components cost $700. Reducing the definitions from 4,000 to 1,000 tokens on each call saves $0.036 per workflow, or $360 over that volume, if the other counts stay unchanged. Hosting, paid tool services, base prompts, answer tokens and any extra reasoning are excluded.</p>
+<p>This estimates identifiable token components. It does not prove the workflow is $0.070 more expensive than a tool-free alternative: tools may improve completion, reduce other context, or avoid retries. Test both designs on the same tasks before claiming savings.</p>
+<h2>How should you measure MCP overhead?</h2>
+<ol><li>Assign one workflow ID to the entire task, with child IDs for model attempts and tool executions.</li><li>Record provider, model, service tier, input/output usage, cache breakdown, latency and outcome for each model attempt.</li><li>Record server, tool, duration, retry attempt and downstream charge for each tool execution. Keep infrastructure allocation separate from per-call fees.</li><li>Compare matched tasks using the full tool catalogue and a selected subset. Hold model settings constant; report cache state and completion quality.</li><li>Sum all billed attempts and divide by successful tasks. Reconcile provider estimates against invoices before reporting financial savings.</li></ol>
+<p>Counting a tool result as input is useful attribution, but its tokens are already inside the model's input total. Do not add the result-token estimate to that total again. Similarly, a server that invokes another model needs a child charge only if that usage is not already captured elsewhere in your ledger.</p>
+<h2>Which cost controls should you try first?</h2>
+<ul><li><strong>Expose relevant tools:</strong> reduce the active catalogue and check that tool selection still works.</li><li><strong>Return bounded results:</strong> project required fields, paginate long lists, and let the agent fetch detail when needed.</li><li><strong>Reuse stable context:</strong> measure cache reads and writes under your provider's rules.</li><li><strong>Bound execution:</strong> cap tool attempts, workflow steps and total spend. Reserve budget before launching parallel work.</li><li><strong>Cache tool results selectively:</strong> reuse safe reads with an explicit freshness policy; do not replay writes or mix tenant data.</li></ul>
+<p>The <a href="/research/agent-workflow-architecture-cost-controls">practical agent workflow guide</a> combines these controls into a workflow with configuration, logging and a worked cost ledger.</p>
+<h2>Sources and scope</h2>
+<p>Technical references checked 22 October 2026: <a href="https://modelcontextprotocol.io/docs/learn/architecture">official MCP architecture</a>, <a href="https://modelcontextprotocol.io/specification/2026-07-28/basic/transports">MCP transports</a>, and <a href="https://developers.openai.com/api/docs/guides/prompt-caching">OpenAI prompt caching</a>. The dollar example uses explicitly assumed rates so you can substitute your own.</p>
+<h2>Related</h2><ul><li><a href="/research/mcp-tool-definition-overhead">Control tool-definition overhead</a></li><li><a href="/research/agent-spend-attribution">Attribute agent spend</a></li><li><a href="/research/agent-workflow-architecture-cost-controls">Build an observable agent workflow</a></li></ul>
+<hr /><p>Want this applied to your own LLM spend? Bring your provider bills and a sample of tool-heavy workflows. <a href="/book">Book a free audit →</a></p><p><a href="/research">Back to research</a></p>
+{% endblock %}
