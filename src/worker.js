@@ -243,6 +243,92 @@ const AI_CRAWLERS = [
 	{ token: 'cohere-ai', name: 'Cohere', kind: 'train' },
 ];
 
+// Recognized AI answer surfaces that send visitors to the site. This records
+// observed referral signals; it does not prove a page was cited, since request
+// headers and query parameters can be absent or spoofed.
+//
+// Hostname is matched with a real URL parse and an exact-or-subdomain test,
+// never a substring test. `Referer: https://chatgpt.com.evil.net/` must not
+// be classified as ChatGPT, and unrelated company/search hosts are excluded.
+const AI_REFERRERS = [
+	{ host: 'chatgpt.com', name: 'ChatGPT' },
+	{ host: 'chat.openai.com', name: 'ChatGPT' },
+	{ host: 'perplexity.ai', name: 'Perplexity' },
+	{ host: 'claude.ai', name: 'Claude' },
+	{ host: 'copilot.microsoft.com', name: 'Copilot' },
+	{ host: 'gemini.google.com', name: 'Gemini' },
+	{ host: 'chat.mistral.ai', name: 'Mistral' },
+	{ host: 'poe.com', name: 'Poe' },
+	{ host: 'you.com', name: 'You.com' },
+	{ host: 'phind.com', name: 'Phind' },
+	{ host: 'chat.deepseek.com', name: 'DeepSeek' },
+	{ host: 'grok.com', name: 'Grok' },
+	{ host: 'meta.ai', name: 'Meta AI' },
+	{ host: 'bard.google.com', name: 'Gemini' }, // pre-Gemini legacy surface
+];
+
+// Returns { name } when a recognized AI answer-surface referral signal exists, else null.
+// Only the host is ever read, and only the surface name is stored — a
+// Referer can carry query strings with real user data, and none of that is
+// needed for this coarse attribution.
+function matchAiHost(host) {
+	return (
+		AI_REFERRERS.find((r) => host === r.host || host.endsWith('.' + r.host)) || null
+	);
+}
+
+// `utm_source` can also arrive as a bare surface label ('chatgpt') rather than
+// a hostname, so keep a name index alongside the host table.
+const AI_REFERRERS_BY_NAME = new Map(AI_REFERRERS.map((r) => [r.name.toLowerCase(), r]));
+
+export function detectAiReferrer(referer, url) {
+	if (referer) {
+		try {
+			const hit = matchAiHost(new URL(referer).hostname.toLowerCase());
+			if (hit) return hit;
+		} catch {
+			// a malformed Referer is routine, not exceptional — fall through
+			// to the query string rather than giving up.
+		}
+	}
+
+	// The Referer header alone can undercount our largest surface. ChatGPT's
+	// free-tier citation links carry ?utm_source=chatgpt.com, and its paid-tier
+	// inline links are rel=noreferrer, so the query string is the only signal
+	// that survives. UTM is an attribution hint and can be spoofed; host matching
+	// keeps unrelated labels from being treated as known AI surfaces.
+	const utm = url && url.searchParams && url.searchParams.get('utm_source');
+	if (utm) {
+		const value = utm.trim().toLowerCase();
+		const host = value.includes('.')
+			? value.replace(/^https?:\/\//, '').split('/')[0]
+			: null;
+		const hit = (host && matchAiHost(host)) || AI_REFERRERS_BY_NAME.get(value);
+		if (hit) return hit;
+	}
+
+	return null;
+}
+
+// Referral counterpart to logAiCrawler. A crawler carrying a Referer would
+// otherwise be counted twice — once as a hit, once as a visitor — so UA
+// detection runs first and wins.
+function logAiReferral(request, env, url) {
+	if (!env || !env.AI_HITS) return;
+	if (detectAiCrawler(request.headers.get('User-Agent'))) return;
+	const ref = detectAiReferrer(request.headers.get('Referer'), url);
+	if (!ref) return;
+	try {
+		env.AI_HITS.writeDataPoint({
+			blobs: [ref.name, 'referral', url.pathname.slice(0, 200), url.hostname],
+			doubles: [1],
+			indexes: [ref.name],
+		});
+	} catch (e) {
+		// Swallowed on purpose: analytics must never break the response.
+	}
+}
+
 // Returns the matching crawler descriptor, or null for humans and non-AI bots.
 export function detectAiCrawler(userAgent) {
 	const ua = (userAgent || '').toLowerCase();
@@ -757,7 +843,6 @@ export default {
 		//    www or a translated path is still counted against the URL it asked
 		//    for. Non-blocking and never throws.
 		logAiCrawler(request, env, url);
-
 		// 1. www -> apex (301).
 		if (url.hostname === 'www.' + APEX) {
 			url.hostname = APEX;
@@ -771,6 +856,13 @@ export default {
 		// 3. Fetch whatever the static host would serve (also applies _redirects/_headers).
 		const assetResponse = await env.ASSETS.fetch(request);
 		const response = assetResponse;
+
+		// Count referrals only after redirects have settled and only for a served page.
+		// This avoids counting the www/language redirect hop and its final request twice.
+		const responseType = assetResponse.headers.get('Content-Type') || '';
+		if (request.method === 'GET' && assetResponse.status === 200 && responseType.includes('text/html')) {
+			logAiReferral(request, env, url);
+		}
 
 		// 6. Only transform GET requests that explicitly negotiate markdown.
 		const accept = request.headers.get('Accept') || '';
