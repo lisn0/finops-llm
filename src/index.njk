@@ -1,44 +1,44 @@
 ---
-pagination:
-  data: homeUi
-  size: 1
-  alias: lang
-permalink: "{{ 'index.html' if lang == 'en' else lang + '/index.html' }}"
+permalink: "index.html"
 ---
-{% set t = homeUi[lang] %}{% set base = 'https://finopsllm.com/' if lang == 'en' else 'https://finopsllm.com/' + lang + '/' %}{% set rp = '/research' if lang == 'en' else '/' + lang + '/research' %}<!DOCTYPE html>
-<html lang="{{ lang }}">
+<!DOCTYPE html>
+<html lang="en">
 <head>
 <meta charset="UTF-8" />
 <meta name="msvalidate.01" content="53BB61CAA2A3130541DEE41206C8C057" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-<title>{{ t.meta.title | safe }}</title>
-<meta name="description" content="{{ t.meta.description | safe }}" />
-<meta name="keywords" content="{{ t.meta.keywords | safe }}" />
+<title>FinOps LLM - AI cost management and LLM observability</title>
+<meta name="description" content="We find, cut and keep your LLM savings. Free Tidal Audit, Tidal Gateway and Tidal Telemetry included, and a flat 20% of the savings we verify. Nothing else." />
+<meta name="keywords" content="FinOps LLM, LLM FinOps, AI FinOps, GenAI FinOps platform, LLM cost optimization, AI cost management, OpenAI cost attribution, Anthropic spend, AI chargeback, AI showback, LLM observability, token cost analytics, AI budget governance, model routing, semantic caching, FinOps for AI" />
 <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
 <meta name="theme-color" content="#FAFBFD" />
-<link rel="canonical" href="{{ base }}" />
-{% for l, d in homeUi %}<link rel="alternate" hreflang="{{ l }}" href="{{ 'https://finopsllm.com/' if l == 'en' else 'https://finopsllm.com/' + l + '/' }}" />
-{% endfor %}
+<link rel="canonical" href="https://finopsllm.com/" />
+<link rel="alternate" hreflang="en" href="https://finopsllm.com/" />
+<link rel="alternate" hreflang="es" href="https://finopsllm.com/es/" />
+<link rel="alternate" hreflang="fr" href="https://finopsllm.com/fr/" />
+<link rel="alternate" hreflang="de" href="https://finopsllm.com/de/" />
+<link rel="alternate" hreflang="pt" href="https://finopsllm.com/pt/" />
+<link rel="alternate" hreflang="ja" href="https://finopsllm.com/ja/" />
 <link rel="alternate" hreflang="x-default" href="https://finopsllm.com/" />
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 <link rel="manifest" href="/site.webmanifest" />
 <link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap.xml" />
 
 <meta property="og:type" content="website" />
-<meta property="og:url" content="{{ base }}" />
-<meta property="og:title" content="{{ t.meta.ogTitle | safe }}" />
-<meta property="og:description" content="{{ t.meta.ogDesc | safe }}" />
+<meta property="og:url" content="https://finopsllm.com/" />
+<meta property="og:title" content="FinOps LLM - AI cost management for the era of tokens" />
+<meta property="og:description" content="AI cost management, LLM observability, and AI FinOps for production teams. Real-time attribution, anomaly detection, and automated optimization across OpenAI, Anthropic, Bedrock. 40-60% typical savings." />
 <meta property="og:image" content="https://finopsllm.com/og.png" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
 <meta property="og:site_name" content="FinOps LLM" />
-<meta property="og:locale" content="{{ t.ogLocale }}" />
+<meta property="og:locale" content="en_US" />
 
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:site" content="@finopsllm" />
-<meta name="twitter:title" content="{{ t.meta.twTitle | safe }}" />
-<meta name="twitter:description" content="{{ t.meta.twDesc | safe }}" />
+<meta name="twitter:title" content="FinOps LLM - The FinOps platform for LLM and AI spend" />
+<meta name="twitter:description" content="We find, cut and keep your LLM savings. A flat 20% of the savings we verify, and nothing else." />
 <meta name="twitter:image" content="https://finopsllm.com/og.png" />
 
 <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -53,10 +53,10 @@ permalink: "{{ 'index.html' if lang == 'en' else lang + '/index.html' }}"
 {"@context":"https://schema.org","@type":"WebSite","@id":"https://finopsllm.com/#website","name":"FinOps LLM","url":"https://finopsllm.com/","publisher":{"@id":"https://finopsllm.com/#org"}}
 </script>
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":["Service","ProfessionalService"],"name":"FinOps LLM","provider":{"@id":"https://finopsllm.com/#org"},"areaServed":"Worldwide","serviceType":"FinOps for AI, LLM cost audit, AI cost optimization","priceRange":"Performance-based; % of verified savings","description":{{ t.meta.serviceDesc | dump | safe }},"offers":{"@type":"Offer","priceCurrency":"USD","description":{{ t.meta.offerDesc | dump | safe }}}}
+{"@context":"https://schema.org","@type":["Service","ProfessionalService"],"name":"FinOps LLM","provider":{"@id":"https://finopsllm.com/#org"},"areaServed":"Worldwide","serviceType":"FinOps for AI, LLM cost audit, AI cost optimization","priceRange":"Performance-based; % of verified savings","description":"Managed FinOps engagement for LLM and GenAI spend. Real-time attribution, anomaly detection, model routing, semantic caching and prompt compression, with monthly reconciliation against provider invoices.","offers":{"@type":"Offer","priceCurrency":"USD","description":"Free audit; then a flat 20% of verified monthly savings. No down payment, no minimum. No licence fee."}}
 </script>
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{% for f in t.faq.items %}{"@type":"Question","name":{{ f.q | replace("&amp;","&") | dump | safe }},"acceptedAnswer":{"@type":"Answer","text":{{ f.a | striptags | replace("&amp;","&") | replace("&lt;","<") | dump | safe }}}}{% if not loop.last %},{% endif %}{% endfor %}]}
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"What is FinOps for LLM?","acceptedAnswer":{"@type":"Answer","text":"FinOps for LLM brings the FinOps Foundation framework - visibility, attribution, optimization, and accountability - to LLM and GenAI spend. It includes per-feature and per-team chargeback, anomaly detection, budget governance, and continuous optimization of model routing, caching, and prompts."}},{"@type":"Question","name":"What does FinOps LLM do?","acceptedAnswer":{"@type":"Answer","text":"FinOps LLM finds, cuts and keeps your LLM savings. It is a managed engagement built on three products we run for you: Tidal Audit (free, read-only), Tidal Gateway (a LiteLLM gateway we deploy and operate in your cloud for routing, fallbacks, caching, batching, per-team budgets and hard stops) and Tidal Telemetry (live cost by provider, model, feature, team and workflow). Savings are reconciled monthly against provider invoices."}},{"@type":"Question","name":"How is pricing structured?","acceptedAnswer":{"@type":"Answer","text":"One model. Free audit, then a flat 20% of verified monthly savings, measured against a baseline locked before anything changes. No licence fee, no seat count, no minimum. Tidal Gateway and Tidal Telemetry operations are included in the 20%."}},{"@type":"Question","name":"How much can we save?","acceptedAnswer":{"@type":"Answer","text":"Typical reduction in the first full billing cycle after implementation is 40–60% , depending on architecture and traffic mix."}},{"@type":"Question","name":"Which providers are supported?","acceptedAnswer":{"@type":"Answer","text":"OpenAI, Anthropic, Gemini & Vertex AI, AWS Bedrock, Azure OpenAI, Groq, Together, Mistral, Cohere, Fireworks, Replicate , and most OSS endpoints. Multi-provider deployments typically have the largest savings surface."}},{"@type":"Question","name":"Does FinOps LLM support chargeback & showback?","acceptedAnswer":{"@type":"Answer","text":"Yes. Token-level attribution to providers, models, features, teams, and customer cohorts. Monthly chargeback and showback exported to NetSuite, QuickBooks, CSV, or API . Custom dimensions supported."}},{"@type":"Question","name":"How do you handle customer data?","acceptedAnswer":{"@type":"Answer","text":"Read-only by default. Billing and usage data is enough for most attribution work. Prompt and output data is only accessed with explicit customer approval, for specific optimizations that require it. NDA and DPA available on request."}},{"@type":"Question","name":"How long does implementation take?","acceptedAnswer":{"@type":"Answer","text":"Attribution and dashboards go live in under a week . Optimization implementation takes 3–5 weeks; savings appear on the first full provider invoice after go-live."}},{"@type":"Question","name":"Will optimization hurt output quality?","acceptedAnswer":{"@type":"Answer","text":"No. Every routing, caching, and compression change is A/B tested against production for seven days minimum before promotion. Regressions auto-rollback. Quality is monitored continuously alongside cost."}}]}
 </script>
 <style>
 :root{
@@ -297,30 +297,30 @@ footer{padding:60px 0 40px}
 <link rel="stylesheet" href="/assets/landing.css" />
 </head>
 <body>
-<a class="skip-link" href="#main-content">{{ t.skip | safe }}</a>
+<a class="skip-link" href="#main-content">Skip to content</a>
 <!-- topbar -->
 <header class="topbar">
   <div class="wrap topbar-in">
-    <a class="brand" href="/" aria-label="{{ t.brandAria | safe }}">
+    <a class="brand" href="/" aria-label="FinOps LLM home">
       <img class="brand-logo" src="/assets/brand/finops-llm-horizontal-light.svg" width="340" height="54" alt="FinOps LLM" />
     </a>
-    <nav class="main" aria-label="{{ t.nav.aria | safe }}">
-      <a href="#pillars">{{ t.nav.whatWeDo | safe }}</a>
-      <a href="#process">{{ t.nav.process | safe }}</a>
-      <a href="#pricing">{{ t.nav.pricing | safe }}</a>
-      <a href="/telemetry">{{ t.nav.telemetry | safe }}</a>
-      <a href="{{ rp }}">{{ t.nav.research | safe }}</a>
-      <a class="btn btn-blue btn-sm" href="/book">{{ t.nav.book | safe }}</a>
+    <nav class="main" aria-label="Main navigation">
+      <a href="#pillars">What we do</a>
+      <a href="#process">How it works</a>
+      <a href="#pricing">Pricing</a>
+      <a href="/telemetry">Telemetry</a>
+      <a href="/research">Research</a>
+      <a class="btn btn-blue btn-sm" href="/book">Book free audit →</a>
     </nav>
     <details class="mobile-menu">
-      <summary>{{ t.nav.menu | safe }} <span aria-hidden="true">+</span></summary>
-      <nav aria-label="{{ t.nav.mobileAria | safe }}">
-        <a href="/about">{{ t.nav.whatWeDo | safe }}</a>
-        <a href="/pricing">{{ t.nav.pricing | safe }}</a>
-        <a href="/telemetry">{{ t.nav.telemetryFull | safe }}</a>
-        <a href="{{ rp }}">{{ t.nav.research | safe }}</a>
-        <a href="/tools/llm-cost-calculator">{{ t.nav.calculator | safe }}</a>
-        <a class="mobile-audit" href="/book">{{ t.nav.book | safe }}</a>
+      <summary>Menu <span aria-hidden="true">+</span></summary>
+      <nav aria-label="Mobile navigation">
+        <a href="/about">What we do</a>
+        <a href="/pricing">Pricing</a>
+        <a href="/telemetry">Tidal Telemetry</a>
+        <a href="/research">Research</a>
+        <a href="/tools/llm-cost-calculator">Cost calculator</a>
+        <a class="mobile-audit" href="/book">Book free audit →</a>
       </nav>
     </details>
   </div>
@@ -332,29 +332,33 @@ footer{padding:60px 0 40px}
   <div class="wrap hero-grid">
     <div>
       <div class="tag-row">
-        <span class="tag">{{ t.hero.tag | safe }}</span>
+        <span class="tag">FinOps for production AI</span>
       </div>
-      <h1 class="display">{{ t.hero.h1 | safe }} <span class="hl">{{ t.hero.h1hl | safe }}</span></h1>
-      <p class="lede">{{ t.hero.lede | safe }}</p>
+      <h1 class="display">AI cost control for the <span class="hl">era of tokens.</span></h1>
+      <p class="lede">We find, cut and keep your <strong>LLM savings</strong>. Tidal Audit maps the spend for free. Tidal Gateway, a LiteLLM gateway we deploy and operate in your cloud, makes the changes stick. Tidal Telemetry shows live cost by team, feature and workflow, reconciled to your provider invoices. You pay a flat <strong>20% of the savings we verify</strong>, and nothing else.</p>
       <div class="hero-ctas">
-        <a class="btn btn-blue" href="/book">{{ t.nav.book | safe }}</a>
-        <a class="btn btn-ghost" href="#pricing">{{ t.hero.cta2 | safe }}</a>
-        <a class="btn btn-ghost" href="#telemetry">{{ t.tele.heroCta | safe }}</a>
+        <a class="btn btn-blue" href="/book">Book free audit →</a>
+        <a class="btn btn-ghost" href="#pricing">What the 20% includes</a>
+        <a class="btn btn-ghost" href="#telemetry">Explore Tidal Telemetry</a>
       </div>
       <div class="hero-facts">
-        {% for f in t.hero.facts %}<span><b>●</b> {{ f | safe }}</span>
-        {% endfor %}
+        <span><b>●</b> Invoice-first audits</span>
+        <span><b>●</b> 40–60% typical reduction</span>
+        <span><b>●</b> Read-only by default</span>
+        <span><b>●</b> Multi-cloud</span>
       </div>
     </div>
 
     <aside class="spec">
-      <div class="spec-head"><span>{{ t.spec.head | safe }}</span><span class="demo-label">{{ t.spec.demo | safe }}</span></div>
+      <div class="spec-head"><span>Cost overview</span><span class="demo-label">Illustrative data</span></div>
       <div class="spec-metrics">
-        {% set mv = ['$70,280', '$94,720', '38.1%', '+0.2%'] %}{% for m in t.spec.metrics %}<div class="metric"><div class="k">{{ m.k | safe }}</div><div class="v">{{ mv[loop.index0] }}</div><div class="d{{ ' up' if loop.index0 < 3 }}">{{ m.d | safe }}</div></div>
-        {% endfor %}
+        <div class="metric"><div class="k">MTD spend</div><div class="v">$70,280</div><div class="d up">↓ 57.4% vs. baseline</div></div>
+        <div class="metric"><div class="k">Savings</div><div class="v">$94,720</div><div class="d up">reconciled to invoice</div></div>
+        <div class="metric"><div class="k">Cache hit-rate</div><div class="v">38.1%</div><div class="d up">+4.2 pts WoW</div></div>
+        <div class="metric"><div class="k">Quality Δ</div><div class="v">+0.2%</div><div class="d">7-day A/B active</div></div>
       </div>
       <div class="spec-chart">
-        <div class="lbl"><span>{{ t.spec.chartLbl | safe }}</span><span>{{ t.spec.chartToday | safe }}</span></div>
+        <div class="lbl"><span>Daily LLM spend · 45 days</span><span>$5,500/d today</span></div>
         <svg viewBox="0 0 520 120" width="100%" height="120" preserveAspectRatio="none" aria-hidden="true">
           <line x1="0" y1="30" x2="520" y2="30" stroke="#C9D6E6" stroke-dasharray="4 4"/>
           <text x="4" y="24" font-family="IBM Plex Mono" font-size="9" fill="#6B7C93">BASELINE $165K/mo</text>
@@ -366,7 +370,7 @@ footer{padding:60px 0 40px}
           <text x="150" y="56" font-family="IBM Plex Mono" font-size="9" fill="#EA580C">OPTIMIZATION LIVE</text>
         </svg>
       </div>
-      <div class="spec-foot">{{ t.spec.foot | safe }}</div>
+      <div class="spec-foot">DEMO DATA · customer-042 · sample cockpit view</div>
     </aside>
   </div>
 </div>
@@ -375,17 +379,19 @@ footer{padding:60px 0 40px}
 <section class="telemetry" id="telemetry" aria-labelledby="telemetry-title">
   <div class="wrap telemetry-in">
     <div class="telemetry-copy">
-      <span class="sec-no">{{ t.tele.tag | safe }}</span>
-      <h2 id="telemetry-title">{{ t.tele.h2 | safe }} <span class="hl">{{ t.tele.h2hl | safe }}</span></h2>
-      <p>{{ t.tele.p | safe }}</p>
+      <span class="sec-no">A SEPARATE PRODUCT · OPENLIT-BASED</span>
+      <h2 id="telemetry-title">Tidal Telemetry for <span class="hl">LLM observability.</span></h2>
+      <p>Tidal Telemetry is our LLM observability product, built on OpenLIT. Send OpenTelemetry data to explore traces with token usage, estimated cost, latency, and errors. Use it on its own; the managed FinOps engagement is a separate service.</p>
       <div class="telemetry-actions">
-        <a class="btn btn-blue" href="https://telemetry.llmcfo.com">{{ t.tele.visit | safe }}</a>
-        <a class="btn btn-ghost" href="https://telemetry.llmcfo.com/docs">{{ t.tele.docs | safe }}</a>
+        <a class="btn btn-blue" href="https://telemetry.llmcfo.com">Visit Tidal Telemetry →</a>
+        <a class="btn btn-ghost" href="https://telemetry.llmcfo.com/docs">Read the docs</a>
       </div>
     </div>
     <div class="telemetry-details">
-      {% for d in t.tele.details %}<div class="telemetry-detail"><h3>{{ d.h | safe }}</h3><p>{{ d.p | safe }}</p></div>
-      {% endfor %}
+      <div class="telemetry-detail"><h3>Cost &amp; tokens</h3><p>Inspect token usage and estimated per-call cost in LLM traces.</p></div>
+      <div class="telemetry-detail"><h3>Latency &amp; errors</h3><p>Review request timing and errors alongside usage.</p></div>
+      <div class="telemetry-detail"><h3>OpenTelemetry</h3><p>Send traces, metrics, and logs through OTLP.</p></div>
+      <div class="telemetry-detail"><h3>Agent setup</h3><p>Connect a coding agent to the hosted MCP server for setup and troubleshooting.</p></div>
     </div>
   </div>
 </section>
@@ -393,7 +399,7 @@ footer{padding:60px 0 40px}
 <!-- schematic -->
 <div class="schematic" id="schematic">
   <div class="wrap">
-    <div class="fig-cap">FIG. 01 — {{ t.schematicCap | safe }}</div>
+    <div class="fig-cap">FIG. 01 — Request routing schematic · per-request cost</div>
     <div class="diagram xcard"><span class="x"></span>
       <svg viewBox="0 0 1000 340" width="100%" aria-hidden="true">
         <defs>
@@ -443,7 +449,7 @@ footer{padding:60px 0 40px}
 <!-- providers -->
 <div class="providers">
   <div class="wrap prov-in">
-    <span class="prov-lbl">{{ t.providersLbl | safe }}</span>
+    <span class="prov-lbl">Reconciled against →</span>
     <span class="chip">OpenAI</span><span class="chip">Anthropic</span><span class="chip">Gemini</span><span class="chip">Bedrock</span><span class="chip">Azure</span><span class="chip">Groq</span><span class="chip">Together</span><span class="chip">Mistral</span>
   </div>
 </div>
@@ -453,22 +459,52 @@ footer{padding:60px 0 40px}
   <div class="wrap">
     <div class="sec-head">
       <div>
-        <span class="sec-no">SEC. 01 — {{ t.pillars.no | safe }}</span>
-        <h2 class="sec-title">{{ t.pillars.title | safe }} <span class="hl">{{ t.pillars.hl | safe }}</span></h2>
+        <span class="sec-no">SEC. 01 — Platform</span>
+        <h2 class="sec-title">FinOps for AI, on <span class="hl">four pillars.</span></h2>
       </div>
-      <p class="sec-note">{{ t.pillars.note | safe }}</p>
+      <p class="sec-note">The FinOps Foundation framework — visibility, attribution, optimization, accountability — applied to LLM spend. Same discipline. Different unit of cost.</p>
     </div>
     <div class="pillars">
-      {% set figs = ['A', 'B', 'C', 'D'] %}{% for p in t.pillars.items %}<div class="pillar xcard"><span class="x"></span>
-        <div class="fig"><span>FIG. 02-{{ figs[loop.index0] }}</span><span>{{ t.pillars.word | safe }} 0{{ loop.index }}</span></div>
-        <h3>{{ p.h | safe }}</h3>
-        <p>{{ p.p | safe }}</p>
+      <div class="pillar xcard"><span class="x"></span>
+        <div class="fig"><span>FIG. 02-A</span><span>PILLAR 01</span></div>
+        <h3>Visibility</h3>
+        <p>Token-level cost data ingested from every provider. Reconciled hourly. Filterable by provider, model, feature, team, customer, environment.</p>
         <ul>
-          {% for li in p.li %}<li>{{ li | safe }}</li>
-          {% endfor %}
+          <li>OpenAI · Anthropic · Bedrock · Gemini · Azure · Groq · Together · Mistral</li>
+          <li>Hourly ingestion · &lt;5 min reconciliation lag</li>
+          <li>Read-only by default · NDA + DPA on request</li>
         </ul>
       </div>
-      {% endfor %}
+      <div class="pillar xcard"><span class="x"></span>
+        <div class="fig"><span>FIG. 02-B</span><span>PILLAR 02</span></div>
+        <h3>Attribution &amp; chargeback</h3>
+        <p>Every token mapped to a feature, team, and customer cohort. Monthly chargeback and showback, exported to your finance system or as CSV.</p>
+        <ul>
+          <li>Custom dimensions · feature, team, tier, region</li>
+          <li>Cohort spend · customer-tier P&amp;L</li>
+          <li>NetSuite · QuickBooks · CSV · API</li>
+        </ul>
+      </div>
+      <div class="pillar xcard"><span class="x"></span>
+        <div class="fig"><span>FIG. 02-C</span><span>PILLAR 03</span></div>
+        <h3>Anomaly detection</h3>
+        <p>Real-time alerts when spend, latency, or quality deviates from a feature's rolling baseline. Slack, PagerDuty, email — and auto-throttle when it matters.</p>
+        <ul>
+          <li>Per-feature rolling baselines · seasonality-aware</li>
+          <li>Slack · PagerDuty · email · webhook</li>
+          <li>Optional auto-throttle &amp; budget enforcement</li>
+        </ul>
+      </div>
+      <div class="pillar xcard"><span class="x"></span>
+        <div class="fig"><span>FIG. 02-D</span><span>PILLAR 04</span></div>
+        <h3>Automated optimization</h3>
+        <p>Routing, caching, and compression deployed behind feature flags, A/B tested seven days minimum, graduated only on quality &amp; cost wins.</p>
+        <ul>
+          <li>Routing tree · per-request quality classification</li>
+          <li>Semantic cache · sub-10ms hit latency</li>
+          <li>Quality SLO + auto-rollback on regression</li>
+        </ul>
+      </div>
     </div>
   </div>
 </section>
@@ -477,15 +513,19 @@ footer{padding:60px 0 40px}
   <div class="wrap">
     <div class="sec-head">
       <div>
-        <span class="sec-no">SEC. 02 — {{ t.levers.no | safe }}</span>
-        <h2 class="sec-title">{{ t.levers.title | safe }} <span class="hl">{{ t.levers.hl | safe }}</span></h2>
+        <span class="sec-no">SEC. 02 — Optimization</span>
+        <h2 class="sec-title">Six levers, one <span class="hl">parts list.</span></h2>
       </div>
-      <p class="sec-note">{{ t.levers.note | safe }}</p>
+      <p class="sec-note">Most teams combine three or four. The audit ranks which dominate your spend surface and projects savings before any commitment.</p>
     </div>
     <div class="bom xcard"><span class="x"></span>
-      <div class="bom-head"><span>{{ t.levers.head[0] | safe }}</span><span>{{ t.levers.head[1] | safe }}</span><span>{{ t.levers.head[2] | safe }}</span><span style="text-align:right">{{ t.levers.head[3] | safe }}</span></div>
-      {% set rng = ['30–50%', '20–40%', '15–30%', '10–50%', '20–35%', '5–15%'] %}{% for it in t.levers.items %}<div class="bom-row"><span class="pn">OPT-0{{ loop.index }}</span><h3>{{ it.h | safe }}</h3><p class="desc">{{ it.desc | safe }}</p><span class="rng">{{ rng[loop.index0] }}</span></div>
-      {% endfor %}
+      <div class="bom-head"><span>PART №</span><span>LEVER</span><span>FUNCTION</span><span style="text-align:right">RANGE</span></div>
+      <div class="bom-row"><span class="pn">OPT-01</span><h3>Model routing</h3><p class="desc">Each request classified by complexity and routed to the cheapest model that meets your quality bar.</p><span class="rng">30–50%</span></div>
+      <div class="bom-row"><span class="pn">OPT-02</span><h3>Semantic caching</h3><p class="desc">Near-duplicate prompts fingerprinted with embeddings; identical answers served from sub-10ms cache.</p><span class="rng">20–40%</span></div>
+      <div class="bom-row"><span class="pn">OPT-03</span><h3>Prompt compression</h3><p class="desc">System prompts audited, examples deduplicated, retrieved context compressed. Every change A/B tested.</p><span class="rng">15–30%</span></div>
+      <div class="bom-row"><span class="pn">OPT-04</span><h3>Batch &amp; async pricing</h3><p class="desc">Non-interactive workloads routed to batch endpoints (up to 50% discount) with SLO-aware queueing.</p><span class="rng">10–50%</span></div>
+      <div class="bom-row"><span class="pn">OPT-05</span><h3>Provider arbitrage</h3><p class="desc">Identical capability often costs 2–3× more at one provider. Route by capability-per-dollar.</p><span class="rng">20–35%</span></div>
+      <div class="bom-row"><span class="pn">OPT-06</span><h3>Fallback chains</h3><p class="desc">Smart retries and tiered fallbacks beat worst-case over-provisioning while holding SLO.</p><span class="rng">5–15%</span></div>
     </div>
   </div>
 </section>
@@ -495,20 +535,34 @@ footer{padding:60px 0 40px}
   <div class="wrap">
     <div class="sec-head">
       <div>
-        <span class="sec-no">SEC. 03 — {{ t.process.no | safe }}</span>
-        <h2 class="sec-title">{{ t.process.title | safe }} <span class="hl">{{ t.process.hl | safe }}</span></h2>
+        <span class="sec-no">SEC. 03 — Engagement</span>
+        <h2 class="sec-title">Assembly sequence: <span class="hl">five weeks.</span></h2>
       </div>
-      <p class="sec-note">{{ t.process.note | safe }}</p>
+      <p class="sec-note">Every engagement follows the same four phases. Most customers see their first reconciled provider invoice by the end of week five.</p>
     </div>
     <div class="timeline">
       <div class="tl-rail"></div>
       <div class="tl-grid">
-        {% for s in t.process.items %}<div class="tl-step">
-          <div class="wk">{{ s.wk | safe }}</div>
-          <h3>{{ s.h | safe }}</h3>
-          <p>{{ s.p | safe }}</p>
+        <div class="tl-step">
+          <div class="wk">STEP 01 · WEEK 01</div>
+          <h3>Audit — map every dollar.</h3>
+          <p>Ingest provider invoices, gateway logs, usage telemetry. Full spend map by provider, model, feature, team — ranked by dollar waste.</p>
         </div>
-        {% endfor %}
+        <div class="tl-step">
+          <div class="wk">STEP 02 · WEEK 02</div>
+          <h3>Agree — lock the baseline.</h3>
+          <p>We set the baseline against your invoices, the quality guardrails and the contract. You sign off on every change.</p>
+        </div>
+        <div class="tl-step">
+          <div class="wk">STEP 03 · WEEKS 03–05</div>
+          <h3>Implement — deploy Tidal Gateway.</h3>
+          <p>We deploy a LiteLLM gateway in your cloud and ship the changes through it: A/B tested 7 days vs. baseline, then graduated to 100% traffic.</p>
+        </div>
+        <div class="tl-step">
+          <div class="wk">STEP 04 · ONGOING</div>
+          <h3>Operate &amp; reconcile.</h3>
+          <p>We run the gateway, so savings don't drift back. Tidal Telemetry measures the result and every month closes with a signed Statement of Savings.</p>
+        </div>
       </div>
     </div>
   </div>
@@ -519,35 +573,42 @@ footer{padding:60px 0 40px}
   <div class="wrap">
     <div class="sec-head">
       <div>
-        <span class="sec-no">SEC. 04 — {{ t.pricing.no | safe }}</span>
-        <h2 class="sec-title">{{ t.pricing.title | safe }} <span class="hl">{{ t.pricing.hl | safe }}</span></h2>
+        <span class="sec-no">SEC. 04 — Pricing</span>
+        <h2 class="sec-title">Pay on <span class="hl">results.</span></h2>
       </div>
-      <p class="sec-note">{{ t.pricing.note | safe }}</p>
+      <p class="sec-note">One fee: a flat 20% of the savings we verify. Tidal Audit, Gateway and Telemetry operations are included. No licence.</p>
     </div>
     <div class="plans">
       <div class="plan xcard hot"><span class="x"></span>
-        <div class="p-tag">{{ t.pricing.perf.tag | safe }}</div>
-        <h3>{{ t.pricing.perf.h | safe }}</h3>
-        <p class="p-sub">{{ t.pricing.perf.sub | safe }}</p>
+        <div class="p-tag">★ MOST POPULAR · PAY ON RESULTS</div>
+        <h3>Performance</h3>
+        <p class="p-sub">Free audit. Then you only pay when we save you money — measured against a locked baseline, reconciled to provider invoices.</p>
         <div class="p-price">20<small>%</small></div>
-        <div class="p-per">{{ t.pricing.perf.per | safe }}</div>
+        <div class="p-per">of verified savings · no savings, no fee</div>
         <ul>
-          {% for li in t.pricing.perf.items %}<li>{{ li | safe }}</li>
-          {% endfor %}
+          <li>Free audit · 1-week turnaround · countersigned baseline</li>
+          <li>We implement, not just recommend · Tidal Gateway deployed and run by us</li>
+          <li>Tidal Telemetry · live cost, chargeback and monthly signed statements</li>
+          <li>Engineering pair · weekly reviews</li>
+          <li>Quality SLO enforcement &amp; auto-rollback</li>
+          <li>No minimum spend · no down payment · 30 days' notice</li>
         </ul>
-        <a class="btn btn-blue" href="#start" style="justify-content:center">{{ t.pricing.perf.btn | safe }}</a>
+        <a class="btn btn-blue" href="#start" style="justify-content:center">Book free audit →</a>
       </div>
       <div class="plan xcard"><span class="x"></span>
-        <div class="p-tag">{{ t.pricing.suite.tag | safe }}</div>
-        <h3>{{ t.pricing.suite.h | safe }}</h3>
-        <p class="p-sub">{{ t.pricing.suite.sub | safe }}</p>
-        <div class="p-price">{{ t.pricing.suite.price | safe }}<small>{{ t.pricing.suite.priceSmall | safe }}</small></div>
-        <div class="p-per">{{ t.pricing.suite.per | safe }}</div>
+        <div class="p-tag">INCLUDED · THE TIDAL SUITE</div>
+        <h3>Audit, Gateway, Telemetry</h3>
+        <p class="p-sub">Three products, one fee. Our team runs all three. None is licensed or priced separately.</p>
+        <div class="p-price">Incl.<small> in the 20%</small></div>
+        <div class="p-per">audit free · gateway and telemetry operations included</div>
         <ul>
-          {% for li in t.pricing.suite.items %}<li>{{ li | safe }}</li>
-          {% endfor %}
+          <li>Tidal Audit · free, read-only review of invoices and usage logs, run by our team</li>
+          <li>Tidal Gateway · a LiteLLM gateway we deploy and operate in your cloud: routing, fallbacks, caching, batching, per-team budgets, hard stops</li>
+          <li>Tidal Telemetry · live cost by provider, model, feature, team and workflow, and the evidence behind each monthly statement</li>
+          <li>Baseline locked to invoices · provider price cuts excluded · quality regressions don't count</li>
+          <li>No licence · no down payment · no minimum</li>
         </ul>
-        <a class="btn btn-ghost" href="/telemetry" style="justify-content:center">{{ t.pricing.suite.btn | safe }}</a>
+        <a class="btn btn-ghost" href="/telemetry" style="justify-content:center">See Tidal Telemetry →</a>
       </div>
     </div>
   </div>
@@ -558,17 +619,36 @@ footer{padding:60px 0 40px}
   <div class="wrap">
     <div class="sec-head">
       <div>
-        <span class="sec-no">SEC. 05 — {{ t.faq.no | safe }}</span>
-        <h2 class="sec-title">{{ t.faq.title | safe }} <span class="hl">{{ t.faq.hl | safe }}</span></h2>
+        <span class="sec-no">SEC. 05 — Reference</span>
+        <h2 class="sec-title">Common <span class="hl">questions.</span></h2>
       </div>
-      <p class="sec-note">{{ t.faq.note | safe }}</p>
+      <p class="sec-note">Missing something? Email hello@finopsllm.com — we respond within one business day.</p>
     </div>
     <div class="faq-list">
-      {% for f in t.faq.items %}<details class="faq"{{ ' open' if loop.first }}>
-        <summary>{{ f.q | safe }} <span class="pm">[+]</span></summary>
-        <div class="a">{{ f.a | safe }}</div>
+      <details class="faq" open>
+        <summary>How much can we save? <span class="pm">[+]</span></summary>
+        <div class="a">Typical reduction in the first full billing cycle after implementation is <strong>40–60%</strong>, depending on architecture and traffic mix. Real targets are set after a provider-invoice audit and workload review.</div>
       </details>
-      {% endfor %}
+      <details class="faq">
+        <summary>Does FinOps LLM support chargeback &amp; showback? <span class="pm">[+]</span></summary>
+        <div class="a">Yes. Token-level attribution to providers, models, features, teams, and customer cohorts. Monthly chargeback and showback exported to <strong>NetSuite, QuickBooks, CSV, or API</strong>. Custom dimensions supported.</div>
+      </details>
+      <details class="faq">
+        <summary>How do you handle customer data? <span class="pm">[+]</span></summary>
+        <div class="a"><strong>Read-only by default.</strong> Billing and usage data is enough for most attribution work. Prompt and output data is only accessed with explicit approval, for specific optimizations that require it. NDA and DPA available on request.</div>
+      </details>
+      <details class="faq">
+        <summary>How long does implementation take? <span class="pm">[+]</span></summary>
+        <div class="a">Attribution and dashboards go live in <strong>under a week</strong>. Optimization implementation takes 3–5 weeks; savings appear on the first full provider invoice after go-live.</div>
+      </details>
+      <details class="faq">
+        <summary>Will optimization hurt output quality? <span class="pm">[+]</span></summary>
+        <div class="a">No. Every routing, caching, and compression change is A/B tested against production for <strong>seven days minimum</strong> before promotion. Regressions auto-rollback. Quality is monitored continuously alongside cost.</div>
+      </details>
+      <details class="faq">
+        <summary>Which providers are supported? <span class="pm">[+]</span></summary>
+        <div class="a">OpenAI, Anthropic, Gemini &amp; Vertex AI, AWS Bedrock, Azure OpenAI, Groq, Together, Mistral, Cohere, Fireworks, Replicate, and most OSS endpoints. <strong>Multi-provider deployments typically have the largest savings surface.</strong></div>
+      </details>
     </div>
   </div>
 </section>
@@ -578,21 +658,68 @@ footer{padding:60px 0 40px}
   <div class="wrap">
     <div class="sec-head">
       <div>
-        <span class="sec-no">SEC. 06 — {{ t.research.no | safe }}</span>
-        <h2 class="sec-title">{{ t.research.title | safe }} <span class="hl">{{ t.research.hl | safe }}</span></h2>
+        <span class="sec-no">SEC. 06 — Research</span>
+        <h2 class="sec-title">Engineering guides that show up <span class="hl">in AI answers.</span></h2>
       </div>
-      <p class="sec-note">{{ t.research.note | safe }}</p>
+      <p class="sec-note">Deep dives on LLM cost attribution, monitoring, caching, and governance. Cited by Microsoft Copilot when buyers research AI FinOps.</p>
     </div>
     <div class="research-grid">
-      {% for c in t.research.cards %}<a class="research-card xcard" href="{{ ('/' + lang + '/research/' + c.slug) if (lang != 'en' and c.slug in ['finops-for-llm', 'how-much-does-gpt5-cost']) else ('/research/' + c.slug) }}">
-        <div class="fig"><span>{{ t.research.guide | safe }}</span><span>{{ c.badge | safe }}</span></div>
-        <h3>{{ c.title | safe }}</h3>
-        <p>{{ c.desc | safe }}</p>
-        <div class="meta">{{ c.meta | safe }}</div>
+      <a class="research-card xcard" href="/research/chargeback-vs-showback">
+        <div class="fig"><span>GUIDE</span><span>NEW</span></div>
+        <h3>Chargeback vs showback</h3>
+        <p>Which FinOps cost allocation model fits your team, and how to migrate from visibility to budget accountability.</p>
+        <div class="meta">High search demand</div>
       </a>
-      {% endfor %}
+      <a class="research-card xcard" href="/research/it-chargeback-showback-ai">
+        <div class="fig"><span>GUIDE</span><span>NEW</span></div>
+        <h3>IT chargeback and showback for AI</h3>
+        <p>Apply chargeback and showback to LLM and GenAI spend: allocation rules, implementation steps, and common mistakes.</p>
+        <div class="meta">High search demand</div>
+      </a>
+      <a class="research-card xcard" href="/research/showback-comes-first-chargeback">
+        <div class="fig"><span>GUIDE</span><span>NEW</span></div>
+        <h3>Showback comes before chargeback</h3>
+        <p>Why leading FinOps teams start with showback, clean their data, and only then transfer budget ownership.</p>
+        <div class="meta">High search demand</div>
+      </a>
+      <a class="research-card xcard" href="/research/finops-for-llm">
+        <div class="fig"><span>GUIDE</span><span>296</span></div>
+        <h3>FinOps for LLM</h3>
+        <p>The complete framework for visibility, attribution, optimization, and accountability across LLM and GenAI spend.</p>
+        <div class="meta">Copilot citations</div>
+      </a>
+      <a class="research-card xcard" href="/research/llm-cost-monitoring">
+        <div class="fig"><span>GUIDE</span><span>274</span></div>
+        <h3>LLM cost monitoring</h3>
+        <p>How production teams track token spend, set alerts, and build a real-time cost cockpit across providers.</p>
+        <div class="meta">Copilot citations</div>
+      </a>
+      <a class="research-card xcard" href="/research/llm-cost-monitoring-production-guide">
+        <div class="fig"><span>GUIDE</span><span>NEW</span></div>
+        <h3>LLM cost monitoring in production</h3>
+        <p>Production monitoring stack, alert runbooks, and the metrics that catch spikes before they hit your invoice.</p>
+        <div class="meta">High citation demand</div>
+      </a>
+      <a class="research-card xcard" href="/research/agent-spend-guardrails">
+        <div class="fig"><span>GUIDE</span><span>93</span></div>
+        <h3>Agent spend guardrails</h3>
+        <p>Budgets, rate limits, and circuit breakers for autonomous agents that can loop, retry, and surprise you.</p>
+        <div class="meta">Copilot citations</div>
+      </a>
+      <a class="research-card xcard" href="/research/agent-spend-guardrails-production">
+        <div class="fig"><span>GUIDE</span><span>NEW</span></div>
+        <h3>Agent guardrails for production</h3>
+        <p>Runtime controls, kill switches, and production metrics that keep agents from becoming runaway bills.</p>
+        <div class="meta">High citation demand</div>
+      </a>
+      <a class="research-card xcard" href="/research/how-much-does-gpt5-cost">
+        <div class="fig"><span>GUIDE</span><span>86</span></div>
+        <h3>How much does GPT-5 cost?</h3>
+        <p>Token pricing, expected tiers, and how to model spend for reasoning and frontier models.</p>
+        <div class="meta">Copilot citations</div>
+      </a>
     </div>
-    <p style="margin-top:28px"><a class="btn btn-ghost" href="{{ rp }}">{{ t.research.browse | safe }}</a></p>
+    <p style="margin-top:28px"><a class="btn btn-ghost" href="/research">Browse all research →</a></p>
   </div>
 </section>
 
@@ -600,14 +727,14 @@ footer{padding:60px 0 40px}
 <section id="start" style="border-bottom:none">
   <div class="wrap">
     <div class="cta-panel xcard"><span class="x"></span>
-      <span class="sec-no">SEC. 07 — {{ t.cta.no | safe }}</span>
-      <h2>{{ t.cta.title | safe }} <span class="hl">{{ t.cta.hl | safe }}</span></h2>
-      <p>{{ t.cta.p | safe }}</p>
+      <span class="sec-no">SEC. 07 — Start here</span>
+      <h2>Start with a clear picture of <span class="hl">your AI spend.</span></h2>
+      <p>About a week. Read-only access. We return with a full map of your spend, ranked by waste, plus a baseline Tidal Telemetry can track against. Free. No implementation commitment.</p>
       <div class="hero-ctas cta-actions">
-        <a class="btn btn-blue" href="/book">{{ t.cta.btn | safe }}</a>
+        <a class="btn btn-blue" href="/book">Book free audit →</a>
         <a class="btn btn-ghost" href="mailto:hello@finopsllm.com">hello@finopsllm.com</a>
       </div>
-      <div class="fine">{{ t.cta.fine | safe }}</div>
+      <div class="fine">30-min discovery · read-only by default · NDA + DPA on request · no commitment</div>
     </div>
   </div>
 </section>
@@ -617,54 +744,57 @@ footer{padding:60px 0 40px}
   <div class="wrap">
     <div class="foot-grid">
       <div>
-        <a class="footer-brand" href="/" aria-label="{{ t.brandAria | safe }}"><img src="/assets/brand/finops-llm-horizontal-light.svg" width="340" height="54" alt="FinOps LLM" /></a>
-        <div class="foot-tag">{{ t.footer.tag | safe }}</div>
+        <a class="footer-brand" href="/" aria-label="FinOps LLM home"><img src="/assets/brand/finops-llm-horizontal-light.svg" width="340" height="54" alt="FinOps LLM" /></a>
+        <div class="foot-tag">AI cost management · LLM observability</div>
       </div>
       <div class="foot-links">
         <div>
-          <h3>{{ t.footer.platform | safe }}</h3>
-          <a href="#pillars">{{ t.footer.pillars | safe }}</a>
-          <a href="#levers">{{ t.footer.techniques | safe }}</a>
-          <a href="/pricing">{{ t.footer.pricing | safe }}</a>
-          <a href="/book">{{ t.footer.book | safe }}</a>
-          <a href="/contact">{{ t.footer.contact | safe }}</a>
+          <h3>Platform</h3>
+          <a href="#pillars">Four pillars</a>
+          <a href="#levers">Techniques</a>
+          <a href="/pricing">Pricing</a>
+          <a href="/book">Book an audit</a>
+          <a href="/contact">Contact us</a>
         </div>
         <div>
-          <h3>{{ t.footer.resources | safe }}</h3>
-          <a href="{{ rp }}">{{ t.footer.research | safe }}</a>
-          <a href="/templates">{{ t.footer.templates | safe }}</a>
-          <a href="/compare/llm-gateways">{{ t.footer.compare | safe }}</a>
-          <a href="/telemetry">{{ t.footer.telemetry | safe }}</a>
-          <a href="/audit/openai">{{ t.footer.auditOpenai | safe }}</a>
-          <a href="/audit/bedrock">{{ t.footer.auditBedrock | safe }}</a>
-          <a href="/audit/vertex-ai">{{ t.footer.auditVertex | safe }}</a>
-          <a href="/tools/llm-cost-calculator">{{ t.footer.calculator | safe }}</a>
-          <a href="/tools/llm-api-pricing-tracker">{{ t.footer.pricingTracker | safe }}</a>
-          <a href="/tools/llm-release-tracker">{{ t.footer.releaseTracker | safe }}</a>
-          <a href="/benchmarks">{{ t.footer.benchmarks | safe }}</a>
-          <a href="/case-studies">{{ t.footer.caseStudies | safe }}</a>
-          <a href="/glossary">{{ t.footer.glossary | safe }}</a>
-          <a href="#faq">{{ t.footer.faq | safe }}</a>
+          <h3>Resources</h3>
+          <a href="/research">Research</a>
+          <a href="/templates">Free templates</a>
+          <a href="/compare/llm-gateways">Tool comparison</a>
+          <a href="/telemetry">Tidal Telemetry</a>
+          <a href="/audit/openai">OpenAI cost audit</a>
+          <a href="/audit/bedrock">Bedrock cost audit</a>
+          <a href="/audit/vertex-ai">Vertex AI cost audit</a>
+          <a href="/tools/llm-cost-calculator">Cost calculator</a>
+          <a href="/tools/llm-api-pricing-tracker">Pricing tracker</a>
+    <a href="/tools/llm-release-tracker">Model release tracker</a>
+          <a href="/benchmarks">Benchmarks</a>
+          <a href="/case-studies">Case studies</a>
+          <a href="/glossary">Glossary</a>
+          <a href="#faq">FAQ</a>
         </div>
         <div>
-          <h3>{{ t.footer.company | safe }}</h3>
-          <a href="/about">{{ t.footer.about | safe }}</a>
-          <a href="/careers">{{ t.footer.careers | safe }}</a>
-          <a href="/security">{{ t.footer.security | safe }}</a>
-          <a href="/privacy">{{ t.footer.privacy | safe }}</a>
-          <a href="/terms">{{ t.footer.terms | safe }}</a>
+          <h3>Company</h3>
+          <a href="/about">About</a>
+          <a href="/careers">Careers</a>
+          <a href="/security">Security</a>
+          <a href="/privacy">Privacy</a>
+          <a href="/terms">Terms</a>
         </div>
         <div>
-          <h3>{{ t.footer.contactH | safe }}</h3>
+          <h3>Contact</h3>
           <a href="mailto:hello@finopsllm.com">hello@finopsllm.com</a>
-          <a href="#start">{{ t.footer.bookAudit | safe }}</a>
+          <a href="#start">Book an audit</a>
         </div>
         <!-- The locale homepages were in the sitemap but hreflang was the only
              thing pointing at them, so nothing crawlable linked them. -->
         <div>
-          <h3>{{ t.footer.languages | safe }}</h3>
-          {% for l, d in homeUi %}{% if l != lang %}<a href="{{ '/' if l == 'en' else '/' + l + '/' }}" hreflang="{{ l }}">{{ d.langName }}</a>
-          {% endif %}{% endfor %}
+          <h3>Languages</h3>
+          <a href="/es/" hreflang="es">Español</a>
+          <a href="/fr/" hreflang="fr">Français</a>
+          <a href="/de/" hreflang="de">Deutsch</a>
+          <a href="/pt/" hreflang="pt">Português</a>
+          <a href="/ja/" hreflang="ja">日本語</a>
         </div>
       </div>
     </div>
