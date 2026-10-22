@@ -15,3 +15,15 @@ When you find an issue, search the live tracker for an existing ticket first; up
 ## Only deployment route — user directive 2026-10-03
 
 The only deployment route for this site is a push to the verified personal GitHub production branch, which triggers Cloudflare Workers automatic builds and deployment. For authorized website releases, commit the reviewed changes and push through that route. Do not run local Wrangler deployment commands. Do not use Playwright for website work or release checks unless the user explicitly requests it; use builds, tests, SEO/GEO checks, and HTTP checks instead. Carry an authorized release through the push without asking again.
+
+## Article-only publishing — user directive 2026-10-22
+
+For changes limited to article JSON content, use `npm run publish:articles --
+--message "Publish article" src/_data/articles/<article>.json`. This performs
+source checks, commits selected content, pushes directly to verified GitHub
+`main`, waits for the actual content to be live, and submits search discovery.
+Cloudflare runs the site build once after the push. Do not run a separate local
+or remote site build/test suite, create a release branch, or manually repeat
+publication checks for ordinary article-only updates. Source checks and the
+normal commit hook still apply. Runtime, template, dependency or publishing-tool
+changes require the relevant tests; this shortcut is limited to article content.

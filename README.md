@@ -46,18 +46,41 @@ Single source of truth: the git repo. No manual CLI deployments.
 
 ## Post-publish search submission
 
-Use the workspace's shared runner after committing article or site changes:
+Publish one or more article JSON files, including every locale declared in each
+file, with one command:
 
 ```bash
-node ~/projects/ai/portfolio/scripts/publish-search.mjs \
-  --site finops-llm --push https://finopsllm.com/research/example
+npm run publish:articles -- --message "Publish article title" src/_data/articles/article-slug.json
 ```
 
-`--push` verifies this repo's `main` branch and GitHub remote, pushes all
-outgoing commits, then waits until each supplied URL returns successfully and
-appears in the live sitemap. Review the printed commit and file list first.
-Existing uncommitted changes stay local. Omit `--push` when Cloudflare has
-already deployed the commit.
+Add more JSON paths to publish several articles together. `--dry-run` validates
+the selected files and prints the exact locale URLs without changing Git or
+contacting the network:
+
+```bash
+npm run publish:articles -- --dry-run --message "Publish article title" src/_data/articles/article-slug.json
+```
+
+The publisher checks article metadata and locale content, verifies the `main`
+branch and `lisn0/finops-llm` push destination, fetches `origin/main`, then
+commits and pushes only the selected article JSON files. It waits for every
+declared locale URL to serve the selected title, canonical URL, modification
+date, and article body before invoking the shared search submission runner.
+Cloudflare builds and deploys once from the push. Set
+`SEARCH_PUBLISH_WAIT_SECONDS` and `SEARCH_PUBLISH_POLL_SECONDS` to change the
+bounded live check. A successful push and search submission do not guarantee
+search indexing.
+
+Use the canonical shared runner directly after committing other site changes:
+
+```bash
+node ~/projects/tools/publish-search.mjs \
+  --site finops-llm https://finopsllm.com/research/example
+```
+
+The article publisher invokes this runner after its selected article commit is
+pushed and the live pages match their source. It omits `--push`; the article
+publisher already performed the content-only push.
 
 The runner submits `/sitemap-index.xml` to Google Search Console, inspects each
 URL, verifies the live IndexNow ownership file, and submits the URLs to Bing and

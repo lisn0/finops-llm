@@ -5,10 +5,12 @@
     "prebuild": "node scripts/content-gap-analyzer.js",
     "build": "eleventy",
     "serve": "eleventy --serve",
+    "publish:articles": "node scripts/publish-articles.mjs",
     "post-publish-search": "node scripts/post-publish-search.mjs",
-    "test": "node scripts/worker-crawlers.test.mjs && node scripts/worker-translated.test.mjs && node scripts/test-releases.mjs && node scripts/worker-contact.test.mjs && node scripts/worker-ai-referrals.test.mjs",
+    "test": "node scripts/worker-crawlers.test.mjs && node scripts/worker-translated.test.mjs && node scripts/test-releases.mjs && node scripts/worker-contact.test.mjs && node scripts/worker-ai-referrals.test.mjs && npm run test:publish-articles",
     "fetch-releases": "node scripts/fetch-releases.mjs",
-    "postbuild": "node scripts/generate-llms-full.js && node scripts/check-links.js"
+    "postbuild": "node scripts/generate-llms-full.js && node scripts/check-links.js",
+    "test:publish-articles": "node --test scripts/publish-articles.test.mjs"
   },
   "devDependencies": {
     "@11ty/eleventy": "^3.1.6"
