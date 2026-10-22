@@ -90,6 +90,9 @@
       }
     ],
     "style": "body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.65}.wrap{max-width:860px;margin:0 auto;padding:56px 24px}a{color:#7AAFFF}p,li{color:#B6C0D2}li{margin:12px 0}.langsw{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;color:#647289;margin:0 0 26px}.langsw a{text-decoration:none}.langsw a[aria-current]{color:#E6EAF2;font-weight:600}",
+    "links": [
+      { "rel": "stylesheet", "href": "/assets/research-index.css" }
+    ],
     "scripts": [
       {
         "src": "/assets/consent.js",
@@ -102,11 +105,38 @@
       {
         "src": "/assets/lang.js",
         "defer": true
+      },
+      {
+        "src": "/assets/research-index.js",
+        "defer": true
       }
     ]
   }
 }
 ---
-{% extends "shell.njk" %}{% block body %}<nav class="langsw" aria-label="Language / Idioma"><a href="/research" hreflang="en">EN</a> · <a href="/es/research" hreflang="es">ES</a> · <a href="/fr/research" hreflang="fr">FR</a> · <a href="/de/research" hreflang="de" aria-current="page">DE</a> · <a href="/pt/research" hreflang="pt">PT</a> · <a href="/ja/research" hreflang="ja">JA</a></nav><h1>Forschung</h1><p>Notizen für Ingenieurs- und Finanzteams, die AI-Ausgabenverwaltung aufbauen.</p>
-<h2>Hier anfangen</h2><p>Klare Erklärungen, wenn Sie neu bei LLM-Kosten sind.</p><ul><li><a href="/research/how-llm-providers-charge">Wie berechnen LLM-Anbieter?</a></li><li><a href="/research/llm-token-types-explained">Eingabe-, Ausgabe-, Cache- und Reasoning-Tokens erklärt</a></li><li><a href="/research/what-is-llm-cost-attribution">Was ist LLM-Kostenattribution?</a></li><li><a href="/research/why-llm-bills-spike">Warum steigen meine LLM-Rechnungen an?</a></li><li><a href="/research/how-to-budget-for-ai-spend">Wie budgetiert man AI-Ausgaben?</a></li></ul>
-<h2>Alle Forschung</h2><ul>{%- for a in collections.research['de'] %}<li><a href="{{ a.url }}">{{ a.title }}</a>{% if a.en %} <span style="color:#647289">(EN)</span>{% endif %}</li>{%- endfor %}</ul><hr style="margin:48px 0 24px;border:none;border-top:1px solid #1E2A3F" /><p>Möchten Sie dies auf Ihre eigenen LLM-Ausgaben anwenden? FinOps LLM führt ein kostenloses Audit Ihrer AI-Kosten durch und zeigt Ihnen, wo Einsparungen möglich sind. <a href="/book">Kostenloses Audit anfordern &rarr;</a></p><p><a href="/de/">Zurück zu FinOps LLM</a></p>{% endblock %}
+{% extends "shell.njk" %}{% block body %}
+{% set researchUi = {
+  languageLabel: 'Sprache / Language',
+  kicker: 'Notizen zur KI-Finanzsteuerung',
+  title: 'Forschung',
+  intro: 'Praxisnahe Notizen für Entwicklungs- und Finanzteams, die KI-Ausgaben besser steuern. Themen sind Kostentransparenz, Optimierung, Modellökonomie und Agentenbetrieb.',
+  startHeading: 'Mit den Grundlagen beginnen',
+  startDescription: 'Klare Einstiege in die Mechanismen und Entscheidungen hinter LLM-Kosten.',
+  libraryHeading: 'Alle Beiträge durchsuchen',
+  toolsNavLabel: 'Tools für die praktische Anwendung',
+  toolsHeading: 'Erkenntnisse anwenden',
+  tools: [{url: '/tools/llm-cost-calculator', title: 'Workload-Kosten schätzen', summary: 'Vergleichen Sie Ausgaben je Anbieter anhand Ihres Tokenvolumens.'}, {url: '/tools/llm-api-pricing-tracker', title: 'Aktuelle API-Preise ansehen', summary: 'Prüfen Sie die aktuellen Tokenpreise großer Anbieter.'}, {url: '/tools/llm-release-tracker', title: 'Modellveröffentlichungen verfolgen', summary: 'Sehen Sie neue Modelle und ihre veröffentlichten Preise.'}],
+  searchLabel: 'Bibliothek durchsuchen',
+  searchPlaceholder: 'Zum Beispiel „Token“, „Budget“ oder ein Modell',
+  topicLabel: 'Nach Thema filtern',
+  allTopics: 'Alle Themen',
+  resetLabel: 'Filter zurücksetzen',
+  cta: 'Möchten Sie diese Erkenntnisse auf Ihre LLM-Ausgaben anwenden? FinOps LLM prüft Ihre KI-Kosten und zeigt konkrete Einsparmöglichkeiten.',
+  book: 'Kostenloses Audit buchen →',
+  back: 'Zurück zu FinOps LLM',
+  locale: 'de',
+  homeUrl: '/de/',
+  languages: [{'code': 'en', 'url': '/research'}, {'code': 'es', 'url': '/es/research'}, {'code': 'fr', 'url': '/fr/research'}, {'code': 'de', 'url': '/de/research'}, {'code': 'pt', 'url': '/pt/research'}, {'code': 'ja', 'url': '/ja/research'}],
+  startArticles: [{'url': '/research/how-llm-providers-charge', 'title': 'Wie rechnen LLM-Anbieter ab?'}, {'url': '/research/llm-token-types-explained', 'title': 'Ein-, Ausgabe-, Cache- und Reasoning-Tokens erklärt'}, {'url': '/research/what-is-llm-cost-attribution', 'title': 'Was bedeutet LLM-Kostenzuordnung?'}, {'url': '/research/why-llm-bills-spike', 'title': 'Warum steigt meine LLM-Rechnung?'}, {'url': '/research/how-to-budget-for-ai-spend', 'title': 'KI-Ausgaben budgetieren'}]
+} %}
+{% include "research-index-body.njk" %}{% endblock %}

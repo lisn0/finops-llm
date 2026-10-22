@@ -90,6 +90,9 @@
       }
     ],
     "style": "body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.65}.wrap{max-width:860px;margin:0 auto;padding:56px 24px}a{color:#7AAFFF}p,li{color:#B6C0D2}li{margin:12px 0}.langsw{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;color:#647289;margin:0 0 26px}.langsw a{text-decoration:none}.langsw a[aria-current]{color:#E6EAF2;font-weight:600}",
+    "links": [
+      { "rel": "stylesheet", "href": "/assets/research-index.css" }
+    ],
     "scripts": [
       {
         "src": "/assets/consent.js",
@@ -102,11 +105,38 @@
       {
         "src": "/assets/lang.js",
         "defer": true
+      },
+      {
+        "src": "/assets/research-index.js",
+        "defer": true
       }
     ]
   }
 }
 ---
-{% extends "shell.njk" %}{% block body %}<nav class="langsw" aria-label="Language / Idioma"><a href="/research" hreflang="en">EN</a> · <a href="/es/research" hreflang="es">ES</a> · <a href="/fr/research" hreflang="fr">FR</a> · <a href="/de/research" hreflang="de">DE</a> · <a href="/pt/research" hreflang="pt">PT</a> · <a href="/ja/research" hreflang="ja" aria-current="page">JA</a></nav><h1>リサーチ</h1><p>AI支出ガバナンスを構築するエンジニアリングおよび財務チーム向けのノート。</p>
-<h2>ここから始める</h2><p>LLM費用が初めての方向けの分かりやすい解説。</p><ul><li><a href="/research/how-llm-providers-charge">LLMプロバイダーはどのように課金するのか？</a></li><li><a href="/research/llm-token-types-explained">入力、出力、キャッシュ、推論トークンの説明</a></li><li><a href="/research/what-is-llm-cost-attribution">LLM費用配分とは？</a></li><li><a href="/research/why-llm-bills-spike">なぜLLM請求書が急増するのか？</a></li><li><a href="/research/how-to-budget-for-ai-spend">AI支出の予算化方法</a></li></ul>
-<h2>すべてのリサーチ</h2><ul>{%- for a in collections.research['ja'] %}<li><a href="{{ a.url }}">{{ a.title }}</a>{% if a.en %} <span style="color:#647289">(EN)</span>{% endif %}</li>{%- endfor %}</ul><hr style="margin:48px 0 24px;border:none;border-top:1px solid #1E2A3F" /><p>自分のLLM支出に適用したいですか？FinOps LLMはAI費用の無料監査を実施し、節約場所を示します。<a href="/book">無料監査を予約 &rarr;</a></p><p><a href="/ja/">FinOps LLMに戻る</a></p>{% endblock %}
+{% extends "shell.njk" %}{% block body %}
+{% set researchUi = {
+  languageLabel: '言語 / Language',
+  kicker: 'AIファイナンスの実務ノート',
+  title: 'リサーチ',
+  intro: 'AI支出のガバナンスを改善するエンジニアリング・財務チーム向けの実践的なノートです。コストの可視化、最適化、モデルの費用構造、エージェント運用を取り上げます。',
+  startHeading: 'まずは基礎から',
+  startDescription: 'LLMコストの仕組みと意思決定をわかりやすく解説します。',
+  libraryHeading: 'すべての記事を見る',
+  toolsNavLabel: '学びを実践するためのツール',
+  toolsHeading: '学んだ内容を実践する',
+  tools: [{url: '/tools/llm-cost-calculator', title: 'ワークロード費用を試算', summary: 'トークン量をもとにプロバイダー別の費用を比較できます。'}, {url: '/tools/llm-api-pricing-tracker', title: 'API料金を確認', summary: '主要プロバイダーの最新のトークン単価を確認できます。'}, {url: '/tools/llm-release-tracker', title: 'モデルの公開情報を追跡', summary: '新しいモデルと公開価格を確認できます。'}],
+  searchLabel: '記事を検索',
+  searchPlaceholder: '「トークン」「予算」やモデル名で検索',
+  topicLabel: 'トピックで絞り込む',
+  allTopics: 'すべてのトピック',
+  resetLabel: '条件をリセット',
+  cta: 'LLM支出に活用しませんか？FinOps LLMがAIコストを確認し、実行可能な節約策を見つけます。',
+  book: '無料監査を予約 →',
+  back: 'FinOps LLMに戻る',
+  locale: 'ja',
+  homeUrl: '/ja/',
+  languages: [{'code': 'en', 'url': '/research'}, {'code': 'es', 'url': '/es/research'}, {'code': 'fr', 'url': '/fr/research'}, {'code': 'de', 'url': '/de/research'}, {'code': 'pt', 'url': '/pt/research'}, {'code': 'ja', 'url': '/ja/research'}],
+  startArticles: [{'url': '/research/how-llm-providers-charge', 'title': 'LLMプロバイダーはどのように課金するのか？'}, {'url': '/research/llm-token-types-explained', 'title': '入力、出力、キャッシュ、推論トークンの説明'}, {'url': '/research/what-is-llm-cost-attribution', 'title': 'LLM費用配分とは？'}, {'url': '/research/why-llm-bills-spike', 'title': 'なぜLLM請求書が急増するのか？'}, {'url': '/research/how-to-budget-for-ai-spend', 'title': 'AI支出の予算化方法'}]
+} %}
+{% include "research-index-body.njk" %}{% endblock %}

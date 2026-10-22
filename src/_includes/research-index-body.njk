@@ -1,0 +1,52 @@
+<div class="research-index" data-research-index data-locale="{{ researchUi.locale }}">
+  <nav class="langsw" aria-label="{{ researchUi.languageLabel }}">{% for option in researchUi.languages %}{% if not loop.first %} · {% endif %}<a href="{{ option.url }}" hreflang="{{ option.code }}"{% if option.code == researchUi.locale %} aria-current="page"{% endif %}>{{ option.code | upper }}</a>{% endfor %}</nav>
+
+  <header class="research-hero">
+    <span class="research-kicker">{{ researchUi.kicker }}</span>
+    <h1>{{ researchUi.title }}</h1>
+    <p>{{ researchUi.intro }}</p>
+  </header>
+
+  <section class="research-start" aria-labelledby="research-start-heading">
+    <h2 id="research-start-heading">{{ researchUi.startHeading }}</h2>
+    <p>{{ researchUi.startDescription }}</p>
+    <ul class="research-starters">
+      {% for article in researchUi.startArticles %}<li><a href="{{ article.url }}"><span>{{ loop.index }}</span>{{ article.title }}</a></li>{% endfor %}
+    </ul>
+  </section>
+
+  <section class="research-library" aria-labelledby="research-library-heading">
+    <div class="research-library-head">
+      <h2 id="research-library-heading">{{ researchUi.libraryHeading }}</h2>
+      <p data-research-count role="status" aria-live="polite" hidden></p>
+    </div>
+    <div class="research-controls" data-research-controls hidden>
+      <div class="research-field">
+        <label for="research-search">{{ researchUi.searchLabel }}</label>
+        <input id="research-search" type="search" data-research-search placeholder="{{ researchUi.searchPlaceholder }}" autocomplete="off" />
+      </div>
+      <div class="research-field">
+        <label for="research-topic">{{ researchUi.topicLabel }}</label>
+        <select id="research-topic" data-research-topic><option value="">{{ researchUi.allTopics }}</option></select>
+      </div>
+      <button type="button" data-research-reset disabled>{{ researchUi.resetLabel }}</button>
+    </div>
+    <p class="research-empty" data-research-empty hidden></p>
+    <ul class="research-list">
+      {%- for article in collections.research[researchUi.locale] %}
+      <li data-research-item data-search="{{ article.slug }}"><a href="{{ article.url }}">{{ article.title }}{% if article.en %} <span class="research-en">EN</span>{% endif %}</a></li>
+      {%- endfor %}
+    </ul>
+  </section>
+
+  <div class="research-cta">
+    <p>{{ researchUi.cta }} <a href="/book">{{ researchUi.book }}</a></p>
+    <nav class="research-apply" aria-label="{{ researchUi.toolsNavLabel }}">
+      <h2>{{ researchUi.toolsHeading }}</h2>
+      <ul class="research-tools">
+        {% for tool in researchUi.tools %}<li><a href="{{ tool.url }}"><strong>{{ tool.title }}</strong><span>{{ tool.summary }}</span></a></li>{% endfor %}
+      </ul>
+    </nav>
+    <p class="research-back"><a href="{{ researchUi.homeUrl }}">{{ researchUi.back }}</a></p>
+  </div>
+</div>

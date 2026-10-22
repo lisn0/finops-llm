@@ -90,6 +90,9 @@
       }
     ],
     "style": "body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.65}.wrap{max-width:860px;margin:0 auto;padding:56px 24px}a{color:#7AAFFF}p,li{color:#B6C0D2}li{margin:12px 0}.langsw{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;color:#647289;margin:0 0 26px}.langsw a{text-decoration:none}.langsw a[aria-current]{color:#E6EAF2;font-weight:600}",
+    "links": [
+      { "rel": "stylesheet", "href": "/assets/research-index.css" }
+    ],
     "scripts": [
       {
         "src": "/assets/consent.js",
@@ -102,11 +105,38 @@
       {
         "src": "/assets/lang.js",
         "defer": true
+      },
+      {
+        "src": "/assets/research-index.js",
+        "defer": true
       }
     ]
   }
 }
 ---
-{% extends "shell.njk" %}{% block body %}<nav class="langsw" aria-label="Language / Idioma"><a href="/research" hreflang="en" aria-current="page">EN</a> · <a href="/es/research" hreflang="es">ES</a> · <a href="/fr/research" hreflang="fr">FR</a> · <a href="/de/research" hreflang="de">DE</a> · <a href="/pt/research" hreflang="pt">PT</a> · <a href="/ja/research" hreflang="ja">JA</a></nav><h1>Research</h1><p>Notes for engineering and finance teams building AI spend governance.</p>
-<h2>Start here</h2><p>Plain-English explainers if you're new to LLM cost.</p><ul><li><a href="/research/how-llm-providers-charge">How do LLM providers charge?</a></li><li><a href="/research/llm-token-types-explained">Input, output, cache, and reasoning tokens explained</a></li><li><a href="/research/what-is-llm-cost-attribution">What is LLM cost attribution?</a></li><li><a href="/research/why-llm-bills-spike">Why does my LLM bill spike?</a></li><li><a href="/research/how-to-budget-for-ai-spend">How to budget for AI spend</a></li></ul>
-<h2>All research</h2><ul>{%- for a in collections.research['en'] %}<li><a href="{{ a.url }}">{{ a.title }}</a>{% if a.en %} <span style="color:#647289">(EN)</span>{% endif %}</li>{%- endfor %}</ul><hr style="margin:48px 0 24px;border:none;border-top:1px solid #1E2A3F" /><p>Want this applied to your own LLM spend? FinOps LLM runs a free audit of your AI costs and shows where the savings are. <a href="/book">Book free audit &rarr;</a></p><p><a href="/">Back to FinOps LLM</a></p>{% endblock %}
+{% extends "shell.njk" %}{% block body %}
+{% set researchUi = {
+  languageLabel: 'Language / Idioma',
+  kicker: 'Field notes for AI finance',
+  title: 'Research',
+  intro: 'Practical notes for engineering and finance teams building better governance for AI spend. Explore cost visibility, optimization, model economics, and agent operations.',
+  startHeading: 'Start with the fundamentals',
+  startDescription: 'Clear introductions to the mechanics and decisions behind LLM costs.',
+  libraryHeading: 'Browse all research',
+  toolsNavLabel: 'Tools to put the research to work',
+  toolsHeading: 'Apply what you learn',
+  tools: [{url: '/tools/llm-cost-calculator', title: 'Estimate workload costs', summary: 'Compare projected spend across providers using your token volume.'}, {url: '/tools/llm-api-pricing-tracker', title: 'Check live API pricing', summary: 'Review current per-token rates from major providers.'}, {url: '/tools/llm-release-tracker', title: 'Track model releases', summary: 'See recent model launches and their published pricing.'}],
+  searchLabel: 'Search the library',
+  searchPlaceholder: 'Try “token”, “budget”, or a model name',
+  topicLabel: 'Filter by topic',
+  allTopics: 'All topics',
+  resetLabel: 'Clear filters',
+  cta: 'Want to apply this to your own LLM spend? FinOps LLM reviews your AI costs and identifies practical savings.',
+  book: 'Book a free audit →',
+  back: 'Back to FinOps LLM',
+  locale: 'en',
+  homeUrl: '/',
+  languages: [{'code': 'en', 'url': '/research'}, {'code': 'es', 'url': '/es/research'}, {'code': 'fr', 'url': '/fr/research'}, {'code': 'de', 'url': '/de/research'}, {'code': 'pt', 'url': '/pt/research'}, {'code': 'ja', 'url': '/ja/research'}],
+  startArticles: [{'url': '/research/how-llm-providers-charge', 'title': 'How do LLM providers charge?'}, {'url': '/research/llm-token-types-explained', 'title': 'Input, output, cache, and reasoning tokens explained'}, {'url': '/research/what-is-llm-cost-attribution', 'title': 'What is LLM cost attribution?'}, {'url': '/research/why-llm-bills-spike', 'title': 'Why does my LLM bill spike?'}, {'url': '/research/how-to-budget-for-ai-spend', 'title': 'How to budget for AI spend'}]
+} %}
+{% include "research-index-body.njk" %}{% endblock %}

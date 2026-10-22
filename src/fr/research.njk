@@ -90,6 +90,9 @@
       }
     ],
     "style": "body{font-family:Inter,system-ui,sans-serif;margin:0;background:#0A0F1A;color:#E6EAF2;line-height:1.65}.wrap{max-width:860px;margin:0 auto;padding:56px 24px}a{color:#7AAFFF}p,li{color:#B6C0D2}li{margin:12px 0}.langsw{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;color:#647289;margin:0 0 26px}.langsw a{text-decoration:none}.langsw a[aria-current]{color:#E6EAF2;font-weight:600}",
+    "links": [
+      { "rel": "stylesheet", "href": "/assets/research-index.css" }
+    ],
     "scripts": [
       {
         "src": "/assets/consent.js",
@@ -102,11 +105,38 @@
       {
         "src": "/assets/lang.js",
         "defer": true
+      },
+      {
+        "src": "/assets/research-index.js",
+        "defer": true
       }
     ]
   }
 }
 ---
-{% extends "shell.njk" %}{% block body %}<nav class="langsw" aria-label="Language / Idioma"><a href="/research" hreflang="en">EN</a> · <a href="/es/research" hreflang="es">ES</a> · <a href="/fr/research" hreflang="fr" aria-current="page">FR</a> · <a href="/de/research" hreflang="de">DE</a> · <a href="/pt/research" hreflang="pt">PT</a> · <a href="/ja/research" hreflang="ja">JA</a></nav><h1>Recherche</h1><p>Notes pour les équipes d'ingénierie et de finance construisant la gouvernance des dépenses d'IA.</p>
-<h2>Commencer ici</h2><p>Explications claires si vous découvrez les coûts des LLM.</p><ul><li><a href="/research/how-llm-providers-charge">Comment les fournisseurs de LLM facturent-ils?</a></li><li><a href="/research/llm-token-types-explained">Tokens d'entrée, de sortie, de cache et de raisonnement expliqués</a></li><li><a href="/research/what-is-llm-cost-attribution">Qu'est-ce que l'attribution des coûts des LLM?</a></li><li><a href="/research/why-llm-bills-spike">Pourquoi ma facture LLM explose-t-elle?</a></li><li><a href="/research/how-to-budget-for-ai-spend">Comment budgétiser les dépenses d'IA</a></li></ul>
-<h2>Toute la recherche</h2><ul>{%- for a in collections.research['fr'] %}<li><a href="{{ a.url }}">{{ a.title }}</a>{% if a.en %} <span style="color:#647289">(EN)</span>{% endif %}</li>{%- endfor %}</ul><hr style="margin:48px 0 24px;border:none;border-top:1px solid #1E2A3F" /><p>Vous voulez l'appliquer à vos propres dépenses en LLM? FinOps LLM réalise un audit gratuit de vos coûts d'IA et vous montre où se trouvent les économies. <a href="/book">Réservez votre audit gratuit &rarr;</a></p><p><a href="/fr/">Retour à FinOps LLM</a></p>{% endblock %}
+{% extends "shell.njk" %}{% block body %}
+{% set researchUi = {
+  languageLabel: 'Langue / Language',
+  kicker: 'Notes sur la finance de l’IA',
+  title: 'Recherche',
+  intro: 'Des notes pratiques pour les équipes d’ingénierie et de finance qui mettent en place une meilleure gouvernance des dépenses d’IA. Explorez la visibilité des coûts, l’optimisation, l’économie des modèles et les opérations des agents.',
+  startHeading: 'Commencer par les bases',
+  startDescription: 'Des introductions claires aux mécanismes et décisions qui déterminent les coûts des LLM.',
+  libraryHeading: 'Parcourir toutes les recherches',
+  toolsNavLabel: 'Des outils pour appliquer ces connaissances',
+  toolsHeading: 'Appliquer les connaissances',
+  tools: [{url: '/tools/llm-cost-calculator', title: 'Estimer le coût d’une charge', summary: 'Comparez les dépenses prévues selon le volume de tokens.'}, {url: '/tools/llm-api-pricing-tracker', title: 'Consulter les tarifs API', summary: 'Vérifiez les tarifs actuels par token des principaux fournisseurs.'}, {url: '/tools/llm-release-tracker', title: 'Suivre les sorties de modèles', summary: 'Consultez les sorties récentes et leurs tarifs publiés.'}],
+  searchLabel: 'Rechercher dans la bibliothèque',
+  searchPlaceholder: 'Essayez « tokens », « budget » ou un modèle',
+  topicLabel: 'Filtrer par sujet',
+  allTopics: 'Tous les sujets',
+  resetLabel: 'Effacer les filtres',
+  cta: 'Vous souhaitez appliquer ces conseils à vos dépenses LLM ? FinOps LLM examine vos coûts d’IA et repère des économies concrètes.',
+  book: 'Réserver un audit gratuit →',
+  back: 'Retour à FinOps LLM',
+  locale: 'fr',
+  homeUrl: '/fr/',
+  languages: [{'code': 'en', 'url': '/research'}, {'code': 'es', 'url': '/es/research'}, {'code': 'fr', 'url': '/fr/research'}, {'code': 'de', 'url': '/de/research'}, {'code': 'pt', 'url': '/pt/research'}, {'code': 'ja', 'url': '/ja/research'}],
+  startArticles: [{'url': '/research/how-llm-providers-charge', 'title': 'Comment les fournisseurs de LLM facturent-ils ?'}, {'url': '/research/llm-token-types-explained', 'title': 'Tokens d’entrée, de sortie, de cache et de raisonnement'}, {'url': '/research/what-is-llm-cost-attribution', 'title': 'Qu’est-ce que l’attribution des coûts LLM ?'}, {'url': '/research/why-llm-bills-spike', 'title': 'Pourquoi ma facture LLM augmente-t-elle ?'}, {'url': '/research/how-to-budget-for-ai-spend', 'title': 'Comment budgéter les dépenses d’IA'}]
+} %}
+{% include "research-index-body.njk" %}{% endblock %}
