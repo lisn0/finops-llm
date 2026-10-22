@@ -27,3 +27,18 @@ or remote site build/test suite, create a release branch, or manually repeat
 publication checks for ordinary article-only updates. Source checks and the
 normal commit hook still apply. Runtime, template, dependency or publishing-tool
 changes require the relevant tests; this shortcut is limited to article content.
+
+## Autonomous new-article cycle — user directive 2026-10-22
+
+The user authorizes recurring discovery, research, writing and production
+publication for finopsllm.com without asking for each batch. The active daily
+Codex automation is `publish-new-finops-llm-articles` (09:00 Europe/Lisbon), with
+up to three new English articles per day when supported opportunities exist.
+Deduplicate by reader intent against actual article bodies, use current primary
+sources and explicit calculation assumptions, and skip weak or covered topics.
+Refreshes are not the default. Use the article-only publishing command above;
+recover partial publications before starting another batch. Keep the non-secret
+opportunity/publication ledger at
+`/Users/bilelUser/.codex/finopsllm-content-state.json`. Preserve other sessions'
+changes. Report published article links or actionable failures; stay quiet when
+nothing qualifies or an existing blocker is unchanged.
