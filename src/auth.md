@@ -21,7 +21,7 @@ No API key is required for public discovery or contact endpoints. An agent must 
 
 ## Tidal Telemetry login
 
-Existing Tidal users sign in at https://openlit.llmcfo.com/login. New company access is moving to issued, expiring enrollment or invitation links; request access through `/contact` or book a call. The marketing site cannot create accounts or grant roles. Company governance controls are being prepared and should not be assumed live until the Tidal rollout is confirmed.
+Existing Tidal users sign in at https://openlit.llmcfo.com/login. New users sign up in the browser at https://openlit.llmcfo.com/register. Beta is free with up to three projects per account; no consulting engagement or card is required. The marketing site cannot create accounts or grant roles. Company governance controls are being prepared and should not be assumed live until the Tidal rollout is confirmed.
 
 Tidal's separate MCP endpoint is `https://otlp.llmcfo.com/mcp`. Use only credentials and tool permissions currently granted by Tidal. Delegated company access is part of the pending governance rollout. This marketing site's public API has no MCP tool endpoint or OAuth authorization server.
 
