@@ -7,27 +7,27 @@
     "token-optimization"
   ],
   "datePublished": "2026-09-19",
-  "dateModified": "2026-09-19",
+  "dateModified": "2026-10-22",
   "image": "https://finopsllm.com/og.png",
   "agentMode": true,
   "languages": {
     "en": {
       "title": "Control MCP tool definition token overhead",
       "titleCore": "Control MCP tool definition token overhead in agent workflows",
-      "description": "Connecting multiple MCP servers injects thousands of schema tokens per turn. How to prune schemas, cache tool definitions, and control prompt tax.",
-      "body": "<p>Connecting an AI agent to multiple Model Context Protocol (MCP) servers injects thousands of input tokens on every turn before the model reads a single word of user intent. Every registered tool appends a JSON schema containing function names, parameter descriptions, enum definitions, and type constraints. In an enterprise workspace with 6 connected MCP servers (GitHub, Postgres, Slack, Jira, Brave Search, Filesystem), this tool preamble consumes 4,500 to 12,000 input tokens per API call. At 30 turns across a task, that static overhead drains $0.35 to $1.20 in pure schema redundancy.</p><h2>The anatomy of MCP schema tax</h2><p>The Model Context Protocol establishes a standard client-server JSON-RPC interface for LLM capabilities. However, language models cannot infer tool availability without explicit schema injection in the system prompt or tool definition parameter block. When an engineer connects a database MCP server with 24 schema-inspection and SQL tools, the full JSON schema must be presented to the model on every inference turn so the attention mechanism can route tool calls. Because standard API billing meters total input tokens on every request, unmanaged MCP tool catalogues create an immediate, linear baseline tax across all agent operations.</p><h2>Why do MCP server tool definitions cost so many tokens?</h2><p>Each MCP tool definition requires verbose metadata: parameter names, nested properties, human-readable descriptions, and JSON Schema specification headers. A single detailed database query tool often consumes 350 to 600 tokens. Across dozens of tools spanning multiple departmental MCP servers, the initial context window is occupied by static tool contracts rather than dynamic conversational history.</p><h2>Three architectures to eliminate MCP overhead</h2><p>Engineering teams running production agent fleets deploy three distinct mitigation strategies to control tool token inflation:</p><ul><li><strong>Prompt Caching Breakpoints:</strong> Place the static MCP tool definitions before any dynamic conversation history in the prompt structure, and set an explicit prompt caching breakpoint immediately after the tool block. On Anthropic, OpenAI, and Google Gemini models supporting 5-minute or 1-hour cache TTLs, cache hits reduce the input token cost of the tool schema by 75% to 90% after the first turn.</li><li><strong>Dynamic Two-Stage Tool Registration:</strong> Avoid exposing all MCP tools globally. Use a lightweight router model or semantic index to identify the specific tool domain required by the user prompt, dynamically injecting only the relevant 3–5 tool schemas into the execution agent's active payload.</li><li><strong>Schema Compression and Description Minification:</strong> Strip verbose formatting, eliminate markdown descriptions within JSON schema strings, and replace long field explanations with compact type definitions. Aggressive schema minification typically cuts tool definition payload volume by 35% to 50% without degrading tool selection accuracy.</li></ul><h2>How can engineering teams reduce MCP tool token overhead?</h2><p>Teams reduce MCP overhead by setting prompt cache breakpoints after tool declarations, employing two-stage semantic tool routing, and minifying redundant JSON schema property descriptions.</p><h2>Can prompt caching eliminate MCP schema token costs?</h2><p>While prompt caching cannot eliminate token processing latency entirely, it slashes the billing cost of recurrent tool definition tokens by up to 90% on models that support prefix caching, provided the tool definition block remains identical across consecutive turns.</p>",
+      "description": "Measure MCP tool-schema input, select relevant tools and evaluate prompt caching without assuming every connected definition is billed on every turn.",
+      "body": "<p><strong>MCP tool definitions add model-input tokens when the host includes them in a request.</strong> The size and cost depend on the exposed schemas, active tool selection and provider cache behavior. Connecting more servers does not imply a fixed number of tokens or a fixed overhead percentage.</p>\n<h2>Where does tool-schema overhead come from?</h2>\n<p>A tool definition can contain a name, description and input schema with nested types and parameter guidance. The <a href=\"https://modelcontextprotocol.io/docs/learn/architecture\">official MCP architecture</a> separates tool discovery from execution. The host controls which discovered definitions reach the model; MCP does not require every schema to appear on every inference turn.</p>\n<p>Measure the serialized input your model provider receives. Counting connected servers or tool names is not enough. A small catalogue with long parameter descriptions may consume more tokens than a larger catalogue of concise definitions.</p>\n<h2>How do you estimate the cost?</h2>\n<p>Illustrative example: if your host includes a 4,000-token tool block in six requests, that is 24,000 input-token occurrences. At an assumed uncached rate of $2 per million, the schema component costs $0.048. Reducing each block to 1,000 tokens brings it to $0.012, saving $0.036 if the other request components and outcomes stay unchanged.</p>\n<p>Those are assumed rates and counts, not measured production savings. Cache hits or writes change the calculation. Tool selection may also change the number of steps, so compare whole-workflow cost and completion quality, not just the smaller prompt.</p>\n<h2>Which approaches reduce unnecessary schema input?</h2>\n<ul><li><strong>Select relevant tools:</strong> expose the tools needed for the current task or discover them on demand. Measure any router call or discovery overhead too.</li><li><strong>Keep stable prefixes reusable:</strong> apply the provider's supported caching controls and log actual cache reads and writes. Identical schema text alone does not guarantee a hit.</li><li><strong>Shorten descriptions carefully:</strong> remove duplication while retaining units, required fields, constraints and guidance needed to choose the correct tool.</li></ul>\n<p>Do not assume a universal schema size, cache lifetime or savings percentage. <a href=\"https://developers.openai.com/api/docs/guides/prompt-caching\">OpenAI's caching guide</a>, for example, distinguishes cache-write categories from cached reads. Other providers have their own rules.</p>\n<h2>How should you validate a change?</h2>\n<ol><li>Replay a fixed set of tasks with the same model settings and record cache state.</li><li>Compare the full catalogue against a selected subset or revised descriptions.</li><li>Record tool-selection errors, missing required tools, retries, latency and acceptance outcomes.</li><li>Sum model and downstream tool charges across every attempt. Divide by successful tasks.</li></ol>\n<p>A shorter tool description is useful only if the agent can still select and call the tool correctly. Keep changes that improve measured task economics at your required quality.</p>\n<h2>Related guides and sources</h2>\n<p>The <a href=\"/research/mcp-server-cost-impact\">MCP server cost guide</a> separates hosting, downstream services and token costs. The <a href=\"/research/agent-workflow-architecture-cost-controls\">agent workflow architecture guide</a> adds logging, shared budget reservations and retry controls. Official architecture and caching references above were checked on 22 October 2026; this revision updates the English text.</p>",
       "faq": [
         {
-          "question": "Why do MCP server tool definitions cost so many tokens?",
-          "answer": "Each MCP tool requires a full JSON Schema declaration including parameter specifications, nested objects, and descriptive guidance, accumulating 300 to 600 tokens per function."
+          "question": "Are all connected MCP tool definitions sent to the model on every turn?",
+          "answer": "Not necessarily. The host chooses which tools to expose. Discovery, model input and tool execution are separate operations."
         },
         {
-          "question": "How can engineering teams reduce MCP tool token overhead?",
-          "answer": "Teams reduce MCP overhead by setting prompt cache breakpoints after tool declarations, employing two-stage semantic tool routing, and minifying redundant JSON schema property descriptions."
+          "question": "How can teams reduce MCP tool-definition overhead?",
+          "answer": "Select relevant tools, reuse eligible stable prefixes and shorten redundant descriptions. Test tool selection and cost per successful task before claiming savings."
         },
         {
-          "question": "Can prompt caching eliminate MCP schema token costs?",
-          "answer": "While prompt caching cannot eliminate token processing latency entirely, it slashes the billing cost of recurrent tool definition tokens by up to 90% on models that support prefix caching, provided the tool definition block remains identical across consecutive turns."
+          "question": "Does caching eliminate tool-schema costs?",
+          "answer": "No. Cache reads and writes use provider-specific rates and eligibility rules. Measure actual usage rather than assuming every repeated definition is a hit."
         }
       ],
       "related": [
@@ -42,6 +42,14 @@
         {
           "slug": "/research/agent-spend-guardrails",
           "label": "Agent spend guardrails"
+        },
+        {
+          "slug": "/research/mcp-server-cost-impact",
+          "label": "MCP server costs"
+        },
+        {
+          "slug": "/research/agent-workflow-architecture-cost-controls",
+          "label": "Practical agent workflow architecture"
         }
       ]
     },
