@@ -1,5 +1,7 @@
 # Architectural Plan: Showback vs Chargeback Keyword Cannibalization Consolidation
 
+> **Superseded 2026-10-23.** Executed with `/research/it-chargeback-showback` as the pillar (best GSC position, 39.9 avg over 90d), not `showback-vs-chargeback`. The other four pages 301 there via `src/_redirects`.
+
 > **Context**: Google Search Console reports **410 impressions with 0 clicks** on the query `"showback vs chargeback"` for `finopsllm.com`.
 > **Root Cause**: Keyword cannibalization across 7 overlapping articles diluting link equity, confusing Googlebot ranking algorithms, and suppressing search position to page 2 (positions 10–18).
 > **Target Status**: **DO NOT EXECUTE YET** — Designed for handoff to a specialized optimization agent.
