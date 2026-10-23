@@ -162,6 +162,7 @@ const generatedLd = (head, url) => {
 module.exports = function (eleventyConfig) {
   eleventyConfig.addFilter("generatedLd", generatedLd);
   eleventyConfig.addFilter("hreflangsFor", hreflangsFor);
+  eleventyConfig.addFilter("decodeEntities", decodeEntities);
 
   // Utility pages (about, terms, tools…) ship no schema and no date, so an AI
   // answer engine has nothing to attribute and cites them without a link, if at
