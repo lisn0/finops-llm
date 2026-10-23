@@ -324,3 +324,230 @@ Drop any of these blocks directly into article HTML (`src/_data/articles/*.json`
   ]
 }'></div>
 ```
+
+---
+
+## Template 6: Cost-Quality Pareto Frontier (SWE-bench Accuracy vs Unit Cost)
+
+```html
+<div class="table-container">
+  <table>
+    <thead>
+      <tr>
+        <th>Model</th>
+        <th>Benchmark Accuracy</th>
+        <th>Cost per Task</th>
+        <th>Efficiency Score</th>
+        <th>Frontier Tier</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>DeepSeek V3</strong></td>
+        <td>71.4%</td>
+        <td>$0.85</td>
+        <td>84.0 pts/$</td>
+        <td>Value Leader</td>
+      </tr>
+      <tr>
+        <td><strong>Claude 3.7 Haiku</strong></td>
+        <td>73.2%</td>
+        <td>$1.25</td>
+        <td>58.6 pts/$</td>
+        <td>Value Leader</td>
+      </tr>
+      <tr>
+        <td><strong>o3-mini Fast</strong></td>
+        <td>81.2%</td>
+        <td>$1.80</td>
+        <td>45.1 pts/$</td>
+        <td>Pareto Sweet Spot</td>
+      </tr>
+      <tr>
+        <td><strong>Claude 3.7 Sonnet</strong></td>
+        <td>86.8%</td>
+        <td>$4.50</td>
+        <td>19.3 pts/$</td>
+        <td>Frontier Efficiency</td>
+      </tr>
+      <tr>
+        <td><strong>GPT-5.4 Standard</strong></td>
+        <td>87.5%</td>
+        <td>$6.20</td>
+        <td>14.1 pts/$</td>
+        <td>Frontier Benchmark</td>
+      </tr>
+      <tr>
+        <td><strong>Claude 3.7 Opus</strong></td>
+        <td>89.1%</td>
+        <td>$22.00</td>
+        <td>4.1 pts/$</td>
+        <td>Diminishing Returns</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Chart: Pareto Frontier Scatter Plot with Optimal Boundary -->
+<div data-finops-chart="pareto-frontier"></div>
+```
+
+---
+
+## Template 7: Multi-Tier Cascade Routing Funnel (AI Gateway Yield)
+
+```html
+<div class="table-container">
+  <table>
+    <thead>
+      <tr>
+        <th>Routing Tier</th>
+        <th>Queries Handled</th>
+        <th>Traffic Share</th>
+        <th>Unit Rate / 1M</th>
+        <th>Subtotal Spend</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Incoming Gateway Traffic</strong></td>
+        <td>10.0M</td>
+        <td>100%</td>
+        <td>$0.00 Base</td>
+        <td>$0.00</td>
+      </tr>
+      <tr>
+        <td><strong>Tier 1: Filter & Flash</strong></td>
+        <td>6.8M</td>
+        <td>68%</td>
+        <td>$0.15/M</td>
+        <td>$1.02</td>
+      </tr>
+      <tr>
+        <td><strong>Tier 2: Mid Reasoning</strong></td>
+        <td>2.2M</td>
+        <td>22%</td>
+        <td>$3.00/M</td>
+        <td>$6.60</td>
+      </tr>
+      <tr>
+        <td><strong>Tier 3: Frontier Opus/Pro</strong></td>
+        <td>1.0M</td>
+        <td>10%</td>
+        <td>$25.00/M</td>
+        <td>$25.00</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Chart: Multi-Tier Cascade Funnel with -86.9% Net Savings -->
+<div data-finops-chart="cascade-funnel"></div>
+```
+
+---
+
+## Template 8: SaaS AI Feature Gross Margin Erosion Meter
+
+```html
+<div class="table-container">
+  <table>
+    <thead>
+      <tr>
+        <th>Customer Usage Tier</th>
+        <th>Seat Revenue</th>
+        <th>Token Burn Cost</th>
+        <th>Gross Profit / Loss</th>
+        <th>Unit Margin</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Light User (50% of seats)</strong></td>
+        <td>$40.00</td>
+        <td>$4.20</td>
+        <td>+$35.80 profit</td>
+        <td>+89.5% Gross Margin</td>
+      </tr>
+      <tr>
+        <td><strong>Medium User (35% of seats)</strong></td>
+        <td>$40.00</td>
+        <td>$18.50</td>
+        <td>+$21.50 profit</td>
+        <td>+53.7% Gross Margin</td>
+      </tr>
+      <tr>
+        <td><strong>Heavy User (10% of seats)</strong></td>
+        <td>$40.00</td>
+        <td>$34.00</td>
+        <td>+$6.00 profit</td>
+        <td>+15.0% Gross Margin</td>
+      </tr>
+      <tr>
+        <td><strong>Uncapped Extreme (Top 5%)</strong></td>
+        <td>$40.00</td>
+        <td>$88.40</td>
+        <td>-$48.40 loss</td>
+        <td>-121.0% Net Loss</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Chart: Gross Margin Erosion Meter with Revenue Ceiling -->
+<div data-finops-chart="margin-erosion" data-finops-config='{
+  "seatRevenue": 40.00
+}'></div>
+```
+
+---
+
+## Template 9: Prompt Cache Inactivity TTL Decay Timeline
+
+```html
+<div class="table-container">
+  <table>
+    <thead>
+      <tr>
+        <th>Inactivity Window</th>
+        <th>Cache Status</th>
+        <th>Effective Token Rate</th>
+        <th>Latency</th>
+        <th>Financial Impact</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>0 to 4 Minutes</strong></td>
+        <td>Hot Cache (90% Hit)</td>
+        <td>$0.30 / 1M</td>
+        <td>~280ms</td>
+        <td>92% Cache Discount</td>
+      </tr>
+      <tr>
+        <td><strong>5-Minute Boundary</strong></td>
+        <td>Eviction Threshold</td>
+        <td>Transition Phase</td>
+        <td>Ramping</td>
+        <td>TTL Eviction Boundary</td>
+      </tr>
+      <tr>
+        <td><strong>6 to 10+ Minutes</strong></td>
+        <td>Evicted Cold Write (0% Hit)</td>
+        <td>$3.75 / 1M</td>
+        <td>~1,420ms</td>
+        <td>Full Cold Write Penalty</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Chart: TTL Decay Timeline with Snapping Time Crosshair -->
+<div data-finops-chart="ttl-decay" data-finops-config='{
+  "hotRate": 0.30,
+  "coldRate": 3.75,
+  "ttlMinutes": 5.0,
+  "maxMinutes": 10.0
+}'></div>
+```
+
