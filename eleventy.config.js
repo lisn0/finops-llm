@@ -246,7 +246,9 @@ module.exports = function (eleventyConfig) {
       if (item.url.includes("-v2")) continue;
       const lang = LANGS.find((l) => item.url.startsWith("/" + l + "/")) || "en";
       // head.title carries the " · FinOps LLM" suffix; the index only wants the topic.
-      const title = (item.data.head?.title || item.url).split(" · ")[0];
+      // No head.title (e.g. pagination items): skip; articlePages below supplies the titleCore.
+      if (!item.data.head?.title) continue;
+      const title = item.data.head.title.split(" · ")[0];
       byLang[lang].push({ url: cleanUrl(item.url), title, slug: item.url.split("/research/")[1].replace(".html", "") });
     }
     for (const p of articlePages) {
