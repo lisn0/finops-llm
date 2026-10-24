@@ -99,8 +99,8 @@
     document.addEventListener('click', function (ev) {
       var a = ev.target && ev.target.closest ? ev.target.closest('a[href]') : null;
       if (!a || !isBookLink(a)) return;
-      if (window.analyticsConsent && typeof window.gtag === 'function') {
-        window.gtag('event', 'book_click', {
+      if (window.analyticsConsent && window.zaraz && typeof window.zaraz.track === 'function') {
+        window.zaraz.track('book_click', {
           book_source: ft.source,
           book_medium: ft.medium,
           landing_page: ft.landing

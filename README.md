@@ -186,12 +186,14 @@ The Worker (`src/worker.js`) implements client-side language negotiation:
 response is never cached and contains only the consent requirement. Europe
 (including the UK, Switzerland, EEA, European territories and transcontinental
 countries) and unknown locations require acceptance before GA4 loads. Elsewhere,
-GA4 starts automatically without an automatic banner. Microsoft Clarity still
-requires explicit acceptance everywhere. Advertising consent stays denied.
+Cloudflare Zaraz starts automatically without an automatic banner and manages
+GA4 and Microsoft Clarity through one loader.
+Both wait for acceptance in Europe or unknown locations. Advertising consent
+stays denied, including through the Clarity ConsentV2 API.
 
 The footer's Cookie settings control lets visitors opt out of both tools or
 accept both. Saved rejection and browser GPC/DNT prevent tracking everywhere.
-Automatic GA4 activation is not stored as acceptance, so future European visits
+Automatic Zaraz activation is not stored as acceptance, so future European visits
 still ask. The regional policy also governs first-party booking attribution.
 Run `node --test scripts/analytics-consent.test.mjs` for the policy and browser
 state tests; the regular `npm test` command includes them.

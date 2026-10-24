@@ -1,54 +1,44 @@
-/* FinOps LLM — Google Consent Mode v2 + cookie banner. Vanilla JS, no deps. */
+/* FinOps LLM — regional Zaraz loading + cookie banner. Vanilla JS, no deps. */
 (function () {
 	'use strict';
 
-	var GA4_ID = 'G-5BB5KVZCL3';
-	var CLARITY_ID = 'x04shhb3of';
 	var COOKIE_NAME = 'finops_consent';
 	var COOKIE_MAX_AGE = 60 * 60 * 24 * 365; // 365 days
 
-	// 1. Initialize dataLayer + gtag shim before GA4 loads.
+	// 1. Queue consent for Zaraz's Google Consent Mode compatibility.
 	window.analyticsConsent = false;
 	window.dataLayer = window.dataLayer || [];
-	function gtag() { window.dataLayer.push(arguments); }
-	window.gtag = window.gtag || gtag;
+	var deniedGoogleConsent = {
+		ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied', analytics_storage: 'denied'
+	};
 
-	// 2. Default consent state — everything denied.
-	gtag('consent', 'default', {
-		ad_storage: 'denied',
-		analytics_storage: 'denied',
-		ad_user_data: 'denied',
-		ad_personalization: 'denied',
-		functionality_storage: 'denied',
-		personalization_storage: 'denied',
-		security_storage: 'granted',
-		wait_for_update: 500
-	});
-	gtag('set', 'ads_data_redaction', true);
-
-	// 3. Load GA4 only after explicit analytics consent.
-	var ga4Loaded = false;
-	function loadGa4(w, d, s, i) {
-		if (ga4Loaded || !i) return;
-		ga4Loaded = true;
-		var f = d.getElementsByTagName(s)[0];
-		var j = d.createElement(s);
-		j.async = true;
-		j.src = 'https://www.googletagmanager.com/gtag/js?id=' + i;
-		f.parentNode.insertBefore(j, f);
-		gtag('js', new Date());
-		gtag('config', i);
-	}
-
-	// 3b. Load Microsoft Clarity (heatmaps + session replay) only after consent.
-	var clarityLoaded = false;
-	function loadClarity(c, l, a, r, i, t, y) {
-		if (clarityLoaded || !i) return;
-		clarityLoaded = true;
-		c[a] = c[a] || function () { (c[a].q = c[a].q || []).push(arguments); };
-		t = l.createElement(r); t.async = 1; t.src = 'https://www.clarity.ms/tag/' + i + '?ref=bwt';
-		y = l.getElementsByTagName(r)[0]; y.parentNode.insertBefore(t, y);
-		c[a]('consent');
+	// 2. Zaraz manages GA4 and Clarity. This is the only analytics script this
+	// site injects, and only after the regional policy allows analytics.
+	var zarazStarted = false;
+	function loadZaraz() {
+		if (zarazStarted) return;
+		zarazStarted = true;
+		// Zaraz evaluates its Pageview actions during script initialization; make
+		// the user's decision visible before i.js processes the initial event.
+		window.analyticsConsent = true;
+		window.dataLayer.push({ google_consent_default: deniedGoogleConsent });
+		window.dataLayer.push({ google_consent_update: {
+			ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied', analytics_storage: 'granted'
+		} });
+		var script = document.createElement('script');
+		script.src = '/cdn-cgi/zaraz/i.js';
+		script.referrerPolicy = 'origin';
+		script.onload = function () {
+			if (privacyRequested()) {
+				revoke();
+				location.reload();
+				return;
+			}
+			try { window.dispatchEvent(new Event('analyticsconsent')); } catch (e) {}
+		};
+		script.onerror = function () { window.analyticsConsent = false; };
+		var first = document.getElementsByTagName('script')[0];
+		first.parentNode.insertBefore(script, first);
 	}
 
 	// 4. Cookie helpers.
@@ -72,31 +62,20 @@
 	}
 	function grantAnalytics() {
 		if (privacyRequested()) return false;
-		gtag('consent', 'update', {
-			analytics_storage: 'granted',
-		});
-		loadGa4(window, document, 'script', GA4_ID);
-		// window.gtag is the always-present dataLayer shim, so other scripts
-		// cannot use it to tell granted from denied. Publish the decision.
-		window.analyticsConsent = true;
-		try { window.dispatchEvent(new Event('analyticsconsent')); } catch (e) {}
+		loadZaraz();
 		return true;
-	}
-	function grantAll() {
-		if (!grantAnalytics()) return;
-		loadClarity(window, document, 'clarity', 'script', CLARITY_ID);
 	}
 
 	// 5b. Withdrawal (GDPR Art. 7(3)) must be as easy as consent. The banner only
-	//     stops future loads; GA4 and Clarity have already set their own cookies
-	//     by then, so revoking has to clear those and reload to unload the tags.
+	//     stops future loads; Zaraz-managed tools already running on this page
+	//     need consent revoked and a reload to unload them.
 	function revoke() {
 		window.analyticsConsent = false;
-		gtag('consent', 'update', {
-			ad_storage: 'denied', analytics_storage: 'denied',
-			ad_user_data: 'denied', ad_personalization: 'denied',
-			functionality_storage: 'denied', personalization_storage: 'denied'
-		});
+		if (zarazStarted) window.dataLayer.push({ google_consent_update: deniedGoogleConsent });
+		if (window.clarity) window.clarity('consentv2', { analytics_Storage: 'denied', ad_Storage: 'denied' });
+		if (window.zaraz && window.zaraz.consent && typeof window.zaraz.consent.setAll === 'function') {
+			window.zaraz.consent.setAll(false);
+		}
 		var host = location.hostname;
 		var domains = ['', '; Domain=' + host, '; Domain=.' + host.replace(/^www\./, '')];
 		document.cookie.split(';').forEach(function (c) {
@@ -131,7 +110,7 @@
 		btn.id = 'cookie-settings-link';
 		btn.type = 'button';
 		btn.textContent = 'Cookie settings';
-		btn.style.cssText = 'color:inherit;text-decoration:underline;text-decoration-color:#7AAFFF;text-underline-offset:3px;cursor:pointer;background:none;border:0;padding:0;font:inherit';
+		btn.style.cssText = 'color:inherit;text-decoration:underline;text-decoration-color:#B83A13;text-underline-offset:3px;cursor:pointer;background:none;border:0;padding:0;font:inherit';
 		btn.addEventListener('click', function () { showBanner(true); });
 		if (slot) { slot.appendChild(btn); return; }
 		privacy.parentNode.insertBefore(document.createTextNode(' \u00b7 '), privacy.nextSibling);
@@ -140,7 +119,7 @@
 	onReady(addSettingsLink);
 	if (privacyRequested()) return;
 	if (stored === 'accepted') {
-		grantAll();
+		grantAnalytics();
 		return;
 	}
 	if (stored === 'rejected') {
@@ -159,18 +138,17 @@
 		banner.style.cssText = [
 			'position:fixed', 'left:16px', 'right:16px', 'bottom:16px',
 			'max-width:560px', 'margin:0 auto', 'z-index:2147483647',
-			'background:#0F1626', 'color:#E6EAF2',
-			'border:1px solid #2A3550',
-			'border-radius:10px',
-			'box-shadow:0 10px 40px rgba(0,0,0,0.5)',
+			'background:#FBFAF6', 'color:#0E0F0C',
+			'border:1px solid #0E0F0C',
+			'box-shadow:6px 6px 0 #0E0F0C',
 			'padding:16px 18px',
-			'font-family:Inter,-apple-system,system-ui,sans-serif',
+			'font-family:Geist,-apple-system,system-ui,sans-serif',
 			'font-size:14px', 'line-height:1.5'
 		].join(';');
 
 		var msg = document.createElement('div');
-		msg.style.cssText = 'margin-bottom:12px; color:#B6C0D2;';
-		msg.innerHTML = 'We use Google Analytics for traffic measurement and, with your acceptance, Microsoft Clarity for heatmaps and session replay. In Europe, Google Analytics also waits for acceptance; elsewhere it may start automatically. Reject opts out of both. See our <a href="/privacy" style="color:#7AAFFF; text-decoration:underline; text-underline-offset:3px;">Privacy Policy</a>.';
+		msg.style.cssText = 'margin-bottom:12px; color:#0E0F0C;';
+		msg.innerHTML = 'We use Google Analytics and Microsoft Clarity for analytics. Outside Europe they may start automatically; in Europe they wait for your choice. Reject opts out of both. See our <a href="/privacy" style="color:#0E0F0C; text-decoration:underline; text-decoration-color:#B83A13; text-underline-offset:3px;">Privacy Policy</a>.';
 
 		var row = document.createElement('div');
 		row.style.cssText = 'display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;';
@@ -180,13 +158,12 @@
 			b.type = 'button';
 			b.textContent = label;
 			b.style.cssText = [
-				'font-family:JetBrains Mono,ui-monospace,monospace',
+				'font-family:Geist Mono,ui-monospace,monospace',
 				'font-size:12px', 'letter-spacing:-0.01em',
 				'padding:8px 14px', 'cursor:pointer',
-				'border-radius:6px',
-				primary ? 'border:1px solid #7AAFFF' : 'border:1px solid #2A3550',
-				primary ? 'background:#7AAFFF' : 'background:transparent',
-				primary ? 'color:#0A0F1A' : 'color:#E6EAF2',
+				'border:1px solid #0E0F0C',
+				primary ? 'background:#B83A13' : 'background:#FBFAF6',
+				primary ? 'color:#FFFFFF' : 'color:#0E0F0C',
 				'font-weight:600'
 			].join(';');
 			return b;
@@ -197,7 +174,7 @@
 		var acceptBtn = makeBtn(reopened && current === 'accepted' ? 'Keep accepted' : 'Accept', true);
 		if (privacyRequested()) {
 			acceptBtn.disabled = true;
-			msg.innerHTML = 'Analytics is disabled by your browser privacy preference (Do Not Track or Global Privacy Control). Turn that preference off to enable analytics.';
+			msg.textContent = 'Analytics is disabled by your browser privacy preference (Do Not Track or Global Privacy Control).';
 		}
 
 		function close() {
@@ -206,10 +183,10 @@
 		}
 		function accept() {
 			if (privacyRequested()) return;
-			setCookie(COOKIE_NAME, 'accepted'); grantAll(); close();
+			setCookie(COOKIE_NAME, 'accepted'); grantAnalytics(); close();
 		}
 		function reject() {
-			var tagsRunning = ga4Loaded || clarityLoaded;
+			var tagsRunning = zarazStarted;
 			setCookie(COOKIE_NAME, 'rejected');
 			revoke();
 			close();
@@ -233,19 +210,16 @@
 		try { banner.setAttribute('tabindex', '-1'); banner.focus(); } catch (e) {}
 	}
 
-	// Only this first-party edge endpoint sees the location. Never store an
-	// automatic decision as acceptance: a later visit from Europe must ask.
 	Promise.resolve().then(function () {
 		return fetch('/api/analytics-policy', { cache: 'no-store', credentials: 'same-origin' });
 	}).then(function (response) {
 		if (!response.ok) throw new Error('Analytics policy unavailable');
 		return response.json();
 	}).then(function (policy) {
-		// A choice made while the request was in flight takes precedence.
-		if (getCookie(COOKIE_NAME)) return;
+		if (getCookie(COOKIE_NAME) || privacyRequested()) return;
 		if (policy && policy.requireConsent === false) grantAnalytics();
 		else onReady(function () { showBanner(false); });
 	}).catch(function () {
-		if (!getCookie(COOKIE_NAME)) onReady(function () { showBanner(false); });
+		if (!getCookie(COOKIE_NAME) && !privacyRequested()) onReady(function () { showBanner(false); });
 	});
 })();
