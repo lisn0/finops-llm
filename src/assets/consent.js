@@ -7,24 +7,30 @@
 
 	// 1. Queue consent for Zaraz's Google Consent Mode compatibility.
 	window.analyticsConsent = false;
-	window.dataLayer = window.dataLayer || [];
 	var deniedGoogleConsent = {
 		ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied', analytics_storage: 'denied'
 	};
+	var grantedAnalyticsConsent = {
+		ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied', analytics_storage: 'granted'
+	};
+	function persistConsentUpdate(state) {
+		try {
+			window.localStorage.setItem('_zaraz_google_consent_update', JSON.stringify(state));
+			return true;
+		} catch (e) { return false; }
+	}
 
 	// 2. Zaraz manages GA4 and Clarity. This is the only analytics script this
 	// site injects, and only after the regional policy allows analytics.
 	var zarazStarted = false;
 	function loadZaraz() {
-		if (zarazStarted) return;
+		if (zarazStarted) return true;
+		try { window.localStorage.setItem('_zaraz_google_consent_default', JSON.stringify(deniedGoogleConsent)); } catch (e) { return false; }
+		if (!persistConsentUpdate(grantedAnalyticsConsent)) return false;
 		zarazStarted = true;
 		// Zaraz evaluates its Pageview actions during script initialization; make
 		// the user's decision visible before i.js processes the initial event.
 		window.analyticsConsent = true;
-		window.dataLayer.push({ google_consent_default: deniedGoogleConsent });
-		window.dataLayer.push({ google_consent_update: {
-			ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied', analytics_storage: 'granted'
-		} });
 		var script = document.createElement('script');
 		script.src = '/cdn-cgi/zaraz/i.js';
 		script.referrerPolicy = 'origin';
@@ -39,9 +45,10 @@
 		script.onerror = function () { window.analyticsConsent = false; };
 		var first = document.getElementsByTagName('script')[0];
 		first.parentNode.insertBefore(script, first);
+		return true;
 	}
 
-	// 4. Cookie helpers.
+	// 3. Cookie helpers.
 	function onReady(fn) {
 		if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn);
 		else fn();
@@ -55,7 +62,7 @@
 		document.cookie = name + '=' + encodeURIComponent(value) + '; Max-Age=' + COOKIE_MAX_AGE + '; Path=/; SameSite=Lax' + secure;
 	}
 
-	// 5. Consent updates.
+	// 4. Consent updates.
 	function privacyRequested() {
 		var nav = window.navigator || {};
 		return nav.globalPrivacyControl || nav.doNotTrack === '1' || window.doNotTrack === '1';
@@ -66,12 +73,15 @@
 		return true;
 	}
 
-	// 5b. Withdrawal (GDPR Art. 7(3)) must be as easy as consent. The banner only
+	// 4b. Withdrawal (GDPR Art. 7(3)) must be as easy as consent. The banner only
 	//     stops future loads; Zaraz-managed tools already running on this page
 	//     need consent revoked and a reload to unload them.
 	function revoke() {
 		window.analyticsConsent = false;
-		if (zarazStarted) window.dataLayer.push({ google_consent_update: deniedGoogleConsent });
+		persistConsentUpdate(deniedGoogleConsent);
+		if (window.zaraz && typeof window.zaraz.set === 'function') {
+			try { window.zaraz.set('google_consent_update', deniedGoogleConsent); } catch (e) {}
+		}
 		if (window.clarity) window.clarity('consentv2', { analytics_Storage: 'denied', ad_Storage: 'denied' });
 		if (window.zaraz && window.zaraz.consent && typeof window.zaraz.consent.setAll === 'function') {
 			window.zaraz.consent.setAll(false);
@@ -87,10 +97,10 @@
 		});
 	}
 
-	// 6. Read existing decision.
+	// 5. Read existing decision.
 	var stored = getCookie(COOKIE_NAME);
 
-	// 6a. A stored decision hid the banner for a year with no way back to it, so
+	// 5a. A stored decision hid the banner for a year with no way back to it, so
 	//     withdrawing consent (Art. 7(3)) was impossible without hand-editing
 	//     cookies. Inject a footer control instead of editing ~15 footer blocks
 	//     across both sites and every locale — and it needs JS to work anyway.
@@ -127,7 +137,7 @@
 		return;
 	}
 
-	// 7. No prior decision — show banner once DOM is ready.
+	// 6. No prior decision — show banner once DOM is ready.
 	function showBanner(reopened) {
 		if (document.getElementById('finops-consent-banner')) return;
 		var banner = document.createElement('div');
