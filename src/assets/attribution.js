@@ -5,8 +5,8 @@
  * can tell whether AI citations and search clicks actually produce a booking.
  *
  * Privacy: first-party only, and it does nothing at all until the visitor has
- * granted analytics consent in consent.js (`window.analyticsConsent`) — the
- * sessionStorage write is terminal-equipment storage and needs consent just as
+ * enabled analytics under the regional policy in consent.js (`window.analyticsConsent`) — the
+ * sessionStorage write follows the same regional policy as
  * the GA4 `book_click` event does. No third-party calls, no cross-site
  * identifiers, no persistent cookie. Cleared when the tab closes.
  *
@@ -94,7 +94,7 @@
     }
 
     // 2. Reliable signal: fire a GA4 event on book click. Sends only when
-    //    analytics consent has been granted (gtag present). Capture phase so it
+    //    analytics is enabled. Capture phase so it
     //    runs before the browser navigates away.
     document.addEventListener('click', function (ev) {
       var a = ev.target && ev.target.closest ? ev.target.closest('a[href]') : null;
@@ -109,7 +109,7 @@
     }, true);
   }
 
-  // Nothing here may run before consent — not even the sessionStorage write.
+  // Nothing here may run before analytics is enabled — not even the sessionStorage write.
   var started = false;
   function start() {
     if (started || !window.analyticsConsent) return;

@@ -28,6 +28,24 @@ const CONTACT_FROM = 'contact@finopsllm.com';
 const CONTACT_MAX_BYTES = 8192;
 const CONTACT_TOPICS = new Set(['audit', 'telemetry', 'partnership', 'support', 'other']);
 
+// Europe, including transcontinental countries and European territories.
+// Country fallback also covers EEA/UK/Swiss traffic if continent is unavailable.
+const CONSENT_COUNTRIES = new Set('AD AL AM AT AX AZ BA BE BG BY CH CY CZ DE DK EE ES FI FO FR GB GE GG GI GR HR HU IE IM IS IT JE KZ LI LT LU LV MC MD ME MK MT NL NO PL PT RO RS RU SE SI SJ SK SM TR UA VA XK'.split(' '));
+
+function analyticsPolicy(request) {
+	const country = request.cf?.country;
+	const continent = request.cf?.continent;
+	const knownLocation = typeof country === 'string' && /^[A-Z]{2}$/.test(country) &&
+		!['XX', 'T1'].includes(country) && ['AF', 'AN', 'AS', 'EU', 'NA', 'OC', 'SA'].includes(continent);
+	return new Response(JSON.stringify({
+		requireConsent: !knownLocation || continent === 'EU' || CONSENT_COUNTRIES.has(country),
+	}), { headers: {
+		'Content-Type': 'application/json; charset=utf-8',
+		'Cache-Control': 'no-store',
+		'X-Content-Type-Options': 'nosniff',
+	} });
+}
+
 function contactJson(body, status = 200) {
 	return new Response(JSON.stringify(body), {
 		status,
@@ -816,6 +834,7 @@ export function buildReleases(data, now = Date.now()) {
 export default {
 	async fetch(request, env) {
 		const url = new URL(request.url);
+		if (url.pathname === '/api/analytics-policy') return analyticsPolicy(request);
 		if (url.pathname === '/api/contact') return serveContact(request, env);
 
 		// Live pricing feed for the tracker pages. Served before anything else

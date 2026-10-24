@@ -66,22 +66,25 @@
 	}
 
 	// 5. Consent updates.
-	function grantAll() {
+	function privacyRequested() {
+		var nav = window.navigator || {};
+		return nav.globalPrivacyControl || nav.doNotTrack === '1' || window.doNotTrack === '1';
+	}
+	function grantAnalytics() {
+		if (privacyRequested()) return false;
 		gtag('consent', 'update', {
-			ad_storage: 'granted',
 			analytics_storage: 'granted',
-			ad_user_data: 'granted',
-			ad_personalization: 'granted',
-			functionality_storage: 'granted',
-			personalization_storage: 'granted',
-			security_storage: 'granted'
 		});
 		loadGa4(window, document, 'script', GA4_ID);
-		loadClarity(window, document, 'clarity', 'script', CLARITY_ID);
 		// window.gtag is the always-present dataLayer shim, so other scripts
 		// cannot use it to tell granted from denied. Publish the decision.
 		window.analyticsConsent = true;
 		try { window.dispatchEvent(new Event('analyticsconsent')); } catch (e) {}
+		return true;
+	}
+	function grantAll() {
+		if (!grantAnalytics()) return;
+		loadClarity(window, document, 'clarity', 'script', CLARITY_ID);
 	}
 
 	// 5b. Withdrawal (GDPR Art. 7(3)) must be as easy as consent. The banner only
@@ -135,6 +138,7 @@
 		privacy.parentNode.insertBefore(btn, privacy.nextSibling.nextSibling);
 	}
 	onReady(addSettingsLink);
+	if (privacyRequested()) return;
 	if (stored === 'accepted') {
 		grantAll();
 		return;
@@ -166,7 +170,7 @@
 
 		var msg = document.createElement('div');
 		msg.style.cssText = 'margin-bottom:12px; color:#B6C0D2;';
-		msg.innerHTML = 'We use cookies for anonymous analytics (GA4) and product usage insights, including heatmaps and session replay (Microsoft Clarity). See our <a href="/privacy" style="color:#7AAFFF; text-decoration:underline; text-underline-offset:3px;">Privacy Policy</a>.';
+		msg.innerHTML = 'We use Google Analytics for traffic measurement and, with your acceptance, Microsoft Clarity for heatmaps and session replay. In Europe, Google Analytics also waits for acceptance; elsewhere it may start automatically. Reject opts out of both. See our <a href="/privacy" style="color:#7AAFFF; text-decoration:underline; text-underline-offset:3px;">Privacy Policy</a>.';
 
 		var row = document.createElement('div');
 		row.style.cssText = 'display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;';
@@ -191,19 +195,26 @@
 		var current = getCookie(COOKIE_NAME);
 		var rejectBtn = makeBtn(reopened && current === 'rejected' ? 'Keep rejected' : 'Reject', false);
 		var acceptBtn = makeBtn(reopened && current === 'accepted' ? 'Keep accepted' : 'Accept', true);
+		if (privacyRequested()) {
+			acceptBtn.disabled = true;
+			msg.innerHTML = 'Analytics is disabled by your browser privacy preference (Do Not Track or Global Privacy Control). Turn that preference off to enable analytics.';
+		}
 
 		function close() {
 			if (banner.parentNode) banner.parentNode.removeChild(banner);
 			document.removeEventListener('keydown', onKey);
 		}
-		function accept() { setCookie(COOKIE_NAME, 'accepted'); grantAll(); close(); }
+		function accept() {
+			if (privacyRequested()) return;
+			setCookie(COOKIE_NAME, 'accepted'); grantAll(); close();
+		}
 		function reject() {
-			var wasAccepted = getCookie(COOKIE_NAME) === 'accepted';
+			var tagsRunning = ga4Loaded || clarityLoaded;
 			setCookie(COOKIE_NAME, 'rejected');
 			revoke();
 			close();
 			// Tags already running in this page cannot be unloaded in place.
-			if (wasAccepted) location.reload();
+			if (tagsRunning) location.reload();
 		}
 		function onKey(e) { if (e.key !== 'Escape') return; if (reopened) close(); else reject(); }
 
@@ -222,5 +233,19 @@
 		try { banner.setAttribute('tabindex', '-1'); banner.focus(); } catch (e) {}
 	}
 
-	onReady(function () { showBanner(false); });
+	// Only this first-party edge endpoint sees the location. Never store an
+	// automatic decision as acceptance: a later visit from Europe must ask.
+	Promise.resolve().then(function () {
+		return fetch('/api/analytics-policy', { cache: 'no-store', credentials: 'same-origin' });
+	}).then(function (response) {
+		if (!response.ok) throw new Error('Analytics policy unavailable');
+		return response.json();
+	}).then(function (policy) {
+		// A choice made while the request was in flight takes precedence.
+		if (getCookie(COOKIE_NAME)) return;
+		if (policy && policy.requireConsent === false) grantAnalytics();
+		else onReady(function () { showBanner(false); });
+	}).catch(function () {
+		if (!getCookie(COOKIE_NAME)) onReady(function () { showBanner(false); });
+	});
 })();
