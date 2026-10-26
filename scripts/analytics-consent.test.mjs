@@ -29,7 +29,7 @@ test('client-supplied country header cannot override unknown edge location', asy
   assert.deepEqual(await response.json(), { requireConsent: true });
 });
 
-function browser({ policy = { requireConsent: true }, stored, navigator = {}, responseOk = true, failure = false, pending, storageFailure = false } = {}) {
+function browser({ policy = { requireConsent: true }, stored, navigator = {}, responseOk = true, failure = false, pending, storageFailure = false, scriptFailures = 0 } = {}) {
   const scripts = [];
   const elements = [];
   const tracks = [];
@@ -65,7 +65,10 @@ function browser({ policy = { requireConsent: true }, stored, navigator = {}, re
         set: (...args) => zarazSets.push(args),
         consent: { setAll: value => consentStates.push(value) },
       };
-      if (script.onload) script.onload();
+      if (scriptFailures > 0) {
+        scriptFailures--;
+        if (script.onerror) script.onerror();
+      } else if (script.onload) script.onload();
     } } }],
     addEventListener() {}, removeEventListener() {},
   };
@@ -95,8 +98,9 @@ function browser({ policy = { requireConsent: true }, stored, navigator = {}, re
       return { ok: responseOk, json: async () => policy };
     },
   };
-  vm.runInNewContext(source, context);
-  return { window, scripts, tracks, clarityCalls, consentStates, zarazSets, localValues, cookies,
+  function evaluate() { vm.runInNewContext(source, context); }
+  evaluate();
+  return { window, scripts, evaluate, tracks, clarityCalls, consentStates, zarazSets, localValues, cookies,
     get storageAtInjection() { return storageAtInjection; }, get consentAtInjection() { return consentAtInjection; },
     get reloads() { return reloads; }, get requests() { return requests; },
     banner: () => document.getElementById('finops-consent-banner'),
@@ -130,6 +134,35 @@ test('European visit stays blocked until acceptance; then loads only Zaraz', asy
   assert.equal(granted.ad_storage, 'denied');
   assert.equal(granted.ad_user_data, 'denied');
   assert.equal(granted.ad_personalization, 'denied');
+});
+
+test('repeated evaluation preserves consent without duplicating scripts or policy requests', async () => {
+  const b = browser({ stored: 'accepted' });
+  await settle();
+  assert.equal(b.scripts.length, 1);
+  const requests = b.requests;
+  const settings = b.window.cookieSettings;
+  b.evaluate();
+  await settle();
+  assert.equal(b.scripts.length, 1);
+  assert.equal(b.requests, requests);
+  assert.equal(b.window.analyticsConsent, true);
+  assert.equal(b.window.cookieSettings, settings);
+});
+
+test('failed Zaraz load stays denied and can retry after reopening cookie settings', async () => {
+  const b = browser({ scriptFailures: 1 });
+  await settle();
+  b.click('Accept');
+  assert.equal(b.scripts.length, 1);
+  assert.equal(b.window.analyticsConsent, false);
+  assert.equal(JSON.parse(b.localValues.get('_zaraz_google_consent_update')).analytics_storage, 'denied');
+
+  b.window.cookieSettings();
+  b.click('Keep accepted');
+  assert.equal(b.scripts.length, 2);
+  assert.equal(b.window.analyticsConsent, true);
+  assert.equal(b.cookies.get('finops_consent'), 'accepted');
 });
 
 test('known non-European visit loads only Zaraz without banner or stored acceptance', async () => {

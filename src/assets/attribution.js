@@ -16,6 +16,8 @@
  */
 (function () {
   'use strict';
+  if (window.__finopsAttributionInitialized) return;
+  window.__finopsAttributionInitialized = true;
 
   var FT_KEY = 'fa_first_touch';
 
@@ -80,15 +82,15 @@
   }
 
   function init() {
-    var ft = firstTouch();
-    if (!ft) return;
+    var ft = firstTouch() || { source: 'unknown', medium: 'unknown', landing: '' };
+    var hasOriginalTouch = ft.source !== 'unknown' || ft.medium !== 'unknown';
 
     // 1. Best-effort: tag book links in the DOM. The edge 302 may drop the query
     //    string, so the GA4 event below is the reliable signal — this is a bonus
     //    for booking tools that read UTM params.
     var links = document.querySelectorAll('a[href]');
     for (var i = 0; i < links.length; i++) {
-      if (isBookLink(links[i])) {
+      if (hasOriginalTouch && isBookLink(links[i])) {
         links[i].setAttribute('href', decorate(links[i].getAttribute('href'), ft));
       }
     }
@@ -98,15 +100,35 @@
     //    runs before the browser navigates away.
     document.addEventListener('click', function (ev) {
       var a = ev.target && ev.target.closest ? ev.target.closest('a[href]') : null;
-      if (!a || !isBookLink(a)) return;
-      if (window.analyticsConsent && window.zaraz && typeof window.zaraz.track === 'function') {
+      if (!a || !window.analyticsConsent || !window.zaraz || typeof window.zaraz.track !== 'function') return;
+      if (isBookLink(a)) {
         window.zaraz.track('book_click', {
           book_source: ft.source,
           book_medium: ft.medium,
           landing_page: ft.landing
         });
       }
+      var target;
+      try { target = new URL(a.href || a.getAttribute('href'), location.href); }
+      catch (e) { return; }
+      if ((target.protocol !== 'http:' && target.protocol !== 'https:') || target.origin === location.origin) return;
+      window.zaraz.track('click', {
+        link_url: target.origin + target.pathname,
+        link_domain: target.hostname,
+        outbound: true
+      });
     }, true);
+
+    var scrollSent = false;
+    document.addEventListener('scroll', function () {
+      if (scrollSent || !window.analyticsConsent || !window.zaraz || typeof window.zaraz.track !== 'function') return;
+      var doc = document.documentElement;
+      var height = Math.max(doc.scrollHeight, document.body.scrollHeight);
+      var viewport = window.innerHeight;
+      if (height <= viewport || (window.scrollY + viewport) / height < 0.9) return;
+      scrollSent = true;
+      window.zaraz.track('scroll', { percent_scrolled: 90 });
+    }, { passive: true });
   }
 
   // Nothing here may run before analytics is enabled — not even the sessionStorage write.

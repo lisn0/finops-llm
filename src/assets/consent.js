@@ -1,6 +1,8 @@
 /* FinOps LLM — regional Zaraz loading + cookie banner. Vanilla JS, no deps. */
 (function () {
 	'use strict';
+	if (window.__finopsConsentInitialized) return;
+	window.__finopsConsentInitialized = true;
 
 	var COOKIE_NAME = 'finops_consent';
 	var COOKIE_MAX_AGE = 60 * 60 * 24 * 365; // 365 days
@@ -42,7 +44,11 @@
 			}
 			try { window.dispatchEvent(new Event('analyticsconsent')); } catch (e) {}
 		};
-		script.onerror = function () { window.analyticsConsent = false; };
+		script.onerror = function () {
+			zarazStarted = false;
+			window.analyticsConsent = false;
+			persistConsentUpdate(deniedGoogleConsent);
+		};
 		var first = document.getElementsByTagName('script')[0];
 		first.parentNode.insertBefore(script, first);
 		return true;

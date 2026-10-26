@@ -197,3 +197,20 @@ Automatic Zaraz activation is not stored as acceptance, so future European visit
 still ask. The regional policy also governs first-party booking attribution.
 Run `node --test scripts/analytics-consent.test.mjs` for the policy and browser
 state tests; the regular `npm test` command includes them.
+
+Consent and attribution initialize once per document. Failed Zaraz bootstrap
+requests can be retried through Cookie settings. Attribution also sends a
+single 90% `scroll` event and outbound HTTP(S) `click` events after analytics
+is permitted; outbound link values omit query strings and fragments. Booking
+clicks still count when the original source is unavailable after late consent,
+with `unknown` source/medium rather than invented attribution.
+
+Zaraz must route ordinary events with conversion disabled and `book_click`
+through its separate conversion action. Consent remains the collection boundary:
+GA reports measured visits, not every human visitor, and missing historical
+visits cannot be reconstructed. The current IP-hiding setting can affect GA
+country attribution; use Cloudflare country data separately, without equating
+HTTP requests or edge visits with unique people. API reporting uses property
+`536095637` and timezone `Etc/GMT`; access references live in the workspace
+credential inventory. Exclude `utm_source=tracking_audit` QA sessions when
+reviewing release-day traffic, and allow recent daily data to finish processing.
