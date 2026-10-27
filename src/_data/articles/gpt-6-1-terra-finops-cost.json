@@ -1,0 +1,690 @@
+{
+  "slug": "research/gpt-6-1-terra-finops-cost",
+  "tags": [
+    "openai",
+    "model-routing",
+    "llm-costs",
+    "computer-use"
+  ],
+  "datePublished": "2026-10-27",
+  "dateModified": "2026-10-27",
+  "image": "https://finopsllm.com/og.png",
+  "languages": {
+    "en": {
+      "title": "GPT-6.1 Terra Pricing and FinOps Guide",
+      "titleCore": "GPT-6.1 Terra: price, performance and fit",
+      "description": "GPT-6.1 Terra costs $1/$5 per million input/output tokens. Compare caching, long-context and batch rates, GPT-6 models, and cost per completed task.",
+      "body": "<p><strong>OpenAI released GPT-6.1 Terra on October 26, 2026.</strong> Its standard API rate is $1 per million input tokens and $5 per million output tokens. That is half the input price and less than half the output price of GPT-5.6 Terra. The useful FinOps question is whether your workflow can complete with fewer model dollars after caching, reasoning, computer-use steps, retries, and human review are counted. Terra is positioned for visual reasoning and computer use; it is not automatically the cheapest fit for every request.</p>\n<p>One naming detail matters: the new model is <code>gpt-6.1-terra</code>, called GPT-6.1 Terra. It is separate from GPT-6.1 Sol, GPT-6 Luna, and GPT-6 Astra. OpenAI’s <a href=\"https://openai.com/index/introducing-gpt-6-1-terra/\">release announcement</a> and <a href=\"https://developers.openai.com/api/docs/models/gpt-6.1-terra\">API model page</a> describe the intended use and current specifications.</p>\n<h2>GPT-6 releases: price and workload fit</h2>\n<p>The sequence moved from the premium flagship toward lower-cost and more specialized work. The table uses standard API text-token prices per million tokens. It is a rate-card comparison, not a ranking of cost per successful task.</p>\n<table><thead><tr><th>Release</th><th>Model</th><th>Input / output</th><th>Best starting point</th></tr></thead><tbody>\n<tr><td>Sep 3</td><td>GPT-6 Astra</td><td>$10 / $50</td><td>Highest-stakes or hardest work where evaluation shows the quality is needed</td></tr>\n<tr><td>Sep 22</td><td>GPT-6 Sol</td><td>$2 / $10</td><td>Complex professional work and coding at a lower rate than Astra</td></tr>\n<tr><td>Sep 22</td><td>GPT-6 Luna</td><td>$0.10 / $0.50</td><td>Focused, high-volume tasks that pass quality checks</td></tr>\n<tr><td>Sep 29</td><td>GPT-6.1 Sol</td><td>$2 / $10</td><td>Updated Sol for complex work; cached input is $0.10 per million</td></tr>\n<tr><td>Oct 26</td><td>GPT-6.1 Terra</td><td>$1 / $5</td><td>Visual reasoning, screen-based computer use, and scoped work</td></tr>\n<tr><td>Previous generation</td><td>GPT-5.6 Terra</td><td>$2 / $12</td><td>Baseline for existing Terra traffic and migration tests</td></tr>\n</tbody></table>\n<p>GPT-6.1 Terra’s standard input rate is half the GPT-5.6 Terra and GPT-6.1 Sol rate; its output rate is half GPT-6.1 Sol’s and 58% below GPT-5.6 Terra’s. GPT-6 Luna remains much cheaper for simple text jobs. Astra remains the expensive flagship. That makes Terra a potential middle path for tasks where screen understanding or its measured capability matters. See OpenAI’s <a href=\"https://openai.com/index/introducing-gpt-6-sol-and-luna/\">GPT-6 Sol and Luna announcement</a> and <a href=\"https://openai.com/index/introducing-gpt-6-1-sol/\">GPT-6.1 Sol announcement</a> for the release context. The <a href=\"https://developers.openai.com/api/docs/pricing\">API pricing page</a> is the source of truth for rates and pricing modes.</p>\n<h2>What a migration could save</h2>\n<p>Consider one million tasks, each using 1,000 uncached input tokens and 500 output tokens. At standard rates, token charges would be:</p>\n<table><thead><tr><th>Model</th><th>Modeled spend</th><th>Compared with GPT-5.6 Terra</th></tr></thead><tbody>\n<tr><td>GPT-5.6 Terra ($2 / $12)</td><td>$8,000</td><td>Baseline</td></tr>\n<tr><td>GPT-6.1 Terra ($1 / $5)</td><td>$3,500</td><td>56.25% lower</td></tr>\n<tr><td>GPT-6 Luna ($0.10 / $0.50)</td><td>$350</td><td>95.6% lower</td></tr>\n<tr><td>GPT-6.1 Sol ($2 / $10)</td><td>$7,000</td><td>12.5% lower</td></tr>\n<tr><td>GPT-6 Astra ($10 / $50)</td><td>$35,000</td><td>4.4x the baseline</td></tr>\n</tbody></table>\n<p>This is arithmetic from published list rates, not a forecast: it assumes the same token counts, uncached input, no retries, no tools, and no changes in task success. Luna’s low token bill does not make it the right choice if it produces more failures or escalations. Compare <strong>cost per accepted outcome</strong> and quality, not just price per token.</p>\n<h2>The details that change the invoice</h2>\n<table><thead><tr><th>Price component</th><th>GPT-6.1 Terra rate or rule</th><th>FinOps implication</th></tr></thead><tbody>\n<tr><td>Cached input</td><td>$0.05 per million tokens</td><td>5% of uncached input; measure cache hit rate by workload</td></tr>\n<tr><td>Cache writes</td><td>$1.25 per million tokens at 30-minute retention; $2.50 at 12-hour retention</td><td>Include write charges when estimating whether long-lived caching pays off</td></tr>\n<tr><td>Batch and Flex</td><td>50% below Standard</td><td>Candidate for work that can tolerate asynchronous or flexible processing</td></tr>\n<tr><td>Fast mode</td><td>2x Standard</td><td>Use only when the latency benefit is worth the premium</td></tr>\n<tr><td>Long context</td><td>Above 272K input tokens, the full request uses 2x input/cache and 1.5x output rates</td><td>There is a threshold jump, not a gradual surcharge; alert before crossing it</td></tr>\n<tr><td>Regional processing and FedRAMP endpoints</td><td>10% uplift where applicable</td><td>Model the endpoint premium in regulated-workload forecasts</td></tr>\n<tr><td>Tools</td><td>Some tool use has separate charges</td><td>Attribute tool fees separately from model tokens</td></tr>\n</tbody></table>\n<p>At the long-context threshold, Terra’s effective rates become $2 input, $0.10 cached input, and $7.50 output per million tokens for the full request. A request just over 272K can therefore cost materially more than one just under it, even if the extra context is small. The API model page lists a 1.05-million-token context window and 128,000-token output limit; a large context window is capacity, not a reason to send the whole history on every turn.</p>\n<h2>What changed beyond the price</h2>\n<p>OpenAI positions Terra around visual reasoning, computer use, and clearer writing. It accepts image input, but not audio or video. Its model page lists reasoning effort from <code>none</code> through <code>max</code>, with <code>medium</code> as the default, a June 1, 2026 knowledge cutoff, and support for computer use and other Responses API tools.</p>\n<p>OpenAI reports that, at medium effort, Terra scored 15 percentage points above GPT-5.6 Terra on Agents’ Last Exam at about one-third the cost per task. The announcement also says Terra at maximum effort was over three times as token-efficient as Claude Opus 5.5, with about nine times lower cost per task, and completed tasks over three times faster than GPT-6 Astra and GPT-6.1 Sol. On OpenAI’s internal difficult-prompt factual-error test, its low-effort error rate was 16.7%, compared with 53.6% for GPT-5.6 Terra. Its maximum-effort Terminal-Bench 4.0 score was 50.3%, versus 21.5% for GPT-5.6 Terra.</p>\n<p>These are OpenAI-reported evaluations, not independent guarantees or your production results. Benchmark task mixes, effort settings, tools, and scoring rules matter. The launch itself says Sol and Astra remain better choices for the most complex coding tasks. Treat the numbers as a reason to run a migration evaluation, not as a committed savings percentage.</p>\n<h2>A FinOps migration test that answers the real question</h2>\n<ol><li><strong>Choose one workflow.</strong> Start with a bounded visual or computer-use process, such as extracting invoice fields for review. Do not start with an autonomous payment or vendor-bank-change flow.</li>\n<li><strong>Replay the same cases.</strong> Use representative screens and documents, including missing fields, layout changes, access errors, and timeouts. Hold tools, prompts, and acceptance rules constant.</li>\n<li><strong>Record the full unit cost.</strong> Log model ID, effort, uncached and cached tokens, cache writes, tool fees, screenshots or other metered inputs, retries, and human-review time.</li>\n<li><strong>Compare cost per accepted task.</strong> Include failed attempts and review. Also compare completion rate, error severity, latency, and exception handling.</li>\n<li><strong>Roll out with a guardrail.</strong> Set a quality floor, a per-task spend limit, an exception route, and a rollback path. Recheck actual spend after traffic ramps.</li></ol>\n<p>The decision rule is simple: route a task to Terra if it meets the quality and safety bar and reduces total cost per accepted result, or unlocks a useful screen-based workflow at an acceptable cost. Route simpler work to Luna when it passes the same bar. Keep Sol or Astra for cases where your own evaluation proves their extra capability is needed.</p>\n<p>Sources: <a href=\"https://openai.com/index/introducing-gpt-6-1-terra/\">OpenAI: GPT-6.1 Terra</a>; <a href=\"https://developers.openai.com/api/docs/models/gpt-6.1-terra\">Terra API model page</a>; <a href=\"https://developers.openai.com/api/docs/pricing\">API pricing</a>; <a href=\"https://openai.com/index/introducing-gpt-6-sol-and-luna/\">GPT-6 Sol and Luna</a>; <a href=\"https://openai.com/index/introducing-gpt-6-1-sol/\">GPT-6.1 Sol</a>. Prices and product details checked October 27, 2026.</p>",
+      "faq": [
+        {
+          "question": "How much does GPT-6.1 Terra cost?",
+          "answer": "Standard API rates are $1 per million input tokens and $5 per million output tokens. Cached input is $0.05; cache writes are $1.25 at 30-minute retention or $2.50 at 12-hour retention. Batch and Flex are half price; Fast is double."
+        },
+        {
+          "question": "How much cheaper is GPT-6.1 Terra than GPT-5.6 Terra?",
+          "answer": "Input is 50% cheaper ($1 vs $2 per million) and output is about 58% cheaper ($5 vs $12). For one million tasks with 1,000 input and 500 output tokens each, uncached token spend falls from $8,000 to $3,500, assuming no retries or other costs."
+        },
+        {
+          "question": "How does GPT-6.1 Terra compare with GPT-6.1 Sol and GPT-6 Luna?",
+          "answer": "Terra costs $1/$5 per million input/output tokens and is positioned for visual reasoning and computer use. Sol costs $2/$10 for complex work; Luna costs $0.10/$0.50 for focused high-volume tasks. Choose by measured cost per accepted result, not rates alone."
+        },
+        {
+          "question": "What is the GPT-6.1 Terra long-context price?",
+          "answer": "When a request exceeds 272K input tokens, the full request is charged at 2x input and cached-input rates and 1.5x output rates: $2 input, $0.10 cached input, and $7.50 output per million tokens."
+        },
+        {
+          "question": "Should teams move all GPT-5.6 Terra traffic to GPT-6.1 Terra?",
+          "answer": "No. Replay representative tasks and compare quality, safety, latency, retries, tools, review time, and total cost per accepted task. Roll out only when the workload meets its quality bar and the measured economics improve."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/gpt-6-sol-cost-model",
+          "label": "GPT-6 Sol cost model"
+        },
+        {
+          "slug": "/research/gpt-6-luna-cost-model",
+          "label": "GPT-6 Luna cost model"
+        },
+        {
+          "slug": "/research/real-cost-per-task-frontier-models",
+          "label": "Measuring cost per task"
+        },
+        {
+          "slug": "/research/agent-workflow-architecture-cost-controls",
+          "label": "Agent workflow cost controls"
+        }
+      ]
+    },
+    "es": {
+      "title": "GPT-6.1 Terra: precios y costes para FinOps",
+      "titleCore": "GPT-6.1 Terra: qué cambia para FinOps",
+      "description": "Precios, caché y coste por tarea de GPT-6.1 Terra, con una comparación frente a Luna, Sol, Astra y GPT-5.6 Terra.",
+      "body": "<p>OpenAI lanzó GPT-6.1 Terra el 26 de octubre de 2026. En la API cuesta $1 por millón de tokens de entrada y $5 por millón de salida. Para FinOps, la decisión es si sus capacidades de visión y uso de aplicaciones reducen el coste por tarea completada, no solo el precio por token.</p><h2>Precios y costes que pueden cambiar la factura</h2><p>El identificador de la API es <code>gpt-6.1-terra</code>. Estas son las tarifas estándar por millón de tokens publicadas por <a href='https://developers.openai.com/api/docs/models/gpt-6.1-terra'>OpenAI</a>:</p><table><thead><tr><th>Entrada</th><th>Entrada en caché</th><th>Escritura de caché, 30 min</th><th>Salida</th></tr></thead><tbody><tr><td>$1</td><td>$0.05</td><td>$1.25</td><td>$5</td></tr></tbody></table><p>La retención de caché de 12 horas cuesta $2.50 por millón de tokens escritos. Batch y Flex cuestan la mitad de la tarifa estándar; Fast cuesta el doble. Si una solicitud supera los 272.000 tokens de entrada, toda la solicitud se factura al doble en entrada y caché y a 1,5 veces en salida. El procesamiento regional y los puntos de conexión FedRAMP añaden un 10% cuando corresponda. Las herramientas pueden generar cargos adicionales: compruebe el <a href='https://developers.openai.com/api/docs/pricing'>tarifario vigente</a>.</p><h2>Cómo encaja entre las otras novedades</h2><p>OpenAI presentó Astra el 3 de septiembre, Sol y Luna el 22 de septiembre, GPT-6.1 Sol el 29 de septiembre y Terra el 26 de octubre de 2026. La tabla compara tarifas estándar de entrada/salida por millón de tokens y un ejemplo idéntico para todos: un millón de tareas con 1.000 tokens de entrada y 500 de salida por tarea, sin caché.</p><table><thead><tr><th>Modelo</th><th>Entrada / salida</th><th>Coste del ejemplo</th><th>Uso a evaluar</th></tr></thead><tbody><tr><td>GPT-6 Luna</td><td>$0.10 / $0.50</td><td>$350</td><td>Tareas sencillas y de gran volumen</td></tr><tr><td>GPT-6.1 Terra</td><td>$1 / $5</td><td>$3,500</td><td>Pantallas, imágenes y acciones en aplicaciones</td></tr><tr><td>GPT-6.1 Sol</td><td>$2 / $10</td><td>$7,000</td><td>Flujos y programación complejos</td></tr><tr><td>GPT-5.6 Terra</td><td>$2 / $12</td><td>$8,000</td><td>Referencia anterior de Terra</td></tr><tr><td>GPT-6 Astra</td><td>$10 / $50</td><td>$35,000</td><td>Tareas más difíciles</td></tr></tbody></table><p>Pasar de GPT-5.6 Terra a GPT-6.1 Terra reduce un 56,25% el coste de tokens en este ejemplo: de $8,000 a $3,500. Son cálculos de tarifa pública, no una previsión de ahorro real; excluyen herramientas, reintentos, revisión humana e infraestructura. Sol y Luna forman parte de las <a href='https://openai.com/index/introducing-gpt-6-sol-and-luna/'>actualizaciones de septiembre</a>, y GPT-6.1 Sol recibió su <a href='https://openai.com/index/introducing-gpt-6-1-sol/'>propia mejora</a>.</p><h2>Capacidad y resultados: qué está demostrado</h2><p>Terra admite texto e imágenes como entrada, no audio ni vídeo; ofrece una ventana de contexto de 1,05 millones de tokens, hasta 128.000 tokens de salida y niveles de razonamiento <code>none</code>, <code>low</code>, <code>medium</code> (predeterminado), <code>high</code>, <code>xhigh</code> y <code>max</code>. Su fecha de corte de conocimiento es el 1 de junio de 2026.</p><p>Según <a href='https://openai.com/index/introducing-gpt-6-1-terra/'>las evaluaciones publicadas por OpenAI</a>, Terra supera a GPT-5.6 Terra por 15 puntos porcentuales en Agents' Last Exam con razonamiento medio a cerca de un tercio del coste. OpenAI también comunica una tasa de errores factuales del 16,7% frente al 53,6% anterior con razonamiento bajo, y un 50,3% frente al 21,5% en Terminal-Bench 4.0 con razonamiento máximo. Son resultados de pruebas concretas del proveedor, no garantías para su proceso.</p><h2>Decisión de FinOps</h2><p>Pruebe el mismo conjunto de facturas, pantallas y excepciones en Terra y el modelo actual. Registre identificador del modelo, esfuerzo, tokens nuevos y en caché, llamadas a herramientas, reintentos, tiempo, intervenciones humanas y resultado aceptado. Compare el coste total por tarea aceptada y mantenga la revisión humana para acciones financieras sensibles. Un precio menor solo produce ahorro si la tasa de éxito y el número de pasos acompañan.</p>",
+      "faq": [
+        {
+          "question": "¿Cuánto cuesta GPT-6.1 Terra en la API?",
+          "answer": "La tarifa estándar es de $1 por millón de tokens de entrada, $0.05 de entrada en caché y $5 de salida. La escritura de caché de 30 minutos cuesta $1.25 por millón."
+        },
+        {
+          "question": "¿Cuánto se ahorra frente a GPT-5.6 Terra?",
+          "answer": "La entrada baja de $2 a $1 y la salida de $12 a $5 por millón de tokens. En el ejemplo de un millón de tareas con 1.000 tokens de entrada y 500 de salida, el coste de tokens baja de $8,000 a $3,500: un 56,25%."
+        },
+        {
+          "question": "¿Es más barato que GPT-6 Luna?",
+          "answer": "No. Luna cuesta $0.10 de entrada y $0.50 de salida por millón de tokens. Terra cuesta diez veces más por token estándar, pero conviene comparar la tasa de éxito en tareas visuales y de uso de aplicaciones."
+        },
+        {
+          "question": "¿Cómo se debe evaluar una migración a Terra?",
+          "answer": "Repita tareas representativas con los mismos permisos y criterios de éxito. Compare el coste por resultado aceptado, incluidos caché, herramientas, reintentos y revisión humana."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/gpt-6-sol-cost-model",
+          "label": "Modelo de costes de GPT-6 Sol"
+        },
+        {
+          "slug": "/research/gpt-6-luna-cost-model",
+          "label": "Modelo de costes de GPT-6 Luna"
+        },
+        {
+          "slug": "/research/real-cost-per-task-frontier-models",
+          "label": "Medir el coste por tarea"
+        },
+        {
+          "slug": "/research/agent-workflow-architecture-cost-controls",
+          "label": "Controles de costes para flujos de agentes"
+        }
+      ]
+    },
+    "fr": {
+      "title": "GPT-6.1 Terra : prix et coût pour le FinOps",
+      "titleCore": "GPT-6.1 Terra : ce qui change pour le FinOps",
+      "description": "Prix, cache et coût par tâche de GPT-6.1 Terra, comparés à Luna, Sol, Astra et GPT-5.6 Terra.",
+      "body": "<p>OpenAI a lancé GPT-6.1 Terra le 26 octobre 2026. Son tarif API standard est de 1 $ par million de tokens en entrée et de 5 $ en sortie. Pour une équipe FinOps, la vraie question est de savoir si sa vision et son utilisation des applications abaissent le coût par tâche terminée.</p><h2>Prix et paramètres de facturation</h2><p>L'identifiant API est <code>gpt-6.1-terra</code>. Voici les tarifs standard par million de tokens indiqués par <a href='https://developers.openai.com/api/docs/models/gpt-6.1-terra'>OpenAI</a> :</p><table><thead><tr><th>Entrée</th><th>Entrée en cache</th><th>Écriture du cache, 30 min</th><th>Sortie</th></tr></thead><tbody><tr><td>1 $</td><td>0,05 $</td><td>1,25 $</td><td>5 $</td></tr></tbody></table><p>Une conservation du cache pendant 12 heures coûte 2,50 $ par million de tokens écrits. Batch et Flex coûtent la moitié du tarif standard ; Fast coûte le double. Au-delà de 272 000 tokens en entrée, la requête entière passe à deux fois le prix d'entrée et de cache et à 1,5 fois le prix de sortie. Le traitement régional et les points de terminaison FedRAMP ajoutent 10 % lorsque ces options s'appliquent. Les outils peuvent être facturés séparément : consultez les <a href='https://developers.openai.com/api/docs/pricing'>tarifs en vigueur</a>.</p><h2>Comparaison avec les autres lancements</h2><p>OpenAI a lancé Astra le 3 septembre, Sol et Luna le 22 septembre, GPT-6.1 Sol le 29 septembre, puis Terra le 26 octobre 2026. Le calcul ci-dessous applique les tarifs standard à un million de tâches identiques, chacune avec 1 000 tokens en entrée et 500 en sortie, sans cache.</p><table><thead><tr><th>Modèle</th><th>Entrée / sortie par million</th><th>Coût du scénario</th><th>Usage à évaluer</th></tr></thead><tbody><tr><td>GPT-6 Luna</td><td>0,10 $ / 0,50 $</td><td>350 $</td><td>Tâches simples et fréquentes</td></tr><tr><td>GPT-6.1 Terra</td><td>1 $ / 5 $</td><td>3 500 $</td><td>Écrans, images et actions dans les applications</td></tr><tr><td>GPT-6.1 Sol</td><td>2 $ / 10 $</td><td>7 000 $</td><td>Processus et code complexes</td></tr><tr><td>GPT-5.6 Terra</td><td>2 $ / 12 $</td><td>8 000 $</td><td>Ancien point de comparaison Terra</td></tr><tr><td>GPT-6 Astra</td><td>10 $ / 50 $</td><td>35 000 $</td><td>Tâches les plus difficiles</td></tr></tbody></table><p>Dans ce scénario, passer de GPT-5.6 Terra à GPT-6.1 Terra réduit la dépense en tokens de 56,25 %, de 8 000 $ à 3 500 $. Le calcul exclut les outils, les nouvelles tentatives, la revue humaine et l'infrastructure. Consultez les annonces de <a href='https://openai.com/index/introducing-gpt-6-sol-and-luna/'>Sol et Luna</a> et de <a href='https://openai.com/index/introducing-gpt-6-1-sol/'>GPT-6.1 Sol</a> pour le contexte des autres mises à jour.</p><h2>Capacités et résultats publiés</h2><p>Terra accepte le texte et les images en entrée, mais ni l'audio ni la vidéo. Sa fenêtre de contexte est de 1,05 million de tokens, sa sortie maximale de 128 000 tokens et sa date limite de connaissances du 1er juin 2026. Les niveaux de raisonnement sont <code>none</code>, <code>low</code>, <code>medium</code> (par défaut), <code>high</code>, <code>xhigh</code> et <code>max</code>.</p><p>Dans les <a href='https://openai.com/index/introducing-gpt-6-1-terra/'>évaluations publiées par OpenAI</a>, Terra obtient 15 points de pourcentage de plus que GPT-5.6 Terra sur Agents' Last Exam avec un effort moyen, pour environ un tiers du coût. OpenAI rapporte aussi un taux d'erreur factuelle de 16,7 % contre 53,6 % avec un faible effort, et un score de 50,3 % contre 21,5 % sur Terminal-Bench 4.0 avec l'effort maximal. Ces résultats propres aux évaluations du fournisseur ne garantissent pas la qualité dans vos applications.</p><h2>Mesurer la bonne unité économique</h2><p>Rejouez les mêmes factures, écrans et cas d'exception sur Terra et votre modèle actuel. Consignez le modèle, l'effort, les tokens nouveaux et mis en cache, les appels d'outils, les tentatives, le délai, la revue humaine et le résultat accepté. Décidez sur le coût total par tâche acceptée, avec validation humaine pour les actions financières sensibles. Une baisse du prix unitaire peut disparaître si les échecs multiplient les étapes.</p>",
+      "faq": [
+        {
+          "question": "Quel est le prix API de GPT-6.1 Terra ?",
+          "answer": "Le tarif standard est de 1 $ par million de tokens en entrée, 0,05 $ pour l’entrée en cache et 5 $ en sortie. L’écriture du cache de 30 minutes coûte 1,25 $ par million."
+        },
+        {
+          "question": "Combien coûte-t-il de moins que GPT-5.6 Terra ?",
+          "answer": "L’entrée passe de 2 $ à 1 $ et la sortie de 12 $ à 5 $ par million de tokens. Pour un million de tâches à 1 000 tokens en entrée et 500 en sortie, le coût des tokens passe de 8 000 $ à 3 500 $, soit 56,25 % de moins."
+        },
+        {
+          "question": "GPT-6.1 Terra est-il moins cher que GPT-6 Luna ?",
+          "answer": "Non. Les tarifs standard de Luna sont de 0,10 $ en entrée et 0,50 $ en sortie par million de tokens. Pour les tâches visuelles, comparez toutefois le coût par résultat accepté."
+        },
+        {
+          "question": "Comment évaluer une migration vers Terra ?",
+          "answer": "Rejouez des tâches représentatives avec les mêmes autorisations et critères de réussite. Comparez le coût par résultat accepté, en incluant cache, outils, nouvelles tentatives et revue humaine."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/gpt-6-sol-cost-model",
+          "label": "Modèle de coût de GPT-6 Sol"
+        },
+        {
+          "slug": "/research/gpt-6-luna-cost-model",
+          "label": "Modèle de coût de GPT-6 Luna"
+        },
+        {
+          "slug": "/research/real-cost-per-task-frontier-models",
+          "label": "Mesurer le coût par tâche"
+        },
+        {
+          "slug": "/research/agent-workflow-architecture-cost-controls",
+          "label": "Contrôles des coûts des agents"
+        }
+      ]
+    },
+    "pt": {
+      "title": "GPT-6.1 Terra: preços e custos para FinOps",
+      "titleCore": "GPT-6.1 Terra: o que muda para FinOps",
+      "description": "Preços, cache e custo por tarefa do GPT-6.1 Terra, comparados com Luna, Sol, Astra e GPT-5.6 Terra.",
+      "body": "<p>A OpenAI lançou o GPT-6.1 Terra em 26 de outubro de 2026. Na API, o preço padrão é de $1 por milhão de tokens de entrada e $5 por milhão de tokens de saída. Para FinOps, a questão é saber se a capacidade de interpretar e usar aplicações reduz o custo por tarefa concluída.</p><h2>Preços e fatores que alteram a fatura</h2><p>O identificador na API é <code>gpt-6.1-terra</code>. A <a href='https://developers.openai.com/api/docs/models/gpt-6.1-terra'>OpenAI</a> publica estes preços padrão por milhão de tokens:</p><table><thead><tr><th>Entrada</th><th>Entrada em cache</th><th>Escrita em cache, 30 min</th><th>Saída</th></tr></thead><tbody><tr><td>$1</td><td>$0.05</td><td>$1.25</td><td>$5</td></tr></tbody></table><p>A retenção em cache durante 12 horas custa $2.50 por milhão de tokens escritos. Batch e Flex custam metade do preço padrão; Fast custa o dobro. Se um pedido exceder 272.000 tokens de entrada, todo o pedido passa a custar o dobro em entrada e cache e 1,5 vezes em saída. O processamento regional e os endpoints FedRAMP acrescentam 10% quando aplicáveis. As ferramentas podem ter custos separados; confirme a <a href='https://developers.openai.com/api/docs/pricing'>tabela de preços atual</a>.</p><h2>Comparação com os outros lançamentos</h2><p>A OpenAI lançou o Astra em 3 de setembro, Sol e Luna em 22 de setembro, GPT-6.1 Sol em 29 de setembro e Terra em 26 de outubro de 2026. Este exemplo usa os preços padrão para um milhão de tarefas, cada uma com 1.000 tokens de entrada e 500 de saída, sem cache.</p><table><thead><tr><th>Modelo</th><th>Entrada / saída por milhão</th><th>Custo do exemplo</th><th>Aplicação a avaliar</th></tr></thead><tbody><tr><td>GPT-6 Luna</td><td>$0.10 / $0.50</td><td>$350</td><td>Tarefas simples e frequentes</td></tr><tr><td>GPT-6.1 Terra</td><td>$1 / $5</td><td>$3,500</td><td>Ecrãs, imagens e ações em aplicações</td></tr><tr><td>GPT-6.1 Sol</td><td>$2 / $10</td><td>$7,000</td><td>Fluxos e programação complexos</td></tr><tr><td>GPT-5.6 Terra</td><td>$2 / $12</td><td>$8,000</td><td>Referência anterior do Terra</td></tr><tr><td>GPT-6 Astra</td><td>$10 / $50</td><td>$35,000</td><td>Tarefas mais difíceis</td></tr></tbody></table><p>Neste cenário, a migração de GPT-5.6 Terra para GPT-6.1 Terra reduz o custo de tokens em 56,25%, de $8,000 para $3,500. O cálculo exclui ferramentas, novas tentativas, revisão humana e infraestrutura. As páginas de lançamento de <a href='https://openai.com/index/introducing-gpt-6-sol-and-luna/'>Sol e Luna</a> e de <a href='https://openai.com/index/introducing-gpt-6-1-sol/'>GPT-6.1 Sol</a> explicam as outras atualizações.</p><h2>Capacidades e resultados publicados</h2><p>O Terra aceita texto e imagens como entrada, mas não áudio nem vídeo. Tem uma janela de contexto de 1,05 milhões de tokens, saída máxima de 128.000 tokens e data de corte do conhecimento de 1 de junho de 2026. Suporta os níveis de raciocínio <code>none</code>, <code>low</code>, <code>medium</code> (predefinido), <code>high</code>, <code>xhigh</code> e <code>max</code>.</p><p>Nas <a href='https://openai.com/index/introducing-gpt-6-1-terra/'>avaliações publicadas pela OpenAI</a>, o Terra supera o GPT-5.6 Terra em 15 pontos percentuais no Agents' Last Exam com esforço médio e cerca de um terço do custo. A OpenAI também relata uma taxa de erros factuais de 16,7% face a 53,6% com esforço baixo e 50,3% face a 21,5% no Terminal-Bench 4.0 com esforço máximo. São resultados de avaliações específicas do fornecedor, não garantias para os seus processos.</p><h2>Decisão de FinOps</h2><p>Repita o mesmo conjunto de faturas, ecrãs e exceções no Terra e no modelo atual. Registe o modelo, nível de esforço, tokens novos e em cache, chamadas a ferramentas, tentativas, latência, revisão humana e resultado aceite. Compare o custo total por tarefa aceite e mantenha a aprovação humana em ações financeiras sensíveis. A poupança no preço unitário desaparece se aumentarem as falhas ou os passos necessários.</p>",
+      "faq": [
+        {
+          "question": "Quanto custa o GPT-6.1 Terra na API?",
+          "answer": "O preço padrão é de $1 por milhão de tokens de entrada, $0.05 por entrada em cache e $5 por saída. A escrita em cache com retenção de 30 minutos custa $1.25 por milhão."
+        },
+        {
+          "question": "Quanto se poupa face ao GPT-5.6 Terra?",
+          "answer": "A entrada desce de $2 para $1 e a saída de $12 para $5 por milhão de tokens. No exemplo de um milhão de tarefas com 1.000 tokens de entrada e 500 de saída, o custo dos tokens desce de $8,000 para $3,500: menos 56,25%."
+        },
+        {
+          "question": "É mais barato do que o GPT-6 Luna?",
+          "answer": "Não. O Luna custa $0.10 de entrada e $0.50 de saída por milhão de tokens no modo padrão. Em tarefas visuais, compare também o custo por resultado aceite."
+        },
+        {
+          "question": "Como avaliar uma migração para o Terra?",
+          "answer": "Repita tarefas representativas com as mesmas permissões e critérios de sucesso. Compare o custo por resultado aceite, incluindo cache, ferramentas, novas tentativas e revisão humana."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/gpt-6-sol-cost-model",
+          "label": "Modelo de custos do GPT-6 Sol"
+        },
+        {
+          "slug": "/research/gpt-6-luna-cost-model",
+          "label": "Modelo de custos do GPT-6 Luna"
+        },
+        {
+          "slug": "/research/real-cost-per-task-frontier-models",
+          "label": "Medir o custo por tarefa"
+        },
+        {
+          "slug": "/research/agent-workflow-architecture-cost-controls",
+          "label": "Controlos de custos para fluxos de agentes"
+        }
+      ]
+    },
+    "de": {
+      "title": "GPT-6.1 Terra: Preise und FinOps-Vergleich",
+      "titleCore": "GPT-6.1 Terra: Was sich für FinOps ändert",
+      "description": "Terra kostet $1 pro Mio. Input- und $5 pro Mio. Output-Token. Preise, Modellvergleich und Kosten je erfolgreichem Workflow.",
+      "body": "<p>OpenAI veröffentlichte GPT-6.1 Terra am 26. Oktober 2026. Für FinOps ist der wichtigste Unterschied der API-Preis: $1 pro Million Input-Token, $0.05 für gecachten Input und $5 für Output. Gegenüber GPT-5.6 Terra sinkt der Input-Preis um 50 % und der Output-Preis um rund 58 %. Das Modell eignet sich laut OpenAI besonders für visuelle Aufgaben und die Bedienung von Anwendungen. Ob es im eigenen Betrieb günstiger ist, entscheidet der Preis pro erfolgreich abgeschlossenem Workflow.</p><h2>Preise und Modellvergleich</h2><p>Die folgenden Standardpreise gelten pro Million Token. OpenAI stellte GPT-6 Astra am 3. September, GPT-6 Sol und Luna am 22. September, GPT-6.1 Sol am 29. September und GPT-6.1 Terra am 26. Oktober 2026 vor. Angaben: <a href='https://developers.openai.com/api/docs/pricing'>OpenAI API-Preise</a> und <a href='https://developers.openai.com/api/docs/models/gpt-6.1-terra'>Terra-Modellseite</a>.</p><table><thead><tr><th>Modell</th><th>Input</th><th>Gecachter Input</th><th>Output</th><th>Prüfenswerter Einsatz</th></tr></thead><tbody><tr><td>GPT-5.6 Terra</td><td>$2</td><td>$0.20</td><td>$12</td><td>Bestehende Terra-Workflows als Vergleichsbasis</td></tr><tr><td>GPT-6 Luna</td><td>$0.10</td><td>$0.01</td><td>$0.50</td><td>Eng umrissene Aufgaben in großer Menge</td></tr><tr><td>GPT-6.1 Terra</td><td>$1</td><td>$0.05</td><td>$5</td><td>Bildschirme verstehen und Anwendungen bedienen</td></tr><tr><td>GPT-6.1 Sol</td><td>$2</td><td>$0.10</td><td>$10</td><td>Komplexe Workflows und Programmieraufgaben</td></tr><tr><td>GPT-6 Astra</td><td>$10</td><td>$1</td><td>$50</td><td>Besonders schwierige Aufgaben</td></tr></tbody></table><p>Bei einer Million Aufgaben mit jeweils 1.000 Input- und 500 Output-Token ohne Cache ergeben sich rechnerisch $8,000 für GPT-5.6 Terra, $3,500 für GPT-6.1 Terra, $350 für Luna, $7,000 für Sol und $35,000 für Astra. Der Wechsel vom alten auf das neue Terra spart in diesem Beispiel 56,25 %. Das ist nur eine Tokenrechnung: Tool-Aufrufe, zusätzliche Schritte, Wiederholungen, menschliche Prüfung und Infrastruktur kommen hinzu.</p><h2>Was die Terra-Rechnung verändert</h2><p>Ein Cache-Schreibvorgang kostet bei Terra $1.25 pro Million Token mit 30 Minuten und $2.50 mit 12 Stunden Aufbewahrung. Batch und Flex kosten die Hälfte der Standardpreise; Fast kostet das Doppelte. Bei mehr als 272.000 Input-Token steigen die Input- und Cache-Sätze für die gesamte Anfrage auf das Doppelte und der Output-Satz auf das 1,5-Fache. Regionale Verarbeitung und FedRAMP-Endpunkte kosten, wo verfügbar, 10 % zusätzlich. Vergleiche müssen deshalb Cache-Treffer, Aufbewahrungszeit, Kontextgröße und Verarbeitungsklasse einschließen.</p><p>Die API-Modellkennung lautet <code>gpt-6.1-terra</code>. Das Modell bietet ein Kontextfenster von 1,05 Millionen Token, höchstens 128.000 Output-Token und einen Wissensstand bis zum 1. Juni 2026. Es nimmt Text und Bilder entgegen, aber kein Audio oder Video direkt. Unterstützte Denkstufen sind <code>none</code>, <code>low</code>, <code>medium</code> (Standard), <code>high</code>, <code>xhigh</code> und <code>max</code>. Visuelle Videoworkflows benötigen daher eine vorgelagerte Verarbeitung, etwa Einzelbilder.</p><h2>Wie stark ist das Update?</h2><p><a href='https://openai.com/index/introducing-gpt-6-1-terra/'>OpenAI berichtet</a> bei mittlerer Denkstufe von 15 Prozentpunkten mehr auf Agents’ Last Exam als GPT-5.6 Terra, bei ungefähr einem Drittel der Kosten. Bei maximaler Denkstufe nennt OpenAI mehr als dreifache Tokeneffizienz gegenüber Claude Opus 5.5 und etwa neunfach niedrigere Kosten pro Aufgabe; Terra habe Aufgaben außerdem mehr als dreimal schneller als GPT-6.1 Sol und Astra abgeschlossen. Die Fehlerquote eines internen Fakten-Benchmarks sank bei niedriger Denkstufe von 53,6 % auf 16,7 %. Auf Terminal-Bench 4.0 stieg die Erfolgsquote bei maximaler Denkstufe von 21,5 % auf 50,3 %. Das sind von OpenAI veröffentlichte Evaluierungen, keine unabhängige Zusage für den eigenen Workflow.</p><p>Die anderen Updates veränderten andere Punkte der Kostenkurve: <a href='https://openai.com/index/introducing-gpt-6-sol-and-luna/'>Sol und Luna</a> reduzierten im September ihre API-Preise gegenüber GPT-5.6; <a href='https://openai.com/index/introducing-gpt-6-1-sol/'>GPT-6.1 Sol</a> verbesserte komplexe Aufgaben zum unveränderten Standardpreis von $2/$10 gegenüber GPT-6 Sol und senkte den Preis für gecachten Input auf $0.10. Terra bringt jetzt eine günstigere Route für visuelle und bildschirmbasierte Arbeit.</p><h2>Entscheidung anhand eigener Aufgaben</h2><p>Wiederholt typische Belege, Formulare und Anwendungsabläufe mit identischen Berechtigungen und Erfolgskriterien. Erfasst Modellkennung, Denkstufe, Token nach Kategorie, Screenshots, Tool-Aufrufe, Wiederholungen, Laufzeit, Fehler und menschliche Korrekturen. Vergleicht anschließend die Gesamtkosten pro akzeptiertem Ergebnis. Für Buchungen, Zahlungen oder Änderungen an Bankdaten sollte ein Mensch die endgültige Aktion freigeben. Die günstigere Tokenrate lohnt sich nur, wenn Qualität und Abschlussquote nicht durch zusätzliche Versuche aufgezehrt werden.</p>",
+      "faq": [
+        {
+          "question": "Was kostet GPT-6.1 Terra in der API?",
+          "answer": "Die Standardpreise betragen $1 pro Million Input-Token, $0.05 für gecachten Input und $5 für Output. Cache-Schreiben, andere Verarbeitungsarten und zusätzliche Tools können die Rechnung ändern."
+        },
+        {
+          "question": "Wie viel günstiger ist GPT-6.1 Terra als GPT-5.6 Terra?",
+          "answer": "Der Input-Preis sinkt von $2 auf $1 und der Output-Preis von $12 auf $5 pro Million Token. Bei 1.000 Input- und 500 Output-Token pro Aufgabe ergibt das ohne Cache 56,25 % weniger Tokenkosten."
+        },
+        {
+          "question": "Wann ist Terra sinnvoller als Luna oder Sol?",
+          "answer": "Terra sollte für visuelle, bildschirmbasierte Aufgaben geprüft werden. Luna ist preiswerter für einfache Aufgaben in großer Menge; Sol eignet sich für komplexere Workflows. Entscheidend sind Qualität und Kosten pro akzeptiertem Ergebnis."
+        },
+        {
+          "question": "Welche Preisfallen gibt es bei Terra?",
+          "answer": "Cache-Schreiben, Fast-Verarbeitung, zusätzliche Tools, regionale Verarbeitung und Eingaben über 272.000 Token können die tatsächlichen Kosten deutlich erhöhen."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/gpt-6-sol-cost-model",
+          "label": "GPT-6-Sol-Kostenmodell"
+        },
+        {
+          "slug": "/research/gpt-6-luna-cost-model",
+          "label": "GPT-6-Luna-Kostenmodell"
+        },
+        {
+          "slug": "/research/real-cost-per-task-frontier-models",
+          "label": "Kosten pro Aufgabe messen"
+        },
+        {
+          "slug": "/research/agent-workflow-architecture-cost-controls",
+          "label": "Kostenkontrollen für Agenten-Workflows"
+        }
+      ]
+    },
+    "nl": {
+      "title": "GPT-6.1 Terra: prijzen en FinOps-vergelijking",
+      "titleCore": "GPT-6.1 Terra: wat verandert er voor FinOps?",
+      "description": "Terra kost $1 per miljoen inputtokens en $5 per miljoen outputtokens. Vergelijk prijzen en meet kosten per geslaagde workflow.",
+      "body": "<p>OpenAI bracht GPT-6.1 Terra uit op 26 oktober 2026. Voor FinOps is de direct meetbare verandering de API-prijs: $1 per miljoen inputtokens, $0.05 voor input uit de cache en $5 voor output. Vergeleken met GPT-5.6 Terra is input 50% goedkoper en output ongeveer 58% goedkoper. OpenAI richt het model op visueel redeneren en het bedienen van software. Of het in jouw omgeving echt bespaart, hangt af van de kosten per geslaagde workflow.</p><h2>Prijzen en modelvergelijking</h2><p>Dit zijn standaardtarieven per miljoen tokens. OpenAI introduceerde GPT-6 Astra op 3 september, GPT-6 Sol en Luna op 22 september, GPT-6.1 Sol op 29 september en GPT-6.1 Terra op 26 oktober 2026. Bronnen: de <a href='https://developers.openai.com/api/docs/pricing'>OpenAI API-prijslijst</a> en de <a href='https://developers.openai.com/api/docs/models/gpt-6.1-terra'>Terra-modelpagina</a>.</p><table><thead><tr><th>Model</th><th>Input</th><th>Input uit cache</th><th>Output</th><th>Mogelijke toepassing</th></tr></thead><tbody><tr><td>GPT-5.6 Terra</td><td>$2</td><td>$0.20</td><td>$12</td><td>Referentie voor bestaande Terra-processen</td></tr><tr><td>GPT-6 Luna</td><td>$0.10</td><td>$0.01</td><td>$0.50</td><td>Afbakende taken op grote schaal</td></tr><tr><td>GPT-6.1 Terra</td><td>$1</td><td>$0.05</td><td>$5</td><td>Schermen begrijpen en software bedienen</td></tr><tr><td>GPT-6.1 Sol</td><td>$2</td><td>$0.10</td><td>$10</td><td>Complexe processen en codeerwerk</td></tr><tr><td>GPT-6 Astra</td><td>$10</td><td>$1</td><td>$50</td><td>De moeilijkste taken</td></tr></tbody></table><p>Neem één miljoen taken met elk 1.000 inputtokens en 500 outputtokens, zonder caching. De berekende tokenkosten zijn $8,000 voor GPT-5.6 Terra, $3,500 voor GPT-6.1 Terra, $350 voor Luna, $7,000 voor Sol en $35,000 voor Astra. De overstap van oude naar nieuwe Terra bespaart in dit voorbeeld 56,25%. Dit zijn uitsluitend tokenkosten: tools, extra stappen, nieuwe pogingen, menselijke controle en infrastructuur ontbreken.</p><h2>Wat beïnvloedt de Terra-factuur?</h2><p>Een schrijfactie naar de cache kost bij Terra $1.25 per miljoen tokens bij 30 minuten bewaartijd en $2.50 bij 12 uur. Batch en Flex kosten de helft van het standaardtarief; Fast kost het dubbele. Boven 272.000 inputtokens gelden voor de volledige aanvraag dubbele input- en cachetarieven en 1,5 keer het outputtarief. Regionale verwerking en FedRAMP-eindpunten voegen, waar beschikbaar, 10% toe. Neem dus cachetreffers, bewaartijd, contextlengte en verwerkingstype mee in elke vergelijking.</p><p>De API-modelnaam is <code>gpt-6.1-terra</code>. Het model heeft een contextvenster van 1,05 miljoen tokens, maximaal 128.000 outputtokens en een kennisgrens van 1 juni 2026. Het accepteert tekst en afbeeldingen als input, maar geen audio of video rechtstreeks. De beschikbare redeneerniveaus zijn <code>none</code>, <code>low</code>, <code>medium</code> (standaard), <code>high</code>, <code>xhigh</code> en <code>max</code>. Een videoproces vereist daarom eerst omzetting naar bijvoorbeeld beelden.</p><h2>Hoe groot is de verbetering?</h2><p><a href='https://openai.com/index/introducing-gpt-6-1-terra/'>Volgens OpenAI</a> scoort Terra bij medium 15 procentpunten hoger dan GPT-5.6 Terra op Agents’ Last Exam, tegen ongeveer een derde van de kosten. Op max meldt OpenAI meer dan driemaal zo hoge tokenefficiëntie als Claude Opus 5.5 en ongeveer negenmaal lagere kosten per taak; de taken zouden bovendien ruim driemaal sneller klaar zijn dan met GPT-6.1 Sol en Astra. In een interne test daalde het percentage feitelijke fouten bij low van 53,6% naar 16,7%. Op Terminal-Bench 4.0 steeg de score bij max van 21,5% naar 50,3%. Dit zijn door OpenAI gepubliceerde evaluaties, geen onafhankelijke garantie voor een eigen proces.</p><p>De andere updates verschoven andere delen van de kostenvergelijking: <a href='https://openai.com/index/introducing-gpt-6-sol-and-luna/'>Sol en Luna</a> verlaagden in september de API-prijzen ten opzichte van GPT-5.6. <a href='https://openai.com/index/introducing-gpt-6-1-sol/'>GPT-6.1 Sol</a> verbeterde complexe taken zonder verhoging van het standaardtarief van $2/$10 voor GPT-6 Sol en bracht de prijs van input uit de cache terug naar $0.10. Terra biedt nu een goedkopere route voor visuele taken in applicaties.</p><h2>Beslis met je eigen taakgegevens</h2><p>Speel representatieve facturen, formulieren en applicatieprocessen opnieuw af met dezelfde rechten en succescriteria. Registreer modelnaam, redeneerniveau, tokens per categorie, screenshots, toolaanroepen, nieuwe pogingen, doorlooptijd, fouten en menselijke correcties. Vergelijk vervolgens de totale kosten per geaccepteerd resultaat. Laat een medewerker de definitieve actie goedkeuren bij betalingen, boekingen of wijzigingen van bankgegevens. Een lager tokentarief helpt alleen als extra pogingen de besparing niet opslokken.</p>",
+      "faq": [
+        {
+          "question": "Wat kost GPT-6.1 Terra via de API?",
+          "answer": "De standaardtarieven zijn $1 per miljoen inputtokens, $0.05 voor input uit de cache en $5 voor output. Cacheacties, andere verwerkingstypen en tools kunnen extra kosten veroorzaken."
+        },
+        {
+          "question": "Hoeveel goedkoper is GPT-6.1 Terra dan GPT-5.6 Terra?",
+          "answer": "Input daalt van $2 naar $1 en output van $12 naar $5 per miljoen tokens. Bij 1.000 input- en 500 outputtokens per taak zijn de tokenkosten zonder cache 56,25% lager."
+        },
+        {
+          "question": "Wanneer past Terra beter dan Luna of Sol?",
+          "answer": "Test Terra voor visuele taken op schermen. Luna is goedkoper voor eenvoudige taken op grote schaal; Sol is bedoeld voor complexere processen. Vergelijk kwaliteit en kosten per geaccepteerd resultaat."
+        },
+        {
+          "question": "Welke tarieven kunnen de Terra-kosten verhogen?",
+          "answer": "Schrijven naar de cache, Fast-verwerking, extra tools, regionale verwerking en aanvragen boven 272.000 inputtokens kunnen de werkelijke kosten verhogen."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/gpt-6-sol-cost-model",
+          "label": "GPT-6 Sol-kostenmodel"
+        },
+        {
+          "slug": "/research/gpt-6-luna-cost-model",
+          "label": "GPT-6 Luna-kostenmodel"
+        },
+        {
+          "slug": "/research/real-cost-per-task-frontier-models",
+          "label": "Kosten per taak meten"
+        },
+        {
+          "slug": "/research/agent-workflow-architecture-cost-controls",
+          "label": "Kostenbeheersing voor agentworkflows"
+        }
+      ]
+    },
+    "ja": {
+      "title": "GPT-6.1 Terraの料金とFinOps比較",
+      "titleCore": "GPT-6.1 Terra：料金、用途、他モデルとの比較",
+      "description": "GPT-6.1 TerraのAPI料金、キャッシュと長文入力の条件、GPT-6.1 Sol・Luna・Astraとの比較、移行判断に使うタスク単位の費用を解説。",
+      "body": "<p>OpenAIは2026年10月26日にGPT-6.1 Terraを公開した。標準API料金は入力100万トークン当たり$1、出力100万トークン当たり$5。旧GPT-5.6 Terraの$2/$12から、入力は50%、出力は約58%安くなった。画面の理解、画像を使う判断、アプリ操作を伴う作業が主な評価対象だ。モデルIDは<code>gpt-6.1-terra</code>。料金と機能は<a href=\"https://developers.openai.com/api/docs/models/gpt-6.1-terra\">公式モデル仕様</a>と<a href=\"https://developers.openai.com/api/docs/pricing\">公式料金表</a>で確認できる。</p><h2>最近のGPT-6更新と料金比較</h2><p>OpenAIはGPT-6 Astraを9月3日、GPT-6 SolとLunaを9月22日、GPT-6.1 Solを9月29日、GPT-6.1 Terraを10月26日に発表した。以下は標準APIの入力／出力料金で、単位はそれぞれ100万トークン。GPT-6.1 Terraは画面操作や視覚情報の処理、GPT-6.1 Solは複雑な開発や業務フロー、Lunaは範囲の明確な大量処理、Astraは最難関の作業に向く。これは用途の目安であり、品質順位を保証するものではない。</p><table><thead><tr><th>モデル</th><th>入力</th><th>出力</th><th>評価する用途</th></tr></thead><tbody><tr><td>GPT-6 Luna</td><td>$0.10</td><td>$0.50</td><td>単純で大量の処理</td></tr><tr><td>GPT-6.1 Terra</td><td>$1</td><td>$5</td><td>画像・画面・アプリ操作</td></tr><tr><td>GPT-6.1 Sol</td><td>$2</td><td>$10</td><td>複雑な開発・業務フロー</td></tr><tr><td>GPT-6 Astra</td><td>$10</td><td>$50</td><td>最も難しい作業</td></tr><tr><td>GPT-5.6 Terra</td><td>$2</td><td>$12</td><td>移行前の比較基準</td></tr></tbody></table><p>各更新の位置付けは<a href=\"https://openai.com/index/introducing-gpt-6-sol-and-luna/\">SolとLunaの発表</a>、<a href=\"https://openai.com/index/introducing-gpt-6-1-sol/\">GPT-6.1 Solの発表</a>、<a href=\"https://openai.com/index/introducing-gpt-6-1-terra/\">GPT-6.1 Terraの発表</a>に基づく。</p><h2>100万件の処理ではいくらか</h2><p>各処理がキャッシュなしで入力1,000、出力500トークンを使い、100万件実行すると仮定する。トークン料金だけならGPT-5.6 Terraは$8,000、GPT-6.1 Terraは$3,500で56.25%減る。同じトークン数ならLunaは$350、GPT-6.1 Solは$7,000、Astraは$35,000。ただし、同じ件数の成功をどのモデルも達成できるとは限らない。この試算にはツール呼び出し、再試行、人による確認、インフラの費用を含めていない。</p><h2>請求額を左右する条件</h2><p>Terraのキャッシュ済み入力は100万トークン当たり$0.05。キャッシュ書き込みは保持時間30分で$1.25、12時間で$2.50。BatchとFlexは標準料金の半額、Fastモードは2倍。入力が272,000トークンを超えると、そのリクエスト全体について入力とキャッシュの料金が2倍、出力料金が1.5倍になる。対象となる地域処理またはFedRAMPエンドポイントには10%の上乗せがある。予算にはキャッシュの読取・書込、処理モード、長いコンテキスト、追加のツール料金を別々に記録したい。</p><p>コンテキスト窓は105万トークン、最大出力は128,000トークン、知識の基準日は2026年6月1日。画像入力は使えるが、音声・動画の直接入力には対応しない。推論強度は<code>none</code>、<code>low</code>、<code>medium</code>（既定）、<code>high</code>、<code>xhigh</code>、<code>max</code>から選べる。推論強度を変えると出力トークン数や所要時間も変わり得る。</p><h2>性能発表をどう読むか</h2><p>OpenAIの発表によると、中程度の推論強度でAgents' Last Examの得点はGPT-5.6 Terraより15パーセントポイント高く、タスク費用は約3分の1だった。最大強度ではClaude Opus 5.5よりトークン効率が3倍超、タスク費用が約9分の1と報告している。また、GPT-6.1 SolやAstraより処理が3倍超速いという。難問での事実誤り率は低強度で53.6%から16.7%へ、Terminal-Bench 4.0の最大強度の達成率は21.5%から50.3%へ改善した。これらはOpenAIが公表した評価結果であり、自社の画面操作や請求処理で同じ改善が出ることを保証しない。</p><h2>FinOpsでの移行判断</h2><p>請求書の読み取りから会計システムへの入力など、完了条件が明確な処理を選び、旧モデルとTerraで同じ案件を再実行する。モデルID、推論強度、入力・出力・キャッシュのトークン、ツール呼び出し、再試行、処理時間、人の修正と合格結果を記録する。比較するのはトークン単価だけでなく、<strong>検収に通った処理1件当たりの総費用</strong>だ。支払実行や取引先の口座変更には人の承認を残す。</p>",
+      "faq": [
+        {
+          "question": "GPT-6.1 TerraのAPI料金はいくらですか？",
+          "answer": "標準料金は100万トークン当たり入力$1、キャッシュ済み入力$0.05、出力$5です。キャッシュ書き込み、処理モード、長い入力、対象エンドポイントには別の料金条件があります。"
+        },
+        {
+          "question": "GPT-5.6 Terraよりどれだけ安いですか？",
+          "answer": "標準の入力料金は$2から$1へ50%低下し、出力料金は$12から$5へ約58%低下しました。実際の削減率はトークン構成や再試行によって変わります。"
+        },
+        {
+          "question": "GPT-6.1 TerraとSol、Luna、Astraのどれを使うべきですか？",
+          "answer": "画面や画像を使う明確な作業ではTerra、複雑な業務フローではSol、単純な大量処理ではLuna、最難関の作業ではAstraを候補にします。同じ案件で品質と検収済みタスク当たりの総費用を比較してください。"
+        },
+        {
+          "question": "公表されたベンチマークの改善を予算にそのまま使えますか？",
+          "answer": "いいえ。数値はOpenAIが公表した評価結果です。自社の入力、ツール、失敗例を使って、成功率、再試行、人の確認、所要時間を含む費用を測定してください。"
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/gpt-6-sol-cost-model",
+          "label": "GPT-6 Sol cost model"
+        },
+        {
+          "slug": "/research/gpt-6-luna-cost-model",
+          "label": "GPT-6 Luna cost model"
+        },
+        {
+          "slug": "/research/real-cost-per-task-frontier-models",
+          "label": "Measuring cost per task"
+        },
+        {
+          "slug": "/research/agent-workflow-architecture-cost-controls",
+          "label": "エージェントの費用管理"
+        }
+      ]
+    },
+    "ko": {
+      "title": "GPT-6.1 Terra 요금과 FinOps 비교",
+      "titleCore": "GPT-6.1 Terra: 요금, 용도, 다른 모델과의 비교",
+      "description": "GPT-6.1 Terra의 API 요금과 캐시·긴 문맥 조건을 살펴보고, GPT-6.1 Sol·Luna·Astra와 작업당 실제 비용을 비교합니다.",
+      "body": "<p>OpenAI는 2026년 10월 26일 GPT-6.1 Terra를 출시했다. 표준 API 요금은 입력 100만 토큰당 $1, 출력 100만 토큰당 $5다. 이전 GPT-5.6 Terra의 $2/$12와 비교하면 입력은 50%, 출력은 약 58% 저렴하다. 평가할 만한 주된 용도는 화면 이해, 시각 자료 해석, 앱 조작을 포함한 작업이다. API 모델 ID는 <code>gpt-6.1-terra</code>이며, 세부 요금과 기능은 <a href=\"https://developers.openai.com/api/docs/models/gpt-6.1-terra\">공식 모델 문서</a>와 <a href=\"https://developers.openai.com/api/docs/pricing\">공식 요금표</a>에 나와 있다.</p><h2>최근 GPT-6 업데이트와 요금</h2><p>OpenAI는 GPT-6 Astra를 9월 3일, GPT-6 Sol과 Luna를 9월 22일, GPT-6.1 Sol을 9월 29일, GPT-6.1 Terra를 10월 26일 발표했다. 아래는 표준 API의 입력/출력 토큰 100만 개당 요금이다. Terra는 화면·이미지·앱 조작, Sol은 복잡한 개발과 업무 흐름, Luna는 범위가 명확한 대량 처리, Astra는 가장 어려운 작업의 후보가 된다. 이 구분은 테스트를 시작할 기준이지 품질 보증이 아니다.</p><table><thead><tr><th>모델</th><th>입력</th><th>출력</th><th>검토할 용도</th></tr></thead><tbody><tr><td>GPT-6 Luna</td><td>$0.10</td><td>$0.50</td><td>단순한 대량 처리</td></tr><tr><td>GPT-6.1 Terra</td><td>$1</td><td>$5</td><td>이미지·화면·앱 조작</td></tr><tr><td>GPT-6.1 Sol</td><td>$2</td><td>$10</td><td>복잡한 개발·업무 흐름</td></tr><tr><td>GPT-6 Astra</td><td>$10</td><td>$50</td><td>가장 어려운 작업</td></tr><tr><td>GPT-5.6 Terra</td><td>$2</td><td>$12</td><td>이전 버전 비교 기준</td></tr></tbody></table><p>모델별 발표 내용은 <a href=\"https://openai.com/index/introducing-gpt-6-sol-and-luna/\">Sol·Luna 발표</a>, <a href=\"https://openai.com/index/introducing-gpt-6-1-sol/\">GPT-6.1 Sol 발표</a>, <a href=\"https://openai.com/index/introducing-gpt-6-1-terra/\">GPT-6.1 Terra 발표</a>를 참조했다.</p><h2>작업 100만 건의 토큰 비용</h2><p>작업마다 캐시 없이 입력 1,000토큰과 출력 500토큰을 쓰고 100만 건을 처리한다고 가정하자. 토큰 요금만 계산하면 GPT-5.6 Terra는 $8,000, GPT-6.1 Terra는 $3,500으로 56.25% 줄어든다. 토큰 수가 같다면 Luna는 $350, GPT-6.1 Sol은 $7,000, Astra는 $35,000이다. 모든 모델이 같은 성공률을 낸다는 뜻은 아니다. 이 계산에는 도구 호출, 재시도, 사람의 검토, 인프라 비용도 포함되지 않는다.</p><h2>실제 청구액을 바꾸는 조건</h2><p>Terra의 캐시 입력은 100만 토큰당 $0.05다. 캐시 쓰기는 보존 기간 30분에 $1.25, 12시간에 $2.50이다. Batch와 Flex는 표준 요금의 절반, Fast 모드는 2배다. 입력이 272,000토큰을 넘으면 해당 요청 전체에 입력·캐시 요금 2배와 출력 요금 1.5배가 적용된다. 적용 대상 지역 처리 및 FedRAMP 엔드포인트에는 10% 할증이 붙는다. 예산을 세울 때 캐시 읽기·쓰기, 처리 모드, 긴 문맥, 별도 도구 요금을 구분해야 한다.</p><p>문맥 창은 105만 토큰, 최대 출력은 128,000토큰, 지식 기준일은 2026년 6월 1일이다. 이미지 입력은 지원하지만 오디오·비디오 직접 입력은 지원하지 않는다. 추론 강도는 <code>none</code>, <code>low</code>, <code>medium</code>(기본값), <code>high</code>, <code>xhigh</code>, <code>max</code>를 지원한다. 강도에 따라 출력 토큰과 지연 시간도 달라질 수 있다.</p><h2>성능 발표를 해석하는 방법</h2><p>OpenAI 발표에 따르면 중간 추론 강도의 Agents' Last Exam에서 Terra는 GPT-5.6 Terra보다 15%포인트 높은 점수를 약 3분의 1의 작업 비용으로 기록했다. 최대 강도에서는 Claude Opus 5.5보다 토큰 효율이 3배 이상 높고 작업 비용이 약 9분의 1이라고 보고했다. GPT-6.1 Sol 및 Astra보다 작업 완료도 3배 이상 빠르다고 밝혔다. 낮은 추론 강도에서 어려운 질문의 사실 오류율은 53.6%에서 16.7%로, Terminal-Bench 4.0의 최대 강도 성공률은 21.5%에서 50.3%로 개선됐다고 한다. 이는 OpenAI가 공개한 평가 결과이며 자체 회계 시스템에서 같은 결과를 보장하지 않는다.</p><h2>FinOps의 도입 판단</h2><p>청구서 읽기와 회계 시스템 입력처럼 완료 조건이 명확한 흐름을 고른 뒤, 이전 모델과 Terra에 동일한 사례를 실행한다. 모델 ID, 추론 강도, 입력·출력·캐시 토큰, 도구 호출, 재시도, 지연 시간, 사람의 수정, 최종 승인 여부를 기록한다. 비교 기준은 토큰 단가뿐 아니라 <strong>승인된 작업 1건당 총비용</strong>이다. 결제 실행이나 공급업체 계좌 변경에는 사람의 승인을 유지한다.</p>",
+      "faq": [
+        {
+          "question": "GPT-6.1 Terra의 API 요금은 얼마인가요?",
+          "answer": "표준 요금은 100만 토큰당 입력 $1, 캐시 입력 $0.05, 출력 $5입니다. 캐시 쓰기, 처리 모드, 긴 입력, 대상 엔드포인트에는 추가 요금 조건이 적용됩니다."
+        },
+        {
+          "question": "GPT-5.6 Terra보다 얼마나 저렴한가요?",
+          "answer": "표준 입력 요금은 $2에서 $1로 50%, 출력 요금은 $12에서 $5로 약 58% 내려갔습니다. 실제 절감률은 토큰 구성과 재시도에 따라 달라집니다."
+        },
+        {
+          "question": "Terra, Sol, Luna, Astra 중 어떤 모델을 써야 하나요?",
+          "answer": "화면이나 이미지가 필요한 명확한 작업은 Terra, 복잡한 업무 흐름은 Sol, 단순한 대량 처리는 Luna, 가장 어려운 작업은 Astra를 평가해 보세요. 같은 사례로 품질과 승인된 작업당 총비용을 비교해야 합니다."
+        },
+        {
+          "question": "발표된 벤치마크 개선을 예산에 그대로 반영해도 되나요?",
+          "answer": "안 됩니다. 해당 수치는 OpenAI가 공개한 평가 결과입니다. 자체 데이터와 도구, 실패 사례로 성공률, 재시도, 사람의 검토, 처리 시간을 포함한 비용을 측정해야 합니다."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/gpt-6-sol-cost-model",
+          "label": "GPT-6 Sol cost model"
+        },
+        {
+          "slug": "/research/gpt-6-luna-cost-model",
+          "label": "GPT-6 Luna cost model"
+        },
+        {
+          "slug": "/research/real-cost-per-task-frontier-models",
+          "label": "Measuring cost per task"
+        },
+        {
+          "slug": "/research/agent-workflow-architecture-cost-controls",
+          "label": "에이전트 업무 흐름 비용 관리"
+        }
+      ]
+    },
+    "zh": {
+      "title": "GPT-6.1 Terra 定价与 FinOps 对比",
+      "titleCore": "GPT-6.1 Terra：价格、适用场景与模型对比",
+      "description": "核对 GPT-6.1 Terra 的 API 价格、缓存和长上下文规则，对比 GPT-6.1 Sol、Luna、Astra，并按完成任务的总成本评估迁移。",
+      "body": "<p>OpenAI 于 2026 年 10 月 26 日发布 GPT-6.1 Terra。标准 API 价格为每百万输入 token 1 美元、每百万输出 token 5 美元。相比 GPT-5.6 Terra 的 2 美元和 12 美元，输入便宜 50%，输出便宜约 58%。值得优先评估的场景是理解屏幕、处理图像并在应用中执行操作。API 模型 ID 为 <code>gpt-6.1-terra</code>；价格和能力以<a href=\"https://developers.openai.com/api/docs/models/gpt-6.1-terra\">官方模型文档</a>及<a href=\"https://developers.openai.com/api/docs/pricing\">官方定价页</a>为准。</p><h2>与近期 GPT-6 更新比较</h2><p>OpenAI 分别在 9 月 3 日发布 GPT-6 Astra，9 月 22 日发布 GPT-6 Sol 和 Luna，9 月 29 日发布 GPT-6.1 Sol，10 月 26 日发布 GPT-6.1 Terra。下表是标准 API 每百万输入／输出 token 的价格。Terra 适合评估屏幕、图像和应用操作；Sol 面向复杂开发与业务流程；Luna 适合范围明确的大批量任务；Astra 用于最困难的任务。这些是测试方向，并非对效果的保证。</p><table><thead><tr><th>模型</th><th>输入</th><th>输出</th><th>适合评估的工作</th></tr></thead><tbody><tr><td>GPT-6 Luna</td><td>$0.10</td><td>$0.50</td><td>简单的大批量任务</td></tr><tr><td>GPT-6.1 Terra</td><td>$1</td><td>$5</td><td>图像、屏幕、应用操作</td></tr><tr><td>GPT-6.1 Sol</td><td>$2</td><td>$10</td><td>复杂开发和业务流程</td></tr><tr><td>GPT-6 Astra</td><td>$10</td><td>$50</td><td>最困难的任务</td></tr><tr><td>GPT-5.6 Terra</td><td>$2</td><td>$12</td><td>旧版迁移基线</td></tr></tbody></table><p>发布信息见 <a href=\"https://openai.com/index/introducing-gpt-6-sol-and-luna/\">Sol 与 Luna 公告</a>、<a href=\"https://openai.com/index/introducing-gpt-6-1-sol/\">GPT-6.1 Sol 公告</a>和<a href=\"https://openai.com/index/introducing-gpt-6-1-terra/\">GPT-6.1 Terra 公告</a>。</p><h2>一百万项任务要花多少钱</h2><p>假设每项任务使用 1,000 个输入 token 和 500 个输出 token，没有缓存，共处理一百万项。仅按 token 单价计算，GPT-5.6 Terra 的费用为 8,000 美元，GPT-6.1 Terra 为 3,500 美元，下降 56.25%。在完全相同的 token 用量下，Luna 为 350 美元，GPT-6.1 Sol 为 7,000 美元，Astra 为 35,000 美元。这不意味着各模型能以相同成功率完成任务。计算也未包含工具调用、重试、人工复核和基础设施费用。</p><h2>影响实际账单的规则</h2><p>Terra 的缓存输入价格为每百万 token 0.05 美元。缓存写入按保留时间收费：30 分钟为 1.25 美元，12 小时为 2.50 美元。Batch 和 Flex 的价格是标准模式的一半，Fast 模式是两倍。输入超过 272,000 token 时，整个请求的输入及缓存价格翻倍，输出价格乘以 1.5。适用的区域处理和 FedRAMP 端点另加 10%。预算模型应分别记录缓存读取与写入、处理模式、长上下文以及单独计费的工具。</p><p>上下文窗口为 105 万 token，最大输出为 128,000 token，知识截止日期为 2026 年 6 月 1 日。模型支持图像输入，不支持直接输入音频或视频。推理强度可设为 <code>none</code>、<code>low</code>、<code>medium</code>（默认）、<code>high</code>、<code>xhigh</code>、<code>max</code>。强度也可能改变输出 token 数量和延迟。</p><h2>如何看待性能数字</h2><p>OpenAI 公布的结果显示，在中等推理强度的 Agents' Last Exam 中，Terra 比 GPT-5.6 Terra 高 15 个百分点，单项任务成本约为后者的三分之一。在最大强度下，OpenAI 称其 token 效率比 Claude Opus 5.5 高三倍以上，单项任务成本约为九分之一；完成任务的速度比 GPT-6.1 Sol 和 Astra 快三倍以上。在其困难问题评测中，低强度事实错误率由 53.6% 降至 16.7%；Terminal-Bench 4.0 的最大强度成功率由 21.5% 升至 50.3%。这些是 OpenAI 公布的评测结果，不能直接当作企业自身流程的预期效果。</p><h2>FinOps 团队该怎么评估</h2><p>先选发票录入等完成标准明确的流程，用相同案例分别运行旧模型和 Terra。记录模型 ID、推理强度、输入／输出／缓存 token、工具调用、重试、耗时、人工修改和最终验收结果。比较<strong>每项验收通过任务的总成本</strong>，而非只比较每百万 token 的标价。执行付款或修改供应商银行账户仍应由人审批。</p>",
+      "faq": [
+        {
+          "question": "GPT-6.1 Terra 的 API 价格是多少？",
+          "answer": "标准价格为每百万输入 token 1 美元、每百万缓存输入 token 0.05 美元、每百万输出 token 5 美元。缓存写入、处理模式、长输入及特定端点有其他计费规则。"
+        },
+        {
+          "question": "它比 GPT-5.6 Terra 便宜多少？",
+          "answer": "标准输入价格由 2 美元降至 1 美元，下降 50%；输出由 12 美元降至 5 美元，下降约 58%。实际节省取决于 token 构成和重试次数。"
+        },
+        {
+          "question": "Terra、Sol、Luna 和 Astra 应该怎么选？",
+          "answer": "可优先用 Terra 评估明确的屏幕或图像任务，Sol 评估复杂流程，Luna 评估简单的大批量任务，Astra 评估最困难的任务。应在同一案例集上比较质量和每项验收通过任务的总成本。"
+        },
+        {
+          "question": "能直接按公布的基准测试结果制定预算吗？",
+          "answer": "不能。这些是 OpenAI 公布的评测数据。要用自己的输入、工具和失败案例测量成功率、重试、人工复核、耗时与总成本。"
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/gpt-6-sol-cost-model",
+          "label": "GPT-6 Sol cost model"
+        },
+        {
+          "slug": "/research/gpt-6-luna-cost-model",
+          "label": "GPT-6 Luna cost model"
+        },
+        {
+          "slug": "/research/real-cost-per-task-frontier-models",
+          "label": "Measuring cost per task"
+        },
+        {
+          "slug": "/research/agent-workflow-architecture-cost-controls",
+          "label": "代理工作流成本控制"
+        }
+      ]
+    },
+    "it": {
+      "title": "GPT-6.1 Terra: prezzi e scelta del modello",
+      "titleCore": "GPT-6.1 Terra: costi e scelta del modello per FinOps",
+      "description": "Prezzi API, cache, contesto lungo e confronto con Sol, Luna, Astra e Terra precedente, con un esempio di costo per un milione di attività.",
+      "body": "<p>OpenAI ha rilasciato GPT-6.1 Terra il 26 ottobre 2026. L'API costa $1 per milione di token di input e $5 per milione di token di output. Il prezzo è inferiore a quello di GPT-5.6 Terra, ma per decidere una migrazione occorre misurare il costo per attività completata, compresi tentativi, strumenti e revisione umana.</p><h2>Prezzi e confronto</h2><p>Tariffe API Standard per un milione di token, secondo il <a href=\"https://developers.openai.com/api/docs/pricing\">listino OpenAI</a>:</p><table><thead><tr><th>Modello</th><th>Input</th><th>Output</th><th>Uso da valutare</th></tr></thead><tbody><tr><td>GPT-5.6 Terra</td><td>$2</td><td>$12</td><td>Base di confronto</td></tr><tr><td>GPT-6.1 Terra</td><td>$1</td><td>$5</td><td>Schermate, immagini e azioni nelle app</td></tr><tr><td>GPT-6.1 Sol</td><td>$2</td><td>$10</td><td>Workflow e codice complessi</td></tr><tr><td>GPT-6 Luna</td><td>$0.10</td><td>$0.50</td><td>Attività circoscritte ad alto volume</td></tr><tr><td>GPT-6 Astra</td><td>$10</td><td>$50</td><td>Casi più difficili</td></tr></tbody></table><p>Con un milione di attività da 1.000 token di input e 500 di output ciascuna, senza cache, il solo costo dei token è $8,000 con GPT-5.6 Terra, $3,500 con GPT-6.1 Terra, $350 con Luna, $7,000 con Sol e $35,000 con Astra. Il risparmio Terra su Terra è 56.25%; questi importi escludono strumenti, nuovi tentativi, revisione e infrastruttura.</p><h2>Dettagli che cambiano la fattura</h2><p>Per <code>gpt-6.1-terra</code>, l'input letto dalla cache costa $0.05 per milione di token. Scrivere nella cache costa $1.25 con conservazione di 30 minuti oppure $2.50 per 12 ore. Batch e Flex costano metà della tariffa Standard; Fast il doppio. Oltre 272.000 token di input, l'intera richiesta paga il doppio per input e cache e 1.5 volte per output. Gli endpoint regionali o FedRAMP aggiungono il 10% quando disponibili. Il <a href=\"https://developers.openai.com/api/docs/models/gpt-6.1-terra\">modello API</a> ha una finestra di contesto di 1.05 milioni di token, output massimo di 128.000 e conoscenze fino al 1º giugno 2026. Accetta testo e immagini in input, non audio o video; i livelli di ragionamento sono <code>none</code>, <code>low</code>, <code>medium</code> (predefinito), <code>high</code>, <code>xhigh</code> e <code>max</code>.</p><h2>Che cosa cambia rispetto agli altri lanci</h2><p>OpenAI ha introdotto Astra il 3 settembre, <a href=\"https://openai.com/index/introducing-gpt-6-sol-and-luna/\">Sol e Luna il 22 settembre</a>, <a href=\"https://openai.com/index/introducing-gpt-6-1-sol/\">GPT-6.1 Sol il 29 settembre</a> e Terra il 26 ottobre. Astra punta ai problemi più impegnativi; Sol migliora il lavoro complesso; Luna riduce il costo dei compiti semplici; Terra occupa lo spazio delle attività visive e dell'uso del computer. Nel suo <a href=\"https://openai.com/index/introducing-gpt-6-1-terra/\">annuncio</a>, OpenAI dichiara per Terra 15 punti percentuali in più rispetto a GPT-5.6 Terra in Agents' Last Exam a sforzo medio e circa un terzo del costo; un calo degli errori fattuali dal 53.6% al 16.7% a sforzo basso; e 50.3% contro 21.5% in Terminal-Bench 4.0 a sforzo massimo. Sono valutazioni pubblicate dal fornitore, non garanzie per il proprio processo.</p><p>Per un processo finanziario, ripetere gli stessi casi con modelli e permessi equivalenti, registrare token, chiamate agli strumenti, errori e interventi umani, quindi confrontare il costo per risultato accettato. Conservare un controllo umano per pagamenti e modifiche ai dati bancari.</p>",
+      "faq": [
+        {
+          "question": "Quanto costa GPT-6.1 Terra nell'API?",
+          "answer": "La tariffa Standard è $1 per milione di token di input, $0.05 per input dalla cache e $5 per output. Scrivere nella cache costa $1.25 per 30 minuti o $2.50 per 12 ore."
+        },
+        {
+          "question": "Quanto si risparmia rispetto a GPT-5.6 Terra?",
+          "answer": "L'input scende da $2 a $1 e l'output da $12 a $5 per milione di token. Nell'esempio da un milione di attività il costo dei token scende del 56.25%; il risparmio reale dipende dal workflow."
+        },
+        {
+          "question": "Quando conviene Terra invece di Sol o Luna?",
+          "answer": "Provare Terra per schermate e immagini con un risultato verificabile, Sol per workflow complessi e Luna per attività semplici ad alto volume. Scegliere in base al costo per risultato accettato."
+        },
+        {
+          "question": "Il prezzo dei token comprende l'uso degli strumenti?",
+          "answer": "No. In una previsione vanno considerati anche strumenti, tentativi ripetuti, orchestrazione, infrastruttura e revisione umana."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/gpt-6-sol-cost-model",
+          "label": "Modello di costo GPT-6 Sol"
+        },
+        {
+          "slug": "/research/gpt-6-luna-cost-model",
+          "label": "Modello di costo GPT-6 Luna"
+        },
+        {
+          "slug": "/research/real-cost-per-task-frontier-models",
+          "label": "Misurare il costo per attività"
+        },
+        {
+          "slug": "/research/agent-workflow-architecture-cost-controls",
+          "label": "Controlli di costo dei workflow agentici"
+        }
+      ]
+    },
+    "id": {
+      "title": "GPT-6.1 Terra: harga dan pilihan model",
+      "titleCore": "GPT-6.1 Terra: biaya dan pilihan model untuk FinOps",
+      "description": "Harga API, cache, konteks panjang, dan perbandingan dengan Sol, Luna, Astra, serta Terra lama, lengkap dengan contoh biaya sejuta tugas.",
+      "body": "<p>OpenAI merilis GPT-6.1 Terra pada 26 Oktober 2026. Harga API-nya $1 per satu juta token input dan $5 per satu juta token output. Tarif ini lebih rendah daripada GPT-5.6 Terra, tetapi keputusan migrasi perlu memakai biaya per tugas yang berhasil, termasuk percobaan ulang, alat, dan tinjauan manusia.</p><h2>Harga dan perbandingan</h2><p>Tarif API Standard per satu juta token menurut <a href=\"https://developers.openai.com/api/docs/pricing\">daftar harga OpenAI</a>:</p><table><thead><tr><th>Model</th><th>Input</th><th>Output</th><th>Kegunaan yang layak diuji</th></tr></thead><tbody><tr><td>GPT-5.6 Terra</td><td>$2</td><td>$12</td><td>Pembanding lama</td></tr><tr><td>GPT-6.1 Terra</td><td>$1</td><td>$5</td><td>Layar, gambar, dan tindakan dalam aplikasi</td></tr><tr><td>GPT-6.1 Sol</td><td>$2</td><td>$10</td><td>Alur kerja dan kode yang rumit</td></tr><tr><td>GPT-6 Luna</td><td>$0.10</td><td>$0.50</td><td>Tugas terarah dalam volume besar</td></tr><tr><td>GPT-6 Astra</td><td>$10</td><td>$50</td><td>Kasus tersulit</td></tr></tbody></table><p>Untuk satu juta tugas, masing-masing memakai 1.000 token input dan 500 token output tanpa cache, biaya token saja ialah $8,000 pada GPT-5.6 Terra, $3,500 pada GPT-6.1 Terra, $350 pada Luna, $7,000 pada Sol, dan $35,000 pada Astra. Penghematan Terra baru terhadap Terra lama ialah 56.25%. Angka ini belum mencakup alat, percobaan ulang, tinjauan, atau infrastruktur.</p><h2>Rincian yang memengaruhi tagihan</h2><p>Pada <code>gpt-6.1-terra</code>, input yang dibaca dari cache berharga $0.05 per satu juta token. Menulis cache berharga $1.25 untuk retensi 30 menit atau $2.50 untuk 12 jam. Batch dan Flex berharga setengah tarif Standard; Fast dua kali lipat. Bila input melebihi 272.000 token, seluruh permintaan dikenai tarif 2 kali untuk input dan cache serta 1.5 kali untuk output. Endpoint regional atau FedRAMP menambah 10% bila tersedia. <a href=\"https://developers.openai.com/api/docs/models/gpt-6.1-terra\">Halaman model API</a> mencantumkan konteks 1.05 juta token, output maksimum 128.000 token, dan batas pengetahuan 1 Juni 2026. Input gambar didukung, audio dan video tidak. Pilihan penalaran ialah <code>none</code>, <code>low</code>, <code>medium</code> (default), <code>high</code>, <code>xhigh</code>, dan <code>max</code>.</p><h2>Perbedaan dari peluncuran lain</h2><p>OpenAI meluncurkan Astra pada 3 September, <a href=\"https://openai.com/index/introducing-gpt-6-sol-and-luna/\">Sol dan Luna pada 22 September</a>, <a href=\"https://openai.com/index/introducing-gpt-6-1-sol/\">GPT-6.1 Sol pada 29 September</a>, lalu Terra pada 26 Oktober. Astra ditujukan untuk pekerjaan paling sulit, Sol untuk alur kerja yang lebih rumit, Luna untuk tugas sederhana berbiaya rendah, dan Terra untuk pekerjaan visual serta penggunaan komputer. Dalam <a href=\"https://openai.com/index/introducing-gpt-6-1-terra/\">pengumumannya</a>, OpenAI melaporkan kenaikan 15 poin persentase dibanding GPT-5.6 Terra pada Agents' Last Exam dengan penalaran medium dan sekitar sepertiga biaya; tingkat kesalahan faktual turun dari 53.6% menjadi 16.7% pada penalaran low; Terminal-Bench 4.0 mencapai 50.3% dibanding 21.5% pada penalaran max. Ini hasil evaluasi yang dipublikasikan vendor, bukan jaminan untuk tugas Anda.</p><p>Untuk proses keuangan, jalankan ulang kasus yang sama dengan izin alat yang setara. Catat token, panggilan alat, kegagalan, dan tinjauan manusia, lalu bandingkan biaya per hasil yang diterima. Tetapkan persetujuan manusia untuk pembayaran dan perubahan rekening vendor.</p>",
+      "faq": [
+        {
+          "question": "Berapa harga GPT-6.1 Terra melalui API?",
+          "answer": "Tarif Standard ialah $1 per satu juta token input, $0.05 untuk input cache, dan $5 untuk output. Penulisan cache berharga $1.25 untuk 30 menit atau $2.50 untuk 12 jam."
+        },
+        {
+          "question": "Berapa penghematan dibanding GPT-5.6 Terra?",
+          "answer": "Harga input turun dari $2 menjadi $1 dan output dari $12 menjadi $5 per satu juta token. Pada contoh satu juta tugas, biaya token turun 56.25%; penghematan nyata bergantung pada alur kerja."
+        },
+        {
+          "question": "Kapan memilih Terra dibanding Sol atau Luna?",
+          "answer": "Uji Terra untuk tugas berbasis layar dan gambar dengan hasil yang dapat diperiksa, Sol untuk alur kerja rumit, dan Luna untuk tugas sederhana bervolume besar. Bandingkan biaya per hasil yang diterima."
+        },
+        {
+          "question": "Apakah harga token sudah termasuk biaya alat?",
+          "answer": "Belum. Perkiraan biaya juga perlu memasukkan alat, percobaan ulang, orkestrasi, infrastruktur, dan tinjauan manusia."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/gpt-6-sol-cost-model",
+          "label": "Model biaya GPT-6 Sol"
+        },
+        {
+          "slug": "/research/gpt-6-luna-cost-model",
+          "label": "Model biaya GPT-6 Luna"
+        },
+        {
+          "slug": "/research/real-cost-per-task-frontier-models",
+          "label": "Mengukur biaya per tugas"
+        },
+        {
+          "slug": "/research/agent-workflow-architecture-cost-controls",
+          "label": "Kontrol biaya alur kerja agen"
+        }
+      ]
+    },
+    "pl": {
+      "title": "GPT-6.1 Terra: ceny i wybór modelu",
+      "titleCore": "GPT-6.1 Terra: koszty i wybór modelu w FinOps",
+      "description": "Ceny API, pamięć podręczna, długi kontekst i porównanie z Sol, Luna, Astra oraz starszym Terra. Przykład kosztu miliona zadań.",
+      "body": "<p>OpenAI udostępniło GPT-6.1 Terra 26 października 2026 r. Standardowa cena API wynosi $1 za milion tokenów wejściowych i $5 za milion wyjściowych. To mniej niż w GPT-5.6 Terra, lecz o migracji powinien decydować koszt skutecznie ukończonego zadania, obejmujący ponowienia, narzędzia i pracę człowieka.</p><h2>Ceny i porównanie</h2><p>Stawki Standard za milion tokenów według <a href=\"https://developers.openai.com/api/docs/pricing\">cennika OpenAI</a>:</p><table><thead><tr><th>Model</th><th>Wejście</th><th>Wyjście</th><th>Zastosowanie do sprawdzenia</th></tr></thead><tbody><tr><td>GPT-5.6 Terra</td><td>$2</td><td>$12</td><td>Poprzedni punkt odniesienia</td></tr><tr><td>GPT-6.1 Terra</td><td>$1</td><td>$5</td><td>Ekrany, obrazy i działania w aplikacjach</td></tr><tr><td>GPT-6.1 Sol</td><td>$2</td><td>$10</td><td>Złożone procesy i programowanie</td></tr><tr><td>GPT-6 Luna</td><td>$0.10</td><td>$0.50</td><td>Proste zadania na dużą skalę</td></tr><tr><td>GPT-6 Astra</td><td>$10</td><td>$50</td><td>Najtrudniejsze przypadki</td></tr></tbody></table><p>Przy milionie zadań po 1000 tokenów wejściowych i 500 wyjściowych, bez cache, sam koszt tokenów to $8,000 w GPT-5.6 Terra, $3,500 w GPT-6.1 Terra, $350 w Luna, $7,000 w Sol i $35,000 w Astra. Nowy Terra obniża ten koszt o 56.25%. Obliczenie pomija narzędzia, ponowienia, kontrolę człowieka i infrastrukturę.</p><h2>Co zmienia rachunek</h2><p>Dla <code>gpt-6.1-terra</code> odczyt wejścia z cache kosztuje $0.05 za milion tokenów. Zapis kosztuje $1.25 przy 30 minutach przechowywania lub $2.50 przy 12 godzinach. Batch i Flex kosztują połowę stawki Standard, a Fast dwa razy tyle. Po przekroczeniu 272 000 tokenów wejściowych cała prośba jest rozliczana według stawek 2 razy wyższych dla wejścia i cache oraz 1.5 raza wyższych dla wyjścia. Dostępne punkty końcowe regionalne lub FedRAMP dodają 10%. <a href=\"https://developers.openai.com/api/docs/models/gpt-6.1-terra\">Opis modelu API</a> podaje okno kontekstu 1.05 mln tokenów, maksymalnie 128 000 tokenów wyjściowych i granicę wiedzy 1 czerwca 2026 r. Model przyjmuje obrazy, ale nie audio ani wideo. Poziomy rozumowania to <code>none</code>, <code>low</code>, <code>medium</code> (domyślny), <code>high</code>, <code>xhigh</code> i <code>max</code>.</p><h2>Na tle innych aktualizacji</h2><p>Astra pojawił się 3 września, <a href=\"https://openai.com/index/introducing-gpt-6-sol-and-luna/\">Sol i Luna 22 września</a>, <a href=\"https://openai.com/index/introducing-gpt-6-1-sol/\">GPT-6.1 Sol 29 września</a>, a Terra 26 października. Astra służy najtrudniejszym pracom, Sol bardziej złożonym procesom, Luna tanim zadaniom o dużej skali, a Terra pracy z obrazem i ekranem. W <a href=\"https://openai.com/index/introducing-gpt-6-1-terra/\">komunikacie</a> OpenAI podaje przewagę 15 punktów procentowych nad GPT-5.6 Terra w Agents' Last Exam przy poziomie medium i około jednej trzeciej kosztu; spadek błędów rzeczowych z 53.6% do 16.7% przy low; oraz wynik 50.3% wobec 21.5% w Terminal-Bench 4.0 przy max. To opublikowane wyniki dostawcy, nie gwarancja dla własnego procesu.</p><p>W finansach należy odtworzyć te same przypadki przy identycznych uprawnieniach, zapisać tokeny, wywołania narzędzi, błędy i udział człowieka, a następnie porównać koszt zaakceptowanego wyniku. Płatności i zmiany rachunków dostawców powinny wymagać zatwierdzenia przez człowieka.</p>",
+      "faq": [
+        {
+          "question": "Ile kosztuje GPT-6.1 Terra w API?",
+          "answer": "Standardowo $1 za milion tokenów wejściowych, $0.05 za wejście z cache i $5 za wyjście. Zapis cache kosztuje $1.25 na 30 minut albo $2.50 na 12 godzin."
+        },
+        {
+          "question": "Ile można zaoszczędzić względem GPT-5.6 Terra?",
+          "answer": "Wejście tanieje z $2 do $1, a wyjście z $12 do $5 za milion tokenów. W przykładzie miliona zadań koszt tokenów spada o 56.25%; rzeczywisty wynik zależy od procesu."
+        },
+        {
+          "question": "Kiedy wybrać Terra zamiast Sol lub Luna?",
+          "answer": "Sprawdź Terra przy pracy na ekranach i obrazach z mierzalnym wynikiem, Sol przy złożonych procesach, a Luna przy prostych zadaniach masowych. Porównaj koszt zaakceptowanego wyniku."
+        },
+        {
+          "question": "Czy cena tokenów obejmuje narzędzia?",
+          "answer": "Nie. Kalkulacja powinna obejmować także narzędzia, ponowienia, orkiestrację, infrastrukturę i kontrolę człowieka."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/gpt-6-sol-cost-model",
+          "label": "Model kosztowy GPT-6 Sol"
+        },
+        {
+          "slug": "/research/gpt-6-luna-cost-model",
+          "label": "Model kosztowy GPT-6 Luna"
+        },
+        {
+          "slug": "/research/real-cost-per-task-frontier-models",
+          "label": "Pomiar kosztu zadania"
+        },
+        {
+          "slug": "/research/agent-workflow-architecture-cost-controls",
+          "label": "Kontrola kosztów procesów agentowych"
+        }
+      ]
+    },
+    "ru": {
+      "title": "GPT-6.1 Terra: цены и выбор модели",
+      "titleCore": "GPT-6.1 Terra: стоимость и выбор модели для FinOps",
+      "description": "Цены API, кеширование, длинный контекст и сравнение с Sol, Luna, Astra и прежней Terra. Пример расчёта для миллиона задач.",
+      "body": "<p>OpenAI выпустила GPT-6.1 Terra 26 октября 2026 года. Стандартная цена API составляет $1 за миллион входных токенов и $5 за миллион выходных. Это дешевле GPT-5.6 Terra, но решение о переходе следует принимать по стоимости успешно завершённой задачи с учётом повторов, инструментов и проверки человеком.</p><h2>Цены и сравнение</h2><p>Стандартные ставки за миллион токенов по <a href=\"https://developers.openai.com/api/docs/pricing\">прайс-листу OpenAI</a>:</p><table><thead><tr><th>Модель</th><th>Вход</th><th>Выход</th><th>Что оценивать</th></tr></thead><tbody><tr><td>GPT-5.6 Terra</td><td>$2</td><td>$12</td><td>Прежняя база сравнения</td></tr><tr><td>GPT-6.1 Terra</td><td>$1</td><td>$5</td><td>Экраны, изображения, действия в приложениях</td></tr><tr><td>GPT-6.1 Sol</td><td>$2</td><td>$10</td><td>Сложные процессы и программирование</td></tr><tr><td>GPT-6 Luna</td><td>$0.10</td><td>$0.50</td><td>Простые массовые задачи</td></tr><tr><td>GPT-6 Astra</td><td>$10</td><td>$50</td><td>Самые сложные случаи</td></tr></tbody></table><p>Для миллиона задач по 1000 входных и 500 выходных токенов без кеша расходы только на токены составляют $8,000 на GPT-5.6 Terra, $3,500 на GPT-6.1 Terra, $350 на Luna, $7,000 на Sol и $35,000 на Astra. Новая Terra снижает эту часть расходов на 56.25%. В расчёт не входят инструменты, повторы, проверка и инфраструктура.</p><h2>Что влияет на счёт</h2><p>Для <code>gpt-6.1-terra</code> чтение входа из кеша стоит $0.05 за миллион токенов. Запись в кеш стоит $1.25 при хранении 30 минут либо $2.50 при хранении 12 часов. Batch и Flex стоят вдвое меньше Standard; Fast — вдвое больше. Если вход превышает 272 000 токенов, вся заявка оплачивается по удвоенной ставке за вход и кеш и по ставке 1.5× за выход. Региональные и FedRAMP-эндпоинты, если доступны, добавляют 10%. <a href=\"https://developers.openai.com/api/docs/models/gpt-6.1-terra\">Страница модели API</a> указывает контекст 1.05 млн токенов, до 128 000 выходных токенов и дату отсечения знаний 1 июня 2026 года. На вход принимаются изображения, но не аудио и видео. Уровни рассуждения: <code>none</code>, <code>low</code>, <code>medium</code> (по умолчанию), <code>high</code>, <code>xhigh</code> и <code>max</code>.</p><h2>Сравнение с другими обновлениями</h2><p>Astra вышла 3 сентября, <a href=\"https://openai.com/index/introducing-gpt-6-sol-and-luna/\">Sol и Luna — 22 сентября</a>, <a href=\"https://openai.com/index/introducing-gpt-6-1-sol/\">GPT-6.1 Sol — 29 сентября</a>, Terra — 26 октября. Astra рассчитана на самые трудные задачи, Sol — на сложные процессы, Luna — на недорогую массовую работу, а Terra — на визуальные задачи и управление компьютером. В <a href=\"https://openai.com/index/introducing-gpt-6-1-terra/\">анонсе</a> OpenAI заявляет о преимуществе Terra в 15 процентных пунктов над GPT-5.6 Terra в Agents' Last Exam при medium и примерно трети стоимости; снижении доли фактических ошибок с 53.6% до 16.7% при low; результате 50.3% против 21.5% в Terminal-Bench 4.0 при max. Это результаты испытаний, опубликованные поставщиком, а не гарантия для вашего процесса.</p><p>Для финансового процесса повторите одинаковые случаи при одинаковых разрешениях, запишите токены, вызовы инструментов, сбои и участие человека. Сравнивайте стоимость принятого результата. Платежи и изменение банковских реквизитов поставщика должны подтверждаться человеком.</p>",
+      "faq": [
+        {
+          "question": "Сколько стоит GPT-6.1 Terra через API?",
+          "answer": "Ставка Standard — $1 за миллион входных токенов, $0.05 за вход из кеша и $5 за выход. Запись в кеш стоит $1.25 на 30 минут либо $2.50 на 12 часов."
+        },
+        {
+          "question": "Какая экономия по сравнению с GPT-5.6 Terra?",
+          "answer": "Вход дешевеет с $2 до $1, выход — с $12 до $5 за миллион токенов. В примере миллиона задач расходы на токены падают на 56.25%; фактическая экономия зависит от процесса."
+        },
+        {
+          "question": "Когда выбирать Terra вместо Sol или Luna?",
+          "answer": "Проверяйте Terra для работы с экраном и изображением при измеримом результате, Sol — для сложных процессов, Luna — для простых массовых задач. Сравнивайте стоимость принятого результата."
+        },
+        {
+          "question": "Включает ли цена токенов инструменты?",
+          "answer": "Нет. В бюджет нужно включать инструменты, повторы, оркестрацию, инфраструктуру и проверку человеком."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/gpt-6-sol-cost-model",
+          "label": "Модель затрат GPT-6 Sol"
+        },
+        {
+          "slug": "/research/gpt-6-luna-cost-model",
+          "label": "Модель затрат GPT-6 Luna"
+        },
+        {
+          "slug": "/research/real-cost-per-task-frontier-models",
+          "label": "Оценка затрат на задачу"
+        },
+        {
+          "slug": "/research/agent-workflow-architecture-cost-controls",
+          "label": "Контроль затрат агентного процесса"
+        }
+      ]
+    },
+    "tr": {
+      "title": "GPT-6.1 Terra: fiyat ve model seçimi",
+      "titleCore": "GPT-6.1 Terra: FinOps için maliyet ve model seçimi",
+      "description": "API fiyatı, önbellek, uzun bağlam ve Sol, Luna, Astra ile eski Terra karşılaştırması. Bir milyon görev için maliyet örneği.",
+      "body": "<p>OpenAI, GPT-6.1 Terra'yı 26 Ekim 2026'da yayımladı. Standart API fiyatı milyon giriş tokenı başına $1, milyon çıkış tokenı başına $5. GPT-5.6 Terra'dan daha ucuz olsa da geçiş kararı; tekrarlar, araçlar ve insan incelemesi dahil, başarıyla tamamlanan görev başına maliyete dayanmalı.</p><h2>Fiyat ve karşılaştırma</h2><p><a href=\"https://developers.openai.com/api/docs/pricing\">OpenAI fiyat listesine</a> göre milyon token başına Standard tarifeler:</p><table><thead><tr><th>Model</th><th>Giriş</th><th>Çıkış</th><th>Değerlendirilecek kullanım</th></tr></thead><tbody><tr><td>GPT-5.6 Terra</td><td>$2</td><td>$12</td><td>Eski karşılaştırma noktası</td></tr><tr><td>GPT-6.1 Terra</td><td>$1</td><td>$5</td><td>Ekranlar, görseller ve uygulama işlemleri</td></tr><tr><td>GPT-6.1 Sol</td><td>$2</td><td>$10</td><td>Karmaşık iş akışları ve kod</td></tr><tr><td>GPT-6 Luna</td><td>$0.10</td><td>$0.50</td><td>Basit, yüksek hacimli görevler</td></tr><tr><td>GPT-6 Astra</td><td>$10</td><td>$50</td><td>En zor durumlar</td></tr></tbody></table><p>Her biri 1.000 giriş ve 500 çıkış tokenı kullanan bir milyon görevde, önbellek olmadan yalnız token maliyeti GPT-5.6 Terra için $8,000; GPT-6.1 Terra için $3,500; Luna için $350; Sol için $7,000; Astra için $35,000 olur. Yeni Terra'nın eski Terra'ya göre token tasarrufu %56.25'tir. Araçlar, tekrarlar, inceleme ve altyapı dahil değildir.</p><h2>Faturayı değiştiren ayrıntılar</h2><p><code>gpt-6.1-terra</code> için önbellekten okunan giriş milyon token başına $0.05'tir. Önbelleğe yazma 30 dakikalık saklama için $1.25, 12 saat için $2.50'dir. Batch ve Flex, Standard fiyatın yarısı; Fast iki katıdır. Giriş 272.000 tokenı aşarsa isteğin tamamında giriş ve önbellek 2 kat, çıkış 1.5 kat fiyatlanır. Kullanılabilir bölgesel veya FedRAMP uç noktaları %10 ekler. <a href=\"https://developers.openai.com/api/docs/models/gpt-6.1-terra\">API model sayfası</a> 1.05 milyon tokenlık bağlam penceresi, en fazla 128.000 çıkış tokenı ve 1 Haziran 2026 bilgi kesim tarihi belirtir. Görsel girişi desteklenir; ses ve video desteklenmez. Akıl yürütme düzeyleri <code>none</code>, <code>low</code>, <code>medium</code> (varsayılan), <code>high</code>, <code>xhigh</code> ve <code>max</code>tır.</p><h2>Diğer güncellemelerle farkı</h2><p>Astra 3 Eylül'de, <a href=\"https://openai.com/index/introducing-gpt-6-sol-and-luna/\">Sol ve Luna 22 Eylül'de</a>, <a href=\"https://openai.com/index/introducing-gpt-6-1-sol/\">GPT-6.1 Sol 29 Eylül'de</a>, Terra ise 26 Ekim'de çıktı. Astra en zor işlere, Sol karmaşık akışlara, Luna ucuz ve yoğun kullanıma, Terra görsel işlere ve bilgisayar kullanımına yöneliktir. OpenAI <a href=\"https://openai.com/index/introducing-gpt-6-1-terra/\">duyurusunda</a> Terra'nın Agents' Last Exam'de medium düzeyinde GPT-5.6 Terra'dan 15 yüzde puan yüksek skor aldığını ve görev maliyetinin yaklaşık üçte bir olduğunu; low düzeyinde olgusal hata oranının %53.6'dan %16.7'ye indiğini; Terminal-Bench 4.0'da max düzeyinde %21.5'e karşı %50.3'e ulaştığını bildiriyor. Bunlar sağlayıcının yayımladığı değerlendirmelerdir; kendi iş akışınız için garanti değildir.</p><p>Finans süreçlerinde aynı örnekleri eşit araç izinleriyle yeniden çalıştırın. Tokenları, araç çağrılarını, hataları ve insan müdahalesini kaydedin; kabul edilen sonuç başına maliyeti karşılaştırın. Ödemeler ve tedarikçi banka bilgisi değişiklikleri için insan onayı kullanın.</p>",
+      "faq": [
+        {
+          "question": "GPT-6.1 Terra API fiyatı nedir?",
+          "answer": "Standard fiyat milyon giriş tokenı için $1, önbellekten okunan giriş için $0.05, çıkış için $5'tir. Önbelleğe yazma 30 dakika için $1.25, 12 saat için $2.50'dir."
+        },
+        {
+          "question": "GPT-5.6 Terra'ya göre tasarruf ne kadar?",
+          "answer": "Milyon token başına giriş $2'den $1'e, çıkış $12'den $5'e iner. Bir milyon görev örneğinde token maliyeti %56.25 düşer; gerçek tasarruf iş akışına bağlıdır."
+        },
+        {
+          "question": "Sol veya Luna yerine Terra ne zaman seçilmeli?",
+          "answer": "Doğrulanabilir ekran ve görsel görevlerinde Terra'yı, karmaşık akışlarda Sol'u, basit ve yoğun görevlerde Luna'yı deneyin. Kabul edilen sonuç başına maliyeti karşılaştırın."
+        },
+        {
+          "question": "Token fiyatına araç maliyetleri dahil mi?",
+          "answer": "Hayır. Bütçe araçları, tekrarları, orkestrasyonu, altyapıyı ve insan incelemesini de kapsamalıdır."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/gpt-6-sol-cost-model",
+          "label": "GPT-6 Sol maliyet modeli"
+        },
+        {
+          "slug": "/research/gpt-6-luna-cost-model",
+          "label": "GPT-6 Luna maliyet modeli"
+        },
+        {
+          "slug": "/research/real-cost-per-task-frontier-models",
+          "label": "Görev başına maliyeti ölçme"
+        },
+        {
+          "slug": "/research/agent-workflow-architecture-cost-controls",
+          "label": "Ajan iş akışı maliyet kontrolleri"
+        }
+      ]
+    },
+    "vi": {
+      "title": "GPT-6.1 Terra: giá và cách chọn mô hình",
+      "titleCore": "GPT-6.1 Terra: chi phí và lựa chọn mô hình cho FinOps",
+      "description": "Giá API, bộ nhớ đệm, ngữ cảnh dài và so sánh với Sol, Luna, Astra cùng Terra cũ; có ví dụ chi phí cho một triệu tác vụ.",
+      "body": "<p>OpenAI phát hành GPT-6.1 Terra ngày 26 tháng 10 năm 2026. Giá API Standard là $1 cho một triệu token đầu vào và $5 cho một triệu token đầu ra. Giá thấp hơn GPT-5.6 Terra, nhưng quyết định chuyển mô hình nên dựa trên chi phí cho mỗi tác vụ hoàn thành thành công, gồm cả chạy lại, công cụ và kiểm tra của con người.</p><h2>Giá và so sánh</h2><p>Mức Standard cho mỗi triệu token theo <a href=\"https://developers.openai.com/api/docs/pricing\">bảng giá OpenAI</a>:</p><table><thead><tr><th>Mô hình</th><th>Đầu vào</th><th>Đầu ra</th><th>Trường hợp nên đánh giá</th></tr></thead><tbody><tr><td>GPT-5.6 Terra</td><td>$2</td><td>$12</td><td>Mốc so sánh cũ</td></tr><tr><td>GPT-6.1 Terra</td><td>$1</td><td>$5</td><td>Màn hình, hình ảnh và thao tác trong ứng dụng</td></tr><tr><td>GPT-6.1 Sol</td><td>$2</td><td>$10</td><td>Quy trình và lập trình phức tạp</td></tr><tr><td>GPT-6 Luna</td><td>$0.10</td><td>$0.50</td><td>Tác vụ đơn giản với lưu lượng lớn</td></tr><tr><td>GPT-6 Astra</td><td>$10</td><td>$50</td><td>Trường hợp khó nhất</td></tr></tbody></table><p>Với một triệu tác vụ, mỗi tác vụ dùng 1.000 token đầu vào và 500 token đầu ra, không dùng cache, chi phí token là $8,000 trên GPT-5.6 Terra; $3,500 trên GPT-6.1 Terra; $350 trên Luna; $7,000 trên Sol; và $35,000 trên Astra. Terra mới giảm 56.25% chi phí token so với Terra cũ. Con số chưa bao gồm công cụ, chạy lại, kiểm tra và hạ tầng.</p><h2>Những yếu tố làm thay đổi hóa đơn</h2><p>Với <code>gpt-6.1-terra</code>, token đầu vào đọc từ cache có giá $0.05 cho mỗi triệu token. Ghi cache có giá $1.25 với thời gian lưu 30 phút hoặc $2.50 với 12 giờ. Batch và Flex bằng một nửa giá Standard; Fast gấp đôi. Khi đầu vào vượt 272.000 token, toàn bộ yêu cầu bị tính gấp đôi cho đầu vào và cache, gấp 1.5 lần cho đầu ra. Điểm cuối theo khu vực hoặc FedRAMP cộng 10% nếu có. <a href=\"https://developers.openai.com/api/docs/models/gpt-6.1-terra\">Trang mô hình API</a> nêu cửa sổ ngữ cảnh 1.05 triệu token, đầu ra tối đa 128.000 token và mốc kiến thức ngày 1 tháng 6 năm 2026. Mô hình nhận hình ảnh đầu vào, nhưng không nhận âm thanh hoặc video. Các mức suy luận gồm <code>none</code>, <code>low</code>, <code>medium</code> (mặc định), <code>high</code>, <code>xhigh</code> và <code>max</code>.</p><h2>So với các bản cập nhật khác</h2><p>Astra ra mắt ngày 3 tháng 9, <a href=\"https://openai.com/index/introducing-gpt-6-sol-and-luna/\">Sol và Luna ngày 22 tháng 9</a>, <a href=\"https://openai.com/index/introducing-gpt-6-1-sol/\">GPT-6.1 Sol ngày 29 tháng 9</a>, còn Terra ngày 26 tháng 10. Astra dành cho công việc khó nhất, Sol cho quy trình phức tạp, Luna cho tác vụ đơn giản cần chi phí thấp, Terra cho công việc thị giác và thao tác máy tính. Trong <a href=\"https://openai.com/index/introducing-gpt-6-1-terra/\">thông báo</a>, OpenAI báo cáo Terra cao hơn GPT-5.6 Terra 15 điểm phần trăm trên Agents' Last Exam ở mức medium với khoảng một phần ba chi phí; tỷ lệ lỗi thực tế giảm từ 53.6% xuống 16.7% ở mức low; và điểm Terminal-Bench 4.0 ở mức max là 50.3% so với 21.5%. Đây là kết quả do nhà cung cấp công bố, không bảo đảm cho quy trình của bạn.</p><p>Đối với quy trình tài chính, chạy lại cùng bộ tình huống với quyền công cụ tương đương. Ghi token, lần gọi công cụ, lỗi và sự can thiệp của con người; sau đó so sánh chi phí trên mỗi kết quả được chấp nhận. Cần có phê duyệt của con người cho thanh toán và thay đổi tài khoản ngân hàng của nhà cung cấp.</p>",
+      "faq": [
+        {
+          "question": "GPT-6.1 Terra có giá API bao nhiêu?",
+          "answer": "Giá Standard là $1 cho một triệu token đầu vào, $0.05 cho đầu vào từ cache và $5 cho đầu ra. Ghi cache là $1.25 cho 30 phút hoặc $2.50 cho 12 giờ."
+        },
+        {
+          "question": "Tiết kiệm bao nhiêu so với GPT-5.6 Terra?",
+          "answer": "Đầu vào giảm từ $2 xuống $1, đầu ra từ $12 xuống $5 cho mỗi triệu token. Trong ví dụ một triệu tác vụ, chi phí token giảm 56.25%; mức tiết kiệm thực tế phụ thuộc quy trình."
+        },
+        {
+          "question": "Khi nào nên chọn Terra thay vì Sol hoặc Luna?",
+          "answer": "Thử Terra cho tác vụ trên màn hình và hình ảnh có kết quả kiểm chứng được, Sol cho quy trình phức tạp và Luna cho tác vụ đơn giản lưu lượng lớn. So sánh chi phí trên mỗi kết quả được chấp nhận."
+        },
+        {
+          "question": "Giá token đã gồm chi phí công cụ chưa?",
+          "answer": "Chưa. Dự toán cần tính thêm công cụ, chạy lại, điều phối, hạ tầng và kiểm tra của con người."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/gpt-6-sol-cost-model",
+          "label": "Mô hình chi phí GPT-6 Sol"
+        },
+        {
+          "slug": "/research/gpt-6-luna-cost-model",
+          "label": "Mô hình chi phí GPT-6 Luna"
+        },
+        {
+          "slug": "/research/real-cost-per-task-frontier-models",
+          "label": "Đo chi phí mỗi tác vụ"
+        },
+        {
+          "slug": "/research/agent-workflow-architecture-cost-controls",
+          "label": "Kiểm soát chi phí quy trình tác nhân"
+        }
+      ]
+    },
+    "ar": {
+      "title": "GPT-6.1 Terra: الأسعار واختيار النموذج",
+      "titleCore": "GPT-6.1 Terra: التكلفة واختيار النموذج في FinOps",
+      "description": "أسعار الواجهة البرمجية والتخزين المؤقت والسياق الطويل، مع مقارنة Sol وLuna وAstra وTerra السابق ومثال لتكلفة مليون مهمة.",
+      "body": "<p>أصدرت OpenAI نموذج GPT-6.1 Terra في 26 أكتوبر 2026. يبلغ سعر الواجهة البرمجية القياسي $1 لكل مليون رمز إدخال و$5 لكل مليون رمز إخراج. هذه الأسعار أقل من أسعار GPT-5.6 Terra، لكن قرار الانتقال ينبغي أن يستند إلى تكلفة المهمة المكتملة بنجاح، بما في ذلك إعادة المحاولة والأدوات والمراجعة البشرية.</p><h2>الأسعار والمقارنة</h2><p>الأسعار القياسية لكل مليون رمز وفق <a href=\"https://developers.openai.com/api/docs/pricing\">قائمة أسعار OpenAI</a>:</p><table><thead><tr><th>النموذج</th><th>الإدخال</th><th>الإخراج</th><th>الاستخدام المناسب للتقييم</th></tr></thead><tbody><tr><td>GPT-5.6 Terra</td><td>$2</td><td>$12</td><td>خط المقارنة السابق</td></tr><tr><td>GPT-6.1 Terra</td><td>$1</td><td>$5</td><td>الشاشات والصور والإجراءات داخل التطبيقات</td></tr><tr><td>GPT-6.1 Sol</td><td>$2</td><td>$10</td><td>مسارات العمل والبرمجة المعقدة</td></tr><tr><td>GPT-6 Luna</td><td>$0.10</td><td>$0.50</td><td>المهام المحددة عالية الحجم</td></tr><tr><td>GPT-6 Astra</td><td>$10</td><td>$50</td><td>أصعب الحالات</td></tr></tbody></table><p>إذا نُفذت مليون مهمة تستخدم كل منها 1,000 رمز إدخال و500 رمز إخراج دون تخزين مؤقت، تبلغ تكلفة الرموز وحدها $8,000 على GPT-5.6 Terra و$3,500 على GPT-6.1 Terra و$350 على Luna و$7,000 على Sol و$35,000 على Astra. يوفر Terra الجديد 56.25% من تكلفة الرموز مقارنةً بسابقه. لا تشمل الأرقام الأدوات أو المحاولات المتكررة أو المراجعة أو البنية التحتية.</p><h2>تفاصيل تؤثر في الفاتورة</h2><p>في <code>gpt-6.1-terra</code>، تبلغ تكلفة الإدخال المقروء من الذاكرة المؤقتة $0.05 لكل مليون رمز. وتبلغ تكلفة الكتابة إليها $1.25 عند الاحتفاظ 30 دقيقة أو $2.50 عند الاحتفاظ 12 ساعة. تبلغ تكلفة Batch وFlex نصف السعر القياسي، بينما تبلغ تكلفة Fast ضعفه. إذا تجاوز الإدخال 272,000 رمز، يُحاسَب الطلب كله بضعف سعر الإدخال والذاكرة المؤقتة و1.5 ضعف سعر الإخراج. تضيف نقاط النهاية الإقليمية أو FedRAMP نسبة 10% عند توفرها. توضح <a href=\"https://developers.openai.com/api/docs/models/gpt-6.1-terra\">صفحة النموذج البرمجية</a> نافذة سياق تبلغ 1.05 مليون رمز، وحد إخراج أقصى يبلغ 128,000 رمز، وحد معرفة بتاريخ 1 يونيو 2026. يدعم إدخال الصور، ولا يدعم إدخال الصوت أو الفيديو. مستويات الاستدلال هي <code>none</code> و<code>low</code> و<code>medium</code> (الافتراضي) و<code>high</code> و<code>xhigh</code> و<code>max</code>.</p><h2>مقارنة بالتحديثات الأخرى</h2><p>صدر Astra في 3 سبتمبر، و<a href=\"https://openai.com/index/introducing-gpt-6-sol-and-luna/\">Sol وLuna في 22 سبتمبر</a>، و<a href=\"https://openai.com/index/introducing-gpt-6-1-sol/\">GPT-6.1 Sol في 29 سبتمبر</a>، وTerra في 26 أكتوبر. يناسب Astra الأعمال الأصعب، وSol المسارات المعقدة، وLuna المهام البسيطة منخفضة التكلفة، وTerra العمل البصري واستخدام الحاسوب. تذكر OpenAI في <a href=\"https://openai.com/index/introducing-gpt-6-1-terra/\">إعلانها</a> أن Terra تفوق على GPT-5.6 Terra بمقدار 15 نقطة مئوية في Agents' Last Exam عند مستوى medium وبتكلفة تقارب الثلث؛ وانخفض معدل الأخطاء الواقعية من 53.6% إلى 16.7% عند مستوى low؛ وبلغت نتيجته 50.3% مقابل 21.5% في Terminal-Bench 4.0 عند مستوى max. هذه نتائج منشورة من المورّد، ولا تضمن أداء مسار عملك.</p><p>بالنسبة إلى الإجراءات المالية، أعِد تشغيل الحالات نفسها بصلاحيات أدوات متماثلة. سجّل الرموز واستدعاءات الأدوات والإخفاقات وتدخل البشر، ثم قارن التكلفة لكل نتيجة مقبولة. احتفظ بموافقة بشرية على المدفوعات وتغيير الحسابات البنكية للمورّدين.</p>",
+      "faq": [
+        {
+          "question": "كم تبلغ تكلفة GPT-6.1 Terra عبر الواجهة البرمجية؟",
+          "answer": "السعر القياسي $1 لكل مليون رمز إدخال و$0.05 للإدخال من الذاكرة المؤقتة و$5 للإخراج. تبلغ تكلفة الكتابة في الذاكرة $1.25 لمدة 30 دقيقة أو $2.50 لمدة 12 ساعة."
+        },
+        {
+          "question": "كم يبلغ التوفير مقارنةً بـ GPT-5.6 Terra؟",
+          "answer": "ينخفض سعر الإدخال من $2 إلى $1 والإخراج من $12 إلى $5 لكل مليون رمز. في مثال مليون مهمة تنخفض تكلفة الرموز 56.25%؛ ويعتمد التوفير الفعلي على مسار العمل."
+        },
+        {
+          "question": "متى يُختار Terra بدلاً من Sol أو Luna؟",
+          "answer": "اختبر Terra للمهام المرئية وعلى الشاشة ذات النتائج القابلة للتحقق، وSol للمسارات المعقدة، وLuna للمهام البسيطة عالية الحجم. قارن تكلفة كل نتيجة مقبولة."
+        },
+        {
+          "question": "هل تشمل أسعار الرموز تكلفة الأدوات؟",
+          "answer": "لا. ينبغي أن تشمل الميزانية الأدوات وإعادة المحاولة والتنسيق والبنية التحتية والمراجعة البشرية."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/gpt-6-sol-cost-model",
+          "label": "نموذج تكلفة GPT-6 Sol"
+        },
+        {
+          "slug": "/research/gpt-6-luna-cost-model",
+          "label": "نموذج تكلفة GPT-6 Luna"
+        },
+        {
+          "slug": "/research/real-cost-per-task-frontier-models",
+          "label": "قياس تكلفة المهمة"
+        },
+        {
+          "slug": "/research/agent-workflow-architecture-cost-controls",
+          "label": "ضوابط تكلفة سير عمل الوكلاء"
+        }
+      ]
+    }
+  }
+}

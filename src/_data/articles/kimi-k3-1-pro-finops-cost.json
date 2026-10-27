@@ -1,0 +1,432 @@
+{
+  "slug": "research/kimi-k3-1-pro-finops-cost",
+  "tags": [
+    "kimi",
+    "moonshot",
+    "pricing",
+    "model-routing",
+    "finops"
+  ],
+  "datePublished": "2026-10-27",
+  "dateModified": "2026-10-27",
+  "image": "https://finopsllm.com/og.png",
+  "agentMode": true,
+  "languages": {
+    "en": {
+      "title": "Kimi K3.1 Pro pricing and FinOps guide",
+      "titleCore": "Kimi K3.1 Pro pricing and FinOps guide",
+      "description": "Kimi K3.1 Pro launched Oct 23. Compare Pro, Highspeed and K3 API token prices, with request-cost examples and a rollout plan.",
+      "body": "<p><strong>Kimi K3.1 Pro arrived on October 23, 2026.</strong> The Moonshot developer forum announcement calls it the first K3.1-series model; the API platform lists a 1-million-token context and current usage rates of $2 per million input tokens and $10 per million output tokens. That is a cheaper rate card than Kimi K3, but it does not establish lower cost per completed task. Long prompts, output volume, cache hits, retries, tool calls, and quality all affect the invoice.</p>\n<h2>Current API rates</h2><p>Moonshot’s public platform currently lists these rates in USD per million tokens. Confirm them before budgeting because provider prices and availability can change.</p><table><thead><tr><th>Model / token type</th><th>Uncached input</th><th>Cache write</th><th>Cache hit</th><th>Output</th></tr></thead><tbody><tr><td>Kimi K3.1 Pro</td><td>$2.00</td><td>$2.00</td><td>$0.20</td><td>$10.00</td></tr><tr><td>Kimi K3.1 Pro Highspeed</td><td>$4.00</td><td>$4.00</td><td>$0.20</td><td>$20.00</td></tr><tr><td>Kimi K3</td><td>$3.00</td><td>$3.00</td><td>$0.30</td><td>$15.00</td></tr></tbody></table><p>K3.1 Pro’s standard uncached rates are one-third below K3’s input and output rates. Highspeed is twice the standard K3.1 Pro rate for uncached input and output, while the listed cache-hit price stays at $0.20. This means cache status matters especially when comparing Highspeed: do not apply a blanket 2× multiplier to cached input. The platform describes Highspeed as roughly three times faster with the same intelligence and 1M context; verify that latency claim against your own workload.</p>\n<h2>Translate the rate card into request cost</h2><p>For a simple illustration, assume each completed request uses 10,000 uncached input tokens and 2,000 output tokens, with no tools, retries, or other charges:</p><table><thead><tr><th>Route</th><th>Cost per request</th><th>Cost for 100,000 requests</th></tr></thead><tbody><tr><td>K3.1 Pro</td><td>$0.040</td><td>$4,000</td></tr><tr><td>K3.1 Pro Highspeed</td><td>$0.080</td><td>$8,000</td></tr><tr><td>K3</td><td>$0.060</td><td>$6,000</td></tr></tbody></table><p>These are list-rate calculations, not observed bills. At the same token counts, K3.1 Pro saves $2,000 per 100,000 requests against K3. Highspeed costs $2,000 more than K3 at those assumptions; its business case requires the faster response to improve throughput or task completion enough to pay for the premium. If every request has 8,000 cache-hit input tokens and 2,000 uncached input tokens instead, K3.1 Pro’s input cost drops to $0.0056 per request ($0.0016 cached plus $0.004 uncached). Track cache-hit and uncached input separately in your usage records.</p>\n<h2>A million-token context is a ceiling, not a budget</h2><p>The large context window can support long code, research, and financial-modeling workflows, but sending more context still creates token charges. A single million-token uncached input would cost $2 on K3.1 Pro before output; 100,000 output tokens would add $1. That illustrative call costs $3 before any tools or retries. A nominal 1M context therefore says how much may fit, not what a typical request costs or whether the model will use the full window efficiently.</p><p>For agent workflows, measure the entire run rather than one API call: accumulated history, repeated tool results, retries, and final output can make multi-step work much more expensive than the first turn suggests. The K3 launch announcement noted K3’s 2.8-trillion total parameters and 1M context; K3.1 Pro is described as 3T-class, but parameter counts do not directly predict your serving bill.</p>\n<h2>FinOps rollout: benchmark accepted work</h2><ol><li><strong>Start with a representative sample.</strong> Replay real requests through K3 and K3.1 Pro, stratified by task type and prompt length. Keep the task, tools, and success criteria fixed.</li><li><strong>Log token categories.</strong> Capture model ID, uncached input, cache writes, cache hits, output, latency, retries, and tool charges for each task. Reconcile sampled usage to provider invoices.</li><li><strong>Compare cost per accepted outcome.</strong> Include failed tasks, human review, and fallback calls. Lower price per token is not a saving if the new route needs extra attempts.</li><li><strong>Route by value.</strong> Use standard K3.1 Pro where it meets quality and latency targets. Reserve Highspeed for work with a measurable value from lower latency. Keep a fallback for tasks where evaluation shows a quality gap.</li><li><strong>Set budgets below the context ceiling.</strong> Apply per-task token and spend limits, compact stale history, and cap oversized tool results. Alert on tail behavior, not just average tokens.</li></ol><p>Moonshot describes API pay-as-you-go and Kimi memberships as separate products; do not treat a consumer subscription as an API allowance. Also model tool and infrastructure charges separately when they are outside the token price.</p><h2>Sources</h2><ul><li><a href=\"https://forum.moonshot.ai/latest\">Moonshot AI Kimi Forum announcement, October 23, 2026</a></li><li><a href=\"https://platform.kimi.ai/\">Kimi API Platform: current model prices and specifications</a></li><li><a href=\"https://forum.moonshot.ai/t/kimi-k3-is-here-our-most-capable-model/480\">Moonshot AI: Kimi K3 launch and API pricing</a></li></ul>",
+      "faq": [
+        {
+          "question": "When did Kimi K3.1 Pro launch?",
+          "answer": "Moonshot's developer forum announcement is dated October 23, 2026."
+        },
+        {
+          "question": "How much does Kimi K3.1 Pro cost?",
+          "answer": "The Kimi API platform currently lists $2 per million input tokens and $10 per million output tokens; cache writes are $2 and cache hits are $0.20 per million."
+        },
+        {
+          "question": "Is Highspeed twice the price?",
+          "answer": "Its listed uncached input, cache-write, and output rates are twice K3.1 Pro's, but the cache-hit rate is the same $0.20 per million tokens."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/real-cost-per-task-frontier-models",
+          "label": "Cost per task across frontier models"
+        }
+      ]
+    },
+    "de": {
+      "title": "Kimi K3.1 Pro: Preise und FinOps",
+      "titleCore": "Kimi K3.1 Pro: Preise und FinOps",
+      "description": "Kimi K3.1 Pro startete am 23. Oktober. API-Preise für Pro, Highspeed und K3 mit Kostenbeispielen und FinOps-Rollout.",
+      "body": "<p><strong>Kimi K3.1 Pro wurde am 23. Oktober 2026 vorgestellt.</strong> Moonshots Entwicklerforum bezeichnet es als erstes Modell der K3.1-Reihe. Die API-Plattform nennt ein Kontextfenster von einer Million Tokens und aktuelle Preise von 2 US-Dollar pro Million Eingabe-Tokens sowie 10 US-Dollar pro Million Ausgabe-Tokens. Das ist günstiger als K3 auf der Preisliste, beweist aber keine geringeren Kosten je erfolgreicher Aufgabe.</p><h2>Aktuelle API-Preise je Million Tokens</h2><table><tr><th>Modell</th><th>Eingabe</th><th>Cache-Schreiben</th><th>Cache-Treffer</th><th>Ausgabe</th></tr><tr><td>K3.1 Pro</td><td>$2</td><td>$2</td><td>$0.20</td><td>$10</td></tr><tr><td>K3.1 Pro Highspeed</td><td>$4</td><td>$4</td><td>$0.20</td><td>$20</td></tr><tr><td>K3</td><td>$3</td><td>$3</td><td>$0.30</td><td>$15</td></tr></table><p>Pro liegt bei nicht gecachten Ein- und Ausgaben ein Drittel unter K3. Highspeed kostet dort doppelt so viel; der angegebene Cache-Trefferpreis bleibt jedoch bei $0.20. Moonshot bewirbt Highspeed mit etwa dreifacher Geschwindigkeit. Prüfen Sie Latenz und Qualität mit eigenen Aufgaben.</p><h2>Beispielkosten</h2><p>Bei 10.000 nicht gecachten Eingabe- und 2.000 Ausgabe-Tokens je Aufgabe, ohne Tools oder Wiederholungen, kostet eine Anfrage K3.1 Pro $0.04, Highspeed $0.08 und K3 $0.06. 100.000 Anfragen entsprächen $4.000, $8.000 bzw. $6.000. Das ist eine Listenpreisrechnung, keine Rechnungsprognose. Der Mehrpreis für Highspeed muss durch messbar kürzere Laufzeit oder mehr erledigte Aufgaben ausgeglichen werden.</p><p>Ein Million-Tokens-Kontext ist eine Obergrenze, kein Budget. Eine Million nicht gecachte Eingabe-Tokens kosten bei Pro $2; 100.000 Ausgabe-Tokens weitere $1. Erfassen Sie außerdem Cache-Treffer, Wiederholungen, Toolkosten und Erfolg pro gesamtem Agentenlauf.</p><h2>Einführung mit FinOps-Kontrollen</h2><ol><li>Reale Aufgaben nach Typ und Promptlänge mit K3 und K3.1 Pro wiederholen.</li><li>Eingabe, Cache-Schreiben und -Treffer, Ausgabe, Latenz, Wiederholungen und Toolgebühren protokollieren.</li><li>Kosten je akzeptiertem Ergebnis samt Fehlern, menschlicher Prüfung und Fallback vergleichen.</li><li>Highspeed nur einsetzen, wenn sein Latenzvorteil messbaren Geschäftswert hat.</li><li>Token- und Ausgabenlimits unterhalb der Kontextgrenze setzen und lange Verläufe kürzen.</li></ol><p>API-Abrechnung und Kimi-Mitgliedschaften sind getrennte Produkte. Prüfen Sie vor der Budgetierung die <a href=\"https://platform.kimi.ai/\">aktuelle Preisliste</a>.</p><h2>Sources</h2><ul><li><a href=\"https://forum.moonshot.ai/latest\">Moonshot AI Kimi Forum announcement, October 23, 2026</a></li><li><a href=\"https://platform.kimi.ai/\">Kimi API Platform: current model prices and specifications</a></li><li><a href=\"https://forum.moonshot.ai/t/kimi-k3-is-here-our-most-capable-model/480\">Moonshot AI: Kimi K3 launch and API pricing</a></li></ul>",
+      "faq": [
+        {
+          "question": "Wann kam Kimi K3.1 Pro heraus?",
+          "answer": "Die Ankündigung im Moonshot-Entwicklerforum ist auf den 23. Oktober 2026 datiert."
+        },
+        {
+          "question": "Was kostet Kimi K3.1 Pro?",
+          "answer": "Die API-Plattform nennt aktuell $2 je Million Eingabe-Tokens und $10 je Million Ausgabe-Tokens."
+        },
+        {
+          "question": "Kostet Highspeed doppelt so viel?",
+          "answer": "Die gelisteten nicht gecachten Ein- und Ausgaberaten sind doppelt so hoch; Cache-Treffer kosten weiterhin $0.20 je Million Tokens."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/real-cost-per-task-frontier-models",
+          "label": "Kosten je Aufgabe bei Frontier-Modellen"
+        }
+      ]
+    },
+    "es": {
+      "title": "Kimi K3.1 Pro: precios y FinOps",
+      "titleCore": "Kimi K3.1 Pro: precios y FinOps",
+      "description": "Kimi K3.1 Pro se lanzó el 23 de octubre. Compara precios API de Pro, Highspeed y K3 con ejemplos de coste y un plan FinOps.",
+      "body": "<p><strong>Kimi K3.1 Pro se presentó el 23 de octubre de 2026.</strong> Moonshot lo describe como el primer modelo de la serie K3.1. Su plataforma API indica un contexto de un millón de tokens y tarifas actuales de 2 USD por millón de tokens de entrada y 10 USD por millón de salida. La tarifa es inferior a K3, pero no demuestra un menor coste por tarea completada correctamente.</p><h2>Tarifas API actuales por millón de tokens</h2><table><tr><th>Modelo</th><th>Entrada</th><th>Escritura caché</th><th>Lectura caché</th><th>Salida</th></tr><tr><td>K3.1 Pro</td><td>$2</td><td>$2</td><td>$0.20</td><td>$10</td></tr><tr><td>K3.1 Pro Highspeed</td><td>$4</td><td>$4</td><td>$0.20</td><td>$20</td></tr><tr><td>K3</td><td>$3</td><td>$3</td><td>$0.30</td><td>$15</td></tr></table><p>Pro reduce un tercio las tarifas de entrada y salida sin caché frente a K3. Highspeed cuesta el doble en esas categorías, aunque la lectura de caché permanece en $0.20. Moonshot afirma que Highspeed es aproximadamente tres veces más rápido; mida latencia y calidad en su carga real.</p><h2>Coste por solicitud</h2><p>Con 10.000 tokens de entrada sin caché y 2.000 de salida por tarea, sin herramientas ni reintentos, una solicitud cuesta $0.04 con K3.1 Pro, $0.08 con Highspeed y $0.06 con K3. Para 100.000 solicitudes serían $4.000, $8.000 y $6.000. Es un cálculo a tarifa pública, no una previsión de factura. El sobreprecio de Highspeed necesita generar suficiente valor por menor latencia.</p><p>Un contexto de un millón de tokens es un límite, no un presupuesto. Un millón de tokens de entrada sin caché cuesta $2 en Pro; 100.000 de salida añaden $1. Mida también caché, herramientas, reintentos y coste por resultado aceptado en todo el flujo del agente.</p><h2>Despliegue con controles FinOps</h2><ol><li>Reproduzca solicitudes reales de K3 y K3.1 Pro por tipo de tarea y longitud.</li><li>Registre entrada, escrituras y aciertos de caché, salida, latencia, reintentos y herramientas.</li><li>Compare coste por resultado aceptado, incluidos fallos, revisión humana y alternativas.</li><li>Reserve Highspeed para tareas donde la menor latencia aporte valor medible.</li><li>Fije límites de tokens y gasto por debajo del máximo de contexto y acorte historiales antiguos.</li></ol><p>La API y las suscripciones de Kimi son productos separados. Verifique la <a href=\"https://platform.kimi.ai/\">tarifa vigente</a> antes de presupuestar.</p><h2>Sources</h2><ul><li><a href=\"https://forum.moonshot.ai/latest\">Moonshot AI Kimi Forum announcement, October 23, 2026</a></li><li><a href=\"https://platform.kimi.ai/\">Kimi API Platform: current model prices and specifications</a></li><li><a href=\"https://forum.moonshot.ai/t/kimi-k3-is-here-our-most-capable-model/480\">Moonshot AI: Kimi K3 launch and API pricing</a></li></ul>",
+      "faq": [
+        {
+          "question": "¿Cuándo se lanzó Kimi K3.1 Pro?",
+          "answer": "El anuncio del foro de desarrolladores de Moonshot está fechado el 23 de octubre de 2026."
+        },
+        {
+          "question": "¿Cuánto cuesta?",
+          "answer": "La plataforma API indica $2 por millón de tokens de entrada y $10 por millón de salida."
+        },
+        {
+          "question": "¿Highspeed cuesta el doble?",
+          "answer": "Sus tarifas de entrada y salida no cacheadas duplican las de Pro, pero la lectura de caché cuesta lo mismo."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/real-cost-per-task-frontier-models",
+          "label": "Coste por tarea entre modelos frontera"
+        }
+      ]
+    },
+    "fr": {
+      "title": "Kimi K3.1 Pro : tarifs et FinOps",
+      "titleCore": "Kimi K3.1 Pro : tarifs et FinOps",
+      "description": "Kimi K3.1 Pro a été lancé le 23 octobre. Comparez les tarifs API Pro, Highspeed et K3, avec des coûts types et un plan FinOps.",
+      "body": "<p><strong>Kimi K3.1 Pro a été présenté le 23 octobre 2026.</strong> Moonshot le décrit comme le premier modèle de la série K3.1. Sa plateforme API indique un contexte d’un million de tokens et des tarifs actuels de 2 $ par million de tokens en entrée et 10 $ en sortie. Le tarif est inférieur à celui de K3, sans prouver un coût moindre par tâche réussie.</p><h2>Tarifs API par million de tokens</h2><table><tr><th>Modèle</th><th>Entrée</th><th>Écriture cache</th><th>Lecture cache</th><th>Sortie</th></tr><tr><td>K3.1 Pro</td><td>$2</td><td>$2</td><td>$0.20</td><td>$10</td></tr><tr><td>K3.1 Pro Highspeed</td><td>$4</td><td>$4</td><td>$0.20</td><td>$20</td></tr><tr><td>K3</td><td>$3</td><td>$3</td><td>$0.30</td><td>$15</td></tr></table><p>Pro réduit d’un tiers les tarifs d’entrée et de sortie non mis en cache par rapport à K3. Highspeed double ces tarifs, mais le prix de lecture du cache reste à 0,20 $. Moonshot annonce une vitesse environ trois fois supérieure pour Highspeed : vérifiez latence et qualité sur vos tâches.</p><h2>Coût d’une requête</h2><p>Avec 10 000 tokens d’entrée non mis en cache et 2 000 tokens de sortie, sans outils ni nouvelles tentatives, une requête coûte 0,04 $ avec K3.1 Pro, 0,08 $ avec Highspeed et 0,06 $ avec K3. Pour 100 000 requêtes, cela représente 4 000 $, 8 000 $ et 6 000 $. C’est un calcul au tarif public, pas une prévision de facture. Le surcoût de Highspeed doit produire une valeur mesurable grâce à la latence réduite.</p><p>Un contexte d’un million de tokens est un plafond, pas un budget. Un million de tokens d’entrée non mis en cache coûte 2 $ avec Pro, auxquels s’ajoutent 1 $ pour 100 000 tokens de sortie. Mesurez aussi le cache, les outils, les tentatives et le coût par résultat accepté sur l’ensemble de l’agent.</p><h2>Déploiement avec contrôles FinOps</h2><ol><li>Rejouez des demandes réelles sur K3 et K3.1 Pro, par type de tâche et longueur.</li><li>Consignez entrées, écritures et lectures du cache, sorties, latence, tentatives et outils.</li><li>Comparez le coût par résultat accepté, échecs et revue humaine compris.</li><li>Réservez Highspeed aux cas où le gain de latence a une valeur mesurable.</li><li>Fixez des limites de tokens et de dépenses sous le plafond de contexte.</li></ol><p>L’API et les abonnements Kimi sont des produits distincts. Vérifiez le <a href=\"https://platform.kimi.ai/\">tarif actuel</a> avant tout budget.</p><h2>Sources</h2><ul><li><a href=\"https://forum.moonshot.ai/latest\">Moonshot AI Kimi Forum announcement, October 23, 2026</a></li><li><a href=\"https://platform.kimi.ai/\">Kimi API Platform: current model prices and specifications</a></li><li><a href=\"https://forum.moonshot.ai/t/kimi-k3-is-here-our-most-capable-model/480\">Moonshot AI: Kimi K3 launch and API pricing</a></li></ul>",
+      "faq": [
+        {
+          "question": "Quand Kimi K3.1 Pro est-il sorti ?",
+          "answer": "L’annonce du forum développeurs Moonshot est datée du 23 octobre 2026."
+        },
+        {
+          "question": "Quel est son prix ?",
+          "answer": "La plateforme API indique 2 $ par million de tokens en entrée et 10 $ en sortie."
+        },
+        {
+          "question": "Highspeed coûte-t-il deux fois plus ?",
+          "answer": "Ses tarifs d’entrée et de sortie non mis en cache doublent, mais la lecture du cache reste au même prix."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/real-cost-per-task-frontier-models",
+          "label": "Coût par tâche des modèles de pointe"
+        }
+      ]
+    },
+    "ja": {
+      "title": "Kimi K3.1 Proの料金とFinOps",
+      "titleCore": "Kimi K3.1 Proの料金とFinOps",
+      "description": "Kimi K3.1 Proは10月23日発表。Pro、Highspeed、K3のAPI料金、リクエスト費用例、FinOps導入手順を比較します。",
+      "body": "<p><strong>Kimi K3.1 Proは2026年10月23日に発表されました。</strong>Moonshotの開発者フォーラムではK3.1シリーズ初のモデルと説明されています。APIプラットフォームの現行料金は入力100万トークンあたり2ドル、出力100万あたり10ドルで、コンテキスト上限は100万トークンです。K3より料金表は低いものの、成功したタスクあたりの費用が下がるとは限りません。</p><h2>100万トークンあたりのAPI料金</h2><table><tr><th>モデル</th><th>入力</th><th>キャッシュ書込</th><th>キャッシュ読込</th><th>出力</th></tr><tr><td>K3.1 Pro</td><td>$2</td><td>$2</td><td>$0.20</td><td>$10</td></tr><tr><td>K3.1 Pro Highspeed</td><td>$4</td><td>$4</td><td>$0.20</td><td>$20</td></tr><tr><td>K3</td><td>$3</td><td>$3</td><td>$0.30</td><td>$15</td></tr></table><p>Proの未キャッシュ入力・出力はK3より3分の1安価です。Highspeedはその2倍ですが、キャッシュ読込料金は$0.20のままです。Moonshotは約3倍高速と説明しています。自社のタスクで速度と品質を測定してください。</p><h2>リクエスト費用の例</h2><p>1件あたり未キャッシュ入力1万、出力2千トークン、ツール・再試行なしなら、K3.1 Proは$0.04、Highspeedは$0.08、K3は$0.06です。10万件ではそれぞれ$4,000、$8,000、$6,000です。これは公開料金での計算であり、請求予測ではありません。Highspeedの追加費用は、短縮した遅延が十分な業務価値を生む必要があります。</p><p>100万トークンのコンテキストは上限であり予算ではありません。未キャッシュ入力100万トークンはProで$2、出力10万トークンでさらに$1です。エージェント全体のキャッシュ、ツール、再試行、受け入れ結果あたりの費用も記録しましょう。</p><h2>FinOps導入手順</h2><ol><li>実際の依頼をタスク種別と長さ別にK3とK3.1 Proで再実行する。</li><li>入力、キャッシュ書込・読込、出力、遅延、再試行、ツール費を記録する。</li><li>失敗や人手レビューを含め、受け入れ結果あたりの費用を比較する。</li><li>測定可能な遅延価値がある仕事にHighspeedを限定する。</li><li>コンテキスト上限未満にタスク別トークン・費用上限を設定する。</li></ol><p>Kimi APIと消費者向け会員契約は別商品です。予算化前に<a href=\"https://platform.kimi.ai/\">最新料金</a>を確認してください。</p><h2>Sources</h2><ul><li><a href=\"https://forum.moonshot.ai/latest\">Moonshot AI Kimi Forum announcement, October 23, 2026</a></li><li><a href=\"https://platform.kimi.ai/\">Kimi API Platform: current model prices and specifications</a></li><li><a href=\"https://forum.moonshot.ai/t/kimi-k3-is-here-our-most-capable-model/480\">Moonshot AI: Kimi K3 launch and API pricing</a></li></ul>",
+      "faq": [
+        {
+          "question": "Kimi K3.1 Proの発表日は？",
+          "answer": "Moonshot開発者フォーラムの発表日は2026年10月23日です。"
+        },
+        {
+          "question": "API料金はいくらですか？",
+          "answer": "現行料金は入力100万トークンあたり$2、出力100万あたり$10です。"
+        },
+        {
+          "question": "Highspeedは2倍の価格ですか？",
+          "answer": "未キャッシュ入力と出力は2倍ですが、キャッシュ読込料金は同じです。"
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/real-cost-per-task-frontier-models",
+          "label": "主要モデルのタスク単価"
+        }
+      ]
+    },
+    "pt": {
+      "title": "Kimi K3.1 Pro: preços e FinOps",
+      "titleCore": "Kimi K3.1 Pro: preços e FinOps",
+      "description": "Kimi K3.1 Pro foi lançado em 23 de outubro. Compare os preços API de Pro, Highspeed e K3, exemplos de custo e plano FinOps.",
+      "body": "<p><strong>Kimi K3.1 Pro foi apresentado em 23 de outubro de 2026.</strong> O fórum de desenvolvedores da Moonshot o chama de primeiro modelo da série K3.1. A plataforma API indica contexto de um milhão de tokens e preços atuais de US$ 2 por milhão de tokens de entrada e US$ 10 por milhão de saída. A tabela é mais barata que a do K3, mas isso não prova menor custo por tarefa bem-sucedida.</p><h2>Preços API por milhão de tokens</h2><table><tr><th>Modelo</th><th>Entrada</th><th>Gravação cache</th><th>Leitura cache</th><th>Saída</th></tr><tr><td>K3.1 Pro</td><td>$2</td><td>$2</td><td>$0.20</td><td>$10</td></tr><tr><td>K3.1 Pro Highspeed</td><td>$4</td><td>$4</td><td>$0.20</td><td>$20</td></tr><tr><td>K3</td><td>$3</td><td>$3</td><td>$0.30</td><td>$15</td></tr></table><p>O Pro reduz em um terço as tarifas de entrada e saída sem cache frente ao K3. O Highspeed custa o dobro nessas categorias, mas a leitura de cache continua em US$ 0,20. A Moonshot afirma que ele é cerca de três vezes mais rápido; valide latência e qualidade na sua carga.</p><h2>Custo por solicitação</h2><p>Com 10 mil tokens de entrada sem cache e 2 mil de saída por tarefa, sem ferramentas ou novas tentativas, cada solicitação custa US$ 0,04 no K3.1 Pro, US$ 0,08 no Highspeed e US$ 0,06 no K3. Para 100 mil solicitações: US$ 4.000, US$ 8.000 e US$ 6.000. É um cálculo de tabela, não uma previsão de fatura. O adicional do Highspeed precisa gerar valor mensurável pela latência menor.</p><p>Um contexto de um milhão de tokens é um limite, não um orçamento. Um milhão de tokens de entrada sem cache custa US$ 2 no Pro; mais 100 mil tokens de saída acrescentam US$ 1. Meça também cache, ferramentas, tentativas e custo por resultado aceito em todo o fluxo do agente.</p><h2>Implantação com controles FinOps</h2><ol><li>Reexecute solicitações reais no K3 e K3.1 Pro por tipo e tamanho.</li><li>Registre entrada, gravação e leitura de cache, saída, latência, tentativas e ferramentas.</li><li>Compare custo por resultado aceito, incluindo falhas e revisão humana.</li><li>Use Highspeed quando a redução de latência tiver valor mensurável.</li><li>Defina limites de tokens e gasto abaixo do máximo de contexto.</li></ol><p>A API e as assinaturas Kimi são produtos separados. Confirme a <a href=\"https://platform.kimi.ai/\">tabela atual</a> antes de orçar.</p><h2>Sources</h2><ul><li><a href=\"https://forum.moonshot.ai/latest\">Moonshot AI Kimi Forum announcement, October 23, 2026</a></li><li><a href=\"https://platform.kimi.ai/\">Kimi API Platform: current model prices and specifications</a></li><li><a href=\"https://forum.moonshot.ai/t/kimi-k3-is-here-our-most-capable-model/480\">Moonshot AI: Kimi K3 launch and API pricing</a></li></ul>",
+      "faq": [
+        {
+          "question": "Quando foi lançado?",
+          "answer": "O anúncio no fórum de desenvolvedores Moonshot é de 23 de outubro de 2026."
+        },
+        {
+          "question": "Quanto custa?",
+          "answer": "A plataforma API indica US$ 2 por milhão de tokens de entrada e US$ 10 de saída."
+        },
+        {
+          "question": "Highspeed custa o dobro?",
+          "answer": "As tarifas de entrada e saída sem cache são o dobro, mas a leitura de cache tem o mesmo preço."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/real-cost-per-task-frontier-models",
+          "label": "Custo por tarefa entre modelos de fronteira"
+        }
+      ]
+    },
+    "it": {
+      "title": "Kimi K3.1 Pro: prezzi e FinOps",
+      "titleCore": "Kimi K3.1 Pro: prezzi e FinOps",
+      "description": "Kimi K3.1 Pro è uscito il 23 ottobre. Confronto tra prezzi API Pro, Highspeed e K3, esempi di costo e piano FinOps.",
+      "body": "<p><strong>Kimi K3.1 Pro è stato presentato il 23 ottobre 2026.</strong> Il forum sviluppatori Moonshot lo definisce il primo modello della serie K3.1. La piattaforma API indica un contesto di un milione di token e tariffe attuali di 2 $ per milione di token in ingresso e 10 $ in uscita. Il listino è inferiore a quello di K3, ma non dimostra un costo inferiore per attività completata correttamente.</p><h2>Tariffe API per milione di token</h2><table><tr><th>Modello</th><th>Ingresso</th><th>Scrittura cache</th><th>Lettura cache</th><th>Uscita</th></tr><tr><td>K3.1 Pro</td><td>$2</td><td>$2</td><td>$0.20</td><td>$10</td></tr><tr><td>K3.1 Pro Highspeed</td><td>$4</td><td>$4</td><td>$0.20</td><td>$20</td></tr><tr><td>K3</td><td>$3</td><td>$3</td><td>$0.30</td><td>$15</td></tr></table><p>Pro riduce di un terzo le tariffe di ingresso e uscita senza cache rispetto a K3. Highspeed costa il doppio in queste categorie, mentre la lettura cache resta a 0,20 $. Moonshot dichiara una velocità circa tripla: verificatela sulle vostre richieste.</p><h2>Costo per richiesta</h2><p>Con 10.000 token di ingresso senza cache e 2.000 di uscita, senza strumenti né tentativi aggiuntivi, una richiesta costa 0,04 $ con K3.1 Pro, 0,08 $ con Highspeed e 0,06 $ con K3. Per 100.000 richieste: 4.000 $, 8.000 $ e 6.000 $. È un calcolo sul listino, non una previsione di fattura. Il sovrapprezzo Highspeed deve creare valore misurabile grazie alla minore latenza.</p><p>Un contesto da un milione di token è un limite, non un budget. Un milione di token in ingresso senza cache costa 2 $ con Pro; 100.000 token in uscita aggiungono 1 $. Misurate anche cache, strumenti, ripetizioni e costo per risultato accettato nell’intero flusso dell’agente.</p><h2>Avvio con controlli FinOps</h2><ol><li>Ripetete richieste reali su K3 e K3.1 Pro, per tipo e lunghezza.</li><li>Registrate ingresso, scritture e letture cache, uscita, latenza, ripetizioni e strumenti.</li><li>Confrontate il costo per risultato accettato, includendo errori e revisione umana.</li><li>Riservate Highspeed ai casi in cui la latenza inferiore abbia valore misurabile.</li><li>Impostate limiti di token e spesa inferiori alla finestra di contesto.</li></ol><p>API e abbonamenti Kimi sono prodotti distinti. Verificate il <a href=\"https://platform.kimi.ai/\">listino corrente</a> prima di pianificare il budget.</p><h2>Sources</h2><ul><li><a href=\"https://forum.moonshot.ai/latest\">Moonshot AI Kimi Forum announcement, October 23, 2026</a></li><li><a href=\"https://platform.kimi.ai/\">Kimi API Platform: current model prices and specifications</a></li><li><a href=\"https://forum.moonshot.ai/t/kimi-k3-is-here-our-most-capable-model/480\">Moonshot AI: Kimi K3 launch and API pricing</a></li></ul>",
+      "faq": [
+        {
+          "question": "Quando è uscito Kimi K3.1 Pro?",
+          "answer": "L’annuncio sul forum sviluppatori Moonshot è datato 23 ottobre 2026."
+        },
+        {
+          "question": "Quanto costa?",
+          "answer": "La piattaforma API indica 2 $ per milione di token in ingresso e 10 $ in uscita."
+        },
+        {
+          "question": "Highspeed costa il doppio?",
+          "answer": "Le tariffe di ingresso e uscita senza cache raddoppiano, ma la lettura cache mantiene lo stesso prezzo."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/real-cost-per-task-frontier-models",
+          "label": "Costo per attività tra modelli frontier"
+        }
+      ]
+    },
+    "ko": {
+      "title": "Kimi K3.1 Pro 가격과 FinOps",
+      "titleCore": "Kimi K3.1 Pro 가격과 FinOps",
+      "description": "Kimi K3.1 Pro는 10월 23일 출시됐습니다. Pro, Highspeed, K3 API 가격과 요청 비용 예시, FinOps 도입 계획을 비교합니다.",
+      "body": "<p><strong>Kimi K3.1 Pro는 2026년 10월 23일 공개됐습니다.</strong> Moonshot 개발자 포럼은 이를 K3.1 시리즈의 첫 모델로 소개합니다. API 플랫폼의 현재 요금은 입력 100만 토큰당 $2, 출력 100만 토큰당 $10이며 컨텍스트는 100만 토큰입니다. K3보다 요금표는 낮지만 성공한 작업당 비용이 감소한다고 단정할 수는 없습니다.</p><h2>100만 토큰당 API 요금</h2><table><tr><th>모델</th><th>입력</th><th>캐시 기록</th><th>캐시 적중</th><th>출력</th></tr><tr><td>K3.1 Pro</td><td>$2</td><td>$2</td><td>$0.20</td><td>$10</td></tr><tr><td>K3.1 Pro Highspeed</td><td>$4</td><td>$4</td><td>$0.20</td><td>$20</td></tr><tr><td>K3</td><td>$3</td><td>$3</td><td>$0.30</td><td>$15</td></tr></table><p>Pro의 캐시되지 않은 입력·출력 요금은 K3보다 3분의 1 낮습니다. Highspeed는 해당 요금이 2배지만 캐시 적중 가격은 $0.20로 같습니다. Moonshot은 약 3배 빠르다고 설명하지만 실제 워크로드에서 지연시간과 품질을 확인하세요.</p><h2>요청 비용 예시</h2><p>요청당 캐시되지 않은 입력 1만 토큰과 출력 2천 토큰, 도구와 재시도가 없다고 하면 K3.1 Pro는 $0.04, Highspeed는 $0.08, K3는 $0.06입니다. 10만 건이면 각각 $4,000, $8,000, $6,000입니다. 이는 공개 요금표 계산이지 청구액 예측이 아닙니다. Highspeed 추가 비용은 속도 개선이 충분한 사업 가치를 만들어야 합니다.</p><p>100만 토큰 컨텍스트는 한도이지 예산이 아닙니다. 캐시되지 않은 입력 100만 토큰은 Pro에서 $2이고, 출력 10만 토큰은 $1을 더합니다. 에이전트 전체의 캐시, 도구, 재시도, 승인된 결과당 비용도 측정하세요.</p><h2>FinOps 방식의 도입</h2><ol><li>실제 요청을 유형과 길이별로 K3와 K3.1 Pro에서 재생합니다.</li><li>입력, 캐시 기록·적중, 출력, 지연시간, 재시도, 도구 비용을 기록합니다.</li><li>실패 및 사람 검토를 포함해 승인 결과당 비용을 비교합니다.</li><li>측정 가능한 지연시간 가치가 있는 작업에 Highspeed를 씁니다.</li><li>컨텍스트 한도보다 낮은 작업별 토큰 및 지출 제한을 둡니다.</li></ol><p>Kimi API와 구독은 별도 상품입니다. 예산 책정 전 <a href=\"https://platform.kimi.ai/\">현재 요금</a>을 확인하세요.</p><h2>Sources</h2><ul><li><a href=\"https://forum.moonshot.ai/latest\">Moonshot AI Kimi Forum announcement, October 23, 2026</a></li><li><a href=\"https://platform.kimi.ai/\">Kimi API Platform: current model prices and specifications</a></li><li><a href=\"https://forum.moonshot.ai/t/kimi-k3-is-here-our-most-capable-model/480\">Moonshot AI: Kimi K3 launch and API pricing</a></li></ul>",
+      "faq": [
+        {
+          "question": "Kimi K3.1 Pro는 언제 출시됐나요?",
+          "answer": "Moonshot 개발자 포럼 발표 날짜는 2026년 10월 23일입니다."
+        },
+        {
+          "question": "API 가격은 얼마인가요?",
+          "answer": "플랫폼은 입력 100만 토큰당 $2, 출력 100만 토큰당 $10을 표시합니다."
+        },
+        {
+          "question": "Highspeed는 두 배 비싼가요?",
+          "answer": "캐시되지 않은 입력과 출력은 두 배지만 캐시 적중 가격은 같습니다."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/real-cost-per-task-frontier-models",
+          "label": "프런티어 모델별 작업 비용"
+        }
+      ]
+    },
+    "zh": {
+      "title": "Kimi K3.1 Pro 定价与 FinOps",
+      "titleCore": "Kimi K3.1 Pro 定价与 FinOps",
+      "description": "Kimi K3.1 Pro 于 10 月 23 日发布。比较 Pro、Highspeed 与 K3 的 API 价格、请求成本示例和 FinOps 部署方案。",
+      "body": "<p><strong>Kimi K3.1 Pro 于 2026 年 10 月 23 日发布。</strong>Moonshot 开发者论坛称其为 K3.1 系列首款模型。API 平台目前列出的上下文窗口为 100 万 token，输入每百万 token 2 美元、输出每百万 10 美元。价格表低于 K3，但这不能证明每个成功任务的成本更低。</p><h2>每百万 token 的 API 价格</h2><table><tr><th>模型</th><th>输入</th><th>缓存写入</th><th>缓存命中</th><th>输出</th></tr><tr><td>K3.1 Pro</td><td>$2</td><td>$2</td><td>$0.20</td><td>$10</td></tr><tr><td>K3.1 Pro Highspeed</td><td>$4</td><td>$4</td><td>$0.20</td><td>$20</td></tr><tr><td>K3</td><td>$3</td><td>$3</td><td>$0.30</td><td>$15</td></tr></table><p>与 K3 相比，Pro 未缓存输入和输出价格低三分之一。Highspeed 在这两项价格翻倍，但缓存命中价格仍是 $0.20。Moonshot 称 Highspeed 速度约为三倍；应在自己的任务上检验延迟和质量。</p><h2>单次请求成本示例</h2><p>假设每次请求有 1 万未缓存输入 token 和 2 千输出 token，且无工具或重试：K3.1 Pro 为 $0.04，Highspeed 为 $0.08，K3 为 $0.06。10 万次分别为 $4,000、$8,000 和 $6,000。这只是按公开价格计算，不是账单预测。Highspeed 的溢价必须由更低延迟带来可量化的业务价值。</p><p>100 万 token 上下文是容量上限，不是预算。Pro 的 100 万未缓存输入 token 花费 $2，另加 10 万输出 token 的 $1。还要在完整 agent 运行中追踪缓存、工具、重试和每个验收结果的成本。</p><h2>FinOps 上线控制</h2><ol><li>按任务类型和提示长度，用真实请求对 K3 与 K3.1 Pro 回放测试。</li><li>记录输入、缓存写入/命中、输出、延迟、重试和工具费用。</li><li>比较每个验收结果的成本，并计入失败和人工审核。</li><li>仅在延迟优势有可衡量价值时使用 Highspeed。</li><li>设置低于上下文上限的任务级 token 与支出限额。</li></ol><p>Kimi API 与会员订阅是不同产品。预算前请核对<a href=\"https://platform.kimi.ai/\">当前价格</a>。</p><h2>Sources</h2><ul><li><a href=\"https://forum.moonshot.ai/latest\">Moonshot AI Kimi Forum announcement, October 23, 2026</a></li><li><a href=\"https://platform.kimi.ai/\">Kimi API Platform: current model prices and specifications</a></li><li><a href=\"https://forum.moonshot.ai/t/kimi-k3-is-here-our-most-capable-model/480\">Moonshot AI: Kimi K3 launch and API pricing</a></li></ul>",
+      "faq": [
+        {
+          "question": "Kimi K3.1 Pro 何时发布？",
+          "answer": "Moonshot 开发者论坛公告日期为 2026 年 10 月 23 日。"
+        },
+        {
+          "question": "API 价格是多少？",
+          "answer": "平台目前列出输入每百万 token $2、输出每百万 $10。"
+        },
+        {
+          "question": "Highspeed 价格是两倍吗？",
+          "answer": "未缓存输入和输出价格翻倍，但缓存命中价格相同。"
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/real-cost-per-task-frontier-models",
+          "label": "前沿模型的单任务成本"
+        }
+      ]
+    },
+    "nl": {
+      "title": "Kimi K3.1 Pro-prijzen en FinOps",
+      "titleCore": "Kimi K3.1 Pro-prijzen en FinOps",
+      "description": "Kimi K3.1 Pro verscheen op 23 oktober. Vergelijk API-prijzen voor Pro, Highspeed en K3, met kostenvoorbeelden en een FinOps-plan.",
+      "body": "<p><strong>Kimi K3.1 Pro werd op 23 oktober 2026 aangekondigd.</strong> Moonshots ontwikkelaarsforum noemt het het eerste model in de K3.1-serie. Het API-platform vermeldt een context van één miljoen tokens en actuele tarieven van $2 per miljoen invoertokens en $10 per miljoen uitvoertokens. Dat is lager dan K3, maar bewijst geen lagere kosten per geslaagde taak.</p><h2>API-tarieven per miljoen tokens</h2><table><tr><th>Model</th><th>Invoer</th><th>Cache schrijven</th><th>Cache-hit</th><th>Uitvoer</th></tr><tr><td>K3.1 Pro</td><td>$2</td><td>$2</td><td>$0.20</td><td>$10</td></tr><tr><td>K3.1 Pro Highspeed</td><td>$4</td><td>$4</td><td>$0.20</td><td>$20</td></tr><tr><td>K3</td><td>$3</td><td>$3</td><td>$0.30</td><td>$15</td></tr></table><p>Pro is voor niet-gecachete invoer en uitvoer een derde goedkoper dan K3. Highspeed verdubbelt die tarieven, maar cache-hits blijven $0,20. Moonshot zegt dat Highspeed ongeveer driemaal sneller is; toets snelheid en kwaliteit op je eigen werklast.</p><h2>Kosten per verzoek</h2><p>Bij 10.000 niet-gecachete invoertokens en 2.000 uitvoertokens per taak, zonder tools of retries, kost een verzoek $0,04 met K3.1 Pro, $0,08 met Highspeed en $0,06 met K3. Voor 100.000 verzoeken is dat respectievelijk $4.000, $8.000 en $6.000. Dit is een berekening met lijstprijzen, geen factuurprognose. De Highspeed-premie moet genoeg waarde opleveren via lagere latency.</p><p>Een context van één miljoen tokens is een limiet, geen budget. Eén miljoen niet-gecachete invoertokens kost $2 bij Pro; 100.000 uitvoertokens voegen $1 toe. Meet ook cache, tools, retries en kosten per geaccepteerd resultaat voor de hele agentrun.</p><h2>FinOps-invoering</h2><ol><li>Herhaal echte verzoeken op K3 en K3.1 Pro per taaktype en promptlengte.</li><li>Leg invoer, cache-schrijfacties en hits, uitvoer, latency, retries en toolkosten vast.</li><li>Vergelijk kosten per geaccepteerd resultaat, inclusief fouten en menselijke controle.</li><li>Gebruik Highspeed alleen als de lagere latency meetbare waarde heeft.</li><li>Stel token- en bestedingslimieten in onder de contextlimiet.</li></ol><p>De Kimi API en abonnementen zijn aparte producten. Controleer de <a href=\"https://platform.kimi.ai/\">actuele tarieven</a> voor je budget.</p><h2>Sources</h2><ul><li><a href=\"https://forum.moonshot.ai/latest\">Moonshot AI Kimi Forum announcement, October 23, 2026</a></li><li><a href=\"https://platform.kimi.ai/\">Kimi API Platform: current model prices and specifications</a></li><li><a href=\"https://forum.moonshot.ai/t/kimi-k3-is-here-our-most-capable-model/480\">Moonshot AI: Kimi K3 launch and API pricing</a></li></ul>",
+      "faq": [
+        {
+          "question": "Wanneer verscheen Kimi K3.1 Pro?",
+          "answer": "De aankondiging op het Moonshot-ontwikkelaarsforum is van 23 oktober 2026."
+        },
+        {
+          "question": "Wat kost de API?",
+          "answer": "Het platform vermeldt $2 per miljoen invoertokens en $10 per miljoen uitvoertokens."
+        },
+        {
+          "question": "Is Highspeed twee keer zo duur?",
+          "answer": "Niet-gecachete invoer en uitvoer kosten tweemaal zoveel, maar cache-hits hebben hetzelfde tarief."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/real-cost-per-task-frontier-models",
+          "label": "Kosten per taak bij frontiermodellen"
+        }
+      ]
+    },
+    "ar": {
+      "title": "أسعار Kimi K3.1 Pro وإدارة تكاليف FinOps",
+      "titleCore": "أسعار Kimi K3.1 Pro وإدارة تكاليف FinOps",
+      "description": "أُطلق Kimi K3.1 Pro في 23 أكتوبر. قارن أسعار API لإصدارات Pro وHighspeed وK3 مع أمثلة التكلفة وخطة FinOps.",
+      "body": "<p><strong>أُعلن عن Kimi K3.1 Pro في 23 أكتوبر 2026.</strong> يصفه منتدى مطوري Moonshot بأنه أول طراز من سلسلة K3.1. تعرض منصة API سياقاً بمليون رمز وأسعاراً حالية قدرها دولاران لكل مليون رمز إدخال و10 دولارات لكل مليون رمز إخراج. السعر أقل من K3، لكن ذلك لا يثبت انخفاض التكلفة لكل مهمة ناجحة.</p><h2>أسعار API لكل مليون رمز</h2><table><tr><th>الطراز</th><th>الإدخال</th><th>كتابة الذاكرة المؤقتة</th><th>قراءة الذاكرة</th><th>الإخراج</th></tr><tr><td>K3.1 Pro</td><td>$2</td><td>$2</td><td>$0.20</td><td>$10</td></tr><tr><td>K3.1 Pro Highspeed</td><td>$4</td><td>$4</td><td>$0.20</td><td>$20</td></tr><tr><td>K3</td><td>$3</td><td>$3</td><td>$0.30</td><td>$15</td></tr></table><p>يخفض Pro أسعار الإدخال والإخراج غير المخزنين مؤقتاً بمقدار الثلث مقارنة بـ K3. أما Highspeed فيضاعفهما، بينما يظل سعر قراءة الذاكرة $0.20. تقول Moonshot إن Highspeed أسرع بنحو ثلاثة أضعاف؛ اختبروا السرعة والجودة على حملكم الفعلي.</p><h2>تكلفة الطلب الواحد</h2><p>إذا استخدم الطلب 10 آلاف رمز إدخال غير مخزن و2 ألف رمز إخراج، بلا أدوات أو إعادات، فتكلفته $0.04 في K3.1 Pro و$0.08 في Highspeed و$0.06 في K3. وتبلغ تكلفة 100 ألف طلب $4,000 و$8,000 و$6,000. هذا حساب وفق الأسعار المنشورة وليس توقعاً للفاتورة. يجب أن يحقق فرق Highspeed قيمة قابلة للقياس من خفض زمن الاستجابة.</p><p>سياق المليون رمز حد أقصى وليس ميزانية. مليون رمز إدخال غير مخزن يكلف $2 في Pro، وتضيف 100 ألف رمز إخراج دولاراً واحداً. قيسوا أيضاً التخزين المؤقت والأدوات والإعادات والتكلفة لكل نتيجة مقبولة ضمن تشغيل الوكيل كاملاً.</p><h2>تطبيق ضوابط FinOps</h2><ol><li>أعيدوا تشغيل طلبات حقيقية على K3 وK3.1 Pro حسب نوع المهمة وطول الطلب.</li><li>سجلوا الإدخال وكتابات وقراءات الذاكرة والإخراج وزمن الاستجابة والإعادات والأدوات.</li><li>قارنوا التكلفة لكل نتيجة مقبولة، شاملاً الفشل والمراجعة البشرية.</li><li>خصصوا Highspeed للمهام التي يحقق فيها خفض التأخير قيمة قابلة للقياس.</li><li>ضعوا حدوداً للرموز والإنفاق دون الحد الأقصى للسياق.</li></ol><p>واجهة API واشتراكات Kimi منتجان منفصلان. تحققوا من <a href=\"https://platform.kimi.ai/\">الأسعار الحالية</a> قبل إعداد الميزانية.</p><h2>Sources</h2><ul><li><a href=\"https://forum.moonshot.ai/latest\">Moonshot AI Kimi Forum announcement, October 23, 2026</a></li><li><a href=\"https://platform.kimi.ai/\">Kimi API Platform: current model prices and specifications</a></li><li><a href=\"https://forum.moonshot.ai/t/kimi-k3-is-here-our-most-capable-model/480\">Moonshot AI: Kimi K3 launch and API pricing</a></li></ul>",
+      "faq": [
+        {
+          "question": "متى أُطلق Kimi K3.1 Pro؟",
+          "answer": "تاريخ إعلان منتدى مطوري Moonshot هو 23 أكتوبر 2026."
+        },
+        {
+          "question": "ما تكلفة API؟",
+          "answer": "تعرض المنصة حالياً دولارين لكل مليون رمز إدخال و10 دولارات لكل مليون إخراج."
+        },
+        {
+          "question": "هل Highspeed أغلى مرتين؟",
+          "answer": "تتضاعف أسعار الإدخال والإخراج غير المخزنين، لكن سعر قراءة الذاكرة المؤقتة ثابت."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/real-cost-per-task-frontier-models",
+          "label": "تكلفة المهمة عبر النماذج الرائدة"
+        }
+      ]
+    },
+    "ru": {
+      "title": "Kimi K3.1 Pro: цены и FinOps",
+      "titleCore": "Kimi K3.1 Pro: цены и FinOps",
+      "description": "Kimi K3.1 Pro вышла 23 октября. Сравнение API-тарифов Pro, Highspeed и K3, примеры стоимости и план FinOps.",
+      "body": "<p><strong>Kimi K3.1 Pro представили 23 октября 2026 года.</strong> Форум разработчиков Moonshot называет её первой моделью серии K3.1. API-платформа указывает контекст в миллион токенов и текущие тарифы: $2 за миллион входных и $10 за миллион выходных токенов. Это ниже прайса K3, но не доказывает меньшую стоимость успешно выполненной задачи.</p><h2>Тарифы API за миллион токенов</h2><table><tr><th>Модель</th><th>Вход</th><th>Запись кэша</th><th>Чтение кэша</th><th>Выход</th></tr><tr><td>K3.1 Pro</td><td>$2</td><td>$2</td><td>$0.20</td><td>$10</td></tr><tr><td>K3.1 Pro Highspeed</td><td>$4</td><td>$4</td><td>$0.20</td><td>$20</td></tr><tr><td>K3</td><td>$3</td><td>$3</td><td>$0.30</td><td>$15</td></tr></table><p>Для некэшированных входных и выходных токенов Pro на треть дешевле K3. Highspeed удваивает эти тарифы, но чтение кэша остаётся $0.20. Moonshot заявляет примерно трёхкратный прирост скорости Highspeed; проверьте задержку и качество на своих задачах.</p><h2>Стоимость запроса</h2><p>При 10 000 некэшированных входных и 2 000 выходных токенов на задачу, без инструментов и повторов, запрос стоит $0.04 для K3.1 Pro, $0.08 для Highspeed и $0.06 для K3. За 100 000 запросов — $4 000, $8 000 и $6 000. Это расчёт по прайсу, а не прогноз счёта. Доплата за Highspeed должна окупаться измеримой ценностью более низкой задержки.</p><p>Контекст в миллион токенов — это предел, а не бюджет. Миллион некэшированных входных токенов стоит $2 на Pro, ещё $1 добавят 100 000 выходных. Измеряйте также кэш, инструменты, повторы и стоимость принятого результата для всего запуска агента.</p><h2>Внедрение с контролями FinOps</h2><ol><li>Повторите реальные запросы на K3 и K3.1 Pro по типу задачи и длине промпта.</li><li>Записывайте вход, операции кэша, выход, задержку, повторы и стоимость инструментов.</li><li>Сравнивайте цену принятого результата с учётом ошибок и проверки человеком.</li><li>Используйте Highspeed, только если снижение задержки даёт измеримую ценность.</li><li>Задайте лимиты токенов и расходов ниже предела контекста.</li></ol><p>API и подписки Kimi — разные продукты. Перед бюджетированием проверьте <a href=\"https://platform.kimi.ai/\">текущие тарифы</a>.</p><h2>Sources</h2><ul><li><a href=\"https://forum.moonshot.ai/latest\">Moonshot AI Kimi Forum announcement, October 23, 2026</a></li><li><a href=\"https://platform.kimi.ai/\">Kimi API Platform: current model prices and specifications</a></li><li><a href=\"https://forum.moonshot.ai/t/kimi-k3-is-here-our-most-capable-model/480\">Moonshot AI: Kimi K3 launch and API pricing</a></li></ul>",
+      "faq": [
+        {
+          "question": "Когда вышла Kimi K3.1 Pro?",
+          "answer": "Объявление на форуме разработчиков Moonshot датировано 23 октября 2026 года."
+        },
+        {
+          "question": "Сколько стоит API?",
+          "answer": "Платформа указывает $2 за миллион входных и $10 за миллион выходных токенов."
+        },
+        {
+          "question": "Highspeed стоит вдвое дороже?",
+          "answer": "Некэшированные вход и выход стоят вдвое больше, но чтение кэша — столько же."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/real-cost-per-task-frontier-models",
+          "label": "Стоимость задачи у передовых моделей"
+        }
+      ]
+    },
+    "tr": {
+      "title": "Kimi K3.1 Pro fiyatları ve FinOps",
+      "titleCore": "Kimi K3.1 Pro fiyatları ve FinOps",
+      "description": "Kimi K3.1 Pro 23 Ekim'de çıktı. Pro, Highspeed ve K3 API fiyatlarını, maliyet örneklerini ve FinOps planını karşılaştırın.",
+      "body": "<p><strong>Kimi K3.1 Pro, 23 Ekim 2026'da tanıtıldı.</strong> Moonshot geliştirici forumu bunu K3.1 serisinin ilk modeli olarak tanımlıyor. API platformu bir milyon tokenlık bağlam ve milyon giriş tokenı başına 2 $, milyon çıkış tokenı başına 10 $ güncel fiyat gösteriyor. Bu, K3'ten ucuz bir fiyat tablosudur; başarılı görev başına maliyetin düştüğünü kanıtlamaz.</p><h2>Milyon token başına API fiyatları</h2><table><tr><th>Model</th><th>Giriş</th><th>Önbellek yazımı</th><th>Önbellek isabeti</th><th>Çıkış</th></tr><tr><td>K3.1 Pro</td><td>$2</td><td>$2</td><td>$0.20</td><td>$10</td></tr><tr><td>K3.1 Pro Highspeed</td><td>$4</td><td>$4</td><td>$0.20</td><td>$20</td></tr><tr><td>K3</td><td>$3</td><td>$3</td><td>$0.30</td><td>$15</td></tr></table><p>Önbelleksiz giriş ve çıkışta Pro, K3'ten üçte bir daha ucuzdur. Highspeed bu fiyatları ikiye katlar ancak önbellek isabeti $0.20 kalır. Moonshot Highspeed'in yaklaşık üç kat hızlı olduğunu belirtiyor; kendi iş yükünüzde gecikme ve kaliteyi ölçün.</p><h2>İstek maliyeti</h2><p>Görev başına önbelleksiz 10.000 giriş ve 2.000 çıkış tokenı, araç veya tekrar olmadan, K3.1 Pro'da istek $0.04, Highspeed'de $0.08, K3'te $0.06 tutar. 100.000 istek sırasıyla $4.000, $8.000 ve $6.000 eder. Bu liste fiyatı hesabıdır, fatura tahmini değildir. Highspeed farkı, düşük gecikmeden ölçülebilir değer sağlamalıdır.</p><p>Bir milyon tokenlık bağlam bir sınırdır, bütçe değildir. Pro'da bir milyon önbelleksiz giriş tokenı $2, 100.000 çıkış tokenı ek $1 tutar. Tüm agent çalışmasında önbelleği, araçları, tekrarları ve kabul edilen sonuç başına maliyeti de ölçün.</p><h2>FinOps kontrollü geçiş</h2><ol><li>Gerçek istekleri görev türü ve uzunluğuna göre K3 ve K3.1 Pro'da tekrar çalıştırın.</li><li>Giriş, önbellek, çıkış, gecikme, tekrar ve araç maliyetlerini kaydedin.</li><li>Hatalar ve insan incelemesi dahil kabul edilen sonuç başına maliyeti kıyaslayın.</li><li>Highspeed'i yalnızca gecikme kazancı ölçülebilir değer sağlıyorsa kullanın.</li><li>Bağlam sınırının altında token ve harcama limitleri belirleyin.</li></ol><p>Kimi API ve üyelik abonelikleri ayrı ürünlerdir. Bütçeden önce <a href=\"https://platform.kimi.ai/\">güncel fiyatları</a> doğrulayın.</p><h2>Sources</h2><ul><li><a href=\"https://forum.moonshot.ai/latest\">Moonshot AI Kimi Forum announcement, October 23, 2026</a></li><li><a href=\"https://platform.kimi.ai/\">Kimi API Platform: current model prices and specifications</a></li><li><a href=\"https://forum.moonshot.ai/t/kimi-k3-is-here-our-most-capable-model/480\">Moonshot AI: Kimi K3 launch and API pricing</a></li></ul>",
+      "faq": [
+        {
+          "question": "Kimi K3.1 Pro ne zaman çıktı?",
+          "answer": "Moonshot geliştirici forumundaki duyuru 23 Ekim 2026 tarihli."
+        },
+        {
+          "question": "API fiyatı nedir?",
+          "answer": "Platform, milyon giriş tokenı başına $2 ve milyon çıkış tokenı başına $10 gösteriyor."
+        },
+        {
+          "question": "Highspeed iki kat mı pahalı?",
+          "answer": "Önbelleksiz giriş ve çıkış iki kat fiyatlıdır, ancak önbellek isabeti aynı fiyattadır."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/real-cost-per-task-frontier-models",
+          "label": "Öncü modellerde görev başına maliyet"
+        }
+      ]
+    },
+    "pl": {
+      "title": "Kimi K3.1 Pro: ceny i FinOps",
+      "titleCore": "Kimi K3.1 Pro: ceny i FinOps",
+      "description": "Kimi K3.1 Pro wydano 23 października. Porównanie cen API Pro, Highspeed i K3, przykłady kosztów i plan FinOps.",
+      "body": "<p><strong>Kimi K3.1 Pro zaprezentowano 23 października 2026 r.</strong> Forum deweloperskie Moonshot nazywa go pierwszym modelem serii K3.1. Platforma API podaje kontekst miliona tokenów oraz aktualne ceny: 2 USD za milion tokenów wejściowych i 10 USD za milion wyjściowych. Cennik jest niższy niż dla K3, ale nie dowodzi niższego kosztu poprawnie ukończonego zadania.</p><h2>Ceny API za milion tokenów</h2><table><tr><th>Model</th><th>Wejście</th><th>Zapis cache</th><th>Odczyt cache</th><th>Wyjście</th></tr><tr><td>K3.1 Pro</td><td>$2</td><td>$2</td><td>$0.20</td><td>$10</td></tr><tr><td>K3.1 Pro Highspeed</td><td>$4</td><td>$4</td><td>$0.20</td><td>$20</td></tr><tr><td>K3</td><td>$3</td><td>$3</td><td>$0.30</td><td>$15</td></tr></table><p>Pro obniża o jedną trzecią stawki za niebuforowane wejście i wyjście względem K3. Highspeed podwaja te stawki, ale odczyt cache nadal kosztuje $0.20. Moonshot deklaruje około trzykrotnie większą szybkość Highspeed; sprawdź opóźnienie i jakość na własnych zadaniach.</p><h2>Koszt żądania</h2><p>Przy 10 000 niebuforowanych tokenów wejściowych i 2 000 wyjściowych na zadanie, bez narzędzi i ponowień, żądanie kosztuje $0.04 w K3.1 Pro, $0.08 w Highspeed i $0.06 w K3. Dla 100 000 żądań to odpowiednio $4 000, $8 000 i $6 000. To kalkulacja według cennika, nie prognoza rachunku. Dopłata do Highspeed musi przynieść mierzalną wartość dzięki mniejszym opóźnieniom.</p><p>Kontekst miliona tokenów to limit, a nie budżet. Milion niebuforowanych tokenów wejściowych kosztuje $2 w Pro, a 100 000 tokenów wyjściowych dodaje $1. Mierz także cache, narzędzia, ponowienia i koszt zaakceptowanego wyniku dla całego przebiegu agenta.</p><h2>Wdrożenie z kontrolami FinOps</h2><ol><li>Odtwórz rzeczywiste żądania w K3 i K3.1 Pro według typu zadania i długości.</li><li>Rejestruj wejście, operacje cache, wyjście, opóźnienie, ponowienia i koszty narzędzi.</li><li>Porównuj koszt zaakceptowanego wyniku, uwzględniając błędy i kontrolę człowieka.</li><li>Stosuj Highspeed, gdy krótsze opóźnienie ma mierzalną wartość.</li><li>Ustaw limity tokenów i wydatków poniżej limitu kontekstu.</li></ol><p>API Kimi i subskrypcje członkowskie to osobne produkty. Przed budżetowaniem sprawdź <a href=\"https://platform.kimi.ai/\">aktualne ceny</a>.</p><h2>Sources</h2><ul><li><a href=\"https://forum.moonshot.ai/latest\">Moonshot AI Kimi Forum announcement, October 23, 2026</a></li><li><a href=\"https://platform.kimi.ai/\">Kimi API Platform: current model prices and specifications</a></li><li><a href=\"https://forum.moonshot.ai/t/kimi-k3-is-here-our-most-capable-model/480\">Moonshot AI: Kimi K3 launch and API pricing</a></li></ul>",
+      "faq": [
+        {
+          "question": "Kiedy wydano Kimi K3.1 Pro?",
+          "answer": "Ogłoszenie na forum deweloperskim Moonshot pochodzi z 23 października 2026 r."
+        },
+        {
+          "question": "Ile kosztuje API?",
+          "answer": "Platforma podaje $2 za milion tokenów wejściowych i $10 za milion wyjściowych."
+        },
+        {
+          "question": "Czy Highspeed kosztuje dwa razy więcej?",
+          "answer": "Niebuforowane wejście i wyjście kosztują dwa razy więcej, ale odczyt cache ma tę samą stawkę."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/real-cost-per-task-frontier-models",
+          "label": "Koszt zadania w modelach frontier"
+        }
+      ]
+    },
+    "id": {
+      "title": "Harga Kimi K3.1 Pro dan FinOps",
+      "titleCore": "Harga Kimi K3.1 Pro dan FinOps",
+      "description": "Kimi K3.1 Pro diluncurkan 23 Oktober. Bandingkan harga API Pro, Highspeed, dan K3, contoh biaya, serta rencana FinOps.",
+      "body": "<p><strong>Kimi K3.1 Pro diperkenalkan pada 23 Oktober 2026.</strong> Forum pengembang Moonshot menyebutnya model pertama seri K3.1. Platform API mencantumkan konteks satu juta token dan tarif saat ini sebesar $2 per juta token input dan $10 per juta token output. Tarifnya lebih rendah daripada K3, tetapi itu tidak membuktikan biaya per tugas berhasil lebih murah.</p><h2>Tarif API per juta token</h2><table><tr><th>Model</th><th>Input</th><th>Tulis cache</th><th>Cache hit</th><th>Output</th></tr><tr><td>K3.1 Pro</td><td>$2</td><td>$2</td><td>$0.20</td><td>$10</td></tr><tr><td>K3.1 Pro Highspeed</td><td>$4</td><td>$4</td><td>$0.20</td><td>$20</td></tr><tr><td>K3</td><td>$3</td><td>$3</td><td>$0.30</td><td>$15</td></tr></table><p>Pro menurunkan tarif input dan output tanpa cache sepertiga dibanding K3. Highspeed menggandakan tarif tersebut, tetapi cache hit tetap $0.20. Moonshot menyebut Highspeed sekitar tiga kali lebih cepat; ukur latensi dan kualitas dengan beban kerja Anda.</p><h2>Biaya per permintaan</h2><p>Dengan 10.000 token input tanpa cache dan 2.000 token output per tugas, tanpa alat atau percobaan ulang, satu permintaan berbiaya $0.04 di K3.1 Pro, $0.08 di Highspeed, dan $0.06 di K3. Untuk 100.000 permintaan: $4.000, $8.000, dan $6.000. Ini hitungan tarif publik, bukan prediksi tagihan. Biaya tambahan Highspeed harus menghasilkan nilai nyata dari latensi yang lebih rendah.</p><p>Konteks satu juta token adalah batas, bukan anggaran. Satu juta token input tanpa cache berbiaya $2 di Pro; 100.000 token output menambah $1. Ukur juga cache, alat, percobaan ulang, serta biaya per hasil yang diterima dalam seluruh proses agen.</p><h2>Penerapan dengan kontrol FinOps</h2><ol><li>Putar ulang permintaan nyata pada K3 dan K3.1 Pro berdasarkan tipe dan panjang tugas.</li><li>Catat input, penulisan dan hit cache, output, latensi, percobaan ulang, dan biaya alat.</li><li>Bandingkan biaya per hasil yang diterima, termasuk kegagalan dan tinjauan manusia.</li><li>Gunakan Highspeed bila manfaat latensinya terukur.</li><li>Tetapkan batas token dan biaya di bawah batas konteks.</li></ol><p>API dan langganan Kimi adalah produk terpisah. Periksa <a href=\"https://platform.kimi.ai/\">harga terbaru</a> sebelum menyusun anggaran.</p><h2>Sources</h2><ul><li><a href=\"https://forum.moonshot.ai/latest\">Moonshot AI Kimi Forum announcement, October 23, 2026</a></li><li><a href=\"https://platform.kimi.ai/\">Kimi API Platform: current model prices and specifications</a></li><li><a href=\"https://forum.moonshot.ai/t/kimi-k3-is-here-our-most-capable-model/480\">Moonshot AI: Kimi K3 launch and API pricing</a></li></ul>",
+      "faq": [
+        {
+          "question": "Kapan Kimi K3.1 Pro diluncurkan?",
+          "answer": "Pengumuman forum pengembang Moonshot bertanggal 23 Oktober 2026."
+        },
+        {
+          "question": "Berapa harga API?",
+          "answer": "Platform mencantumkan $2 per juta token input dan $10 per juta token output."
+        },
+        {
+          "question": "Apakah Highspeed dua kali lebih mahal?",
+          "answer": "Input dan output tanpa cache dua kali tarifnya, tetapi cache hit tetap sama."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/real-cost-per-task-frontier-models",
+          "label": "Biaya per tugas pada model frontier"
+        }
+      ]
+    },
+    "vi": {
+      "title": "Giá Kimi K3.1 Pro và FinOps",
+      "titleCore": "Giá Kimi K3.1 Pro và FinOps",
+      "description": "Kimi K3.1 Pro ra mắt ngày 23 tháng 10. So sánh giá API Pro, Highspeed, K3 cùng ví dụ chi phí và kế hoạch FinOps.",
+      "body": "<p><strong>Kimi K3.1 Pro được giới thiệu ngày 23 tháng 10 năm 2026.</strong> Diễn đàn nhà phát triển Moonshot gọi đây là mô hình đầu tiên của dòng K3.1. Nền tảng API hiện niêm yết ngữ cảnh một triệu token, giá 2 USD mỗi triệu token đầu vào và 10 USD mỗi triệu token đầu ra. Bảng giá thấp hơn K3 nhưng không chứng minh chi phí cho mỗi tác vụ thành công thấp hơn.</p><h2>Giá API trên mỗi triệu token</h2><table><tr><th>Mô hình</th><th>Đầu vào</th><th>Ghi bộ nhớ đệm</th><th>Đọc bộ nhớ đệm</th><th>Đầu ra</th></tr><tr><td>K3.1 Pro</td><td>$2</td><td>$2</td><td>$0.20</td><td>$10</td></tr><tr><td>K3.1 Pro Highspeed</td><td>$4</td><td>$4</td><td>$0.20</td><td>$20</td></tr><tr><td>K3</td><td>$3</td><td>$3</td><td>$0.30</td><td>$15</td></tr></table><p>Pro giảm một phần ba giá đầu vào và đầu ra không dùng bộ nhớ đệm so với K3. Highspeed tăng gấp đôi các mức giá đó nhưng giá đọc cache vẫn là $0.20. Moonshot cho biết Highspeed nhanh hơn khoảng ba lần; hãy kiểm tra độ trễ và chất lượng trên tải thực tế.</p><h2>Chi phí mỗi yêu cầu</h2><p>Với 10.000 token đầu vào không cache và 2.000 token đầu ra mỗi tác vụ, không tính công cụ hay thử lại, một yêu cầu tốn $0.04 với K3.1 Pro, $0.08 với Highspeed và $0.06 với K3. Với 100.000 yêu cầu, chi phí lần lượt là $4.000, $8.000 và $6.000. Đây là phép tính theo giá niêm yết, không phải dự báo hóa đơn. Phần phí thêm của Highspeed phải tạo giá trị đo được nhờ độ trễ thấp hơn.</p><p>Ngữ cảnh một triệu token là giới hạn, không phải ngân sách. Một triệu token đầu vào không cache tốn $2 ở Pro; 100.000 token đầu ra cộng thêm $1. Hãy đo cả cache, công cụ, thử lại và chi phí mỗi kết quả được chấp nhận cho toàn bộ lượt chạy agent.</p><h2>Triển khai với kiểm soát FinOps</h2><ol><li>Chạy lại yêu cầu thực tế trên K3 và K3.1 Pro theo loại tác vụ và độ dài prompt.</li><li>Ghi nhận đầu vào, ghi/đọc cache, đầu ra, độ trễ, thử lại và phí công cụ.</li><li>So sánh chi phí mỗi kết quả được chấp nhận, gồm lỗi và rà soát thủ công.</li><li>Chỉ dùng Highspeed khi lợi ích giảm độ trễ có thể đo được.</li><li>Đặt giới hạn token và chi phí thấp hơn mức ngữ cảnh tối đa.</li></ol><p>API Kimi và gói thành viên là hai sản phẩm riêng. Kiểm tra <a href=\"https://platform.kimi.ai/\">giá hiện hành</a> trước khi lập ngân sách.</p><h2>Sources</h2><ul><li><a href=\"https://forum.moonshot.ai/latest\">Moonshot AI Kimi Forum announcement, October 23, 2026</a></li><li><a href=\"https://platform.kimi.ai/\">Kimi API Platform: current model prices and specifications</a></li><li><a href=\"https://forum.moonshot.ai/t/kimi-k3-is-here-our-most-capable-model/480\">Moonshot AI: Kimi K3 launch and API pricing</a></li></ul>",
+      "faq": [
+        {
+          "question": "Kimi K3.1 Pro ra mắt khi nào?",
+          "answer": "Thông báo trên diễn đàn nhà phát triển Moonshot ghi ngày 23 tháng 10 năm 2026."
+        },
+        {
+          "question": "Giá API là bao nhiêu?",
+          "answer": "Nền tảng niêm yết $2 mỗi triệu token đầu vào và $10 mỗi triệu token đầu ra."
+        },
+        {
+          "question": "Highspeed có giá gấp đôi không?",
+          "answer": "Đầu vào và đầu ra không cache có giá gấp đôi, nhưng đọc cache giữ nguyên giá."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/real-cost-per-task-frontier-models",
+          "label": "Chi phí mỗi tác vụ ở các mô hình tiên phong"
+        }
+      ]
+    }
+  }
+}

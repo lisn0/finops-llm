@@ -1,0 +1,437 @@
+{
+  "slug": "research/voxtral-3-finops-audio-economics",
+  "tags": [
+    "mistral",
+    "voxtral",
+    "audio-ai",
+    "pricing",
+    "finops",
+    "voice-agents"
+  ],
+  "datePublished": "2026-10-27",
+  "dateModified": "2026-10-27",
+  "image": "https://finopsllm.com/og.png",
+  "agentMode": true,
+  "languages": {
+    "en": {
+      "title": "Voxtral 3 costs: price audio by the minute",
+      "titleCore": "Voxtral 3 FinOps: price audio by the minute and character",
+      "description": "Mistral's Voxtral 3 prices transcription by audio minute and TTS by character. Model batch, realtime, and voice-agent spend separately.",
+      "body": "<p><strong>Voxtral 3 is priced on audio minutes for transcription and generated characters for speech.</strong> Mistral's changelog dates the public-preview release to October 20, 2026; its standalone announcement is dated October 21. The published rates make it possible to forecast audio processing directly, but a voice agent can add a separate per-minute charge for the managed pipeline and its reasoning model.</p><h2>Four launch models, three billing meters</h2><p>Mistral listed four public-preview models at launch: offline Mini and Small transcription, realtime Mini transcription, and Mini TTS. Its current pricing table gives these API rates in USD:</p><table><thead><tr><th>Work</th><th>Model</th><th>Rate</th></tr></thead><tbody><tr><td>Recorded audio transcription</td><td>Voxtral Mini Transcribe 3</td><td>$0.0035 / audio min</td></tr><tr><td>Recorded audio, higher-accuracy tier</td><td>Voxtral Small Transcribe 3</td><td>$0.0040 / audio min</td></tr><tr><td>Live transcription</td><td>Voxtral Mini Transcribe Realtime 3</td><td>$0.0080 / audio min</td></tr><tr><td>Text-to-speech</td><td>Voxtral Mini TTS 3</td><td>$13 / 1M input characters</td></tr></tbody></table><p>These are different meters. Do not convert audio minutes to text tokens or TTS characters using a single blended rate. For speech generation, the bill follows input characters; for transcription, it follows audio duration.</p><h2>Budget examples you can audit</h2><p>At the published rate, 10,000 recorded minutes cost <strong>$35</strong> with Mini Transcribe or <strong>$40</strong> with Small. The $5 difference buys the higher-accuracy tier, so compare cost per accepted transcript, not only cost per processed minute. Ten thousand realtime minutes cost <strong>$80</strong>.</p><p>TTS at $13 per million characters costs <strong>$130 per 10 million characters</strong>. A six-minute recorded call transcribed with Mini ($0.021) and followed by a 5,000-character spoken response ($0.065) totals about <strong>$0.086</strong> for those two model calls. This excludes the reasoning model, any managed voice-agent charge, retries, storage, telephony, and application infrastructure.</p><h2>Do not mix standalone models with the managed agent rate</h2><p>Mistral separately lists Voice Agent API pricing at $0.04 per minute with Mistral Small 4 for reasoning, or $0.08 per minute with a larger reasoning model. That is a managed, end-to-end pipeline price. Treat it as its own product meter; do not add individual transcription and TTS line items on top unless your contract or usage records show they are billed separately. Conversely, a self-built pipeline should count its transcription, reasoning, and speech-generation calls independently.</p><h2>Choose by the workload you have</h2><p>Batch Mini is the starting point for recorded calls, meetings, and support archives. Move to Small when an evaluation set shows its transcript quality reduces human correction or downstream errors enough to offset the extra $0.0005 per minute. Use realtime transcription when text must arrive during the conversation; its $0.008/min rate is about 2.3 times Mini batch, so reserve it for latency-sensitive workflows.</p><p>For FinOps, log audio duration, generated character count, selected model, and final task outcome together. Report cost per accepted minute, resolved call, or completed interaction. The raw rate card is low, but retries, idle live sessions, repeated speech, and reasoning can dominate the realized cost. All figures above are Mistral's published API prices checked October 27, 2026; verify the live rate card and your billing configuration before forecasting.</p><h2>Sources</h2><ul><li><a href=\"https://docs.mistral.ai/resources/changelogs\">Mistral Docs: October 20 release changelog</a></li><li><a href=\"https://mistral.ai/news/voxtral-3/\">Mistral: Voxtral 3 announcement and pricing table</a></li><li><a href=\"https://docs.mistral.ai/models/voxtral-mini-transcribe-3-0\">Mini Transcribe 3 model card</a></li><li><a href=\"https://docs.mistral.ai/models/voxtral-small-transcribe-3-0\">Small Transcribe 3 model card</a></li><li><a href=\"https://docs.mistral.ai/studio/audio/overview\">Mistral Docs: audio model selection</a></li><li><a href=\"https://docs.mistral.ai/studio/audio/voice-agents/overview\">Mistral Docs: managed voice agents</a></li></ul>",
+      "faq": [
+        {
+          "question": "How much does Voxtral 3 transcription cost?",
+          "answer": "Mistral lists $0.0035 per audio minute for Mini batch transcription, $0.0040/min for Small, and $0.0080/min for Mini realtime transcription."
+        },
+        {
+          "question": "Is the Voxtral voice-agent rate added to transcription and TTS?",
+          "answer": "Mistral presents voice agents as a managed per-minute pipeline, including a selected reasoning model. Do not add standalone model rates unless your billing setup explicitly charges them separately."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "Cost per successful task"
+        },
+        {
+          "slug": "/research/model-price-cuts-routing-budget",
+          "label": "Model pricing and routing budgets"
+        },
+        {
+          "slug": "/research/three-agent-budgets",
+          "label": "Budgeting for agent workloads"
+        }
+      ]
+    },
+    "de": {
+      "title": "Voxtral 3: Audiokosten pro Minute",
+      "titleCore": "Voxtral 3 FinOps: Audiokosten pro Minute und Zeichen",
+      "description": "Mistral berechnet Transkription nach Audiominuten und TTS nach Zeichen. So kalkulieren Sie Batch-, Echtzeit- und Voice-Agent-Kosten getrennt.",
+      "body": "<p><strong>Voxtral 3 wird bei Transkription nach Audiominuten und bei Sprachausgabe nach Textzeichen berechnet.</strong> Mistrals Changelog nennt den 20. Oktober 2026 als Start der öffentlichen Vorschau; die separate Ankündigung trägt das Datum 21. Oktober. Voice Agents haben zusätzlich einen eigenen Minutenpreis für die verwaltete Pipeline samt Reasoning-Modell.</p><h2>Preise nach Aufgabe</h2><table><thead><tr><th>Aufgabe</th><th>Modell</th><th>Preis</th></tr></thead><tbody><tr><td>Aufzeichnung transkribieren</td><td>Mini Transcribe 3</td><td>$0,0035 / Audiominute</td></tr><tr><td>Aufzeichnung, höhere Genauigkeit</td><td>Small Transcribe 3</td><td>$0,0040 / Audiominute</td></tr><tr><td>Echtzeit-Transkription</td><td>Mini Transcribe Realtime 3</td><td>$0,0080 / Audiominute</td></tr><tr><td>Text in Sprache umwandeln</td><td>Mini TTS 3</td><td>$13 / 1 Mio. Zeichen</td></tr></tbody></table><p>Die Abrechnungseinheiten sind verschieden: Transkription folgt der Audiodauer, TTS der Zahl der Eingabezeichen. Eine gemischte Pauschale verschleiert, welcher Arbeitsschritt die Kosten verursacht.</p><h2>Beispiele und Budgetierung</h2><p>10.000 Minuten aufgezeichnetes Audio kosten laut Preisliste <strong>$35</strong> mit Mini oder <strong>$40</strong> mit Small. Echtzeit-Transkription kostet für 10.000 Minuten <strong>$80</strong>. Bewerten Sie Small nach Kosten pro akzeptiertem Transkript: Die zusätzlichen $5 können sich lohnen, wenn weniger menschliche Korrektur nötig ist.</p><p>10 Millionen TTS-Zeichen kosten <strong>$130</strong>. Eine sechsminütige Aufzeichnung kostet mit Mini $0,021; eine anschließende gesprochene Antwort mit 5.000 Zeichen kostet $0,065. Zusammen sind das etwa <strong>$0,086</strong> für diese beiden Modellaufrufe, ohne Reasoning, Voice-Agent-Dienst, Wiederholungen, Telefonie oder Infrastruktur.</p><p>Mistral führt Voice Agents separat mit $0,04 pro Minute und Mistral Small 4 als Reasoning-Modell beziehungsweise $0,08 mit einem größeren Modell. Behandeln Sie dies als Preis für die verwaltete Pipeline. Addieren Sie einzelne Transkriptions- und TTS-Positionen nur, wenn Ihre Abrechnung sie tatsächlich separat ausweist. Protokollieren Sie Minuten, Zeichen, Modell und Ergebnis und kontrollieren Sie die aktuellen Preise vor jeder Prognose.</p><h2>Quellen</h2><ul><li><a href=\"https://docs.mistral.ai/resources/changelogs\">Mistral Changelog</a></li><li><a href=\"https://mistral.ai/news/voxtral-3/\">Mistral: Voxtral 3 und Preise</a></li><li><a href=\"https://docs.mistral.ai/studio/audio/overview\">Mistral Audio-Dokumentation</a></li></ul>",
+      "faq": [
+        {
+          "question": "Was kostet Voxtral-3-Transkription?",
+          "answer": "Mini Batch kostet $0,0035 pro Audiominute, Small $0,0040 und Mini Realtime $0,0080."
+        },
+        {
+          "question": "Kommt der Voice-Agent-Preis zusätzlich zu Transkription und TTS?",
+          "answer": "Mistral weist Voice Agents als verwaltete Pipeline mit Reasoning-Modell pro Minute aus. Addieren Sie Einzelpreise nur, wenn Ihr Abrechnungsdatensatz sie separat berechnet."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "Kosten pro erfolgreicher Aufgabe"
+        },
+        {
+          "slug": "/research/model-price-cuts-routing-budget",
+          "label": "Modellpreise und Routing-Budgets"
+        }
+      ]
+    },
+    "es": {
+      "title": "Voxtral 3: coste de audio por minuto",
+      "titleCore": "FinOps de Voxtral 3: coste por minuto y carácter",
+      "description": "Mistral cobra la transcripción por minutos de audio y el TTS por caracteres. Calcula por separado el coste por lotes, en tiempo real y de agentes de voz.",
+      "body": "<p><strong>Voxtral 3 cobra la transcripción por minutos de audio y la generación de voz por caracteres.</strong> El registro de cambios de Mistral fecha la vista previa pública el 20 de octubre de 2026; el anuncio independiente lleva fecha del 21 de octubre. Los agentes de voz tienen además una tarifa por minuto para la canalización administrada y su modelo de razonamiento.</p><h2>Tarifas por tarea</h2><table><thead><tr><th>Tarea</th><th>Modelo</th><th>Precio</th></tr></thead><tbody><tr><td>Transcribir audio grabado</td><td>Mini Transcribe 3</td><td>$0,0035 / min de audio</td></tr><tr><td>Audio grabado, mayor precisión</td><td>Small Transcribe 3</td><td>$0,0040 / min</td></tr><tr><td>Transcripción en directo</td><td>Mini Transcribe Realtime 3</td><td>$0,0080 / min</td></tr><tr><td>Texto a voz</td><td>Mini TTS 3</td><td>$13 / 1 millón de caracteres</td></tr></tbody></table><p>Son unidades distintas: la transcripción depende de la duración del audio; el TTS, de los caracteres de entrada. No los combines en una tarifa media sin conservar el desglose.</p><h2>Ejemplos para presupuestar</h2><p>10.000 minutos grabados cuestan <strong>$35</strong> con Mini o <strong>$40</strong> con Small. 10.000 minutos en tiempo real cuestan <strong>$80</strong>. El nivel Small añade $5; compáralo con el coste de revisión humana y errores posteriores, no solo por minuto procesado.</p><p>10 millones de caracteres TTS cuestan <strong>$130</strong>. Una llamada grabada de seis minutos cuesta $0,021 con Mini; una respuesta hablada posterior de 5.000 caracteres cuesta $0,065. Total: aproximadamente <strong>$0,086</strong> por esas dos llamadas al modelo. No incluye razonamiento, agentes de voz administrados, reintentos, telefonía ni infraestructura.</p><p>Mistral publica por separado agentes de voz a $0,04 por minuto con Mistral Small 4 para razonamiento, o $0,08 con un modelo mayor. Trátalo como la tarifa de la canalización administrada y no sumes las líneas de transcripción y TTS salvo que tu factura las cobre aparte. Registra minutos, caracteres, modelo y resultado; verifica los precios vigentes antes de hacer previsiones.</p><h2>Fuentes</h2><ul><li><a href=\"https://docs.mistral.ai/resources/changelogs\">Registro de cambios de Mistral</a></li><li><a href=\"https://mistral.ai/news/voxtral-3/\">Anuncio y precios de Voxtral 3</a></li><li><a href=\"https://docs.mistral.ai/studio/audio/overview\">Documentación de audio de Mistral</a></li></ul>",
+      "faq": [
+        {
+          "question": "¿Cuánto cuesta transcribir con Voxtral 3?",
+          "answer": "Mini por lotes cuesta $0,0035 por minuto de audio, Small $0,0040 y Mini en tiempo real $0,0080."
+        },
+        {
+          "question": "¿La tarifa de agente de voz se suma a la transcripción y al TTS?",
+          "answer": "Mistral presenta el agente como una canalización administrada por minuto que incluye un modelo de razonamiento. No sumes las tarifas individuales a menos que tu facturación las cobre por separado."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "Coste por tarea completada"
+        },
+        {
+          "slug": "/research/model-price-cuts-routing-budget",
+          "label": "Precios de modelos y presupuestos de enrutamiento"
+        }
+      ]
+    },
+    "fr": {
+      "title": "Voxtral 3 : coût audio à la minute",
+      "titleCore": "FinOps Voxtral 3 : coût à la minute et au caractère",
+      "description": "Mistral facture la transcription à la minute audio et le TTS au caractère. Estimez séparément le traitement différé, le temps réel et les agents vocaux.",
+      "body": "<p><strong>Voxtral 3 facture la transcription par minute audio et la synthèse vocale par caractère.</strong> Le journal des changements de Mistral date l’aperçu public du 20 octobre 2026 ; l’annonce dédiée est datée du 21 octobre. Les agents vocaux ont aussi un tarif à la minute pour le pipeline géré et son modèle de raisonnement.</p><h2>Tarifs par tâche</h2><table><thead><tr><th>Usage</th><th>Modèle</th><th>Tarif</th></tr></thead><tbody><tr><td>Transcription d’un enregistrement</td><td>Mini Transcribe 3</td><td>$0,0035 / minute audio</td></tr><tr><td>Enregistrement, précision supérieure</td><td>Small Transcribe 3</td><td>$0,0040 / minute</td></tr><tr><td>Transcription en direct</td><td>Mini Transcribe Realtime 3</td><td>$0,0080 / minute</td></tr><tr><td>Texte vers parole</td><td>Mini TTS 3</td><td>$13 / million de caractères</td></tr></tbody></table><p>Les unités sont différentes : la transcription suit la durée audio, le TTS le nombre de caractères d’entrée. Une moyenne globale ferait perdre cette distinction.</p><h2>Exemples budgétaires</h2><p>10 000 minutes enregistrées coûtent <strong>$35</strong> avec Mini ou <strong>$40</strong> avec Small. 10 000 minutes en temps réel coûtent <strong>$80</strong>. Évaluez le supplément de Small de $5 au regard des corrections humaines et des erreurs évitées, pas seulement du prix par minute.</p><p>10 millions de caractères TTS coûtent <strong>$130</strong>. Une conversation enregistrée de six minutes coûte $0,021 avec Mini ; une réponse parlée de 5 000 caractères coûte $0,065. Total : environ <strong>$0,086</strong> pour ces deux appels. Le raisonnement, les agents gérés, les nouvelles tentatives, la téléphonie et l’infrastructure sont exclus.</p><p>Mistral affiche séparément les agents vocaux à $0,04/min avec Mistral Small 4 pour le raisonnement, ou $0,08/min avec un modèle plus grand. Considérez ce tarif comme celui du pipeline géré ; n’ajoutez pas les lignes de transcription et de TTS sauf si votre facture les sépare. Enregistrez durée, caractères, modèle et résultat, puis vérifiez la grille en vigueur avant toute prévision.</p><h2>Sources</h2><ul><li><a href=\"https://docs.mistral.ai/resources/changelogs\">Journal des changements Mistral</a></li><li><a href=\"https://mistral.ai/news/voxtral-3/\">Annonce et tarifs de Voxtral 3</a></li><li><a href=\"https://docs.mistral.ai/studio/audio/overview\">Documentation audio Mistral</a></li></ul>",
+      "faq": [
+        {
+          "question": "Combien coûte la transcription avec Voxtral 3 ?",
+          "answer": "Mini différé coûte $0,0035 par minute audio, Small $0,0040 et Mini Realtime $0,0080."
+        },
+        {
+          "question": "Le tarif d’un agent vocal s’ajoute-t-il à la transcription et au TTS ?",
+          "answer": "Mistral présente l’agent comme un pipeline géré facturé à la minute avec un modèle de raisonnement. N’ajoutez les tarifs individuels que si votre facturation les distingue."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "Coût par tâche réussie"
+        },
+        {
+          "slug": "/research/model-price-cuts-routing-budget",
+          "label": "Tarifs des modèles et budgets de routage"
+        }
+      ]
+    },
+    "pt": {
+      "title": "Voxtral 3: custo de áudio por minuto",
+      "titleCore": "FinOps do Voxtral 3: custo por minuto e caractere",
+      "description": "A Mistral cobra transcrição por minuto de áudio e TTS por caractere. Calcule separadamente lote, tempo real e agentes de voz.",
+      "body": "<p><strong>O Voxtral 3 cobra a transcrição por minuto de áudio e a geração de voz por caractere.</strong> O changelog da Mistral indica o lançamento em prévia pública em 20 de outubro de 2026; o anúncio dedicado tem data de 21 de outubro. Agentes de voz também têm uma tarifa própria por minuto para o pipeline gerenciado e o modelo de raciocínio.</p><h2>Preço por tarefa</h2><table><thead><tr><th>Tarefa</th><th>Modelo</th><th>Preço</th></tr></thead><tbody><tr><td>Transcrever gravações</td><td>Mini Transcribe 3</td><td>$0,0035 / minuto de áudio</td></tr><tr><td>Gravações, maior precisão</td><td>Small Transcribe 3</td><td>$0,0040 / minuto</td></tr><tr><td>Transcrição ao vivo</td><td>Mini Transcribe Realtime 3</td><td>$0,0080 / minuto</td></tr><tr><td>Texto para fala</td><td>Mini TTS 3</td><td>$13 / 1 milhão de caracteres</td></tr></tbody></table><p>As unidades não são iguais: transcrição depende da duração do áudio; TTS, dos caracteres de entrada. Evite uma taxa média que esconda qual etapa gera o custo.</p><h2>Exemplos para o orçamento</h2><p>10.000 minutos gravados custam <strong>$35</strong> com Mini ou <strong>$40</strong> com Small. 10.000 minutos em tempo real custam <strong>$80</strong>. Compare os $5 adicionais do Small com a redução de revisão humana e de erros, não só com o custo por minuto.</p><p>10 milhões de caracteres TTS custam <strong>$130</strong>. Uma chamada gravada de seis minutos custa $0,021 com Mini; uma resposta falada de 5.000 caracteres custa $0,065. Total: cerca de <strong>$0,086</strong> para essas duas chamadas. Não inclui raciocínio, agente de voz gerenciado, novas tentativas, telefonia ou infraestrutura.</p><p>A Mistral lista agentes de voz separadamente: $0,04/min com Mistral Small 4 para raciocínio ou $0,08/min com um modelo maior. Trate isso como preço do pipeline gerenciado; não some as tarifas individuais se a fatura não as cobrar separadamente. Registre minutos, caracteres, modelo e resultado e confira a tabela vigente antes de prever gastos.</p><h2>Fontes</h2><ul><li><a href=\"https://docs.mistral.ai/resources/changelogs\">Changelog da Mistral</a></li><li><a href=\"https://mistral.ai/news/voxtral-3/\">Anúncio e preços do Voxtral 3</a></li><li><a href=\"https://docs.mistral.ai/studio/audio/overview\">Documentação de áudio da Mistral</a></li></ul>",
+      "faq": [
+        {
+          "question": "Quanto custa transcrever com o Voxtral 3?",
+          "answer": "Mini em lote custa $0,0035 por minuto de áudio, Small $0,0040 e Mini em tempo real $0,0080."
+        },
+        {
+          "question": "A tarifa do agente de voz é adicional à transcrição e ao TTS?",
+          "answer": "A Mistral apresenta o agente como pipeline gerenciado por minuto, com modelo de raciocínio. Só some tarifas individuais se a cobrança as separar."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "Custo por tarefa bem-sucedida"
+        },
+        {
+          "slug": "/research/model-price-cuts-routing-budget",
+          "label": "Preços de modelos e orçamento de roteamento"
+        }
+      ]
+    },
+    "it": {
+      "title": "Voxtral 3: costo audio al minuto",
+      "titleCore": "FinOps Voxtral 3: costo per minuto e carattere",
+      "description": "Mistral tariffa la trascrizione al minuto audio e il TTS a carattere. Calcola separatamente batch, tempo reale e agenti vocali.",
+      "body": "<p><strong>Voxtral 3 addebita la trascrizione per minuto audio e la sintesi vocale per carattere.</strong> Il changelog Mistral indica il 20 ottobre 2026 per la public preview; l’annuncio dedicato è datato 21 ottobre. Gli agenti vocali hanno inoltre una tariffa al minuto per la pipeline gestita e il modello di ragionamento.</p><h2>Prezzi per attività</h2><table><thead><tr><th>Attività</th><th>Modello</th><th>Prezzo</th></tr></thead><tbody><tr><td>Trascrivere registrazioni</td><td>Mini Transcribe 3</td><td>$0,0035 / minuto audio</td></tr><tr><td>Registrazioni, maggiore accuratezza</td><td>Small Transcribe 3</td><td>$0,0040 / minuto</td></tr><tr><td>Trascrizione in diretta</td><td>Mini Transcribe Realtime 3</td><td>$0,0080 / minuto</td></tr><tr><td>Testo in voce</td><td>Mini TTS 3</td><td>$13 / 1 milione di caratteri</td></tr></tbody></table><p>Le unità sono diverse: la trascrizione dipende dalla durata audio, il TTS dai caratteri di input. Una tariffa media nasconde quale passaggio genera la spesa.</p><h2>Esempi di budget</h2><p>10.000 minuti registrati costano <strong>$35</strong> con Mini o <strong>$40</strong> con Small. 10.000 minuti realtime costano <strong>$80</strong>. Valuta i $5 in più di Small rispetto alle correzioni umane e agli errori evitati, non solo al prezzo per minuto.</p><p>10 milioni di caratteri TTS costano <strong>$130</strong>. Una registrazione di sei minuti costa $0,021 con Mini; una risposta parlata di 5.000 caratteri costa $0,065. Totale: circa <strong>$0,086</strong> per queste due chiamate. Sono esclusi ragionamento, agente gestito, retry, telefonia e infrastruttura.</p><p>Mistral indica separatamente gli agenti vocali a $0,04/min con Mistral Small 4 per il ragionamento o $0,08/min con un modello più grande. Consideralo il prezzo della pipeline gestita e non sommare le singole voci se la fattura non le addebita separatamente. Registra minuti, caratteri, modello ed esito e verifica i prezzi correnti prima delle previsioni.</p><h2>Fonti</h2><ul><li><a href=\"https://docs.mistral.ai/resources/changelogs\">Changelog Mistral</a></li><li><a href=\"https://mistral.ai/news/voxtral-3/\">Annuncio e prezzi Voxtral 3</a></li><li><a href=\"https://docs.mistral.ai/studio/audio/overview\">Documentazione audio Mistral</a></li></ul>",
+      "faq": [
+        {
+          "question": "Quanto costa la trascrizione con Voxtral 3?",
+          "answer": "Mini batch costa $0,0035 per minuto audio, Small $0,0040 e Mini realtime $0,0080."
+        },
+        {
+          "question": "Il prezzo dell’agente vocale si aggiunge a trascrizione e TTS?",
+          "answer": "Mistral presenta l’agente come pipeline gestita al minuto con un modello di ragionamento. Aggiungi le tariffe singole soltanto se la fattura le separa."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "Costo per attività riuscita"
+        },
+        {
+          "slug": "/research/model-price-cuts-routing-budget",
+          "label": "Prezzi dei modelli e budget di routing"
+        }
+      ]
+    },
+    "nl": {
+      "title": "Voxtral 3: audiokosten per minuut",
+      "titleCore": "FinOps voor Voxtral 3: kosten per minuut en teken",
+      "description": "Mistral rekent transcriptie per audiominuut en TTS per teken. Begroot batch, realtime en spraakagents afzonderlijk.",
+      "body": "<p><strong>Voxtral 3 rekent transcriptie af per audiominuut en spraakgeneratie per teken.</strong> Mistrals changelog vermeldt 20 oktober 2026 als start van de publieke preview; de aparte aankondiging is van 21 oktober. Voor spraakagents geldt daarnaast een tarief per minuut voor de beheerde pipeline en het redeneermodel.</p><h2>Tarieven per taak</h2><table><thead><tr><th>Taak</th><th>Model</th><th>Tarief</th></tr></thead><tbody><tr><td>Opgenomen audio transcriberen</td><td>Mini Transcribe 3</td><td>$0,0035 / audiominuut</td></tr><tr><td>Opname, hogere nauwkeurigheid</td><td>Small Transcribe 3</td><td>$0,0040 / minuut</td></tr><tr><td>Live transcriptie</td><td>Mini Transcribe Realtime 3</td><td>$0,0080 / minuut</td></tr><tr><td>Tekst naar spraak</td><td>Mini TTS 3</td><td>$13 / 1 miljoen tekens</td></tr></tbody></table><p>Dit zijn verschillende meeteenheden: transcriptie volgt de audiolengte; TTS het aantal invoertekens. Een gecombineerd gemiddelde verbergt welke stap de kosten veroorzaakt.</p><h2>Begrotingsvoorbeelden</h2><p>10.000 opgenomen minuten kosten <strong>$35</strong> met Mini of <strong>$40</strong> met Small. 10.000 realtime minuten kosten <strong>$80</strong>. Vergelijk de extra $5 voor Small met minder handmatige correcties en downstream fouten.</p><p>10 miljoen TTS-tekens kosten <strong>$130</strong>. Een opname van zes minuten kost $0,021 met Mini; een gesproken antwoord van 5.000 tekens kost $0,065. Samen ongeveer <strong>$0,086</strong> voor deze twee modelaanroepen. Redenering, beheerde spraakagenten, retries, telefonie en infrastructuur zijn niet inbegrepen.</p><p>Mistral vermeldt spraakagenten apart voor $0,04/min met Mistral Small 4 als redeneermodel of $0,08/min met een groter model. Behandel dit als de prijs van de beheerde pipeline; tel losse transcriptie- en TTS-regels alleen erbij als je factuur ze apart rekent. Registreer minuten, tekens, model en resultaat en controleer actuele prijzen vóór prognoses.</p><h2>Bronnen</h2><ul><li><a href=\"https://docs.mistral.ai/resources/changelogs\">Mistral-changelog</a></li><li><a href=\"https://mistral.ai/news/voxtral-3/\">Aankondiging en prijzen Voxtral 3</a></li><li><a href=\"https://docs.mistral.ai/studio/audio/overview\">Mistral-audiodocumentatie</a></li></ul>",
+      "faq": [
+        {
+          "question": "Wat kost transcriptie met Voxtral 3?",
+          "answer": "Mini batch kost $0,0035 per audiominuut, Small $0,0040 en Mini realtime $0,0080."
+        },
+        {
+          "question": "Komt het tarief voor spraakagenten boven op transcriptie en TTS?",
+          "answer": "Mistral presenteert agents als een beheerde pipeline per minuut inclusief redeneermodel. Tel losse tarieven alleen mee als je facturering ze apart vermeldt."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "Kosten per geslaagde taak"
+        },
+        {
+          "slug": "/research/model-price-cuts-routing-budget",
+          "label": "Modelprijzen en routeringsbudgetten"
+        }
+      ]
+    },
+    "pl": {
+      "title": "Voxtral 3: koszt audio za minutę",
+      "titleCore": "FinOps Voxtral 3: koszt za minutę i znak",
+      "description": "Mistral rozlicza transkrypcję za minutę audio, a TTS za znaki. Osobno planuj batch, realtime i agentów głosowych.",
+      "body": "<p><strong>Voxtral 3 rozlicza transkrypcję według minut audio, a syntezę mowy według znaków.</strong> Changelog Mistral podaje 20 października 2026 jako datę publicznej wersji preview; osobny wpis zapowiadający ma datę 21 października. Agenci głosowi mają ponadto osobną stawkę minutową za zarządzany pipeline i model rozumujący.</p><h2>Ceny według zadania</h2><table><thead><tr><th>Zadanie</th><th>Model</th><th>Stawka</th></tr></thead><tbody><tr><td>Transkrypcja nagrania</td><td>Mini Transcribe 3</td><td>$0,0035 / minuta audio</td></tr><tr><td>Nagranie, wyższa dokładność</td><td>Small Transcribe 3</td><td>$0,0040 / minuta</td></tr><tr><td>Transkrypcja na żywo</td><td>Mini Transcribe Realtime 3</td><td>$0,0080 / minuta</td></tr><tr><td>Tekst na mowę</td><td>Mini TTS 3</td><td>$13 / 1 mln znaków</td></tr></tbody></table><p>To różne jednostki: transkrypcja zależy od długości audio, a TTS od liczby znaków wejściowych. Jedna uśredniona stawka ukrywa koszt poszczególnych etapów.</p><h2>Przykłady budżetowe</h2><p>10 000 minut nagrań kosztuje <strong>$35</strong> w Mini lub <strong>$40</strong> w Small. 10 000 minut realtime kosztuje <strong>$80</strong>. Dodatkowe $5 za Small porównaj z kosztami korekty przez człowieka i błędów w dalszym procesie.</p><p>10 mln znaków TTS kosztuje <strong>$130</strong>. Sześciominutowe nagranie transkrybowane przez Mini kosztuje $0,021; odpowiedź głosowa o długości 5 000 znaków to $0,065. Razem około <strong>$0,086</strong> za te dwa wywołania. Bez rozumowania, agenta zarządzanego, ponowień, telefonii i infrastruktury.</p><p>Mistral osobno podaje $0,04/min za agentów głosowych z Mistral Small 4 do rozumowania albo $0,08/min z większym modelem. Traktuj to jako stawkę za zarządzany pipeline; nie dodawaj osobnych pozycji transkrypcji i TTS, jeśli faktura nie rozlicza ich oddzielnie. Zapisuj minuty, znaki, model i wynik; przed prognozą sprawdź aktualny cennik.</p><h2>Źródła</h2><ul><li><a href=\"https://docs.mistral.ai/resources/changelogs\">Changelog Mistral</a></li><li><a href=\"https://mistral.ai/news/voxtral-3/\">Ogłoszenie i cennik Voxtral 3</a></li><li><a href=\"https://docs.mistral.ai/studio/audio/overview\">Dokumentacja audio Mistral</a></li></ul>",
+      "faq": [
+        {
+          "question": "Ile kosztuje transkrypcja Voxtral 3?",
+          "answer": "Mini batch kosztuje $0,0035 za minutę audio, Small $0,0040, a Mini realtime $0,0080."
+        },
+        {
+          "question": "Czy stawka agenta głosowego jest doliczana do transkrypcji i TTS?",
+          "answer": "Mistral przedstawia agenta jako zarządzany pipeline rozliczany za minutę z modelem rozumującym. Dodawaj stawki osobno tylko wtedy, gdy faktura rzeczywiście je rozdziela."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "Koszt skutecznie ukończonego zadania"
+        },
+        {
+          "slug": "/research/model-price-cuts-routing-budget",
+          "label": "Ceny modeli i budżety routingu"
+        }
+      ]
+    },
+    "ru": {
+      "title": "Voxtral 3: цена аудио за минуту",
+      "titleCore": "FinOps Voxtral 3: цена за минуту и символ",
+      "description": "Mistral тарифицирует транскрибацию по минутам аудио, а TTS — по символам. Считайте batch, realtime и голосовых агентов отдельно.",
+      "body": "<p><strong>Voxtral 3 тарифицирует транскрибацию по минутам аудио, а синтез речи — по символам.</strong> В журнале изменений Mistral датой публичного preview указано 20 октября 2026 года; отдельная публикация-анонс датирована 21 октября. Для голосовых агентов также есть отдельная поминутная ставка за управляемый конвейер и модель рассуждений.</p><h2>Цены по задачам</h2><table><thead><tr><th>Задача</th><th>Модель</th><th>Цена</th></tr></thead><tbody><tr><td>Транскрибация записи</td><td>Mini Transcribe 3</td><td>$0,0035 / мин аудио</td></tr><tr><td>Запись, выше точность</td><td>Small Transcribe 3</td><td>$0,0040 / мин</td></tr><tr><td>Транскрибация в реальном времени</td><td>Mini Transcribe Realtime 3</td><td>$0,0080 / мин</td></tr><tr><td>Текст в речь</td><td>Mini TTS 3</td><td>$13 / 1 млн символов</td></tr></tbody></table><p>Это разные единицы учета: транскрибация зависит от длительности аудио, TTS — от количества входных символов. Единая усредненная ставка скроет источник затрат.</p><h2>Примеры для бюджета</h2><p>10 000 минут записанного аудио стоят <strong>$35</strong> в Mini или <strong>$40</strong> в Small. 10 000 минут realtime стоят <strong>$80</strong>. Сравнивайте доплату $5 за Small со стоимостью ручной проверки и последующих ошибок.</p><p>10 млн символов TTS стоят <strong>$130</strong>. Транскрибация шестиминутной записи через Mini стоит $0,021; озвученный ответ на 5 000 символов — $0,065. Итого около <strong>$0,086</strong> за эти два вызова. Не включены рассуждения модели, управляемый голосовой агент, повторы, телефония и инфраструктура.</p><p>Mistral отдельно указывает $0,04/мин за голосового агента с Mistral Small 4 для рассуждений или $0,08/мин с более крупной моделью. Считайте это тарифом управляемого конвейера; не добавляйте отдельные тарифы транскрибации и TTS, если счет не выставляет их отдельно. Записывайте минуты, символы, модель и результат; перед прогнозом проверяйте актуальный тариф.</p><h2>Источники</h2><ul><li><a href=\"https://docs.mistral.ai/resources/changelogs\">Журнал изменений Mistral</a></li><li><a href=\"https://mistral.ai/news/voxtral-3/\">Анонс и цены Voxtral 3</a></li><li><a href=\"https://docs.mistral.ai/studio/audio/overview\">Документация Mistral по аудио</a></li></ul>",
+      "faq": [
+        {
+          "question": "Сколько стоит транскрибация Voxtral 3?",
+          "answer": "Mini batch стоит $0,0035 за минуту аудио, Small — $0,0040, Mini realtime — $0,0080."
+        },
+        {
+          "question": "Оплата голосового агента добавляется к транскрибации и TTS?",
+          "answer": "Mistral указывает голосового агента как управляемый поминутный конвейер с моделью рассуждений. Складывайте отдельные ставки только если счет действительно разделяет их."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "Стоимость успешно выполненной задачи"
+        },
+        {
+          "slug": "/research/model-price-cuts-routing-budget",
+          "label": "Цены моделей и бюджеты маршрутизации"
+        }
+      ]
+    },
+    "tr": {
+      "title": "Voxtral 3: dakika başına ses maliyeti",
+      "titleCore": "Voxtral 3 FinOps: dakika ve karakter başına maliyet",
+      "description": "Mistral transkripsiyonu ses dakikasıyla, TTS'yi karakterle fiyatlandırıyor. Toplu, gerçek zamanlı ve sesli ajan maliyetlerini ayrı hesaplayın.",
+      "body": "<p><strong>Voxtral 3, transkripsiyonda ses dakikası; konuşma üretiminde karakter sayısı üzerinden ücretlendirilir.</strong> Mistral değişiklik günlüğü herkese açık önizleme tarihini 20 Ekim 2026, ayrı duyuruyu ise 21 Ekim olarak veriyor. Sesli ajanlar, yönetilen işlem hattı ve akıl yürütme modeli için ayrıca dakika başına ücret taşır.</p><h2>Göreve göre fiyatlar</h2><table><thead><tr><th>İş</th><th>Model</th><th>Ücret</th></tr></thead><tbody><tr><td>Kaydedilmiş sesi yazıya çevirme</td><td>Mini Transcribe 3</td><td>$0,0035 / ses dakikası</td></tr><tr><td>Kayıt, daha yüksek doğruluk</td><td>Small Transcribe 3</td><td>$0,0040 / dakika</td></tr><tr><td>Canlı transkripsiyon</td><td>Mini Transcribe Realtime 3</td><td>$0,0080 / dakika</td></tr><tr><td>Metinden konuşma</td><td>Mini TTS 3</td><td>$13 / 1 milyon karakter</td></tr></tbody></table><p>Bunlar farklı ölçülerdir: transkripsiyon ses süresine, TTS giriş karakterlerine bağlıdır. Tek bir ortalama ücret maliyetin hangi aşamada oluştuğunu gizler.</p><h2>Bütçe örnekleri</h2><p>10.000 dakikalık kayıt Mini ile <strong>$35</strong>, Small ile <strong>$40</strong> tutar. Gerçek zamanlı 10.000 dakika <strong>$80</strong> tutar. Small için ek $5'i yalnızca dakika fiyatıyla değil, insan düzeltmesi ve sonraki hatalardaki azalmayla karşılaştırın.</p><p>10 milyon TTS karakteri <strong>$130</strong> tutar. Altı dakikalık kaydı Mini ile yazıya dökmek $0,021; 5.000 karakterlik sesli yanıt $0,065 tutar. Bu iki model çağrısının toplamı yaklaşık <strong>$0,086</strong>'dır. Akıl yürütme, yönetilen sesli ajan, tekrar denemeler, telefon ve altyapı dahil değildir.</p><p>Mistral sesli ajanları ayrıca Mistral Small 4 akıl yürütme modeliyle $0,04/dakika, daha büyük modelle $0,08/dakika olarak listeliyor. Bunu yönetilen işlem hattının ücreti olarak ele alın; fatura ayrı ücret göstermedikçe transkripsiyon ve TTS kalemlerini üstüne eklemeyin. Dakika, karakter, model ve sonucu kaydedip tahmin öncesi güncel tarifeyi doğrulayın.</p><h2>Kaynaklar</h2><ul><li><a href=\"https://docs.mistral.ai/resources/changelogs\">Mistral değişiklik günlüğü</a></li><li><a href=\"https://mistral.ai/news/voxtral-3/\">Voxtral 3 duyurusu ve fiyatları</a></li><li><a href=\"https://docs.mistral.ai/studio/audio/overview\">Mistral ses belgeleri</a></li></ul>",
+      "faq": [
+        {
+          "question": "Voxtral 3 transkripsiyonu ne kadar?",
+          "answer": "Mini batch ses dakikası başına $0,0035, Small $0,0040 ve Mini gerçek zamanlı $0,0080 tutar."
+        },
+        {
+          "question": "Sesli ajan ücreti transkripsiyon ve TTS'ye ekleniyor mu?",
+          "answer": "Mistral ajanı, akıl yürütme modeli içeren ve dakika başına fiyatlanan yönetilen işlem hattı olarak sunuyor. Ayrı kalemleri yalnızca fatura gerçekten ayrı gösteriyorsa ekleyin."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "Başarılı görev başına maliyet"
+        },
+        {
+          "slug": "/research/model-price-cuts-routing-budget",
+          "label": "Model fiyatları ve yönlendirme bütçeleri"
+        }
+      ]
+    },
+    "vi": {
+      "title": "Voxtral 3: chi phí âm thanh theo phút",
+      "titleCore": "FinOps Voxtral 3: chi phí theo phút và ký tự",
+      "description": "Mistral tính phí phiên âm theo phút âm thanh và TTS theo ký tự. Hãy dự toán riêng batch, realtime và tác nhân thoại.",
+      "body": "<p><strong>Voxtral 3 tính phí phiên âm theo phút âm thanh và tạo giọng nói theo số ký tự.</strong> Nhật ký thay đổi của Mistral ghi bản xem trước công khai phát hành ngày 20/10/2026; bài công bố riêng mang ngày 21/10. Tác nhân thoại còn có giá riêng theo phút cho quy trình được quản lý và mô hình suy luận.</p><h2>Giá theo công việc</h2><table><thead><tr><th>Công việc</th><th>Mô hình</th><th>Giá</th></tr></thead><tbody><tr><td>Phiên âm bản ghi</td><td>Mini Transcribe 3</td><td>$0,0035 / phút âm thanh</td></tr><tr><td>Bản ghi, độ chính xác cao hơn</td><td>Small Transcribe 3</td><td>$0,0040 / phút</td></tr><tr><td>Phiên âm trực tiếp</td><td>Mini Transcribe Realtime 3</td><td>$0,0080 / phút</td></tr><tr><td>Chuyển văn bản thành giọng nói</td><td>Mini TTS 3</td><td>$13 / 1 triệu ký tự</td></tr></tbody></table><p>Đây là các đơn vị khác nhau: phiên âm dựa trên thời lượng âm thanh; TTS dựa trên ký tự đầu vào. Một mức trung bình chung sẽ che khuất bước tạo ra chi phí.</p><h2>Ví dụ ngân sách</h2><p>10.000 phút bản ghi có giá <strong>$35</strong> với Mini hoặc <strong>$40</strong> với Small. 10.000 phút realtime có giá <strong>$80</strong>. Hãy so khoản chênh $5 của Small với chi phí sửa thủ công và lỗi phát sinh, không chỉ giá mỗi phút.</p><p>10 triệu ký tự TTS có giá <strong>$130</strong>. Phiên âm cuộc gọi ghi âm sáu phút bằng Mini tốn $0,021; câu trả lời thoại 5.000 ký tự tốn $0,065. Tổng khoảng <strong>$0,086</strong> cho hai lần gọi mô hình. Chưa gồm suy luận, tác nhân thoại quản lý, thử lại, điện thoại hay hạ tầng.</p><p>Mistral niêm yết riêng tác nhân thoại ở mức $0,04/phút với Mistral Small 4 làm mô hình suy luận, hoặc $0,08/phút với mô hình lớn hơn. Hãy coi đây là giá của quy trình được quản lý; đừng cộng phí phiên âm và TTS riêng nếu hóa đơn không tính riêng. Ghi nhận phút, ký tự, mô hình và kết quả; kiểm tra bảng giá hiện hành trước khi dự báo.</p><h2>Nguồn</h2><ul><li><a href=\"https://docs.mistral.ai/resources/changelogs\">Nhật ký thay đổi Mistral</a></li><li><a href=\"https://mistral.ai/news/voxtral-3/\">Thông báo và giá Voxtral 3</a></li><li><a href=\"https://docs.mistral.ai/studio/audio/overview\">Tài liệu âm thanh Mistral</a></li></ul>",
+      "faq": [
+        {
+          "question": "Phiên âm Voxtral 3 giá bao nhiêu?",
+          "answer": "Mini batch giá $0,0035 mỗi phút âm thanh, Small $0,0040 và Mini realtime $0,0080."
+        },
+        {
+          "question": "Phí tác nhân thoại có cộng thêm vào phiên âm và TTS không?",
+          "answer": "Mistral mô tả tác nhân là quy trình được quản lý, tính theo phút và có mô hình suy luận. Chỉ cộng giá từng mô hình nếu hệ thống thanh toán tính riêng."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "Chi phí mỗi tác vụ thành công"
+        },
+        {
+          "slug": "/research/model-price-cuts-routing-budget",
+          "label": "Giá mô hình và ngân sách định tuyến"
+        }
+      ]
+    },
+    "id": {
+      "title": "Voxtral 3: biaya audio per menit",
+      "titleCore": "FinOps Voxtral 3: biaya per menit dan karakter",
+      "description": "Mistral menagih transkripsi per menit audio dan TTS per karakter. Anggarkan batch, realtime, dan agen suara secara terpisah.",
+      "body": "<p><strong>Voxtral 3 menagih transkripsi berdasarkan menit audio dan pembuatan suara berdasarkan karakter.</strong> Changelog Mistral mencatat pratinjau publik pada 20 Oktober 2026; pengumuman tersendiri bertanggal 21 Oktober. Agen suara juga memiliki tarif per menit tersendiri untuk pipeline terkelola dan model penalarannya.</p><h2>Tarif menurut tugas</h2><table><thead><tr><th>Tugas</th><th>Model</th><th>Tarif</th></tr></thead><tbody><tr><td>Transkripsi rekaman</td><td>Mini Transcribe 3</td><td>$0,0035 / menit audio</td></tr><tr><td>Rekaman, akurasi lebih tinggi</td><td>Small Transcribe 3</td><td>$0,0040 / menit</td></tr><tr><td>Transkripsi langsung</td><td>Mini Transcribe Realtime 3</td><td>$0,0080 / menit</td></tr><tr><td>Teks ke suara</td><td>Mini TTS 3</td><td>$13 / 1 juta karakter</td></tr></tbody></table><p>Unitnya berbeda: transkripsi mengikuti durasi audio, sedangkan TTS mengikuti jumlah karakter input. Tarif gabungan akan menyamarkan tahap yang mendorong biaya.</p><h2>Contoh anggaran</h2><p>10.000 menit rekaman berharga <strong>$35</strong> dengan Mini atau <strong>$40</strong> dengan Small. 10.000 menit realtime berharga <strong>$80</strong>. Bandingkan tambahan $5 untuk Small dengan pengurangan koreksi manual dan kesalahan lanjutan.</p><p>10 juta karakter TTS berharga <strong>$130</strong>. Transkripsi rekaman enam menit dengan Mini berharga $0,021; jawaban suara 5.000 karakter berharga $0,065. Total sekitar <strong>$0,086</strong> untuk dua panggilan model tersebut. Belum termasuk penalaran, agen terkelola, percobaan ulang, telepon, atau infrastruktur.</p><p>Mistral mencantumkan agen suara terpisah seharga $0,04/menit dengan Mistral Small 4 untuk penalaran atau $0,08/menit dengan model lebih besar. Perlakukan itu sebagai harga pipeline terkelola; jangan tambahkan biaya transkripsi dan TTS terpisah kecuali tagihan Anda memang memisahkannya. Catat menit, karakter, model, dan hasil; periksa tarif terbaru sebelum membuat proyeksi.</p><h2>Sumber</h2><ul><li><a href=\"https://docs.mistral.ai/resources/changelogs\">Changelog Mistral</a></li><li><a href=\"https://mistral.ai/news/voxtral-3/\">Pengumuman dan harga Voxtral 3</a></li><li><a href=\"https://docs.mistral.ai/studio/audio/overview\">Dokumentasi audio Mistral</a></li></ul>",
+      "faq": [
+        {
+          "question": "Berapa biaya transkripsi Voxtral 3?",
+          "answer": "Mini batch $0,0035 per menit audio, Small $0,0040, dan Mini realtime $0,0080."
+        },
+        {
+          "question": "Apakah tarif agen suara ditambahkan ke transkripsi dan TTS?",
+          "answer": "Mistral menyajikan agen sebagai pipeline terkelola per menit yang mencakup model penalaran. Tambahkan tarif model terpisah hanya jika penagihan Anda memisahkannya."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "Biaya per tugas yang berhasil"
+        },
+        {
+          "slug": "/research/model-price-cuts-routing-budget",
+          "label": "Harga model dan anggaran routing"
+        }
+      ]
+    },
+    "ar": {
+      "title": "Voxtral 3: تكلفة الصوت لكل دقيقة",
+      "titleCore": "FinOps لـ Voxtral 3: التكلفة لكل دقيقة وحرف",
+      "description": "تحتسب Mistral النسخ حسب دقائق الصوت وTTS حسب الأحرف. افصل ميزانية المعالجة الدفعية والآنية ووكلاء الصوت.",
+      "body": "<p><strong>تُحاسب Voxtral 3 على النسخ بحسب دقائق الصوت، وعلى توليد الكلام بحسب عدد الأحرف.</strong> يسجل سجل تغييرات Mistral تاريخ 20 أكتوبر 2026 لإتاحة المعاينة العامة، بينما يحمل الإعلان المنفصل تاريخ 21 أكتوبر. ولخدمات وكلاء الصوت سعر مستقل لكل دقيقة يشمل خط المعالجة المُدار ونموذج الاستدلال.</p><h2>الأسعار حسب المهمة</h2><table><thead><tr><th>المهمة</th><th>النموذج</th><th>السعر</th></tr></thead><tbody><tr><td>نسخ تسجيل صوتي</td><td>Mini Transcribe 3</td><td>$0.0035 / دقيقة صوت</td></tr><tr><td>تسجيل بدقة أعلى</td><td>Small Transcribe 3</td><td>$0.0040 / دقيقة</td></tr><tr><td>نسخ فوري</td><td>Mini Transcribe Realtime 3</td><td>$0.0080 / دقيقة</td></tr><tr><td>تحويل النص إلى كلام</td><td>Mini TTS 3</td><td>$13 / مليون حرف</td></tr></tbody></table><p>هذه وحدات قياس مختلفة: النسخ يعتمد على مدة الصوت، وTTS على أحرف الإدخال. لا تدمجها في متوسط واحد يخفي مصدر التكلفة.</p><h2>أمثلة للميزانية</h2><p>تكلف 10,000 دقيقة من التسجيلات <strong>$35</strong> مع Mini أو <strong>$40</strong> مع Small. وتكلف 10,000 دقيقة فورية <strong>$80</strong>. قارن فرق $5 في Small بتكلفة المراجعة البشرية والأخطاء اللاحقة.</p><p>تكلف 10 ملايين حرف TTS مبلغ <strong>$130</strong>. نسخ مكالمة مسجلة مدتها ست دقائق عبر Mini يكلف $0.021؛ وإجابة منطوقة من 5,000 حرف تكلف $0.065. الإجمالي نحو <strong>$0.086</strong> لهذين الاستدعاءين. لا يشمل الاستدلال أو وكيل الصوت المُدار أو الإعادات أو الاتصالات أو البنية التحتية.</p><p>تعرض Mistral وكلاء الصوت بشكل منفصل بسعر $0.04 للدقيقة مع Mistral Small 4 للاستدلال، أو $0.08 مع نموذج أكبر. اعتبر ذلك سعر خط المعالجة المُدار، ولا تضف بنود النسخ وTTS المنفصلة إلا إذا كانت فاتورتك تفصلها. سجّل الدقائق والأحرف والنموذج والنتيجة، وتحقق من الأسعار الحالية قبل التوقع.</p><h2>المصادر</h2><ul><li><a href=\"https://docs.mistral.ai/resources/changelogs\">سجل تغييرات Mistral</a></li><li><a href=\"https://mistral.ai/news/voxtral-3/\">إعلان وأسعار Voxtral 3</a></li><li><a href=\"https://docs.mistral.ai/studio/audio/overview\">وثائق الصوت من Mistral</a></li></ul>",
+      "faq": [
+        {
+          "question": "كم تبلغ تكلفة النسخ باستخدام Voxtral 3؟",
+          "answer": "تكلفة Mini batch هي $0.0035 لكل دقيقة صوت، وSmall هي $0.0040، وMini realtime هي $0.0080."
+        },
+        {
+          "question": "هل تُضاف رسوم وكيل الصوت إلى النسخ وTTS؟",
+          "answer": "تعرض Mistral الوكيل كخط معالجة مُدار بسعر لكل دقيقة ويتضمن نموذج استدلال. لا تجمع الأسعار الفردية إلا إذا كانت الفاتورة تفصلها."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "تكلفة المهمة الناجحة"
+        },
+        {
+          "slug": "/research/model-price-cuts-routing-budget",
+          "label": "أسعار النماذج وميزانيات التوجيه"
+        }
+      ]
+    },
+    "ja": {
+      "title": "Voxtral 3の音声コストを分単位で把握",
+      "titleCore": "Voxtral 3のFinOps：分単位・文字単位のコスト",
+      "description": "Mistralは文字起こしを音声分数、TTSを文字数で課金します。バッチ、リアルタイム、音声エージェントを分けて予算化します。",
+      "body": "<p><strong>Voxtral 3は文字起こしを音声の分数、音声生成を入力文字数で課金します。</strong>Mistralの変更履歴では公開プレビュー開始日は2026年10月20日、個別の発表記事は10月21日付です。音声エージェントには、管理型パイプラインと推論モデルの分単位料金もあります。</p><h2>タスク別料金</h2><table><thead><tr><th>タスク</th><th>モデル</th><th>料金</th></tr></thead><tbody><tr><td>録音の文字起こし</td><td>Mini Transcribe 3</td><td>音声1分あたり$0.0035</td></tr><tr><td>高精度の録音文字起こし</td><td>Small Transcribe 3</td><td>1分あたり$0.0040</td></tr><tr><td>リアルタイム文字起こし</td><td>Mini Transcribe Realtime 3</td><td>1分あたり$0.0080</td></tr><tr><td>テキストから音声</td><td>Mini TTS 3</td><td>100万文字あたり$13</td></tr></tbody></table><p>課金単位は異なります。文字起こしは音声時間、TTSは入力文字数で決まります。単一の平均単価にまとめると、どの処理で費用が発生したか分からなくなります。</p><h2>予算例</h2><p>録音10,000分はMiniで<strong>$35</strong>、Smallで<strong>$40</strong>です。リアルタイム10,000分は<strong>$80</strong>です。Smallの追加$5は、処理分数だけでなく、人手による修正や後工程のエラー削減と比較してください。</p><p>TTSの1,000万文字は<strong>$130</strong>です。6分の録音をMiniで文字起こしすると$0.021、5,000文字の音声回答は$0.065で、2つのモデル呼び出しの合計は約<strong>$0.086</strong>です。推論、管理型音声エージェント、再試行、電話、インフラ費用は含みません。</p><p>Mistralは音声エージェントを別途、推論にMistral Small 4を使う場合は$0.04/分、大型モデルの場合は$0.08/分としています。これは管理型パイプラインの料金として扱い、請求上で別項目になっていない限り、文字起こしとTTSの個別料金を重ねないでください。分数、文字数、モデル、結果を記録し、予測前に最新料金を確認します。</p><h2>出典</h2><ul><li><a href=\"https://docs.mistral.ai/resources/changelogs\">Mistral変更履歴</a></li><li><a href=\"https://mistral.ai/news/voxtral-3/\">Voxtral 3の発表と料金</a></li><li><a href=\"https://docs.mistral.ai/studio/audio/overview\">Mistral音声モデルのドキュメント</a></li></ul>",
+      "faq": [
+        {
+          "question": "Voxtral 3の文字起こし料金はいくらですか？",
+          "answer": "Miniのバッチ処理は音声1分あたり$0.0035、Smallは$0.0040、Miniのリアルタイム処理は$0.0080です。"
+        },
+        {
+          "question": "音声エージェント料金は文字起こしとTTSに加算されますか？",
+          "answer": "Mistralは推論モデルを含む管理型パイプラインとして分単位で提示しています。請求で個別課金が確認できる場合だけ別料金を加算してください。"
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "成功タスクあたりのコスト"
+        },
+        {
+          "slug": "/research/model-price-cuts-routing-budget",
+          "label": "モデル価格とルーティング予算"
+        }
+      ]
+    },
+    "ko": {
+      "title": "Voxtral 3 오디오 비용: 분당 단가",
+      "titleCore": "Voxtral 3 FinOps: 분 및 문자당 비용",
+      "description": "Mistral은 전사를 오디오 분 단위로, TTS를 문자 단위로 과금합니다. 배치·실시간·음성 에이전트 비용을 분리해 예산화하세요.",
+      "body": "<p><strong>Voxtral 3는 전사를 오디오 분 단위로, 음성 생성을 입력 문자 수로 과금합니다.</strong>Mistral 변경 로그는 공개 프리뷰 출시일을 2026년 10월 20일로 기록하며 별도 발표 글은 10월 21일자입니다. 음성 에이전트에는 관리형 파이프라인과 추론 모델에 대한 분당 요금도 따로 있습니다.</p><h2>작업별 요금</h2><table><thead><tr><th>작업</th><th>모델</th><th>요금</th></tr></thead><tbody><tr><td>녹음 파일 전사</td><td>Mini Transcribe 3</td><td>오디오 분당 $0.0035</td></tr><tr><td>고정확도 녹음 전사</td><td>Small Transcribe 3</td><td>분당 $0.0040</td></tr><tr><td>실시간 전사</td><td>Mini Transcribe Realtime 3</td><td>분당 $0.0080</td></tr><tr><td>텍스트 음성 변환</td><td>Mini TTS 3</td><td>100만 문자당 $13</td></tr></tbody></table><p>측정 단위가 다릅니다. 전사는 오디오 길이, TTS는 입력 문자 수에 따라 비용이 발생합니다. 하나의 평균 요금으로 합치면 비용 발생 단계를 파악하기 어렵습니다.</p><h2>예산 예시</h2><p>녹음 10,000분은 Mini 기준 <strong>$35</strong>, Small 기준 <strong>$40</strong>입니다. 실시간 10,000분은 <strong>$80</strong>입니다. Small의 $5 추가 비용은 단순 분당 가격이 아니라 사람의 수정 작업과 후속 오류 감소 효과와 비교하세요.</p><p>TTS 1,000만 문자는 <strong>$130</strong>입니다. 6분 녹음을 Mini로 전사하면 $0.021, 5,000자 음성 답변은 $0.065이며, 두 모델 호출 합계는 약 <strong>$0.086</strong>입니다. 추론, 관리형 음성 에이전트, 재시도, 전화 통신, 인프라는 제외됩니다.</p><p>Mistral은 음성 에이전트 요금을 별도로 분당 $0.04(추론에 Mistral Small 4 사용), 더 큰 모델은 $0.08로 제시합니다. 이를 관리형 파이프라인 요금으로 보고 청구서에서 별도 과금이 확인되지 않으면 전사와 TTS 요금을 중복 합산하지 마세요. 분, 문자, 모델, 결과를 기록하고 예측 전에 최신 요금을 확인하세요.</p><h2>출처</h2><ul><li><a href=\"https://docs.mistral.ai/resources/changelogs\">Mistral 변경 로그</a></li><li><a href=\"https://mistral.ai/news/voxtral-3/\">Voxtral 3 발표 및 요금</a></li><li><a href=\"https://docs.mistral.ai/studio/audio/overview\">Mistral 오디오 문서</a></li></ul>",
+      "faq": [
+        {
+          "question": "Voxtral 3 전사 비용은 얼마인가요?",
+          "answer": "Mini 배치는 오디오 분당 $0.0035, Small은 $0.0040, Mini 실시간은 $0.0080입니다."
+        },
+        {
+          "question": "음성 에이전트 요금은 전사와 TTS에 추가되나요?",
+          "answer": "Mistral은 추론 모델이 포함된 관리형 파이프라인을 분당 요금으로 제공합니다. 청구서에서 개별 항목이 분리된 경우에만 별도 요금을 더하세요."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "성공한 작업당 비용"
+        },
+        {
+          "slug": "/research/model-price-cuts-routing-budget",
+          "label": "모델 가격 및 라우팅 예산"
+        }
+      ]
+    },
+    "zh": {
+      "title": "Voxtral 3：按分钟计算音频成本",
+      "titleCore": "Voxtral 3 FinOps：按分钟和字符计算成本",
+      "description": "Mistral按音频分钟为转录计费，按字符为TTS计费。批处理、实时处理和语音代理应分别预算。",
+      "body": "<p><strong>Voxtral 3的转录按音频分钟计费，语音生成按输入字符数计费。</strong>Mistral更新日志将公开预览发布日期列为2026年10月20日，单独的发布公告日期为10月21日。语音代理还有独立的分钟费率，涵盖托管流程和推理模型。</p><h2>按任务划分的价格</h2><table><thead><tr><th>任务</th><th>模型</th><th>价格</th></tr></thead><tbody><tr><td>录音转录</td><td>Mini Transcribe 3</td><td>每音频分钟$0.0035</td></tr><tr><td>高准确度录音转录</td><td>Small Transcribe 3</td><td>每分钟$0.0040</td></tr><tr><td>实时转录</td><td>Mini Transcribe Realtime 3</td><td>每分钟$0.0080</td></tr><tr><td>文本转语音</td><td>Mini TTS 3</td><td>每100万字符$13</td></tr></tbody></table><p>计费单位不同：转录取决于音频时长，TTS取决于输入字符数。不要用一个混合均价掩盖成本来自哪个环节。</p><h2>预算示例</h2><p>10,000分钟录音使用Mini需<strong>$35</strong>，使用Small需<strong>$40</strong>。10,000分钟实时转录需<strong>$80</strong>。评估Small多出的$5时，应同时考虑人工修正和下游错误是否减少。</p><p>1,000万TTS字符需<strong>$130</strong>。使用Mini转录一段6分钟录音需$0.021；生成5,000字符的语音回复需$0.065。两次模型调用合计约<strong>$0.086</strong>，不含推理、托管语音代理、重试、电话或基础设施。</p><p>Mistral另列语音代理价格：使用Mistral Small 4推理时每分钟$0.04，使用更大型号时每分钟$0.08。应将其视为托管流程的价格；除非账单明确分开收费，否则不要再叠加单独的转录和TTS费用。记录分钟、字符、模型和结果，并在预测前核对当前价格。</p><h2>来源</h2><ul><li><a href=\"https://docs.mistral.ai/resources/changelogs\">Mistral更新日志</a></li><li><a href=\"https://mistral.ai/news/voxtral-3/\">Voxtral 3发布公告与价格</a></li><li><a href=\"https://docs.mistral.ai/studio/audio/overview\">Mistral音频文档</a></li></ul>",
+      "faq": [
+        {
+          "question": "Voxtral 3转录费用是多少？",
+          "answer": "Mini批处理为每音频分钟$0.0035，Small为$0.0040，Mini实时转录为$0.0080。"
+        },
+        {
+          "question": "语音代理费用会叠加到转录和TTS费用上吗？",
+          "answer": "Mistral将语音代理作为包含推理模型的托管流程按分钟报价。只有账单明确分项计费时，才另外加上单模型费用。"
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "每个成功任务的成本"
+        },
+        {
+          "slug": "/research/model-price-cuts-routing-budget",
+          "label": "模型价格与路由预算"
+        }
+      ]
+    }
+  }
+}
