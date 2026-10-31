@@ -5,7 +5,7 @@
 ## What this site is
 
 - **Research & education hub**: 150+ articles on LLM cost attribution, budgeting, anomaly detection, and FinOps practice.
-- **Multi-language**: locale support is declared in `src/_data/langs.js` (currently EN, DE, ES, FR, JA, PT, IT, KO, ZH, NL, AR). Each article emits only its declared translations; built page totals are source-driven.
+- **Multi-language**: locale support is declared in `src/_data/langs.js` (currently 16 locales). Each article emits only its declared translations; built page totals are source-driven.
 - **AI-crawler friendly**: Markdown export via `Accept: text/markdown`, FAQPage JSON-LD for Bing AI, robots.txt AI signals.
 - **Managed cost optimization service pitch**: Free audit booking at `/book`.
 
