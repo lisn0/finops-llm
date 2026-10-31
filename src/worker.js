@@ -190,10 +190,18 @@ const TRANSLATED_PATHS = [
 ];
 const TRANSLATED = Object.fromEntries(LANGS.map((l) => [l, new Set(TRANSLATED_PATHS)]));
 
+// Locales that publish translated articles and a /research hub but have no
+// translated home page. LANGS above is deliberately NOT extended with them: it
+// drives the Accept-Language redirect of "/", which must only send visitors to a
+// locale that has a real home. /{l}/ has nothing to serve, so it goes to the hub.
+const HUB_ONLY_LANGS = ['ar', 'it', 'ko', 'nl', 'pl', 'ru', 'tr', 'id', 'vi', 'zh'];
+const HUB_ONLY_RE = new RegExp(`^/(${HUB_ONLY_LANGS.join('|')})(?:/(?:index\\.html)?)?$`);
+const HOME_DIR_RE = new RegExp(`^/(${LANGS.join('|')})/?$`);
+
 // Derived from LANGS, never hand-written: a hardcoded (es|fr|de|ja) list silently
 // desyncs the moment a locale is added, and the failure is invisible — the new
 // locale just never matches.
-const LANG_PREFIX_RE = new RegExp(`^/(${LANGS.join('|')})(/|$)`);
+const LANG_PREFIX_RE = new RegExp(`^/(${[...LANGS, ...HUB_ONLY_LANGS].join('|')})(/|$)`);
 const LANG_COOKIE_RE = new RegExp(`(?:^|;\\s*)lang=(en|${LANGS.join('|')})\\b`);
 export const __TRANSLATED_PATHS = TRANSLATED_PATHS; // for the sync test
 
@@ -211,6 +219,9 @@ function targetFor(lang, path) {
 function langInfo(url) {
 	const m = url.pathname.match(LANG_PREFIX_RE);
 	const lang = m ? m[1] : 'en';
+	// Hub-only locales are outside the TRANSLATED parity table; report the
+	// language and stop rather than advertise alternates computed for the five.
+	if (HUB_ONLY_LANGS.includes(lang)) return { lang, alternates: [] };
 	const base = normalizePath(m ? url.pathname.slice(lang.length + 1) || '/' : url.pathname);
 	const langsWithPage = LANGS.filter((l) => TRANSLATED[l].has(base));
 	if (!langsWithPage.length) return { lang, alternates: [] };
@@ -868,6 +879,12 @@ export default {
 			return Response.redirect(url.toString(), 301);
 		}
 
+		// 1b. Canonical URL shape. The static-assets layer answers a non-canonical
+		//     path (/de, /research/, /x.html, /index.html) with a 307; serve a
+		//     permanent 301 here instead, ahead of the asset fetch.
+		const canonicalHop = canonicalRedirect(request, url);
+		if (canonicalHop) return canonicalHop;
+
 		// 2. Language negotiation (humans only, translated pages only).
 		const langHop = languageRedirect(request, url);
 		if (langHop) return langHop;
@@ -920,6 +937,40 @@ export default {
 /* ------------------------------------------------------------------ */
 /* Language routing                                                    */
 /* ------------------------------------------------------------------ */
+
+// The one canonical spelling of each URL, or null when `url` already has it:
+//   /{hub-only locale}, /{hub-only locale}/  -> /{l}/research
+//   /index.html, /de/index.html              -> /, /de/
+//   /x.html                                  -> /x
+//   /de                                      -> /de/   (the home pages are directories)
+//   /research/                               -> /research
+// All fold into one hop, and the target is a fixed point of this function, so
+// it cannot loop. Assets are left to the asset layer untouched.
+function canonicalRedirect(request, url) {
+	if (request.method !== 'GET' && request.method !== 'HEAD') return null;
+	const p = url.pathname;
+	if (p.startsWith('/assets/') || p.startsWith('/.well-known/') || p.startsWith('/api/')) return null;
+
+	let path = p;
+	const hub = p.match(HUB_ONLY_RE);
+	if (hub) {
+		path = `/${hub[1]}/research`;
+	} else {
+		if (path.endsWith('/index.html')) path = path.slice(0, -'index.html'.length);
+		else if (path.endsWith('.html')) path = path.slice(0, -'.html'.length);
+		const home = path.match(HOME_DIR_RE);
+		if (home) path = `/${home[1]}/`;
+		else if (path.length > 1 && path.endsWith('/')) path = path.replace(/\/+$/, '') || '/';
+	}
+	if (path === p) return null;
+
+	const dest = new URL(url.toString());
+	dest.pathname = path;
+	return new Response(null, {
+		status: 301,
+		headers: { Location: dest.toString(), 'Cache-Control': 'public, max-age=3600' },
+	});
+}
 
 function languageRedirect(request, url) {
 	if (request.method !== 'GET') return null;
