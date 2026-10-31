@@ -36,6 +36,8 @@ function validateArticle(article, path = "article") {
       const label = `languages.${lang}`;
       check(locale && typeof locale === "object" && !Array.isArray(locale), `${label} must be an object`);
       if (!locale || typeof locale !== "object" || Array.isArray(locale)) continue;
+      const modified = locale.dateModified ?? article.dateModified;
+      check(/^\d{4}-\d{2}-\d{2}$/.test(modified || "") && !Number.isNaN(Date.parse(modified)) && new Date(modified).toISOString().slice(0, 10) === modified, `${label}.dateModified must be YYYY-MM-DD when present`);
       check(typeof locale.title === "string" && locale.title.trim().length > 0, `${label}.title is required`);
       check(typeof locale.titleCore === "string" && locale.titleCore.trim().length > 0, `${label}.titleCore is required`);
       check(typeof locale.description === "string" && locale.description.trim().length > 0 && locale.description.length <= 165, `${label}.description is required and must be at most 165 characters`);
@@ -44,12 +46,12 @@ function validateArticle(article, path = "article") {
       if (typeof locale.title === "string") check(locale.title.length + " · FinOps LLM".length <= 70, `${label}.title plus site suffix exceeds 70 characters`);
       if (typeof slug === "string" && /^research\/[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug) && typeof locale.body === "string") {
         const pathname = `${lang === "en" ? "" : `/${lang}`}/${slug}`;
-        const displayDate = new Date(`${article.dateModified}T00:00:00Z`).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
+        const displayDate = new Date(`${modified}T00:00:00Z`).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
         let expectedBody = locale.body.replace(/<p class="updated">([^·]*·\s*)[^<]*(<\/p>)/, `<p class="updated">$1${displayDate}$2`);
         if (expectedBody === locale.body) {
           expectedBody = locale.body.replace(/<p class="updated">[^<]*(<\/p>)/, `<p class="updated">${displayDate}$1`);
         }
-        urls.push({ url: `${BASE}${pathname}`, title: locale.titleCore, body: expectedBody, dateModified: article.dateModified });
+        urls.push({ url: `${BASE}${pathname}`, title: locale.titleCore, body: expectedBody, dateModified: modified });
       }
     }
   }

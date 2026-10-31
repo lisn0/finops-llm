@@ -4,6 +4,7 @@
 {%- endif -%}
 {%- set lang = lang or 'en' -%}
 {%- set locale = article.languages[lang] or article.languages['en'] -%}
+{%- set modified = locale.dateModified or article.dateModified -%}
 {%- set ui = articleUi[lang] or articleUi['en'] -%}
 {%- if not locale -%}
   {{ throw("Missing language " + lang + " and no English fallback for article: " + slug) }}
@@ -49,7 +50,7 @@
   "description": locale.description,
   "url": canonicalUrl,
   "datePublished": article.datePublished,
-  "dateModified": article.dateModified,
+  "dateModified": modified,
   "image": article.image,
   "author": { "@type": "Organization", "name": "FinOps LLM team" },
   "publisher": { "@type": "Organization", "name": "FinOps LLM", "url": siteUrl + '/' }
@@ -200,7 +201,7 @@ A: {{ q.answer }}
 
 
 <h1>{{ locale.titleCore or locale.title }}</h1>
-<p class="updated" style="color:#6B7689;font-size:14px;margin-top:-6px">{{ ui.updated }} {{ article.dateModified | formatDate }} · {{ ui.published }} {{ article.datePublished | formatDate }}</p>
+<p class="updated" style="color:#6B7689;font-size:14px;margin-top:-6px">{{ ui.updated }} {{ modified | formatDate }} · {{ ui.published }} {{ article.datePublished | formatDate }}</p>
 
 {%- if article.agentMode -%}
 <section class="agent-summary" aria-label="Agent summary">

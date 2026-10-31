@@ -212,3 +212,19 @@ test('CLI reports search submission failure after publication', () => {
   assert.notEqual(result.status, 0);
   assert.match(result.stderr, /search submission runner failed/);
 });
+
+// A locale edit must not make another translation appear newly reviewed.
+test('locale freshness overrides the article default in publication verification', () => {
+  const article = fixture();
+  article.languages.es = { ...article.languages.en, dateModified: '2026-10-31', body: '<p class="updated">Updated · September 1, 2026</p>' };
+  const [english, spanish] = validateArticle(article);
+  assert.equal(english.dateModified, '2026-10-22');
+  assert.equal(spanish.dateModified, '2026-10-31');
+  assert.match(spanish.body, /October 31, 2026/);
+  assert.equal(matchesPublishedArticle(liveHtml(spanish), spanish), true);
+  assert.equal(matchesPublishedArticle(liveHtml(spanish, { dateModified: english.dateModified }), spanish), false);
+  for (const invalid of ['invalid', '2026-02-31']) {
+    article.languages.es.dateModified = invalid;
+    assert.throws(() => validateArticle(article), /languages.es.dateModified/);
+  }
+});

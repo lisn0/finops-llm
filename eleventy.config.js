@@ -200,7 +200,7 @@ module.exports = function (eleventyConfig) {
     const seen = new Set();
     const fromData = articlePages.map((p) => ({
       loc: SITE_URL + cleanUrl("/" + p.permalink),
-      lastmod: articles[p.key].dateModified || articles[p.key].datePublished,
+      lastmod: articles[p.key].languages[p.lang].dateModified || articles[p.key].dateModified || articles[p.key].datePublished,
       lang: p.lang,
       priority: "0.9",
     }));

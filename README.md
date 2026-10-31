@@ -32,6 +32,8 @@ npm test
 
 Outputs to `_site/` (gitignored). The prebuild topic-gap check and postbuild generated Markdown/link checks run as part of `npm run build`; page totals vary with source and declared translations.
 
+Article JSON can set `languages.<locale>.dateModified` when translations are revised on different dates. The visible date, article JSON-LD, sitemap and publication verifier use that locale date, falling back to the article-wide `dateModified` for existing content. Updating one locale should not refresh another locale’s review date.
+
 ## Deployment
 
 **Deployment = git push.** Do not run `wrangler deploy` manually.
