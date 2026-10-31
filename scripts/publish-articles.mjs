@@ -55,7 +55,7 @@ function validateArticle(article, path = "article") {
         if (expectedBody === locale.body) {
           expectedBody = locale.body.replace(/<p class="updated">[^<]*(<\/p>)/, `<p class="updated">${displayDate}$1`);
         }
-        urls.push({ url: `${BASE}${pathname}`, title: locale.titleCore, body: expectedBody, dateModified: modified, thin: isThin(lang, locale) });
+        urls.push({ url: `${BASE}${pathname}`, title: locale.titleCore, body: expectedBody, dateModified: modified, thin: isThin(lang, locale, article) });
       }
     }
   }
