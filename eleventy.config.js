@@ -13,6 +13,13 @@ const SITEMAP_SKIP = new Set(["/404.html"]);
 // them from the same data file the template paginates over.
 const articlePages = require("./src/_data/articlePages.js")();
 const articles = require("./src/_data/articles.js")();
+const { decodeEntities, faqNotInBody, thinLocalesBySlug } = require("./lib/thin-pages.js");
+
+// Thin translated pages (see lib/thin-pages.js): "research/<slug>" -> locales.
+// They are noindexed, so they stay out of the sitemaps and of every hreflang
+// cluster.
+const thinBySlug = thinLocalesBySlug(articles);
+const isThinPage = (slug, lang) => (thinBySlug["research/" + slug] || []).includes(lang);
 
 // Strip the .html and any trailing index so the sitemap advertises the same
 // extensionless URLs the site links internally.
@@ -118,7 +125,10 @@ const hreflangsFor = (url) => {
   }
   const m = url.match(/^\/(?:([a-z]{2})\/)?research\/([^/]+?)(?:\.html)?\/?$/);
   if (!m) return [];
-  const langs = localesForSlug.get(m[2]) || [];
+  // A noindexed thin locale neither declares nor receives hreflang.
+  const self = m[1] || "en";
+  if (isThinPage(m[2], self)) return [];
+  const langs = (localesForSlug.get(m[2]) || []).filter((l) => !isThinPage(m[2], l));
   if (langs.length < 2) return [];
   const href = (lang) => `${SITE_URL}${lang === "en" ? "" : "/" + lang}/research/${m[2]}`;
   return [
@@ -130,23 +140,8 @@ const hreflangsFor = (url) => {
 // Frontmatter titles are written for HTML, so some carry entities. Script bodies
 // are not entity-decoded, so copying one straight into JSON-LD publishes a
 // literal "&middot;" as part of the headline.
-const decodeEntities = (s) =>
-  (s || "")
-    .replace(/&middot;/g, "·").replace(/&mdash;/g, "—").replace(/&ndash;/g, "–")
-    .replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&rsquo;/g, "’")
-    .replace(/&nbsp;/g, " ").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
-
-// FAQPage markup must describe text the reader can see. Plain-text form of a
-// string, for asking "is this question already on the page?".
-const plainText = (s) => decodeEntities(String(s || "").replace(/<[^>]*>/g, " ")).replace(/\s+/g, " ").trim().toLowerCase();
-
-// The FAQ entries whose question does not already appear in the article body.
-// Some bodies carry their own FAQ section; repeating those questions in a second
-// block would show every one of them twice.
-const faqNotInBody = (faq, body) => {
-  const haystack = plainText(body);
-  return (faq || []).filter((f) => !haystack.includes(plainText(f.question)));
-};
+// decodeEntities, plainText and faqNotInBody live in lib/thin-pages.js so the
+// thin-page word count sees exactly the text article.njk renders.
 
 const faqNode = (faq) => ({
   "@context": "https://schema.org",
@@ -266,7 +261,7 @@ module.exports = function (eleventyConfig) {
   // /research/* from search. Derive it from the build instead.
   eleventyConfig.addCollection("sitemap", (api) => {
     const seen = new Set();
-    const fromData = articlePages.map((p) => ({
+    const fromData = articlePages.filter((p) => !(thinBySlug[articles[p.key].slug || "research/" + p.key] || []).includes(p.lang)).map((p) => ({
       loc: SITE_URL + cleanUrl("/" + p.permalink),
       lastmod: articles[p.key].languages[p.lang].dateModified || articles[p.key].dateModified || articles[p.key].datePublished,
       lang: p.lang,

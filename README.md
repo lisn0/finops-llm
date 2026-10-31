@@ -172,6 +172,7 @@ The Worker (`src/worker.js`) implements client-side language negotiation:
 
 - Canonical: `https://finopsllm.com/<path>` per domain/per language.
 - hreflang: every translated page lists alternates in EN/ES/FR/DE/JA/PT, plus x-default.
+- Thin translations: a non-English locale of a JSON article with fewer than `THIN_WORDS` (300, `lib/thin-pages.js`) reader-visible words (body plus visible FAQ; ja/zh count CJK chars/2) is built as `noindex, follow` with a self canonical, left out of the sitemaps and out of every hreflang cluster, but stays live and linked from hubs and the language switcher. It is computed at build time, so expanding a translation re-indexes it automatically.
 - FAQPage JSON-LD: research pages with a `faq` block emit structured Q&A for AI extraction.
 - Breadcrumb JSON-LD: every page includes hierarchical navigation.
 - Sitemap: generated at build time from the `sitemap` collection in `eleventy.config.js`; its page set follows the current source and available translations. Do not reintroduce hand-maintained locale sitemaps.

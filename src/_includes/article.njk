@@ -36,14 +36,25 @@
     Google "the en/es version of me is /…-v2" while its own canonical pointed at
     the control — an inconsistent cluster Google drops wholesale. controlSlug is
     identical to urlSlug on every non-variant article. -#}
+{#- Thin translated locales (lib/thin-pages.js) are noindexed: they are neither
+    listed in anyone's hreflang cluster nor do they declare one. The language
+    switcher below still iterates every code. -#}
+{%- set thinHere = lang in (thinPages[urlSlug] or []) -%}
+{%- set thinControl = thinPages[controlSlug] or [] -%}
 {%- set hreflangs = [] -%}
+{%- set hreflangCodes = [] -%}
 {%- for code in codes -%}
+  {%- if not (code in thinControl) -%}{%- set _ = hreflangCodes.push(code) -%}{%- endif -%}
+{%- endfor -%}
+{%- if not thinHere -%}
+{%- for code in hreflangCodes -%}
   {%- set prefix = '/' + code if code != 'en' else '' -%}
   {%- set _ = hreflangs.push({ lang: code, href: siteUrl + prefix + '/' + controlSlug }) -%}
 {%- endfor -%}
+{%- endif -%}
 {#- A page that exists in one language has nothing to alternate with. en + x-default
     pointing at itself is noise, so such pages declare no hreflang at all. -#}
-{%- if codes.length > 1 -%}
+{%- if hreflangCodes.length > 1 and not thinHere -%}
   {%- set _ = hreflangs.push({ lang: 'x-default', href: siteUrl + '/' + controlSlug }) -%}
 {%- else -%}
   {%- set hreflangs = [] -%}
@@ -101,7 +112,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>{{ locale.title }} · FinOps LLM</title>
 <meta name="description" content="{{ locale.description }}" />
-<meta name="robots" content="index, follow" />
+<meta name="robots" content="{{ 'noindex, follow' if thinHere else 'index, follow' }}" />
 <meta name="theme-color" content="#0A0F1A" />
 {%- if article.agentMode -%}
 <meta name="content-signal" content="search=yes, ai-input=yes, ai-train=no" />

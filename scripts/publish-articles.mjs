@@ -4,6 +4,10 @@ import { dirname, isAbsolute, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
 import { setTimeout as sleep } from "node:timers/promises";
+import { createRequire } from "node:module";
+
+// Same thin-page rule the build uses (lib/thin-pages.js).
+const { isThin } = createRequire(import.meta.url)("../lib/thin-pages.js");
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const BASE = "https://finopsllm.com";
@@ -51,7 +55,7 @@ function validateArticle(article, path = "article") {
         if (expectedBody === locale.body) {
           expectedBody = locale.body.replace(/<p class="updated">[^<]*(<\/p>)/, `<p class="updated">${displayDate}$1`);
         }
-        urls.push({ url: `${BASE}${pathname}`, title: locale.titleCore, body: expectedBody, dateModified: modified });
+        urls.push({ url: `${BASE}${pathname}`, title: locale.titleCore, body: expectedBody, dateModified: modified, thin: isThin(lang, locale) });
       }
     }
   }
@@ -204,8 +208,12 @@ async function main() {
   } else {
     console.log("No unpublished selected article commits; resuming live check and search submission.");
   }
+  // Thin locales are served (200, so the live check still covers them) but
+  // noindexed and absent from the sitemaps: do not ask search engines to crawl them.
   await waitForLive(actualPages);
-  const runner = spawnSync(process.execPath, [searchRunner, "--site", "finops-llm", ...actualPages.map(({ url }) => url)], { cwd: ROOT, stdio: "inherit" });
+  const indexable = actualPages.filter(({ thin }) => !thin).map(({ url }) => url);
+  if (!indexable.length) { console.log("Every selected locale is a noindexed thin page; skipping search submission."); return; }
+  const runner = spawnSync(process.execPath, [searchRunner, "--site", "finops-llm", ...indexable], { cwd: ROOT, stdio: "inherit" });
   if (runner.error) throw runner.error;
   if (runner.status !== 0) throw new Error(`Shared search submission runner failed with exit status ${runner.status}.`);
 }
