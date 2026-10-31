@@ -341,7 +341,7 @@ module.exports = function (eleventyConfig) {
   eleventyConfig.addFilter("formatDate", (dateStr) => {
     if (!dateStr) return "";
     const d = new Date(dateStr + "T00:00:00Z");
-    return d.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
+    return d.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric", timeZone: "UTC" });
   });
 
   // Return the keys of an object as an array.
@@ -351,7 +351,7 @@ module.exports = function (eleventyConfig) {
   // or just "<p class="updated">OldDate</p>" with dateModified. Preserves any label.
   eleventyConfig.addFilter("updateVisibleDate", (content, dateModified, datePublished) => {
     if (!content || !dateModified) return content;
-    const displayDate = new Date(dateModified + "T00:00:00Z").toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
+    const displayDate = new Date(dateModified + "T00:00:00Z").toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric", timeZone: "UTC" });
     // First try pattern with label and separator: "Label · OldDate"
     let result = content.replace(
       /<p class="updated">([^·]*·\s*)[^<]*(<\/p>)/,

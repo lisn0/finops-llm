@@ -7,7 +7,7 @@ import { setTimeout as sleep } from "node:timers/promises";
 import { createRequire } from "node:module";
 
 // Same thin-page rule the build uses (lib/thin-pages.js).
-const { isThin } = createRequire(import.meta.url)("../lib/thin-pages.js");
+const { isThin, shortTranslations, formatShortTranslations } = createRequire(import.meta.url)("../lib/thin-pages.js");
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const BASE = "https://finopsllm.com";
@@ -47,15 +47,16 @@ function validateArticle(article, path = "article") {
       check(typeof locale.description === "string" && locale.description.trim().length > 0 && locale.description.length <= 165, `${label}.description is required and must be at most 165 characters`);
       check(typeof locale.body === "string" && locale.body.trim().length > 0, `${label}.body is required`);
       check(Array.isArray(locale.faq) && locale.faq.every((faq) => faq && typeof faq.question === "string" && faq.question.trim() && typeof faq.answer === "string" && faq.answer.trim()), `${label}.faq must be an array of question/answer objects`);
+      check(locale.related === undefined || (Array.isArray(locale.related) && locale.related.every((r) => r && typeof r === "object" && typeof r.label === "string")), `${label}.related must be an array of objects with a label`);
       if (typeof locale.title === "string") check(locale.title.length + " · FinOps LLM".length <= 70, `${label}.title plus site suffix exceeds 70 characters`);
       if (typeof slug === "string" && /^research\/[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug) && typeof locale.body === "string") {
         const pathname = `${lang === "en" ? "" : `/${lang}`}/${slug}`;
-        const displayDate = new Date(`${modified}T00:00:00Z`).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
+        const displayDate = new Date(`${modified}T00:00:00Z`).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric", timeZone: "UTC" });
         let expectedBody = locale.body.replace(/<p class="updated">([^·]*·\s*)[^<]*(<\/p>)/, `<p class="updated">$1${displayDate}$2`);
         if (expectedBody === locale.body) {
           expectedBody = locale.body.replace(/<p class="updated">[^<]*(<\/p>)/, `<p class="updated">${displayDate}$1`);
         }
-        urls.push({ url: `${BASE}${pathname}`, title: locale.titleCore, body: expectedBody, dateModified: modified, thin: isThin(lang, locale, article) });
+        urls.push({ url: `${BASE}${pathname}`, title: locale.titleCore, body: expectedBody, dateModified: modified, thin: errors.length === 0 && isThin(lang, locale, article) });
       }
     }
   }
@@ -169,6 +170,10 @@ async function main() {
   const { entries, urls } = readAndValidate(files);
   console.log(`Articles: ${entries.map(({ repoPath }) => repoPath).join(", ")}`);
   console.log(`Locale pages: ${urls.map(({ url }) => url).join("\n")}`);
+  // Warning only: existing content is not blocked, but a translation under half
+  // the English length is almost always a truncated or summarised one.
+  const short = shortTranslations(Object.fromEntries(entries.map(({ repoPath, article }) => [repoPath, article])));
+  if (short.length) console.warn(`WARNING: ${formatShortTranslations(short)}`);
   if (dryRun) { console.log(`Dry run: would publish with commit message: ${message}`); return; }
 
   if (!Number.isFinite(WAIT_SECONDS) || WAIT_SECONDS <= 0 || !Number.isFinite(POLL_SECONDS) || POLL_SECONDS <= 0) {

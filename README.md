@@ -176,6 +176,7 @@ The Worker (`src/worker.js`) implements client-side language negotiation:
 - FAQPage JSON-LD: research pages with a `faq` block emit structured Q&A for AI extraction.
 - Breadcrumb JSON-LD: every page includes hierarchical navigation.
 - Sitemap: generated at build time from the `sitemap` collection in `eleventy.config.js`; its page set follows the current source and available translations. Do not reintroduce hand-maintained locale sitemaps.
+- SEO guards: `scripts/check-seo.js` (postbuild) fails the build on missing locale hubs or sitemap files, duplicate titles, sitemap `lastmod` gaps or file-mtime use, hreflang/canonical/noindex contradictions, FAQ JSON-LD not visible on the page, and thin-rule drift, and warns on translations under 50% of the English length; known FAQ-answer gaps live in `scripts/seo-baseline.json` (`node scripts/check-seo.js --update-baseline`).
 
 ## Getting help
 
