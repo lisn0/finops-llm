@@ -41,7 +41,13 @@
   {%- set prefix = '/' + code if code != 'en' else '' -%}
   {%- set _ = hreflangs.push({ lang: code, href: siteUrl + prefix + '/' + controlSlug }) -%}
 {%- endfor -%}
-{%- set _ = hreflangs.push({ lang: 'x-default', href: siteUrl + '/' + controlSlug }) -%}
+{#- A page that exists in one language has nothing to alternate with. en + x-default
+    pointing at itself is noise, so such pages declare no hreflang at all. -#}
+{%- if codes.length > 1 -%}
+  {%- set _ = hreflangs.push({ lang: 'x-default', href: siteUrl + '/' + controlSlug }) -%}
+{%- else -%}
+  {%- set hreflangs = [] -%}
+{%- endif -%}
 
 {%- set jsonLdArticle = {
   "@context": "https://schema.org",
@@ -49,6 +55,8 @@
   "headline": locale.title,
   "description": locale.description,
   "url": canonicalUrl,
+  "mainEntityOfPage": { "@type": "WebPage", "@id": canonicalUrl },
+  "inLanguage": lang,
   "datePublished": article.datePublished,
   "dateModified": modified,
   "image": article.image,
@@ -80,7 +88,7 @@
   "@type": "BreadcrumbList",
   "itemListElement": [
     { "@type": "ListItem", "position": 1, "name": bl[0], "item": siteUrl + '/' },
-    { "@type": "ListItem", "position": 2, "name": bl[1], "item": siteUrl + '/research' },
+    { "@type": "ListItem", "position": 2, "name": bl[1], "item": siteUrl + ('/' + lang if lang != 'en' else '') + '/research' },
     { "@type": "ListItem", "position": 3, "name": locale.titleCore or locale.title, "item": canonicalUrl }
   ]
 } -%}
@@ -184,7 +192,7 @@ A: {{ q.answer }}
 <body>
 {% include "site-header.njk" %}
 <main class="wrap" id="main-content">
-{% if '/research' in page.url %}<nav class="site-breadcrumb" aria-label="Breadcrumb"><a href="/">{{ (articleUi[lang or 'en'] or articleUi.en).home }}</a><span aria-hidden="true">/</span><a href="{% if lang in ['de', 'es', 'fr', 'ja', 'pt'] %}/{{ lang }}{% endif %}/research">{{ (articleUi[lang or 'en'] or articleUi.en).research }}</a>{% if '/research/' in page.url %}<span aria-hidden="true">/</span><span>{{ (articleUi[lang or 'en'] or articleUi.en).article }}</span>{% endif %}</nav>{% endif %}
+{% if '/research' in page.url %}<nav class="site-breadcrumb" aria-label="Breadcrumb"><a href="/">{{ (articleUi[lang or 'en'] or articleUi.en).home }}</a><span aria-hidden="true">/</span><a href="{% if lang != 'en' %}/{{ lang }}{% endif %}/research">{{ (articleUi[lang or 'en'] or articleUi.en).research }}</a>{% if '/research/' in page.url %}<span aria-hidden="true">/</span><span>{{ (articleUi[lang or 'en'] or articleUi.en).article }}</span>{% endif %}</nav>{% endif %}
 
 
 <nav class="langsw" aria-label="{{ ui.language }}">
@@ -211,6 +219,16 @@ A: {{ q.answer }}
 
 {{ locale.body | safe }}
 
+{#- FAQPage JSON-LD above is only valid if its Q&A is visible on the page. Render
+    the questions the body does not already show, from the same data, so the
+    markup and the visible text cannot drift apart. -#}
+{%- set faqShown = locale.faq | faqNotInBody(locale.body) -%}
+{%- if faqShown.length > 0 -%}
+<section class="faq" aria-labelledby="faq-heading" style="margin-top:48px;border-top:1px solid #1E2A3F;padding-top:28px"><h2 id="faq-heading">{{ ui.faq }}</h2>
+{%- for f in faqShown -%}<h3 style="margin:24px 0 6px;font-size:17px">{{ f.question | decodeEntities }}</h3><p>{{ f.answer | decodeEntities }}</p>{%- endfor -%}
+</section>
+{%- endif -%}
+
 {%- if locale.related.length > 0 -%}
 <h2>{{ ui.related }}</h2>
 <ul>
@@ -231,7 +249,7 @@ A: {{ q.answer }}
 
 <hr style="margin:48px 0 24px;border:none;border-top:1px solid #1E2A3F" />
 <p><strong>{{ ui.bottomLead }}</strong> {{ ui.bottomBody }} <a href="/book">{{ ui.auditButton }} &rarr;</a></p>
-<p><a href="{% if lang in ['de', 'es', 'fr', 'ja', 'pt'] %}/{{ lang }}{% endif %}/research">{{ ui.back }}</a></p>
+<p><a href="{% if lang != 'en' %}/{{ lang }}{% endif %}/research">{{ ui.back }}</a></p>
 <footer style="margin-top:56px;padding-top:20px;border-top:1px solid #1E2A3F;font-size:13px;color:#647289;display:flex;gap:12px;flex-wrap:wrap;justify-content:space-between"><span>© 2026 FinOps LLM</span><span><a href="/privacy">{{ ui.privacy }}</a> · <a href="/terms">{{ ui.terms }}</a> · <a href="/security">{{ ui.security }}</a></span></footer>
 </main>
 </body>

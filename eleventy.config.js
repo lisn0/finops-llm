@@ -18,9 +18,25 @@ const articles = require("./src/_data/articles.js")();
 // extensionless URLs the site links internally.
 const cleanUrl = (url) => url.replace(/index\.html$/, "").replace(/\.html$/, "");
 
+// A utility page (about, terms, tools, locale hubs…) states its own date as a
+// top-level `dateModified` in frontmatter, set to the day of its last content
+// change. File mtime is not an option: every deploy checks the repo out fresh,
+// so mtime re-stamped all of these pages on each release.
+const frontmatterDate = (inputPath) => {
+  try {
+    const src = fs.readFileSync(inputPath, "utf8");
+    const fm = src.match(/^---(?:json)?\r?\n([\s\S]*?)\r?\n---/);
+    const m = fm && fm[1].match(/(?:^|\n)\s*"?dateModified"?\s*:\s*"?(\d{4}-\d{2}-\d{2})/);
+    return m ? m[1] : undefined;
+  } catch {
+    return undefined;
+  }
+};
+
 // Every article already carries datePublished/dateModified inside its JSON-LD.
-// Read it from there rather than duplicating the date in frontmatter; fall back
-// to the source file's mtime so a page can never land without a lastmod.
+// Read it from there rather than duplicating the date in frontmatter. A page
+// with neither returns undefined and the sitemap omits its lastmod rather than
+// inventing one.
 const lastmodOf = (item) => {
   const blob =
     JSON.stringify(item.data.head?.jsonLd || "") +
@@ -28,8 +44,12 @@ const lastmodOf = (item) => {
     JSON.stringify(item.data.article || "");
   const m = blob.match(/dateModified\W+(\d{4}-\d{2}-\d{2})/) || blob.match(/datePublished\W+(\d{4}-\d{2}-\d{2})/);
   if (m) return m[1];
-  return fs.statSync(item.inputPath).mtime.toISOString().slice(0, 10);
+  return frontmatterDate(item.inputPath);
 };
+
+// Locales that have their own marketing home page (src/{l}/index.njk). Every
+// locale has a /research hub, but the rest send "Home" to the English page.
+const HOME_LANGS = ["de", "es", "fr", "ja", "pt"];
 
 // Research pages used to carry their TechArticle/BreadcrumbList/FAQPage as
 // hand-escaped JSON strings in frontmatter. They drifted: 94 pages had a
@@ -88,6 +108,14 @@ const localesForSlug = (() => {
 })();
 
 const hreflangsFor = (url) => {
+  // The /research hubs: every locale has one, so the cluster is the full set.
+  if (/^\/(?:[a-z]{2}\/)?research(?:\.html)?\/?$/.test(url)) {
+    const hub = (lang) => `${SITE_URL}${lang === "en" ? "" : "/" + lang}/research`;
+    return [
+      ...["en", ...LANGS].map((lang) => ({ lang, href: hub(lang) })),
+      { lang: "x-default", href: hub("en") },
+    ];
+  }
   const m = url.match(/^\/(?:([a-z]{2})\/)?research\/([^/]+?)(?:\.html)?\/?$/);
   if (!m) return [];
   const langs = localesForSlug.get(m[2]) || [];
@@ -106,7 +134,19 @@ const decodeEntities = (s) =>
   (s || "")
     .replace(/&middot;/g, "·").replace(/&mdash;/g, "—").replace(/&ndash;/g, "–")
     .replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&rsquo;/g, "’")
-    .replace(/&nbsp;/g, " ").replace(/&amp;/g, "&");
+    .replace(/&nbsp;/g, " ").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
+
+// FAQPage markup must describe text the reader can see. Plain-text form of a
+// string, for asking "is this question already on the page?".
+const plainText = (s) => decodeEntities(String(s || "").replace(/<[^>]*>/g, " ")).replace(/\s+/g, " ").trim().toLowerCase();
+
+// The FAQ entries whose question does not already appear in the article body.
+// Some bodies carry their own FAQ section; repeating those questions in a second
+// block would show every one of them twice.
+const faqNotInBody = (faq, body) => {
+  const haystack = plainText(body);
+  return (faq || []).filter((f) => !haystack.includes(plainText(f.question)));
+};
 
 const faqNode = (faq) => ({
   "@context": "https://schema.org",
@@ -138,13 +178,15 @@ const generatedLd = (head, url) => {
       datePublished: head.article.datePublished,
       dateModified: head.article.dateModified || head.article.datePublished,
       url: head.canonical,
+      mainEntityOfPage: { "@type": "WebPage", "@id": head.canonical },
+      inLanguage: lang,
       image: SITE_URL + "/og.png",
     },
     {
       "@context": "https://schema.org",
       "@type": "BreadcrumbList",
       itemListElement: [
-        { "@type": "ListItem", position: 1, name: labels[0], item: `${SITE_URL}${prefix}/` },
+        { "@type": "ListItem", position: 1, name: labels[0], item: `${SITE_URL}${HOME_LANGS.includes(lang) ? prefix : ""}/` },
         { "@type": "ListItem", position: 2, name: labels[1], item: `${SITE_URL}${prefix}/research` },
         {
           "@type": "ListItem",
@@ -163,12 +205,37 @@ module.exports = function (eleventyConfig) {
   eleventyConfig.addFilter("generatedLd", generatedLd);
   eleventyConfig.addFilter("hreflangsFor", hreflangsFor);
   eleventyConfig.addFilter("decodeEntities", decodeEntities);
+  eleventyConfig.addFilter("faqNotInBody", faqNotInBody);
+
+  // Localized pages used to link to the English article even when the same
+  // article exists in their own language (2,045 links on the live site), which
+  // sent readers and link equity back out of the locale. Rewrite those links
+  // when the translated twin exists. It runs on the built page, not on the JSON,
+  // so hand-written and data-driven articles are covered by one rule, and the
+  // language switcher (whose EN link must stay English) is left alone.
+  eleventyConfig.addTransform("localizedBodyLinks", function (content) {
+    if (!this.page.outputPath?.endsWith(".html")) return content;
+    const lang = LANGS.find((l) => this.page.url.startsWith("/" + l + "/"));
+    if (!lang) return content;
+    const start = content.indexOf("<main");
+    const end = content.lastIndexOf("</main>");
+    if (start < 0 || end < 0) return content;
+    const main = content.slice(start, end).replace(
+      /(<nav class="langsw"[\s\S]*?<\/nav>)|href=(["'])\/research(?:\/([a-z0-9][a-z0-9-]*))?([#?][^"']*)?\2/g,
+      (m, switcher, quote, slug, tail) => {
+        if (switcher) return switcher;
+        if (slug && !(localesForSlug.get(slug) || []).includes(lang)) return m;
+        return `href=${quote}/${lang}/research${slug ? "/" + slug : ""}${tail || ""}${quote}`;
+      }
+    );
+    return content.slice(0, start) + main + content.slice(end);
+  });
 
   // Utility pages (about, terms, tools…) ship no schema and no date, so an AI
   // answer engine has nothing to attribute and cites them without a link, if at
   // all. Inject a WebPage node wherever the page carries no dateModified —
-  // valid alongside any existing block, and the date is the source file mtime
-  // so freshness is real rather than a hardcoded build stamp.
+  // valid alongside any existing block. The date is the page's own frontmatter
+  // `dateModified`; a page that states none gets the node without a date.
   eleventyConfig.addTransform("webPageSchema", function (content) {
     if (!this.page.outputPath?.endsWith(".html")) return content;
     if (/dateModified/.test(content)) return content;
@@ -183,10 +250,11 @@ module.exports = function (eleventyConfig) {
       url,
       name: (content.match(/<title>([\s\S]*?)<\/title>/i) || [])[1]?.trim(),
       description: (content.match(/<meta name="description" content="([^"]*)"/i) || [])[1],
-      dateModified: require("fs").statSync(this.page.inputPath).mtime.toISOString().slice(0, 10),
+      dateModified: frontmatterDate(this.page.inputPath),
       isPartOf: { "@id": "https://finopsllm.com/#website" },
       publisher: { "@id": "https://finopsllm.com/#org" },
     };
+    if (!node.dateModified) delete node.dateModified;
     if (!node.name) delete node.name;
     if (!node.description) delete node.description;
     const tag = `<script type="application/ld+json">${JSON.stringify(node)}</script>`;
@@ -204,8 +272,8 @@ module.exports = function (eleventyConfig) {
       lang: p.lang,
       priority: "0.9",
     }));
-    return api
-      .getAll()
+    return fromData
+      .concat(api.getAll()
       .filter((item) => {
         const url = item.url;
         if (!url || !(url.endsWith(".html") || url.endsWith("/"))) return false;
@@ -226,11 +294,15 @@ module.exports = function (eleventyConfig) {
         // The homepages get crawled most; research beats the rest of the site.
         priority: cleanUrl(item.url).replace(/\/$/, "").split("/").filter(Boolean).length === 0 ? "1.0" : item.url.includes("/research/") ? "0.9" : "0.7",
       }))
-      .concat(fromData)
+      )
       // A/B variants canonical to their control, so listing them asks crawlers to
       // index a URL that disclaims itself. They reach the sitemap from both
       // sources above, hence the filter here rather than in either one.
       .filter((u) => !/-v2$/.test(u.loc))
+      // fromData is first on purpose: the first page of the paginated
+      // articles.njk also shows up in getAll(), with no head data of its own, and
+      // keeping that copy gave /research/adaptive-thinking-cost-forecast a
+      // lastmod from the template instead of the article's dateModified.
       .filter((u) => !seen.has(u.loc) && seen.add(u.loc))
       .sort((a, b) => a.loc.localeCompare(b.loc));
   });
@@ -243,7 +315,9 @@ module.exports = function (eleventyConfig) {
     for (const l of LANGS) byLang[l] = [];
     for (const item of api.getAll()) {
       if (!item.url || !item.url.includes("/research/")) continue;
-      if (item.url.includes("-v2")) continue;
+      // Only an A/B variant ends in "-v2". A bare substring test also dropped
+      // mimo-v2-6-open-weights-price-ceiling (a model name) from every hub.
+      if (/-v2(?:\.html)?$/.test(item.url)) continue;
       const lang = LANGS.find((l) => item.url.startsWith("/" + l + "/")) || "en";
       // head.title carries the " · FinOps LLM" suffix; the index only wants the topic.
       // No head.title (e.g. pagination items): skip; articlePages below supplies the titleCore.
@@ -252,7 +326,7 @@ module.exports = function (eleventyConfig) {
       byLang[lang].push({ url: cleanUrl(item.url), title, slug: item.url.split("/research/")[1].replace(".html", "") });
     }
     for (const p of articlePages) {
-      if (p.permalink.includes("-v2")) continue;
+      if (/-v2(?:\.html)?$/.test(p.permalink)) continue;
       const url = cleanUrl("/" + p.permalink);
       if (byLang[p.lang].some((a) => a.url === url)) continue;
       byLang[p.lang].push({ url, title: articles[p.key].languages[p.lang].titleCore, slug: p.permalink.split("research/")[1].replace(".html", "") });
