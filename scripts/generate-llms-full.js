@@ -33,8 +33,17 @@ const textOf = (html) => {
     .replace(/\s+/g, " ").trim();
 };
 
+// English pages only. With 15 translations of every article the file passed
+// 11 MB, too large for an agent to load, and the translations add no facts the
+// English page lacks. Each translation stays at its own URL (see the header).
+const locales = require("../src/_data/langs.js").filter((l) => l !== "en");
+const isTranslated = (u) => {
+  const first = new URL(u).pathname.split("/")[1];
+  return locales.includes(first);
+};
+
 const pages = [];
-for (const u of urls) {
+for (const u of urls.filter((u) => !isTranslated(u))) {
   const f = fileFor(u);
   if (!f) { console.warn(`[llms-full] sitemap URL has no file: ${u}`); continue; }
   const html = fs.readFileSync(f, "utf8");
@@ -43,7 +52,8 @@ for (const u of urls) {
 }
 
 const out = `# FinOps LLM — Complete Research & Knowledge Base (llms-full.txt)\n\nContent-Signal: ai-train=no, search=yes, ai-input=yes\n\n` +
-  `This document contains the complete text of all ${pages.length} public pages on finopsllm.com.\n\n` +
+  `This document contains the complete text of all ${pages.length} English public pages on finopsllm.com.\n\n` +
+  `Translations are not included. Every page is also published in ${locales.length} other languages (${locales.join(", ")}) at https://finopsllm.com/<lang>/<path>, for example https://finopsllm.com/es/research/ai-finops; fetch those URLs directly.\n\n` +
   "=".repeat(80) + "\n\n" + pages.join("");
 
 fs.writeFileSync(outputFile, out, "utf8");

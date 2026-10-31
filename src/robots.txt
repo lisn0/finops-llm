@@ -5,6 +5,8 @@ Disallow: /metrics/
 # Content Signals (contentsignals.org): how our content may be used by AI.
 # Bing's robots.txt linter flags this as unknown; per RFC 9309 crawlers ignore
 # directives they do not recognize, so it is a linter warning, not a crawl error.
+# A crawler that matches a named group below ignores the "*" group entirely, so
+# every named group repeats the signal.
 Content-Signal: search=yes, ai-input=yes, ai-train=no
 
 Sitemap: https://finopsllm.com/sitemap-index.xml
@@ -28,46 +30,59 @@ Sitemap: https://finopsllm.com/sitemap-vi.xml
 # AI crawlers — explicitly allowed (we want indexing)
 User-agent: GPTBot
 Allow: /
+Content-Signal: search=yes, ai-input=yes, ai-train=no
 
 User-agent: ClaudeBot
 Allow: /
+Content-Signal: search=yes, ai-input=yes, ai-train=no
 
 User-agent: PerplexityBot
 Allow: /
+Content-Signal: search=yes, ai-input=yes, ai-train=no
 
 # Google Gemini / Vertex generative grounding + citations
 User-agent: Google-Extended
 Allow: /
+Content-Signal: search=yes, ai-input=yes, ai-train=no
 
 User-agent: OAI-SearchBot
 Allow: /
+Content-Signal: search=yes, ai-input=yes, ai-train=no
 
 User-agent: ChatGPT-User
 Allow: /
+Content-Signal: search=yes, ai-input=yes, ai-train=no
 
 # Anthropic — live retrieval & search (citations)
 User-agent: Claude-User
 Allow: /
+Content-Signal: search=yes, ai-input=yes, ai-train=no
 
 User-agent: Claude-SearchBot
 Allow: /
+Content-Signal: search=yes, ai-input=yes, ai-train=no
 
 # Perplexity — live retrieval (citations)
 User-agent: Perplexity-User
 Allow: /
+Content-Signal: search=yes, ai-input=yes, ai-train=no
 
 # Apple Intelligence / Siri answers
 User-agent: Applebot
 Allow: /
+Content-Signal: search=yes, ai-input=yes, ai-train=no
 
 # Amazon (Alexa / Rufus answers)
 User-agent: Amazonbot
 Allow: /
+Content-Signal: search=yes, ai-input=yes, ai-train=no
 
 # Meta AI
 User-agent: Meta-ExternalAgent
 Allow: /
+Content-Signal: search=yes, ai-input=yes, ai-train=no
 
 # Mistral (Le Chat retrieval)
 User-agent: MistralAI-User
 Allow: /
+Content-Signal: search=yes, ai-input=yes, ai-train=no
