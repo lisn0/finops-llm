@@ -209,7 +209,13 @@ is permitted; outbound link values omit query strings and fragments. Booking
 clicks still count when the original source is unavailable after late consent,
 with `unknown` source/medium rather than invented attribution.
 
-Zaraz must route ordinary events with conversion disabled and `book_click`
+Funnel events: `book_page_open` (clicked a link to the `/book` info page),
+`calendar_open` (clicked through to the booking calendar) and `email_click`
+(clicked an email address). `book_click` before 2026-11-03 mixed the first two.
+No event proves a booking; confirmed bookings exist only in the Finops Llm
+Google calendar.
+
+Zaraz must route ordinary events with conversion disabled and `calendar_open`
 through its separate conversion action. Consent remains the collection boundary:
 GA reports measured visits, not every human visitor, and missing historical
 visits cannot be reconstructed. The current IP-hiding setting can affect GA

@@ -87,11 +87,33 @@ test('tracks sanitized outbound HTTP links, skips internal and non-HTTP links', 
   const b = browser({ consent: true });
   b.click('https://outside.example/path?q=secret#fragment');
   b.click('https://finopsllm.com/internal?q=secret');
-  b.click('mailto:hello@example.com');
   b.click('javascript:void(0)');
   assert.deepEqual(b.events, [['click', {
     link_url: 'https://outside.example/path', link_domain: 'outside.example', outbound: true,
   }]]);
+});
+
+test('names each funnel step after what the visitor actually did', () => {
+  const b = browser({ consent: true, referrer: 'https://google.com/' });
+  const source = { book_source: 'google.com', book_medium: 'organic_search', landing_page: '/page' };
+  b.click('/book');
+  b.click('/fr/book?utm_source=google.com');
+  b.click('/book/schedule');
+  b.click('/book/schedule?utm_source=google.com&utm_medium=organic_search');
+  b.click('mailto:hello@finopsllm.com');
+  assert.deepEqual(b.events, [
+    ['book_page_open', source],
+    ['book_page_open', source],
+    ['calendar_open', source],
+    ['calendar_open', source],
+    ['email_click', source],
+  ]);
+});
+
+test('a direct calendar link is both the conversion and an outbound click', () => {
+  const b = browser({ consent: true });
+  b.click('https://calendar.app.google/abc');
+  assert.deepEqual(b.events.map(event => event[0]), ['calendar_open', 'click']);
 });
 
 test('late acceptance on an internal page counts booking with unknown original source', () => {
@@ -99,7 +121,7 @@ test('late acceptance on an internal page counts booking with unknown original s
   b.window.analyticsConsent = true;
   b.dispatch('analyticsconsent');
   b.click('/book');
-  assert.deepEqual(b.events, [['book_click', {
+  assert.deepEqual(b.events, [['book_page_open', {
     book_source: 'unknown', book_medium: 'unknown', landing_page: '',
   }]]);
   assert.equal(b.storage.has('fa_first_touch'), false);

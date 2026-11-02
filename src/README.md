@@ -82,9 +82,10 @@ The 6 localized homepages (`index.njk`, `de/index.njk`, `es/index.njk`, `fr/inde
 ## Booking attribution
 
 `assets/attribution.js` records the visit's first-touch source (AI assistant /
-search / social / direct) in `sessionStorage` and fires a GA4 `book_click` event
-when a visitor clicks the booking CTA — only after analytics consent is granted.
-To break bookings down by source, register the event params `book_source`,
+search / social / direct) in `sessionStorage` and fires GA4 funnel events, only
+after analytics consent is granted: `book_page_open` on a link to `/book`,
+`calendar_open` on "Pick a time", and `email_click` on an email address.
+To break them down by source, register the event params `book_source`,
 `book_medium`, and `landing_page` as event-scoped custom dimensions in GA4.
 
 ## Local preview
