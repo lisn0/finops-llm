@@ -1,0 +1,57 @@
+{
+  "slug": "research/deepseek-super-agent-proactive-agent-cost",
+  "tags": [
+    "deepseek",
+    "deepseek-harness",
+    "agents",
+    "agentic-coding",
+    "cost-controls"
+  ],
+  "datePublished": "2026-11-02",
+  "dateModified": "2026-11-02",
+  "image": "https://finopsllm.com/og.png",
+  "languages": {
+    "en": {
+      "title": "DeepSeek Super-Agent: Cost of a Proactive Coding Agent",
+      "titleCore": "DeepSeek Super-Agent: What a Proactive Coding Agent Costs",
+      "description": "DeepSeek's open-source Super-Agent works a GitHub repo from team requests. What is confirmed, what is not, and how to budget and cap a proactive coding agent.",
+      "body": "<p>DeepSeek's Super-Agent (<code>dsh-superagent</code>) is an MIT-licensed research prototype of a proactive coding agent. It watches one GitHub repository and, optionally, Feishu chat, turns requests from allowed people into work items, and replies in the original thread, often with a pull request. DeepSeek publishes no cost or token figures for it, so you must measure your own.</p><p>Facts below come from <a href='https://github.com/deepseek-ai/dsh-superagent-prototype'>the project README</a> and <a href='https://www.helpnetsecurity.com/2026/11/02/deepseek-dsh-superagent/'>Help Net Security's 2 November 2026 report</a>, read on 2 November 2026. Bloomberg also <a href='https://www.bloomberg.com/news/articles/2026-11-01/deepseek-drops-enhanced-coding-agent-with-aim-to-rival-anthropic'>reported the release</a> as a challenge to Anthropic's Claude Code. DeepSeek has published no benchmark against Claude Code, so treat that framing as press positioning, not a measured result.</p><h2>What is confirmed?</h2><ul><li><strong>Scope:</strong> a proactive coding agent for one GitHub repository, packaged as a bundle for <a href='/research/what-is-deepseek-harness'>DeepSeek Harness</a>.</li><li><strong>Flow:</strong> when an allowed person asks for work, it opens a work item, works on it in its own agent session and directory, and replies in the original conversation. A web panel lists items that need a person.</li><li><strong>License and status:</strong> MIT. The README calls it a &ldquo;research prototype for reference only, not an official DeepSeek product,&rdquo; says to treat it as research code and not production-ready software, and says some designs in DeepSeek's accompanying article are future directions not implemented in the prototype.</li><li><strong>Setup:</strong> the README says setup has many steps and points to SETUP.md and a deployment document. It does not state which models, API keys or spend limits to configure.</li></ul><h2>What is not published?</h2><p>The README and Help Net Security report no token usage, per-task cost, budget setting, concurrency limit or benchmark. Some third-party write-ups quote latency numbers from a DeepSeek test; we could not find them in the README or the Help Net Security report, so we do not repeat them. Anything about cost per pull request has to come from your own runs.</p><h2>Why does a proactive agent change the cost model?</h2><p>A normal coding assistant spends when one person types a prompt. A team agent spends when a message arrives. That moves three things:</p><ol><li><strong>Who triggers spend.</strong> Any allowed person in a covered chat or GitHub scope can start a work item by mentioning the agent, so the budget owner is a team, not a seat. Help Net Security says a team can open a chat or GitHub scope and anyone in it can request work.</li><li><strong>How much runs at once.</strong> Each work item gets its own agent session and directory. Several requests in the same hour mean several sessions in parallel, which is the same fan-out risk covered in <a href='/research/subagent-fan-out-concurrency-limits'>subagent fan-out and concurrency limits</a>. The sources describe no cap, so set one in your own infrastructure.</li><li><strong>What counts as a request.</strong> This is where the design is useful for cost control. By default, implicit requests (unaddressed messages, bot messages, follow-ups from people not on the allow list) are logged as ones the agent would have accepted, but none are accepted. Explicit requests from allowed users work in every mode, and the report advises reviewing those logs before switching to auto mode. That log is a free preview of how much extra spend auto mode would create.</li></ol><p>The same report says a message, comment or quoted document cannot expand what the agent is allowed to do, because the host enforces the allow lists and rules. For spend, that is the right layer: the limit lives outside the model's own judgment.</p><h2>How should you budget a trial?</h2><p>Use the logged would-have-accepted count to size the work, then price it with your own measurements. The formula for a month is: accepted work items x average billed cost per work item, where cost per item includes every model call, retry, tool call and abandoned attempt. Divide total spend by items that actually became merged or accepted changes, as in <a href='/research/cost-per-successful-task'>cost per successful task</a>.</p><p>Illustration with assumed inputs, not DeepSeek data: 200 work items a month at an assumed $4 average billed cost each is $800. If only 140 produce an accepted change, the cost per accepted change is $800 / 140 = $5.71, not $4. The gap is the price of abandoned and rejected work.</p><h2>What controls to set before turning on auto mode</h2><ul><li><strong>Keep the allow list small</strong> and add people deliberately. It is the first spend gate.</li><li><strong>Run in the default mode first</strong> and read the would-have-accepted log for at least a week.</li><li><strong>Cap parallel sessions and per-item spend</strong> at your model gateway or provider key, since the project documents no built-in budget. See <a href='/research/three-agent-budgets'>three agent budgets</a> and <a href='/research/agent-spend-guardrails-production'>production spend guardrails</a>.</li><li><strong>Tag spend by repository and work item</strong> so a pull request can be traced to its bill.</li><li><strong>Leave merging to people.</strong> The report says the agent does not enable auto-merge under its own account by default, because GitHub credits the merge to whoever enabled it, and that merge behavior is governed by a Delivery requirements prompt. Treat that prompt as a policy file with an owner.</li><li><strong>Watch idle cost.</strong> A listener that is always on has a standing cost even with no requests; see <a href='/research/background-agents-cost-clock'>the background-agent cost clock</a>.</li></ul><h2>Should you deploy it now?</h2><p>For production, no: DeepSeek itself says it is not production-ready. For a contained trial on a non-critical repository with a capped key, it is a cheap way to learn what proactive agents cost your team, because the code is free and the spend is visible at your own provider. The decision metric is cost per accepted pull request against the attention it saves, not the headline that it competes with another tool.</p>",
+      "faq": [
+        {
+          "question": "What is DeepSeek's Super-Agent?",
+          "answer": "dsh-superagent is an open-source (MIT) research prototype of a proactive coding agent from DeepSeek. It works on one GitHub repository, can also listen to Feishu chat, opens a work item when an allowed person asks, and replies in the original thread, for example with a pull request."
+        },
+        {
+          "question": "Is DeepSeek's Super-Agent free?",
+          "answer": "The code is free under the MIT license. Running it still costs whatever the models, infrastructure and tools you connect to it cost. DeepSeek publishes no token or per-task cost figures for it."
+        },
+        {
+          "question": "Is Super-Agent ready for production use?",
+          "answer": "No. The README calls it a research prototype for reference only, not an official DeepSeek product, and says to treat it as research code, not production-ready software."
+        },
+        {
+          "question": "How do you stop a proactive agent from overspending?",
+          "answer": "Keep the allow list small, review the log of requests the agent would have accepted before enabling auto mode, cap parallel sessions and per-item spend at your gateway or provider key, tag spend by work item, and measure cost per accepted change."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/what-is-deepseek-harness",
+          "label": "What is DeepSeek Harness?"
+        },
+        {
+          "slug": "/research/subagent-fan-out-concurrency-limits",
+          "label": "Subagent fan-out and concurrency limits"
+        },
+        {
+          "slug": "/research/background-agents-cost-clock",
+          "label": "Background agents and the cost clock"
+        },
+        {
+          "slug": "/research/three-agent-budgets",
+          "label": "Three agent budgets"
+        }
+      ]
+    }
+  }
+}
