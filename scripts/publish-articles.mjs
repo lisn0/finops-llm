@@ -56,7 +56,7 @@ function validateArticle(article, path = "article") {
         if (expectedBody === locale.body) {
           expectedBody = locale.body.replace(/<p class="updated">[^<]*(<\/p>)/, `<p class="updated">${displayDate}$1`);
         }
-        urls.push({ url: `${BASE}${pathname}`, title: locale.titleCore, body: expectedBody, dateModified: modified, thin: errors.length === 0 && isThin(lang, locale, article) });
+        urls.push({ url: `${BASE}${pathname}`, lang, title: locale.titleCore, body: expectedBody, dateModified: modified, thin: errors.length === 0 && isThin(lang, locale, article) });
       }
     }
   }
@@ -77,7 +77,10 @@ function matchesPublishedArticle(html, expected) {
   if (!title || decodeEntities(title.replace(/<[^>]*>/g, "")).replace(/\s+/g, " ").trim() !== decodeEntities(expected.title).replace(/\s+/g, " ").trim()) return false;
   if (!html.includes(`"dateModified": "${expected.dateModified}"`) && !html.includes(`"dateModified":"${expected.dateModified}"`)) return false;
   const normalize = (value) => value.replace(/\r\n?/g, "\n").replace(/\s+/g, " ").trim();
-  return normalize(html).includes(normalize(expected.body));
+  // The build's localizedBodyLinks transform rewrites /research links on a translated page to /<lang>/research
+  // when the translated twin exists, so the live page never carries the source href verbatim.
+  const live = expected.lang && expected.lang !== "en" ? html.replace(new RegExp(`href=(["'])/${expected.lang}/research`, "g"), "href=$1/research") : html;
+  return normalize(live).includes(normalize(expected.body));
 }
 
 function git(args, { allowFailure = false } = {}) {
