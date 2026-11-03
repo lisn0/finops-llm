@@ -52,6 +52,216 @@
           "label": "Sonnet 5 pricing: the September increase was cancelled"
         }
       ]
+    },
+    "de": {
+      "title": "Gemini 4 Argon: Preis verdoppelt sich am 1. Dezember",
+      "titleCore": "Gemini 4 Argon verdoppelt den Preis am 1. Dezember: die Klippe einplanen",
+      "description": "Gemini 4 Argons Einführungspreis von $2/$10 endet am 30. November, ab 1. Dezember gilt $4/$20. Alle Tarife, eine Beispielrechnung und was Sie vorher ändern sollten.",
+      "body": "<p>Der Standard-API-Preis von Gemini 4 Argon beträgt bis zum 30. November 2026 $2,00 pro Million Eingabe-Token und $10,00 pro Million Ausgabe-Token. Am 1. Dezember steigt er auf $4,00 und $20,00. Alle Argon-Tarife verdoppeln sich am selben Tag, ein unveränderter Workload kostet im Dezember also genau das Doppelte.</p><p>Preise geprüft am 2. November 2026 auf <a href='https://aistudio.google.com/docs/pricing'>Googles Preisseite der Gemini API</a>. Preise können sich ändern; bestätigen Sie sie dort, bevor Sie ein Budget freigeben. Dieser Artikel behandelt nur den API-Preisplan, nicht die Modellqualität.</p><h2>Was ändert sich am 1. Dezember?</h2><p>Google führt Gemini 4 Argon mit zeitlich befristeten Preisen. Die Seite zeigt keinen separaten Einführungstarif, sondern einen Preis bis zum 30. November und einen zweiten ab dem 1. Dezember. Alle Angaben gelten pro Million Token, die Ausgabe enthält Thinking-Token.</p><table><thead><tr><th>Tarif</th><th>Eingabe jetzt</th><th>Eingabe ab 1. Dez.</th><th>Ausgabe jetzt</th><th>Ausgabe ab 1. Dez.</th><th>Gecachte Eingabe jetzt / ab 1. Dez.</th></tr></thead><tbody><tr><td>Standard</td><td>$2,00</td><td>$4,00</td><td>$10,00</td><td>$20,00</td><td>$0,10 / $0,20</td></tr><tr><td>Batch</td><td>$1,00</td><td>$2,00</td><td>$5,00</td><td>$10,00</td><td>$0,05 / $0,10</td></tr><tr><td>Flex</td><td>$1,00</td><td>$2,00</td><td>$5,00</td><td>$10,00</td><td>$0,05 / $0,10</td></tr><tr><td>Priority</td><td>$3,60</td><td>$7,20</td><td>$18,00</td><td>$36,00</td><td>$0,18 / $0,36</td></tr></tbody></table><p>Für die Prognose sind zwei Details wichtig. Erstens listet die Seite für Argon keine Kontextlängen-Stufen, es gibt also keinen separaten Preis für lange Prompts zu modellieren. Zweitens ist das Caching nur implizit; die Seite nennt für dieses Modell weder explizites Caching noch einen eigenen Preis für Cache-Speicher. Argon ist außerdem im kostenlosen Tarif nicht verfügbar.</p><h2>Was macht die Verdopplung mit einer echten Rechnung?</h2><p>Nehmen wir einen beispielhaften Monat: 1.000 Millionen Eingabe-Token und 100 Millionen Ausgabe-Token im Standard-Tarif, ohne Caching. Die Formel lautet (Eingabe-Token in Mio. x Eingabepreis) + (Ausgabe-Token in Mio. x Ausgabepreis).</p><table><thead><tr><th>Szenario</th><th>Bis 30. Nov.</th><th>Ab 1. Dez.</th></tr></thead><tbody><tr><td>Standard, ohne Cache</td><td>1.000 x $2 + 100 x $10 = <strong>$3.000</strong></td><td>1.000 x $4 + 100 x $20 = <strong>$6.000</strong></td></tr><tr><td>Standard, 80% der Eingabe aus dem Cache</td><td>200 x $2 + 800 x $0,10 + 100 x $10 = <strong>$1.480</strong></td><td>200 x $4 + 800 x $0,20 + 100 x $20 = <strong>$2.960</strong></td></tr><tr><td>Batch, ohne Cache</td><td>1.000 x $1 + 100 x $5 = <strong>$1.500</strong></td><td>1.000 x $2 + 100 x $10 = <strong>$3.000</strong></td></tr></tbody></table><p>Das sind Rechnungen auf angenommenen Volumen, keine Messungen eines echten Workloads. Entscheidend ist der strukturelle Punkt: Caching und Batch senken die Basis, schützen aber nicht vor dem Stichtag. Gecachte Lesevorgänge bleiben vorher wie nachher bei 5% des Eingabepreises, der Rabatt von 95% bezieht sich also auf einen Preis, der sich verdoppelt hat.</p><h2>Ist Gemini 3.8 Flash auch betroffen?</h2><p>Ja, zu einem späteren Datum. Google führt Gemini 3.8 Flash im Standard-Tarif mit $0,75 Eingabe und $3,75 Ausgabe bis zum 31. Dezember 2026, danach mit $1,50 und $7,50 ab dem 1. Januar 2027. Batch und Flex folgen demselben Muster ($0,375 / $1,875 jetzt, $0,75 / $3,75 später). Auch der Cache-Speicher für 3.8 Flash verdoppelt sich, von $0,50 auf $1,00 pro Million Token und Stunde.</p><p>Im selben beispielhaften Monat (1.000 Millionen Eingabe, 100 Millionen Ausgabe, Standard, ohne Cache) kostet 3.8 Flash bis Dezember $1.125 und ab dem 1. Januar $2.250. Alles, was Sie auf Flash umleiten, um der Argon-Erhöhung zu entgehen, bekommt einen Monat später seine eigene Erhöhung.</p><h2>Was sollten Sie vor dem 30. November ändern?</h2><ol><li><strong>Den Dezember mit dem neuen Preis neu prognostizieren.</strong> Schreiben Sie den Novemberwert nicht fort. Multiplizieren Sie die Argon-Token-Volumen mit den Dezemberpreisen und führen Sie die Differenz in einer benannten Abweichungszeile.</li><li><strong>Mengenwachstum vom Preis trennen.</strong> Ist die Dezemberrechnung mehr als doppelt so hoch wie die vom November, ist auch die Nutzung gewachsen. Trennen Sie beides nicht, verdeckt der Preissprung ein echtes Nutzungsproblem. Siehe die <a href='/research/ai-spend-variance-bridge'>Abweichungsbrücke für KI-Ausgaben</a>.</li><li><strong>Die Routing-Entscheidung neu durchrechnen.</strong> Ein Modell, das bei $2/$10 günstiger war, ist es bei $4/$20 vielleicht nicht mehr. Vergleichen Sie die Kosten pro akzeptierter Aufgabe statt des Token-Preises, anhand der <a href='/research/cost-per-successful-task'>Kosten pro erfolgreicher Aufgabe</a> in einem Replay Ihres eigenen Traffics.</li><li><strong>Aufschiebbare Arbeit auf Batch oder Flex verlagern.</strong> Beide kosten an beiden Stichtagen die Hälfte des Standard-Preises. Auch nach der Erhöhung bleibt das ein Rabatt von 50%. Hintergrundjobs, die keine sofortige Antwort brauchen, sind die ersten Kandidaten; siehe <a href='/research/batch-api-finops'>Wirtschaftlichkeit der Batch-API</a>.</li><li><strong>Festpreis-Zusagen prüfen.</strong> Wenn Sie einem Kunden oder einem internen Team einen Preis pro Anfrage auf Basis von $2/$10 genannt haben, stimmt er im Dezember nicht mehr.</li></ol><h2>Wie schneidet Argon nach der Erhöhung im Vergleich ab?</h2><p>Nur auf Basis der Listenpreise: Ab dem 1. Dezember ist Argons $4/$20 doppelt so viel wie die $2/$10, die OpenAI für GPT-6 Sol auf seiner <a href='https://developers.openai.com/api/docs/pricing'>Preisseite</a> führt. Das sagt nichts darüber, welches Modell Ihre Aufgaben besser oder mit weniger Wiederholungen löst, und die Preislisten der Anbieter sind nicht direkt vergleichbar (Cache-Regeln, Tarife und die Behandlung von Thinking-Token unterscheiden sich; siehe <a href='/research/provider-prices-not-comparable'>warum Anbieterpreise nicht vergleichbar sind</a>). Es bedeutet aber, dass die Dezember-Entscheidung auf gemessenen Kosten pro akzeptiertem Ergebnis beruhen sollte und nicht auf der Rechnung dieses Monats.</p><h2>Was ist noch unsicher?</h2><p>Googles Seite nennt die Preise ab dem 1. Dezember, sagt aber nicht, ob der Einführungsplan verlängert oder geändert wird. Betrachten Sie die veröffentlichten Daten als Basisfall und prüfen Sie die Seite in der letzten Novemberwoche erneut. Anthropics Sonnet 5 zeigt, warum: Es wurde mit einer geplanten Preiserhöhung im September angekündigt, die später abgesagt wurde (<a href='/research/sonnet-5-intro-pricing-deadline'>die Korrektur</a>). Eine geplante Erhöhung ist ein Prognoserisiko, keine Gewissheit, in beide Richtungen.</p>",
+      "faq": [
+        {
+          "question": "Wann steigt der Preis von Gemini 4 Argon?",
+          "answer": "Google nennt die aktuellen Argon-Preise bis zum 30. November 2026 und höhere Preise ab dem 1. Dezember 2026. Standard steigt von $2/$10 auf $4/$20 pro Million Eingabe-/Ausgabe-Token, alle übrigen Tarife verdoppeln sich am selben Tag."
+        },
+        {
+          "question": "Verdoppeln sich Batch und Flex am 1. Dezember ebenfalls?",
+          "answer": "Ja. Beide steigen von $1,00 Eingabe und $5,00 Ausgabe auf $2,00 und $10,00 pro Million Token. Sie bleiben an beiden Stichtagen bei der Hälfte des Standard-Preises."
+        },
+        {
+          "question": "Schützt mich Caching vor der Preiserhöhung bei Gemini 4 Argon?",
+          "answer": "Nicht vor dem Stichtag. Gecachte Eingabe kostet jetzt $0,10 und ab dem 1. Dezember $0,20, der Cache-Rabatt bleibt also derselbe Prozentsatz eines verdoppelten Preises. Caching senkt die Basisrechnung, aber die Dezemberrechnung verdoppelt sich für denselben Workload trotzdem."
+        },
+        {
+          "question": "Wird Gemini 3.8 Flash auch teurer?",
+          "answer": "Ja. Google nennt für Standard $0,75 Eingabe und $3,75 Ausgabe bis zum 31. Dezember 2026 und $1,50 und $7,50 ab dem 1. Januar 2027. Auch der Cache-Speicher verdoppelt sich, von $0,50 auf $1,00 pro Million Token und Stunde."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/provider-prices-not-comparable",
+          "label": "Warum Anbieterpreise nicht direkt vergleichbar sind"
+        },
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "Kosten pro erfolgreicher Aufgabe"
+        },
+        {
+          "slug": "/research/batch-api-finops",
+          "label": "Wirtschaftlichkeit der Batch-API für FinOps"
+        },
+        {
+          "slug": "/research/sonnet-5-intro-pricing-deadline",
+          "label": "Sonnet-5-Preise: Die Septembererhöhung wurde abgesagt"
+        }
+      ]
+    },
+    "es": {
+      "title": "El precio de Gemini 4 Argon se duplica el 1 de diciembre",
+      "titleCore": "El precio de Gemini 4 Argon se duplica el 1 de diciembre: presupuesta el salto",
+      "description": "La tarifa de lanzamiento de $2/$10 de Gemini 4 Argon termina el 30 de noviembre y pasa a $4/$20 el 1 de diciembre. Niveles, factura mensual y qué cambiar antes.",
+      "body": "<p>El precio de la API Standard de Gemini 4 Argon es de $2,00 por millón de tokens de entrada y $10,00 por millón de tokens de salida hasta el 30 de noviembre de 2026. El 1 de diciembre pasa a $4,00 y $20,00. Todos los niveles de Argon se duplican en la misma fecha, así que una carga de trabajo sin cambios costará exactamente el doble en diciembre.</p><p>Precios comprobados el 2 de noviembre de 2026 en la <a href='https://aistudio.google.com/docs/pricing'>página de precios de la API de Gemini de Google</a>. Las tarifas pueden cambiar; confírmalas allí antes de aprobar un presupuesto. Este artículo trata solo del calendario de precios de la API, no de la calidad del modelo.</p><h2>¿Qué cambia el 1 de diciembre?</h2><p>Google lista Gemini 4 Argon con tarifas de duración limitada. La página no muestra un nivel de lanzamiento aparte; muestra un precio hasta el 30 de noviembre y otro desde el 1 de diciembre. Todas las cifras son por millón de tokens, y la salida incluye los tokens de razonamiento.</p><table><thead><tr><th>Nivel</th><th>Entrada ahora</th><th>Entrada desde el 1 dic</th><th>Salida ahora</th><th>Salida desde el 1 dic</th><th>Entrada en caché ahora / desde el 1 dic</th></tr></thead><tbody><tr><td>Standard</td><td>$2,00</td><td>$4,00</td><td>$10,00</td><td>$20,00</td><td>$0,10 / $0,20</td></tr><tr><td>Batch</td><td>$1,00</td><td>$2,00</td><td>$5,00</td><td>$10,00</td><td>$0,05 / $0,10</td></tr><tr><td>Flex</td><td>$1,00</td><td>$2,00</td><td>$5,00</td><td>$10,00</td><td>$0,05 / $0,10</td></tr><tr><td>Priority</td><td>$3,60</td><td>$7,20</td><td>$18,00</td><td>$36,00</td><td>$0,18 / $0,36</td></tr></tbody></table><p>Dos detalles importan para la previsión. Primero, la página no lista niveles por longitud de contexto para Argon, así que no hay una tarifa aparte para prompts largos que modelar. Segundo, la caché es solo implícita; la página no lista caché explícita ni un precio de almacenamiento de caché aparte para este modelo. Argon tampoco está disponible en el nivel gratuito.</p><h2>¿Qué hace la duplicación en una factura real?</h2><p>Tomemos un mes ilustrativo: 1.000 millones de tokens de entrada y 100 millones de tokens de salida en Standard, sin caché. La fórmula es (tokens de entrada en millones x tarifa de entrada) + (tokens de salida en millones x tarifa de salida).</p><table><thead><tr><th>Escenario</th><th>Hasta el 30 nov</th><th>Desde el 1 dic</th></tr></thead><tbody><tr><td>Standard, sin caché</td><td>1.000 x $2 + 100 x $10 = <strong>$3.000</strong></td><td>1.000 x $4 + 100 x $20 = <strong>$6.000</strong></td></tr><tr><td>Standard, 80% de la entrada en caché</td><td>200 x $2 + 800 x $0,10 + 100 x $10 = <strong>$1.480</strong></td><td>200 x $4 + 800 x $0,20 + 100 x $20 = <strong>$2.960</strong></td></tr><tr><td>Batch, sin caché</td><td>1.000 x $1 + 100 x $5 = <strong>$1.500</strong></td><td>1.000 x $2 + 100 x $10 = <strong>$3.000</strong></td></tr></tbody></table><p>Son cálculos sobre volúmenes supuestos, no mediciones de ninguna carga de trabajo real. Lo útil es estructural: la caché y Batch bajan la base, pero no te protegen de la fecha. Las lecturas en caché se mantienen en el 5% de la tarifa de entrada antes y después, así que el descuento del 95% se aplica sobre un precio que se ha duplicado.</p><h2>¿Afecta también a Gemini 3.8 Flash?</h2><p>Sí, en una fecha posterior. Google lista Gemini 3.8 Flash Standard a $0,75 de entrada y $3,75 de salida hasta el 31 de diciembre de 2026, y a $1,50 y $7,50 desde el 1 de enero de 2027. Batch y Flex siguen el mismo patrón ($0,375 / $1,875 ahora, $0,75 / $3,75 después). El almacenamiento de caché de 3.8 Flash también se duplica, de $0,50 a $1,00 por millón de tokens por hora.</p><p>En el mismo mes ilustrativo (1.000 millones de entrada, 100 millones de salida, Standard, sin caché), 3.8 Flash cuesta $1.125 hasta diciembre y $2.250 desde el 1 de enero. Todo lo que redirijas a Flash para escapar del aumento de Argon tendrá su propio aumento un mes después.</p><h2>¿Qué conviene cambiar antes del 30 de noviembre?</h2><ol><li><strong>Vuelve a prever diciembre con la nueva tarifa.</strong> No arrastres el ritmo de noviembre. Multiplica los volúmenes de tokens de Argon por los precios de diciembre y pon la diferencia en una línea de variación con nombre.</li><li><strong>Separa el crecimiento del volumen del precio.</strong> Si la factura de diciembre es más del doble que la de noviembre, el uso también creció. Si no separas ambos efectos, el salto de precio ocultará un problema de uso real. Consulta el <a href='/research/ai-spend-variance-bridge'>puente de variación del gasto en IA</a>.</li><li><strong>Repite la decisión de enrutamiento.</strong> Un modelo que era más barato a $2/$10 puede no serlo a $4/$20. Compara el coste por tarea aceptada, no el precio por token, usando el <a href='/research/cost-per-successful-task'>coste por tarea exitosa</a> sobre una reproducción de tu propio tráfico.</li><li><strong>Pasa el trabajo diferible a Batch o Flex.</strong> Cuestan la mitad del precio Standard en ambas fechas. Sigue siendo un 50% de descuento después del aumento. Los trabajos en segundo plano que no necesitan respuesta inmediata son los primeros candidatos; consulta la <a href='/research/batch-api-finops'>economía de la API Batch</a>.</li><li><strong>Revisa cualquier promesa de precio fijo.</strong> Si le cotizaste a un cliente o equipo interno un precio por petición basado en $2/$10, ya no es correcto para diciembre.</li></ol><h2>¿Cómo queda Argon frente a otros tras el aumento?</h2><p>Comparando solo precios de lista: desde el 1 de diciembre, los $4/$20 de Argon son el doble de los $2/$10 que OpenAI lista para GPT-6 Sol en su <a href='https://developers.openai.com/api/docs/pricing'>página de precios</a>. Eso no dice nada sobre qué modelo completa mejor tus tareas o con menos reintentos, y las tarifas de los proveedores no son directamente comparables (las reglas de caché, los niveles y el tratamiento de los tokens de razonamiento difieren; consulta <a href='/research/provider-prices-not-comparable'>por qué los precios de los proveedores no son comparables</a>). Sí significa que la decisión de diciembre debe tomarse sobre el coste medido por resultado aceptado, no sobre la factura de este mes.</p><h2>¿Qué sigue siendo incierto?</h2><p>La página de Google indica las tarifas del 1 de diciembre, pero no dice si ampliará o modificará el calendario de lanzamiento. Toma las fechas publicadas como caso base y vuelve a revisar la página en la última semana de noviembre. Sonnet 5 de Anthropic muestra por qué: se anunció con un aumento previsto para septiembre que después se canceló (<a href='/research/sonnet-5-intro-pricing-deadline'>la corrección</a>). Un aumento programado es un riesgo de previsión, no una certeza, en ninguno de los dos sentidos.</p>",
+      "faq": [
+        {
+          "question": "¿Cuándo sube el precio de Gemini 4 Argon?",
+          "answer": "Google lista las tarifas actuales de Argon hasta el 30 de noviembre de 2026 y tarifas más altas desde el 1 de diciembre de 2026. Standard pasa de $2/$10 a $4/$20 por millón de tokens de entrada/salida, y todos los demás niveles se duplican en la misma fecha."
+        },
+        {
+          "question": "¿Batch y Flex también se duplican el 1 de diciembre?",
+          "answer": "Sí. Ambos pasan de $1,00 de entrada y $5,00 de salida a $2,00 y $10,00 por millón de tokens. Siguen costando la mitad del precio Standard en ambas fechas."
+        },
+        {
+          "question": "¿Me protege la caché del aumento de Gemini 4 Argon?",
+          "answer": "No de la fecha. La entrada en caché cuesta $0,10 ahora y $0,20 desde el 1 de diciembre, así que el descuento de la caché sigue siendo el mismo porcentaje de una tarifa duplicada. La caché reduce la factura base, pero la factura de diciembre se duplica igualmente para la misma carga de trabajo."
+        },
+        {
+          "question": "¿Gemini 3.8 Flash también tiene un aumento de precio?",
+          "answer": "Sí. Google lista Standard a $0,75 de entrada y $3,75 de salida hasta el 31 de diciembre de 2026, y a $1,50 y $7,50 desde el 1 de enero de 2027. El almacenamiento de caché también se duplica, de $0,50 a $1,00 por millón de tokens por hora."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/provider-prices-not-comparable",
+          "label": "Por qué los precios de los proveedores no son directamente comparables"
+        },
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "Coste por tarea exitosa"
+        },
+        {
+          "slug": "/research/batch-api-finops",
+          "label": "Economía de la API Batch para FinOps"
+        },
+        {
+          "slug": "/research/sonnet-5-intro-pricing-deadline",
+          "label": "Precios de Sonnet 5: se canceló el aumento de septiembre"
+        }
+      ]
+    },
+    "fr": {
+      "title": "Le prix de Gemini 4 Argon double le 1er décembre",
+      "titleCore": "Le prix de Gemini 4 Argon double le 1er décembre : budgétez la falaise",
+      "description": "Le tarif d'introduction de Gemini 4 Argon (2 $/10 $) s'arrête le 30 novembre et passe à 4 $/20 $ le 1er décembre. Paliers, facture chiffrée, que changer.",
+      "body": "<p>Le prix API Standard de Gemini 4 Argon est de 2,00 $ par million de jetons d'entrée et de 10,00 $ par million de jetons de sortie jusqu'au 30 novembre 2026. Le 1er décembre, il passe à 4,00 $ et 20,00 $. Tous les paliers d'Argon doublent à la même date : une charge de travail inchangée coûtera donc exactement deux fois plus cher en décembre.</p><p>Prix vérifiés le 2 novembre 2026 sur <a href='https://aistudio.google.com/docs/pricing'>la page tarifaire de l'API Gemini de Google</a>. Les tarifs peuvent changer ; confirmez-les sur cette page avant de valider un budget. Cet article ne traite que du calendrier tarifaire de l'API, pas de la qualité du modèle.</p><h2>Qu'est-ce qui change le 1er décembre ?</h2><p>Google affiche Gemini 4 Argon avec des tarifs limités dans le temps. La page ne présente pas de palier d'introduction distinct : elle indique un prix jusqu'au 30 novembre et un second à partir du 1er décembre. Tous les chiffres sont par million de jetons, et la sortie inclut les jetons de réflexion.</p><table><thead><tr><th>Palier</th><th>Entrée actuelle</th><th>Entrée dès le 1er déc.</th><th>Sortie actuelle</th><th>Sortie dès le 1er déc.</th><th>Entrée en cache : actuelle / dès le 1er déc.</th></tr></thead><tbody><tr><td>Standard</td><td>2,00 $</td><td>4,00 $</td><td>10,00 $</td><td>20,00 $</td><td>0,10 $ / 0,20 $</td></tr><tr><td>Batch</td><td>1,00 $</td><td>2,00 $</td><td>5,00 $</td><td>10,00 $</td><td>0,05 $ / 0,10 $</td></tr><tr><td>Flex</td><td>1,00 $</td><td>2,00 $</td><td>5,00 $</td><td>10,00 $</td><td>0,05 $ / 0,10 $</td></tr><tr><td>Priority</td><td>3,60 $</td><td>7,20 $</td><td>18,00 $</td><td>36,00 $</td><td>0,18 $ / 0,36 $</td></tr></tbody></table><p>Deux détails comptent pour la prévision. Premièrement, la page ne liste aucun palier de longueur de contexte pour Argon : il n'y a donc pas de tarif distinct pour les longs prompts à modéliser. Deuxièmement, la mise en cache est uniquement implicite ; la page ne mentionne ni cache explicite ni prix de stockage du cache pour ce modèle. Argon n'est pas non plus disponible dans l'offre gratuite.</p><h2>Que fait ce doublement à une facture réelle ?</h2><p>Prenons un mois illustratif : 1 000 millions de jetons d'entrée et 100 millions de jetons de sortie en Standard, sans cache. La formule est (jetons d'entrée en millions x tarif d'entrée) + (jetons de sortie en millions x tarif de sortie).</p><table><thead><tr><th>Scénario</th><th>Jusqu'au 30 nov.</th><th>Dès le 1er déc.</th></tr></thead><tbody><tr><td>Standard, sans cache</td><td>1 000 x 2 $ + 100 x 10 $ = <strong>3 000 $</strong></td><td>1 000 x 4 $ + 100 x 20 $ = <strong>6 000 $</strong></td></tr><tr><td>Standard, 80 % de l'entrée en cache</td><td>200 x 2 $ + 800 x 0,10 $ + 100 x 10 $ = <strong>1 480 $</strong></td><td>200 x 4 $ + 800 x 0,20 $ + 100 x 20 $ = <strong>2 960 $</strong></td></tr><tr><td>Batch, sans cache</td><td>1 000 x 1 $ + 100 x 5 $ = <strong>1 500 $</strong></td><td>1 000 x 2 $ + 100 x 10 $ = <strong>3 000 $</strong></td></tr></tbody></table><p>Ce sont des calculs sur des volumes supposés, pas des mesures d'une charge réelle. L'enseignement est structurel : le cache et le Batch abaissent la base, mais ils ne vous protègent pas de la date. Les lectures en cache restent à 5 % du tarif d'entrée avant comme après, de sorte que la remise de 95 % s'applique à un prix qui a doublé.</p><h2>Gemini 3.8 Flash est-il aussi concerné ?</h2><p>Oui, à une date ultérieure. Google affiche Gemini 3.8 Flash en Standard à 0,75 $ en entrée et 3,75 $ en sortie jusqu'au 31 décembre 2026, puis 1,50 $ et 7,50 $ à partir du 1er janvier 2027. Batch et Flex suivent le même schéma (0,375 $ / 1,875 $ aujourd'hui, 0,75 $ / 3,75 $ ensuite). Le stockage du cache de 3.8 Flash double lui aussi, de 0,50 $ à 1,00 $ par million de jetons et par heure.</p><p>Sur le même mois illustratif (1 000 millions d'entrée, 100 millions de sortie, Standard, sans cache), 3.8 Flash coûte 1 125 $ jusqu'à décembre et 2 250 $ à partir du 1er janvier. Tout ce que vous basculez vers Flash pour échapper à la hausse d'Argon subit sa propre hausse un mois plus tard.</p><h2>Que changer avant le 30 novembre ?</h2><ol><li><strong>Refaire la prévision de décembre au nouveau tarif.</strong> Ne reportez pas le rythme de novembre. Multipliez les volumes de jetons d'Argon par les prix de décembre et inscrivez l'écart dans une ligne de variance nommée.</li><li><strong>Séparer la croissance du volume de l'effet prix.</strong> Si la facture de décembre dépasse le double de celle de novembre, l'usage a aussi augmenté. Sans cette séparation, la hausse de prix masquera un vrai problème d'usage. Voir le <a href='/research/ai-spend-variance-bridge'>pont de variance des dépenses IA</a>.</li><li><strong>Relancer la décision de routage.</strong> Un modèle moins cher à 2 $/10 $ ne l'est peut-être plus à 4 $/20 $. Comparez le coût par tâche acceptée, pas le prix du jeton, avec le <a href='/research/cost-per-successful-task'>coût par tâche réussie</a> sur un rejeu de votre propre trafic.</li><li><strong>Déplacer le travail différable vers Batch ou Flex.</strong> Ils valent la moitié du prix Standard aux deux dates. Cela reste une remise de 50 % après la hausse. Les tâches de fond qui n'exigent pas de réponse immédiate sont les premières candidates ; voir <a href='/research/batch-api-finops'>l'économie de l'API Batch</a>.</li><li><strong>Vérifier toute promesse de prix fixe.</strong> Si vous avez annoncé à un client ou à une équipe interne un prix par requête fondé sur 2 $/10 $, il est désormais faux pour décembre.</li></ol><h2>Comment Argon se compare-t-il après la hausse ?</h2><p>En comparant uniquement les prix publics : à partir du 1er décembre, les 4 $/20 $ d'Argon valent le double des 2 $/10 $ qu'OpenAI affiche pour GPT-6 Sol sur sa <a href='https://developers.openai.com/api/docs/pricing'>page tarifaire</a>. Cela ne dit rien du modèle qui réussit le mieux vos tâches ou avec le moins de nouvelles tentatives, et les grilles tarifaires des fournisseurs ne sont pas directement comparables (règles de cache, paliers et traitement des jetons de réflexion diffèrent ; voir <a href='/research/provider-prices-not-comparable'>pourquoi les prix des fournisseurs ne sont pas comparables</a>). Cela signifie en revanche que la décision de décembre doit reposer sur le coût mesuré par résultat accepté, pas sur la facture de ce mois-ci.</p><h2>Qu'est-ce qui reste incertain ?</h2><p>La page de Google indique les tarifs du 1er décembre mais ne dit pas si le calendrier d'introduction sera prolongé ou modifié. Prenez les dates publiées comme scénario de base et revérifiez la page durant la dernière semaine de novembre. Sonnet 5 d'Anthropic en est la preuve : il avait été annoncé avec une hausse prévue en septembre, ensuite annulée (<a href='/research/sonnet-5-intro-pricing-deadline'>la correction</a>). Une hausse programmée est un risque de prévision, pas une certitude, dans un sens comme dans l'autre.</p>",
+      "faq": [
+        {
+          "question": "Quand le prix de Gemini 4 Argon augmente-t-il ?",
+          "answer": "Google affiche les tarifs actuels d'Argon jusqu'au 30 novembre 2026 et des tarifs plus élevés à partir du 1er décembre 2026. Le palier Standard passe de 2 $/10 $ à 4 $/20 $ par million de jetons d'entrée/sortie, et tous les autres paliers doublent à la même date."
+        },
+        {
+          "question": "Batch et Flex doublent-ils aussi le 1er décembre ?",
+          "answer": "Oui. Tous deux passent de 1,00 $ en entrée et 5,00 $ en sortie à 2,00 $ et 10,00 $ par million de jetons. Ils restent à la moitié du prix Standard aux deux dates."
+        },
+        {
+          "question": "Le cache me protège-t-il de la hausse de Gemini 4 Argon ?",
+          "answer": "Pas de la date. L'entrée en cache coûte 0,10 $ aujourd'hui et 0,20 $ dès le 1er décembre : la remise du cache reste le même pourcentage d'un tarif doublé. Le cache abaisse la facture de base, mais celle de décembre double quand même pour la même charge de travail."
+        },
+        {
+          "question": "Gemini 3.8 Flash connaît-il aussi une hausse de prix ?",
+          "answer": "Oui. Google affiche le Standard à 0,75 $ en entrée et 3,75 $ en sortie jusqu'au 31 décembre 2026, puis 1,50 $ et 7,50 $ à partir du 1er janvier 2027. Le stockage du cache double aussi, de 0,50 $ à 1,00 $ par million de jetons et par heure."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/provider-prices-not-comparable",
+          "label": "Pourquoi les prix des fournisseurs ne sont pas directement comparables"
+        },
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "Coût par tâche réussie"
+        },
+        {
+          "slug": "/research/batch-api-finops",
+          "label": "L'économie de l'API Batch pour le FinOps"
+        },
+        {
+          "slug": "/research/sonnet-5-intro-pricing-deadline",
+          "label": "Tarifs de Sonnet 5 : la hausse de septembre a été annulée"
+        }
+      ]
+    },
+    "ja": {
+      "title": "Gemini 4 Argon、12月1日に価格が2倍に",
+      "titleCore": "Gemini 4 Argonは12月1日に価格が2倍に: 値上げの崖への予算対応",
+      "description": "Gemini 4 Argonの導入価格$2/$10は11月30日で終了し、12月1日から$4/$20になります。全階層、月額請求の計算例、期日までに見直すべき点を解説します。",
+      "body": "<p>Gemini 4 ArgonのStandard API価格は、2026年11月30日まで入力100万トークンあたり$2.00、出力100万トークンあたり$10.00です。12月1日からは$4.00と$20.00になります。Argonのすべての階層が同じ日に2倍になるため、ワークロードを変えなければ12月のコストはちょうど2倍になります。</p><p>価格は2026年11月2日に<a href='https://aistudio.google.com/docs/pricing'>GoogleのGemini API料金ページ</a>で確認しました。料金は変更されることがあるため、予算を承認する前にそちらで再確認してください。この記事で扱うのはAPIの価格スケジュールのみで、モデルの品質は扱いません。</p><h2>12月1日に何が変わるのですか?</h2><p>GoogleはGemini 4 Argonを期間限定の料金で掲載しています。ページに別の導入期間用の階層はなく、11月30日までの価格と12月1日以降の価格の2つだけが示されています。数値はすべて100万トークンあたりで、出力にはthinkingトークンが含まれます。</p><table><thead><tr><th>階層</th><th>現在の入力</th><th>12月1日以降の入力</th><th>現在の出力</th><th>12月1日以降の出力</th><th>キャッシュ入力 現在 / 12月1日以降</th></tr></thead><tbody><tr><td>Standard</td><td>$2.00</td><td>$4.00</td><td>$10.00</td><td>$20.00</td><td>$0.10 / $0.20</td></tr><tr><td>Batch</td><td>$1.00</td><td>$2.00</td><td>$5.00</td><td>$10.00</td><td>$0.05 / $0.10</td></tr><tr><td>Flex</td><td>$1.00</td><td>$2.00</td><td>$5.00</td><td>$10.00</td><td>$0.05 / $0.10</td></tr><tr><td>Priority</td><td>$3.60</td><td>$7.20</td><td>$18.00</td><td>$36.00</td><td>$0.18 / $0.36</td></tr></tbody></table><p>予測のうえで重要な点が2つあります。1つ目は、ページにArgon向けのコンテキスト長ごとの階層が載っていないため、長いプロンプト用の別料金をモデル化する必要がないことです。2つ目は、キャッシュは暗黙的なもののみで、このモデルには明示的なキャッシュも、キャッシュ保管料金も記載されていないことです。ArgonはFree階層でも利用できません。</p><h2>2倍になると実際の請求はどうなりますか?</h2><p>例として、Standardで入力10億トークン(1,000百万)、出力1億トークン(100百万)、キャッシュなしの1か月を考えます。計算式は(入力トークン数(百万) x 入力料金) + (出力トークン数(百万) x 出力料金)です。</p><table><thead><tr><th>シナリオ</th><th>11月30日まで</th><th>12月1日以降</th></tr></thead><tbody><tr><td>Standard、キャッシュなし</td><td>1,000 x $2 + 100 x $10 = <strong>$3,000</strong></td><td>1,000 x $4 + 100 x $20 = <strong>$6,000</strong></td></tr><tr><td>Standard、入力の80%がキャッシュ</td><td>200 x $2 + 800 x $0.10 + 100 x $10 = <strong>$1,480</strong></td><td>200 x $4 + 800 x $0.20 + 100 x $20 = <strong>$2,960</strong></td></tr><tr><td>Batch、キャッシュなし</td><td>1,000 x $1 + 100 x $5 = <strong>$1,500</strong></td><td>1,000 x $2 + 100 x $10 = <strong>$3,000</strong></td></tr></tbody></table><p>これらは想定した量に基づく計算であり、実際のワークロードの測定値ではありません。重要なのは構造上の点です。キャッシュとBatchはベースを下げますが、この日付からは守ってくれません。キャッシュ読み取りは前後とも入力料金の5%のままなので、95%の割引は2倍になった価格に対するものです。</p><h2>Gemini 3.8 Flashも影響を受けますか?</h2><p>はい、ただし時期は後です。GoogleはGemini 3.8 FlashのStandardを、2026年12月31日まで入力$0.75、出力$3.75、2027年1月1日以降は$1.50と$7.50と掲載しています。BatchとFlexも同じパターンです(現在$0.375 / $1.875、以降$0.75 / $3.75)。3.8 Flashのキャッシュ保管料金も、100万トークンあたり1時間$0.50から$1.00へと2倍になります。</p><p>同じ想定の1か月(入力10億トークン、出力1億トークン、Standard、キャッシュなし)では、3.8 Flashは12月末までが$1,125、1月1日以降が$2,250です。Argonの値上げを避けるためにFlashへ振り分けた分にも、1か月後に独自の値上げが来ます。</p><h2>11月30日までに何を変えるべきですか?</h2><ol><li><strong>12月を新料金で予測し直す。</strong> 11月の実績をそのまま持ち越さないでください。Argonのトークン量に12月の価格を掛け、差額を名前を付けた差異行に入れます。</li><li><strong>量の増加と価格を分ける。</strong> 12月の請求が11月の2倍を超えるなら、使用量も増えています。両者を分けないと、価格の段差が実際の使用量の問題を隠してしまいます。<a href='/research/ai-spend-variance-bridge'>AI支出の差異ブリッジ</a>を参照してください。</li><li><strong>ルーティングの判断をやり直す。</strong> $2/$10では安かったモデルが、$4/$20ではそうでないかもしれません。トークン単価ではなく、受け入れられたタスクあたりのコストを比較します。自社トラフィックのリプレイで<a href='/research/cost-per-successful-task'>成功タスクあたりのコスト</a>を使ってください。</li><li><strong>後回しにできる処理をBatchまたはFlexへ移す。</strong> どちらも両方の日付でStandardの半額です。値上げ後も50%の割引になります。すぐに答えが要らないバックグラウンドジョブが最初の候補です。<a href='/research/batch-api-finops'>Batch APIの経済性</a>を参照してください。</li><li><strong>固定価格の約束を確認する。</strong> $2/$10に基づくリクエスト単価を顧客や社内チームに提示している場合、12月分については正しくなくなります。</li></ol><h2>値上げ後、Argonは他と比べてどうですか?</h2><p>定価だけを比較すると、12月1日以降のArgonの$4/$20は、OpenAIが<a href='https://developers.openai.com/api/docs/pricing'>料金ページ</a>で掲載しているGPT-6 Solの$2/$10の2倍です。これはどちらのモデルがタスクをよりうまく、または少ない再試行で完了するかについては何も示しません。また、プロバイダーの料金表は直接比較できません(キャッシュのルール、階層、thinkingトークンの扱いが異なります。<a href='/research/provider-prices-not-comparable'>プロバイダー価格が比較できない理由</a>を参照)。ただし、12月の判断は今月の請求書ではなく、実測した受け入れ結果あたりのコストに基づいて行うべきだということは言えます。</p><h2>まだ不確かな点は何ですか?</h2><p>Googleのページは12月1日の料金を示していますが、導入期間のスケジュールを延長または変更するかどうかは述べていません。公表された日付を基本ケースとして扱い、11月の最終週にページを再確認してください。AnthropicのSonnet 5がその例です。9月の値上げが予定されて発表されましたが、のちに取り消されました(<a href='/research/sonnet-5-intro-pricing-deadline'>訂正記事</a>)。予定された値上げは、どちらの方向にも確実ではなく、予測上のリスクです。</p>",
+      "faq": [
+        {
+          "question": "Gemini 4 Argonの価格はいつ上がりますか?",
+          "answer": "Googleは、Argonの現在の料金を2026年11月30日まで、より高い料金を2026年12月1日からと掲載しています。Standardは入力/出力100万トークンあたり$2/$10から$4/$20になり、他のすべての階層も同じ日に2倍になります。"
+        },
+        {
+          "question": "BatchとFlexも12月1日に2倍になりますか?",
+          "answer": "はい。どちらも100万トークンあたり、入力$1.00・出力$5.00から$2.00・$10.00になります。両方の日付でStandardの半額のままです。"
+        },
+        {
+          "question": "キャッシュはGemini 4 Argonの値上げから守ってくれますか?",
+          "answer": "日付からは守ってくれません。キャッシュ入力は現在$0.10、12月1日以降は$0.20なので、キャッシュ割引は2倍になった料金に対する同じ割合のままです。キャッシュはベースの請求額を下げますが、同じワークロードの12月の請求額は2倍になります。"
+        },
+        {
+          "question": "Gemini 3.8 Flashにも値上げはありますか?",
+          "answer": "はい。GoogleはStandardを2026年12月31日まで入力$0.75・出力$3.75、2027年1月1日以降は$1.50・$7.50と掲載しています。キャッシュ保管料金も、100万トークンあたり1時間$0.50から$1.00へと2倍になります。"
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/provider-prices-not-comparable",
+          "label": "プロバイダー価格が直接比較できない理由"
+        },
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "成功タスクあたりのコスト"
+        },
+        {
+          "slug": "/research/batch-api-finops",
+          "label": "FinOps向けBatch APIの経済性"
+        },
+        {
+          "slug": "/research/sonnet-5-intro-pricing-deadline",
+          "label": "Sonnet 5の価格: 9月の値上げは取り消されました"
+        }
+      ]
+    },
+    "pt": {
+      "title": "Gemini 4 Argon dobra de preço em 1º de dezembro",
+      "titleCore": "Gemini 4 Argon dobra de preço em 1º de dezembro: planeje o salto",
+      "description": "A tarifa introdutória de $2/$10 do Gemini 4 Argon acaba em 30/11 e vira $4/$20 em 1º/12. Veja todas as faixas, uma fatura mensal e o que mudar antes da data.",
+      "body": "<p>O preço da API Standard do Gemini 4 Argon é $2,00 por milhão de tokens de entrada e $10,00 por milhão de tokens de saída até 30 de novembro de 2026. Em 1º de dezembro passa a ser $4,00 e $20,00. Todas as faixas do Argon dobram na mesma data, então uma carga de trabalho inalterada custa exatamente o dobro em dezembro.</p><p>Preços conferidos em 2 de novembro de 2026 na <a href='https://aistudio.google.com/docs/pricing'>página de preços da API Gemini do Google</a>. As tarifas podem mudar; confirme-as lá antes de aprovar um orçamento. Este artigo trata apenas da tabela de preços da API, não da qualidade do modelo.</p><h2>O que muda em 1º de dezembro?</h2><p>O Google lista o Gemini 4 Argon com tarifas por tempo limitado. A página não mostra uma faixa introdutória separada; mostra um preço até 30 de novembro e um segundo a partir de 1º de dezembro. Todos os valores são por milhão de tokens, e a saída inclui os tokens de raciocínio.</p><table><thead><tr><th>Faixa</th><th>Entrada hoje</th><th>Entrada a partir de 1º/dez.</th><th>Saída hoje</th><th>Saída a partir de 1º/dez.</th><th>Entrada em cache hoje / a partir de 1º/dez.</th></tr></thead><tbody><tr><td>Standard</td><td>$2,00</td><td>$4,00</td><td>$10,00</td><td>$20,00</td><td>$0,10 / $0,20</td></tr><tr><td>Batch</td><td>$1,00</td><td>$2,00</td><td>$5,00</td><td>$10,00</td><td>$0,05 / $0,10</td></tr><tr><td>Flex</td><td>$1,00</td><td>$2,00</td><td>$5,00</td><td>$10,00</td><td>$0,05 / $0,10</td></tr><tr><td>Priority</td><td>$3,60</td><td>$7,20</td><td>$18,00</td><td>$36,00</td><td>$0,18 / $0,36</td></tr></tbody></table><p>Dois detalhes importam para a projeção. Primeiro, a página não lista faixas por tamanho de contexto para o Argon, então não há uma tarifa separada para prompts longos a modelar. Segundo, o cache é apenas implícito; a página não lista cache explícito nem um preço separado de armazenamento de cache para este modelo. O Argon também não está disponível na faixa Free.</p><h2>O que a duplicação faz com uma fatura real?</h2><p>Tome um mês ilustrativo: 1.000 milhões de tokens de entrada e 100 milhões de tokens de saída no Standard, sem cache. A fórmula é (tokens de entrada em milhões x tarifa de entrada) + (tokens de saída em milhões x tarifa de saída).</p><table><thead><tr><th>Cenário</th><th>Até 30/nov.</th><th>A partir de 1º/dez.</th></tr></thead><tbody><tr><td>Standard, sem cache</td><td>1.000 x $2 + 100 x $10 = <strong>$3.000</strong></td><td>1.000 x $4 + 100 x $20 = <strong>$6.000</strong></td></tr><tr><td>Standard, 80% da entrada em cache</td><td>200 x $2 + 800 x $0,10 + 100 x $10 = <strong>$1.480</strong></td><td>200 x $4 + 800 x $0,20 + 100 x $20 = <strong>$2.960</strong></td></tr><tr><td>Batch, sem cache</td><td>1.000 x $1 + 100 x $5 = <strong>$1.500</strong></td><td>1.000 x $2 + 100 x $10 = <strong>$3.000</strong></td></tr></tbody></table><p>Estes são cálculos sobre volumes presumidos, não medições de nenhuma carga de trabalho real. O ponto útil é estrutural: cache e batch reduzem a base, mas não protegem você da data. As leituras em cache continuam em 5% da tarifa de entrada antes e depois, então o desconto de 95% incide sobre um preço que dobrou.</p><h2>O Gemini 3.8 Flash também é afetado?</h2><p>Sim, em uma data posterior. O Google lista o Gemini 3.8 Flash Standard a $0,75 de entrada e $3,75 de saída até 31 de dezembro de 2026, e depois $1,50 e $7,50 a partir de 1º de janeiro de 2027. Batch e Flex seguem o mesmo padrão ($0,375 / $1,875 hoje, $0,75 / $3,75 depois). O armazenamento de cache do 3.8 Flash também dobra, de $0,50 para $1,00 por milhão de tokens por hora.</p><p>No mesmo mês ilustrativo (1.000 milhões de entrada, 100 milhões de saída, Standard, sem cache), o 3.8 Flash custa $1.125 até dezembro e $2.250 a partir de 1º de janeiro. Qualquer carga que você direcione ao Flash para escapar do aumento do Argon recebe o seu próprio aumento um mês depois.</p><h2>O que mudar antes de 30 de novembro?</h2><ol><li><strong>Refaça a projeção de dezembro com a nova tarifa.</strong> Não leve adiante o ritmo de novembro. Multiplique os volumes de tokens do Argon pelos preços de dezembro e coloque a diferença em uma linha de variação nomeada.</li><li><strong>Separe crescimento de volume de preço.</strong> Se a fatura de dezembro for mais que o dobro da de novembro, o uso também cresceu. Se você não separar os dois, o salto de preço vai esconder um problema real de uso. Veja a <a href='/research/ai-spend-variance-bridge'>ponte de variação do gasto com IA</a>.</li><li><strong>Refaça a decisão de roteamento.</strong> Um modelo que era mais barato a $2/$10 pode não ser a $4/$20. Compare o custo por tarefa aceita, não o preço do token, usando o <a href='/research/cost-per-successful-task'>custo por tarefa bem-sucedida</a> em um replay do seu próprio tráfego.</li><li><strong>Mova o trabalho adiável para Batch ou Flex.</strong> Eles custam metade do preço do Standard nas duas datas. Isso continua sendo um desconto de 50% depois do aumento. Tarefas em segundo plano que não precisam de resposta imediata são as primeiras candidatas; veja a <a href='/research/batch-api-finops'>economia da API em batch</a>.</li><li><strong>Verifique qualquer promessa de preço fixo que você tenha feito.</strong> Se você cotou a um cliente ou a uma equipe interna um preço por requisição baseado em $2/$10, ele agora está errado para dezembro.</li></ol><h2>Como o Argon se compara depois do aumento?</h2><p>Comparando apenas preços de lista: a partir de 1º de dezembro, os $4/$20 do Argon são o dobro dos $2/$10 que a OpenAI lista para o GPT-6 Sol em sua <a href='https://developers.openai.com/api/docs/pricing'>página de preços</a>. Isso não diz nada sobre qual modelo conclui melhor as suas tarefas ou com menos novas tentativas, e as tabelas de preços dos provedores não são diretamente comparáveis (regras de cache, faixas e tratamento de tokens de raciocínio diferem; veja <a href='/research/provider-prices-not-comparable'>por que os preços dos provedores não são comparáveis</a>). Significa, sim, que a decisão de dezembro deve se basear no custo medido por resultado aceito, e não na fatura deste mês.</p><h2>O que ainda é incerto?</h2><p>A página do Google informa as tarifas de 1º de dezembro, mas não diz se vai prorrogar ou alterar o cronograma introdutório. Trate as datas publicadas como o cenário-base e confira a página novamente na última semana de novembro. O Sonnet 5 da Anthropic mostra por quê: foi anunciado com um aumento previsto para setembro que depois foi cancelado (<a href='/research/sonnet-5-intro-pricing-deadline'>a correção</a>). Um aumento programado é um risco de projeção, não uma certeza, em qualquer direção.</p>",
+      "faq": [
+        {
+          "question": "Quando o preço do Gemini 4 Argon aumenta?",
+          "answer": "O Google lista as tarifas atuais do Argon até 30 de novembro de 2026 e tarifas mais altas a partir de 1º de dezembro de 2026. O Standard passa de $2/$10 para $4/$20 por milhão de tokens de entrada/saída, e todas as outras faixas dobram na mesma data."
+        },
+        {
+          "question": "Batch e Flex também dobram em 1º de dezembro?",
+          "answer": "Sim. Ambos passam de $1,00 de entrada e $5,00 de saída para $2,00 e $10,00 por milhão de tokens. Continuam custando metade do preço do Standard nas duas datas."
+        },
+        {
+          "question": "O cache me protege do aumento do Gemini 4 Argon?",
+          "answer": "Não da data. A entrada em cache custa $0,10 hoje e $0,20 a partir de 1º de dezembro, então o desconto do cache continua sendo a mesma porcentagem de uma tarifa que dobrou. O cache reduz a fatura-base, mas a fatura de dezembro ainda dobra para a mesma carga de trabalho."
+        },
+        {
+          "question": "O Gemini 3.8 Flash também terá aumento de preço?",
+          "answer": "Sim. O Google lista o Standard a $0,75 de entrada e $3,75 de saída até 31 de dezembro de 2026, e $1,50 e $7,50 a partir de 1º de janeiro de 2027. O armazenamento de cache também dobra, de $0,50 para $1,00 por milhão de tokens por hora."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/provider-prices-not-comparable",
+          "label": "Por que os preços dos provedores não são diretamente comparáveis"
+        },
+        {
+          "slug": "/research/cost-per-successful-task",
+          "label": "Custo por tarefa bem-sucedida"
+        },
+        {
+          "slug": "/research/batch-api-finops",
+          "label": "Economia da API em batch para FinOps"
+        },
+        {
+          "slug": "/research/sonnet-5-intro-pricing-deadline",
+          "label": "Preço do Sonnet 5: o aumento de setembro foi cancelado"
+        }
+      ]
     }
   }
 }
