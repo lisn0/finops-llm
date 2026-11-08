@@ -171,6 +171,8 @@ const TRANSLATED_PATHS = [
 	'/research/cheapest-ai-code-generation',
 	'/research/coding-plan-comparison',
 	'/research/finops-for-llm',
+	'/research/gpt-6-2-release-date-pricing',
+	'/research/gpt-6-2-sol-routing-test',
 	'/research/gpt-5-6-pricing-tier-guide',
 	'/research/how-much-does-gpt5-cost',
 	'/research/how-to-audit-llm-spend',
