@@ -159,15 +159,15 @@
       "faq": [
         {
           "question": "良いデモはGPT-6.2 Solの稼働を証明しますか？",
-          "answer": "いいえ。出力の品質だけで生成モデルを特定できません。"
+          "answer": "いいえ。出力の品質はプロンプトや設定でも変わり、生成モデルのバージョンを一意に特定する証拠にはなりません。"
         },
         {
           "question": "APIのmodel欄はChatGPTのルーティングを証明しますか？",
-          "answer": "いいえ。そのAPI応答のIDであり、別のChatGPT会話のモデルは示しません。"
+          "answer": "いいえ。モデルが自分の名前を答えても、APIの記録や公式文書のような独立した識別情報にはなりません。"
         },
         {
           "question": "モデルに名前を尋ねれば本人確認できますか？",
-          "answer": "いいえ。生成された自己申告は独立した証拠ではありません。"
+          "answer": "いいえ。モデルの自己紹介は自分で生成した文章にすぎず、APIの記録や公式文書のような独立した識別情報にはなりません。"
         }
       ],
       "related": [
@@ -208,6 +208,236 @@
         {
           "slug": "/research/llm-api-pricing-tracker",
           "label": "LLM API pricing"
+        }
+      ]
+    },
+    "nl": {
+      "title": "Is GPT-6.2 Sol er al? Zo controleer je routering",
+      "titleCore": "GPT-6.2 Sol-routering controleren",
+      "description": "Kun je zien of een verzoek naar GPT-6.2 Sol is gerouteerd? Dit tonen model-ID’s, API-metadata en virale tests wel en niet.",
+      "body": "<p class=\"lede\">Een virale claim zegt dat sommige gebruikers al naar GPT-6.2 Sol worden gerouteerd. Op 8 november 2026 had OpenAI dat model niet openbaar aangekondigd en kunnen we de claim niet verifiëren. Een antwoord op een kennisvraag of een opvallende demo identificeert niet welk model een verzoek heeft verwerkt.</p><h2>Wat is de claim?</h2><p>De video vraagt of GPT-6.2 Sol er al is en hoe routering te testen. Online berichten noemen ook indrukwekkende beelden en kennisantwoorden als aanwijzing. Resultaten variëren echter met prompt, tools, context, instellingen en normale modelvariatie. Geen daarvan identificeert op zichzelf een modelversie.</p><p>Gemelde schermafbeeldingen van modelnamen in een cloud-quotafilter zijn een ander signaal. Volgens <a href=\"https://argolink.io/en/blog/what-is-gpt-6-2-sol\">ArgoLink</a> tonen ze vermeende labels, geen geslaagd verzoek of bewijs van uitrol. We hebben de schermafbeeldingen niet onafhankelijk gecontroleerd.</p><h2>Hoe controleren API-gebruikers het model?</h2><ol><li>Leg het exacte aangevraagde model-ID, het provider-endpoint en het tijdstip vast.</li><li>Controleer de responsmetadata. De <a href=\"https://developers.openai.com/api/reference/resources/responses/methods/create\">Responses API-referentie</a> beschrijft het veld <code>model</code> als het ID van het model dat de respons genereerde. Bewaar dit met request-ID en gebruiksgegevens.</li><li>Vergelijk gevraagd en geretourneerd ID met actuele documentatie. Aliassen en snapshots kunnen verschillen; een verschil verdient onderzoek, maar bewijst geen verborgen release.</li><li>Neem bij tegenspraak contact op met de provider en geef request-ID en tijdstip door. Verwijder inloggegevens en gevoelige invoer voordat u logs deelt.</li></ol><p>Dit controleert het ID dat de API voor die respons meldt. Het is geen onafhankelijke audit van de infrastructuur en bewijst niet welk model een ander ChatGPT-gesprek afhandelde.</p><h2>Wat kunnen ChatGPT-gebruikers controleren?</h2><p>Bekijk het getoonde model of denkniveau, uw abonnement en werkruimte-instellingen. OpenAI’s <a href=\"https://help.openai.com/en/articles/20001354-gpt-6-and-other-models-in-chatgpt\">beschikbaarheidsgids</a> legt uit dat opties per abonnement en werkruimte verschillen. Een zichtbare selectie toont de interface, maar bewijst geen onaangekondigd backendmodel. Een model dat zijn eigen naam noemt, is geen onafhankelijke verificatie.</p><h2>Bewijst een prompttest routering?</h2><p>Nee. Vraag naar een recent onderwerp, de modelnaam of vergelijk één afbeelding en u krijgt hooguit een anekdote, geen model-ID. Kennis kan uit context of tools komen en antwoorden kunnen fout zijn. OpenAI vermeldt dat <a href=\"https://help.openai.com/en/articles/8313428\">ChatGPT onjuiste of misleidende antwoorden kan geven</a>. Ook een goed antwoord zonder zoeken is geen modelvingerafdruk.</p><h2>Wat moeten teams met het gerucht doen?</h2><p>Baseer productie-instellingen en budgetten op gedocumenteerde modellen. Bewaar voor een gecontroleerde vergelijking prompts, model-ID’s, instellingen, datums, resultaten, vertraging en kosten; test meerdere representatieve taken. Werk de registratie bij na een officiële modelkaart of uitrolmelding. Zie ook onze <a href=\"/research/gpt-6-2-release-date-pricing\">gids over GPT-6.2-status en prijs</a>.</p><h2>Verder lezen</h2><ul><li><a href=\"/research/model-routing\">Modelroutering</a></li><li><a href=\"/research/llm-api-pricing-tracker\">LLM API-prijstracker</a></li></ul>",
+      "faq": [
+        {
+          "question": "Bewijst een goede demo dat GPT-6.2 Sol actief is?",
+          "answer": "Nee. De uitvoerkwaliteit identificeert niet uniek welk model die heeft gegenereerd."
+        },
+        {
+          "question": "Bewijst het API-modelveld routering in ChatGPT?",
+          "answer": "Nee. Het meldt het ID voor die API-respons, niet het model van een afzonderlijk ChatGPT-gesprek."
+        },
+        {
+          "question": "Kun je verificatie doen door het model naar zijn naam te vragen?",
+          "answer": "Nee. Een gegenereerde zelfbeschrijving is geen onafhankelijk bewijs."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/model-routing",
+          "label": "Modelroutering"
+        },
+        {
+          "slug": "/research/llm-api-pricing-tracker",
+          "label": "LLM API-prijstracker"
+        }
+      ]
+    },
+    "ko": {
+      "title": "GPT-6.2 Sol이 이미 제공되나요? 라우팅 확인법",
+      "titleCore": "GPT-6.2 Sol 라우팅 확인",
+      "description": "요청이 GPT-6.2 Sol로 라우팅됐는지 알 수 있을까요? 모델 ID, API 메타데이터, 화제의 테스트가 보여주는 범위를 설명합니다.",
+      "body": "<p class=\"lede\">일부 사용자가 이미 GPT-6.2 Sol로 라우팅되고 있다는 주장이 퍼지고 있습니다. 2026년 11월 8일 현재 OpenAI는 이 모델을 공개 발표하지 않았고 주장을 확인할 수도 없습니다. 상식 퀴즈 답변이나 인상적인 데모는 요청을 처리한 모델을 식별하지 못합니다.</p><h2>무엇이 주장되나요?</h2><p>영상은 GPT-6.2 Sol이 이미 나왔는지, 라우팅을 어떻게 시험하는지 묻습니다. 온라인 글은 생성 이미지와 지식 답변을 단서로 듭니다. 하지만 결과는 프롬프트, 도구, 문맥, 설정, 일반적인 모델 변동에 따라 달라집니다. 어느 것도 버전을 고유하게 식별하지 않습니다.</p><p>클라우드 할당량 필터에서 모델명이 보였다는 캡처는 별개의 신호입니다. <a href=\"https://argolink.io/en/blog/what-is-gpt-6-2-sol\">ArgoLink</a> 설명에 따르면 주장된 라벨을 보여줄 뿐 성공한 요청이나 출시 증거는 아닙니다. 캡처를 독립 검증하지 않았습니다.</p><h2>API 사용자는 어떻게 확인하나요?</h2><ol><li>요청한 정확한 모델 ID, 공급자 엔드포인트, 시각을 기록합니다.</li><li>응답 메타데이터를 확인합니다. OpenAI <a href=\"https://developers.openai.com/api/reference/resources/responses/methods/create\">Responses API 문서</a>는 <code>model</code> 필드를 응답을 생성한 모델 ID로 설명합니다. 요청 ID와 사용량 데이터와 함께 저장하세요.</li><li>요청 ID와 응답 ID를 최신 문서와 대조합니다. 별칭이나 스냅샷은 다를 수 있습니다. 차이는 조사할 사안이지 비공개 모델의 증거는 아닙니다.</li><li>문서와 다르면 요청 ID와 시각을 제공해 공급자에 문의합니다. 로그를 공유하기 전 인증정보와 민감한 입력을 지웁니다.</li></ol><p>이 방법은 해당 응답에 대해 API가 보고한 ID를 확인합니다. 기반 인프라를 독립 감사하거나 별도의 ChatGPT 대화에서 사용된 모델을 증명하지는 않습니다.</p><h2>ChatGPT 사용자가 확인할 수 있는 것</h2><p>화면의 모델·추론 옵션, 요금제와 워크스페이스 제어를 확인하세요. OpenAI <a href=\"https://help.openai.com/en/articles/20001354-gpt-6-and-other-models-in-chatgpt\">가용성 안내</a>에 따르면 옵션은 요금제와 워크스페이스에 따라 다릅니다. 화면 선택은 UI가 표시하는 내용을 알려줄 뿐, 미발표 백엔드 모델의 증거가 아닙니다. 모델의 자기소개도 독립 검증이 아닙니다.</p><h2>프롬프트 테스트가 라우팅을 증명하나요?</h2><p>아니요. 최신 주제나 모델 이름을 묻거나 이미지 하나를 비교하는 것은 일화일 뿐 모델 ID가 아닙니다. 지식은 문맥이나 도구에서 올 수 있고 답은 틀릴 수 있습니다. OpenAI는 <a href=\"https://help.openai.com/en/articles/8313428\">ChatGPT가 부정확하거나 오해를 부르는 답을 할 수 있음</a>을 안내합니다. 검색 없이 맞힌 답도 모델 지문이 아닙니다.</p><h2>팀은 어떻게 대응할까요?</h2><p>문서화된 모델을 기준으로 운영 설정과 예산을 유지하세요. 비교 시 프롬프트, ID, 설정, 날짜, 작업 결과, 지연 시간과 비용을 기록하고 대표 작업 여러 개를 시험합니다. 공식 문서가 나오면 기록을 갱신하세요. <a href=\"/research/gpt-6-2-release-date-pricing\">GPT-6.2 상태·가격 가이드</a>도 참고하세요.</p><h2>관련 자료</h2><ul><li><a href=\"/research/model-routing\">모델 라우팅</a></li><li><a href=\"/research/llm-api-pricing-tracker\">LLM API 가격 추적</a></li></ul>",
+      "faq": [
+        {
+          "question": "좋은 데모가 GPT-6.2 Sol 사용을 증명하나요?",
+          "answer": "아니요. 결과물의 품질은 프롬프트와 설정에도 좌우되므로 생성 모델 버전을 고유하게 식별하는 증거가 아닙니다."
+        },
+        {
+          "question": "API model 필드가 ChatGPT 라우팅을 확인하나요?",
+          "answer": "아니요. 모델이 자신의 이름을 말해도 API 기록이나 공식 문서 같은 독립적인 식별 증거가 되지 않습니다."
+        },
+        {
+          "question": "모델에게 이름을 물으면 신원을 확인할 수 있나요?",
+          "answer": "아니요. 모델이 자신의 이름을 말해도 API 기록이나 공식 문서처럼 독립적인 식별 증거가 되지 않습니다."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/model-routing",
+          "label": "모델 라우팅"
+        },
+        {
+          "slug": "/research/llm-api-pricing-tracker",
+          "label": "LLM API 가격 추적"
+        }
+      ]
+    },
+    "zh": {
+      "title": "GPT-6.2 Sol 已经上线了吗？如何检查路由",
+      "titleCore": "GPT-6.2 Sol 路由检查",
+      "description": "如何判断请求是否由 GPT-6.2 Sol 处理？说明模型标识、API 元数据和热门测试能证明什么。",
+      "body": "<p class=\"lede\">网上流传有用户已被路由到 GPT-6.2 Sol。截至 2026 年 11 月 8 日，OpenAI 尚未公开宣布该模型，我们也无法验证这一说法。回答一道知识题或生成令人惊艳的演示，都无法识别处理请求的模型。</p><h2>这项说法是什么？</h2><p>视频标题询问 GPT-6.2 Sol 是否已经上线，以及如何测试路由。网上报告还把生成图像和知识问答当作线索。但输出会受提示、工具、上下文、设置和模型正常波动影响，任何单一结果都不能唯一确定版本。</p><p>云配额筛选器中出现模型名称的截图是另一类线索。据<a href=\"https://argolink.io/en/blog/what-is-gpt-6-2-sol\">ArgoLink</a>描述，它们显示的是声称存在的标签，并非成功请求或已推出的证明。我们未独立验证截图。</p><h2>API 用户如何检查模型？</h2><ol><li>记录请求的准确模型 ID、供应商端点和时间。</li><li>检查响应元数据。OpenAI 的<a href=\"https://developers.openai.com/api/reference/resources/responses/methods/create\">Responses API 参考</a>将 <code>model</code> 字段定义为生成该响应的模型 ID。与请求 ID 和使用量一起保存。</li><li>将请求 ID 和返回 ID 与供应商当前文档对照。别名和快照可能不同；差异值得调查，但不自动证明存在隐藏模型。</li><li>若响应与文档不符，向供应商提供请求 ID 和时间咨询。分享日志前请删除凭证和敏感输入。</li></ol><p>这能检查 API 为该响应报告的标识符，但不能独立审计基础设施，也不能证明另一段 ChatGPT 对话使用的模型。</p><h2>ChatGPT 用户能检查什么？</h2><p>查看界面显示的模型或思考级别、账户方案和工作区设置。OpenAI 的<a href=\"https://help.openai.com/en/articles/20001354-gpt-6-and-other-models-in-chatgpt\">可用性指南</a>说明选项会因方案和工作区而异。界面选择说明展示的选项，并不能证明未公布的后台模型。模型自述身份也不是独立验证。</p><h2>提示词测试能证明路由吗？</h2><p>不能。询问近期话题、模型名称或比较一张图，只能得到轶事，不能得到模型 ID。知识可能来自上下文或工具，回答也可能出错。OpenAI 提醒<a href=\"https://help.openai.com/en/articles/8313428\">ChatGPT 可能给出错误或误导性回答</a>。关闭搜索后答对也不是模型指纹。</p><h2>团队应如何处理传闻？</h2><p>生产配置和预算应以有文档依据的模型为准。对比时保存提示词、模型 ID、设置、日期、任务结果、延迟和成本，并测试多个代表性任务。OpenAI 发布模型卡或推出公告后再更新记录。参见<a href=\"/research/gpt-6-2-release-date-pricing\">GPT-6.2 状态与价格指南</a>。</p><h2>相关阅读</h2><ul><li><a href=\"/research/model-routing\">模型路由</a></li><li><a href=\"/research/llm-api-pricing-tracker\">LLM API 价格追踪</a></li></ul>",
+      "faq": [
+        {
+          "question": "出色的演示能证明正在运行 GPT-6.2 Sol 吗？",
+          "answer": "不能。输出质量可能随提示词、工具和设置变化，单凭结果无法唯一识别实际生成模型的版本。"
+        },
+        {
+          "question": "API 的 model 字段能验证 ChatGPT 路由吗？",
+          "answer": "不能。该字段只报告这次 API 响应使用的模型标识，不能说明另一段 ChatGPT 对话由哪个模型处理。"
+        },
+        {
+          "question": "询问模型名称能验证身份吗？",
+          "answer": "不能。模型生成的自我介绍并非独立标识，无法替代 API 记录、请求 ID 或官方文档。"
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/model-routing",
+          "label": "模型路由"
+        },
+        {
+          "slug": "/research/llm-api-pricing-tracker",
+          "label": "LLM API 价格追踪"
+        }
+      ]
+    },
+    "ar": {
+      "title": "هل أصبح GPT-6.2 Sol متاحاً؟ كيفية التحقق من التوجيه",
+      "titleCore": "GPT-6.2 Sol: التحقق من التوجيه",
+      "description": "هل يمكن معرفة ما إذا كان الطلب قد وُجّه إلى GPT-6.2 Sol؟ نوضح ما تثبته معرّفات النماذج وبيانات API والاختبارات المتداولة.",
+      "body": "<p class=\"lede\">يزعم منشور واسع الانتشار أن بعض المستخدمين يُوجّهون بالفعل إلى GPT-6.2 Sol. حتى 8 نوفمبر 2026، لم تعلن OpenAI النموذج علناً ولا نستطيع التحقق من الادعاء. لا تكشف إجابة عن معلومة عامة أو تجربة مبهرة هوية النموذج الذي عالج الطلب.</p><h2>ما الادعاء؟</h2><p>يسأل عنوان الفيديو إن كان GPT-6.2 Sol قد وصل بالفعل وكيفية اختبار التوجيه. وتشير تقارير على الإنترنت إلى صور منشأة وإجابات معرفية بوصفها أدلة. لكن النتيجة قد تتغير بحسب التعليمات والأدوات والسياق والإعدادات والتباين الطبيعي للنموذج؛ ولا يحدد أي منها إصداراً بعينه.</p><p>اللقطات المنقولة لأسماء نماذج في مرشح حصص سحابي إشارة منفصلة. وفق وصف <a href=\"https://argolink.io/en/blog/what-is-gpt-6-2-sol\">ArgoLink</a>، فهي تعرض أسماء مزعومة، لا طلباً ناجحاً أو إثباتاً لبدء الإتاحة. لم نتحقق من اللقطات مستقلاً.</p><h2>كيف يتحقق مستخدمو API؟</h2><ol><li>سجلوا معرّف النموذج المطلوب حرفياً، ونقطة نهاية المزود، ووقت الطلب.</li><li>افحصوا بيانات الاستجابة الوصفية. يعرّف <a href=\"https://developers.openai.com/api/reference/resources/responses/methods/create\">مرجع Responses API</a> الحقل <code>model</code> بأنه معرّف النموذج الذي أنشأ الاستجابة. احفظوه مع معرّف الطلب وبيانات الاستخدام.</li><li>قارنوا المعرّف المطلوب والعائد بوثائق المزود الحالية. قد تختلف الأسماء المستعارة واللقطات الثابتة؛ ويستحق الاختلاف التحقيق لكنه لا يثبت نموذجاً مخفياً.</li><li>إذا خالفت الاستجابة الوثائق، تواصلوا مع المزود مع معرّف الطلب ووقته. احذفوا بيانات الاعتماد والمدخلات الحساسة قبل مشاركة السجلات.</li></ol><p>يتحقق ذلك من المعرّف الذي أبلغت به API لهذه الاستجابة. لكنه لا يدقق البنية التحتية مستقلاً ولا يثبت النموذج المستخدم في محادثة ChatGPT منفصلة.</p><h2>ماذا يستطيع مستخدمو ChatGPT التحقق منه؟</h2><p>افحصوا اسم النموذج أو مستوى التفكير الظاهر والخطة وإعدادات مساحة العمل. يوضح <a href=\"https://help.openai.com/en/articles/20001354-gpt-6-and-other-models-in-chatgpt\">دليل توفر النماذج من OpenAI</a> أن الخيارات تختلف بحسب الخطة ومساحة العمل. يخبر الاختيار الظاهر بما تعرضه الواجهة، لكنه لا يثبت نموذجاً خلفياً لم يُعلن. كما أن وصف النموذج لنفسه ليس تحققاً مستقلاً.</p><h2>هل يثبت اختبار التعليمات التوجيه؟</h2><p>لا. السؤال عن موضوع حديث أو اسم النموذج أو مقارنة صورة واحدة لا ينتج إلا حكاية، وليس معرّفاً. قد تأتي المعرفة من السياق أو الأدوات وقد تكون الإجابات خاطئة. تشير OpenAI إلى أن <a href=\"https://help.openai.com/en/articles/8313428\">ChatGPT قد يقدم معلومات غير صحيحة أو مضللة</a>. وحتى الإجابة الصحيحة دون بحث ليست بصمة للنموذج.</p><h2>كيف تتعامل الفرق مع الشائعة؟</h2><p>أبقوا إعدادات الإنتاج والميزانيات مرتبطة بنماذج موثقة. للمقارنة المنضبطة، سجلوا التعليمات ومعرّفات النماذج والإعدادات والتواريخ والنتائج وزمن الاستجابة والتكلفة، واختبروا مهام تمثيلية متعددة. حدّثوا السجل إذا نشرت OpenAI بطاقة نموذج أو إعلان إتاحة. راجعوا <a href=\"/research/gpt-6-2-release-date-pricing\">دليل حالة GPT-6.2 وأسعاره</a>.</p><h2>قراءات ذات صلة</h2><ul><li><a href=\"/research/model-routing\">توجيه النماذج</a></li><li><a href=\"/research/llm-api-pricing-tracker\">متابعة أسعار واجهات LLM</a></li></ul>",
+      "faq": [
+        {
+          "question": "هل تثبت تجربة جيدة أن GPT-6.2 Sol يعمل؟",
+          "answer": "لا. جودة الناتج لا تحدد النموذج الذي أنشأه بصورة فريدة."
+        },
+        {
+          "question": "هل يثبت حقل model في API توجيه ChatGPT؟",
+          "answer": "لا. إنه يذكر معرّف استجابة API تلك ولا يثبت نموذج محادثة ChatGPT منفصلة."
+        },
+        {
+          "question": "هل يمكن التحقق من الهوية بسؤال النموذج عن اسمه؟",
+          "answer": "لا. وصف النموذج لنفسه ليس دليلاً مستقلاً."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/model-routing",
+          "label": "توجيه النماذج"
+        },
+        {
+          "slug": "/research/llm-api-pricing-tracker",
+          "label": "متابعة أسعار واجهات LLM"
+        }
+      ]
+    },
+    "ru": {
+      "title": "GPT-6.2 Sol уже доступна? Как проверить маршрутизацию",
+      "titleCore": "GPT-6.2 Sol: проверка маршрутизации",
+      "description": "Можно ли определить, был ли запрос направлен в GPT-6.2 Sol? Что показывают ID модели, метаданные API и вирусные тесты.",
+      "body": "<p class=\"lede\">Вирусное утверждение гласит, что некоторых пользователей уже направляют в GPT-6.2 Sol. На 8 ноября 2026 года OpenAI публично не объявляла эту модель, и мы не можем подтвердить утверждение. Ответ на вопрос-викторину или эффектная демонстрация не определяют модель, обработавшую запрос.</p><h2>В чём состоит утверждение?</h2><p>Видеозаголовок спрашивает, появилась ли GPT-6.2 Sol и как проверить маршрутизацию. В публикациях также приводят впечатляющие изображения и ответы на вопросы как признаки. Однако результат зависит от запроса, инструментов, контекста, настроек и обычной вариативности модели. Ни один такой результат сам по себе не определяет версию.</p><p>Сообщения о снимках названий моделей в облачном фильтре квот — отдельный сигнал. По описанию <a href=\"https://argolink.io/en/blog/what-is-gpt-6-2-sol\">ArgoLink</a>, они показывают предполагаемые метки, а не успешный запрос или доказательство запуска. Мы не проверяли снимки независимо.</p><h2>Как проверить модель через API?</h2><ol><li>Запишите точный запрошенный ID модели, endpoint поставщика и время запроса.</li><li>Проверьте метаданные ответа. В <a href=\"https://developers.openai.com/api/reference/resources/responses/methods/create\">справочнике Responses API</a> поле <code>model</code> описано как ID модели, создавшей ответ. Сохраните его вместе с ID запроса и данными об использовании.</li><li>Сравните запрошенный и возвращённый ID с текущей документацией поставщика. Алиасы и снимки версий могут различаться; несоответствие нужно расследовать, но оно автоматически не доказывает скрытый выпуск.</li><li>Если ответ противоречит документации, обратитесь к поставщику с ID и временем. Удалите ключи доступа и конфиденциальный ввод перед отправкой журналов.</li></ol><p>Так можно проверить ID, который API указывает для данного ответа. Это не независимый аудит инфраструктуры и не доказательство модели в отдельном диалоге ChatGPT.</p><h2>Что проверить пользователям ChatGPT?</h2><p>Посмотрите на модель или уровень рассуждений в интерфейсе, план и настройки рабочего пространства. <a href=\"https://help.openai.com/en/articles/20001354-gpt-6-and-other-models-in-chatgpt\">Справка OpenAI о доступности</a> объясняет, что варианты зависят от плана и пространства. Видимый выбор показывает интерфейс, но сам по себе не доказывает необъявленную серверную модель. Самоописание модели также не является независимой проверкой.</p><h2>Доказывает ли тестовый запрос маршрутизацию?</h2><p>Нет. Вопрос о недавнем событии или собственном названии модели, как и сравнение одного изображения, даёт лишь наблюдение, а не идентификатор. Знание может идти из контекста или инструментов, а ответы бывают ошибочными. OpenAI отмечает, что <a href=\"https://help.openai.com/en/articles/8313428\">ChatGPT может давать неверные или вводящие в заблуждение ответы</a>. Верный ответ без поиска тоже не является отпечатком модели.</p><h2>Как командам относиться к слухам?</h2><p>Опирайте производственные настройки и бюджет на документированные модели. Для контролируемого сравнения сохраняйте запросы, ID моделей, настройки, даты, результаты, задержку и стоимость; проверяйте несколько типичных задач. Обновите материалы, когда OpenAI выпустит карточку модели или объявление. См. <a href=\"/research/gpt-6-2-release-date-pricing\">руководство по статусу и цене GPT-6.2</a>.</p><h2>По теме</h2><ul><li><a href=\"/research/model-routing\">Маршрутизация моделей</a></li><li><a href=\"/research/llm-api-pricing-tracker\">Трекер цен API для LLM</a></li></ul>",
+      "faq": [
+        {
+          "question": "Доказывает ли хорошая демонстрация, что работает GPT-6.2 Sol?",
+          "answer": "Нет. По качеству результата нельзя однозначно определить модель, которая его создала."
+        },
+        {
+          "question": "Подтверждает ли поле model в API маршрутизацию ChatGPT?",
+          "answer": "Нет. Оно указывает ID этого ответа API, а не модель отдельного разговора ChatGPT."
+        },
+        {
+          "question": "Можно ли проверить модель, спросив её имя?",
+          "answer": "Нет. Сгенерированное самоописание не является независимым доказательством."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/model-routing",
+          "label": "Маршрутизация моделей"
+        },
+        {
+          "slug": "/research/llm-api-pricing-tracker",
+          "label": "Трекер цен API для LLM"
+        }
+      ]
+    },
+    "tr": {
+      "title": "GPT-6.2 Sol şimdiden burada mı? Nasıl kontrol edilir",
+      "titleCore": "GPT-6.2 Sol şimdiden burada mı? Nasıl kontrol edilir",
+      "description": "Bir isteğin GPT-6.2 Sol’a yönlendirildiği anlaşılabilir mi? Model etiketlerinin, API yanıt üstverisinin ve viral testlerin ne gösterdiğini öğrenin.",
+      "body": "<p class=\"lede\">Viral bir iddiaya göre bazı kullanıcıların istekleri şimdiden GPT-6.2 Sol’a yönlendiriliyor. 8 Kasım 2026 itibarıyla OpenAI bu modeli kamuya duyurmadı ve iddiayı doğrulayamıyoruz. Bir modelin genel kültür sorusuna yanıtı veya tek seferde üretilen çarpıcı bir demo, isteği karşılayan modeli tanımlamaz.</p><h2>İddia ne?</h2><p>Videonun başlığı GPT-6.2 Sol’un şimdiden kullanılıp kullanılmadığını ve yönlendirmenin nasıl sınanacağını soruyor. Çevrimiçi paylaşımlar, etkileyici görselleri ve bir bilgi sorusunun yanıtını ipucu olarak gösteriyor. Bu gözlemler ilginç olabilir; ancak sonuç isteme, araçlara, bağlama, ayarlara ve olağan model değişkenliğine göre farklılaşabilir. Hiçbiri model sürümünü tek başına belirlemez.</p><p>Bulut kota filtrelerinde model adlarının göründüğü bildirilen ekran görüntüleri ayrı bir işarettir. <a href=\"https://argolink.io/en/blog/what-is-gpt-6-2-sol\">ArgoLink’in</a> aktardığı üzere bunlar iddia edilen etiketleri gösterir; başarılı bir isteği veya yayına alımı kanıtlamaz. Görüntüleri bağımsız doğrulamadık.</p><h2>API kullanıcıları modeli nasıl kontrol edebilir?</h2><ol><li>İstenen model kimliğini, sağlayıcı uç noktasını ve istek zamanını kaydedin.</li><li>Dönen yanıtın üstverisini inceleyin. OpenAI’ın <a href=\"https://developers.openai.com/api/reference/resources/responses/methods/create\">Responses API başvurusu</a>, yanıttaki <code>model</code> alanını yanıtı oluşturan model kimliği olarak tanımlar. Bu alanı istek kimliği ve kullanım verileriyle saklayın.</li><li>İstenen ve dönen kimlikleri sağlayıcının güncel belgeleriyle karşılaştırın. Takma adlar ve anlık görüntü kimlikleri farklı olabilir; uyuşmazlık araştırılmalıdır, ancak tek başına gizli bir sürümün kanıtı sayılmamalıdır.</li><li>Yanıt belgelenmiş davranışla çelişiyorsa istek kimliği ve zaman damgasıyla sağlayıcıya başvurun. Günlük paylaşmadan önce kimlik bilgilerini ve hassas girdileri çıkarın.</li></ol><p>Bu yöntem API’nin ilgili yanıt için bildirdiği kimliği kontrol eder. Altyapıyı bağımsız olarak denetlemez veya ayrı bir ChatGPT görüşmesinde kullanılan modeli kanıtlamaz.</p><h2>ChatGPT kullanıcıları neyi kontrol edebilir?</h2><p>Arayüzde gösterilen model veya düşünme seçeneğini, planınızı ve çalışma alanı denetimlerini kontrol edin. OpenAI’ın <a href=\"https://help.openai.com/en/articles/20001354-gpt-6-and-other-models-in-chatgpt\">model erişilebilirliği rehberi</a>, seçeneklerin plan ve çalışma alanına göre değiştiğini açıklar. Görünür seçim arayüzün ne sunduğunu gösterir; duyurulmamış bir arka uç modeli kendi başına kanıtlamaz. Modelin kendi kimlik beyanını bağımsız doğrulama olarak kullanmayın.</p><h2>Bir istem testi yönlendirmeyi kanıtlar mı?</h2><p>Hayır. Modelin yeni bir konuyu bilip bilmediğini sormak, adını söylemesini istemek veya tek bir sahneyi karşılaştırmak ilginç anekdotlar sağlayabilir; ancak hiçbiri model kimliğini belirlemez. Bilgi bağlamdan veya araçlardan gelebilir; yanıtlar da yanlış olabilir. OpenAI, <a href=\"https://help.openai.com/en/articles/8313428\">ChatGPT’nin hatalı veya yanıltıcı yanıtlar verebileceğini</a> belirtir. Web araması kapalıyken doğru yanıt vermesi bile model parmak izi değildir.</p><h2>Ekipler bu söylenti karşısında ne yapmalı?</h2><p>Üretim ayarlarını ve bütçeleri belgelenmiş modellere dayandırın. Kontrollü karşılaştırma için istemleri, model kimliklerini, ayarları, tarihleri, görev sonuçlarını, gecikmeyi ve maliyeti kaydedin; tek bir etkileyici çıktı yerine temsili çok sayıda görev çalıştırın. OpenAI model kartı veya dağıtım duyurusu yayımlarsa kayıtları güncelleyin. Mevcut kanıtlar için <a href=\"/research/gpt-6-2-release-date-pricing\">GPT-6.2 durum ve fiyat rehberimize</a> bakın.</p><h2>İlgili araştırmalar</h2><ul><li><a href=\"/research/model-routing\">Model yönlendirme</a></li><li><a href=\"/research/llm-api-pricing-tracker\">LLM API fiyat izleyicisi</a></li></ul>",
+      "faq": [
+        {
+          "question": "İyi bir kara delik demosu GPT-6.2 Sol’un çalıştığını kanıtlar mı?",
+          "answer": "Hayır. Çıktı kalitesi, onu hangi modelin ürettiğini tek başına belirleyemez."
+        },
+        {
+          "question": "API’deki model alanı ChatGPT yönlendirmesini doğrular mı?",
+          "answer": "Hayır. Bu alan ilgili API yanıtı için bildirilen model kimliğini verir; ayrı bir ChatGPT görüşmesinde hangi modelin çalıştığını göstermez."
+        },
+        {
+          "question": "Modele adını sormak kimliğini doğrular mı?",
+          "answer": "Hayır. Modelin kendi ürettiği kimlik açıklaması, isteği karşılayan modeli bağımsız olarak kanıtlamaz."
+        }
+      ]
+    },
+    "pl": {
+      "title": "Czy GPT-6.2 Sol już działa? Jak to sprawdzić",
+      "titleCore": "Czy GPT-6.2 Sol już działa? Jak to sprawdzić",
+      "description": "Czy da się ustalić, że żądanie trafiło do GPT-6.2 Sol? Sprawdź, co naprawdę pokazują etykiety modeli, metadane API i testy wiralowe.",
+      "body": "<p class=\"lede\">Wiralowe twierdzenie głosi, że niektórzy użytkownicy są już kierowani do GPT-6.2 Sol. Na 8 listopada 2026 r. OpenAI nie ogłosiło tego modelu, a my nie możemy potwierdzić tej tezy. Odpowiedź modelu na pytanie z wiedzy ogólnej ani efektowne demo stworzone za jednym podejściem nie wskazują, który model obsłużył żądanie.</p><h2>Na czym polega twierdzenie?</h2><p>Tytuł filmu pyta, czy GPT-6.2 Sol jest już dostępny i jak sprawdzić routing. Doniesienia internetowe wskazują też imponujące wygenerowane grafiki i odpowiedź na pytanie jako wskazówki. Takie obserwacje mogą być ciekawe, ale wynik zależy od promptu, narzędzi, kontekstu, ustawień i zwykłej zmienności modelu. Żadna z tych rzeczy nie identyfikuje jednoznacznie wersji modelu.</p><p>Zrzuty ekranu, na których w filtrze limitów chmurowych miały pojawić się nazwy modeli, stanowią osobny sygnał. Jak opisuje <a href=\"https://argolink.io/en/blog/what-is-gpt-6-2-sol\">ArgoLink</a>, pokazują rzekome etykiety, a nie udane żądanie ani dowód wdrożenia. Nie zweryfikowaliśmy tych zrzutów niezależnie.</p><h2>Jak użytkownicy API mogą sprawdzić model?</h2><ol><li>Zapisz dokładny identyfikator żądanego modelu, adres endpointu dostawcy i czas żądania.</li><li>Sprawdź metadane otrzymanej odpowiedzi. Dokumentacja <a href=\"https://developers.openai.com/api/reference/resources/responses/methods/create\">OpenAI Responses API</a> opisuje pole <code>model</code> jako identyfikator modelu, który wygenerował odpowiedź. Zapisuj je razem z identyfikatorem żądania i danymi o użyciu.</li><li>Porównaj identyfikator żądany i zwrócony z aktualną dokumentacją dostawcy. Alias i migawka modelu mogą się różnić; rozbieżność wymaga sprawdzenia, ale sama w sobie nie dowodzi ukrytej premiery.</li><li>Jeśli odpowiedź nie zgadza się z dokumentacją, skontaktuj się z dostawcą, podając identyfikator żądania i znacznik czasu. Przed wysłaniem logów usuń dane uwierzytelniające i wrażliwe dane wejściowe.</li></ol><p>Ta metoda sprawdza identyfikator zgłoszony przez API dla danej odpowiedzi. Nie audytuje niezależnie infrastruktury ani nie dowodzi, jaki model obsłużył osobną rozmowę w ChatGPT.</p><h2>Co mogą sprawdzić użytkownicy ChatGPT?</h2><p>Sprawdź model lub poziom myślenia pokazany w interfejsie, swój plan i ustawienia przestrzeni roboczej. <a href=\"https://help.openai.com/en/articles/20001354-gpt-6-and-other-models-in-chatgpt\">Przewodnik OpenAI o dostępności modeli</a> wyjaśnia, że opcje zależą od planu i obszaru roboczego. Widoczny wybór pokazuje ofertę interfejsu; sam nie potwierdza nieogłoszonego modelu zaplecza. Nie traktuj samoopisu modelu jako niezależnej weryfikacji.</p><h2>Czy test promptem dowodzi routingu?</h2><p>Nie. Pytanie o nowy temat, prośba o podanie własnej nazwy albo porównanie jednej wygenerowanej sceny mogą dać interesujące anegdoty, ale nie ustalają identyfikatora modelu. Wiedza może pochodzić z kontekstu lub narzędzi, a odpowiedzi bywają błędne. OpenAI zauważa, że <a href=\"https://help.openai.com/en/articles/8313428\">ChatGPT może udzielać nieprawidłowych lub mylących odpowiedzi</a>. Nawet poprawna odpowiedź przy wyłączonym wyszukiwaniu nie jest odciskiem modelu.</p><h2>Co zespoły powinny zrobić z tą plotką?</h2><p>Opieraj ustawienia produkcyjne i budżety na udokumentowanych modelach. W kontrolowanym porównaniu zapisuj prompty, identyfikatory modeli, ustawienia, daty, wyniki zadań, opóźnienie i koszt. Uruchamiaj wiele reprezentatywnych zadań zamiast wybierać pojedynczy efektowny wynik. Zaktualizuj rejestr, gdy OpenAI opublikuje kartę modelu lub komunikat o wdrożeniu. Bieżące dowody omawia nasz <a href=\"/research/gpt-6-2-release-date-pricing\">przewodnik o statusie i cenie GPT-6.2</a>.</p><h2>Powiązane materiały</h2><ul><li><a href=\"/research/model-routing\">Routing modeli</a></li><li><a href=\"/research/llm-api-pricing-tracker\">Monitor cen API LLM</a></li></ul>",
+      "faq": [
+        {
+          "question": "Czy dobre demo czarnej dziury dowodzi, że działa GPT-6.2 Sol?",
+          "answer": "Nie. Jakość wyniku nie pozwala jednoznacznie ustalić, który model go wygenerował."
+        },
+        {
+          "question": "Czy pole model w API weryfikuje routing w ChatGPT?",
+          "answer": "Nie. Zawiera identyfikator modelu zgłoszony dla danej odpowiedzi API; nie wskazuje modelu obsługującego osobną rozmowę w ChatGPT."
+        },
+        {
+          "question": "Czy pytanie modelu o jego nazwę weryfikuje tożsamość?",
+          "answer": "Nie. Samoopis wygenerowany przez model nie stanowi niezależnego dowodu na tożsamość modelu obsługującego żądanie."
+        }
+      ]
+    },
+    "id": {
+      "title": "Apakah GPT-6.2 Sol sudah tersedia? Cara memeriksanya",
+      "titleCore": "Apakah GPT-6.2 Sol sudah tersedia? Cara memeriksanya",
+      "description": "Bisakah kita mengetahui permintaan dialihkan ke GPT-6.2 Sol? Pelajari arti label model, metadata respons API, dan tes viral.",
+      "body": "<p class=\"lede\">Klaim yang viral menyebut sebagian pengguna sudah diarahkan ke GPT-6.2 Sol. Per 8 November 2026, OpenAI belum mengumumkan model tersebut dan kami belum dapat memverifikasi klaim itu. Jawaban model atas pertanyaan pengetahuan umum maupun demo satu kali yang mengesankan tidak mengidentifikasi model yang melayani permintaan.</p><h2>Apa klaimnya?</h2><p>Judul video mempertanyakan apakah GPT-6.2 Sol sudah hadir dan bagaimana menguji peruteannya. Laporan daring juga menunjuk visual yang dihasilkan dengan baik dan jawaban atas pertanyaan pengetahuan sebagai petunjuk. Pengamatan ini mungkin menarik, tetapi hasil bisa berubah karena prompt, alat, konteks, pengaturan, dan variasi model biasa. Tidak satu pun memastikan versi model secara unik.</p><p>Tangkapan layar yang dilaporkan menampilkan nama model pada filter kuota cloud merupakan sinyal terpisah. Seperti dijelaskan <a href=\"https://argolink.io/en/blog/what-is-gpt-6-2-sol\">ArgoLink</a>, gambar tersebut menunjukkan label yang diklaim ada, bukan permintaan yang berhasil atau bukti peluncuran. Kami belum memverifikasi gambar-gambar itu secara independen.</p><h2>Bagaimana pengguna API memeriksa model?</h2><ol><li>Catat ID model yang diminta secara persis, endpoint penyedia, dan waktu permintaan.</li><li>Periksa metadata respons yang dikembalikan. Dokumentasi <a href=\"https://developers.openai.com/api/reference/resources/responses/methods/create\">Responses API OpenAI</a> menjelaskan bahwa kolom <code>model</code> berisi ID model yang menghasilkan respons. Simpan kolom tersebut bersama ID permintaan dan data penggunaan.</li><li>Bandingkan ID yang diminta dan dikembalikan dengan dokumentasi penyedia terbaru. Alias dan snapshot dapat berbeda; ketidakcocokan perlu diselidiki, tetapi tidak otomatis membuktikan ada rilis tersembunyi.</li><li>Jika respons bertentangan dengan perilaku yang didokumentasikan, hubungi penyedia dengan ID permintaan dan cap waktu. Hapus kredensial serta masukan sensitif sebelum membagikan log.</li></ol><p>Cara ini memeriksa identitas yang dilaporkan API untuk respons tersebut. Cara ini tidak mengaudit infrastruktur secara independen dan tidak membuktikan model yang melayani percakapan ChatGPT terpisah.</p><h2>Apa yang dapat diperiksa pengguna ChatGPT?</h2><p>Periksa model atau tingkat berpikir yang terlihat di antarmuka, paket akun, dan kontrol ruang kerja. <a href=\"https://help.openai.com/en/articles/20001354-gpt-6-and-other-models-in-chatgpt\">Panduan ketersediaan model OpenAI</a> menjelaskan bahwa opsi berbeda menurut paket dan ruang kerja. Pilihan yang terlihat menunjukkan apa yang disajikan antarmuka; itu sendiri tidak membuktikan model backend yang belum diumumkan. Jangan mengandalkan pengakuan model tentang identitasnya sebagai verifikasi independen.</p><h2>Apakah tes prompt membuktikan perutean?</h2><p>Tidak. Menanyakan apakah model mengetahui topik baru, meminta model menyebut namanya, atau membandingkan satu adegan yang dihasilkan dapat memberi anekdot menarik, tetapi tidak menetapkan ID model. Pengetahuan dapat berasal dari konteks atau alat; jawaban juga bisa keliru. OpenAI menyatakan bahwa <a href=\"https://help.openai.com/en/articles/8313428\">ChatGPT dapat menghasilkan jawaban yang salah atau menyesatkan</a>. Jawaban benar tanpa penelusuran web pun bukan sidik jari model.</p><h2>Apa yang sebaiknya dilakukan tim terhadap rumor ini?</h2><p>Dasarkan pengaturan produksi dan anggaran pada model yang terdokumentasi. Untuk perbandingan terkontrol, simpan prompt, ID model, pengaturan, tanggal, hasil tugas, latensi, dan biaya; jalankan banyak tugas yang mewakili penggunaan nyata, bukan memilih satu keluaran yang mengesankan. Perbarui catatan jika OpenAI menerbitkan kartu model atau pengumuman peluncuran. Lihat <a href=\"/research/gpt-6-2-release-date-pricing\">panduan status dan harga GPT-6.2</a> untuk bukti terbaru.</p><h2>Riset terkait</h2><ul><li><a href=\"/research/model-routing\">Perutean model</a></li><li><a href=\"/research/llm-api-pricing-tracker\">Pelacak harga API LLM</a></li></ul>",
+      "faq": [
+        {
+          "question": "Apakah demo lubang hitam yang bagus membuktikan GPT-6.2 Sol sedang digunakan?",
+          "answer": "Tidak. Kualitas keluaran tidak dapat mengidentifikasi secara unik model yang menghasilkannya."
+        },
+        {
+          "question": "Apakah kolom model API memverifikasi perutean ChatGPT?",
+          "answer": "Tidak. Kolom itu melaporkan ID model untuk respons API tersebut; kolom itu tidak menunjukkan model yang melayani percakapan ChatGPT terpisah."
+        },
+        {
+          "question": "Apakah menanyakan nama model dapat memverifikasi identitasnya?",
+          "answer": "Tidak. Deskripsi identitas yang dihasilkan model bukan bukti independen mengenai model yang melayani permintaan."
+        }
+      ]
+    },
+    "vi": {
+      "title": "GPT-6.2 Sol đã có chưa? Cách kiểm tra",
+      "titleCore": "GPT-6.2 Sol đã có chưa? Cách kiểm tra",
+      "description": "Có thể biết yêu cầu đã được định tuyến tới GPT-6.2 Sol không? Tìm hiểu ý nghĩa của nhãn mô hình, metadata API và các thử nghiệm lan truyền.",
+      "body": "<p class=\"lede\">Một tuyên bố lan truyền cho rằng một số người dùng đã được chuyển sang GPT-6.2 Sol. Tính đến ngày 8 tháng 11 năm 2026, OpenAI chưa công bố mô hình này và chúng tôi chưa thể xác minh tuyên bố đó. Câu trả lời cho câu hỏi kiến thức hay một bản demo ấn tượng tạo trong một lần không cho biết mô hình nào đã xử lý yêu cầu.</p><h2>Tuyên bố này là gì?</h2><p>Tiêu đề video hỏi GPT-6.2 Sol đã xuất hiện chưa và cách kiểm tra việc định tuyến. Các bài đăng trực tuyến còn nêu hình ảnh được tạo ấn tượng và câu trả lời cho một câu hỏi kiến thức như dấu hiệu. Những quan sát này có thể đáng chú ý, nhưng kết quả có thể thay đổi theo prompt, công cụ, ngữ cảnh, cài đặt và biến thiên thông thường của mô hình. Không điều nào xác định duy nhất phiên bản mô hình.</p><p>Ảnh chụp màn hình được cho là hiển thị tên mô hình trong bộ lọc hạn mức đám mây là một tín hiệu riêng. Theo mô tả của <a href=\"https://argolink.io/en/blog/what-is-gpt-6-2-sol\">ArgoLink</a>, chúng cho thấy nhãn được cho là có tồn tại, chứ không chứng minh một yêu cầu đã thành công hoặc mô hình đã được triển khai. Chúng tôi chưa tự xác minh độc lập các ảnh này.</p><h2>Người dùng API kiểm tra mô hình thế nào?</h2><ol><li>Ghi lại chính xác ID mô hình đã yêu cầu, endpoint của nhà cung cấp và thời điểm gửi yêu cầu.</li><li>Kiểm tra metadata trong phản hồi nhận được. Tài liệu <a href=\"https://developers.openai.com/api/reference/resources/responses/methods/create\">Responses API của OpenAI</a> mô tả trường <code>model</code> là ID mô hình đã tạo phản hồi. Lưu trường này cùng ID yêu cầu và dữ liệu sử dụng.</li><li>So sánh ID đã yêu cầu và ID được trả về với tài liệu hiện hành của nhà cung cấp. Bí danh và ảnh chụp phiên bản có thể khác nhau; cần điều tra sự không khớp, nhưng không tự động kết luận đó là bản phát hành bí mật.</li><li>Nếu phản hồi không phù hợp tài liệu, hãy liên hệ nhà cung cấp bằng ID yêu cầu và dấu thời gian. Xóa thông tin xác thực và dữ liệu đầu vào nhạy cảm trước khi chia sẻ nhật ký.</li></ol><p>Cách này kiểm tra định danh mà API báo cho phản hồi đó. Nó không kiểm toán độc lập hạ tầng và không chứng minh mô hình nào đã xử lý một cuộc trò chuyện ChatGPT riêng biệt.</p><h2>Người dùng ChatGPT có thể kiểm tra điều gì?</h2><p>Kiểm tra mô hình hoặc mức độ suy nghĩ hiển thị trên giao diện, gói của bạn và các thiết lập không gian làm việc. <a href=\"https://help.openai.com/en/articles/20001354-gpt-6-and-other-models-in-chatgpt\">Hướng dẫn về khả năng truy cập mô hình của OpenAI</a> giải thích rằng các lựa chọn tùy thuộc gói và không gian làm việc. Lựa chọn hiển thị cho biết giao diện đang cung cấp gì; tự nó không chứng minh một mô hình backend chưa được công bố. Đừng xem phần tự giới thiệu của mô hình là xác minh độc lập.</p><h2>Thử nghiệm bằng prompt có chứng minh được định tuyến không?</h2><p>Không. Hỏi mô hình về một chủ đề mới, yêu cầu nó nêu tên, hoặc so sánh một cảnh được tạo có thể tạo ra giai thoại thú vị, nhưng không xác định ID mô hình. Kiến thức có thể đến từ ngữ cảnh hoặc công cụ; câu trả lời cũng có thể sai. OpenAI lưu ý rằng <a href=\"https://help.openai.com/en/articles/8313428\">ChatGPT có thể đưa ra thông tin không chính xác hoặc gây hiểu lầm</a>. Ngay cả khi tắt tìm kiếm web, một câu trả lời đúng cũng không phải dấu vân tay của mô hình.</p><h2>Các nhóm nên làm gì với tin đồn?</h2><p>Dựa cấu hình sản xuất và ngân sách trên các mô hình có tài liệu xác nhận. Khi so sánh có kiểm soát, hãy lưu prompt, ID mô hình, cài đặt, ngày, kết quả nhiệm vụ, độ trễ và chi phí; chạy nhiều nhiệm vụ đại diện thay vì chọn một kết quả nổi bật. Cập nhật hồ sơ nếu OpenAI công bố thẻ mô hình hoặc thông báo triển khai. Xem <a href=\"/research/gpt-6-2-release-date-pricing\">hướng dẫn về tình trạng và giá GPT-6.2</a> để biết bằng chứng hiện có.</p><h2>Nghiên cứu liên quan</h2><ul><li><a href=\"/research/model-routing\">Định tuyến mô hình</a></li><li><a href=\"/research/llm-api-pricing-tracker\">Theo dõi giá API LLM</a></li></ul>",
+      "faq": [
+        {
+          "question": "Demo hố đen đẹp có chứng minh GPT-6.2 Sol đang chạy không?",
+          "answer": "Không. Chất lượng đầu ra không thể xác định duy nhất mô hình đã tạo ra nó."
+        },
+        {
+          "question": "Trường model trong API có xác minh định tuyến ChatGPT không?",
+          "answer": "Không. Trường này báo ID mô hình cho phản hồi API đó; không cho biết mô hình nào xử lý một cuộc trò chuyện ChatGPT khác."
+        },
+        {
+          "question": "Hỏi tên mô hình có xác minh danh tính của nó không?",
+          "answer": "Không. Phần tự mô tả do mô hình tạo ra không phải bằng chứng độc lập về mô hình đang xử lý yêu cầu."
         }
       ]
     }
