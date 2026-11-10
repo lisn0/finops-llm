@@ -1,0 +1,51 @@
+{
+  "slug": "research/antigravity-carbon-swarm-cost",
+  "image": "https://finopsllm.com/og.png",
+  "tags": [
+    "coding-agents",
+    "llm-pricing",
+    "agent-spend"
+  ],
+  "datePublished": "2026-11-10",
+  "dateModified": "2026-11-10",
+  "languages": {
+    "en": {
+      "title": "Gemini 4 Carbon in Antigravity: Swarm Cost and Quota",
+      "titleCore": "Gemini 4 Carbon in Antigravity: what does /swarm cost?",
+      "description": "Check Carbon and /swarm access in Antigravity, then use a five-agent cost breakdown to budget quota, retries and accepted patches.",
+      "body": "<p class=\"lede\">Gemini 4 Carbon is available in Antigravity on Google AI Ultra and eligible Enterprise plans. The <code>/swarm</code> preview lets agents work in parallel, so each active worker adds usage. In the five-agent example below, Standard API rates value the token usage at $2.28 from December 1, versus $0.76 for a single agent.</p>\n\n<h2>Which Antigravity plans get Carbon and /swarm?</h2>\n<div style=\"overflow-x:auto\"><table><thead><tr><th scope=\"col\">Access route</th><th scope=\"col\">Gemini 4 Carbon</th><th scope=\"col\">/swarm</th></tr></thead><tbody><tr><th scope=\"row\">Google AI Free / Plus</th><td>Unavailable in the model picker</td><td>Unavailable</td></tr><tr><th scope=\"row\">Google AI Pro</th><td>Unavailable. Argon is available on eligible Pro plans.</td><td>Preview in Antigravity App and CLI</td></tr><tr><th scope=\"row\">Google AI Ultra</th><td>App, CLI and IDE extensions</td><td>Preview in Antigravity App and CLI</td></tr><tr><th scope=\"row\">Eligible Gemini Enterprise</th><td>Available according to the model matrix</td><td>Check rollout for your workspace</td></tr></tbody></table></div>\n<p>Carbon and <code>/swarm</code> have separate eligibility. The <a href=\"https://antigravity.google/docs/models\">model picker documentation</a> lists Carbon for Ultra and Enterprise, while the <a href=\"https://antigravity.google/docs/swarm/\">swarm guide</a> explicitly lists Pro and Ultra for the App and CLI. Access checked November 10, 2026. Within a swarm, you can pin a model to a role. Google describes using Carbon on coordination or difficult verification and lighter models on implementation. Workers can use isolated Git worktrees and coordinate through a shared board. <a href=\"https://antigravity.google/blog/gemini-4-carbon-in-google-antigravity\">Antigravity launch announcement</a>.</p>\n\n<h2>Where does the extra token spend come from?</h2>\n<figure style=\"margin:24px 0;padding:18px;background:#101726;color:#edf2fa;border:1px solid #2c3c56;border-radius:12px\"><figcaption style=\"font-weight:700;font-size:18px;margin-bottom:14px\">December Standard API equivalent for one job</figcaption><div style=\"margin:12px 0\"><div style=\"display:flex;justify-content:space-between;gap:12px\"><span>Single Carbon agent</span><strong>$0.76</strong></div><div aria-hidden=\"true\" style=\"height:8px;background:#29364c;border-radius:4px;margin-top:4px\"><div style=\"height:8px;width:33.3%;background:#9ab7ff;border-radius:4px\"></div></div></div><div style=\"margin:12px 0\"><div style=\"display:flex;justify-content:space-between;gap:12px\"><span>Swarm coordinator · Carbon</span><strong>$0.76</strong></div><div aria-hidden=\"true\" style=\"height:8px;background:#29364c;border-radius:4px;margin-top:4px\"><div style=\"height:8px;width:33.3%;background:#69e5c3;border-radius:4px\"></div></div></div><div style=\"margin:12px 0\"><div style=\"display:flex;justify-content:space-between;gap:12px\"><span>Swarm implementation · 3 × Argon</span><strong>$1.14</strong></div><div aria-hidden=\"true\" style=\"height:8px;background:#29364c;border-radius:4px;margin-top:4px\"><div style=\"height:8px;width:50.0%;background:#f3af76;border-radius:4px\"></div></div></div><div style=\"margin:12px 0\"><div style=\"display:flex;justify-content:space-between;gap:12px\"><span>Swarm verifier · Carbon</span><strong>$0.38</strong></div><div aria-hidden=\"true\" style=\"height:8px;background:#29364c;border-radius:4px;margin-top:4px\"><div style=\"height:8px;width:16.7%;background:#69e5c3;border-radius:4px\"></div></div></div><div style=\"margin:12px 0\"><div style=\"display:flex;justify-content:space-between;gap:12px\"><span>Swarm total</span><strong>$2.28</strong></div><div aria-hidden=\"true\" style=\"height:8px;background:#29364c;border-radius:4px;margin-top:4px\"><div style=\"height:8px;width:100.0%;background:#9ab7ff;border-radius:4px\"></div></div></div><p style=\"margin:14px 0 0;color:#bdc9db;font-size:14px\">Illustrative token usage. Subscription quota and overage credits have their own terms.</p></figure>\n<p>The single agent and the swarm coordinator each use an assumed 80,000 uncached input, 200,000 cached input and 20,000 output tokens. Each of the three workers and the verifier uses half that mix. That makes the swarm total 240,000 uncached input, 600,000 cached input and 60,000 output tokens. All output figures include billed thinking.</p>\n<p>Carbon and Argon have identical public Standard rates: from December 1, $4 per million uncached input, $0.20 per million implicit cache hits and $20 per million output. At those rates the coordinator costs $0.32 + $0.04 + $0.40 = $0.76. The example totals $2.28 for the swarm and $0.76 for one agent. Through November 30 those estimates are $1.14 and $0.38. Cache hits are assumed separately for each agent. The estimates exclude tool fees, retries and human review. <a href=\"https://aistudio.google.com/docs/pricing#gemini-4-carbon\">Google Gemini API pricing</a>.</p>\n<p>Moving a worker from Carbon to Argon reduces the bill when Argon finishes that role using a cheaper token mix. The listed rates are identical. The quota cost of an idle worker also differs from the cost of an active worker: Google describes idle waits as zero-token and warns that parallel execution burns through quota faster than standard chat. <a href=\"https://antigravity.google/blog/gemini-4-carbon-in-google-antigravity\">Antigravity swarm details</a>.</p>\n\n<h2>How many more patches does the swarm need to get accepted?</h2>\n<p>With a threefold spend per attempt, the swarm needs three times the single agent’s acceptance rate to break even on tokens. If a single agent clears 25% of comparable hard jobs, a $0.76 attempt averages $3.04 per accepted patch. A $2.28 swarm attempt needs a 75% acceptance rate to match it. Both rates are hypothetical. At higher baseline acceptance rates, saved review time or earlier completion can be the deciding factor.</p>\n\n<h2>What should you record in an Antigravity pilot?</h2>\n<ol><li>Pick issues with independent work that can actually run in parallel. For each issue, run a single agent and a swarm from the same clean baseline and apply the same tests and review criteria.</li><li>Record coordinator, worker and verifier models, effort, active run time, retries and which patches you accept. Where metered token data is available, capture input, cache hits and output per role. Keep manual review time and elapsed time for the whole issue.</li><li>Check the usage panel before and after each run and record any purchased credits consumed. On the consumer plans, credits can cover overages, depending on the <em>AI Credit Overages</em> setting. Use the plan’s reported quota and billing data for actual spend. A public Gemini API estimate can help compare configurations separately. <a href=\"https://antigravity.google/docs/plans\">Antigravity quota and credit rules</a>.</li></ol>",
+      "faq": [
+        {
+          "question": "Can I use Gemini 4 Carbon on Google AI Pro?",
+          "answer": "Google’s Antigravity model matrix lists Carbon for Ultra and eligible Enterprise access. Pro supports /swarm preview and can use eligible models such as Argon."
+        },
+        {
+          "question": "Does every agent in /swarm have to use Carbon?",
+          "answer": "No. Antigravity lets you pin models to individual roles. You can start with Argon workers and reserve Carbon for coordination or verification when your plan includes it."
+        },
+        {
+          "question": "Is $2.28 what Google charges for a swarm run?",
+          "answer": "It is an example calculated from stated token volumes and December Standard Gemini API rates. Actual Antigravity cost depends on the account’s entitlement, overage settings and billing route."
+        },
+        {
+          "question": "Where can I see Antigravity usage?",
+          "answer": "Open View Usage in Antigravity or run /usage in the CLI to see quota information. Check purchased credits or enterprise billing records for actual charges."
+        }
+      ],
+      "related": [
+        {
+          "slug": "/research/gemini-4-carbon-vs-claude-fable-5-2",
+          "label": "Carbon vs Fable 5.2 benchmark and pricing"
+        },
+        {
+          "slug": "/research/antigravity-quota-weekly-vs-five-hour-credits",
+          "label": "Antigravity quota and overage credits"
+        },
+        {
+          "slug": "/research/gemini-4-argon-price-doubles-december-1",
+          "label": "Gemini 4 Argon’s December rates"
+        }
+      ]
+    }
+  }
+}
