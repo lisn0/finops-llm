@@ -9,6 +9,7 @@
     "canonical": "https://finopsllm.com/research/hidden-llm-costs",
     "article": {
       "datePublished": "2026-07-12",
+      "dateModified": "2026-11-14",
       "breadcrumb": "Hidden LLM Costs"
     },
     "faq": [
@@ -51,7 +52,7 @@
 
 
 <h1>Hidden LLM Costs</h1>
-<p class="updated" style="color:#6B7689;font-size:14px;margin-top:-6px">Updated 12 July 2026</p>
+<p class="updated" style="color:#6B7689;font-size:14px;margin-top:-6px">Updated 14 November 2026</p>
 <p>LLM spending isn't just per-token pricing. Infrastructure overhead, redundant calls, retry chains, and cache management add significant cost. Many teams track only API tokens but miss 20–50% of their true LLM spend. Learn what to measure.</p>
 
 <ul class="badge-row">
@@ -64,6 +65,22 @@
 <div class="warning">
   <strong>Warning:</strong> If your LLM spend tracking only includes API tokens, you're likely blind to 30–40% of your true cost. This guide helps you find them.
 </div>
+
+<h2>Worked example: what 100,000 successful responses really cost</h2>
+<p>Suppose a support chatbot delivers 100,000 successful responses in one month. The amounts below are illustrative. The model provider's $530 invoice already includes $30 for billed retries and fallback calls.</p>
+<div class="table-wrap">
+<table>
+<thead><tr><th scope="col">Cost component</th><th scope="col">Monthly cost</th><th scope="col">Where to find it</th></tr></thead>
+<tbody>
+<tr><th scope="row">Primary generation</th><td class="number">$500</td><td>Model usage export</td></tr>
+<tr><th scope="row">Billed retries and fallback</th><td class="number">$30</td><td>Model usage joined to request logs</td></tr>
+<tr><th scope="row">Embeddings and vector database</th><td class="number">$70</td><td>Embedding usage and database bill</td></tr>
+<tr><th scope="row">Logging and tracing</th><td class="number">$50</td><td>Observability bill</td></tr>
+<tr><th scope="row">Total</th><td class="number">$650</td><td>Reconciled costs</td></tr>
+</tbody>
+</table>
+</div>
+<p>Divide $650 by 100,000 successful responses to get <strong>$0.0065 per successful response</strong>. The primary-generation estimate alone is $0.005 per response, so it understates this example's monthly cost by $150. If you start with the $530 model invoice, add only the $120 in costs outside that invoice. Use retry tags to explain the $30 inside it.</p>
 
 <h2>1. Vector Database &amp; Embedding Infrastructure</h2>
 
@@ -345,7 +362,7 @@
 
 <div class="guide-section">
   <h3>Step 2: Audit infrastructure</h3>
-  <p>Vector DB, embeddings API, observability, and self-hosted model costs. Add these to a "hidden infra" line item.</p>
+  <p>Collect vector database, embedding API, observability, and self-hosted model costs. Check which charges are already included in the API invoices before adding the rest.</p>
 </div>
 
 <div class="guide-section">
@@ -355,7 +372,7 @@
 
 <div class="guide-section">
   <h3>Step 4: Calculate true cost per successful response</h3>
-  <p>True cost = (API cost + infra cost + waste cost) / successful_responses. This is 20–50% higher than API cost alone.</p>
+  <p>Add the API invoices and any infrastructure bills they exclude, then divide by the number of successful responses in the same period. Include billed retries and duplicate calls once, under the invoice that covers them.</p>
 </div>
 
 <h2>Quick Audit Checklist</h2>
