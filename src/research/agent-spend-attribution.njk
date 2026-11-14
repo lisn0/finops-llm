@@ -9,7 +9,7 @@
     "canonical": "https://finopsllm.com/research/agent-spend-attribution",
     "article": {
       "datePublished": "2026-05-21",
-      "dateModified": "2026-07-12"
+      "dateModified": "2026-11-14"
     },
     "faq": [
       {
@@ -56,9 +56,23 @@
 }
 ---
 {% extends "shell.njk" %}{% block body %}<h1>Agent spend attribution</h1>
-<p class="updated" style="color:#6B7689;font-size:14px;margin-top:-6px">Updated 12 July 2026 · first published 21 May 2026</p>
+<p class="updated" style="color:#6B7689;font-size:14px;margin-top:-6px">Updated 14 November 2026 · first published 21 May 2026</p>
 <p>Agentic workloads break most FinOps allocation models because a single user action explodes into a tree of planner calls, tool invocations, retrievals, retries, and a final synthesis. The invoice arrives as one large number from one provider, but the work was actually performed on behalf of dozens of features owned by different teams. Without attribution, the only available cost control is a blunt cap on total spend, which punishes everyone for the behavior of a few. With attribution, budget caps stop being throttles and start being accountability contracts between the engineers who ship agents and the finance team that funds them.</p>
 <p>This page is about the ownership side of agent cost. Guardrails matter, but a guardrail without an owner is just a tripwire. The harder problem is connecting every model token, every tool call, and every retry to a person, a product surface, and a budget line that someone has agreed to defend.</p>
+<h2>Worked example: reconcile one agent run across teams</h2>
+<p>In this illustrative support run, give each billed step a unique ID and the same parent run ID. Record the owning team separately from the customer and feature that triggered the run. Attribute each billed step once, including billed retries.</p>
+<table>
+<thead><tr><th scope="col">Step</th><th scope="col">Cost owner</th><th scope="col">Cost</th></tr></thead>
+<tbody>
+<tr><td>Planning model call</td><td>Agent platform</td><td>$0.02</td></tr>
+<tr><td>Search and retrieval</td><td>Search</td><td>$0.01</td></tr>
+<tr><td>Tool execution</td><td>Integrations</td><td>$0.04</td></tr>
+<tr><td>Billed tool retry</td><td>Integrations</td><td>$0.04</td></tr>
+<tr><td>Final model response</td><td>Agent platform</td><td>$0.03</td></tr>
+<tr><th scope="row">Run total</th><td></td><td>$0.14</td></tr>
+</tbody>
+</table>
+<p>The team view shows $0.05 for Agent platform, $0.01 for Search, and $0.08 for Integrations. The customer and feature views each show the same $0.14 run under their respective tags. Those views are different groupings of the same ledger. Keep an unallocated bucket for charges you cannot join, and reconcile the ledger and that bucket against each provider invoice before using the numbers for chargeback.</p>
 <h2>Why attribution is the harder half of the problem</h2>
 <p>Cost control in conventional cloud FinOps relies on tags. An EC2 instance carries an owner tag, a cost-center tag, and a product tag, and the showback report writes itself. Agent workloads inherit none of that hygiene automatically. The OpenAI or Anthropic invoice arrives with model names and token counts, not with the feature flag that decided to call the model, the team that owns that feature flag, or the customer whose request triggered the chain. The mapping has to be added by the application, at the moment of the call, or it is lost forever.</p>
 <p>The cost of skipping this work compounds. When finance asks why spend doubled in March, the engineering answer is usually a guess. When a single customer drives ten percent of total token volume on a fixed-price contract, no one notices until margin calls. When two teams ship agents that quietly share a downstream tool, the invoice attributes everything to the tool owner, not the consumers. Attribution is the foundation under every other FinOps motion: chargeback, showback, forecasting, unit-economics dashboards, and rational budget caps all depend on it.</p>

@@ -17,7 +17,7 @@
 import { createSign } from "node:crypto";
 import { readFileSync, readdirSync } from "node:fs";
 import { dirname, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { spawnSync } from "node:child_process";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -122,14 +122,15 @@ function expectedArticleTitle(url) {
 const locs = (xml) => [...xml.matchAll(/<loc>\s*([^<\s]+)\s*<\/loc>/g)].map((m) => m[1]);
 
 async function fetchSitemapUrls() {
-  const indexResponse = await fetch(SITEMAP_INDEX);
+  const indexResponse = await fetch(SITEMAP_INDEX, { signal: AbortSignal.timeout(20000) });
   if (!indexResponse.ok) fail(`GET ${SITEMAP_INDEX} -> HTTP ${indexResponse.status}`);
   const index = await indexResponse.text();
   const childMaps = locs(index);
   if (!childMaps.length) fail("Live sitemap index contains no child sitemaps.");
   const urls = new Set();
   for (const child of childMaps) {
-    const response = await fetch(child);
+    if (new URL(child).origin !== BASE) fail("Unexpected sitemap origin.");
+    const response = await fetch(child, { signal: AbortSignal.timeout(20000) });
     if (!response.ok) fail(`GET ${child} -> HTTP ${response.status}`);
     for (const loc of locs(await response.text())) urls.add(loc.replace(/\/$/, ""));
   }
@@ -188,11 +189,11 @@ function serviceAccount() {
 
 const b64u = (value) => Buffer.from(value).toString("base64url");
 
-async function googleAccessToken(account) {
+async function googleAccessToken(account, scope = "https://www.googleapis.com/auth/webmasters") {
   const now = Math.floor(Date.now() / 1000);
   const unsigned = `${b64u(JSON.stringify({ alg: "RS256", typ: "JWT" }))}.${b64u(JSON.stringify({
     iss: account.client_email,
-    scope: "https://www.googleapis.com/auth/webmasters",
+    scope,
     aud: "https://oauth2.googleapis.com/token",
     iat: now,
     exp: now + 3600,
@@ -200,6 +201,7 @@ async function googleAccessToken(account) {
   const signature = createSign("RSA-SHA256").update(unsigned).sign(account.private_key);
   const response = await fetch("https://oauth2.googleapis.com/token", {
     method: "POST",
+    signal: AbortSignal.timeout(20000),
     headers: { "content-type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams({
       grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
@@ -324,7 +326,11 @@ async function main() {
   if (!googleOkay || !bingSitemapOkay || !indexNowOkay) process.exitCode = 1;
 }
 
-main().catch((error) => {
-  process.stderr.write(`ERROR: ${error.message}\n`);
-  process.exitCode = 1;
-});
+export { BASE, GSC_SITE, fetchSitemapUrls, googleAccessToken, googleCall, serviceAccount };
+
+if (process.argv[1] && pathToFileURL(resolve(process.argv[1])).href === import.meta.url) {
+  main().catch((error) => {
+    process.stderr.write(`ERROR: ${error.message}\n`);
+    process.exitCode = 1;
+  });
+}

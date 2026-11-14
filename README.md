@@ -48,6 +48,21 @@ Single source of truth: the git repo. No manual CLI deployments.
 
 ## Post-publish search submission
 
+### On-demand search opportunities
+
+Run from the repository with the existing Search Console service account.
+The report reads final Web Search data with read-only access, compares two
+28-day windows, and joins the current live research sitemap with page metrics.
+It prints JSON. Optional URL arguments fetch Google’s last known index status.
+
+```sh
+npm run --silent report:search -- --locale de --limit 5 /de/research/claude-code-token-usage /research/agent-spend-attribution
+```
+
+`--end YYYY-MM-DD` reproduces an earlier window. Missing rows and current
+sitemap membership do not establish indexing or search demand. Review the
+query evidence before changing titles. Use URL inspection on selected pages.
+
 Publish one or more article JSON files, including every locale declared in each
 file, with one command:
 
