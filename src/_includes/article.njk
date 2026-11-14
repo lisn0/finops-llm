@@ -175,7 +175,7 @@ th{color:#E6EAF2;background:#101726}
       "name": {{ q.question | decodeEntities | dump | safe }},
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": {{ q.answer | decodeEntities | dump | safe }}
+        "text": {{ q.answer | striptags | decodeEntities | dump | safe }}
       }
     }{%- if not loop.last -%},{%- endif -%}
     {%- endfor -%}
@@ -234,7 +234,7 @@ A: {{ q.answer }}
 
 {%- if faqShown.length > 0 -%}
 <section class="faq" aria-labelledby="faq-heading" style="margin-top:48px;border-top:1px solid #1E2A3F;padding-top:28px"><h2 id="faq-heading">{{ ui.faq }}</h2>
-{%- for f in faqShown -%}<h3 style="margin:24px 0 6px;font-size:17px">{{ f.question | decodeEntities }}</h3><p>{{ f.answer | decodeEntities }}</p>{%- endfor -%}
+{%- for f in faqShown -%}<h3 style="margin:24px 0 6px;font-size:17px">{{ f.question | decodeEntities }}</h3><p>{{ f.answer | striptags | decodeEntities }}</p>{%- endfor -%}
 </section>
 {%- endif -%}
 
