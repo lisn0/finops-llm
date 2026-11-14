@@ -1,6 +1,14 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import thinPages from '../lib/thin-pages.js';
 import { validateArticle, matchesPublishedArticle } from './publish-articles.mjs';
+
+test('a heading alone does not hide the FAQ answer', () => {
+  const faq = [{ question: 'When does usage reset?', answer: 'After five hours.' }];
+  const heading = '<h2>When does usage reset?</h2>';
+  assert.deepEqual(thinPages.faqNotInBody(faq, heading + '<p>It resets later.</p>'), faq);
+  assert.deepEqual(thinPages.faqNotInBody(faq, heading + '<p>After <em>five hours.</em></p>'), []);
+});
 
 const fixture = () => ({
   slug: 'research/example-guide',

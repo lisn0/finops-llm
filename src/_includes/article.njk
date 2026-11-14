@@ -161,19 +161,21 @@ th{color:#E6EAF2;background:#101726}
 </style>
 <script type="application/ld+json">{{ jsonLdArticle | dump | safe }}</script>
 <script type="application/ld+json">{{ breadcrumb | dump | safe }}</script>
-{%- if locale.faq.length > 0 -%}
+{#- Use the same FAQ list for the structured data and the visible section. -#}
+{%- set faqShown = locale.faq | faqNotInBody(locale.body) -%}
+{%- if faqShown.length > 0 -%}
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "FAQPage",
   "mainEntity": [
-    {%- for q in locale.faq -%}
+    {%- for q in faqShown -%}
     {
       "@type": "Question",
-      "name": {{ q.question | dump | safe }},
+      "name": {{ q.question | decodeEntities | dump | safe }},
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": {{ q.answer | dump | safe }}
+        "text": {{ q.answer | decodeEntities | dump | safe }}
       }
     }{%- if not loop.last -%},{%- endif -%}
     {%- endfor -%}
@@ -230,10 +232,6 @@ A: {{ q.answer }}
 
 {{ locale.body | safe }}
 
-{#- FAQPage JSON-LD above is only valid if its Q&A is visible on the page. Render
-    the questions the body does not already show, from the same data, so the
-    markup and the visible text cannot drift apart. -#}
-{%- set faqShown = locale.faq | faqNotInBody(locale.body) -%}
 {%- if faqShown.length > 0 -%}
 <section class="faq" aria-labelledby="faq-heading" style="margin-top:48px;border-top:1px solid #1E2A3F;padding-top:28px"><h2 id="faq-heading">{{ ui.faq }}</h2>
 {%- for f in faqShown -%}<h3 style="margin:24px 0 6px;font-size:17px">{{ f.question | decodeEntities }}</h3><p>{{ f.answer | decodeEntities }}</p>{%- endfor -%}
