@@ -34,7 +34,7 @@
     textWhite: '#FFFFFF',
     textMain: '#E6EAF2',
     textMuted: '#8C98AC',
-    textDim: '#647289',
+    textDim: '#8C98AC',
     
     // Core Data Series
     savingsMint: '#4ADE80',

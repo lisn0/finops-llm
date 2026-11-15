@@ -226,6 +226,39 @@ module.exports = function (eleventyConfig) {
     return content.slice(0, start) + main + content.slice(end);
   });
 
+  // Wide tables scroll inside a focusable, labelled region instead of the table
+  // itself becoming display:block (which strips its table semantics). Done on the
+  // built page so JSON-body articles and hand-written templates share one rule.
+  // The label is the table's own <caption> when present, else the nearest heading.
+  eleventyConfig.addTransform("tableScroll", function (content) {
+    if (!this.page.outputPath?.endsWith(".html")) return content;
+    const start = content.indexOf("<main");
+    const end = content.lastIndexOf("</main>");
+    if (start < 0 || end < 0) return content;
+    const strip = (h) => h.replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim();
+    const esc = (t) => t.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
+    const main = content.slice(start, end);
+    let last = 0;
+    let out = "";
+    const re = /<table\b[\s\S]*?<\/table>/g;
+    let m;
+    while ((m = re.exec(main))) {
+      const before = main.slice(0, m.index);
+      if (/<div class="table-scroll"[^>]*>\s*$/.test(before)) continue;
+      const cap = /<caption[^>]*>([\s\S]*?)<\/caption>/.exec(m[0]);
+      let label = cap ? strip(cap[1]) : "";
+      if (!label) {
+        const heads = [...before.matchAll(/<h[1-6][^>]*>([\s\S]*?)<\/h[1-6]>/g)];
+        if (heads.length) label = strip(heads[heads.length - 1][1]);
+      }
+      out += main.slice(last, m.index) +
+        `<div class="table-scroll" tabindex="0" role="region" aria-label="${esc(label || "Table")}">${m[0]}</div>`;
+      last = m.index + m[0].length;
+    }
+    if (!last) return content;
+    return content.slice(0, start) + out + main.slice(last) + content.slice(end);
+  });
+
   // Utility pages (about, terms, tools…) ship no schema and no date, so an AI
   // answer engine has nothing to attribute and cites them without a link, if at
   // all. Inject a WebPage node wherever the page carries no dateModified —
