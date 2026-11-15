@@ -3960,7 +3960,8 @@
     if (document.getElementById('finops-a11y-style')) return;
     const st = document.createElement('style');
     st.id = 'finops-a11y-style';
-    st.textContent = '.finops-a11y-sampling,.finops-a11y-sampling *{transition:none!important}' +
+    st.textContent = '@media (prefers-reduced-motion: reduce){.finops-chart-card *{transition:none!important;animation:none!important}}' +
+      '.finops-a11y-sampling,.finops-a11y-sampling *{transition:none!important}' +
       '.finops-stage.finops-a11y-focus{outline:2px solid ' + BRAND.crosshair + ';outline-offset:4px;border-radius:6px}';
     document.head.appendChild(st);
   }

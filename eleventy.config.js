@@ -251,8 +251,21 @@ module.exports = function (eleventyConfig) {
         const heads = [...before.matchAll(/<h[1-6][^>]*>([\s\S]*?)<\/h[1-6]>/g)];
         if (heads.length) label = strip(heads[heads.length - 1][1]);
       }
+      // Header scope: first row (or thead) cells are column headers; leading
+      // <th> in body rows are row headers. Only when no scope exists already.
+      const addScope = (html, scope) =>
+        html.replace(/<th\b([^>]*)>/g, (t, a) => (/\bscope\s*=/.test(a) ? t : `<th${a} scope="${scope}">`));
+      let tbl = m[0];
+      const thead = /<thead\b[\s\S]*?<\/thead>/.exec(tbl);
+      if (thead) {
+        tbl = tbl.replace(thead[0], addScope(thead[0], "col"));
+      } else {
+        tbl = tbl.replace(/<tr\b[\s\S]*?<\/tr>/, (r) => addScope(r, "col"));
+      }
+      tbl = tbl.replace(/(<tr\b[^>]*>\s*)(<th\b[^>]*>)/g, (t, tr, th) =>
+        /\bscope\s*=/.test(th) ? t : `${tr}${th.slice(0, -1)} scope="row">`);
       out += main.slice(last, m.index) +
-        `<div class="table-scroll" tabindex="0" role="region" aria-label="${esc(label || "Table")}">${m[0]}</div>`;
+        `<div class="table-scroll" tabindex="0" role="region" aria-label="${esc(label || "Table")}">${tbl}</div>`;
       last = m.index + m[0].length;
     }
     if (!last) return content;
