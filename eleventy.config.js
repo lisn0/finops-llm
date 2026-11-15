@@ -175,7 +175,7 @@ const generatedLd = (head, url) => {
       url: head.canonical,
       mainEntityOfPage: { "@type": "WebPage", "@id": head.canonical },
       inLanguage: lang,
-      image: SITE_URL + "/og.png",
+      image: head.image || SITE_URL + "/og.png",
     },
     {
       "@context": "https://schema.org",
