@@ -86,26 +86,26 @@
     
     <div class="input-group">
       <label for="inputTokens">Input tokens per request</label>
-      <input type="number" id="inputTokens" value="4000" min="0">
-      <span class="hint">System prompt + user message</span>
+      <input type="number" id="inputTokens" value="4000" min="0" aria-describedby="inputTokens-hint">
+      <span class="hint" id="inputTokens-hint">System prompt + user message</span>
     </div>
     
     <div class="input-group">
       <label for="outputTokens">Output tokens per request</label>
-      <input type="number" id="outputTokens" value="500" min="0">
-      <span class="hint">Expected response length</span>
+      <input type="number" id="outputTokens" value="500" min="0" aria-describedby="outputTokens-hint">
+      <span class="hint" id="outputTokens-hint">Expected response length</span>
     </div>
     
     <div class="input-group">
       <label for="requestsPerDay">Requests per day</label>
-      <input type="number" id="requestsPerDay" value="1000" min="1">
-      <span class="hint">Daily volume</span>
+      <input type="number" id="requestsPerDay" value="1000" min="1" aria-describedby="requestsPerDay-hint">
+      <span class="hint" id="requestsPerDay-hint">Daily volume</span>
     </div>
     
     <div class="input-group">
       <label for="cacheHitRate">Cache hit rate (%)</label>
-      <input type="number" id="cacheHitRate" value="0" min="0" max="100">
-      <span class="hint">0 = no caching, 70 = aggressive caching</span>
+      <input type="number" id="cacheHitRate" value="0" min="0" max="100" aria-describedby="cacheHitRate-hint">
+      <span class="hint" id="cacheHitRate-hint">0 = no caching, 70 = aggressive caching</span>
     </div>
   </div>
   
@@ -129,7 +129,7 @@
       </table>
     </div>
     
-    <div class="summary" id="summary">
+    <div class="summary" id="summary" role="status">
       <!-- Populated by JS -->
     </div>
   </div>
@@ -391,12 +391,16 @@ function calculateCosts() {
   const savings = worst.monthlyCost - best.monthlyCost;
   const cacheSaving = costOf(best, inputTokens, outputTokens, 0) * requestsPerDay * 30 - best.monthlyCost;
 
-  summary.innerHTML = `
+  // Summary is rewritten on every keystroke; debounce the write so the live region is not spammed.
+  clearTimeout(summary._renderTimer);
+  summary._renderTimer = setTimeout(() => {
+    summary.innerHTML = `
     <strong>Best option:</strong> ${best.name} (${best.provider}) at $${best.monthlyCost.toFixed(0)}/month.<br>
     <strong>Worst option:</strong> ${worst.name} (${worst.provider}) at $${worst.monthlyCost.toFixed(0)}/month.<br>
     <strong>Spread:</strong> $${savings.toFixed(0)}/month (${((worst.monthlyCost / best.monthlyCost - 1) * 100).toFixed(0)}% more expensive).<br><br>
     <strong>With ${cacheHitRate}% caching:</strong> You save $${cacheSaving.toFixed(0)}/month vs no caching on the best model.
   `;
+  }, 500);
 }
 
 // Attach listeners
