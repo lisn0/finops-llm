@@ -31,6 +31,10 @@ main.wrap .agent-summary{margin-top:28px}
 .badge-row li,.method-card,.scenario-card,.guide-section{background:#fff;border-color:var(--editorial-line);border-radius:2px;color:var(--editorial-muted)}
 .method-card h3,.scenario-card h3,.guide-section h3{color:var(--editorial-ink)}
 main.wrap table{display:block;max-width:100%;overflow-x:auto;font-variant-numeric:tabular-nums}
+/* Reserve space for charts until finops-charts.js renders the card (CLS). Measured card = ~230px chrome + the 740-wide viewBox scaled to the stage width (column - 42px); text wrapping keeps narrow cards near the floor. Margins match the card's 24px. */
+main.wrap [data-finops-chart]:not(:has(.finops-chart-card)){display:block;margin:24px 0;min-height:max(470px,calc(235px + .332*(min(100vw - 80px,1100px) - 42px)))}
+main.wrap [data-finops-chart="line-compare"]:not(:has(.finops-chart-card)){min-height:max(540px,calc(229px + .372*(min(100vw - 80px,1100px) - 42px)))}
+main.wrap [data-finops-chart="bar-compare"]:not(:has(.finops-chart-card)){min-height:max(430px,calc(185px + .3*(min(100vw - 80px,1100px) - 42px)))}
 main.wrap th,main.wrap td{border-color:var(--editorial-line);color:var(--editorial-muted)}
 main.wrap th{background:#E4ECFB;color:var(--editorial-ink)}
 main.wrap pre,main.wrap code{background:#EAF0F8;border-color:var(--editorial-line);color:var(--editorial-ink)}

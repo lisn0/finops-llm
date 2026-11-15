@@ -2951,7 +2951,7 @@
         <circle id="wf-h-cch" cx="0" cy="0" r="9" fill="rgba(74, 222, 128, 0.25)" />
         <circle id="wf-d-cch" cx="0" cy="0" r="5" fill="${BRAND.savingsMint}" stroke="#FFFFFF" stroke-width="2" />
       </g>
-      <rect id="wf-hitbox" x="${padding.left}" y="${padding.top}" width="${chartW}" height="${chartH}" fill="transparent" style="cursor:crosshair;" />
+      <rect id="wf-hitbox" x="${padding.left}" y="${padding.top}" width="${chartW}" height="${chartH}" fill="transparent" style="cursor:crosshair;" data-steps="${turns.length}" />
     `;
 
     stage.innerHTML = `<svg id="wf-svg" viewBox="0 0 ${width} ${height}" style="width:100%;height:auto;overflow:visible;user-select:none;">${svg}</svg>`;
@@ -3936,6 +3936,154 @@
     });
   }
 
+  // ==========================================
+  // ACCESSIBILITY LAYER (runs after every chart render)
+  // The SVG becomes role="img" with a summary label. Values that were only shown
+  // on hover are exposed two ways: a visually hidden data table, and visually
+  // hidden focusable controls (buttons for discrete marks, a range input for
+  // continuous charts) that drive the same readout deck on focus. The visible
+  // chart is unchanged; focus is shown by an outline around the chart stage.
+  // ==========================================
+  const A11Y_DISCRETE = '[data-gb-group], div[data-donut], [data-delta], .pf-node, .cf-stage-group, .me-cohort-row, .bc-row';
+  const A11Y_SCRUB = '#be-hitbox, #wf-hitbox, #ttl-hitbox, .lc-hitbox';
+  const SR_ONLY = 'position:absolute;width:1px;height:1px;margin:-1px;padding:0;border:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap;';
+
+  function a11yText(el) {
+    return el ? (el.textContent || '').replace(/\s+/g, ' ').replace(/\s*\|\s*/g, '; ').trim() : '';
+  }
+
+  function a11yFire(el, type, x, y) {
+    el.dispatchEvent(new MouseEvent(type, { bubbles: false, cancelable: true, clientX: x || 0, clientY: y || 0 }));
+  }
+
+  function a11yStyle() {
+    if (document.getElementById('finops-a11y-style')) return;
+    const st = document.createElement('style');
+    st.id = 'finops-a11y-style';
+    st.textContent = '.finops-a11y-sampling,.finops-a11y-sampling *{transition:none!important}' +
+      '.finops-stage.finops-a11y-focus{outline:2px solid ' + BRAND.crosshair + ';outline-offset:4px;border-radius:6px}';
+    document.head.appendChild(st);
+  }
+
+  function enhanceChart(container) {
+    const card = container && container.querySelector ? container.querySelector('.finops-chart-card') : null;
+    if (!card || card.hasAttribute('data-finops-a11y')) return;
+    const stage = card.querySelector('.finops-stage');
+    const svg = stage && stage.querySelector('svg');
+    const main = card.querySelector('.readout-main');
+    const delta = card.querySelector('.readout-delta');
+    if (!svg || !main || !delta) return;
+    card.setAttribute('data-finops-a11y', '');
+    a11yStyle();
+
+    const title = a11yText(card.querySelector('h3'));
+    const defaultDelta = a11yText(delta);
+    svg.setAttribute('role', 'img');
+    svg.setAttribute('aria-label', [title, a11yText(card.querySelector('.finops-readout'))].filter(Boolean).join('. '));
+
+    // Current readout as [label, values, note]
+    const readRow = () => {
+      const head = a11yText(main.firstElementChild);
+      const full = a11yText(main);
+      const rest = head && full.indexOf(head) === 0 ? full.slice(head.length).trim() : full;
+      const note = a11yText(delta);
+      return [head, rest, note === defaultDelta ? '' : note];
+    };
+    const rowText = (r) => r.filter(Boolean).join('. ');
+    // Read values without a visible flash: transitions off, state restored before paint.
+    const sample = (fn) => {
+      card.classList.add('finops-a11y-sampling');
+      try { fn(); } finally { void card.offsetWidth; card.classList.remove('finops-a11y-sampling'); }
+    };
+
+    const rows = [];
+    const controls = document.createElement('div');
+    controls.setAttribute('role', 'group');
+    if (title) controls.setAttribute('aria-label', title);
+    controls.style.cssText = SR_ONLY;
+    const onFocus = () => stage.classList.add('finops-a11y-focus');
+    const onBlur = () => stage.classList.remove('finops-a11y-focus');
+
+    const hits = Array.from(stage.querySelectorAll(A11Y_DISCRETE));
+    const scrub = stage.querySelector(A11Y_SCRUB);
+
+    if (hits.length) {
+      hits.forEach(hit => {
+        let row = null;
+        sample(() => { a11yFire(hit, 'mouseenter'); row = readRow(); a11yFire(hit, 'mouseleave'); });
+        rows.push(row);
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.textContent = rowText(row);
+        btn.addEventListener('focus', () => { onFocus(); a11yFire(hit, 'mouseenter'); });
+        btn.addEventListener('blur', () => { onBlur(); a11yFire(hit, 'mouseleave'); });
+        controls.appendChild(btn);
+      });
+    } else if (scrub) {
+      const steps = Math.max(2, parseInt(scrub.getAttribute('data-steps'), 10) || 11);
+      const moveTo = (frac) => {
+        const r = scrub.getBoundingClientRect();
+        if (!r.width) return false;
+        a11yFire(scrub, 'mousemove', r.left + Math.max(0, Math.min(1, frac)) * r.width, r.top + r.height / 2);
+        return true;
+      };
+      sample(() => {
+        const seen = {};
+        for (let k = 0; k < steps; k++) {
+          if (!moveTo(k / (steps - 1))) break;
+          const row = readRow();
+          const key = row.join('\u0000');
+          if (!seen[key]) { seen[key] = true; rows.push(row); }
+        }
+        a11yFire(scrub, 'mouseleave');
+      });
+      const range = document.createElement('input');
+      range.type = 'range';
+      range.min = '0'; range.max = '100'; range.step = '1'; range.value = '0';
+      if (title) range.setAttribute('aria-label', title);
+      const update = () => {
+        if (moveTo(Number(range.value) / 100)) range.setAttribute('aria-valuetext', rowText(readRow()));
+      };
+      range.addEventListener('focus', () => { onFocus(); update(); });
+      range.addEventListener('input', update);
+      range.addEventListener('blur', () => { onBlur(); a11yFire(scrub, 'mouseleave'); });
+      controls.appendChild(range);
+    }
+
+    if (controls.childNodes.length) stage.insertAdjacentElement('afterend', controls);
+
+    if (rows.length) {
+      const table = document.createElement('table');
+      table.style.cssText = SR_ONLY;
+      const caption = document.createElement('caption');
+      caption.textContent = title;
+      table.appendChild(caption);
+      const tbody = document.createElement('tbody');
+      rows.forEach(r => {
+        const tr = document.createElement('tr');
+        const th = document.createElement('th');
+        th.scope = 'row';
+        th.textContent = r[0];
+        tr.appendChild(th);
+        const td = document.createElement('td');
+        td.textContent = r[1];
+        tr.appendChild(td);
+        if (r[2]) { const tn = document.createElement('td'); tn.textContent = r[2]; tr.appendChild(tn); }
+        tbody.appendChild(tr);
+      });
+      table.appendChild(tbody);
+      card.appendChild(table);
+    }
+  }
+
+  function withA11y(fn) {
+    return function (target, options) {
+      const out = fn(target, options);
+      try { enhanceChart(getTarget(target)); } catch (err) { console.error('FinOpsCharts: accessibility layer failed', err); }
+      return out;
+    };
+  }
+
   // Auto-init for data-finops-chart attributes
   function initAll() {
     if (typeof document === 'undefined') return;
@@ -3967,6 +4115,7 @@
       else if (type === 'ttl-decay' || type === 'ttlDecay') ttlDecay(el, config);
       else if (type === 'line-compare' || type === 'lineCompare') lineCompare(el, config);
       else if (type === 'bar-compare' || type === 'barCompare') barCompare(el, config);
+      try { enhanceChart(el); } catch (err) { console.error('FinOpsCharts: accessibility layer failed', err); }
     });
   }
 
@@ -3983,17 +4132,17 @@
     I18N,
     resolveLang,
     resolveText,
-    groupedBar,
-    breakEven,
-    tokenDonut,
-    horizontalDelta,
-    waterfall,
-    paretoFrontier,
-    cascadeFunnel,
-    marginErosion,
-    ttlDecay,
-    lineCompare,
-    barCompare,
+    groupedBar: withA11y(groupedBar),
+    breakEven: withA11y(breakEven),
+    tokenDonut: withA11y(tokenDonut),
+    horizontalDelta: withA11y(horizontalDelta),
+    waterfall: withA11y(waterfall),
+    paretoFrontier: withA11y(paretoFrontier),
+    cascadeFunnel: withA11y(cascadeFunnel),
+    marginErosion: withA11y(marginErosion),
+    ttlDecay: withA11y(ttlDecay),
+    lineCompare: withA11y(lineCompare),
+    barCompare: withA11y(barCompare),
     initAll
   };
 });
