@@ -15,7 +15,7 @@ const site = path.join(ROOT, "_site");
 const ORIGIN = "https://finopsllm.com";
 const LANGS = require("../src/_data/langs.js");
 const NON_EN = LANGS.filter((l) => l !== "en");
-const { THIN_WORDS, isThin, visibleWords, shortTranslations, formatShortTranslations } = require("../lib/thin-pages.js");
+const { THIN_WORDS, isThin, isShortTranslation, visibleWords, shortTranslations, formatShortTranslations } = require("../lib/thin-pages.js");
 
 if (!fs.existsSync(site)) {
   console.error("[check-seo] _site does not exist; run the build first.");
@@ -419,7 +419,7 @@ for (const ap of articlePages) {
   const ruleThin = isThin(ap.lang, locale, article);
   const pageWords = renderedWords(ap.lang, text);
   maxDrift = Math.max(maxDrift, Math.abs(pageWords - ruleWords));
-  const pageThin = pageWords < THIN_WORDS;
+  const pageThin = pageWords < THIN_WORDS || isShortTranslation(ap.lang, locale, article);
   if (ruleThin !== pageThin) fail("thin", where, `thin rule says ${ruleThin ? "thin" : "not thin"} (${ruleWords} words) but the built page has ${pageWords} words of main text (${pageThin ? "thin" : "not thin"}; threshold ${THIN_WORDS})`);
   if (ruleThin !== pg.noindex) fail("thin", where, `thin rule says ${ruleThin ? "thin" : "not thin"} but the page is ${pg.noindex ? "" : "not "}noindex`);
 }
